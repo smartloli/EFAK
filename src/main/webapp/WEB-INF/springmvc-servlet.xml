@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 注意下面不要忘记导入mvc、context的schema -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="    
+   http://www.springframework.org/schema/beans    
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd    
+   http://www.springframework.org/schema/mvc    
+   http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd    
+   http://www.springframework.org/schema/context    
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- 把标记了@Controller注解的类转换为bean -->
+	<context:component-scan base-package="com.webank.cms" />
+	<!-- 开启注解 第一个是处理注解类、第二个是处理方法 -->
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"></bean>
+	<!-- HandlerMapping -->
+	<bean
+		class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
+	
+	<!--配置拦截器, 多个拦截器,顺序执行 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:mapping path="/" />
+			<bean class="com.webank.cms.aop.AccountInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<!-- HandlerAdapter -->
+	<bean
+		class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="10485760" />
+	</bean>
+
+	<mvc:annotation-driven />
+	<mvc:resources mapping="/media/**" location="/WEB-INF/media/" />
+
+	<!-- ViewResolver -->
+	<!-- 过滤掉.jsp的后缀，在指定目录下新建页面 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+</beans> 
