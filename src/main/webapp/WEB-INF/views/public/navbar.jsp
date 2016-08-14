@@ -2,56 +2,40 @@
 	pageEncoding="UTF-8"%>
 
 <!-- Navigation -->
-<nav class="navbar navbar-default navbar-static-top" role="navigation"
-	style="margin-bottom: 0">
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<!-- Brand and toggle get grouped for better mobile display -->
 	<div class="navbar-header">
 		<button type="button" class="navbar-toggle" data-toggle="collapse"
-			data-target=".navbar-collapse">
+			data-target=".navbar-ex1-collapse">
 			<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
 			<span class="icon-bar"></span> <span class="icon-bar"></span>
 		</button>
-		<a class="navbar-brand" href="/cms">CMS v1.0</a>
+		<a class="navbar-brand" href="index.html">Kafka Eagle</a>
 	</div>
-	<!-- /.navbar-header -->
-
-	<ul class="nav navbar-top-links navbar-right">
-		<!-- /.dropdown -->
-		<li class="dropdown"><a class="dropdown-toggle"
-			data-toggle="dropdown" href="#"> <i class="fa fa-user fa-fw"></i>
-				<i class="fa fa-caret-down"></i>
-		</a>
-			<ul class="dropdown-menu dropdown-user">
-				<li><a href="#"><i class="fa fa-user fa-fw"></i>
-						${user.username}</a><a id="username" style="display: none">${user.username}</a></li>
-				<li><a href="#"><i class="fa fa-gear fa-fw"></i> 设置</a></li>
-				<li class="divider"></li>
-				<li><a href="/cms/signout"><i class="fa fa-sign-out fa-fw"></i>
-						注销</a></li>
-			</ul> <!-- /.dropdown-user --></li>
-		<!-- /.dropdown -->
+	<!-- Top Menu Items -->
+	<ul class="nav navbar-right top-nav">
+		<li class="dropdown"><a href="#" class="dropdown-toggle"
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.0.0 </a></li>
 	</ul>
-	<!-- /.navbar-top-links -->
-
-	<div class="navbar-default sidebar" role="navigation">
-		<div class="sidebar-nav navbar-collapse">
-			<ul class="nav" id="side-menu">
-				<li><a href="/cms"><i class="fa fa-dashboard fa-fw"></i> 面板</a></li>
-				<li><a href="/cms/article"><i class="fa fa-wrench fa-fw"></i>
-						咨询管理</a></li>
-				<li><a href="/cms/article/add"><i class="fa fa-edit fa-fw"></i>
-						咨询添加</a></li>
-				<li><a href="/cms/chanle"><i class="fa fa-tags fa-fw"></i>
-						频道管理</a></li>
-				<li><a href="#"><i class="fa fa-comments-o fa-fw"></i> 常见问题<span
-						class="fa arrow"></span></a>
-					<ul class="nav nav-second-level">
-						<li><a href="#"><i class="fa fa-qq fa-fw"></i> 微众银行 App</a></li>
-						<li><a href="#"><i class="fa fa-yen fa-fw"></i> 微粒贷</a></li>
-						<li><a href="#"><i class="fa fa-car fa-fw"></i> 微车贷</a></li>
-					</ul> <!-- /.nav-second-level --></li>
-			</ul>
-		</div>
-		<!-- /.sidebar-collapse -->
+	<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+	<div class="collapse navbar-collapse navbar-ex1-collapse">
+		<ul class="nav navbar-nav side-nav">
+			<li id="navbar_dash"><a href="/ke"><i
+					class="fa fa-fw fa-dashboard"></i> Dashboard</a></li>
+			<li><a href="#" data-toggle="collapse" data-target="#demo"><i
+					class="fa fa-fw fa-comments-o"></i> Topic <i
+					class="fa fa-fw fa-caret-down"></i></a>
+				<ul id="demo" class="collapse">
+					<li id="navbar_create"><a href="/ke/topic/create"><i
+							class="fa fa-plus-square-o fa-fw"></i> Create</a></li>
+					<li id="navbar_list"><a href="/ke/topic/list"><i
+							class="fa fa-table fa-fw"></i> List</a></li>
+				</ul></li>
+			<li id="navbar_consumers"><a href="/ke/consumers"><i
+					class="fa fa-fw fa-users"></i> Consumers</a></li>
+			<li id="navbar_cluster"><a href="/ke/cluster"><i
+					class="fa fa-fw fa-cloud"></i> Cluster Info</a></li>
+		</ul>
 	</div>
-	<!-- /.navbar-static-side -->
+	<!-- /.navbar-collapse -->
 </nav>

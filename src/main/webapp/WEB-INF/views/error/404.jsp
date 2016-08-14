@@ -1,26 +1,38 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<html>
+<!DOCTYPE html>
+<html lang="zh">
 
 <head>
-<title>404</title>
+<title>404 - KafkaEagle</title>
 <jsp:include page="../public/css.jsp"></jsp:include>
-<jsp:include page="../public/script.jsp"></jsp:include>
 </head>
-
-<body>
-	<div class="container">
-		<form class="form-signin">
-			<h1 class="form-signin-heading">404...</h1>
-			<br />
-			<h1 class="form-signin-heading">异常啦~~</h1>
-			<br />
-			<a class="btn btn-large btn-primary" href="/cms"> <span
-				class="ui-button-text">返回首页</span>
-			</a>
-		</form>
+<div class="container">
+	<div class="row">
+		<div class="col-md-4 col-md-offset-4">
+			<div class="login-panel panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">404...</h3>
+				</div>
+				<div class="panel-body">
+					<form role="form">
+						<fieldset>
+							<h1 class="form-signin-heading">异常啦~~</h1>
+							<!-- Change this to a button or input when using this as a form -->
+							<a href="/ke" id="submit" class="btn btn-lg btn-primary btn-block">返回首页</a>
+						</fieldset>
+					</form>
+				</div>
+			</div>
+		</div>
 	</div>
+</div>
+<body>
+
 </body>
+<jsp:include page="../public/script.jsp">
+	<jsp:param value="main/404.js" name="loader" />
+</jsp:include>
+</html>

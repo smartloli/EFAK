@@ -13,10 +13,27 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<title>面板 - 微众银行</title>
+<title>Dashboard - KafkaEagle</title>
 <jsp:include page="../public/css.jsp"></jsp:include>
 </head>
+<style type="text/css">
+.node circle {
+	cursor: pointer;
+	fill: #fff;
+	stroke: steelblue;
+	stroke-width: 1.5px;
+}
 
+.node text {
+	font-size: 14px;
+}
+
+path.link {
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 1.5px;
+}
+</style>
 <body>
 	<jsp:include page="../public/navbar.jsp"></jsp:include>
 	<div id="wrapper">
@@ -24,7 +41,7 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">
-						面板 <small>统计概述</small>
+						Dashboard <small>overview</small>
 					</h1>
 				</div>
 				<!-- /.col-lg-12 -->
@@ -35,8 +52,14 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>面板统计新闻变动详情！</strong>
-						你可以访问 <a href="#" class="alert-link">WeBank 官网</a> 查看新闻详情。
+						<i class="fa fa-info-circle"></i> <strong>Dashboard
+							display topic Kafka related information and Kafka cluster
+							information as well as Zookeeper cluster information</strong> If you don't
+						know the usage of Kafka and Zookeeper, you can visit the website
+						of <a href="http://kafka.apache.org/" target="_blank"
+							class="alert-link">Kafka</a> and <a
+							href="http://zookeeper.apache.org/" target="_blank"
+							class="alert-link">Zookeeper</a> to view the relevant usage.
 					</div>
 				</div>
 			</div>
@@ -47,18 +70,18 @@
 						<div class="panel-heading">
 							<div class="row">
 								<div class="col-xs-3">
-									<i class="fa fa-file fa-5x"></i>
+									<i class="fa fa-tasks fa-5x"></i>
 								</div>
 								<div class="col-xs-9 text-right">
-									<div id="release_count" class="huge">0</div>
-									<div>发布</div>
+									<div id="brokers_count" class="huge">0</div>
+									<div>Brokers</div>
 								</div>
 							</div>
 						</div>
-						<a href="#">
+						<a href="/ke/cluster">
 							<div class="panel-footer">
-								<span class="pull-left">详情</span> <span class="pull-right"><i
-									class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">View Details</span> <span
+									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
@@ -69,62 +92,62 @@
 						<div class="panel-heading">
 							<div class="row">
 								<div class="col-xs-3">
-									<i class="fa fa-plus-square-o fa-5x"></i>
+									<i class="fa fa-comment-o fa-5x"></i>
 								</div>
 								<div class="col-xs-9 text-right">
-									<div id="add_count" class="huge">0</div>
-									<div>添加</div>
+									<div id="topics_count" class="huge">0</div>
+									<div>Topics</div>
 								</div>
 							</div>
 						</div>
 						<a href="#">
 							<div class="panel-footer">
-								<span class="pull-left">详情</span> <span class="pull-right"><i
-									class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">View Details</span> <span
+									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
-					<div class="panel panel-yellow">
+					<div class="panel panel-info">
 						<div class="panel-heading">
 							<div class="row">
 								<div class="col-xs-3">
-									<i class="fa fa-edit fa-5x"></i>
+									<i class="fa fa-sitemap fa-5x"></i>
 								</div>
 								<div class="col-xs-9 text-right">
-									<div id="unrelease_count" class="huge">0</div>
-									<div>未发布</div>
+									<div id="zks_count" class="huge">0</div>
+									<div>Zookeepers</div>
 								</div>
 							</div>
 						</div>
-						<a href="#">
+						<a href="/ke/cluster">
 							<div class="panel-footer">
-								<span class="pull-left">详情</span> <span class="pull-right"><i
-									class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">View Details</span> <span
+									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
-					<div class="panel panel-red">
+					<div class="panel panel-default">
 						<div class="panel-heading">
 							<div class="row">
 								<div class="col-xs-3">
-									<i class="fa fa-remove fa-5x"></i>
+									<i class="fa fa-users fa-5x"></i>
 								</div>
 								<div class="col-xs-9 text-right">
-									<div id="del_count" class="huge">0</div>
-									<div>删除</div>
+									<div id="consumers_count" class="huge">0</div>
+									<div>Consumers</div>
 								</div>
 							</div>
 						</div>
 						<a href="#">
 							<div class="panel-footer">
-								<span class="pull-left">详情</span> <span class="pull-right"><i
-									class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">View Details</span> <span
+									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
@@ -132,28 +155,30 @@
 				</div>
 			</div>
 			<!-- /.row -->
-			<!-- <div class="row">
+			<div class="row">
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-bar-chart-o fa-fw"></i> 文章状态趋势
+							<i class="fa fa-tasks fa-fw"></i> Kafka Brokers
 							<div class="pull-right"></div>
 						</div>
-						/.panel-heading
+						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="morris-area-chart"></div>
+							<div id="kafka_brokers"></div>
 						</div>
-						/.panel-body
+						<!-- /.panel-body -->
 					</div>
 				</div>
-				/.col-lg-4
-			</div> -->
+				<!-- /.col-lg-4 -->
+			</div>
 			<!-- /.row -->
 		</div>
 		<!-- /#page-wrapper -->
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
+	<jsp:param value="plugins/d3/d3.js" name="loader" />
+	<jsp:param value="plugins/d3/d3.layout.js" name="loader" />
 	<jsp:param value="main/index.js" name="loader" />
 </jsp:include>
 </html>
