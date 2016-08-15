@@ -10,6 +10,7 @@ import org.I0Itec.zkclient.ZkClient;
 
 import kafka.cluster.Broker;
 import kafka.common.TopicAndPartition;
+import kafka.consumer.ConsumerThreadId;
 import kafka.utils.ZkUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -22,6 +23,7 @@ import com.google.gson.JsonParser;
 import com.smartloli.kafka.eagle.domain.PartitionsDomain;
 import com.smartloli.kafka.eagle.domain.TopicDomain;
 
+import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.collection.Set;
 
@@ -38,11 +40,41 @@ public class KafkaClusterUtils {
 	private static ZkClient zkc = null;
 
 	public static void main(String[] args) {
-		System.out.println(getAllBrokersInfo());
+//		 System.out.println(getAllBrokersInfo());
+		System.out.println(getActiveTopic());
 	}
 
 	public static String getConsumers() {
 		return "";
+	}
+
+	public static String getActiveTopic() {
+		if (zkc == null) {
+			zkc = zkPool.getZkClientSerializer();
+		}
+		Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.ConsumersPath());
+		String ret = new Gson().toJson(seq);
+		JsonObject json = (JsonObject) new JsonParser().parse(ret);
+		String tmp = json.get("underlying").toString().replace("[", "");
+		String[] str = tmp.replace("]", "").split(",");
+		JSONArray arr = new JSONArray();
+		for (String group : str) {
+			scala.collection.mutable.Map<String, scala.collection.immutable.List<ConsumerThreadId>> map = ZkUtils.getConsumersPerTopic(zkc, group.replaceAll("\"", ""), true);
+			for (Entry<String, ?> entry : JavaConversions.mapAsJavaMap(map).entrySet()) {
+				JSONObject obj = new JSONObject();
+				obj.put("topic", entry.getKey());
+				obj.put("group", group.replaceAll("\"", ""));
+				arr.add(obj);
+			}
+		}
+		for(Object object : arr){
+			JSONObject obj = (JSONObject) object;
+		}
+		if (zkc != null) {
+			zkPool.releaseZKSerializer(zkc);
+			zkc = null;
+		}
+		return arr.toJSONString();
 	}
 
 	/**

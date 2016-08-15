@@ -16,7 +16,24 @@
 <title>Consumers - KafkaEagle</title>
 <jsp:include page="../public/css.jsp"></jsp:include>
 </head>
+<style type="text/css">
+.node circle {
+	cursor: pointer;
+	fill: #fff;
+	stroke: steelblue;
+	stroke-width: 1.5px;
+}
 
+.node text {
+	font-size: 14px;
+}
+
+path.link {
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 1.5px;
+}
+</style>
 <body>
 	<jsp:include page="../public/navbar.jsp"></jsp:include>
 	<div id="wrapper">
@@ -45,15 +62,32 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-tasks fa-fw"></i> Consumers Info
+							<i class="fa fa-user fa-fw"></i> Consumers Info
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
 							<div id="kafka_cluster_info">
-								<table id="kafka_tab" class="table table-bordered table-hover">
+								<table id="result" class="table table-bordered table-hover">
 								</table>
 							</div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+			</div>
+			<!-- /.row -->
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<i class="fa fa-comment fa-fw"></i> Active Topic
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div id="active_topic"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -66,6 +100,8 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
+	<jsp:param value="plugins/d3/d3.js" name="loader" />
+	<jsp:param value="plugins/d3/d3.layout.js" name="loader" />
 	<jsp:param value="main/consumers.js" name="loader" />
 </jsp:include>
 </html>

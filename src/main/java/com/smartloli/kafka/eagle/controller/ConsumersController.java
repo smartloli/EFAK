@@ -40,9 +40,8 @@ public class ConsumersController {
 		String ip = request.getHeader("x-forwarded-for");
 		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
-		// DashBoardDomain dash = DashBoardService.getRelease(username);
 		try {
-			byte[] output = GzipUtils.compressToByte(kafkaCluster());
+			byte[] output = GzipUtils.compressToByte("");
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -52,31 +51,6 @@ public class ConsumersController {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	public static String kafkaCluster() {
-		JSONArray zk = new JSONArray();
-		for (int i = 0; i < 3; i++) {
-			JSONObject tmp = new JSONObject();
-			tmp.put("id", i + 1);
-			tmp.put("ip", "zk" + i);
-			tmp.put("port", "2181");
-			tmp.put("version", "3.4.6");
-			zk.add(tmp);
-		}
-		JSONObject obj = new JSONObject();
-		obj.put("zk", zk);
-		JSONArray kafka = new JSONArray();
-		for (int i = 0; i < 3; i++) {
-			JSONObject tmp = new JSONObject();
-			tmp.put("id", i + 1);
-			tmp.put("ip", "slave" + i);
-			tmp.put("port", "9092");
-			tmp.put("version", "0.8.2.2");
-			kafka.add(tmp);
-		}
-		obj.put("kafka", kafka);
-		return obj.toJSONString();
 	}
 
 }
