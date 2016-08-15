@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -38,8 +39,86 @@ public class TopicController {
 		return mav;
 	}
 
+	@RequestMapping(value = "/topic/meta/{tname}", method = RequestMethod.GET)
+	public ModelAndView topicMetaView(@PathVariable("tname") String tname, HttpServletRequest request) {
+		String ip = request.getHeader("x-forwarded-for");
+		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
+
+		ModelAndView mav = new ModelAndView();
+		if (TopicService.findTopicName(tname, ip)) {
+			mav.setViewName("/topic/topic_meta");
+		} else {
+			mav.setViewName("/error/404");
+		}
+
+		return mav;
+	}
+
+	@RequestMapping(value = "/topic/meta/{tname}/ajax", method = RequestMethod.GET)
+	public void topicMetaAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request) {
+		response.setContentType("text/html;charset=utf-8");
+		response.setCharacterEncoding("utf-8");
+		response.setHeader("Charset", "utf-8");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Content-Encoding", "gzip");
+
+		String ip = request.getHeader("x-forwarded-for");
+		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
+
+		String aoData = request.getParameter("aoData");
+		JSONArray jsonArray = JSON.parseArray(aoData);
+		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+		for (Object obj : jsonArray) {
+			JSONObject jsonObj = (JSONObject) obj;
+			if ("sEcho".equals(jsonObj.getString("name"))) {
+				sEcho = jsonObj.getIntValue("value");
+			} else if ("iDisplayStart".equals(jsonObj.getString("name"))) {
+				iDisplayStart = jsonObj.getIntValue("value");
+			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
+				iDisplayLength = jsonObj.getIntValue("value");
+			}
+		}
+
+		String str = TopicService.topicMeta(tname, ip);
+		System.out.println("tname->" + tname);
+		System.out.println("str->" + str);
+		JSONArray ret = JSON.parseArray(str);
+		int offset = 0;
+		JSONArray retArr = new JSONArray();
+		for (Object tmp : ret) {
+			JSONObject tmp2 = (JSONObject) tmp;
+			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+				JSONObject obj = new JSONObject();
+				obj.put("topic", tname);
+				obj.put("partition", tmp2.getInteger("partitionId"));
+				obj.put("leader", tmp2.getInteger("leader"));
+				obj.put("replicas", tmp2.getInteger("replicas"));
+				obj.put("isr", tmp2.getInteger("isr"));
+				retArr.add(obj);
+			}
+			offset++;
+		}
+
+		JSONObject obj = new JSONObject();
+		obj.put("sEcho", sEcho);
+		obj.put("iTotalRecords", ret.size());
+		obj.put("iTotalDisplayRecords", ret.size());
+		obj.put("aaData", retArr);
+		try {
+			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			response.setContentLength(output.length);
+			OutputStream out = response.getOutputStream();
+			out.write(output);
+
+			out.flush();
+			out.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	@RequestMapping(value = "/topic/list/table/ajax", method = RequestMethod.GET)
-	public void articleListAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void topicListAjax(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setHeader("Charset", "utf-8");
@@ -71,7 +150,7 @@ public class TopicController {
 			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 				JSONObject obj = new JSONObject();
 				obj.put("id", tmp2.getInteger("id"));
-				obj.put("topic", "<a href='#' target='_blank'>" + tmp2.getString("topic") + "</a>");
+				obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "' target='_blank'>" + tmp2.getString("topic") + "</a>");
 				obj.put("partitions", tmp2.getString("partitions"));
 				obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
 				retArr.add(obj);

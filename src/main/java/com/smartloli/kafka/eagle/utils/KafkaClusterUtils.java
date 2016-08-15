@@ -38,7 +38,7 @@ public class KafkaClusterUtils {
 	private static ZkClient zkc = null;
 
 	public static void main(String[] args) {
-		System.out.println(getNewPartitionInfo());
+		System.out.println(getAllBrokersInfo());
 	}
 
 	public static String getConsumers() {
