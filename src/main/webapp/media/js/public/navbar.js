@@ -10,12 +10,12 @@ $(document).ready(function() {
 	} else if (ret == "/") {
 		$("div[id='navbar_click'] li").removeClass('active')
 		$("#navbar_dash").addClass('active');
-	} else if (ret == "/topic/list") {
+	} else if (ret == "/topic/list" || ret.indexOf("meta") > -1) {
 		$("#demo").addClass('collapse in');
 		$("#demo").attr("aria-expanded", true);
 		$("div[id='navbar_click'] li").removeClass('active')
 		$("#navbar_list").addClass('active');
-	} else if (ret == "/topic/create") {
+	} else if (ret == "/topic/create" || ret == "/topic/create/failed" || ret == "/topic/create/success") {
 		$("#demo").addClass('collapse in');
 		$("#demo").attr("aria-expanded", true);
 		$("div[id='navbar_click'] li").removeClass('active')

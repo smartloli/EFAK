@@ -1,6 +1,7 @@
 package com.smartloli.kafka.eagle.controller;
 
 import java.io.OutputStream;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.smartloli.kafka.eagle.service.TopicService;
 import com.smartloli.kafka.eagle.utils.GzipUtils;
+import com.smartloli.kafka.eagle.utils.KafkaCommandUtils;
 
 @Controller
 public class TopicController {
@@ -54,6 +56,20 @@ public class TopicController {
 		return mav;
 	}
 
+	@RequestMapping(value = "/topic/create/success", method = RequestMethod.GET)
+	public ModelAndView successView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/topic/add_success");
+		return mav;
+	}
+
+	@RequestMapping(value = "/topic/create/failed", method = RequestMethod.GET)
+	public ModelAndView failedView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/topic/add_failed");
+		return mav;
+	}
+
 	@RequestMapping(value = "/topic/meta/{tname}/ajax", method = RequestMethod.GET)
 	public void topicMetaAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -80,8 +96,6 @@ public class TopicController {
 		}
 
 		String str = TopicService.topicMeta(tname, ip);
-		System.out.println("tname->" + tname);
-		System.out.println("str->" + str);
 		JSONArray ret = JSON.parseArray(str);
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
@@ -174,6 +188,25 @@ public class TopicController {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	@RequestMapping(value = "/topic/create/form", method = RequestMethod.POST)
+	public ModelAndView articleAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		String ke_topic_name = request.getParameter("ke_topic_name");
+		String ke_topic_partition = request.getParameter("ke_topic_partition");
+		String ke_topic_repli = request.getParameter("ke_topic_repli");
+		Map<String, Object> map = KafkaCommandUtils.create(ke_topic_name, ke_topic_partition, ke_topic_repli);
+		if ("success".equals(map.get("status"))) {
+			session.removeAttribute("Submit_Status");
+			session.setAttribute("Submit_Status", map.get("info"));
+			mav.setViewName("redirect:/topic/create/success");
+		} else {
+			session.removeAttribute("Submit_Status");
+			session.setAttribute("Submit_Status", map.get("info"));
+			mav.setViewName("redirect:/topic/create/failed");
+		}
+		return mav;
 	}
 
 }

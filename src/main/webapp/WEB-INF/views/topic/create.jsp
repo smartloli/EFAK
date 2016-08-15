@@ -35,8 +35,8 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>List all
-							consumers information.</strong>
+						<i class="fa fa-info-circle"></i> <strong>Create a new
+							kafka's topic.</strong>
 					</div>
 				</div>
 			</div>
@@ -45,27 +45,83 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-tasks fa-fw"></i> Consumers Info
+							<i class="fa fa-tasks fa-fw"></i> Topic Property
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="kafka_cluster_info">
-								<table id="kafka_tab" class="table table-bordered table-hover">
-								</table>
+							<div class="row">
+								<div class="col-lg-12">
+									<form role="form" action="/ke/topic/create/form" method="post"
+										onsubmit="return contextFormValid();return false;">
+										<div class="form-group">
+											<label>Topic Name (*)</label> <input id="ke_topic_name"
+												name="ke_topic_name" class="form-control" maxlength=50>
+											<label for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Made up of letters and digits
+												or underscores . Such as "demo_kafka_topic_1" .</label>
+										</div>
+										<div class="form-group">
+											<label>Partitions (*)</label> <input id="ke_topic_partition"
+												name="ke_topic_partition" class="form-control" maxlength=50
+												value="1"> <label for="inputError"
+												class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Partition parameters must be
+												numeric .</label>
+										</div>
+										<div class="form-group">
+											<label>Replication Factor (*)</label> <input
+												id="ke_topic_repli" name="ke_topic_repli"
+												class="form-control" maxlength=50 value="1"><label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Replication Factor parameters
+												must be numeric . Pay attention to available brokers must be larger than replication factor .</label>
+										</div>
+										<button type="submit" class="btn btn-success">Create</button>
+										<div id="alert_mssage" style="display: none"
+											class="alert alert-danger">
+											<label>Error! Please make some changes . (*) is
+												required .</label>
+										</div>
+									</form>
+								</div>
 							</div>
+							<!-- /.panel-body -->
 						</div>
-						<!-- /.panel-body -->
 					</div>
+					<!-- /.col-lg-4 -->
 				</div>
-				<!-- /.col-lg-4 -->
+				<!-- /.row -->
 			</div>
-			<!-- /.row -->
+			<!-- /#page-wrapper -->
 		</div>
-		<!-- /#page-wrapper -->
-	</div>
 </body>
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="main/topic/create.js" name="loader" />
 </jsp:include>
+<script type="text/javascript">
+	//验证提交表单内容
+	function contextFormValid() {
+		var ke_topic_name = $("#ke_topic_name").val();
+		var ke_topic_partition = $("#ke_topic_partition").val();
+		var ke_topic_repli = $("#ke_topic_repli").val();
+		var reg = /^[A-Za-z0-9_]+$/;
+		var digit = /^[0-9]+$/;
+		if (ke_topic_name.length == 0 || !reg.test(ke_topic_name)) {
+			$("#alert_mssage").show();
+			setTimeout(function() {
+				$("#alert_mssage").hide()
+			}, 3000);
+			return false;
+		}
+		if (isNaN(ke_topic_partition) || isNaN(ke_topic_repli)) {
+			$("#alert_mssage").show();
+			setTimeout(function() {
+				$("#alert_mssage").hide()
+			}, 3000);
+			return false;
+		}
+		return true;
+	}
+</script>
 </html>
