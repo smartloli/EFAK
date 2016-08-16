@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	var m = [ 20, 240, 20, 240 ], w = 1280 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
+	var m = [ 20, 140, 20, 140 ], w = 1100 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
 
 	var tree = d3.layout.tree().size([ h, w ]);
 
@@ -9,17 +9,11 @@ $(document).ready(function() {
 
 	var vis = d3.select("#active_topic").append("svg:svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-	d3.json('/ke/dash/kafka/ajax', function(json) {
-		dashboard = JSON.parse(json.dashboard);
-		root = JSON.parse(json.kafka);
+	d3.json('/ke/consumers/info/ajax', function(json) {
+		root = JSON.parse(json.active);
 		root.x0 = h / 2;
 		root.y0 = 0;
 
-		$("#brokers_count").text(dashboard.brokers);
-		$("#topics_count").text(dashboard.topics);
-		$("#zks_count").text(dashboard.zks);
-		$("#consumers_count").text(dashboard.consumers);
-		
 		function toggleAll(d) {
 			if (d.children) {
 				d.children.forEach(toggleAll);
@@ -29,8 +23,46 @@ $(document).ready(function() {
 
 		// Initialize the display to show a few nodes.
 		root.children.forEach(toggleAll);
-		toggle(root.children[0]);
+		for (var i = 0; i < root.children.length; i++) {
+			toggle(root.children[i]);
+		}
 		update(root);
+
+		// Initialize consumer table list --start
+		$("#result").dataTable({
+			"searching" : false,
+			"bSort" : false,
+			"bLengthChange" : false,
+			"bProcessing" : true,
+			"bServerSide" : true,
+			"fnServerData" : retrieveData,
+			"sAjaxSource" : "/ke/consumer/list/table/ajax",
+			"aoColumns" : [ {
+				"mData" : 'id'
+			}, {
+				"mData" : 'group'
+			}, {
+				"mData" : 'topic'
+			}, {
+				"mData" : 'consumerNumber'
+			} ]
+		});
+
+		function retrieveData(sSource, aoData, fnCallback) {
+			$.ajax({
+				"type" : "get",
+				"contentType" : "application/json",
+				"url" : sSource,
+				"dataType" : "json",
+				"data" : {
+					aoData : JSON.stringify(aoData)
+				},
+				"success" : function(data) {
+					fnCallback(data)
+				}
+			});
+		}
+		// --end
 	});
 
 	function update(source) {
@@ -41,7 +73,7 @@ $(document).ready(function() {
 
 		// Normalize for fixed-depth.
 		nodes.forEach(function(d) {
-			d.y = d.depth * 580;
+			d.y = d.depth * 380;
 		});
 
 		// Update the nodes…
@@ -138,4 +170,64 @@ $(document).ready(function() {
 			d._children = null;
 		}
 	}
+
+	// Children div show details of the consumer group
+	var offset = 0;
+	$(document).on('click', 'a[class=link]', function() {
+		var group = $(this).html();
+		console.log("group->" + group);
+		$('#doc_info').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+		$('#doc_info').modal('show').css({
+			width : '800px',
+			height : '680px',
+			position : 'absolute',
+			left : '50%',
+			top : '50%',
+			transform : 'translateX(-50%) translateY(-50%)'
+		});
+
+		$("#consumer_detail_children").append("<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr><th>ID</th><th>Topic</th><th>Consumering</th></tr></thead></table></div>");
+		if (offset > 0) {
+			$("#div_children" + (offset - 1)).remove();
+		}
+
+		// Initialize consumer table list --start
+		$("#result_children" + offset).dataTable({
+			"searching" : false,
+			"bSort" : false,
+			"bLengthChange" : false,
+			"bProcessing" : true,
+			"bServerSide" : true,
+			"fnServerData" : retrieveData,
+			"sAjaxSource" : "/ke/consumer/" + group + "/table/ajax",
+			"aoColumns" : [ {
+				"mData" : 'id'
+			}, {
+				"mData" : 'topic'
+			}, {
+				"mData" : 'isConsumering'
+			} ]
+		});
+
+		function retrieveData(sSource, aoData, fnCallback) {
+			$.ajax({
+				"type" : "get",
+				"contentType" : "application/json",
+				"url" : sSource,
+				"dataType" : "json",
+				"data" : {
+					aoData : JSON.stringify(aoData)
+				},
+				"success" : function(data) {
+					fnCallback(data)
+				}
+			});
+		}
+		// --end
+
+		offset++;
+	});
 });

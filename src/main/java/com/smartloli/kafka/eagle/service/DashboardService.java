@@ -37,6 +37,7 @@ public class DashboardService {
 		dash.setConsumers(0);
 		dash.setTopics(topics);
 		dash.setZks(zks);
+		dash.setConsumers(ConsumerService.getConsumerNumbers());
 		return dash.toString();
 	}
 

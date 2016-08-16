@@ -49,6 +49,11 @@ public class CalendarUtils {
 		long sec = date - 3600 * 24 * day - 3600 * hour - 60 * min;
 		return day + "天" + hour + "时" + min + "分" + sec + "秒";
 	}
+	
+	public static String timeSpan2StrDate(long date){
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return df.format(new Date(date));
+	}
 
 	public static void main(String[] args) {
 		System.out.println(getTime());// 2505600

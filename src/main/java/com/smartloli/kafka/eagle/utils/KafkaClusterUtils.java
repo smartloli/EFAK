@@ -7,10 +7,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.I0Itec.zkclient.ZkClient;
+import org.apache.zookeeper.data.Stat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import kafka.api.PartitionOffsetRequestInfo;
 import kafka.cluster.Broker;
 import kafka.common.TopicAndPartition;
 import kafka.consumer.ConsumerThreadId;
+import kafka.api.OffsetRequest;
+import kafka.javaapi.OffsetResponse;
+import kafka.javaapi.PartitionMetadata;
+import kafka.javaapi.TopicMetadata;
+import kafka.javaapi.TopicMetadataRequest;
+import kafka.javaapi.TopicMetadataResponse;
+import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.utils.ZkUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -20,9 +31,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import com.smartloli.kafka.eagle.domain.PartitionsDomain;
 import com.smartloli.kafka.eagle.domain.TopicDomain;
 
+import scala.Option;
+import scala.Tuple2;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.collection.Set;
@@ -39,42 +53,193 @@ public class KafkaClusterUtils {
 	private static ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
 	private static ZkClient zkc = null;
 
+	private static Logger LOG = LoggerFactory.getLogger(KafkaClusterUtils.class);
+
 	public static void main(String[] args) {
-//		 System.out.println(getAllBrokersInfo());
-		System.out.println(getActiveTopic());
+		// System.out.println(getAllBrokersInfo());
+		System.out.println(getOffset("words", "group1", 0));
 	}
 
-	public static String getConsumers() {
-		return "";
+	public static List<String> findTopicPartition(String topic) {
+		if (zkc == null) {
+			zkc = zkPool.getZkClient();
+		}
+		Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.BrokerTopicsPath() + "/" + topic + "/partitions");
+		List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+		if (zkc != null) {
+			zkPool.release(zkc);
+			zkc = null;
+		}
+		return listSeq;
 	}
 
-	public static String getActiveTopic() {
+	public static boolean findTopicIsConsumer(String topic, String group) {
+		if (zkc == null) {
+			zkc = zkPool.getZkClient();
+		}
+		String ownersPath = ZkUtils.ConsumersPath() + "/" + group + "/owners/" + topic;
+		boolean status = ZkUtils.pathExists(zkc, ownersPath);
+		if (zkc != null) {
+			zkPool.releaseZKSerializer(zkc);
+			zkc = null;
+		}
+		return status;
+	}
+
+	public static OffsetZkDomain getOffset(String topic, String group, int partition) {
+		if (zkc == null) {
+			zkc = zkPool.getZkClientSerializer();
+		}
+		OffsetZkDomain offsetZk = new OffsetZkDomain();
+		String offsetPath = ZkUtils.ConsumersPath() + "/" + group + "/offsets/" + topic + "/" + partition;
+		String ownersPath = ZkUtils.ConsumersPath() + "/" + group + "/owners/" + topic + "/" + partition;
+		Tuple2<Option<String>, Stat> tuple = null;
+		try {
+			tuple = ZkUtils.readDataMaybeNull(zkc, offsetPath);
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
+			if (zkc != null) {
+				zkPool.releaseZKSerializer(zkc);
+				zkc = null;
+			}
+			return offsetZk;
+		}
+		long offsetSize = Long.parseLong(tuple._1.get());
+		if (ZkUtils.pathExists(zkc, ownersPath)) {
+			Tuple2<String, Stat> tuple2 = ZkUtils.readData(zkc, ownersPath);
+			offsetZk.setOwners(tuple2._1);
+		} else {
+			offsetZk.setOwners("");
+		}
+		offsetZk.setOffset(offsetSize);
+		offsetZk.setCreate(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
+		offsetZk.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
+		if (zkc != null) {
+			zkPool.releaseZKSerializer(zkc);
+			zkc = null;
+		}
+		return offsetZk;
+	}
+
+	public static long getLogSize(List<String> hosts, String topic, int partition) {
+		String clientName = "Client_" + topic + "_" + partition;
+		Broker leaderBroker = getLeaderBroker(hosts, topic, partition);
+		String reaHost = null;
+		int port = 9092;
+		if (leaderBroker != null) {
+			reaHost = leaderBroker.host();
+			port = leaderBroker.port();
+		} else {
+			System.out.println("Partition of Host is not find");
+			LOG.error("Partition of Host is not find");
+		}
+		SimpleConsumer simpleConsumer = new SimpleConsumer(reaHost, port, 100000, 64 * 1024, clientName);
+		TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partition);
+		Map<TopicAndPartition, PartitionOffsetRequestInfo> requestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
+		requestInfo.put(topicAndPartition, new PartitionOffsetRequestInfo(OffsetRequest.LatestTime(), 1));
+		kafka.javaapi.OffsetRequest request = new kafka.javaapi.OffsetRequest(requestInfo, OffsetRequest.CurrentVersion(), clientName);
+		OffsetResponse response = simpleConsumer.getOffsetsBefore(request);
+		if (response.hasError()) {
+			System.out.println("Error fetching data Offset , Reason: " + response.errorCode(topic, partition));
+			LOG.error("Error fetching data Offset , Reason: " + response.errorCode(topic, partition));
+			return 0;
+		}
+		long[] offsets = response.offsets(topic, partition);
+		return offsets[0];
+	}
+
+	private static Broker getLeaderBroker(List<String> hosts, String topic, int partition) {
+		String clientName = "Client_Leader_LookUp";
+		SimpleConsumer consumer = null;
+		PartitionMetadata partitionMetaData = null;
+		try {
+			for (String host : hosts) {
+				String ip = host.split(":")[0];
+				String port = host.split(":")[1];
+				consumer = new SimpleConsumer(ip, Integer.parseInt(port), 10000, 64 * 1024, clientName);
+				if (consumer != null) {
+					break;
+				}
+			}
+			List<String> topics = new ArrayList<String>();
+			topics.add(topic);
+			TopicMetadataRequest request = new TopicMetadataRequest(topics);
+			TopicMetadataResponse reponse = consumer.send(request);
+			List<TopicMetadata> topicMetadataList = reponse.topicsMetadata();
+			for (TopicMetadata topicMetadata : topicMetadataList) {
+				for (PartitionMetadata metadata : topicMetadata.partitionsMetadata()) {
+					if (metadata.partitionId() == partition) {
+						partitionMetaData = metadata;
+						break;
+					}
+				}
+			}
+			if (partitionMetaData != null) {
+				return partitionMetaData.leader();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static Map<String, List<String>> getConsumers() {
+		if (zkc == null) {
+			zkc = zkPool.getZkClient();
+		}
+		String consumersPath = ZkUtils.ConsumersPath();
+		Seq<String> seq = ZkUtils.getChildren(zkc, consumersPath);
+		List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+		Map<String, List<String>> mapConsumers = new HashMap<String, List<String>>();
+		for (String group : listSeq) {
+			Seq<String> tmp = ZkUtils.getChildren(zkc, consumersPath + "/" + group + "/owners");
+			List<String> list = JavaConversions.seqAsJavaList(tmp);
+			mapConsumers.put(group, list);
+		}
+		if (zkc != null) {
+			zkPool.release(zkc);
+			zkc = null;
+		}
+		return mapConsumers;
+	}
+
+	/**
+	 * Get kafka active consumer topic
+	 * 
+	 * @return
+	 */
+	public static Map<String, List<String>> getActiveTopic() {
 		if (zkc == null) {
 			zkc = zkPool.getZkClientSerializer();
 		}
 		Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.ConsumersPath());
-		String ret = new Gson().toJson(seq);
-		JsonObject json = (JsonObject) new JsonParser().parse(ret);
-		String tmp = json.get("underlying").toString().replace("[", "");
-		String[] str = tmp.replace("]", "").split(",");
+		List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 		JSONArray arr = new JSONArray();
-		for (String group : str) {
-			scala.collection.mutable.Map<String, scala.collection.immutable.List<ConsumerThreadId>> map = ZkUtils.getConsumersPerTopic(zkc, group.replaceAll("\"", ""), true);
+		for (String group : listSeq) {
+			scala.collection.mutable.Map<String, scala.collection.immutable.List<ConsumerThreadId>> map = ZkUtils.getConsumersPerTopic(zkc, group, false);
 			for (Entry<String, ?> entry : JavaConversions.mapAsJavaMap(map).entrySet()) {
 				JSONObject obj = new JSONObject();
 				obj.put("topic", entry.getKey());
-				obj.put("group", group.replaceAll("\"", ""));
+				obj.put("group", group);
 				arr.add(obj);
 			}
 		}
-		for(Object object : arr){
+		Map<String, List<String>> actvTopic = new HashMap<String, List<String>>();
+		for (Object object : arr) {
 			JSONObject obj = (JSONObject) object;
+			if (actvTopic.containsKey(obj.getString("topic"))) {
+				actvTopic.get(obj.getString("topic")).add(obj.getString("group"));
+			} else {
+				List<String> group = new ArrayList<String>();
+				group.add(obj.getString("group"));
+				actvTopic.put(obj.getString("topic"), group);
+			}
 		}
 		if (zkc != null) {
 			zkPool.releaseZKSerializer(zkc);
 			zkc = null;
 		}
-		return arr.toJSONString();
+		return actvTopic;
 	}
 
 	/**

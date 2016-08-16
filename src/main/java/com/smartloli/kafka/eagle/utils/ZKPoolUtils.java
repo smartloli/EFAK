@@ -23,7 +23,7 @@ public class ZKPoolUtils {
 
 	private Vector<ZkClient> pool;
 	private Vector<ZkClient> poolZKSerializer;
-	private int poolSize = 10;
+	private int poolSize = SystemConfigUtils.getIntProperty("kafka.zk.limit.size");
 	private static ZKPoolUtils instance = null;
 
 	private ZKPoolUtils() {

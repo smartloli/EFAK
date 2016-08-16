@@ -15,6 +15,7 @@
 
 <title>Consumers - KafkaEagle</title>
 <jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/tcss.jsp"></jsp:include>
 </head>
 <style type="text/css">
 .node circle {
@@ -32,6 +33,16 @@ path.link {
 	fill: none;
 	stroke: #ccc;
 	stroke-width: 1.5px;
+}
+
+.links line {
+	stroke: #999;
+	stroke-opacity: 0.6;
+}
+
+.nodes circle {
+	stroke: #fff;
+	stroke-width: 2.5px;
 }
 </style>
 <body>
@@ -69,6 +80,14 @@ path.link {
 						<div class="panel-body">
 							<div id="kafka_cluster_info">
 								<table id="result" class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>Group</th>
+											<th>Topics</th>
+											<th>Consumer Numbers</th>
+										</tr>
+									</thead>
 								</table>
 							</div>
 						</div>
@@ -95,6 +114,26 @@ path.link {
 				<!-- /.col-lg-4 -->
 			</div>
 			<!-- /.row -->
+			<div class="modal fade" style="background-color: #fff" id="doc_info"
+				tabindex="-1" role="dialog">
+				<div class="modal-header">
+					<button class="close" type="button" data-dismiss="modal">×</button>
+					<h3>Details of the consumer group</h3>
+				</div>
+				<!-- /.row -->
+				<div class="row">
+					<div class="col-lg-12">
+						<div id="consumer_detail_children" class="panel panel-default">
+							<div class="panel-heading">
+								<i class="fa fa-comment fa-fw"></i> Consumer Topic
+								<div class="pull-right"></div>
+							</div>
+							<!-- /.panel-heading -->
+						</div>
+					</div>
+					<!-- /.col-lg-4 -->
+				</div>
+			</div>
 		</div>
 		<!-- /#page-wrapper -->
 	</div>
@@ -104,4 +143,5 @@ path.link {
 	<jsp:param value="plugins/d3/d3.layout.js" name="loader" />
 	<jsp:param value="main/consumers.js" name="loader" />
 </jsp:include>
+<jsp:include page="../public/tscript.jsp"></jsp:include>
 </html>
