@@ -45,6 +45,7 @@ start()
     echo "* KE service has started success!                              *"
     echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'  *"
 	echo "*******************************************************************"
+	rm -rf ${LOG_DIR}/ke_console.out
 	ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out
 }
 

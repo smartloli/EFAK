@@ -189,6 +189,7 @@
 				<version>2.2</version>
 				<configuration>
 					<warName>ke</warName>
+					<packagingExcludes>WEB-INF/classes/kms/**,WEB-INF/classes/ke.sh,WEB-INF/classes/assembly.xml</packagingExcludes>
 				</configuration>
 			</plugin>
 
