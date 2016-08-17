@@ -183,7 +183,7 @@ $(document).ready(function() {
 		$('#doc_info').modal('show').css({
 			width : '800px',
 			height : '680px',
-			position : 'absolute',
+			position : 'fixed',
 			left : '50%',
 			top : '50%',
 			transform : 'translateX(-50%) translateY(-50%)'

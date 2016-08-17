@@ -31,6 +31,7 @@ public class ZKPoolUtils {
 	}
 
 	private void initZKPoolUtils() {
+		LOG.info("Initialization ZkClient pool size [" + poolSize + "]");
 		pool = new Vector<ZkClient>(poolSize);
 		poolZKSerializer = new Vector<ZkClient>(poolSize);
 		addZkClient();
@@ -45,7 +46,7 @@ public class ZKPoolUtils {
 		for (int i = 0; i < poolSize; i++) {
 			try {
 				zkc = new ZkClient(zkInfo);
-				zkSerializer = new ZkClient(zkInfo, Integer.MAX_VALUE, 10000, ZKStringSerializer$.MODULE$);
+				zkSerializer = new ZkClient(zkInfo, Integer.MAX_VALUE, 100000, ZKStringSerializer$.MODULE$);
 				pool.add(zkc);
 				poolZKSerializer.add(zkSerializer);
 			} catch (Exception ex) {
@@ -61,6 +62,7 @@ public class ZKPoolUtils {
 	 */
 	public synchronized void releaseZKSerializer(ZkClient zkc) {
 		poolZKSerializer.add(zkc);
+		LOG.info("poolZKSerializer size [" + poolZKSerializer.size() + "]");
 	}
 
 	/**
@@ -70,6 +72,7 @@ public class ZKPoolUtils {
 	 */
 	public synchronized void release(ZkClient zkc) {
 		pool.add(zkc);
+		LOG.info("pool size [" + pool.size() + "]");
 	}
 
 	/**
@@ -109,7 +112,8 @@ public class ZKPoolUtils {
 	public synchronized ZkClient getZkClient() {
 		if (pool.size() > 0) {
 			ZkClient zkc = pool.get(0);
-			pool.remove(zkc);
+			pool.remove(0);
+			LOG.info("pool size [" + pool.size() + "]");
 			return zkc;
 		} else {
 			return null;
@@ -119,7 +123,8 @@ public class ZKPoolUtils {
 	public synchronized ZkClient getZkClientSerializer() {
 		if (poolZKSerializer.size() > 0) {
 			ZkClient zkc = poolZKSerializer.get(0);
-			poolZKSerializer.remove(zkc);
+			poolZKSerializer.remove(0);
+			LOG.info("poolZKSerializer size [" + poolZKSerializer.size() + "]");
 			return zkc;
 		} else {
 			return null;

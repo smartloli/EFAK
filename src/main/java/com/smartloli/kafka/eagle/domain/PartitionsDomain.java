@@ -1,5 +1,6 @@
 package com.smartloli.kafka.eagle.domain;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.google.gson.Gson;
@@ -13,10 +14,28 @@ import com.google.gson.Gson;
  */
 public class PartitionsDomain {
 
-	private int id;
-	private String topic;
-	private Set<Integer> partitions;
-	private int partitionNumbers;
+	private int id = 0;
+	private String topic = "";
+	private Set<String> partitions = new HashSet<String>();
+	private int partitionNumbers = 0;
+	private String created = "";
+	private String modify = "";
+
+	public String getCreated() {
+		return created;
+	}
+
+	public void setCreated(String created) {
+		this.created = created;
+	}
+
+	public String getModify() {
+		return modify;
+	}
+
+	public void setModify(String modify) {
+		this.modify = modify;
+	}
 
 	public int getId() {
 		return id;
@@ -42,11 +61,11 @@ public class PartitionsDomain {
 		this.topic = topic;
 	}
 
-	public Set<Integer> getPartitions() {
+	public Set<String> getPartitions() {
 		return partitions;
 	}
 
-	public void setPartitions(Set<Integer> partitions) {
+	public void setPartitions(Set<String> partitions) {
 		this.partitions = partitions;
 	}
 

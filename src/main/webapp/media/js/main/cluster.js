@@ -9,9 +9,9 @@ $(document).ready(function() {
 				var zk = JSON.parse(datas.zk);
 				$("#kafka_tab").html("");
 				$("#zk_tab").html("");
-				var kafka_tab = "<thead><tr><th>ID</th><th>IP</th><th>Port</th></tr></thead><tbody>";
+				var kafka_tab = "<thead><tr><th>ID</th><th>IP</th><th>Port</th><th>Created</th><th>Modify</th></tr></thead><tbody>";
 				for (var i = 0; i < kafka.length; i++) {
-					kafka_tab += " <tr><td>" + kafka[i].id + "</td><td>" + kafka[i].host + "</td><td>" + kafka[i].port + "</td></tr>";
+					kafka_tab += " <tr><td>" + kafka[i].id + "</td><td>" + kafka[i].host + "</td><td>" + kafka[i].port + "</td><td>" + kafka[i].created + "</td><td>" + kafka[i].modify + "</td></tr>";
 				}
 				kafka_tab += "</tbody>"
 				$("#kafka_tab").append(kafka_tab);

@@ -22,7 +22,7 @@ public class TopicService {
 	private static LRUCacheUtils<String, TupleDomain> map = new LRUCacheUtils<String, TupleDomain>(100000);
 
 	public static String list() {
-		return KafkaClusterUtils.getNewPartitionInfo();
+		return KafkaClusterUtils.getAllPartitions();
 	}
 
 	public static String topicMeta(String topicName, String ip) {
@@ -56,7 +56,7 @@ public class TopicService {
 				map.remove(key);
 			}
 		} else {
-			JSONArray arr = JSON.parseArray(KafkaClusterUtils.getNewPartitionInfo());
+			JSONArray arr = JSON.parseArray(KafkaClusterUtils.getAllPartitions());
 			for (Object object : arr) {
 				JSONObject obj = (JSONObject) object;
 				String topic = obj.getString("topic");

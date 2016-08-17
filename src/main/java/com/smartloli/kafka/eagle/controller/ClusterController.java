@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.smartloli.kafka.eagle.service.ClusterService;
 import com.smartloli.kafka.eagle.utils.GzipUtils;
 
@@ -52,31 +50,6 @@ public class ClusterController {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	public static String kafkaCluster() {
-		JSONArray zk = new JSONArray();
-		for (int i = 0; i < 3; i++) {
-			JSONObject tmp = new JSONObject();
-			tmp.put("id", i + 1);
-			tmp.put("ip", "zk" + i);
-			tmp.put("port", "2181");
-			tmp.put("version", "3.4.6");
-			zk.add(tmp);
-		}
-		JSONObject obj = new JSONObject();
-		obj.put("zk", zk);
-		JSONArray kafka = new JSONArray();
-		for (int i = 0; i < 3; i++) {
-			JSONObject tmp = new JSONObject();
-			tmp.put("id", i + 1);
-			tmp.put("ip", "slave" + i);
-			tmp.put("port", "9092");
-			tmp.put("version", "0.8.2.2");
-			kafka.add(tmp);
-		}
-		obj.put("kafka", kafka);
-		return obj.toJSONString();
 	}
 
 }

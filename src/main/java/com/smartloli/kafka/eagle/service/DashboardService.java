@@ -28,7 +28,7 @@ public class DashboardService {
 
 	private static String dashboard() {
 		int zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",").length;
-		String topicObject = KafkaClusterUtils.getNewPartitionInfo();
+		String topicObject = KafkaClusterUtils.getAllPartitions();
 		int topics = JSON.parseArray(topicObject).size();
 		String kafkaObject = KafkaClusterUtils.getAllBrokersInfo();
 		int brokers = JSON.parseArray(kafkaObject).size();

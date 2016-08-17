@@ -61,7 +61,7 @@ public class OffsetController {
 			}
 		}
 
-		JSONArray ret = JSON.parseArray(OffsetService.getLogSize(topic, group));
+		JSONArray ret = JSON.parseArray(OffsetService.getLogSize(topic, group,ip));
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {
@@ -70,7 +70,11 @@ public class OffsetController {
 				JSONObject obj = new JSONObject();
 				obj.put("partition", tmp2.getInteger("partition"));
 				obj.put("logsize", tmp2.getLong("logSize"));
-				obj.put("offset", "<a class='btn btn-success btn-xs'>" + tmp2.getLong("offset") + "</a>");
+				if(tmp2.getLong("offset")==-1){
+					obj.put("offset", "<a class='btn btn-warning btn-xs'>0</a>");
+				}else{
+					obj.put("offset", "<a class='btn btn-success btn-xs'>" + tmp2.getLong("offset") + "</a>");
+				}
 				obj.put("lag", "<a class='btn btn-danger btn-xs'>" + tmp2.getLong("lag") + "</a>");
 				obj.put("owner", tmp2.getString("owner"));
 				obj.put("created", tmp2.getString("create"));

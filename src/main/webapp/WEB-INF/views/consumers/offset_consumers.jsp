@@ -49,22 +49,7 @@
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
-						<div class="panel-body">
-							<div id="kafka_cluster_info">
-								<table id="result" class="table table-bordered table-hover">
-									<thead>
-										<tr>
-											<th>Partition</th>
-											<th>LogSize</th>
-											<th>Offset</th>
-											<th>Lag</th>
-											<th>Owner</th>
-											<th>Created</th>
-											<th>Modify</th>
-										</tr>
-									</thead>
-								</table>
-							</div>
+						<div id="offset_topic_info" class="panel-body">
 						</div>
 						<!-- /.panel-body -->
 					</div>

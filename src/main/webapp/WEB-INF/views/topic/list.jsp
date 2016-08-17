@@ -59,6 +59,8 @@
 										<th>Topic Name</th>
 										<th>Partition Indexes</th>
 										<th>Partition Numbers</th>
+										<th>Created</th>
+										<th>Modify</th>
 									</tr>
 								</thead>
 							</table>

@@ -13,10 +13,10 @@ import com.google.gson.Gson;
  */
 public class OffsetZkDomain {
 
-	private long offset;
-	private String create;
-	private String modify;
-	private String owners;
+	private long offset = -1L;
+	private String create = "";
+	private String modify = "";
+	private String owners = "";
 
 	public String getOwners() {
 		return owners;

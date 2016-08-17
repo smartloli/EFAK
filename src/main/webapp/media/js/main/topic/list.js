@@ -15,7 +15,11 @@ $(document).ready(function() {
 			"mData" : 'partitions'
 		}, {
 			"mData" : 'partitionNumbers'
-		} ]
+		} , {
+			"mData" : 'created'
+		}, {
+			"mData" : 'modify'
+		}]
 	});
 
 	function retrieveData(sSource, aoData, fnCallback) {

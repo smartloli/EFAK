@@ -25,8 +25,8 @@ public class OffsetService {
 
 	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
 
-	public static String getLogSize(String topic, String group) {
-		List<String> hosts = getBrokers();
+	public static String getLogSize(String topic, String group, String ip) {
+		List<String> hosts = getBrokers(topic, group, ip);
 		List<String> partitions = KafkaClusterUtils.findTopicPartition(topic);
 		List<OffsetDomain> list = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
@@ -39,16 +39,31 @@ public class OffsetService {
 			offset.setCreate(offsetZk.getCreate());
 			offset.setModify(offsetZk.getModify());
 			offset.setOffset(offsetZk.getOffset());
-			offset.setLag(logSize - offsetZk.getOffset());
+			offset.setLag(offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
 			offset.setOwner(offsetZk.getOwners());
 			list.add(offset);
 		}
 		return list.toString();
 	}
 
-	private static List<String> getBrokers() {
+	private static List<String> getBrokers(String topic, String group, String ip) {
 		// Add LRUCache per 3 min
-		String brokers = KafkaClusterUtils.getAllBrokersInfo();
+		String key = group + "_" + topic + "_consumer_brokers_" + ip;
+		String brokers = "";
+		if (lruCache.containsKey(key)) {
+			TupleDomain tuple = lruCache.get(key);
+			brokers = tuple.getRet();
+			long end = System.currentTimeMillis();
+			if ((end - tuple.getTimespan()) / (1000 * 60.0) > 3) {// 1 mins
+				lruCache.remove(key);
+			}
+		} else {
+			brokers = KafkaClusterUtils.getAllBrokersInfo();
+			TupleDomain tuple = new TupleDomain();
+			tuple.setRet(brokers);
+			tuple.setTimespan(System.currentTimeMillis());
+			lruCache.put(key, tuple);
+		}
 		JSONArray arr = JSON.parseArray(brokers);
 		List<String> list = new ArrayList<String>();
 		for (Object object : arr) {
@@ -81,7 +96,7 @@ public class OffsetService {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getLogSize("words", "group1"));
+		System.out.println(getLogSize("words", "group1", "127.0.0.1"));
 	}
 
 }

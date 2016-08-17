@@ -30,11 +30,11 @@ public class KafkaConsumerTest extends Thread {
 	private ExecutorService executor;
 	private ConsumerConnector consumer;
 	private static Properties props = new Properties();
-	private static String topic = "test_data3";
+	private static String topic = "test_data1";
 	private static final int THREAD_PARALLEL_NUM = 6;
 
 	static {
-		props.put("group.id", "group1");
+		props.put("group.id", "group2");
 		props.put("zookeeper.connect", "master:2181");
 		props.put("zookeeper.session.timeout.ms", "40000");
 		props.put("zookeeper.sync.time.ms", "200");

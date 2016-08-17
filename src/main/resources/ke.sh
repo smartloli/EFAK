@@ -3,14 +3,14 @@
 # source function library
 #. /etc/rc.d/init.d/functions
 
-DIALUP_PID=$CMS_HOME/bin/cms.pid
+DIALUP_PID=$KE_HOME/bin/ke.pid
 start()
 {
     echo -n $"Starting $prog: "
-    echo "CMS Service check ..."
+    echo "Ke service check ..."
     
-    if [ "$CMS_HOME" = "" ]; then
-  		echo "Error: CMS_HOME is not set."
+    if [ "$KE_HOME" = "" ]; then
+  		echo "Error: KE_HOME is not set."
   		exit 1
 	fi
 	
@@ -20,41 +20,42 @@ start()
 	fi
 
 	bin=`dirname "$0"`
-	export CMS_HOME=`cd $bin/../; pwd`
+	export KE_HOME=`cd $bin/../; pwd`
 
-	CMS_HOME_CONF_DIR=$CMS_HOME/conf
-	CLASSPATH="${CMS_HOME_CONF_DIR}"
+	KE_HOME_CONF_DIR=$KE_HOME/conf
+	CLASSPATH="${KE_HOME_CONF_DIR}"
 
-	for f in $CMS_HOME/lib/*.jar; do
+	for f in $KE_HOME/lib/*.jar; do
   		CLASSPATH=${CLASSPATH}:$f;
 	done
 
-	LOG_DIR=${CMS_HOME}/logs
+	LOG_DIR=${KE_HOME}/logs
 	
-	cd ${CMS_HOME}
-	CLASS=com.webank.cms.plugins.main.TomcatServerListen
-	nohup ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/cms.out 2>&1
+	cd ${KE_HOME}
+	CLASS=com.smartloli.kafka.eagle.plugins.main.TomcatServerListen
+	nohup ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ke.out 2>&1
 	echo "*******************************************************************"
     echo "* Listen port has successed! *"
 	echo "*******************************************************************"
 	sleep 5
-	chmod +x ${CMS_HOME}/kms/bin/*.sh
-	${CMS_HOME}/kms/bin/startup.sh > ${LOG_DIR}/cms.out 2>&1 < /dev/null & new_agent_pid=$!
+	chmod +x ${KE_HOME}/kms/bin/*.sh
+	${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1 < /dev/null & new_agent_pid=$!
 	echo "$new_agent_pid" > $DIALUP_PID
 	echo "*******************************************************************"
-    echo "* CMS Service has started success!                              *"
-    echo "* Now you can visit 'http://<your_host_or_ip>:port/cms'  *"
+    echo "* KE service has started success!                              *"
+    echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'  *"
 	echo "*******************************************************************"
+	ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke.out
 }
 
 stop()
 {
 
-	 if [ -f $CMS_HOME/bin/cms.pid ];then
-                    SPID=`cat $CMS_HOME/bin/cms.pid`
+	 if [ -f $KE_HOME/bin/ke.pid ];then
+                    SPID=`cat $KE_HOME/bin/ke.pid`
 					  if [ "$SPID" != "" ];then
 						 kill -9  $SPID
-                         ${CMS_HOME}/kms/bin/shutdown.sh
+                         ${KE_HOME}/kms/bin/shutdown.sh
 						 echo  > $DIALUP_PID
 						 echo "stop success"
 					  fi
@@ -98,7 +99,7 @@ CheckProcessStata()
 
 status()
 {
-  SPID=`cat $CMS_HOME/bin/cms.pid`
+  SPID=`cat $KE_HOME/bin/ke.pid`
   CheckProcessStata $SPID >/dev/null
   if [ $? != 0 ];then
 	echo "unixdialup:{$SPID}  Stopped ...."

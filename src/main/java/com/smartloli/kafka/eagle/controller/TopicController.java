@@ -165,8 +165,10 @@ public class TopicController {
 				JSONObject obj = new JSONObject();
 				obj.put("id", tmp2.getInteger("id"));
 				obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "' target='_blank'>" + tmp2.getString("topic") + "</a>");
-				obj.put("partitions", tmp2.getString("partitions"));
+				obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
 				obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
+				obj.put("created", tmp2.getString("created"));
+				obj.put("modify", tmp2.getString("modify"));
 				retArr.add(obj);
 			}
 			offset++;

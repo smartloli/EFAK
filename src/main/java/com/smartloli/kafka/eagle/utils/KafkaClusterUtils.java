@@ -24,22 +24,17 @@ import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.utils.ZkUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.smartloli.kafka.eagle.domain.BrokersDomain;
 import com.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import com.smartloli.kafka.eagle.domain.PartitionsDomain;
-import com.smartloli.kafka.eagle.domain.TopicDomain;
 
 import scala.Option;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
-import scala.collection.Set;
 
 /**
  * @Date Mar 8, 2016
@@ -57,7 +52,7 @@ public class KafkaClusterUtils {
 
 	public static void main(String[] args) {
 		// System.out.println(getAllBrokersInfo());
-		System.out.println(getOffset("words", "group1", 0));
+		System.out.println(getAllPartitions());
 	}
 
 	public static List<String> findTopicPartition(String topic) {
@@ -95,9 +90,14 @@ public class KafkaClusterUtils {
 		String ownersPath = ZkUtils.ConsumersPath() + "/" + group + "/owners/" + topic + "/" + partition;
 		Tuple2<Option<String>, Stat> tuple = null;
 		try {
-			tuple = ZkUtils.readDataMaybeNull(zkc, offsetPath);
+			if (ZkUtils.pathExists(zkc, offsetPath)) {
+				tuple = ZkUtils.readDataMaybeNull(zkc, offsetPath);
+			} else {
+				LOG.info("partition[" + partition + "],offsetPath[" + offsetPath + "] is not exist!");
+				return offsetZk;
+			}
 		} catch (Exception ex) {
-			LOG.error(ex.getMessage());
+			LOG.error("partition[" + partition + "],get offset has error,msg is " + ex.getMessage());
 			if (zkc != null) {
 				zkPool.releaseZKSerializer(zkc);
 				zkc = null;
@@ -107,7 +107,7 @@ public class KafkaClusterUtils {
 		long offsetSize = Long.parseLong(tuple._1.get());
 		if (ZkUtils.pathExists(zkc, ownersPath)) {
 			Tuple2<String, Stat> tuple2 = ZkUtils.readData(zkc, ownersPath);
-			offsetZk.setOwners(tuple2._1);
+			offsetZk.setOwners(tuple2._1 == null ? "" : tuple2._1);
 		} else {
 			offsetZk.setOwners("");
 		}
@@ -261,32 +261,6 @@ public class KafkaClusterUtils {
 		return arr.toJSONString();
 	}
 
-	/**
-	 * Get all topic name
-	 * 
-	 * @return
-	 */
-	public static String getAllTopicInfo() {
-		if (zkc == null) {
-			zkc = zkPool.getZkClient();
-		}
-		Seq<String> seq = ZkUtils.getAllTopics(zkc);
-		String ret = new Gson().toJson(seq);
-		JsonObject json = (JsonObject) new JsonParser().parse(ret);
-		List<TopicDomain> list = new ArrayList<TopicDomain>();
-		String tmp = json.get("underlying").toString().replace("[", "");
-		String[] str = tmp.replace("]", "").split(",");
-		for (String s : str) {
-			TopicDomain topic = new TopicDomain();
-			topic.setTopic(s.replace("\"", ""));
-			list.add(topic);
-		}
-		if (zkc != null) {
-			zkPool.release(zkc);
-			zkc = null;
-		}
-		return list.toString();
-	}
 
 	/**
 	 * Get all broker list
@@ -297,105 +271,63 @@ public class KafkaClusterUtils {
 		if (zkc == null) {
 			zkc = zkPool.getZkClientSerializer();
 		}
-		Seq<Broker> seq = ZkUtils.getAllBrokersInCluster(zkc);
-
-		String ret = new Gson().toJson(seq);
-		JsonObject json = (JsonObject) new JsonParser().parse(ret);
+		List<BrokersDomain> list = new ArrayList<BrokersDomain>();
+		if (ZkUtils.pathExists(zkc, ZkUtils.BrokerIdsPath())) {
+			Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.BrokerIdsPath());
+			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+			int id = 0;
+			for (String ids : listSeq) {
+				Tuple2<String, Stat> tuple = ZkUtils.readData(zkc, ZkUtils.BrokerIdsPath() + "/" + ids);
+				BrokersDomain broker = new BrokersDomain();
+				broker.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
+				broker.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
+				String host = JSON.parseObject(tuple._1).getString("host");
+				int port = JSON.parseObject(tuple._1).getInteger("port");
+				broker.setHost(host);
+				broker.setPort(port);
+				broker.setId(++id);
+				list.add(broker);
+			}
+		}
 		if (zkc != null) {
 			zkPool.releaseZKSerializer(zkc);
 			zkc = null;
 		}
-		return json.get("array").toString();
+		return list.toString();
 	}
 
 	/**
-	 * get all partition
+	 * Get topic info from zookeeper
 	 * 
 	 * @return
 	 */
-	public static List<TopicDomain> getAllPartitionsInfo() {
+	public static String getAllPartitions() {
 		if (zkc == null) {
-			zkc = zkPool.getZkClient();
+			zkc = zkPool.getZkClientSerializer();
 		}
-		Set<TopicAndPartition> seq = ZkUtils.getAllPartitions(zkc);
-		String ret = new Gson().toJson(seq);
-		JsonObject json = (JsonObject) new JsonParser().parse(ret);
-		JsonArray array = json.getAsJsonArray("elems");
-		List<TopicDomain> list = new ArrayList<TopicDomain>();
-
-		for (JsonElement jsonElement : array) {
-			JsonObject obj = jsonElement.getAsJsonObject();
-			if (obj.has("elems")) {
-				JsonArray arr = obj.getAsJsonArray("elems");
-				for (JsonElement jsone : arr) {
-					JsonObject obj1 = jsone.getAsJsonObject();
-					if (obj1.has("key")) {
-						TopicDomain topic = new TopicDomain();
-						topic.setTopic(obj1.get("key").getAsJsonObject().get("topic").getAsString());
-						topic.setPartition(obj1.get("key").getAsJsonObject().get("partition").getAsInt());
-						list.add(topic);
-					}
-				}
-			} else {
-				TopicDomain topic = new TopicDomain();
-				topic.setTopic(obj.get("key").getAsJsonObject().get("topic").getAsString());
-				topic.setPartition(obj.get("key").getAsJsonObject().get("partition").getAsInt());
-				list.add(topic);
+		List<PartitionsDomain> list = new ArrayList<PartitionsDomain>();
+		if (ZkUtils.pathExists(zkc, ZkUtils.BrokerTopicsPath())) {
+			Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.BrokerTopicsPath());
+			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+			int id = 0;
+			for (String topic : listSeq) {
+				Tuple2<String, Stat> tuple = ZkUtils.readData(zkc, ZkUtils.BrokerTopicsPath() + "/" + topic);
+				PartitionsDomain partition = new PartitionsDomain();
+				partition.setId(++id);
+				partition.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
+				partition.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
+				partition.setTopic(topic);
+				JSONObject partitionObject = JSON.parseObject(tuple._1).getJSONObject("partitions");
+				partition.setPartitionNumbers(partitionObject.size());
+				partition.setPartitions(partitionObject.keySet());
+				list.add(partition);
 			}
 		}
 		if (zkc != null) {
-			zkPool.release(zkc);
+			zkPool.releaseZKSerializer(zkc);
 			zkc = null;
 		}
-		return list;
-	}
-
-	public static String getNewPartitionInfo() {
-		List<TopicDomain> list = getAllPartitionsInfo();
-		Map<String, java.util.Set<Integer>> map = new HashMap<String, java.util.Set<Integer>>();
-		for (TopicDomain td : list) {
-			if (map.containsKey(td.getTopic())) {
-				java.util.Set<Integer> set = map.get(td.getTopic());
-				set.add(td.getPartition());
-			} else {
-				java.util.Set<Integer> set = new java.util.HashSet<Integer>();
-				set.add(td.getPartition());
-				map.put(td.getTopic(), set);
-			}
-		}
-
-		List<PartitionsDomain> listPartitions = new ArrayList<PartitionsDomain>();
-		int id = 0;
-		for (Entry<String, java.util.Set<Integer>> entry : map.entrySet()) {
-			PartitionsDomain pd = new PartitionsDomain();
-			pd.setTopic(entry.getKey());
-			pd.setId(++id);
-			pd.setPartitions(entry.getValue());
-			pd.setPartitionNumbers(entry.getValue().size());
-			listPartitions.add(pd);
-		}
-		return listPartitions.toString();
-	}
-
-	public static Map<String, List<TopicDomain>> getPartitionInfo() {
-		List<TopicDomain> list = getAllPartitionsInfo();
-
-		Map<String, List<TopicDomain>> map = new HashMap<String, List<TopicDomain>>();
-		for (int i = 0; i < list.size(); i++) {
-			Object key = map.get(list.get(i).getTopic());
-			List<TopicDomain> tmp = null;
-			if (key == null) {
-				tmp = new ArrayList<TopicDomain>();
-				tmp.add(list.get(i));
-				map.put(list.get(i).getTopic(), tmp);
-			} else {
-				tmp = map.get(list.get(i).getTopic());
-				tmp.add(list.get(i));
-				map.put(list.get(i).getTopic(), tmp);
-			}
-		}
-
-		return map;
+		return list.toString();
 	}
 
 }

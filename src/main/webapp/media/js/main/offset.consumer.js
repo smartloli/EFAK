@@ -5,30 +5,40 @@ $(document).ready(function() {
 	var topic = tmp.split("/")[1];
 	$("#topic_name_header").find("strong").text(topic);
 
-	$("#result").dataTable({
-		"searching" : false,
-		"bSort" : false,
-		"bLengthChange" : false,
-		"bProcessing" : true,
-		"bServerSide" : true,
-		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/consumer/offset/" + group + "/" + topic + "/ajax",
-		"aoColumns" : [ {
-			"mData" : 'partition'
-		}, {
-			"mData" : 'logsize'
-		}, {
-			"mData" : 'offset'
-		}, {
-			"mData" : 'lag'
-		}, {
-			"mData" : 'owner'
-		}, {
-			"mData" : 'created'
-		}, {
-			"mData" : 'modify'
-		} ]
-	});
+	var offset = 0;
+
+	function offsetDetail() {
+		$("#offset_topic_info").append("<div id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr><th>Partition</th><th>LogSize</th><th>Offset</th><th>Lag</th><th>Owner</th><th>Created</th><th>Modify</th></tr></thead></table></div>");
+		if (offset > 0) {
+			$("#div_children" + (offset - 1)).remove();
+		}
+		$("#result_children" + offset).dataTable({
+			"searching" : false,
+			"bSort" : false,
+			"bLengthChange" : false,
+			"bProcessing" : true,
+			"bServerSide" : true,
+			"fnServerData" : retrieveData,
+			"sAjaxSource" : "/ke/consumer/offset/" + group + "/" + topic + "/ajax",
+			"aoColumns" : [ {
+				"mData" : 'partition'
+			}, {
+				"mData" : 'logsize'
+			}, {
+				"mData" : 'offset'
+			}, {
+				"mData" : 'lag'
+			}, {
+				"mData" : 'owner'
+			}, {
+				"mData" : 'created'
+			}, {
+				"mData" : 'modify'
+			} ]
+		});
+
+		offset++;
+	}
 
 	function retrieveData(sSource, aoData, fnCallback) {
 		$.ajax({
@@ -44,4 +54,9 @@ $(document).ready(function() {
 			}
 		});
 	}
+
+	offsetDetail();
+
+	// 5s/per to the background service request details of the state of offset .
+	setInterval(offsetDetail, 5000);
 });
