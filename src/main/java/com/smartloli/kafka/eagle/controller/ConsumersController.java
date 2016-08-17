@@ -150,9 +150,9 @@ public class ConsumersController {
 				obj.put("id", tmp2.getInteger("id"));
 				obj.put("topic", topic);
 				if (tmp2.getBoolean("isConsumering")) {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "' target='_blank' class='btn btn-success btn-xs'>Running</a>");
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-success btn-xs'>Running</a>");
 				} else {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "' target='_blank' class='btn btn-danger btn-xs'>Pending</a>");
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-danger btn-xs'>Pending</a>");
 				}
 				retArr.add(obj);
 			}

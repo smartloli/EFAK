@@ -41,11 +41,12 @@ public class TopicController {
 		return mav;
 	}
 
-	@RequestMapping(value = "/topic/meta/{tname}", method = RequestMethod.GET)
+	@RequestMapping(value = "/topic/meta/{tname}/", method = RequestMethod.GET)
 	public ModelAndView topicMetaView(@PathVariable("tname") String tname, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
 		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
+		System.out.println("tname->"+tname);
 		ModelAndView mav = new ModelAndView();
 		if (TopicService.findTopicName(tname, ip)) {
 			mav.setViewName("/topic/topic_meta");
@@ -164,7 +165,7 @@ public class TopicController {
 			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 				JSONObject obj = new JSONObject();
 				obj.put("id", tmp2.getInteger("id"));
-				obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "' target='_blank'>" + tmp2.getString("topic") + "</a>");
+				obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "/' target='_blank'>" + tmp2.getString("topic") + "</a>");
 				obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
 				obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
 				obj.put("created", tmp2.getString("created"));

@@ -1,6 +1,7 @@
 package com.smartloli.kafka.eagle.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kafka.api.PartitionOffsetRequestInfo;
-import kafka.cluster.Broker;
 import kafka.common.TopicAndPartition;
 import kafka.consumer.ConsumerThreadId;
 import kafka.api.OffsetRequest;
@@ -20,7 +20,6 @@ import kafka.javaapi.OffsetResponse;
 import kafka.javaapi.PartitionMetadata;
 import kafka.javaapi.TopicMetadata;
 import kafka.javaapi.TopicMetadataRequest;
-import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.utils.ZkUtils;
 
@@ -122,17 +121,19 @@ public class KafkaClusterUtils {
 	}
 
 	public static long getLogSize(List<String> hosts, String topic, int partition) {
-		String clientName = "Client_" + topic + "_" + partition;
-		Broker leaderBroker = getLeaderBroker(hosts, topic, partition);
-		String reaHost = null;
-		int port = 9092;
-		if (leaderBroker != null) {
-			reaHost = leaderBroker.host();
-			port = leaderBroker.port();
-		} else {
-			System.out.println("Partition of Host is not find");
-			LOG.error("Partition of Host is not find");
+		LOG.info("Find leader hosts [" + hosts + "]");
+		PartitionMetadata metadata = findLeader(hosts, topic, partition);
+		if (metadata == null) {
+			LOG.error("[KafkaClusterUtils.getLogSize()] - Can't find metadata for Topic and Partition. Exiting");
 		}
+		if (metadata.leader() == null) {
+			LOG.error("[KafkaClusterUtils.getLogSize()] - Can't find Leader for Topic and Partition. Exiting");
+		}
+
+		String clientName = "Client_" + topic + "_" + partition;
+		String reaHost = metadata.leader().host();
+		int port = metadata.leader().port();
+
 		SimpleConsumer simpleConsumer = new SimpleConsumer(reaHost, port, 100000, 64 * 1024, clientName);
 		TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partition);
 		Map<TopicAndPartition, PartitionOffsetRequestInfo> requestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
@@ -148,39 +149,35 @@ public class KafkaClusterUtils {
 		return offsets[0];
 	}
 
-	private static Broker getLeaderBroker(List<String> hosts, String topic, int partition) {
-		String clientName = "Client_Leader_LookUp";
-		SimpleConsumer consumer = null;
-		PartitionMetadata partitionMetaData = null;
-		try {
-			for (String host : hosts) {
-				String ip = host.split(":")[0];
-				String port = host.split(":")[1];
-				consumer = new SimpleConsumer(ip, Integer.parseInt(port), 10000, 64 * 1024, clientName);
-				if (consumer != null) {
-					break;
-				}
-			}
-			List<String> topics = new ArrayList<String>();
-			topics.add(topic);
-			TopicMetadataRequest request = new TopicMetadataRequest(topics);
-			TopicMetadataResponse reponse = consumer.send(request);
-			List<TopicMetadata> topicMetadataList = reponse.topicsMetadata();
-			for (TopicMetadata topicMetadata : topicMetadataList) {
-				for (PartitionMetadata metadata : topicMetadata.partitionsMetadata()) {
-					if (metadata.partitionId() == partition) {
-						partitionMetaData = metadata;
-						break;
+	private static PartitionMetadata findLeader(List<String> a_seedBrokers, String a_topic, int a_partition) {
+		PartitionMetadata returnMetaData = null;
+		loop: for (String seed : a_seedBrokers) {
+			SimpleConsumer consumer = null;
+			try {
+				String ip = seed.split(":")[0];
+				String port = seed.split(":")[1];
+				consumer = new SimpleConsumer(ip, Integer.parseInt(port), 10000, 64 * 1024, "leaderLookup");
+				List<String> topics = Collections.singletonList(a_topic);
+				TopicMetadataRequest req = new TopicMetadataRequest(topics);
+				kafka.javaapi.TopicMetadataResponse resp = consumer.send(req);
+
+				List<TopicMetadata> metaData = resp.topicsMetadata();
+				for (TopicMetadata item : metaData) {
+					for (PartitionMetadata part : item.partitionsMetadata()) {
+						if (part.partitionId() == a_partition) {
+							returnMetaData = part;
+							break loop;
+						}
 					}
 				}
+			} catch (Exception e) {
+				LOG.error("Error communicating with Broker [" + seed + "] to find Leader for [" + a_topic + ", " + a_partition + "] Reason: " + e);
+			} finally {
+				if (consumer != null)
+					consumer.close();
 			}
-			if (partitionMetaData != null) {
-				return partitionMetaData.leader();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		return null;
+		return returnMetaData;
 	}
 
 	public static Map<String, List<String>> getConsumers() {
@@ -260,7 +257,6 @@ public class KafkaClusterUtils {
 		}
 		return arr.toJSONString();
 	}
-
 
 	/**
 	 * Get all broker list

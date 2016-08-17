@@ -58,5 +58,5 @@ $(document).ready(function() {
 	offsetDetail();
 
 	// 5s/per to the background service request details of the state of offset .
-	setInterval(offsetDetail, 5000);
+	setInterval(offsetDetail, 1000 * 30);
 });

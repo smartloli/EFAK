@@ -74,7 +74,7 @@ public class TopicService {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(topicMeta("rebateLog", "127.0.0.1"));
+		System.out.println(findTopicName("mf.test.ip.222", "127.0.0.1"));
 	}
 
 }

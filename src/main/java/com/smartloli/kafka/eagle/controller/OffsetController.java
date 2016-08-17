@@ -24,7 +24,7 @@ public class OffsetController {
 
 	private final Logger LOG = LoggerFactory.getLogger(OffsetController.class);
 
-	@RequestMapping(value = "/consumers/offset/{group}/{topic}", method = RequestMethod.GET)
+	@RequestMapping(value = "/consumers/offset/{group}/{topic}/", method = RequestMethod.GET)
 	public ModelAndView activeConsumersView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
 		ModelAndView mav = new ModelAndView();

@@ -45,7 +45,7 @@ start()
     echo "* KE service has started success!                              *"
     echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'  *"
 	echo "*******************************************************************"
-	ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke.out
+	ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out
 }
 
 stop()
@@ -54,7 +54,6 @@ stop()
 	 if [ -f $KE_HOME/bin/ke.pid ];then
                     SPID=`cat $KE_HOME/bin/ke.pid`
 					  if [ "$SPID" != "" ];then
-						 kill -9  $SPID
                          ${KE_HOME}/kms/bin/shutdown.sh
 						 echo  > $DIALUP_PID
 						 echo "stop success"
