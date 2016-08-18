@@ -61,7 +61,9 @@ public class ZKPoolUtils {
 	 * @param zkc
 	 */
 	public synchronized void releaseZKSerializer(ZkClient zkc) {
-		poolZKSerializer.add(zkc);
+		if (poolZKSerializer.size() < 25) {
+			poolZKSerializer.add(zkc);
+		}
 		LOG.info("poolZKSerializer size [" + poolZKSerializer.size() + "]");
 	}
 
@@ -71,7 +73,9 @@ public class ZKPoolUtils {
 	 * @param zkc
 	 */
 	public synchronized void release(ZkClient zkc) {
-		pool.add(zkc);
+		if (pool.size() < 25) {
+			pool.add(zkc);
+		}
 		LOG.info("pool size [" + pool.size() + "]");
 	}
 
@@ -102,6 +106,7 @@ public class ZKPoolUtils {
 				}
 			}
 		}
+		instance = null;
 	}
 
 	/**

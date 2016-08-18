@@ -1,6 +1,7 @@
 package com.smartloli.kafka.eagle.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +51,7 @@ public class KafkaClusterUtils {
 	private static Logger LOG = LoggerFactory.getLogger(KafkaClusterUtils.class);
 
 	public static void main(String[] args) {
-		// System.out.println(getAllBrokersInfo());
-		System.out.println(getAllPartitions());
+		System.out.println(getLogSize(Arrays.asList("master:9092"), "words", 0));
 	}
 
 	public static List<String> findTopicPartition(String topic) {
@@ -101,6 +101,11 @@ public class KafkaClusterUtils {
 				zkPool.releaseZKSerializer(zkc);
 				zkc = null;
 			}
+			try {
+				zkPool.closePool();
+			} catch (Exception exx) {
+				LOG.error("Close zk pool has error,msg is " + exx.getMessage());
+			}
 			return offsetZk;
 		}
 		long offsetSize = Long.parseLong(tuple._1.get());
@@ -134,19 +139,25 @@ public class KafkaClusterUtils {
 		String reaHost = metadata.leader().host();
 		int port = metadata.leader().port();
 
-		SimpleConsumer simpleConsumer = new SimpleConsumer(reaHost, port, 100000, 64 * 1024, clientName);
-		TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partition);
-		Map<TopicAndPartition, PartitionOffsetRequestInfo> requestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
-		requestInfo.put(topicAndPartition, new PartitionOffsetRequestInfo(OffsetRequest.LatestTime(), 1));
-		kafka.javaapi.OffsetRequest request = new kafka.javaapi.OffsetRequest(requestInfo, OffsetRequest.CurrentVersion(), clientName);
-		OffsetResponse response = simpleConsumer.getOffsetsBefore(request);
-		if (response.hasError()) {
-			System.out.println("Error fetching data Offset , Reason: " + response.errorCode(topic, partition));
-			LOG.error("Error fetching data Offset , Reason: " + response.errorCode(topic, partition));
-			return 0;
+		long ret = 0L;
+		try {
+			SimpleConsumer simpleConsumer = new SimpleConsumer(reaHost, port, 100000, 64 * 1024, clientName);
+			TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partition);
+			Map<TopicAndPartition, PartitionOffsetRequestInfo> requestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
+			requestInfo.put(topicAndPartition, new PartitionOffsetRequestInfo(OffsetRequest.LatestTime(), 1));
+			kafka.javaapi.OffsetRequest request = new kafka.javaapi.OffsetRequest(requestInfo, OffsetRequest.CurrentVersion(), clientName);
+			OffsetResponse response = simpleConsumer.getOffsetsBefore(request);
+			if (response.hasError()) {
+				System.out.println("Error fetching data Offset , Reason: " + response.errorCode(topic, partition));
+				LOG.error("Error fetching data Offset , Reason: " + response.errorCode(topic, partition));
+				return 0;
+			}
+			long[] offsets = response.offsets(topic, partition);
+			ret = offsets[0];
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
 		}
-		long[] offsets = response.offsets(topic, partition);
-		return offsets[0];
+		return ret;
 	}
 
 	private static PartitionMetadata findLeader(List<String> a_seedBrokers, String a_topic, int a_partition) {
@@ -184,14 +195,18 @@ public class KafkaClusterUtils {
 		if (zkc == null) {
 			zkc = zkPool.getZkClient();
 		}
-		String consumersPath = ZkUtils.ConsumersPath();
-		Seq<String> seq = ZkUtils.getChildren(zkc, consumersPath);
-		List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 		Map<String, List<String>> mapConsumers = new HashMap<String, List<String>>();
-		for (String group : listSeq) {
-			Seq<String> tmp = ZkUtils.getChildren(zkc, consumersPath + "/" + group + "/owners");
-			List<String> list = JavaConversions.seqAsJavaList(tmp);
-			mapConsumers.put(group, list);
+		try {
+			String consumersPath = ZkUtils.ConsumersPath();
+			Seq<String> seq = ZkUtils.getChildren(zkc, consumersPath);
+			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+			for (String group : listSeq) {
+				Seq<String> tmp = ZkUtils.getChildren(zkc, consumersPath + "/" + group + "/owners");
+				List<String> list = JavaConversions.seqAsJavaList(tmp);
+				mapConsumers.put(group, list);
+			}
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
 		}
 		if (zkc != null) {
 			zkPool.release(zkc);
@@ -209,28 +224,32 @@ public class KafkaClusterUtils {
 		if (zkc == null) {
 			zkc = zkPool.getZkClientSerializer();
 		}
-		Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.ConsumersPath());
-		List<String> listSeq = JavaConversions.seqAsJavaList(seq);
-		JSONArray arr = new JSONArray();
-		for (String group : listSeq) {
-			scala.collection.mutable.Map<String, scala.collection.immutable.List<ConsumerThreadId>> map = ZkUtils.getConsumersPerTopic(zkc, group, false);
-			for (Entry<String, ?> entry : JavaConversions.mapAsJavaMap(map).entrySet()) {
-				JSONObject obj = new JSONObject();
-				obj.put("topic", entry.getKey());
-				obj.put("group", group);
-				arr.add(obj);
-			}
-		}
 		Map<String, List<String>> actvTopic = new HashMap<String, List<String>>();
-		for (Object object : arr) {
-			JSONObject obj = (JSONObject) object;
-			if (actvTopic.containsKey(obj.getString("topic"))) {
-				actvTopic.get(obj.getString("topic")).add(obj.getString("group"));
-			} else {
-				List<String> group = new ArrayList<String>();
-				group.add(obj.getString("group"));
-				actvTopic.put(obj.getString("topic"), group);
+		try {
+			Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.ConsumersPath());
+			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+			JSONArray arr = new JSONArray();
+			for (String group : listSeq) {
+				scala.collection.mutable.Map<String, scala.collection.immutable.List<ConsumerThreadId>> map = ZkUtils.getConsumersPerTopic(zkc, group, false);
+				for (Entry<String, ?> entry : JavaConversions.mapAsJavaMap(map).entrySet()) {
+					JSONObject obj = new JSONObject();
+					obj.put("topic", entry.getKey());
+					obj.put("group", group);
+					arr.add(obj);
+				}
 			}
+			for (Object object : arr) {
+				JSONObject obj = (JSONObject) object;
+				if (actvTopic.containsKey(obj.getString("topic"))) {
+					actvTopic.get(obj.getString("topic")).add(obj.getString("group"));
+				} else {
+					List<String> group = new ArrayList<String>();
+					group.add(obj.getString("group"));
+					actvTopic.put(obj.getString("topic"), group);
+				}
+			}
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
 		}
 		if (zkc != null) {
 			zkPool.releaseZKSerializer(zkc);
@@ -273,16 +292,20 @@ public class KafkaClusterUtils {
 			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 			int id = 0;
 			for (String ids : listSeq) {
-				Tuple2<String, Stat> tuple = ZkUtils.readData(zkc, ZkUtils.BrokerIdsPath() + "/" + ids);
-				BrokersDomain broker = new BrokersDomain();
-				broker.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
-				broker.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
-				String host = JSON.parseObject(tuple._1).getString("host");
-				int port = JSON.parseObject(tuple._1).getInteger("port");
-				broker.setHost(host);
-				broker.setPort(port);
-				broker.setId(++id);
-				list.add(broker);
+				try {
+					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, ZkUtils.BrokerIdsPath() + "/" + ids);
+					BrokersDomain broker = new BrokersDomain();
+					broker.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
+					broker.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
+					String host = JSON.parseObject(tuple._1.get()).getString("host");
+					int port = JSON.parseObject(tuple._1.get()).getInteger("port");
+					broker.setHost(host);
+					broker.setPort(port);
+					broker.setId(++id);
+					list.add(broker);
+				} catch (Exception ex) {
+					LOG.error(ex.getMessage());
+				}
 			}
 		}
 		if (zkc != null) {
@@ -307,16 +330,20 @@ public class KafkaClusterUtils {
 			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 			int id = 0;
 			for (String topic : listSeq) {
-				Tuple2<String, Stat> tuple = ZkUtils.readData(zkc, ZkUtils.BrokerTopicsPath() + "/" + topic);
-				PartitionsDomain partition = new PartitionsDomain();
-				partition.setId(++id);
-				partition.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
-				partition.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
-				partition.setTopic(topic);
-				JSONObject partitionObject = JSON.parseObject(tuple._1).getJSONObject("partitions");
-				partition.setPartitionNumbers(partitionObject.size());
-				partition.setPartitions(partitionObject.keySet());
-				list.add(partition);
+				try {
+					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, ZkUtils.BrokerTopicsPath() + "/" + topic);
+					PartitionsDomain partition = new PartitionsDomain();
+					partition.setId(++id);
+					partition.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
+					partition.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
+					partition.setTopic(topic);
+					JSONObject partitionObject = JSON.parseObject(tuple._1.get()).getJSONObject("partitions");
+					partition.setPartitionNumbers(partitionObject.size());
+					partition.setPartitions(partitionObject.keySet());
+					list.add(partition);
+				} catch (Exception ex) {
+					LOG.error(ex.getMessage());
+				}
 			}
 		}
 		if (zkc != null) {
