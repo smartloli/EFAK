@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	<!-- 添加调度的任务bean 配置对应的class -->
+	<bean id="offsetsSchedule" class="com.smartloli.kafka.eagle.quartz.OffsetsQuartz" />
+	<!--配置调度具体执行的方法 -->
+	<bean id="offsetsDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="offsetsSchedule" />
+		<property name="targetMethod" value="jobQuartz" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<!--配置调度执行的触发的时间 -->
+	<bean id="offsetsTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="offsetsDetail" />
+		<property name="cronExpression">
+			<!-- 每5s执行任务调度 -->
+			<value>0/10 * * * * ?</value>
+		</property>
+	</bean>
+	<!-- quartz的调度工厂 调度工厂只能有一个，多个调度任务在list中添加 -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<!-- 所有的调度列表 -->
+				<ref local="offsetsTrigger" />
+			</list>
+		</property>
+	</bean>
+</beans>
