@@ -27,7 +27,7 @@ public class SQLitePoolUtils {
 		Connection conn = null;
 		try {
 			conn = getInstance().getConnection();
-			conn.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (topic string,created string,logsize long,offsets long,lag long,producer long,consumer long,PRIMARY KEY(topic))");
+			conn.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (topic string,created string,logsize long,offsets long,lag long,producer long,consumer long)");
 		} catch (Exception e) {
 			LOG.error("SQLite connect has error,msg is  " + e.getMessage());
 		}

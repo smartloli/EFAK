@@ -3,6 +3,8 @@ package com.smartloli.kafka.eagle.service;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -23,10 +25,10 @@ import com.smartloli.kafka.eagle.utils.SQLitePoolUtils;
 public class SQLiteService {
 
 	private static Logger LOG = LoggerFactory.getLogger(SQLiteService.class);
-	private static int MAX_COMMIT_SIZE = 100;
+	private static int MAX_COMMIT_SIZE = 1000;
 
 	// write to sqlite with batch
-	public static void replace(List<? extends OffsetsSQLiteDomain> list, String sql) {
+	public static void insert(List<? extends OffsetsSQLiteDomain> list, String sql) {
 		try {
 			Connection connSQL = SQLitePoolUtils.getSQLiteConn();
 			connSQL.setAutoCommit(false);
@@ -111,9 +113,16 @@ public class SQLiteService {
 	public static void query(String sql) {
 		try {
 			Connection connSQL = SQLitePoolUtils.getSQLiteConn();
-			ResultSet rs = connSQL.createStatement().executeQuery("select * from person");
+			ResultSet rs = connSQL.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				System.out.println(rs.getString("topic"));
+				System.out.println(rs.getString("created"));
+				System.out.println(rs.getString("logsize"));
+				System.out.println(rs.getString("offsets"));
+				System.out.println(rs.getString("lag"));
+				System.out.println(rs.getString("producer"));
+				System.out.println(rs.getString("consumer"));
+				return;
 			}
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
@@ -121,21 +130,25 @@ public class SQLiteService {
 	}
 
 	public static void main(String[] args) {
-		query("select * from offsets");
-//		testInsert();
+		 query("select * from offsets");
+		//testInsert();
 	}
 
 	private static void testInsert() {
-		OffsetsSQLiteDomain offset = new OffsetsSQLiteDomain();
-		offset.setConsumer(90);
-		offset.setCreated("19");
-		offset.setLag(90);
-		offset.setLogSize(100);
-		offset.setOffsets(10);
-		offset.setProducer(90);
-		offset.setTopic("test1");
+		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
+		for (int i = 0; i < 28800; i++) {
+			OffsetsSQLiteDomain offset = new OffsetsSQLiteDomain();
+			offset.setConsumer(i);
+			offset.setCreated(new Date().toString());
+			offset.setLag(i);
+			offset.setLogSize(i);
+			offset.setOffsets(i);
+			offset.setProducer(i);
+			offset.setTopic("test" + i);
+			list.add(offset);
+		}
 		String sql = "INSERT INTO offsets values(?,?,?,?,?,?,?)";
-		insert(offset, sql);
+		insert(list, sql);
 	}
 
 }

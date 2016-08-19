@@ -3,7 +3,7 @@ $(document).ready(function() {
 	var tmp = url.split("offset/")[1];
 	var group = tmp.split("/")[0];
 	var topic = tmp.split("/")[1];
-	$("#topic_name_header").find("strong").text(topic);
+	$("#topic_name_header").find("strong").html("<a href='/ke/consumers/offset/" + group + "/" + topic + "/realtime'>" + topic + "</a>");
 
 	var offset = 0;
 

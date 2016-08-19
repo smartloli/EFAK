@@ -35,6 +35,18 @@ public class OffsetController {
 		}
 		return mav;
 	}
+	
+	@RequestMapping(value = "/consumers/offset/{group}/{topic}/realtime", method = RequestMethod.GET)
+	public ModelAndView offsetsRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
+		String ip = request.getHeader("x-forwarded-for");
+		ModelAndView mav = new ModelAndView();
+		if (OffsetService.isGroupTopic(group, topic, ip)) {
+			mav.setViewName("/consumers/offset_realtime");
+		} else {
+			mav.setViewName("/error/404");
+		}
+		return mav;
+	}
 
 	@RequestMapping(value = "/consumer/offset/{group}/{topic}/ajax", method = RequestMethod.GET)
 	public void offsetDetailAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
