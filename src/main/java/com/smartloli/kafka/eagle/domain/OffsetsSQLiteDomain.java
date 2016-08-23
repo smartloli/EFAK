@@ -1,5 +1,7 @@
 package com.smartloli.kafka.eagle.domain;
 
+import com.google.gson.Gson;
+
 /**
  * @Date Aug 18, 2016
  *
@@ -11,13 +13,20 @@ package com.smartloli.kafka.eagle.domain;
  */
 public class OffsetsSQLiteDomain {
 
+	private String group = "";
 	private String topic = "";
 	private long logSize = 0L;
 	private long offsets = 0L;
 	private long lag = 0L;
-	private long consumer = 0L;
-	private long producer = 0L;
 	private String created = "";
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
 
 	public String getTopic() {
 		return topic;
@@ -51,28 +60,17 @@ public class OffsetsSQLiteDomain {
 		this.lag = lag;
 	}
 
-	public long getConsumer() {
-		return consumer;
-	}
-
-	public void setConsumer(long consumer) {
-		this.consumer = consumer;
-	}
-
-	public long getProducer() {
-		return producer;
-	}
-
-	public void setProducer(long producer) {
-		this.producer = producer;
-	}
-
 	public String getCreated() {
 		return created;
 	}
 
 	public void setCreated(String created) {
 		this.created = created;
+	}
+
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
 	}
 
 }

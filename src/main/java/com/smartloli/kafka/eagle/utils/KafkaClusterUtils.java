@@ -130,9 +130,11 @@ public class KafkaClusterUtils {
 		PartitionMetadata metadata = findLeader(hosts, topic, partition);
 		if (metadata == null) {
 			LOG.error("[KafkaClusterUtils.getLogSize()] - Can't find metadata for Topic and Partition. Exiting");
+			return 0L;
 		}
 		if (metadata.leader() == null) {
 			LOG.error("[KafkaClusterUtils.getLogSize()] - Can't find Leader for Topic and Partition. Exiting");
+			return 0L;
 		}
 
 		String clientName = "Client_" + topic + "_" + partition;

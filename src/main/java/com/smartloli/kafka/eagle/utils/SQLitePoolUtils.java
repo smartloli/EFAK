@@ -27,7 +27,7 @@ public class SQLitePoolUtils {
 		Connection conn = null;
 		try {
 			conn = getInstance().getConnection();
-			conn.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (topic string,created string,logsize long,offsets long,lag long,producer long,consumer long)");
+			conn.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
 		} catch (Exception e) {
 			LOG.error("SQLite connect has error,msg is  " + e.getMessage());
 		}
@@ -44,38 +44,15 @@ public class SQLitePoolUtils {
 			}
 			String osName = System.getProperties().getProperty("os.name");
 			if (osName.contains("Mac") || osName.contains("Win")) {
-				cpds.setJdbcUrl("jdbc:sqlite:" + System.getProperty("user.dir") + "/src/main/resources/ke.db");
+				cpds.setJdbcUrl("jdbc:sqlite:/Users/dengjie/hadoop/workspace/kafka-eagle/src/main/resources/ke.db");
 			} else {
-				cpds.setJdbcUrl("jdbc:sqlite:" + System.getProperty("user.dir") + "/conf/ke.db");
+				cpds.setJdbcUrl("jdbc:sqlite:" + System.getProperty("user.dir") + "/db/ke.db");
 			}
 			cpds.setMinPoolSize(1);
 			cpds.setMaxPoolSize(10);
 			cpds.setInitialPoolSize(5);
 		}
 		return cpds;
-	}
-
-	public static void release() {
-		try {
-			if (cpds != null) {
-				cpds.close();
-			}
-		} catch (Exception e) {
-			LOG.error("Release c3p0 has error = " + e.getMessage());
-		}
-	}
-
-	public static void closeSQLite(Connection sqlite) {
-		try {
-			if (sqlite != null) {
-				sqlite.close();
-			}
-			if (cpds != null) {
-				cpds.close();
-			}
-		} catch (Exception e) {
-			LOG.error("SQLite close has error = " + e.getMessage());
-		}
 	}
 
 }

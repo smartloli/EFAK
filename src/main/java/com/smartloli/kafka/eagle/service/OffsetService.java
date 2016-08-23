@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.smartloli.kafka.eagle.domain.OffsetDomain;
 import com.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import com.smartloli.kafka.eagle.domain.TupleDomain;
+import com.smartloli.kafka.eagle.utils.CalendarUtils;
 import com.smartloli.kafka.eagle.utils.KafkaClusterUtils;
 import com.smartloli.kafka.eagle.utils.LRUCacheUtils;
 
@@ -93,6 +94,28 @@ public class OffsetService {
 			lruCache.put(key, tuple);
 		}
 		return status;
+	}
+
+	public static String getOffsetsGraph(String group, String topic, String ip) {
+		String key = group + "_" + topic + "_consumer_offsets_graph_" + ip;
+		String ret = "";
+		if (lruCache.containsKey(key)) {
+			TupleDomain tuple = lruCache.get(key);
+			ret = tuple.getRet();
+			long end = System.currentTimeMillis();
+			if ((end - tuple.getTimespan()) / (1000 * 60.0) > 3) {// 1 mins
+				lruCache.remove(key);
+			}
+		} else {
+			String sql = "select * from offsets where groups='" + group + "' and topic='" + topic + "' and created between '" + CalendarUtils.getCurrentStartDate() + "' and '" + CalendarUtils.getCurrentEndDate() + "'";
+			ret = SQLiteService.query(sql).toString();
+			TupleDomain tuple = new TupleDomain();
+			tuple.setRet(ret);
+			tuple.setTimespan(System.currentTimeMillis());
+			lruCache.put(key, tuple);
+		}
+
+		return ret;
 	}
 
 	public static void main(String[] args) {

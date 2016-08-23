@@ -13,9 +13,28 @@ import java.util.Date;
  */
 public class CalendarUtils {
 
-	public static String getCurrentDate() {
+	public static String getCurrentEndDate() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return df.format(new Date());
+	}
+
+	public static String getCurrentStartDate() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
+		return df.format(new Date());
+	}
+
+	public static String getStatsPerDate() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		return df.format(new Date());
+	}
+
+	public static String getYestoday() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
+		Calendar calendar = Calendar.getInstance();
+		Date curr = new Date();
+		calendar.setTime(curr);
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		return df.format(calendar.getTime());
 	}
 
 	public static long getTime() {
@@ -49,14 +68,14 @@ public class CalendarUtils {
 		long sec = date - 3600 * 24 * day - 3600 * hour - 60 * min;
 		return day + "天" + hour + "时" + min + "分" + sec + "秒";
 	}
-	
-	public static String timeSpan2StrDate(long date){
+
+	public static String timeSpan2StrDate(long date) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return df.format(new Date(date));
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getTime());// 2505600
+		System.out.println(getYestoday());// 2505600
 	}
 
 }

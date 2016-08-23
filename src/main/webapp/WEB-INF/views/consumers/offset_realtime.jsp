@@ -50,7 +50,7 @@
 									<i class="fa fa-sign-in fa-5x"></i>
 								</div>
 								<div class="col-xs-9 text-right">
-									<div id="brokers_count" class="huge">0</div>
+									<div id="producer_rate" class="huge">0</div>
 									<div>msg / s</div>
 								</div>
 							</div>
@@ -73,7 +73,7 @@
 									<i class="fa fa-sign-out fa-5x"></i>
 								</div>
 								<div class="col-xs-9 text-right">
-									<div id="topics_count" class="huge">0</div>
+									<div id="consumer_rate" class="huge">0</div>
 									<div>msg / s</div>
 								</div>
 							</div>

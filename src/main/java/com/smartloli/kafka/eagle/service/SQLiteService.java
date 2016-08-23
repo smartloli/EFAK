@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -40,13 +39,12 @@ public class SQLiteService {
 
 			for (OffsetsSQLiteDomain p : list) {
 				rowCount++;
-				sqlStatement.setString(1, p.getTopic());
-				sqlStatement.setString(2, p.getCreated());
-				sqlStatement.setLong(3, p.getLogSize());
-				sqlStatement.setLong(4, p.getOffsets());
-				sqlStatement.setLong(5, p.getLag());
-				sqlStatement.setLong(6, p.getProducer());
-				sqlStatement.setLong(7, p.getConsumer());
+				sqlStatement.setString(1, p.getGroup());
+				sqlStatement.setString(2, p.getTopic());
+				sqlStatement.setString(3, p.getCreated());
+				sqlStatement.setLong(4, p.getLogSize());
+				sqlStatement.setLong(5, p.getOffsets());
+				sqlStatement.setLong(6, p.getLag());
 				sqlStatement.addBatch();
 
 				if (rowCount % MAX_COMMIT_SIZE == 0) {
@@ -71,17 +69,19 @@ public class SQLiteService {
 				} catch (Exception e) {
 					connSQL.rollback();
 					LOG.error("[SQLiteService.replace] replace batch error = " + e.getMessage());
-				} finally {
-					try {
-						// sqlStatement.close();
-						// connSQL.close();
-						SQLitePoolUtils.release();
-					} catch (Exception ex) {
-						LOG.error("[SQLiteService.replace] Release SQLite has error, msg is " + ex.getMessage());
-					}
 				}
 			}
 
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
+		}
+	}
+
+	public static void update(String sql) {
+		try {
+			Connection connSQL = SQLitePoolUtils.getSQLiteConn();
+			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
+			sqlStatement.executeUpdate();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		}
@@ -91,63 +91,56 @@ public class SQLiteService {
 		try {
 			Connection connSQL = SQLitePoolUtils.getSQLiteConn();
 			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
-			sqlStatement.setString(1, offsets.getTopic());
-			sqlStatement.setString(2, offsets.getCreated());
-			sqlStatement.setLong(3, offsets.getLogSize());
-			sqlStatement.setLong(4, offsets.getOffsets());
-			sqlStatement.setLong(5, offsets.getLag());
-			sqlStatement.setLong(6, offsets.getProducer());
-			sqlStatement.setLong(7, offsets.getConsumer());
+			sqlStatement.setString(1, offsets.getGroup());
+			sqlStatement.setString(2, offsets.getTopic());
+			sqlStatement.setString(3, offsets.getCreated());
+			sqlStatement.setLong(4, offsets.getLogSize());
+			sqlStatement.setLong(5, offsets.getOffsets());
+			sqlStatement.setLong(6, offsets.getLag());
 			sqlStatement.executeUpdate();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
-		} finally {
-			try {
-				SQLitePoolUtils.release();
-			} catch (Exception ex) {
-				LOG.error("[SQLiteService.replace] Release SQLite has error, msg is " + ex.getMessage());
-			}
 		}
 	}
 
-	public static void query(String sql) {
+	public static List<OffsetsSQLiteDomain> query(String sql) {
+		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
 		try {
 			Connection connSQL = SQLitePoolUtils.getSQLiteConn();
 			ResultSet rs = connSQL.createStatement().executeQuery(sql);
 			while (rs.next()) {
-				System.out.println(rs.getString("topic"));
-				System.out.println(rs.getString("created"));
-				System.out.println(rs.getString("logsize"));
-				System.out.println(rs.getString("offsets"));
-				System.out.println(rs.getString("lag"));
-				System.out.println(rs.getString("producer"));
-				System.out.println(rs.getString("consumer"));
-				return;
+				OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
+				offsetSQLite.setCreated(rs.getString("created"));
+				offsetSQLite.setLag(rs.getLong("lag"));
+				offsetSQLite.setLogSize(rs.getLong("logsize"));
+				offsetSQLite.setOffsets(rs.getLong("offsets"));
+				offsetSQLite.setTopic(rs.getString("topic"));
+				offsetSQLite.setGroup(rs.getString("groups"));
+				list.add(offsetSQLite);
 			}
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		}
+		return list;
 	}
 
 	public static void main(String[] args) {
-		 query("select * from offsets");
-		//testInsert();
+		 System.out.println(query("select * from offsets where created='2016-08-23 16:50'"));
+//		update("delete from offsets where created='2016-08-23 16:50'");
+		// testInsert();
 	}
 
-	private static void testInsert() {
+	public static void testInsert() {
 		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
-		for (int i = 0; i < 28800; i++) {
-			OffsetsSQLiteDomain offset = new OffsetsSQLiteDomain();
-			offset.setConsumer(i);
-			offset.setCreated(new Date().toString());
-			offset.setLag(i);
-			offset.setLogSize(i);
-			offset.setOffsets(i);
-			offset.setProducer(i);
-			offset.setTopic("test" + i);
-			list.add(offset);
-		}
-		String sql = "INSERT INTO offsets values(?,?,?,?,?,?,?)";
+		OffsetsSQLiteDomain offset = new OffsetsSQLiteDomain();
+		offset.setGroup("group1");
+		offset.setCreated("2016-08-23 16:50");
+		offset.setLag(70);
+		offset.setLogSize(1625);
+		offset.setOffsets(70);
+		offset.setTopic("test_data3");
+		list.add(offset);
+		String sql = "INSERT INTO offsets values(?,?,?,?,?,?)";
 		insert(list, sql);
 	}
 

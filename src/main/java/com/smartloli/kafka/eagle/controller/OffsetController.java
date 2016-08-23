@@ -35,7 +35,7 @@ public class OffsetController {
 		}
 		return mav;
 	}
-	
+
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/realtime", method = RequestMethod.GET)
 	public ModelAndView offsetsRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
@@ -73,7 +73,7 @@ public class OffsetController {
 			}
 		}
 
-		JSONArray ret = JSON.parseArray(OffsetService.getLogSize(topic, group,ip));
+		JSONArray ret = JSON.parseArray(OffsetService.getLogSize(topic, group, ip));
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {
@@ -81,10 +81,14 @@ public class OffsetController {
 			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 				JSONObject obj = new JSONObject();
 				obj.put("partition", tmp2.getInteger("partition"));
-				obj.put("logsize", tmp2.getLong("logSize"));
-				if(tmp2.getLong("offset")==-1){
+				if (tmp2.getLong("logSize") == 0) {
+					obj.put("logsize", "<a class='btn btn-warning btn-xs'>0</a>");
+				} else {
+					obj.put("logsize", tmp2.getLong("logSize"));
+				}
+				if (tmp2.getLong("offset") == -1) {
 					obj.put("offset", "<a class='btn btn-warning btn-xs'>0</a>");
-				}else{
+				} else {
 					obj.put("offset", "<a class='btn btn-success btn-xs'>" + tmp2.getLong("offset") + "</a>");
 				}
 				obj.put("lag", "<a class='btn btn-danger btn-xs'>" + tmp2.getLong("lag") + "</a>");
@@ -103,6 +107,30 @@ public class OffsetController {
 		obj.put("aaData", retArr);
 		try {
 			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			response.setContentLength(output.length);
+			OutputStream out = response.getOutputStream();
+			out.write(output);
+
+			out.flush();
+			out.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	@RequestMapping(value = "/consumer/offset/{group}/{topic}/realtime/ajax", method = RequestMethod.GET)
+	public void offsetGraphAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
+		response.setContentType("text/html;charset=utf-8");
+		response.setCharacterEncoding("utf-8");
+		response.setHeader("Charset", "utf-8");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Content-Encoding", "gzip");
+
+		String ip = request.getHeader("x-forwarded-for");
+		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
+
+		try {
+			byte[] output = GzipUtils.compressToByte(OffsetService.getOffsetsGraph(group, topic, ip));
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
