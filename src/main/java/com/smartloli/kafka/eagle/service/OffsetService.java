@@ -102,6 +102,9 @@ public class OffsetService {
 		if (lruCache.containsKey(key)) {
 			TupleDomain tuple = lruCache.get(key);
 			ret = tuple.getRet();
+			if ("".equals(ret)) {
+				lruCache.remove(key);
+			}
 			long end = System.currentTimeMillis();
 			if ((end - tuple.getTimespan()) / (1000 * 60.0) > 3) {// 1 mins
 				lruCache.remove(key);

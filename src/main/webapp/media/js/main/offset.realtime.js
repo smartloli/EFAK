@@ -11,12 +11,23 @@ $(document).ready(function() {
 		success : function(datas) {
 			if (datas != null) {
 				// Consumer & Producer Rate
-				var consumer = 0, producer = 0;
+				var producer = 0, consumer = 0;
+				var consumerArrays = new Array();
+				var producerArrays = new Array();
 				for (var i = 0; i < datas.length; i++) {
-					consumer += datas[i].offsets;
-					producer += datas[i].lag;
+					consumerArrays.push(datas[i].offsets);
+					producerArrays.push(datas[i].logSize);
 				}
+
+				consumerArrays.sort(function(a, b) {
+					return b - a;
+				});
 				
+				producerArrays.sort(function(a, b) {
+					return b - a;
+				});
+				consumer = consumerArrays.length == 0 ? consumerArrays[0] : (consumerArrays[0] - consumerArrays[consumerArrays.length - 1]);
+				producer = producerArrays.length == 0 ? producerArrays[0] : (producerArrays[0] - producerArrays[producerArrays.length - 1]);
 				$("#producer_rate").text((producer / (datas.length * 5 * 60)).toFixed(3));
 				$("#consumer_rate").text((consumer / (datas.length * 5 * 60)).toFixed(3));
 
@@ -41,6 +52,7 @@ $(document).ready(function() {
 					hideHover : 'auto',
 					resize : true
 				});
+				data = [];
 			}
 		}
 	});

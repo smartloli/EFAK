@@ -11,7 +11,7 @@ import com.google.gson.Gson;
  */
 public class TupleDomain {
 	private long timespan;
-	private String ret;
+	private String ret = "";
 	private boolean status;
 
 	public boolean isStatus() {

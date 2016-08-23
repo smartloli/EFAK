@@ -41,9 +41,9 @@ start()
 	chmod +x ${KE_HOME}/kms/bin/*.sh
 	${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1 < /dev/null & new_agent_pid=$!
 	echo "$new_agent_pid" > $DIALUP_PID
-	echo "********************************************************************"
-    	echo "* KE service has started success!                              		*"
-    	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'  	*"
+	echo "*******************************************************************"
+    	echo "* KE service has started success!
+    	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'
 	echo "********************************************************************"
 	rm -rf ${LOG_DIR}/ke_console.out
 	ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out

@@ -49,7 +49,11 @@ public class OffsetsQuartz {
 					offsetSQLite.setGroup(group);
 					offsetSQLite.setCreated(CalendarUtils.getStatsPerDate());
 					offsetSQLite.setTopic(topic);
-					offsetSQLite.setLag(offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
+					if (logSize == 0) {
+						offsetSQLite.setLag(0L);
+					} else {
+						offsetSQLite.setLag(offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
+					}
 					offsetSQLite.setLogSize(logSize);
 					offsetSQLite.setOffsets(offsetZk.getOffset());
 					list.add(offsetSQLite);
