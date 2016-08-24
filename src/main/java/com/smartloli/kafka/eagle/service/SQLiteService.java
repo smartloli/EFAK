@@ -26,10 +26,16 @@ public class SQLiteService {
 	private static Logger LOG = LoggerFactory.getLogger(SQLiteService.class);
 	private static int MAX_COMMIT_SIZE = 1000;
 
-	// write to sqlite with batch
+	/**
+	 * write stats data to sqlite with batch
+	 * 
+	 * @param list
+	 * @param sql
+	 */
 	public static void insert(List<? extends OffsetsSQLiteDomain> list, String sql) {
+		Connection connSQL = null;
 		try {
-			Connection connSQL = SQLitePoolUtils.getSQLiteConn();
+			connSQL = SQLitePoolUtils.getSQLiteConn();
 			connSQL.setAutoCommit(false);
 			connSQL.setSavepoint();
 
@@ -74,22 +80,32 @@ public class SQLiteService {
 
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
+		} finally {
+			if (connSQL != null) {
+				SQLitePoolUtils.release(connSQL);
+			}
 		}
 	}
 
 	public static void update(String sql) {
+		Connection connSQL = null;
 		try {
-			Connection connSQL = SQLitePoolUtils.getSQLiteConn();
+			connSQL = SQLitePoolUtils.getSQLiteConn();
 			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
 			sqlStatement.executeUpdate();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
+		} finally {
+			if (connSQL != null) {
+				SQLitePoolUtils.release(connSQL);
+			}
 		}
 	}
 
 	public static void insert(OffsetsSQLiteDomain offsets, String sql) {
+		Connection connSQL = null;
 		try {
-			Connection connSQL = SQLitePoolUtils.getSQLiteConn();
+			connSQL = SQLitePoolUtils.getSQLiteConn();
 			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
 			sqlStatement.setString(1, offsets.getGroup());
 			sqlStatement.setString(2, offsets.getTopic());
@@ -100,6 +116,10 @@ public class SQLiteService {
 			sqlStatement.executeUpdate();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
+		} finally {
+			if (connSQL != null) {
+				SQLitePoolUtils.release(connSQL);
+			}
 		}
 	}
 
