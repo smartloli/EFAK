@@ -45,9 +45,9 @@ $(document).ready(function() {
 					element : 'morris-area-chart',
 					data : data,
 					xkey : 'period',
-					ykeys : [ 'LogSize', 'Offsets', 'Lag' ],
-					labels : [ 'LogSize', 'Offsets', 'Lag' ],
-					lineColors : [ '#2577b5', '#7cb47c', '#d43f3a' ],
+					ykeys : [ 'Lag', 'Offsets', 'LogSize' ],
+					labels : [ 'Lag', 'Offsets', 'LogSize' ],
+					lineColors : [ '#d43f3a', '#7cb47c', '#2577b5' ],
 					pointSize : 2,
 					hideHover : 'auto',
 					resize : true

@@ -105,8 +105,9 @@ public class SQLiteService {
 
 	public static List<OffsetsSQLiteDomain> query(String sql) {
 		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
+		Connection connSQL = null;
 		try {
-			Connection connSQL = SQLitePoolUtils.getSQLiteConn();
+			connSQL = SQLitePoolUtils.getSQLiteConn();
 			ResultSet rs = connSQL.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
@@ -120,13 +121,17 @@ public class SQLiteService {
 			}
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
+		} finally {
+			if (connSQL != null) {
+				SQLitePoolUtils.release(connSQL);
+			}
 		}
 		return list;
 	}
 
 	public static void main(String[] args) {
-		 System.out.println(query("select * from offsets where created='2016-08-23 16:50'"));
-//		update("delete from offsets where created='2016-08-23 16:50'");
+		System.out.println(query("select * from offsets where created='2016-08-23 16:50'"));
+		// update("delete from offsets where created='2016-08-23 16:50'");
 		// testInsert();
 	}
 

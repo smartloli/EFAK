@@ -3,6 +3,9 @@ package com.smartloli.kafka.eagle.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -25,6 +28,7 @@ import com.smartloli.kafka.eagle.utils.LRUCacheUtils;
 public class OffsetService {
 
 	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
+	private static Logger LOG = LoggerFactory.getLogger(OffsetService.class);
 
 	public static String getLogSize(String topic, String group, String ip) {
 		List<String> hosts = getBrokers(topic, group, ip);
@@ -97,32 +101,13 @@ public class OffsetService {
 	}
 
 	public static String getOffsetsGraph(String group, String topic, String ip) {
-		String key = group + "_" + topic + "_consumer_offsets_graph_" + ip;
-		String ret = "";
-		if (lruCache.containsKey(key)) {
-			TupleDomain tuple = lruCache.get(key);
-			ret = tuple.getRet();
-			if ("".equals(ret)) {
-				lruCache.remove(key);
-			}
-			long end = System.currentTimeMillis();
-			if ((end - tuple.getTimespan()) / (1000 * 60.0) > 3) {// 1 mins
-				lruCache.remove(key);
-			}
-		} else {
-			String sql = "select * from offsets where groups='" + group + "' and topic='" + topic + "' and created between '" + CalendarUtils.getCurrentStartDate() + "' and '" + CalendarUtils.getCurrentEndDate() + "'";
-			ret = SQLiteService.query(sql).toString();
-			TupleDomain tuple = new TupleDomain();
-			tuple.setRet(ret);
-			tuple.setTimespan(System.currentTimeMillis());
-			lruCache.put(key, tuple);
-		}
-
-		return ret;
+		String sql = "select * from offsets where groups='" + group + "' and topic='" + topic + "' and created between '" + CalendarUtils.getCurrentStartDate() + "' and '" + CalendarUtils.getCurrentEndDate() + "'";
+		LOG.info("IP[" + ip + "],SQL[" + sql + "]");
+		return SQLiteService.query(sql).toString();
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getLogSize("words", "group1", "127.0.0.1"));
+		System.out.println(getOffsetsGraph("group1", "test_data3", "127.0.0.1"));
 	}
 
 }

@@ -55,4 +55,14 @@ public class SQLitePoolUtils {
 		return cpds;
 	}
 
+	public static void release(Connection connect) {
+		try {
+			if (connect != null) {
+				connect.close();
+			}
+		} catch (Exception ex) {
+			LOG.error("Release connect has error,msg is " + ex.getMessage());
+		}
+	}
+
 }
