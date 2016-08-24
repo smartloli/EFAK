@@ -19,7 +19,7 @@
 				<div class="panel-body">
 					<form role="form">
 						<fieldset>
-							<h1 class="form-signin-heading">Not found ~~</h1>
+							<h1 class="form-signin-heading">Oops. Not found ~~</h1>
 							<!-- Change this to a button or input when using this as a form -->
 							<a href="/ke" id="submit" class="btn btn-lg btn-primary btn-block">Return</a>
 						</fieldset>
