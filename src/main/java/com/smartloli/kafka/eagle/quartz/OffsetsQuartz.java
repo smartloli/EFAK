@@ -41,23 +41,24 @@ public class OffsetsQuartz {
 		for (Entry<String, List<String>> entry : consumers.entrySet()) {
 			String group = entry.getKey();
 			for (String topic : entry.getValue()) {
+				OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
 				for (String partitionStr : KafkaClusterUtils.findTopicPartition(topic)) {
 					int partition = Integer.parseInt(partitionStr);
-					OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
 					long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partition);
 					OffsetZkDomain offsetZk = KafkaClusterUtils.getOffset(topic, group, partition);
 					offsetSQLite.setGroup(group);
 					offsetSQLite.setCreated(CalendarUtils.getStatsPerDate());
 					offsetSQLite.setTopic(topic);
 					if (logSize == 0) {
-						offsetSQLite.setLag(0L);
+						offsetSQLite.setLag(0L + offsetSQLite.getLag());
 					} else {
-						offsetSQLite.setLag(offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
+						long lag = offsetSQLite.getLag() + (offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
+						offsetSQLite.setLag(lag);
 					}
-					offsetSQLite.setLogSize(logSize);
-					offsetSQLite.setOffsets(offsetZk.getOffset());
-					list.add(offsetSQLite);
+					offsetSQLite.setLogSize(logSize + offsetSQLite.getLogSize());
+					offsetSQLite.setOffsets(offsetZk.getOffset() + offsetSQLite.getOffsets());
 				}
+				list.add(offsetSQLite);
 			}
 		}
 		String sql = "INSERT INTO offsets values(?,?,?,?,?,?)";

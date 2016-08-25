@@ -15,7 +15,7 @@
 	<!-- Top Menu Items -->
 	<ul class="nav navbar-right top-nav">
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.0.2 </a></li>
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.0.3 </a></li>
 	</ul>
 	<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
 	<div class="collapse navbar-collapse navbar-ex1-collapse">

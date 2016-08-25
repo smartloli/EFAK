@@ -38,6 +38,7 @@ start()
     echo "* Listen port has successed! *"
 	echo "*******************************************************************"
 	sleep 5
+	rm -rf ${KE_HOME}/kms/logs/*
 	chmod +x ${KE_HOME}/kms/bin/*.sh
 	${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1 < /dev/null & new_agent_pid=$!
 	echo "$new_agent_pid" > $DIALUP_PID

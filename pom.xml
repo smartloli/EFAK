@@ -4,7 +4,7 @@
 	<groupId>com.smartloli.kafka.eagle</groupId>
 	<artifactId>kafka-eagle</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<name>ke</name>
 	<properties>
 		<package.name>ke</package.name>
@@ -199,7 +199,7 @@
 				<version>2.2</version>
 				<configuration>
 					<warName>ke</warName>
-					<packagingExcludes>WEB-INF/classes/kms/**,WEB-INF/classes/ke.sh,WEB-INF/classes/assembly.xml</packagingExcludes>
+					<packagingExcludes>WEB-INF/classes/kms/**,WEB-INF/classes/ke.db,WEB-INF/classes/ke.sh,WEB-INF/classes/assembly.xml</packagingExcludes>
 				</configuration>
 			</plugin>
 

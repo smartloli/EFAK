@@ -1,6 +1,6 @@
 $(document).ready(function() {
 	$("#result").dataTable({
-		"searching" : false,
+		//"searching" : false,
 		"bSort" : false,
 		"bLengthChange" : false,
 		"bProcessing" : true,

@@ -150,20 +150,20 @@ public class SQLiteService {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(query("select * from offsets where created='2016-08-23 16:50'"));
+		System.out.println(query("select * from offsets where topic='test_data4' and created between '2016-08-25 17:00:00' and '2016-08-25 17:50:55'"));
 		// update("delete from offsets where created='2016-08-23 16:50'");
-		// testInsert();
+//		 testInsert();
 	}
 
 	public static void testInsert() {
 		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
 		OffsetsSQLiteDomain offset = new OffsetsSQLiteDomain();
 		offset.setGroup("group1");
-		offset.setCreated("2016-08-23 16:50");
+		offset.setCreated("2016-08-25 17:00");
 		offset.setLag(70);
 		offset.setLogSize(1625);
 		offset.setOffsets(70);
-		offset.setTopic("test_data3");
+		offset.setTopic("test_data4");
 		list.add(offset);
 		String sql = "INSERT INTO offsets values(?,?,?,?,?,?)";
 		insert(list, sql);

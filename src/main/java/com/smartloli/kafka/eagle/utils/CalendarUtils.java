@@ -14,12 +14,12 @@ import java.util.Date;
 public class CalendarUtils {
 
 	public static String getCurrentEndDate() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		return df.format(new Date());
 	}
 
 	public static String getCurrentStartDate() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:00");
 		return df.format(new Date());
 	}
 

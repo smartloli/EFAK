@@ -22,7 +22,7 @@ $(document).ready(function() {
 				consumerArrays.sort(function(a, b) {
 					return b - a;
 				});
-				
+
 				producerArrays.sort(function(a, b) {
 					return b - a;
 				});
@@ -41,7 +41,7 @@ $(document).ready(function() {
 					data.push(obj);
 				}
 				// Area Chart
-				Morris.Area({
+				var option = {
 					element : 'morris-area-chart',
 					data : data,
 					xkey : 'period',
@@ -51,8 +51,10 @@ $(document).ready(function() {
 					pointSize : 2,
 					hideHover : 'auto',
 					resize : true
-				});
+				};
+				Morris.Area(option);
 				data = [];
+				option = {};
 			}
 		}
 	});

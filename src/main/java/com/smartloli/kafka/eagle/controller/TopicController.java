@@ -46,7 +46,7 @@ public class TopicController {
 		String ip = request.getHeader("x-forwarded-for");
 		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
-		System.out.println("tname->"+tname);
+		System.out.println("tname->" + tname);
 		ModelAndView mav = new ModelAndView();
 		if (TopicService.findTopicName(tname, ip)) {
 			mav.setViewName("/topic/topic_meta");
@@ -146,6 +146,7 @@ public class TopicController {
 		String aoData = request.getParameter("aoData");
 		JSONArray jsonArray = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+		String search = "";
 		for (Object obj : jsonArray) {
 			JSONObject jsonObj = (JSONObject) obj;
 			if ("sEcho".equals(jsonObj.getString("name"))) {
@@ -154,8 +155,12 @@ public class TopicController {
 				iDisplayStart = jsonObj.getIntValue("value");
 			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
 				iDisplayLength = jsonObj.getIntValue("value");
+			} else if ("sSearch".equals(jsonObj.getString("name"))) {
+				search = jsonObj.getString("value");
 			}
 		}
+
+		System.out.println("search->" + search);
 
 		JSONArray ret = JSON.parseArray(TopicService.list());
 		int offset = 0;
@@ -164,13 +169,25 @@ public class TopicController {
 			JSONObject tmp2 = (JSONObject) tmp;
 			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 				JSONObject obj = new JSONObject();
-				obj.put("id", tmp2.getInteger("id"));
-				obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "/' target='_blank'>" + tmp2.getString("topic") + "</a>");
-				obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
-				obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
-				obj.put("created", tmp2.getString("created"));
-				obj.put("modify", tmp2.getString("modify"));
-				retArr.add(obj);
+				if (search.length() > 0) {
+					if (search.equals(tmp2.getString("topic"))) {
+						obj.put("id", tmp2.getInteger("id"));
+						obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "/' target='_blank'>" + tmp2.getString("topic") + "</a>");
+						obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
+						obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
+						obj.put("created", tmp2.getString("created"));
+						obj.put("modify", tmp2.getString("modify"));
+						retArr.add(obj);
+					}
+				} else {
+					obj.put("id", tmp2.getInteger("id"));
+					obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "/' target='_blank'>" + tmp2.getString("topic") + "</a>");
+					obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
+					obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
+					obj.put("created", tmp2.getString("created"));
+					obj.put("modify", tmp2.getString("modify"));
+					retArr.add(obj);
+				}
 			}
 			offset++;
 		}
