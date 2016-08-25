@@ -160,26 +160,23 @@ public class TopicController {
 			}
 		}
 
-		System.out.println("search->" + search);
-
 		JSONArray ret = JSON.parseArray(TopicService.list());
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {
 			JSONObject tmp2 = (JSONObject) tmp;
-			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+			if (search.length() > 0 && search.equals(tmp2.getString("topic"))) {
 				JSONObject obj = new JSONObject();
-				if (search.length() > 0) {
-					if (search.equals(tmp2.getString("topic"))) {
-						obj.put("id", tmp2.getInteger("id"));
-						obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "/' target='_blank'>" + tmp2.getString("topic") + "</a>");
-						obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
-						obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
-						obj.put("created", tmp2.getString("created"));
-						obj.put("modify", tmp2.getString("modify"));
-						retArr.add(obj);
-					}
-				} else {
+				obj.put("id", tmp2.getInteger("id"));
+				obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "/' target='_blank'>" + tmp2.getString("topic") + "</a>");
+				obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
+				obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
+				obj.put("created", tmp2.getString("created"));
+				obj.put("modify", tmp2.getString("modify"));
+				retArr.add(obj);
+			} else if (search.length() == 0) {
+				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+					JSONObject obj = new JSONObject();
 					obj.put("id", tmp2.getInteger("id"));
 					obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "/' target='_blank'>" + tmp2.getString("topic") + "</a>");
 					obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
@@ -188,8 +185,8 @@ public class TopicController {
 					obj.put("modify", tmp2.getString("modify"));
 					retArr.add(obj);
 				}
+				offset++;
 			}
-			offset++;
 		}
 
 		JSONObject obj = new JSONObject();
