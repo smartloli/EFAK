@@ -4,7 +4,7 @@
 	<groupId>com.smartloli.kafka.eagle</groupId>
 	<artifactId>kafka-eagle</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<name>ke</name>
 	<properties>
 		<package.name>ke</package.name>
@@ -174,11 +174,6 @@
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<version>1.8.6</version>
-		</dependency>
-		<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.5.2</version>
 		</dependency>
 	</dependencies>
 	<build>

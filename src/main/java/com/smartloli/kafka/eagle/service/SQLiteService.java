@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
-import com.smartloli.kafka.eagle.utils.SQLitePoolUtils;
+import com.smartloli.kafka.eagle.utils.SQLiteUtils;
 
 /**
  * @Date Aug 18, 2016
@@ -33,9 +33,10 @@ public class SQLiteService {
 	 * @param sql
 	 */
 	public static void insert(List<? extends OffsetsSQLiteDomain> list, String sql) {
+		SQLiteUtils sqlite = new SQLiteUtils();
 		Connection connSQL = null;
 		try {
-			connSQL = SQLitePoolUtils.getSQLiteConn();
+			connSQL = sqlite.getSQLiteConn();
 			connSQL.setAutoCommit(false);
 			connSQL.setSavepoint();
 
@@ -82,30 +83,32 @@ public class SQLiteService {
 			LOG.error(ex.getMessage());
 		} finally {
 			if (connSQL != null) {
-				SQLitePoolUtils.release(connSQL);
+				sqlite.close(connSQL);
 			}
 		}
 	}
 
 	public static void update(String sql) {
+		SQLiteUtils sqlite = new SQLiteUtils();
 		Connection connSQL = null;
 		try {
-			connSQL = SQLitePoolUtils.getSQLiteConn();
+			connSQL = sqlite.getSQLiteConn();
 			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
 			sqlStatement.executeUpdate();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		} finally {
 			if (connSQL != null) {
-				SQLitePoolUtils.release(connSQL);
+				sqlite.close(connSQL);
 			}
 		}
 	}
 
 	public static void insert(OffsetsSQLiteDomain offsets, String sql) {
+		SQLiteUtils sqlite = new SQLiteUtils();
 		Connection connSQL = null;
 		try {
-			connSQL = SQLitePoolUtils.getSQLiteConn();
+			connSQL = sqlite.getSQLiteConn();
 			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
 			sqlStatement.setString(1, offsets.getGroup());
 			sqlStatement.setString(2, offsets.getTopic());
@@ -118,16 +121,17 @@ public class SQLiteService {
 			LOG.error(ex.getMessage());
 		} finally {
 			if (connSQL != null) {
-				SQLitePoolUtils.release(connSQL);
+				sqlite.close(connSQL);
 			}
 		}
 	}
 
 	public static List<OffsetsSQLiteDomain> query(String sql) {
 		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
+		SQLiteUtils sqlite = new SQLiteUtils();
 		Connection connSQL = null;
 		try {
-			connSQL = SQLitePoolUtils.getSQLiteConn();
+			connSQL = sqlite.getSQLiteConn();
 			ResultSet rs = connSQL.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
@@ -143,7 +147,7 @@ public class SQLiteService {
 			LOG.error(ex.getMessage());
 		} finally {
 			if (connSQL != null) {
-				SQLitePoolUtils.release(connSQL);
+				sqlite.close(connSQL);
 			}
 		}
 		return list;
@@ -152,7 +156,7 @@ public class SQLiteService {
 	public static void main(String[] args) {
 		System.out.println(query("select * from offsets where topic='test_data4' and created between '2016-08-25 17:00:00' and '2016-08-25 17:50:55'"));
 		// update("delete from offsets where created='2016-08-23 16:50'");
-//		 testInsert();
+		// testInsert();
 	}
 
 	public static void testInsert() {
