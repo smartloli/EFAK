@@ -15,9 +15,8 @@ rem See the License for the specific language governing permissions and
 rem limitations under the License.
 
 rem ---------------------------------------------------------------------------
-rem Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
-rem are valid and consistent with the selected start-up options and set up the
-rem endorsed directory.
+rem Set JAVA_HOME or JRE_HOME if not already set and ensure any provided
+rem settings are valid and consistent with the selected start-up options.
 rem ---------------------------------------------------------------------------
 
 rem Make sure prerequisite environment variables are set
@@ -65,17 +64,19 @@ echo This environment variable is needed to run this program
 goto exit
 
 :okJava
-rem Don't override the endorsed dir if the user has set it previously
-if not "%JAVA_ENDORSED_DIRS%" == "" goto gotEndorseddir
-rem Set the default -Djava.endorsed.dirs argument
-set "JAVA_ENDORSED_DIRS=%CATALINA_HOME%\endorsed"
-:gotEndorseddir
 
+rem Don't override _RUNJAVA if the user has set it previously
+if not "%_RUNJAVA%" == "" goto gotRunJava
 rem Set standard command for invoking Java.
-rem Note that NT requires a window name argument when using start.
+rem Also note the quoting as JRE_HOME may contain spaces.
+set _RUNJAVA="%JRE_HOME%\bin\java.exe"
+:gotRunJava
+
+rem Don't override _RUNJDB if the user has set it previously
 rem Also note the quoting as JAVA_HOME may contain spaces.
-set _RUNJAVA="%JRE_HOME%\bin\java"
-set _RUNJDB="%JAVA_HOME%\bin\jdb"
+if not "%_RUNJDB%" == "" goto gotRunJdb
+set _RUNJDB="%JAVA_HOME%\bin\jdb.exe"
+:gotRunJdb
 
 goto end
 

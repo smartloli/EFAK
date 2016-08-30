@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -15,11 +15,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-                      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-  version="3.0">
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+  version="3.1">
 
   <!-- ======================== Introduction ============================== -->
   <!-- This document defines default values for *all* web applications      -->
@@ -42,7 +42,8 @@
   <!-- parameters (default values are in square brackets):                  -->
   <!--                                                                      -->
   <!--   debug               Debugging detail level for messages logged     -->
-  <!--                       by this servlet.  [0]                          -->
+  <!--                       by this servlet. Useful values are 0, 1, and   -->
+  <!--                       11 where higher values mean more detail. [0]   -->
   <!--                                                                      -->
   <!--   fileEncoding        Encoding to be used to read static resources   -->
   <!--                       [platform default]                             -->
@@ -137,9 +138,9 @@
   <!--                       pages.  See the jasper documentation for more  -->
   <!--                       information.                                   -->
   <!--                                                                      -->
-  <!--   compilerSourceVM    Compiler source VM. [1.6]                      -->
+  <!--   compilerSourceVM    Compiler source VM. [1.7]                      -->
   <!--                                                                      -->
-  <!--   compilerTargetVM    Compiler target VM. [1.6]                      -->
+  <!--   compilerTargetVM    Compiler target VM. [1.7]                      -->
   <!--                                                                      -->
   <!--   development         Is Jasper used in development mode? If true,   -->
   <!--                       the frequency at which JSPs are checked for    -->
@@ -232,6 +233,16 @@
   <!--                                                                      -->
   <!--   xpoweredBy          Determines whether X-Powered-By response       -->
   <!--                       header is added by generated servlet.  [false] -->
+  <!--                                                                      -->
+  <!--   strictQuoteEscaping When scriptlet expressions are used for        -->
+  <!--                       attribute values, should the rules in JSP.1.6  -->
+  <!--                       for the escaping of quote characters be        -->
+  <!--                       strictly applied? [true]                       -->
+  <!--                                                                      -->
+  <!--   quoteAttributeEL    When EL is used in an attribute value on a     -->
+  <!--                       JSP page should the rules for quoting of       -->
+  <!--                       attributes described in JSP.1.6 be applied to  -->
+  <!--                       the expression? [true]                         -->
 
     <servlet>
         <servlet-name>jsp</servlet-name>
@@ -317,10 +328,25 @@
   <!--                                                                      -->
   <!--   cgiPathPrefix        The CGI search path will start at             -->
   <!--                        webAppRootDir + File.separator + this prefix. -->
-  <!--                        [WEB-INF/cgi]                                 -->
+  <!--                        If not set, then webAppRootDir is used.       -->
+  <!--                        Recommended value: WEB-INF/cgi                -->
   <!--                                                                      -->
   <!--   debug                Debugging detail level for messages logged    -->
-  <!--                        by this servlet.  [0]                         -->
+  <!--                        by this servlet. Useful values range from 0   -->
+  <!--                        to 5 where 0 means no logging and 5 means     -->
+  <!--                        maximum logging. Values of 10 or more mean    -->
+  <!--                        maximum logging plus debug info added to the  -->
+  <!--                        HTTP response. If an error occurs and debug   -->
+  <!--                        is 10 or more the standard error page         -->
+  <!--                        mechanism will be disabled and a response     -->
+  <!--                        body with debug information will be produced. -->
+  <!--                        Note that any value of 10 or more has the     -->
+  <!--                        same effect as a value of 10. If set to 10 or -->
+  <!--                        more the standard error page mechanism will   -->
+  <!--                        be disabled and a debug page shown instead.   -->
+  <!--                        The debug page is not considered secure and   -->
+  <!--                        should not be enabled for production systems. -->
+  <!--                        [0]                                           -->
   <!--                                                                      -->
   <!--   executable           Name of the executable used to run the        -->
   <!--                        script. [perl]                                -->
@@ -393,6 +419,46 @@
 
 
   <!-- ================== Built In Filter Definitions ===================== -->
+
+  <!-- A filter that sets various security related HTTP Response headers.   -->
+  <!-- This filter supports the following initialization parameters         -->
+  <!-- (default values are in square brackets):                             -->
+  <!--                                                                      -->
+  <!--   hstsEnabled         Should the HTTP Strict Transport Security      -->
+  <!--                       (HSTS) header be added to the response? See    -->
+  <!--                       RFC 6797 for more information on HSTS. [true]  -->
+  <!--                                                                      -->
+  <!--   hstsMaxAgeSeconds   The max age value that should be used in the   -->
+  <!--                       HSTS header. Negative values will be treated   -->
+  <!--                       as zero. [0]                                   -->
+  <!--                                                                      -->
+  <!--   hstsIncludeSubDomains                                              -->
+  <!--                       Should the includeSubDomains parameter be      -->
+  <!--                       included in the HSTS header.                   -->
+  <!--                                                                      -->
+  <!--   antiClickJackingEnabled                                            -->
+  <!--                       Should the anti click-jacking header           -->
+  <!--                       X-Frame-Options be added to every response?    -->
+  <!--                       [true]                                         -->
+  <!--                                                                      -->
+  <!--   antiClickJackingOption                                             -->
+  <!--                       What value should be used for the header. Must -->
+  <!--                       be one of DENY, SAMEORIGIN, ALLOW-FROM         -->
+  <!--                       (case-insensitive). [DENY]                     -->
+  <!--                                                                      -->
+  <!--   antiClickJackingUri IF ALLOW-FROM is used, what URI should be      -->
+  <!--                       allowed? []                                    -->
+  <!--                                                                      -->
+  <!--   blockContentTypeSniffingEnabled                                    -->
+  <!--                       Should the header that blocks content type     -->
+  <!--                       sniffing be added to every response? [true]    -->
+<!--
+    <filter>
+        <filter-name>httpHeaderSecurity</filter-name>
+        <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+-->
 
   <!-- A filter that sets character encoding that is used to decode -->
   <!-- parameters in a POST request -->
@@ -482,6 +548,15 @@
 
   <!-- ==================== Built In Filter Mappings ====================== -->
 
+  <!-- The mapping for the HTTP header security Filter -->
+<!--
+    <filter-mapping>
+        <filter-name>httpHeaderSecurity</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+-->
+
   <!-- The mapping for the Set Character Encoding Filter -->
 <!--
     <filter-mapping>
@@ -522,6 +597,7 @@
   <!-- based on these mappings.  Additional mappings can be added here (to  -->
   <!-- apply to all web applications), or in your own application's web.xml -->
   <!-- deployment descriptor.                                               -->
+  <!-- Note: Extensions are always matched in a case-insensitive manner.    -->
 
     <mime-mapping>
         <extension>123</extension>
