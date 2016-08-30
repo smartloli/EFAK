@@ -175,6 +175,11 @@
 			<artifactId>quartz</artifactId>
 			<version>1.8.6</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>7.0.54</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

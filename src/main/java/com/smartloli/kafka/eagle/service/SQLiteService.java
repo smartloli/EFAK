@@ -33,10 +33,10 @@ public class SQLiteService {
 	 * @param sql
 	 */
 	public static void insert(List<? extends OffsetsSQLiteDomain> list, String sql) {
-		SQLiteUtils sqlite = new SQLiteUtils();
 		Connection connSQL = null;
 		try {
-			connSQL = sqlite.getSQLiteConn();
+			connSQL = SQLiteUtils.getInstance();
+			connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
 			connSQL.setAutoCommit(false);
 			connSQL.setSavepoint();
 
@@ -82,33 +82,29 @@ public class SQLiteService {
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		} finally {
-			if (connSQL != null) {
-				sqlite.close(connSQL);
-			}
+			SQLiteUtils.close(connSQL);
 		}
 	}
 
 	public static void update(String sql) {
-		SQLiteUtils sqlite = new SQLiteUtils();
 		Connection connSQL = null;
 		try {
-			connSQL = sqlite.getSQLiteConn();
+			connSQL = SQLiteUtils.getInstance();
+			connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
 			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
 			sqlStatement.executeUpdate();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		} finally {
-			if (connSQL != null) {
-				sqlite.close(connSQL);
-			}
+			SQLiteUtils.close(connSQL);
 		}
 	}
 
 	public static void insert(OffsetsSQLiteDomain offsets, String sql) {
-		SQLiteUtils sqlite = new SQLiteUtils();
 		Connection connSQL = null;
 		try {
-			connSQL = sqlite.getSQLiteConn();
+			connSQL = SQLiteUtils.getInstance();
+			connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
 			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
 			sqlStatement.setString(1, offsets.getGroup());
 			sqlStatement.setString(2, offsets.getTopic());
@@ -120,18 +116,16 @@ public class SQLiteService {
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		} finally {
-			if (connSQL != null) {
-				sqlite.close(connSQL);
-			}
+			SQLiteUtils.close(connSQL);
 		}
 	}
 
 	public static List<OffsetsSQLiteDomain> query(String sql) {
 		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
-		SQLiteUtils sqlite = new SQLiteUtils();
 		Connection connSQL = null;
 		try {
-			connSQL = sqlite.getSQLiteConn();
+			connSQL = SQLiteUtils.getInstance();
+			connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
 			ResultSet rs = connSQL.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
@@ -146,9 +140,7 @@ public class SQLiteService {
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		} finally {
-			if (connSQL != null) {
-				sqlite.close(connSQL);
-			}
+			SQLiteUtils.close(connSQL);
 		}
 		return list;
 	}
