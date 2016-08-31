@@ -35,6 +35,7 @@ public class SQLiteUtils {
 		p.setTestWhileIdle(false);
 		p.setTestOnBorrow(true);
 		p.setValidationQuery("SELECT 1");
+		p.setInitSQL("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
 		p.setTestOnReturn(false);
 		p.setValidationInterval(30000);
 		p.setTimeBetweenEvictionRunsMillis(30000);

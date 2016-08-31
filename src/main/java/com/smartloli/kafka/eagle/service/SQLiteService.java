@@ -3,6 +3,7 @@ package com.smartloli.kafka.eagle.service;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,14 +35,15 @@ public class SQLiteService {
 	 */
 	public static void insert(List<? extends OffsetsSQLiteDomain> list, String sql) {
 		Connection connSQL = null;
+		PreparedStatement sqlStatement = null;
 		try {
 			connSQL = SQLiteUtils.getInstance();
-			connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
+			// connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
 			connSQL.setAutoCommit(false);
 			connSQL.setSavepoint();
 
 			long nowTime = System.currentTimeMillis();
-			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
+			sqlStatement = connSQL.prepareStatement(sql);
 			int rowCount = 0;
 
 			for (OffsetsSQLiteDomain p : list) {
@@ -58,11 +60,11 @@ public class SQLiteService {
 					try {
 						sqlStatement.executeBatch();
 						connSQL.commit();
-						LOG.info("[SQLiteService.replace] replace batch,rowCount=" + rowCount + "; commit spent time =" + (System.currentTimeMillis() - nowTime) / 1000.0 + "s");
-						LOG.info("[SQLiteService.replace] Commit to sqlite db has successed.");
+						LOG.info("[SQLiteService.insert.Batch] insert batch,rowCount=" + rowCount + "; commit spent time =" + (System.currentTimeMillis() - nowTime) / 1000.0 + "s");
+						LOG.info("[SQLiteService.insert.Batch] Commit to sqlite db has successed.");
 					} catch (Exception e) {
 						connSQL.rollback();
-						LOG.error("[SQLiteService.replace] replace batch error is " + e.getMessage());
+						LOG.error("[SQLiteService.insert] insert batch error is " + e.getMessage());
 					}
 				}
 			}
@@ -71,41 +73,53 @@ public class SQLiteService {
 				try {
 					sqlStatement.executeBatch();
 					connSQL.commit();
-					LOG.info("[SQLiteService.replace] replace batch,rowCount=" + rowCount + "; commit spent time =" + (System.currentTimeMillis() - nowTime) / 1000.0 + "s");
-					LOG.info("[SQLiteService.replace] replace to sqlite db has successed.");
+					LOG.info("[SQLiteService.insert.Batch] insert batch,rowCount=" + rowCount + "; commit spent time =" + (System.currentTimeMillis() - nowTime) / 1000.0 + "s");
+					LOG.info("[SQLiteService.insert.Batch] insert to sqlite db has successed.");
 				} catch (Exception e) {
 					connSQL.rollback();
-					LOG.error("[SQLiteService.replace] replace batch error = " + e.getMessage());
+					LOG.error("[SQLiteService.insert] insert batch error = " + e.getMessage());
 				}
 			}
 
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		} finally {
+			try {
+				sqlStatement.close();
+			} catch (SQLException e) {
+				LOG.error("[SQLiteService.insert.Batch] Close (sqlStatement) has error,msg is " + e.getMessage());
+			}
 			SQLiteUtils.close(connSQL);
 		}
 	}
 
 	public static void update(String sql) {
 		Connection connSQL = null;
+		PreparedStatement sqlStatement = null;
 		try {
 			connSQL = SQLiteUtils.getInstance();
-			connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
-			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
+			// connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
+			sqlStatement = connSQL.prepareStatement(sql);
 			sqlStatement.executeUpdate();
 		} catch (Exception ex) {
-			LOG.error(ex.getMessage());
+			LOG.error("[SQLiteService.update] " + ex.getMessage());
 		} finally {
+			try {
+				sqlStatement.close();
+			} catch (SQLException e) {
+				LOG.error("[SQLiteService.update] Close (sqlStatement) has error,msg is " + e.getMessage());
+			}
 			SQLiteUtils.close(connSQL);
 		}
 	}
 
 	public static void insert(OffsetsSQLiteDomain offsets, String sql) {
 		Connection connSQL = null;
+		PreparedStatement sqlStatement = null;
 		try {
 			connSQL = SQLiteUtils.getInstance();
-			connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
-			PreparedStatement sqlStatement = connSQL.prepareStatement(sql);
+			// connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
+			sqlStatement = connSQL.prepareStatement(sql);
 			sqlStatement.setString(1, offsets.getGroup());
 			sqlStatement.setString(2, offsets.getTopic());
 			sqlStatement.setString(3, offsets.getCreated());
@@ -116,6 +130,12 @@ public class SQLiteService {
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		} finally {
+			try {
+				sqlStatement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				LOG.error("[SQLiteService.insert] Close (sqlStatement) has error,msg is " + e.getMessage());
+			}
 			SQLiteUtils.close(connSQL);
 		}
 	}
@@ -123,10 +143,11 @@ public class SQLiteService {
 	public static List<OffsetsSQLiteDomain> query(String sql) {
 		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
 		Connection connSQL = null;
+		ResultSet rs = null;
 		try {
 			connSQL = SQLiteUtils.getInstance();
 			connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
-			ResultSet rs = connSQL.createStatement().executeQuery(sql);
+			rs = connSQL.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
 				offsetSQLite.setCreated(rs.getString("created"));
@@ -140,29 +161,14 @@ public class SQLiteService {
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		} finally {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				LOG.error("[SQLiteService.query] Close (ResultSet) has error,msg is " + e.getMessage());
+			}
 			SQLiteUtils.close(connSQL);
 		}
 		return list;
-	}
-
-	public static void main(String[] args) {
-		System.out.println(query("select * from offsets where topic='test_data4' and created between '2016-08-25 17:00:00' and '2016-08-25 17:50:55'"));
-		// update("delete from offsets where created='2016-08-23 16:50'");
-		// testInsert();
-	}
-
-	public static void testInsert() {
-		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
-		OffsetsSQLiteDomain offset = new OffsetsSQLiteDomain();
-		offset.setGroup("group1");
-		offset.setCreated("2016-08-25 17:00");
-		offset.setLag(70);
-		offset.setLogSize(1625);
-		offset.setOffsets(70);
-		offset.setTopic("test_data4");
-		list.add(offset);
-		String sql = "INSERT INTO offsets values(?,?,?,?,?,?)";
-		insert(list, sql);
 	}
 
 }

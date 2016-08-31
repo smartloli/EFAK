@@ -31,21 +31,23 @@ start()
 
 	LOG_DIR=${KE_HOME}/logs
 	
+	args="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=1G -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=1G -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
+	
 	cd ${KE_HOME}
 	CLASS=com.smartloli.kafka.eagle.plugins.main.TomcatServerListen
-	nohup ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ke.out 2>&1
+	${JAVA_HOME}/bin/java $args -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ke.out 2>&1
 	echo "*******************************************************************"
     echo "* Listen port has successed! *"
 	echo "*******************************************************************"
 	sleep 5
 	rm -rf ${KE_HOME}/kms/logs/*
 	chmod +x ${KE_HOME}/kms/bin/*.sh
-	${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1 < /dev/null & new_agent_pid=$!
-	echo "$new_agent_pid" > $DIALUP_PID
+	nohup ${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1
 	echo "*******************************************************************"
     	echo "* KE service has started success! *"
     	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke' *"
 	echo "*******************************************************************"
+	ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}' > $DIALUP_PID
 	rm -rf ${LOG_DIR}/ke_console.out
 	ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out
 }
@@ -57,6 +59,7 @@ stop()
                     SPID=`cat $KE_HOME/bin/ke.pid`
 					  if [ "$SPID" != "" ];then
                          ${KE_HOME}/kms/bin/shutdown.sh
+                         kill -9  $SPID
 						 echo  > $DIALUP_PID
 						 echo "stop success"
 					  fi
