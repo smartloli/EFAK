@@ -20,7 +20,7 @@ public class SQLiteUtils {
 
 	private static Logger LOG = LoggerFactory.getLogger(SQLiteUtils.class);
 	private static PoolProperties p = new PoolProperties();
-	
+
 	static {
 		String osName = System.getProperties().getProperty("os.name");
 		String jdbc = "";
@@ -47,7 +47,7 @@ public class SQLiteUtils {
 		p.setMinIdle(10);
 		p.setLogAbandoned(true);
 		p.setRemoveAbandoned(true);
-		p.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;" + "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
+		p.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;" + "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;" + "org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer");
 	}
 
 	public static Connection getInstance() {
