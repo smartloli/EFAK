@@ -67,8 +67,21 @@
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
     <Connector port="8080" protocol="HTTP/1.1"
-               connectionTimeout="20000"
-               redirectPort="8443" />
+			URIEncoding="UTF-8"  
+			minSpareThreads="25" 
+			maxSpareThreads="75"
+			enableLookups="false" 
+			disableUploadTimeout="true" 
+			connectionTimeout="20000"
+			acceptCount="300"   
+			maxThreads="300" 
+			maxProcessors="1000" 
+			minProcessors="5"
+			useURIValidationHack="false"
+			compression="on" 
+			compressionMinSize="2048"
+			compressableMimeType="text/html,text/xml,text/javascript,text/css,text/plain"
+			redirectPort="8443" />
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"

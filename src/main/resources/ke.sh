@@ -3,6 +3,23 @@
 # source function library
 #. /etc/rc.d/init.d/functions
 
+COLOR_G="\x1b[0;32m"  # green
+COLOR_R="\x1b[1;31m"  # red
+RESET="\x1b[0m"
+STR_ERR="[Oops! Error occurred! Please see the message upside!]"
+STR_OK="[Job done!]"
+MSG_ERR=$COLOR_R$STR_ERR$RESET
+MSG_OK=$COLOR_G$STR_OK$RESET
+isexit()
+{
+	if [[ $1 -eq 0 ]];then
+		echo -e $MSG_OK
+	else
+		echo -e $MSG_ERR
+		exit 1
+	fi
+}
+
 DIALUP_PID=$KE_HOME/bin/ke.pid
 start()
 {
@@ -31,11 +48,9 @@ start()
 
 	LOG_DIR=${KE_HOME}/logs
 	
-	args="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=1G -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=1G -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
-	
 	cd ${KE_HOME}
 	CLASS=com.smartloli.kafka.eagle.plugins.main.TomcatServerListen
-	${JAVA_HOME}/bin/java $args -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ke.out 2>&1
+	${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ke.out 2>&1
 	echo "*******************************************************************"
     echo "* Listen port has successed! *"
 	echo "*******************************************************************"
@@ -43,6 +58,9 @@ start()
 	rm -rf ${KE_HOME}/kms/logs/*
 	chmod +x ${KE_HOME}/kms/bin/*.sh
 	nohup ${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1
+	ret=$?
+	echo "Status Code["$ret"]"
+	isexit $ret
 	echo "*******************************************************************"
     	echo "* KE service has started success! *"
     	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke' *"
