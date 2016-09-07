@@ -20,5 +20,15 @@ $(document).ready(function() {
 		$("#demo").attr("aria-expanded", true);
 		$("div[id='navbar_click'] li").removeClass('active')
 		$("#navbar_create").addClass('active');
+	}else if (ret == "/alarm/modify") {
+		$("#demo1").addClass('collapse in');
+		$("#demo1").attr("aria-expanded", true);
+		$("div[id='navbar_click'] li").removeClass('active')
+		$("#navbar_modify").addClass('active');
+	} else if (ret == "/alarm/add" || ret == "/alarm/add/failed" || ret == "/alarm/add/success") {
+		$("#demo1").addClass('collapse in');
+		$("#demo1").attr("aria-expanded", true);
+		$("div[id='navbar_click'] li").removeClass('active')
+		$("#navbar_add").addClass('active');
 	}
 });

@@ -15,8 +15,8 @@ public class KafkaMetaDomain {
 
 	private int partitionId;
 	private int leader;
-	private int isr;
-	private int replicas;
+	private String isr;
+	private String replicas;
 
 	public int getPartitionId() {
 		return partitionId;
@@ -34,19 +34,19 @@ public class KafkaMetaDomain {
 		this.leader = leader;
 	}
 
-	public int getIsr() {
+	public String getIsr() {
 		return isr;
 	}
 
-	public void setIsr(int isr) {
+	public void setIsr(String isr) {
 		this.isr = isr;
 	}
 
-	public int getReplicas() {
+	public String getReplicas() {
 		return replicas;
 	}
 
-	public void setReplicas(int replicas) {
+	public void setReplicas(String replicas) {
 		this.replicas = replicas;
 	}
 

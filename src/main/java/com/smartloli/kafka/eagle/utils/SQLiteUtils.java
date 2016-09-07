@@ -29,13 +29,15 @@ public class SQLiteUtils {
 		} else {
 			jdbc = "jdbc:sqlite:" + System.getProperty("user.dir") + "/db/ke.db";
 		}
+//		String initOffsetsSQL = "CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)";
+//		String initAlarmSQL = "CREATE TABLE IF NOT EXISTS alarm (topic string,lag long,owner string,modify string)";
 		p.setUrl(jdbc);
 		p.setDriverClassName("org.sqlite.JDBC");
 		p.setJmxEnabled(true);
 		p.setTestWhileIdle(false);
 		p.setTestOnBorrow(true);
 		p.setValidationQuery("SELECT 1");
-		p.setInitSQL("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
+//		p.setInitSQL(initOffsetsSQL + ";" + initAlarmSQL);
 		p.setTestOnReturn(false);
 		p.setValidationInterval(30000);
 		p.setTimeBetweenEvictionRunsMillis(30000);

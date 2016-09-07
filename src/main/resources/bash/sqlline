@@ -1,0 +1,10 @@
+#!/bin/bash
+# sqlline - Script to launch SQL shell on Unix, Linux or Mac OS
+
+cd $KE_HOME/lib/
+
+BINPATH=$(dirname $0)
+
+exec java -Djava.ext.dirs=$BINPATH sqlline.SqlLine -u jdbc:sqlite:$KE_HOME/db/ke.db --isolation="TRANSACTION_SERIALIZABLE" "$@"
+
+# End sqlline

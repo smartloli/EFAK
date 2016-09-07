@@ -3,6 +3,7 @@ package com.smartloli.kafka.eagle.service;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.smartloli.kafka.eagle.domain.AlarmDomain;
 import com.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
 import com.smartloli.kafka.eagle.utils.SQLiteUtils;
 
@@ -113,31 +117,31 @@ public class SQLiteService {
 		}
 	}
 
-	public static void insert(OffsetsSQLiteDomain offsets, String sql) {
+	public static int insert(AlarmDomain alarm, String sql) {
 		Connection connSQL = null;
 		PreparedStatement sqlStatement = null;
 		try {
 			connSQL = SQLiteUtils.getInstance();
-			// connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
 			sqlStatement = connSQL.prepareStatement(sql);
-			sqlStatement.setString(1, offsets.getGroup());
-			sqlStatement.setString(2, offsets.getTopic());
-			sqlStatement.setString(3, offsets.getCreated());
-			sqlStatement.setLong(4, offsets.getLogSize());
-			sqlStatement.setLong(5, offsets.getOffsets());
-			sqlStatement.setLong(6, offsets.getLag());
+			sqlStatement.setString(1, alarm.getTopics());
+			sqlStatement.setLong(2, alarm.getLag());
+			sqlStatement.setString(3, alarm.getOwners());
+			sqlStatement.setString(4, alarm.getModifyDate());
 			sqlStatement.executeUpdate();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
+			return -1;
 		} finally {
 			try {
 				sqlStatement.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 				LOG.error("[SQLiteService.insert] Close (sqlStatement) has error,msg is " + e.getMessage());
+				return -1;
 			}
 			SQLiteUtils.close(connSQL);
 		}
+		return 0;
 	}
 
 	public static List<OffsetsSQLiteDomain> query(String sql) {
@@ -146,7 +150,7 @@ public class SQLiteService {
 		ResultSet rs = null;
 		try {
 			connSQL = SQLiteUtils.getInstance();
-			connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
+			// connSQL.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long)");
 			rs = connSQL.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
@@ -169,6 +173,35 @@ public class SQLiteService {
 			SQLiteUtils.close(connSQL);
 		}
 		return list;
+	}
+
+	public static String select(String sql) {
+		JSONArray array = new JSONArray();
+		Connection connSQL = null;
+		ResultSet rs = null;
+		try {
+			connSQL = SQLiteUtils.getInstance();
+			rs = connSQL.createStatement().executeQuery(sql);
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnCount = rsmd.getColumnCount();
+			while (rs.next()) {
+				JSONObject object = new JSONObject();
+				for (int i = 1; i <= columnCount; i++) {
+					object.put(rsmd.getColumnName(i), rs.getString(i));
+				}
+				array.add(object);
+			}
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
+		} finally {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				LOG.error("[SQLiteService.select] Close (ResultSet) has error,msg is " + e.getMessage());
+			}
+			SQLiteUtils.close(connSQL);
+		}
+		return array.toJSONString();
 	}
 
 }

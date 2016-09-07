@@ -29,8 +29,8 @@
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
 						<i class="fa fa-info-circle"></i> <strong>${Submit_Status}</strong>
-						<a class="btn btn-large btn-primary" href="/cms/article/add">
-							<span class="ui-button-text">Create Again</span>
+						<a class="btn btn-large btn-primary" href="/ke/topic/list">
+							<span class="ui-button-text">View Details</span>
 						</a>
 					</div>
 				</div>

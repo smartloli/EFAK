@@ -2,7 +2,9 @@ package com.smartloli.kafka.eagle.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.smartloli.kafka.eagle.domain.KafkaBrokerDomain;
 import com.smartloli.kafka.eagle.domain.KafkaMetaDomain;
 
+import kafka.cluster.Broker;
 import kafka.javaapi.PartitionMetadata;
 import kafka.javaapi.TopicMetadata;
 import kafka.javaapi.TopicMetadataRequest;
@@ -55,10 +58,18 @@ public class KafkaMetaUtils {
 		for (TopicMetadata item : metaData) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
 				KafkaMetaDomain kMeta = new KafkaMetaDomain();
-				kMeta.setIsr(part.isr().size() == 0 ? -1 : part.isr().get(0).id());
+				Set<Integer> isrSet = new HashSet<Integer>();
+				for (Broker isr : part.isr()) {
+					isrSet.add(isr.id());
+				}
+				kMeta.setIsr(isrSet.toString());
 				kMeta.setLeader(part.leader() == null ? -1 : part.leader().id());
 				kMeta.setPartitionId(part.partitionId());
-				kMeta.setReplicas(part.replicas().size() == 0 ? -1 : part.replicas().get(0).id());
+				Set<Integer> repliSet = new HashSet<Integer>();
+				for (Broker repli : part.replicas()) {
+					repliSet.add(repli.id());
+				}
+				kMeta.setReplicas(repliSet.toString());
 				list.add(kMeta);
 			}
 		}

@@ -107,8 +107,8 @@ public class TopicController {
 				obj.put("topic", tname);
 				obj.put("partition", tmp2.getInteger("partitionId"));
 				obj.put("leader", tmp2.getInteger("leader"));
-				obj.put("replicas", tmp2.getInteger("replicas"));
-				obj.put("isr", tmp2.getInteger("isr"));
+				obj.put("replicas", tmp2.getString("replicas"));
+				obj.put("isr", tmp2.getString("isr"));
 				retArr.add(obj);
 			}
 			offset++;
@@ -208,7 +208,7 @@ public class TopicController {
 	}
 
 	@RequestMapping(value = "/topic/create/form", method = RequestMethod.POST)
-	public ModelAndView articleAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+	public ModelAndView topicAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		String ke_topic_name = request.getParameter("ke_topic_name");
 		String ke_topic_partition = request.getParameter("ke_topic_partition");

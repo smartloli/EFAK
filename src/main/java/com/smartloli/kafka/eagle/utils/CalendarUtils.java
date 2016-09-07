@@ -74,6 +74,16 @@ public class CalendarUtils {
 		return df.format(new Date(date));
 	}
 
+	/**
+	 * yyyy-MM-dd HH:mm:ss
+	 * 
+	 * @return
+	 */
+	public static String getNormalDate() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return df.format(new Date());
+	}
+
 	public static void main(String[] args) {
 		System.out.println(getYestoday());// 2505600
 	}
