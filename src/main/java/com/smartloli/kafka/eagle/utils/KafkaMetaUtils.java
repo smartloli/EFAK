@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.smartloli.kafka.eagle.domain.KafkaBrokerDomain;
 import com.smartloli.kafka.eagle.domain.KafkaMetaDomain;
 
+import kafka.cluster.Broker;
 import kafka.javaapi.PartitionMetadata;
 import kafka.javaapi.TopicMetadata;
 import kafka.javaapi.TopicMetadataRequest;
@@ -55,10 +56,18 @@ public class KafkaMetaUtils {
 		for (TopicMetadata item : metaData) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
 				KafkaMetaDomain kMeta = new KafkaMetaDomain();
-				kMeta.setIsr(part.isr().size() == 0 ? -1 : part.isr().get(0).id());
+				List<Integer> isrList = new ArrayList<>();
+				for (Broker isr : part.isr()) {
+					isrList.add(isr.id());
+				}
+				kMeta.setIsr(isrList.toString());
 				kMeta.setLeader(part.leader() == null ? -1 : part.leader().id());
 				kMeta.setPartitionId(part.partitionId());
-				kMeta.setReplicas(part.replicas().size() == 0 ? -1 : part.replicas().get(0).id());
+				List<Integer> repliList = new ArrayList<>();
+				for (Broker repli : part.replicas()) {
+					repliList.add(repli.id());
+				}
+				kMeta.setReplicas(repliList.toString());
 				list.add(kMeta);
 			}
 		}
@@ -80,7 +89,7 @@ public class KafkaMetaUtils {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(findLeader("test_data2"));
+		System.out.println(findLeader("boyaa_mf_test12345"));
 	}
 
 }

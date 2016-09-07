@@ -107,8 +107,8 @@ public class TopicController {
 				obj.put("topic", tname);
 				obj.put("partition", tmp2.getInteger("partitionId"));
 				obj.put("leader", tmp2.getInteger("leader"));
-				obj.put("replicas", tmp2.getInteger("replicas"));
-				obj.put("isr", tmp2.getInteger("isr"));
+				obj.put("replicas", tmp2.getString("replicas"));
+				obj.put("isr", tmp2.getString("isr"));
 				retArr.add(obj);
 			}
 			offset++;
