@@ -58,18 +58,18 @@ public class KafkaMetaUtils {
 		for (TopicMetadata item : metaData) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
 				KafkaMetaDomain kMeta = new KafkaMetaDomain();
-				Set<Integer> isrSet = new HashSet<Integer>();
+				List<Integer> isrList = new ArrayList<>();
 				for (Broker isr : part.isr()) {
-					isrSet.add(isr.id());
+					isrList.add(isr.id());
 				}
-				kMeta.setIsr(isrSet.toString());
+				kMeta.setIsr(isrList.toString());
 				kMeta.setLeader(part.leader() == null ? -1 : part.leader().id());
 				kMeta.setPartitionId(part.partitionId());
-				Set<Integer> repliSet = new HashSet<Integer>();
+				List<Integer> repliList = new ArrayList<>();
 				for (Broker repli : part.replicas()) {
-					repliSet.add(repli.id());
+					repliList.add(repli.id());
 				}
-				kMeta.setReplicas(repliSet.toString());
+				kMeta.setReplicas(repliList.toString());
 				list.add(kMeta);
 			}
 		}
@@ -91,7 +91,7 @@ public class KafkaMetaUtils {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(findLeader("test_data2"));
+		System.out.println(findLeader("boyaa_mf_test12345"));
 	}
 
 }
