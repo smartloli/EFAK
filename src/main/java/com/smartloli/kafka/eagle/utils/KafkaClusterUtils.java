@@ -355,4 +355,17 @@ public class KafkaClusterUtils {
 		return list.toString();
 	}
 
+	public static String geyReplicasIsr(String topic, int partitionid) {
+		if (zkc == null) {
+			zkc = zkPool.getZkClientSerializer();
+		}
+		Seq<Object> seq = ZkUtils.getInSyncReplicasForPartition(zkc, topic, partitionid);
+		List<Object> listSeq = JavaConversions.seqAsJavaList(seq);
+		if (zkc != null) {
+			zkPool.releaseZKSerializer(zkc);
+			zkc = null;
+		}
+		return listSeq.toString();
+	}
+
 }
