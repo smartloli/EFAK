@@ -13,10 +13,19 @@ import com.google.gson.Gson;
  */
 public class AlarmDomain {
 
+	private String group = "";
 	private String topics = "";
 	private long lag = 0L;
 	private String owners = "";
 	private String modifyDate = "";
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
 
 	public String getTopics() {
 		return topics;

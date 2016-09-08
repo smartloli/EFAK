@@ -75,7 +75,7 @@ public class OffsetsQuartz {
 			List<AlarmDomain> listAlarm = alarmConfigure();
 			for (AlarmDomain alarm : listAlarm) {
 				for (OffsetsSQLiteDomain offset : list) {
-					if (offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
+					if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
 						try {
 							SendMessageUtils.send(alarm.getOwners(), "Alarm Lag", "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].");
 						} catch (Exception ex) {
@@ -124,6 +124,7 @@ public class OffsetsQuartz {
 		for (Object object : array) {
 			AlarmDomain alarm = new AlarmDomain();
 			JSONObject obj = (JSONObject) object;
+			alarm.setGroup(obj.getString("groups"));
 			alarm.setTopics(obj.getString("topic"));
 			alarm.setLag(obj.getLong("lag"));
 			alarm.setOwners(obj.getString("owner"));

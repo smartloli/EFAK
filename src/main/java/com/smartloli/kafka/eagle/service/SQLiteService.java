@@ -123,10 +123,11 @@ public class SQLiteService {
 		try {
 			connSQL = SQLiteUtils.getInstance();
 			sqlStatement = connSQL.prepareStatement(sql);
-			sqlStatement.setString(1, alarm.getTopics());
-			sqlStatement.setLong(2, alarm.getLag());
-			sqlStatement.setString(3, alarm.getOwners());
-			sqlStatement.setString(4, alarm.getModifyDate());
+			sqlStatement.setString(1, alarm.getGroup());
+			sqlStatement.setString(2, alarm.getTopics());
+			sqlStatement.setLong(3, alarm.getLag());
+			sqlStatement.setString(4, alarm.getOwners());
+			sqlStatement.setString(5, alarm.getModifyDate());
 			sqlStatement.executeUpdate();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());

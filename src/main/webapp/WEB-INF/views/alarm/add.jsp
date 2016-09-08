@@ -56,13 +56,22 @@
 									<form role="form" action="/ke/alarm/add/form" method="post"
 										onsubmit="return contextFormValid();return false;">
 										<div class="form-group">
+											<label>Topic Group (*)</label> <input id="ke_group_alarm"
+												name="ke_group_alarm" class="form-control" maxlength=50
+												value="1"><input id="ke_group_alarms"
+												name="ke_group_alarms" type="hidden"> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the group you need to
+												alarm .</label>
+										</div>
+										<div class="form-group">
 											<label>Topic Name (*)</label> <input id="ke_topic_alarm"
 												name="ke_topic_alarm" class="form-control" maxlength=50
 												value="1"><input id="ke_topic_alarms"
 												name="ke_topic_alarms" type="hidden"> <label
 												for="inputError" class="control-label text-danger"><i
 												class="fa fa-info-circle"></i> Select the topic you need to
-												alarm, You can choose more than one topic .</label>
+												alarm .</label>
 										</div>
 										<div class="form-group">
 											<label>Lag Threshold (*)</label> <input id="ke_topic_lag"
@@ -112,6 +121,15 @@
 		var ke_topic_lag = $("#ke_topic_lag").val();
 		var ke_topic_email = $("#ke_topic_email").val();
 		var ke_topic_alarms = JSON.stringify($('#ke_topic_alarm').magicSuggest().getSelection());
+		var ke_group_alarms = JSON.stringify($('#ke_group_alarm').magicSuggest().getSelection());
+
+		if (ke_group_alarms.length == 2) {
+			$("#alert_mssage").show();
+			setTimeout(function() {
+				$("#alert_mssage").hide()
+			}, 3000);
+			return false;
+		}
 		if (ke_topic_alarms.length == 2) {
 			$("#alert_mssage").show();
 			setTimeout(function() {
@@ -135,6 +153,7 @@
 			return false;
 		}
 		$('#ke_topic_alarms').val(ke_topic_alarms);
+		$('#ke_group_alarms').val(ke_group_alarms);
 		return true;
 	}
 </script>

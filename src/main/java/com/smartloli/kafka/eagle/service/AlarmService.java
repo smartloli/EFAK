@@ -1,9 +1,10 @@
 package com.smartloli.kafka.eagle.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.smartloli.kafka.eagle.domain.AlarmDomain;
@@ -34,15 +35,12 @@ public class AlarmService {
 				map.remove(key);
 			}
 		} else {
-			String tmp = KafkaClusterUtils.getAllPartitions();
-			JSONArray array = JSON.parseArray(tmp);
+			Map<String, List<String>> tmp = KafkaClusterUtils.getConsumers();
 			JSONArray retArray = new JSONArray();
-			long id = 0L;
-			for (Object object : array) {
-				JSONObject obj = (JSONObject) object;
+			for(Entry<String, List<String>> entry : tmp.entrySet()){
 				JSONObject retObj = new JSONObject();
-				retObj.put("id", ++id);
-				retObj.put("name", obj.getString("topic"));
+				retObj.put("group", entry.getKey());
+				retObj.put("topics", entry.getValue());
 				retArray.add(retObj);
 			}
 			ret = retArray.toJSONString();
@@ -56,7 +54,7 @@ public class AlarmService {
 
 	public static Map<String, Object> addAlarm(AlarmDomain alarm) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		String sql = "replace into alarm values(?,?,?,?)";
+		String sql = "replace into alarm values(?,?,?,?,?)";
 		int status = SQLiteService.insert(alarm, sql);
 		if (status == -1) {
 			map.put("status", "error");
@@ -73,13 +71,13 @@ public class AlarmService {
 		return SQLiteService.select(sql).toString();
 	}
 
-	public static void delete(String topic, String owner) {
-		String sql = "delete from alarm where topic='" + topic + "' and owner='" + owner + "'";
+	public static void delete(String group, String topic, String owner) {
+		String sql = "delete from alarm where groups='" + group + "' and topic='" + topic + "' and owner='" + owner + "'";
 		SQLiteService.update(sql);
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getTopics("127.0.0.1"));
+		System.out.println(KafkaClusterUtils.getConsumers());
 	}
 
 }

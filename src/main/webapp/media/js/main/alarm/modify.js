@@ -7,6 +7,8 @@ $(document).ready(function() {
 		"fnServerData" : retrieveData,
 		"sAjaxSource" : "/ke/alarm/list/table/ajax",
 		"aoColumns" : [ {
+			"mData" : 'group'
+		}, {
 			"mData" : 'topic'
 		}, {
 			"mData" : 'lag'
@@ -36,10 +38,11 @@ $(document).ready(function() {
 
 	$(document).on('click', 'a[name=remove]', function() {
 		var href = $(this).attr("href");
-		var topic = href.split("#")[1].split("/")[0];
-		var owner = href.split("#")[1].split("/")[1];
+		var group = href.split("#")[1].split("/")[0];
+		var topic = href.split("#")[1].split("/")[1];
+		var owner = href.split("#")[1].split("/")[2];
 		$("#remove_div").html("");
-		$("#remove_div").append("<a href='/ke/alarm/" + href.split("#")[0] + "/" + href.split("#")[1] + "/del' class='btn btn-danger'>Remove</a>");
+		$("#remove_div").append("<a href='/ke/alarm/" + group + "/" + topic + "/" + owner + "/del' class='btn btn-danger'>Remove</a>");
 		$('#doc_info').modal({
 			backdrop : 'static',
 			keyboard : false

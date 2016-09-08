@@ -83,11 +83,17 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/add/form", method = RequestMethod.POST)
 	public ModelAndView alarmAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
+		String ke_group_alarms = request.getParameter("ke_group_alarms");
 		String ke_topic_alarms = request.getParameter("ke_topic_alarms");
 		String ke_topic_lag = request.getParameter("ke_topic_lag");
 		String ke_topic_email = request.getParameter("ke_topic_email");
 		JSONArray topics = JSON.parseArray(ke_topic_alarms);
+		JSONArray groups = JSON.parseArray(ke_group_alarms);
 		AlarmDomain alarm = new AlarmDomain();
+		for (Object object : groups) {
+			JSONObject obj = (JSONObject) object;
+			alarm.setGroup(obj.getString("name"));
+		}
 		for (Object object : topics) {
 			JSONObject obj = (JSONObject) object;
 			alarm.setTopics(obj.getString("name"));
@@ -148,20 +154,22 @@ public class AlarmController {
 			JSONObject tmp2 = (JSONObject) tmp;
 			if (search.length() > 0 && search.equals(tmp2.getString("topic"))) {
 				JSONObject obj = new JSONObject();
+				obj.put("group", tmp2.getString("groups"));
 				obj.put("topic", tmp2.getString("topic"));
 				obj.put("lag", tmp2.getLong("lag"));
 				obj.put("owner", tmp2.getString("owner"));
 				obj.put("modify", tmp2.getString("modify"));
-				obj.put("operate", "<a name='remove' href='#" + tmp2.getString("topic") + "/" + tmp2.getString("owner") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
+				obj.put("operate", "<a name='remove' href='#" + tmp2.getString("groups") + "/" + tmp2.getString("topic") + "/" + tmp2.getString("owner") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
 				retArr.add(obj);
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 					JSONObject obj = new JSONObject();
+					obj.put("group", tmp2.getString("groups"));
 					obj.put("topic", tmp2.getString("topic"));
 					obj.put("lag", tmp2.getLong("lag"));
 					obj.put("owner", tmp2.getString("owner"));
 					obj.put("modify", tmp2.getString("modify"));
-					obj.put("operate", "<a name='remove' href='#" + tmp2.getString("topic") + "/" + tmp2.getString("owner") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
+					obj.put("operate", "<a name='remove' href='#" + tmp2.getString("groups") + "/" + tmp2.getString("topic") + "/" + tmp2.getString("owner") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
 					retArr.add(obj);
 				}
 				offset++;
@@ -186,9 +194,9 @@ public class AlarmController {
 		}
 	}
 
-	@RequestMapping(value = "/alarm/{topic}/{owner}/del", method = RequestMethod.GET)
-	public ModelAndView alarmDelete(@PathVariable("topic") String topic, @PathVariable("owner") String owner) {
-		AlarmService.delete(topic, owner);
+	@RequestMapping(value = "/alarm/{group}/{topic}/{owner}/del", method = RequestMethod.GET)
+	public ModelAndView alarmDelete(@PathVariable("group") String group, @PathVariable("topic") String topic, @PathVariable("owner") String owner) {
+		AlarmService.delete(group, topic, owner);
 		return new ModelAndView("redirect:/alarm/modify");
 	}
 }

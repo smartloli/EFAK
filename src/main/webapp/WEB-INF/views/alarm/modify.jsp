@@ -84,6 +84,7 @@ path.link {
 								width="100%">
 								<thead>
 									<tr>
+										<th>Group</th>
 										<th>Topic</th>
 										<th>Lag</th>
 										<th>Owner</th>
