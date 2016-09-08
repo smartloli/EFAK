@@ -23,6 +23,11 @@ public class KafkaCommandUtils {
 		TopicCommand.main(options);
 	}
 
+	public static void describe() {
+		String[] options = new String[] { "--describe", "--zookeeper", "dn1:2181,dn2:2181,dn3:2181", "--topic=boyaa_mf_test12345" };
+		TopicCommand.main(options);
+	}
+
 	public static Map<String, Object> create(String topicName, String partitions, String replic) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		int brokers = JSON.parseArray(KafkaClusterUtils.getAllBrokersInfo()).size();
@@ -40,7 +45,7 @@ public class KafkaCommandUtils {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(create("ttt1125", "6", "3"));
+		describe();
 	}
 
 }

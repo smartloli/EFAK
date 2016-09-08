@@ -2,9 +2,7 @@ package com.smartloli.kafka.eagle.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,11 +56,7 @@ public class KafkaMetaUtils {
 		for (TopicMetadata item : metaData) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
 				KafkaMetaDomain kMeta = new KafkaMetaDomain();
-				List<Integer> isrList = new ArrayList<>();
-				for (Broker isr : part.isr()) {
-					isrList.add(isr.id());
-				}
-				kMeta.setIsr(isrList.toString());
+				kMeta.setIsr(KafkaClusterUtils.geyReplicasIsr(topic, part.partitionId()));
 				kMeta.setLeader(part.leader() == null ? -1 : part.leader().id());
 				kMeta.setPartitionId(part.partitionId());
 				List<Integer> repliList = new ArrayList<>();

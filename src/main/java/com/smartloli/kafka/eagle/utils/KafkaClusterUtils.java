@@ -1,7 +1,6 @@
 package com.smartloli.kafka.eagle.utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,7 @@ public class KafkaClusterUtils {
 	private static Logger LOG = LoggerFactory.getLogger(KafkaClusterUtils.class);
 
 	public static void main(String[] args) {
-		System.out.println(getLogSize(Arrays.asList("master:9092"), "words", 0));
+		System.out.println(geyReplicasIsr("boyaa_mf_test12345", 2));
 	}
 
 	public static List<String> findTopicPartition(String topic) {
@@ -355,4 +354,16 @@ public class KafkaClusterUtils {
 		return list.toString();
 	}
 
+	public static String geyReplicasIsr(String topic, int partitionid) {
+		if (zkc == null) {
+			zkc = zkPool.getZkClientSerializer();
+		}
+		Seq<Object> seq = ZkUtils.getInSyncReplicasForPartition(zkc, topic, partitionid);
+		List<Object> listSeq = JavaConversions.seqAsJavaList(seq);
+		if (zkc != null) {
+			zkPool.releaseZKSerializer(zkc);
+			zkc = null;
+		}
+		return listSeq.toString();
+	}
 }
