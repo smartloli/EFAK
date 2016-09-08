@@ -5,9 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.smartloli.kafka.eagle.domain.AlarmDomain;
 import com.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import com.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
 import com.smartloli.kafka.eagle.domain.TupleDomain;
@@ -15,6 +19,8 @@ import com.smartloli.kafka.eagle.service.SQLiteService;
 import com.smartloli.kafka.eagle.utils.CalendarUtils;
 import com.smartloli.kafka.eagle.utils.KafkaClusterUtils;
 import com.smartloli.kafka.eagle.utils.LRUCacheUtils;
+import com.smartloli.kafka.eagle.utils.SendMessageUtils;
+import com.smartloli.kafka.eagle.utils.SystemConfigUtils;
 
 /**
  * @Date Aug 18, 2016
@@ -27,6 +33,7 @@ import com.smartloli.kafka.eagle.utils.LRUCacheUtils;
  */
 public class OffsetsQuartz {
 	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
+	private static Logger LOG = LoggerFactory.getLogger(OffsetsQuartz.class);
 
 	public void cleanHistoryData() {
 		System.out.println(CalendarUtils.getStatsPerDate());
@@ -63,6 +70,21 @@ public class OffsetsQuartz {
 		}
 		String sql = "INSERT INTO offsets values(?,?,?,?,?,?)";
 		SQLiteService.insert(list, sql);
+		boolean alarmEnable = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
+		if (alarmEnable) {
+			List<AlarmDomain> listAlarm = alarmConfigure();
+			for (AlarmDomain alarm : listAlarm) {
+				for (OffsetsSQLiteDomain offset : list) {
+					if (offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
+						try {
+							SendMessageUtils.send(alarm.getOwners(), "Alarm Lag", "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].");
+						} catch (Exception ex) {
+							LOG.error("Topic[" + alarm.getTopics() + "] Send alarm mail has error,msg is " + ex.getMessage());
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private static List<String> getBrokers() {
@@ -94,8 +116,24 @@ public class OffsetsQuartz {
 		return list;
 	}
 
+	private static List<AlarmDomain> alarmConfigure() {
+		String sql = "SELECT * FROM alarm";
+		String ret = SQLiteService.select(sql);
+		List<AlarmDomain> list = new ArrayList<>();
+		JSONArray array = JSON.parseArray(ret);
+		for (Object object : array) {
+			AlarmDomain alarm = new AlarmDomain();
+			JSONObject obj = (JSONObject) object;
+			alarm.setTopics(obj.getString("topic"));
+			alarm.setLag(obj.getLong("lag"));
+			alarm.setOwners(obj.getString("owner"));
+			list.add(alarm);
+		}
+		return list;
+	}
+
 	public static void main(String[] args) {
-		OffsetsQuartz offset = new OffsetsQuartz();
-		offset.jobQuartz();
+		OffsetsQuartz offsets = new OffsetsQuartz();
+		offsets.jobQuartz();
 	}
 }

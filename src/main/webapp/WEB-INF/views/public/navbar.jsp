@@ -10,12 +10,12 @@
 			<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
 			<span class="icon-bar"></span> <span class="icon-bar"></span>
 		</button>
-		<a class="navbar-brand" href="index.html">Kafka Eagle</a>
+		<a class="navbar-brand" href="/ke">Kafka Eagle</a>
 	</div>
 	<!-- Top Menu Items -->
 	<ul class="nav navbar-right top-nav">
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.0.4 </a></li>
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.0.5 </a></li>
 	</ul>
 	<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
 	<div class="collapse navbar-collapse navbar-ex1-collapse">
