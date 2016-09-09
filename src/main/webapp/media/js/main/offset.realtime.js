@@ -40,10 +40,10 @@ $(document).ready(function() {
 					producerArrays.sort(function(a, b) {
 						return b - a;
 					});
-					consumer = consumerArrays.length == 0 ? consumerArrays[0] : (consumerArrays[0] - consumerArrays[consumerArrays.length - 1]);
-					producer = producerArrays.length == 0 ? producerArrays[0] : (producerArrays[0] - producerArrays[producerArrays.length - 1]);
-					$("#producer_rate").text((producer / (datas.length * 5 * 60)).toFixed(3));
-					$("#consumer_rate").text((consumer / (datas.length * 5 * 60)).toFixed(3));
+					consumer = consumerArrays.length == 0 ? 0 : (consumerArrays[0] - consumerArrays[1]);
+					producer = producerArrays.length == 0 ? 0 : (producerArrays[0] - producerArrays[1]);
+					$("#producer_rate").text((producer / (5 * 60)).toFixed(3));
+					$("#consumer_rate").text((consumer / (5 * 60)).toFixed(3));
 
 					var data = new Array();
 					for (var i = 0; i < datas.length; i++) {
