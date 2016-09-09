@@ -273,6 +273,7 @@ public class KafkaClusterUtils {
 			obj.put("id", id++);
 			obj.put("ip", zk.split(":")[0]);
 			obj.put("port", zk.split(":")[1]);
+			obj.put("mode", ZookeeperUtils.serverStatus(zk.split(":")[0], zk.split(":")[1]));
 			arr.add(obj);
 		}
 		return arr.toJSONString();

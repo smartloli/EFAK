@@ -15,10 +15,14 @@ $(document).ready(function() {
 				}
 				kafka_tab += "</tbody>"
 				$("#kafka_tab").append(kafka_tab);
-				
-				var zk_tab = "<thead><tr><th>ID</th><th>IP</th><th>Port</th></tr></thead><tbody>";
+
+				var zk_tab = "<thead><tr><th>ID</th><th>IP</th><th>Port</th><th>Mode</th></tr></thead><tbody>";
 				for (var i = 0; i < zk.length; i++) {
-					zk_tab += " <tr><td>" + zk[i].id + "</td><td>" + zk[i].ip + "</td><td>" + zk[i].port + "</td></tr>";
+					if(zk[i].mode=="death"){
+						zk_tab += " <tr><td>" + zk[i].id + "</td><td>" + zk[i].ip + "</td><td>" + zk[i].port + "</td><td><a class='btn btn-danger btn-xs'>" + zk[i].mode + "</a></td></tr>";
+					}else{
+						zk_tab += " <tr><td>" + zk[i].id + "</td><td>" + zk[i].ip + "</td><td>" + zk[i].port + "</td><td><a class='btn btn-success btn-xs'>" + zk[i].mode + "</a></td></tr>";
+					}
 				}
 				zk_tab += "</tbody>"
 				$("#zk_tab").append(zk_tab);
