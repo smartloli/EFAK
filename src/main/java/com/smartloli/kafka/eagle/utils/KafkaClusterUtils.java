@@ -367,8 +367,4 @@ public class KafkaClusterUtils {
 		}
 		return listSeq.toString();
 	}
-<<<<<<< HEAD
-=======
-
->>>>>>> 36c8297493f5488b9170276f35ebe297f885e928
 }
