@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.smartloli.kafka.eagle.domain.AlarmDomain;
 import com.smartloli.kafka.eagle.domain.TupleDomain;
+import com.smartloli.kafka.eagle.utils.DBZKDataUtils;
 import com.smartloli.kafka.eagle.utils.KafkaClusterUtils;
 import com.smartloli.kafka.eagle.utils.LRUCacheUtils;
 
@@ -67,8 +68,9 @@ public class AlarmService {
 	}
 
 	public static String list() {
-		String sql = "select * from alarm";
-		return SQLiteService.select(sql).toString();
+//		String sql = "select * from alarm";
+//		return SQLiteService.select(sql).toString();
+		return DBZKDataUtils.getAlarm();
 	}
 
 	public static void delete(String group, String topic, String owner) {

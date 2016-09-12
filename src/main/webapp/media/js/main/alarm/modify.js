@@ -15,8 +15,10 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'owner'
 		}, {
-			"mData" : 'modify'
+			"mData" : 'created'
 		}, {
+			"mData" : 'modify'
+		},{
 			"mData" : 'operate'
 		} ]
 	});

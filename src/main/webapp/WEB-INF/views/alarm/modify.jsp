@@ -88,6 +88,7 @@ path.link {
 										<th>Topic</th>
 										<th>Lag</th>
 										<th>Owner</th>
+										<th>Created</th>
 										<th>Modify</th>
 										<th>Operate</th>
 									</tr>

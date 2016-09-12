@@ -4,7 +4,7 @@
 	<groupId>com.smartloli.kafka.eagle</groupId>
 	<artifactId>kafka-eagle</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 	<name>ke</name>
 	<properties>
 		<package.name>ke</package.name>

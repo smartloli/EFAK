@@ -154,20 +154,22 @@ public class AlarmController {
 			JSONObject tmp2 = (JSONObject) tmp;
 			if (search.length() > 0 && search.equals(tmp2.getString("topic"))) {
 				JSONObject obj = new JSONObject();
-				obj.put("group", tmp2.getString("groups"));
+				obj.put("group", tmp2.getString("group"));
 				obj.put("topic", tmp2.getString("topic"));
 				obj.put("lag", tmp2.getLong("lag"));
 				obj.put("owner", tmp2.getString("owner"));
+				obj.put("created", tmp2.getString("created"));
 				obj.put("modify", tmp2.getString("modify"));
 				obj.put("operate", "<a name='remove' href='#" + tmp2.getString("groups") + "/" + tmp2.getString("topic") + "/" + tmp2.getString("owner") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
 				retArr.add(obj);
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 					JSONObject obj = new JSONObject();
-					obj.put("group", tmp2.getString("groups"));
+					obj.put("group", tmp2.getString("group"));
 					obj.put("topic", tmp2.getString("topic"));
 					obj.put("lag", tmp2.getLong("lag"));
 					obj.put("owner", tmp2.getString("owner"));
+					obj.put("created", tmp2.getString("created"));
 					obj.put("modify", tmp2.getString("modify"));
 					obj.put("operate", "<a name='remove' href='#" + tmp2.getString("groups") + "/" + tmp2.getString("topic") + "/" + tmp2.getString("owner") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
 					retArr.add(obj);

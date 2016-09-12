@@ -17,6 +17,7 @@ import com.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
 import com.smartloli.kafka.eagle.domain.TupleDomain;
 import com.smartloli.kafka.eagle.service.SQLiteService;
 import com.smartloli.kafka.eagle.utils.CalendarUtils;
+import com.smartloli.kafka.eagle.utils.DBZKDataUtils;
 import com.smartloli.kafka.eagle.utils.KafkaClusterUtils;
 import com.smartloli.kafka.eagle.utils.LRUCacheUtils;
 import com.smartloli.kafka.eagle.utils.SendMessageUtils;
@@ -68,8 +69,9 @@ public class OffsetsQuartz {
 				list.add(offsetSQLite);
 			}
 		}
-		String sql = "INSERT INTO offsets values(?,?,?,?,?,?)";
-		SQLiteService.insert(list, sql);
+//		String sql = "INSERT INTO offsets values(?,?,?,?,?,?)";
+//		SQLiteService.insert(list, sql);
+		DBZKDataUtils.insert(list);
 		boolean alarmEnable = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
 		if (alarmEnable) {
 			List<AlarmDomain> listAlarm = alarmConfigure();

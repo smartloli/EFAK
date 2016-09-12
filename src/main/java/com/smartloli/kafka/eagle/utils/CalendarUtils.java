@@ -83,9 +83,14 @@ public class CalendarUtils {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return df.format(new Date());
 	}
+	
+	public static String getHour(){
+		SimpleDateFormat df = new SimpleDateFormat("HH");
+		return df.format(new Date());
+	}
 
 	public static void main(String[] args) {
-		System.out.println(getYestoday());// 2505600
+		System.out.println(getHour());// 2505600
 	}
 
 }

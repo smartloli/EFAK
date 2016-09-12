@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  * @Email smartloli.org@gmail.com
  *
- * @Note TODO
+ * @Note ZK tools class
  */
 public class ZookeeperUtils {
 	private static Logger LOG = LoggerFactory.getLogger(ZookeeperUtils.class);
