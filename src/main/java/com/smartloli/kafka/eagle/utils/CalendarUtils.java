@@ -84,13 +84,13 @@ public class CalendarUtils {
 		return df.format(new Date());
 	}
 	
-	public static String getHour(){
-		SimpleDateFormat df = new SimpleDateFormat("HH");
+	public static String getZkHour(){
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHH");
 		return df.format(new Date());
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getHour());// 2505600
+		System.out.println(getZkHour());// 2505600
 	}
 
 }

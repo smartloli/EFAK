@@ -115,7 +115,7 @@ public class DBZKDataUtils {
 	}
 
 	public static void insert(List<OffsetsSQLiteDomain> list) {
-		String hour = CalendarUtils.getHour();
+		String hour = CalendarUtils.getZkHour();
 		for (OffsetsSQLiteDomain offset : list) {
 			JSONObject obj = new JSONObject();
 			obj.put("hour", hour);
