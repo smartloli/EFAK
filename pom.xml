@@ -166,19 +166,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.8.11.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<version>1.8.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-jdbc</artifactId>
-			<version>8.5.4</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-httpclient</groupId>
@@ -214,7 +204,7 @@
 				<version>2.2</version>
 				<configuration>
 					<warName>ke</warName>
-					<packagingExcludes>WEB-INF/classes/plugins/**,WEB-INF/classes/sql/**,WEB-INF/classes/kms/**,WEB-INF/classes/ke.db,WEB-INF/classes/bash/**,WEB-INF/classes/assembly.xml</packagingExcludes>
+					<packagingExcludes>WEB-INF/classes/plugins/**,WEB-INF/classes/kms/**,WEB-INF/classes/bash/**,WEB-INF/classes/assembly.xml</packagingExcludes>
 				</configuration>
 			</plugin>
 

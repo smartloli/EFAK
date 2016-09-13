@@ -16,7 +16,7 @@
 	<bean id="offsetsTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="offsetsDetail" />
 		<property name="cronExpression">
-			<!-- 每5s执行任务调度 -->
+			<!-- 每5min执行任务调度 -->
 			<value>0 0/5 * * * ?</value>
 		</property>
 	</bean>

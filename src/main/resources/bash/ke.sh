@@ -68,14 +68,6 @@ start()
 	ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}' > $DIALUP_PID
 	rm -rf ${LOG_DIR}/ke_console.out
 	ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out
-
-        cd $KE_HOME/lib/
-
-        BINPATH=$(dirname $0)
-
-        exec java -Djava.ext.dirs=$BINPATH sqlline.SqlLine -u jdbc:sqlite:$KE_HOME/db/ke.db --run=$KE_HOME/conf/init.sql --isolation="TRANSACTION_SERIALIZABLE" "$@"
-
-        # End sqlline
 }
 
 stop()

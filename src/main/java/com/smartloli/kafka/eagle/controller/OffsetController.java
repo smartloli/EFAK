@@ -130,7 +130,7 @@ public class OffsetController {
 		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
 		try {
-			byte[] output = GzipUtils.compressToByte(OffsetService.getOffsetsGraph(group, topic, ip));
+			byte[] output = GzipUtils.compressToByte(OffsetService.getOffsetsGraph(group, topic));
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

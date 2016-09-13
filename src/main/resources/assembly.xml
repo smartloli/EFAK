@@ -24,22 +24,8 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>src/main/resources/sql/</directory>
-			<outputDirectory>/conf</outputDirectory>
-			<includes>
-				<include>init.sql</include>
-			</includes>
-		</fileSet>
-		<fileSet>
 			<directory>src/main/resources</directory>
 			<outputDirectory>/logs</outputDirectory>
-			<includes>
-				<include></include>
-			</includes>
-		</fileSet>
-		<fileSet>
-			<directory>src/main/resources</directory>
-			<outputDirectory>/db</outputDirectory>
 			<includes>
 				<include></include>
 			</includes>
@@ -63,7 +49,6 @@
 			<outputDirectory>/lib</outputDirectory>
 			<includes>
 				<include>kafka-eagel-plugins_fat.jar</include>
-				<include>sqlite-jdbc-3.8.11.2.jar</include>
 				<include>sqlline-1.1.10-SNAPSHOT-jar-with-dependencies.jar</include>
 			</includes>
 		</fileSet>

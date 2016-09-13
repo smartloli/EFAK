@@ -160,7 +160,7 @@ public class AlarmController {
 				obj.put("owner", tmp2.getString("owner"));
 				obj.put("created", tmp2.getString("created"));
 				obj.put("modify", tmp2.getString("modify"));
-				obj.put("operate", "<a name='remove' href='#" + tmp2.getString("groups") + "/" + tmp2.getString("topic") + "/" + tmp2.getString("owner") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
+				obj.put("operate", "<a name='remove' href='#" + tmp2.getString("group") + "/" + tmp2.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
 				retArr.add(obj);
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
@@ -171,7 +171,7 @@ public class AlarmController {
 					obj.put("owner", tmp2.getString("owner"));
 					obj.put("created", tmp2.getString("created"));
 					obj.put("modify", tmp2.getString("modify"));
-					obj.put("operate", "<a name='remove' href='#" + tmp2.getString("groups") + "/" + tmp2.getString("topic") + "/" + tmp2.getString("owner") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
+					obj.put("operate", "<a name='remove' href='#" + tmp2.getString("group") + "/" + tmp2.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
 					retArr.add(obj);
 				}
 				offset++;
@@ -196,9 +196,9 @@ public class AlarmController {
 		}
 	}
 
-	@RequestMapping(value = "/alarm/{group}/{topic}/{owner}/del", method = RequestMethod.GET)
-	public ModelAndView alarmDelete(@PathVariable("group") String group, @PathVariable("topic") String topic, @PathVariable("owner") String owner) {
-		AlarmService.delete(group, topic, owner);
+	@RequestMapping(value = "/alarm/{group}/{topic}/del", method = RequestMethod.GET)
+	public ModelAndView alarmDelete(@PathVariable("group") String group, @PathVariable("topic") String topic) {
+		AlarmService.delete(group, topic);
 		return new ModelAndView("redirect:/alarm/modify");
 	}
 }

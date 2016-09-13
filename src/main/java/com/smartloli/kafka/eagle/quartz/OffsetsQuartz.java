@@ -15,7 +15,6 @@ import com.smartloli.kafka.eagle.domain.AlarmDomain;
 import com.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import com.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
 import com.smartloli.kafka.eagle.domain.TupleDomain;
-import com.smartloli.kafka.eagle.service.SQLiteService;
 import com.smartloli.kafka.eagle.utils.CalendarUtils;
 import com.smartloli.kafka.eagle.utils.DBZKDataUtils;
 import com.smartloli.kafka.eagle.utils.KafkaClusterUtils;
@@ -36,16 +35,17 @@ public class OffsetsQuartz {
 	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
 	private static Logger LOG = LoggerFactory.getLogger(OffsetsQuartz.class);
 
+	@Deprecated
 	public void cleanHistoryData() {
+		// Nothing to do
 		System.out.println(CalendarUtils.getStatsPerDate());
-		String sql = "delete from offsets where created<'" + CalendarUtils.getYestoday() + "'";
-		SQLiteService.update(sql);
 	}
 
 	public void jobQuartz() {
 		List<String> hosts = getBrokers();
 		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
 		Map<String, List<String>> consumers = KafkaClusterUtils.getConsumers();
+		String statsPerDate = CalendarUtils.getStatsPerDate();
 		for (Entry<String, List<String>> entry : consumers.entrySet()) {
 			String group = entry.getKey();
 			for (String topic : entry.getValue()) {
@@ -55,7 +55,7 @@ public class OffsetsQuartz {
 					long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partition);
 					OffsetZkDomain offsetZk = KafkaClusterUtils.getOffset(topic, group, partition);
 					offsetSQLite.setGroup(group);
-					offsetSQLite.setCreated(CalendarUtils.getStatsPerDate());
+					offsetSQLite.setCreated(statsPerDate);
 					offsetSQLite.setTopic(topic);
 					if (logSize == 0) {
 						offsetSQLite.setLag(0L + offsetSQLite.getLag());
@@ -69,8 +69,6 @@ public class OffsetsQuartz {
 				list.add(offsetSQLite);
 			}
 		}
-//		String sql = "INSERT INTO offsets values(?,?,?,?,?,?)";
-//		SQLiteService.insert(list, sql);
 		DBZKDataUtils.insert(list);
 		boolean alarmEnable = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
 		if (alarmEnable) {
@@ -119,14 +117,13 @@ public class OffsetsQuartz {
 	}
 
 	private static List<AlarmDomain> alarmConfigure() {
-		String sql = "SELECT * FROM alarm";
-		String ret = SQLiteService.select(sql);
+		String ret = DBZKDataUtils.getAlarm();
 		List<AlarmDomain> list = new ArrayList<>();
 		JSONArray array = JSON.parseArray(ret);
 		for (Object object : array) {
 			AlarmDomain alarm = new AlarmDomain();
 			JSONObject obj = (JSONObject) object;
-			alarm.setGroup(obj.getString("groups"));
+			alarm.setGroup(obj.getString("group"));
 			alarm.setTopics(obj.getString("topic"));
 			alarm.setLag(obj.getLong("lag"));
 			alarm.setOwners(obj.getString("owner"));

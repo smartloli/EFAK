@@ -20,7 +20,7 @@ import com.smartloli.kafka.eagle.utils.LRUCacheUtils;
  *
  * @Email smartloli.org@gmail.com
  *
- * @Note TODO
+ * @Note Alarm service to get configure info.
  */
 public class AlarmService {
 	private static LRUCacheUtils<String, TupleDomain> map = new LRUCacheUtils<String, TupleDomain>(100000);
@@ -38,7 +38,7 @@ public class AlarmService {
 		} else {
 			Map<String, List<String>> tmp = KafkaClusterUtils.getConsumers();
 			JSONArray retArray = new JSONArray();
-			for(Entry<String, List<String>> entry : tmp.entrySet()){
+			for (Entry<String, List<String>> entry : tmp.entrySet()) {
 				JSONObject retObj = new JSONObject();
 				retObj.put("group", entry.getKey());
 				retObj.put("topics", entry.getValue());
@@ -55,8 +55,7 @@ public class AlarmService {
 
 	public static Map<String, Object> addAlarm(AlarmDomain alarm) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		String sql = "replace into alarm values(?,?,?,?,?)";
-		int status = SQLiteService.insert(alarm, sql);
+		int status = DBZKDataUtils.insertAlarmConfigure(alarm);
 		if (status == -1) {
 			map.put("status", "error");
 			map.put("info", "insert [" + alarm + "] has error!");
@@ -68,14 +67,11 @@ public class AlarmService {
 	}
 
 	public static String list() {
-//		String sql = "select * from alarm";
-//		return SQLiteService.select(sql).toString();
 		return DBZKDataUtils.getAlarm();
 	}
 
-	public static void delete(String group, String topic, String owner) {
-		String sql = "delete from alarm where groups='" + group + "' and topic='" + topic + "' and owner='" + owner + "'";
-		SQLiteService.update(sql);
+	public static void delete(String group, String topic) {
+		DBZKDataUtils.delete(group, topic, "alarm");
 	}
 
 	public static void main(String[] args) {

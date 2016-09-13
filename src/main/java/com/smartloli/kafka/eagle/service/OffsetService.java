@@ -3,16 +3,13 @@ package com.smartloli.kafka.eagle.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.smartloli.kafka.eagle.domain.OffsetDomain;
 import com.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import com.smartloli.kafka.eagle.domain.TupleDomain;
-import com.smartloli.kafka.eagle.utils.CalendarUtils;
+import com.smartloli.kafka.eagle.utils.DBZKDataUtils;
 import com.smartloli.kafka.eagle.utils.KafkaClusterUtils;
 import com.smartloli.kafka.eagle.utils.LRUCacheUtils;
 
@@ -23,12 +20,11 @@ import com.smartloli.kafka.eagle.utils.LRUCacheUtils;
  *
  * @Email smartloli.org@gmail.com
  *
- * @Note TODO
+ * @Note Offsets consumer data
  */
 public class OffsetService {
 
 	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
-	private static Logger LOG = LoggerFactory.getLogger(OffsetService.class);
 
 	public static String getLogSize(String topic, String group, String ip) {
 		List<String> hosts = getBrokers(topic, group, ip);
@@ -100,14 +96,16 @@ public class OffsetService {
 		return status;
 	}
 
-	public static String getOffsetsGraph(String group, String topic, String ip) {
-		String sql = "select * from offsets where groups='" + group + "' and topic='" + topic + "' and created between '" + CalendarUtils.getCurrentStartDate() + "' and '" + CalendarUtils.getCurrentEndDate() + "'";
-		LOG.info("IP[" + ip + "],SQL[" + sql + "]");
-		return SQLiteService.query(sql).toString();
+	public static String getOffsetsGraph(String group, String topic) {
+		String ret = DBZKDataUtils.getOffsets(group, topic);
+		if (ret.length() > 0) {
+			ret = JSON.parseObject(ret).getString("data");
+		}
+		return ret;
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getOffsetsGraph("group1", "test_data3", "127.0.0.1"));
+		System.out.println(getOffsetsGraph("group1", "test_data3"));
 	}
 
 }

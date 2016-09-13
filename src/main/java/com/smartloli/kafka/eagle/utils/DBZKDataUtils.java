@@ -1,6 +1,5 @@
 package com.smartloli.kafka.eagle.utils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.smartloli.kafka.eagle.domain.AlarmDomain;
 import com.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
 
 import scala.Option;
@@ -86,7 +86,10 @@ public class DBZKDataUtils {
 		if (ZkUtils.pathExists(zkc, path)) {
 			try {
 				Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, path);
-				data = JSON.parseObject(tuple._1.get()).toJSONString();
+				JSONObject obj = JSON.parseObject(tuple._1.get());
+				if (CalendarUtils.getZkHour().equals(obj.getString("hour"))) {
+					data = obj.toJSONString();
+				}
 			} catch (Exception ex) {
 				LOG.error("[ZK.getOffsets] has error,msg is " + ex.getMessage());
 			}
@@ -98,7 +101,7 @@ public class DBZKDataUtils {
 		return data;
 	}
 
-	public static void update(String data, String path) {
+	private static void update(String data, String path) {
 		if (zkc == null) {
 			zkc = zkPool.getZkClient();
 		}
@@ -145,18 +148,46 @@ public class DBZKDataUtils {
 		}
 	}
 
+	public static void delete(String group, String topic, String theme) {
+		if (zkc == null) {
+			zkc = zkPool.getZkClient();
+		}
+		String path = theme + "/" + group + "/" + topic;
+		if (ZkUtils.pathExists(zkc, KE_PATH + "/" + path)) {
+			ZkUtils.deletePath(zkc, KE_PATH + "/" + path);
+		}
+		if (zkc != null) {
+			zkPool.release(zkc);
+			zkc = null;
+		}
+	}
+
+	public static int insertAlarmConfigure(AlarmDomain alarm) {
+		JSONObject object = new JSONObject();
+		object.put("lag", alarm.getLag());
+		object.put("owner", alarm.getOwners());
+		try {
+			update(object.toJSONString(), TAB_ALARM + "/" + alarm.getGroup() + "/" + alarm.getTopics());
+		} catch (Exception ex) {
+			LOG.error("[ZK.insertAlarm] has error,msg is " + ex.getMessage());
+			return -1;
+		}
+		return 0;
+	}
+
 	public static void main(String[] args) {
-		 System.out.println(getAlarm());
-//		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
-//		OffsetsSQLiteDomain o = new OffsetsSQLiteDomain();
-//		o.setCreated(CalendarUtils.getStatsPerDate());
-//		o.setGroup("mf.user_order2.map");
-//		o.setLag(2000L);
-//		o.setLogSize(20000);
-//		o.setOffsets(19000);
-//		o.setTopic("mf.user_order2");
-//		list.add(o);
-//		insert(list);
+		System.out.println(getAlarm());
+		// List<OffsetsSQLiteDomain> list = new
+		// ArrayList<OffsetsSQLiteDomain>();
+		// OffsetsSQLiteDomain o = new OffsetsSQLiteDomain();
+		// o.setCreated(CalendarUtils.getStatsPerDate());
+		// o.setGroup("mf.user_order2.map");
+		// o.setLag(2000L);
+		// o.setLogSize(20000);
+		// o.setOffsets(19000);
+		// o.setTopic("mf.user_order2");
+		// list.add(o);
+		// insert(list);
 	}
 
 	public static void createAlarmTest() {

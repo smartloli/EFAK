@@ -1,2 +1,0 @@
-CREATE TABLE IF NOT EXISTS offsets (groups string,topic string,created string,logsize long,offsets long,lag long);
-CREATE TABLE IF NOT EXISTS alarm (groups string,topic string,lag long,owner string,modify string,PRIMARY KEY (groups,topic,owner));

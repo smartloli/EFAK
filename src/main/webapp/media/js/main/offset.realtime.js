@@ -30,7 +30,7 @@ $(document).ready(function() {
 					var producerArrays = new Array();
 					for (var i = 0; i < datas.length; i++) {
 						consumerArrays.push(datas[i].offsets);
-						producerArrays.push(datas[i].logSize);
+						producerArrays.push(datas[i].lagsize);
 					}
 
 					consumerArrays.sort(function(a, b) {
@@ -49,7 +49,7 @@ $(document).ready(function() {
 					for (var i = 0; i < datas.length; i++) {
 						var obj = new Object();
 						obj.period = datas[i].created;
-						obj.LogSize = datas[i].logSize;
+						obj.LogSize = datas[i].lagsize;
 						obj.Offsets = datas[i].offsets;
 						obj.Lag = datas[i].lag;
 						data.push(obj);
