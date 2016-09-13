@@ -83,8 +83,8 @@ public class CalendarUtils {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return df.format(new Date());
 	}
-	
-	public static String getZkHour(){
+
+	public static String getZkHour() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHH");
 		return df.format(new Date());
 	}
