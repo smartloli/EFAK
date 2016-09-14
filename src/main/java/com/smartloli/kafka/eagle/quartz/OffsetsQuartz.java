@@ -42,48 +42,53 @@ public class OffsetsQuartz {
 	}
 
 	public void jobQuartz() {
-		List<String> hosts = getBrokers();
-		List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
-		Map<String, List<String>> consumers = KafkaClusterUtils.getConsumers();
-		String statsPerDate = CalendarUtils.getStatsPerDate();
-		for (Entry<String, List<String>> entry : consumers.entrySet()) {
-			String group = entry.getKey();
-			for (String topic : entry.getValue()) {
-				OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
-				for (String partitionStr : KafkaClusterUtils.findTopicPartition(topic)) {
-					int partition = Integer.parseInt(partitionStr);
-					long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partition);
-					OffsetZkDomain offsetZk = KafkaClusterUtils.getOffset(topic, group, partition);
-					offsetSQLite.setGroup(group);
-					offsetSQLite.setCreated(statsPerDate);
-					offsetSQLite.setTopic(topic);
-					if (logSize == 0) {
-						offsetSQLite.setLag(0L + offsetSQLite.getLag());
-					} else {
-						long lag = offsetSQLite.getLag() + (offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
-						offsetSQLite.setLag(lag);
+		try {
+			List<String> hosts = getBrokers();
+			List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
+			Map<String, List<String>> consumers = KafkaClusterUtils.getConsumers();
+			String statsPerDate = CalendarUtils.getStatsPerDate();
+			for (Entry<String, List<String>> entry : consumers.entrySet()) {
+				String group = entry.getKey();
+				for (String topic : entry.getValue()) {
+					OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
+					for (String partitionStr : KafkaClusterUtils.findTopicPartition(topic)) {
+						int partition = Integer.parseInt(partitionStr);
+						long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partition);
+						OffsetZkDomain offsetZk = KafkaClusterUtils.getOffset(topic, group, partition);
+						offsetSQLite.setGroup(group);
+						offsetSQLite.setCreated(statsPerDate);
+						offsetSQLite.setTopic(topic);
+						if (logSize == 0) {
+							offsetSQLite.setLag(0L + offsetSQLite.getLag());
+						} else {
+							long lag = offsetSQLite.getLag() + (offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
+							offsetSQLite.setLag(lag);
+						}
+						offsetSQLite.setLogSize(logSize + offsetSQLite.getLogSize());
+						offsetSQLite.setOffsets(offsetZk.getOffset() + offsetSQLite.getOffsets());
 					}
-					offsetSQLite.setLogSize(logSize + offsetSQLite.getLogSize());
-					offsetSQLite.setOffsets(offsetZk.getOffset() + offsetSQLite.getOffsets());
+					list.add(offsetSQLite);
 				}
-				list.add(offsetSQLite);
 			}
-		}
-		DBZKDataUtils.insert(list);
-		boolean alarmEnable = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
-		if (alarmEnable) {
-			List<AlarmDomain> listAlarm = alarmConfigure();
-			for (AlarmDomain alarm : listAlarm) {
-				for (OffsetsSQLiteDomain offset : list) {
-					if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
-						try {
-							SendMessageUtils.send(alarm.getOwners(), "Alarm Lag", "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].");
-						} catch (Exception ex) {
-							LOG.error("Topic[" + alarm.getTopics() + "] Send alarm mail has error,msg is " + ex.getMessage());
+			DBZKDataUtils.insert(list);
+			boolean alarmEnable = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
+			if (alarmEnable) {
+				List<AlarmDomain> listAlarm = alarmConfigure();
+				for (AlarmDomain alarm : listAlarm) {
+					for (OffsetsSQLiteDomain offset : list) {
+						if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
+							try {
+								SendMessageUtils.send(alarm.getOwners(), "Alarm Lag", "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag()
+										+ "].");
+							} catch (Exception ex) {
+								LOG.error("Topic[" + alarm.getTopics() + "] Send alarm mail has error,msg is " + ex.getMessage());
+							}
 						}
 					}
 				}
 			}
+		} catch (Exception ex) {
+			LOG.error("[Quartz.offsets] has error,msg is " + ex.getMessage());
 		}
 	}
 

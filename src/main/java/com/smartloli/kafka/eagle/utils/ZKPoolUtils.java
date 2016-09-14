@@ -31,10 +31,11 @@ public class ZKPoolUtils {
 	}
 
 	private void initZKPoolUtils() {
-		LOG.info("Initialization ZkClient pool size [" + poolSize + "]");
+		LOG.debug("Initialization ZkClient pool size [" + poolSize + "]");
 		pool = new Vector<ZkClient>(poolSize);
 		poolZKSerializer = new Vector<ZkClient>(poolSize);
 		addZkClient();
+		addZkSerializerClient();
 	}
 
 	/**
@@ -42,12 +43,21 @@ public class ZKPoolUtils {
 	 */
 	private void addZkClient() {
 		ZkClient zkc = null;
-		ZkClient zkSerializer = null;
 		for (int i = 0; i < poolSize; i++) {
 			try {
 				zkc = new ZkClient(zkInfo);
-				zkSerializer = new ZkClient(zkInfo, Integer.MAX_VALUE, 100000, ZKStringSerializer$.MODULE$);
 				pool.add(zkc);
+			} catch (Exception ex) {
+				LOG.error(ex.getMessage());
+			}
+		}
+	}
+
+	private void addZkSerializerClient() {
+		ZkClient zkSerializer = null;
+		for (int i = 0; i < poolSize; i++) {
+			try {
+				zkSerializer = new ZkClient(zkInfo, Integer.MAX_VALUE, 100000, ZKStringSerializer$.MODULE$);
 				poolZKSerializer.add(zkSerializer);
 			} catch (Exception ex) {
 				LOG.error(ex.getMessage());
@@ -64,7 +74,7 @@ public class ZKPoolUtils {
 		if (poolZKSerializer.size() < 25) {
 			poolZKSerializer.add(zkc);
 		}
-		LOG.info("poolZKSerializer size [" + poolZKSerializer.size() + "]");
+		LOG.debug("release poolZKSerializer size [" + poolZKSerializer.size() + "]");
 	}
 
 	/**
@@ -76,7 +86,7 @@ public class ZKPoolUtils {
 		if (pool.size() < 25) {
 			pool.add(zkc);
 		}
-		LOG.info("pool size [" + pool.size() + "]");
+		LOG.debug("release pool size [" + pool.size() + "]");
 	}
 
 	/**
@@ -118,10 +128,14 @@ public class ZKPoolUtils {
 		if (pool.size() > 0) {
 			ZkClient zkc = pool.get(0);
 			pool.remove(0);
-			LOG.info("pool size [" + pool.size() + "]");
+			LOG.debug("get pool size [" + pool.size() + "]");
 			return zkc;
 		} else {
-			return null;
+			addZkClient();
+			ZkClient zkc = pool.get(0);
+			pool.remove(0);
+			LOG.debug("get pool size [" + pool.size() + "]");
+			return zkc;
 		}
 	}
 
@@ -129,10 +143,14 @@ public class ZKPoolUtils {
 		if (poolZKSerializer.size() > 0) {
 			ZkClient zkc = poolZKSerializer.get(0);
 			poolZKSerializer.remove(0);
-			LOG.info("poolZKSerializer size [" + poolZKSerializer.size() + "]");
+			LOG.debug("get poolZKSerializer size [" + poolZKSerializer.size() + "]");
 			return zkc;
 		} else {
-			return null;
+			addZkSerializerClient();
+			ZkClient zkc = poolZKSerializer.get(0);
+			poolZKSerializer.remove(0);
+			LOG.debug("get poolZKSerializer size [" + poolZKSerializer.size() + "]");
+			return zkc;
 		}
 	}
 

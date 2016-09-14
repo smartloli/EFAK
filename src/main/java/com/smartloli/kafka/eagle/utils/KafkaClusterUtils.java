@@ -45,19 +45,18 @@ import scala.collection.Seq;
 public class KafkaClusterUtils {
 
 	private static ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
-	private static ZkClient zkc = null;
-
 	private static Logger LOG = LoggerFactory.getLogger(KafkaClusterUtils.class);
+	private static String ConsumersPath = "/consumers";
+	private static String BrokerIdsPath = "/brokers/ids";
+	private static String BrokerTopicsPath = "/brokers/topics";
 
 	public static void main(String[] args) {
-		System.out.println(geyReplicasIsr("boyaa_mf_test12345", 2));
+		System.out.println(ZkUtils.BrokerIdsPath());
 	}
 
 	public static List<String> findTopicPartition(String topic) {
-		if (zkc == null) {
-			zkc = zkPool.getZkClient();
-		}
-		Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.BrokerTopicsPath() + "/" + topic + "/partitions");
+		ZkClient zkc = zkPool.getZkClient();
+		Seq<String> seq = ZkUtils.getChildren(zkc, BrokerTopicsPath + "/" + topic + "/partitions");
 		List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 		if (zkc != null) {
 			zkPool.release(zkc);
@@ -67,10 +66,8 @@ public class KafkaClusterUtils {
 	}
 
 	public static boolean findTopicIsConsumer(String topic, String group) {
-		if (zkc == null) {
-			zkc = zkPool.getZkClient();
-		}
-		String ownersPath = ZkUtils.ConsumersPath() + "/" + group + "/owners/" + topic;
+		ZkClient zkc = zkPool.getZkClient();
+		String ownersPath = ConsumersPath + "/" + group + "/owners/" + topic;
 		boolean status = ZkUtils.pathExists(zkc, ownersPath);
 		if (zkc != null) {
 			zkPool.releaseZKSerializer(zkc);
@@ -80,12 +77,10 @@ public class KafkaClusterUtils {
 	}
 
 	public static OffsetZkDomain getOffset(String topic, String group, int partition) {
-		if (zkc == null) {
-			zkc = zkPool.getZkClientSerializer();
-		}
+		ZkClient zkc = zkPool.getZkClientSerializer();
 		OffsetZkDomain offsetZk = new OffsetZkDomain();
-		String offsetPath = ZkUtils.ConsumersPath() + "/" + group + "/offsets/" + topic + "/" + partition;
-		String ownersPath = ZkUtils.ConsumersPath() + "/" + group + "/owners/" + topic + "/" + partition;
+		String offsetPath = ConsumersPath + "/" + group + "/offsets/" + topic + "/" + partition;
+		String ownersPath = ConsumersPath + "/" + group + "/owners/" + topic + "/" + partition;
 		Tuple2<Option<String>, Stat> tuple = null;
 		try {
 			if (ZkUtils.pathExists(zkc, offsetPath)) {
@@ -193,16 +188,13 @@ public class KafkaClusterUtils {
 	}
 
 	public static Map<String, List<String>> getConsumers() {
-		if (zkc == null) {
-			zkc = zkPool.getZkClient();
-		}
+		ZkClient zkc = zkPool.getZkClient();
 		Map<String, List<String>> mapConsumers = new HashMap<String, List<String>>();
 		try {
-			String consumersPath = ZkUtils.ConsumersPath();
-			Seq<String> seq = ZkUtils.getChildren(zkc, consumersPath);
+			Seq<String> seq = ZkUtils.getChildren(zkc, ConsumersPath);
 			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 			for (String group : listSeq) {
-				Seq<String> tmp = ZkUtils.getChildren(zkc, consumersPath + "/" + group + "/owners");
+				Seq<String> tmp = ZkUtils.getChildren(zkc, ConsumersPath + "/" + group + "/owners");
 				List<String> list = JavaConversions.seqAsJavaList(tmp);
 				mapConsumers.put(group, list);
 			}
@@ -222,12 +214,10 @@ public class KafkaClusterUtils {
 	 * @return
 	 */
 	public static Map<String, List<String>> getActiveTopic() {
-		if (zkc == null) {
-			zkc = zkPool.getZkClientSerializer();
-		}
+		ZkClient zkc = zkPool.getZkClientSerializer();
 		Map<String, List<String>> actvTopic = new HashMap<String, List<String>>();
 		try {
-			Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.ConsumersPath());
+			Seq<String> seq = ZkUtils.getChildren(zkc, ConsumersPath);
 			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 			JSONArray arr = new JSONArray();
 			for (String group : listSeq) {
@@ -285,17 +275,15 @@ public class KafkaClusterUtils {
 	 * @return
 	 */
 	public static String getAllBrokersInfo() {
-		if (zkc == null) {
-			zkc = zkPool.getZkClientSerializer();
-		}
+		ZkClient zkc = zkPool.getZkClientSerializer();
 		List<BrokersDomain> list = new ArrayList<BrokersDomain>();
-		if (ZkUtils.pathExists(zkc, ZkUtils.BrokerIdsPath())) {
-			Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.BrokerIdsPath());
+		if (ZkUtils.pathExists(zkc, BrokerIdsPath)) {
+			Seq<String> seq = ZkUtils.getChildren(zkc, BrokerIdsPath);
 			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 			int id = 0;
 			for (String ids : listSeq) {
 				try {
-					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, ZkUtils.BrokerIdsPath() + "/" + ids);
+					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, BrokerIdsPath + "/" + ids);
 					BrokersDomain broker = new BrokersDomain();
 					broker.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
 					broker.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
@@ -323,17 +311,15 @@ public class KafkaClusterUtils {
 	 * @return
 	 */
 	public static String getAllPartitions() {
-		if (zkc == null) {
-			zkc = zkPool.getZkClientSerializer();
-		}
+		ZkClient zkc = zkPool.getZkClientSerializer();
 		List<PartitionsDomain> list = new ArrayList<PartitionsDomain>();
-		if (ZkUtils.pathExists(zkc, ZkUtils.BrokerTopicsPath())) {
-			Seq<String> seq = ZkUtils.getChildren(zkc, ZkUtils.BrokerTopicsPath());
+		if (ZkUtils.pathExists(zkc, BrokerTopicsPath)) {
+			Seq<String> seq = ZkUtils.getChildren(zkc, BrokerTopicsPath);
 			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 			int id = 0;
 			for (String topic : listSeq) {
 				try {
-					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, ZkUtils.BrokerTopicsPath() + "/" + topic);
+					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, BrokerTopicsPath + "/" + topic);
 					PartitionsDomain partition = new PartitionsDomain();
 					partition.setId(++id);
 					partition.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
@@ -356,9 +342,7 @@ public class KafkaClusterUtils {
 	}
 
 	public static String geyReplicasIsr(String topic, int partitionid) {
-		if (zkc == null) {
-			zkc = zkPool.getZkClientSerializer();
-		}
+		ZkClient zkc = zkPool.getZkClientSerializer();
 		Seq<Object> seq = ZkUtils.getInSyncReplicasForPartition(zkc, topic, partitionid);
 		List<Object> listSeq = JavaConversions.seqAsJavaList(seq);
 		if (zkc != null) {
