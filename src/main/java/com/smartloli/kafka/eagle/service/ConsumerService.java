@@ -45,7 +45,7 @@ public class ConsumerService {
 			TupleDomain tuple = lruCache.get(key);
 			ret = tuple.getRet();
 			long end = System.currentTimeMillis();
-			if ((end - tuple.getTimespan()) / (1000 * 60.0) > 3) {// 1 mins
+			if ((end - tuple.getTimespan()) / (1000 * 60.0) > 1) {// 1 mins
 				lruCache.remove(key);
 			}
 		} else {
@@ -57,7 +57,7 @@ public class ConsumerService {
 				ConsumerDetailDomain consumerDetail = new ConsumerDetailDomain();
 				consumerDetail.setId(++id);
 				consumerDetail.setTopic(topic);
-				if (actvTopics.containsKey(topic)) {
+				if (actvTopics.containsKey(group + "_" + topic)) {
 					consumerDetail.setConsumering(true);
 				} else {
 					consumerDetail.setConsumering(false);
@@ -120,7 +120,7 @@ public class ConsumerService {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getConsumerDetail("group1", "127.0.0.1"));
+		System.out.println(getConsumerDetail("group2", "127.0.0.1"));
 	}
 
 }

@@ -231,12 +231,14 @@ public class KafkaClusterUtils {
 			}
 			for (Object object : arr) {
 				JSONObject obj = (JSONObject) object;
-				if (actvTopic.containsKey(obj.getString("topic"))) {
-					actvTopic.get(obj.getString("topic")).add(obj.getString("group"));
+				String group = obj.getString("group");
+				String topic = obj.getString("topic");
+				if (actvTopic.containsKey(group + "_" + topic)) {
+					actvTopic.get(group + "_" + topic).add(topic);
 				} else {
-					List<String> group = new ArrayList<String>();
-					group.add(obj.getString("group"));
-					actvTopic.put(obj.getString("topic"), group);
+					List<String> topics = new ArrayList<String>();
+					topics.add(topic);
+					actvTopic.put(group + "_" + topic, topics);
 				}
 			}
 		} catch (Exception ex) {
