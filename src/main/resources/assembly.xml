@@ -48,7 +48,6 @@
 			<outputDirectory>/lib</outputDirectory>
 			<includes>
 				<include>kafka-eagel-plugins_fat.jar</include>
-				<include>sqlline-1.1.10-SNAPSHOT-jar-with-dependencies.jar</include>
 			</includes>
 		</fileSet>
 	</fileSets>
