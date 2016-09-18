@@ -72,7 +72,6 @@ start()
 
 stop()
 {
-
 	 if [ -f $KE_HOME/bin/ke.pid ];then
                     SPID=`cat $KE_HOME/bin/ke.pid`
 					  if [ "$SPID" != "" ];then
@@ -86,8 +85,13 @@ stop()
 
 stats()
 {
-	echo "===================== TCP Connections Count  =========================="
-	netstat -natp|awk '{print $7}'|sort|uniq -c|sort -rn
+	if [ -f $KE_HOME/bin/ke.pid ];then
+                    SPID=`cat $KE_HOME/bin/ke.pid`
+					  if [ "$SPID" != "" ];then
+						echo "===================== TCP Connections Count  =========================="
+						netstat -natp|awk '{print $7}'|sort|uniq -c|sort -rn|grep $SPID
+					  fi
+	fi
 	
 	echo "===================== ESTABLISHED/TIME_OUT Status  ===================="
 	netstat -nat|grep ESTABLISHED|awk '{print$5}'|awk -F : '{print$1}'|sort|uniq -c|sort -rn
