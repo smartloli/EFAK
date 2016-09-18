@@ -26,19 +26,19 @@
 	</servlet-mapping>
 	<error-page>
 		<error-code>404</error-code>
-		<location>/WEB-INF/views/error/404.jsp</location>
+		<location>/errors/404</location>
 	</error-page>
 	<error-page>
 		<error-code>405</error-code>
-		<location>/WEB-INF/views/error/405.jsp</location>
+		<location>/errors/405</location>
 	</error-page>
 	<error-page>
 		<error-code>500</error-code>
-		<location>/WEB-INF/views/error/500.jsp</location>
+		<location>/errors/500</location>
 	</error-page>
 	<error-page>
 		<error-code>503</error-code>
-		<location>/WEB-INF/views/error/503.jsp</location>
+		<location>/errors/503</location>
 	</error-page>
 	<display-name>ke</display-name>
 	<welcome-file-list>
