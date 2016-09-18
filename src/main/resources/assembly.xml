@@ -20,7 +20,6 @@
 			<outputDirectory>/conf</outputDirectory>
 			<includes>
 				<include>system-config.properties</include>
-				<include>log4j.properties</include>
 			</includes>
 		</fileSet>
 		<fileSet>
