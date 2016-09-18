@@ -75,6 +75,9 @@ public class KafkaMetaUtils {
 				list.add(kMeta);
 			}
 		}
+		if (consumer != null) {
+			consumer.close();
+		}
 		return list;
 	}
 

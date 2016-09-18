@@ -84,6 +84,20 @@ stop()
 	 fi
 }
 
+stats()
+{
+	echo "===================== TCP Connections Count  =========================="
+	netstat -natp|awk '{print $7}'|sort|uniq -c|sort -rn
+	
+	echo "===================== ESTABLISHED/TIME_OUT Status  ===================="
+	netstat -nat|grep ESTABLISHED|awk '{print$5}'|awk -F : '{print$1}'|sort|uniq -c|sort -rn
+	
+	echo "===================== Connection Number Of Different States ==========="
+	netstat -an | awk '/^tcp/ {++y[$NF]} END {for(w in y) print w, y[w]}'
+	
+	echo "===================== End ============================================="
+}
+
 CheckProcessStata()
 {
     CPS_PID=$1
@@ -149,11 +163,14 @@ case "$1" in
     status)
          status
         ;;
+    stats)
+         stats
+        ;;
     restart)
         restart
         ;;
     *)
-        echo $"Usage: $0 {start|stop|restart}"
+        echo $"Usage: $0 {start|stop|restart|status|stats}"
         RETVAL=1
 esac
 exit $RETVAL

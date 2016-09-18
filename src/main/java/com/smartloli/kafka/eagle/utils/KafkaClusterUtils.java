@@ -149,6 +149,9 @@ public class KafkaClusterUtils {
 			}
 			long[] offsets = response.offsets(topic, partition);
 			ret = offsets[0];
+			if (simpleConsumer != null) {
+				simpleConsumer.close();
+			}
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 		}

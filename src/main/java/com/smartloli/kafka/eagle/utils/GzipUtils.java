@@ -11,7 +11,6 @@ import java.util.zip.GZIPOutputStream;
  * 
  * @Note English : GZIP compress & uncompress class utils
  * 
- *       中文 : GZIP压缩解压类，压缩数据结果
  */
 public class GzipUtils {
 
@@ -20,7 +19,6 @@ public class GzipUtils {
 	/**
 	 * English : Strings compress to bytes
 	 * 
-	 * 中文 : 字符串压缩为字节数组
 	 */
 	public static byte[] compressToByte(String str) {
 		if (str == null || str.length() == 0) {
@@ -41,7 +39,6 @@ public class GzipUtils {
 	/**
 	 * English : Strings compress to bytes
 	 * 
-	 * 中文 : 字符串压缩为字节数组
 	 */
 	public static byte[] compressToByte(String str, String encoding) {
 		if (str == null || str.length() == 0) {

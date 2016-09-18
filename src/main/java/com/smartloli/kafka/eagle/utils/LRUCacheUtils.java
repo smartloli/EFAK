@@ -19,7 +19,9 @@ public class LRUCacheUtils<K, V> {
 	@SuppressWarnings({ "unchecked", "serial", "rawtypes" })
 	public LRUCacheUtils(int cacheSize) {
 		MAX_CACHE_SIZE = cacheSize;
-		// 通过cacheSize和加载因子计算hashmap的capactiy，+1确保当达到cacheSize上限时不会触发hashmap的扩容，
+		// CacheSize and loading factor calculated by capactiy HashMap, +1 to
+		// ensure that when the cacheSize does not trigger the HashMap limit
+		// will trigger the expansion
 		int capacity = (int) Math.ceil(MAX_CACHE_SIZE / DEFAULT_LOAD_FACTOR) + 1;
 		map = new LinkedHashMap(capacity, DEFAULT_LOAD_FACTOR, true) {
 			@Override
