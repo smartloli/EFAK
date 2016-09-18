@@ -119,8 +119,4 @@ public class ConsumerService {
 		return obj.toJSONString();
 	}
 
-	public static void main(String[] args) {
-		System.out.println(getConsumerDetail("group2", "127.0.0.1"));
-	}
-
 }

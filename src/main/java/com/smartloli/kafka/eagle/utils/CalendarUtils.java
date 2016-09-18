@@ -90,7 +90,7 @@ public class CalendarUtils {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getZkHour());// 2505600
+		//System.out.println(getZkHour());// 2505600
 	}
 
 }

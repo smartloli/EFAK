@@ -19,7 +19,7 @@ import com.smartloli.kafka.eagle.utils.GzipUtils;
 @Controller
 public class ClusterController {
 
-	private final Logger LOG = LoggerFactory.getLogger(ClusterController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(ClusterController.class);
 
 	@RequestMapping(value = "/cluster", method = RequestMethod.GET)
 	public ModelAndView clusterView(HttpSession session) {
@@ -41,7 +41,7 @@ public class ClusterController {
 
 		try {
 			byte[] output = GzipUtils.compressToByte(ClusterService.getCluster());
-			response.setContentLength(output.length);
+			response.setContentLength(output == null ? "NULL".toCharArray().length :output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 

@@ -48,10 +48,18 @@ public class KafkaMetaUtils {
 			}
 		}
 
+		if (consumer == null) {
+			LOG.error("Connection [SimpleConsumer] has failed,please check brokers.");
+			return list;
+		}
+
 		List<String> topics = Collections.singletonList(topic);
 		TopicMetadataRequest req = new TopicMetadataRequest(topics);
 		TopicMetadataResponse resp = consumer.send(req);
-
+		if (resp == null) {
+			LOG.error("Get [TopicMetadataResponse] has null.");
+			return list;
+		}
 		List<TopicMetadata> metaData = resp.topicsMetadata();
 		for (TopicMetadata item : metaData) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {

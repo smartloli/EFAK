@@ -25,7 +25,7 @@ import com.smartloli.kafka.eagle.utils.KafkaCommandUtils;
 @Controller
 public class TopicController {
 
-	private final Logger LOG = LoggerFactory.getLogger(TopicController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(TopicController.class);
 
 	@RequestMapping(value = "/topic/create", method = RequestMethod.GET)
 	public ModelAndView topicCreateView(HttpSession session) {
@@ -46,7 +46,6 @@ public class TopicController {
 		String ip = request.getHeader("x-forwarded-for");
 		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
-		System.out.println("tname->" + tname);
 		ModelAndView mav = new ModelAndView();
 		if (TopicService.findTopicName(tname, ip)) {
 			mav.setViewName("/topic/topic_meta");
@@ -121,7 +120,7 @@ public class TopicController {
 		obj.put("aaData", retArr);
 		try {
 			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
-			response.setContentLength(output.length);
+			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 

@@ -74,8 +74,4 @@ public class AlarmService {
 		DBZKDataUtils.delete(group, topic, "alarm");
 	}
 
-	public static void main(String[] args) {
-		System.out.println(KafkaClusterUtils.getConsumers());
-	}
-
 }

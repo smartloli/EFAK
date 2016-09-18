@@ -73,8 +73,4 @@ public class TopicService {
 		return ret;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(KafkaMetaUtils.findLeader("ip_login").toString());
-	}
-
 }

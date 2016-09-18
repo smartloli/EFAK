@@ -13,6 +13,9 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<listener>
+		<listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+	</listener>
 	<servlet-mapping>
 		<servlet-name>SpringMvc</servlet-name>
 		<url-pattern>/</url-pattern>

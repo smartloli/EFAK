@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * @Note ZK tools class
  */
 public class ZookeeperUtils {
-	private static Logger LOG = LoggerFactory.getLogger(ZookeeperUtils.class);
+	private final static Logger LOG = LoggerFactory.getLogger(ZookeeperUtils.class);
 
 	public static String serverStatus(String host, String port) {
 		String ret = "";
@@ -59,7 +59,4 @@ public class ZookeeperUtils {
 		return ret;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(serverStatus("master1", "2181"));
-	}
 }

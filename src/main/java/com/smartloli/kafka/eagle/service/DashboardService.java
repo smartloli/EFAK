@@ -57,8 +57,4 @@ public class DashboardService {
 		return obj.toJSONString();
 	}
 
-	public static void main(String[] args) {
-		System.out.println(getKafka());
-	}
-
 }

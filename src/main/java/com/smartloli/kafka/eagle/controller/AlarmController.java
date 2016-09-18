@@ -26,7 +26,7 @@ import com.smartloli.kafka.eagle.utils.GzipUtils;
 @Controller
 public class AlarmController {
 
-	private Logger LOG = LoggerFactory.getLogger(AlarmController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(AlarmController.class);
 
 	@RequestMapping(value = "/alarm/add", method = RequestMethod.GET)
 	public ModelAndView addView(HttpSession session) {
@@ -69,7 +69,7 @@ public class AlarmController {
 
 		try {
 			byte[] output = GzipUtils.compressToByte(AlarmService.getTopics(ip));
-			response.setContentLength(output.length);
+			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 

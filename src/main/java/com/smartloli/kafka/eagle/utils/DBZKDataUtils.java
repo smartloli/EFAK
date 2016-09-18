@@ -32,12 +32,12 @@ import scala.collection.Seq;
  */
 public class DBZKDataUtils {
 
-	private static Logger LOG = LoggerFactory.getLogger(DBZKDataUtils.class);
+	private final static Logger LOG = LoggerFactory.getLogger(DBZKDataUtils.class);
 	private static ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
 	private static ZkClient zkc = null;
-	private static String KE_PATH = "/kafka_eagle";
-	private static String TAB_OFFSETS = "offsets";
-	private static String TAB_ALARM = "alarm";
+	private final static String KE_PATH = "/kafka_eagle";
+	private final static String TAB_OFFSETS = "offsets";
+	private final static String TAB_ALARM = "alarm";
 
 	public static String getAlarm() {
 		JSONArray array = new JSONArray();
@@ -173,30 +173,6 @@ public class DBZKDataUtils {
 			return -1;
 		}
 		return 0;
-	}
-
-	public static void main(String[] args) {
-		System.out.println(getAlarm());
-		// List<OffsetsSQLiteDomain> list = new
-		// ArrayList<OffsetsSQLiteDomain>();
-		// OffsetsSQLiteDomain o = new OffsetsSQLiteDomain();
-		// o.setCreated(CalendarUtils.getStatsPerDate());
-		// o.setGroup("mf.user_order2.map");
-		// o.setLag(2000L);
-		// o.setLogSize(20000);
-		// o.setOffsets(19000);
-		// o.setTopic("mf.user_order2");
-		// list.add(o);
-		// insert(list);
-	}
-
-	public static void createAlarmTest() {
-		JSONObject object = new JSONObject();
-		object.put("lag", 50000);
-		object.put("owner", "SmartloliDeng@boyaa.com");
-		String group = "mf.user_order2.map";
-		String topic = "mf.user_order2";
-		update(object.toJSONString(), TAB_ALARM + "/" + group + "/" + topic);
 	}
 
 }

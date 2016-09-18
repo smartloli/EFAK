@@ -22,7 +22,7 @@ import com.smartloli.kafka.eagle.utils.GzipUtils;
 @Controller
 public class OffsetController {
 
-	private final Logger LOG = LoggerFactory.getLogger(OffsetController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(OffsetController.class);
 
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/", method = RequestMethod.GET)
 	public ModelAndView activeConsumersView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
@@ -107,7 +107,7 @@ public class OffsetController {
 		obj.put("aaData", retArr);
 		try {
 			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
-			response.setContentLength(output.length);
+			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 
@@ -117,7 +117,7 @@ public class OffsetController {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	@RequestMapping(value = "/consumer/offset/{group}/{topic}/realtime/ajax", method = RequestMethod.GET)
 	public void offsetGraphAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -131,7 +131,7 @@ public class OffsetController {
 
 		try {
 			byte[] output = GzipUtils.compressToByte(OffsetService.getOffsetsGraph(group, topic));
-			response.setContentLength(output.length);
+			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 

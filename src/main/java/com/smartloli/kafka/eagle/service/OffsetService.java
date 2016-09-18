@@ -104,8 +104,4 @@ public class OffsetService {
 		return ret;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(getOffsetsGraph("group1", "test_data3"));
-	}
-
 }

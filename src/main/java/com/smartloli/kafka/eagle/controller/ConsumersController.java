@@ -23,7 +23,7 @@ import com.smartloli.kafka.eagle.utils.GzipUtils;
 @Controller
 public class ConsumersController {
 
-	private final Logger LOG = LoggerFactory.getLogger(ConsumersController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(ConsumersController.class);
 
 	@RequestMapping(value = "/consumers", method = RequestMethod.GET)
 	public ModelAndView consumersView(HttpSession session) {
