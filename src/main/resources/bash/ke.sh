@@ -65,6 +65,8 @@ start()
     	echo "* KE service has started success! *"
     	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke' *"
 	echo "*******************************************************************"
+    	echo "* <Usage> ke.sh [start|status|stop|restart|stats] </Usage> *"
+	echo "*******************************************************************"
 	ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}' > $DIALUP_PID
 	rm -rf ${LOG_DIR}/ke_console.out
 	ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out
