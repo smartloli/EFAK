@@ -12,7 +12,6 @@
 			<outputDirectory>/bin</outputDirectory>
 			<includes>
 				<include>ke.sh</include>
-				<include>sqlline</include>
 			</includes>
 		</fileSet>
 		<fileSet>
