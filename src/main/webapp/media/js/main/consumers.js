@@ -181,8 +181,6 @@ $(document).ready(function() {
 			keyboard : false
 		});
 		$('#doc_info').modal('show').css({
-			width : '800px',
-			height : '680px',
 			position : 'fixed',
 			left : '50%',
 			top : '50%',

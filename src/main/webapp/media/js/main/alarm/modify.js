@@ -49,8 +49,6 @@ $(document).ready(function() {
 			keyboard : false
 		});
 		$('#doc_info').modal('show').css({
-			width : '200px',
-			height : '150px',
 			position : 'fixed',
 			left : '50%',
 			top : '50%',

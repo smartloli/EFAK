@@ -42,8 +42,8 @@ $(document).ready(function() {
 					});
 					consumer = consumerArrays.length == 0 ? 0 : (consumerArrays[0] - consumerArrays[1]);
 					producer = producerArrays.length == 0 ? 0 : (producerArrays[0] - producerArrays[1]);
-					$("#producer_rate").text((producer / (5 * 60)).toFixed(3));
-					$("#consumer_rate").text((consumer / (5 * 60)).toFixed(3));
+					$("#producer_rate").text((producer / (5 * 60)).toFixed(1));
+					$("#consumer_rate").text((consumer / (5 * 60)).toFixed(1));
 
 					var data = new Array();
 					for (var i = 0; i < datas.length; i++) {

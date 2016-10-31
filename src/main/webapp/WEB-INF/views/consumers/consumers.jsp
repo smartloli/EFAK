@@ -17,6 +17,7 @@
 <jsp:include page="../public/css.jsp"></jsp:include>
 <jsp:include page="../public/tcss.jsp"></jsp:include>
 </head>
+<!-- active graph -->
 <style type="text/css">
 .node circle {
 	cursor: pointer;
@@ -34,17 +35,8 @@ path.link {
 	stroke: #ccc;
 	stroke-width: 1.5px;
 }
-
-.links line {
-	stroke: #999;
-	stroke-opacity: 0.6;
-}
-
-.nodes circle {
-	stroke: #fff;
-	stroke-width: 2.5px;
-}
 </style>
+
 <body>
 	<jsp:include page="../public/navbar.jsp"></jsp:include>
 	<div id="wrapper">
@@ -114,24 +106,31 @@ path.link {
 				<!-- /.col-lg-4 -->
 			</div>
 			<!-- /.row -->
-			<div class="modal fade" style="background-color: #fff" id="doc_info"
-				tabindex="-1" role="dialog">
-				<div class="modal-header">
-					<button class="close" type="button" data-dismiss="modal">×</button>
-					<h3>Details of the consumer group</h3>
-				</div>
-				<!-- /.row -->
-				<div class="row">
-					<div class="col-lg-12">
-						<div id="consumer_detail_children" class="panel panel-default">
-							<div class="panel-heading">
-								<i class="fa fa-comment fa-fw"></i> Consumer Topic
-								<div class="pull-right"></div>
+			<div class="modal fade" aria-labelledby="keModalLabel"
+				aria-hidden="true" id="doc_info" tabindex="-1" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabel">Details of the
+								consumer group</h4>
+						</div>
+						<div class="modal-body">
+							<!-- /.row -->
+							<div class="row">
+								<div class="col-lg-12">
+									<div id="consumer_detail_children" class="panel panel-default">
+										<div class="panel-heading">
+											<i class="fa fa-comment fa-fw"></i> Consumer Topic
+											<div class="pull-right"></div>
+										</div>
+										<!-- /.panel-heading -->
+									</div>
+								</div>
+								<!-- /.col-lg-4 -->
 							</div>
-							<!-- /.panel-heading -->
 						</div>
 					</div>
-					<!-- /.col-lg-4 -->
 				</div>
 			</div>
 		</div>

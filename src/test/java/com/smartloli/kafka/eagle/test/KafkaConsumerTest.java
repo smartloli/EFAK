@@ -30,7 +30,7 @@ public class KafkaConsumerTest extends Thread {
 	private ExecutorService executor;
 	private ConsumerConnector consumer;
 	private static Properties props = new Properties();
-	private static String topic = "test_data1";
+	private static String topic = "ke_test1";
 	private static final int THREAD_PARALLEL_NUM = 6;
 
 	static {

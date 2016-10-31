@@ -18,35 +18,6 @@
 <jsp:include page="../public/tcss.jsp"></jsp:include>
 </head>
 
-<style type="text/css">
-.node circle {
-	cursor: pointer;
-	fill: #fff;
-	stroke: steelblue;
-	stroke-width: 1.5px;
-}
-
-.node text {
-	font-size: 14px;
-}
-
-path.link {
-	fill: none;
-	stroke: #ccc;
-	stroke-width: 1.5px;
-}
-
-.links line {
-	stroke: #999;
-	stroke-opacity: 0.6;
-}
-
-.nodes circle {
-	stroke: #fff;
-	stroke-width: 2.5px;
-}
-</style>
-
 <body>
 	<jsp:include page="../public/navbar.jsp"></jsp:include>
 	<div id="wrapper">
@@ -101,14 +72,21 @@ path.link {
 				<!-- /.col-lg-4 -->
 			</div>
 			<!-- /.row -->
-			<div class="modal fade" style="background-color: #fff" id="doc_info"
-				tabindex="-1" role="dialog">
-				<div class="modal-header">
-					<button class="close" type="button" data-dismiss="modal">×</button>
-					<p>Are you sure you want to delete it?<p>
-				</div>
-				<!-- /.row -->
-				<div id="remove_div" class="modal-body">
+			<div class="modal fade" aria-labelledby="keModalLabel"
+				aria-hidden="true" id="doc_info" tabindex="-1" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabel">Notify</h4>
+						</div>
+						<!-- /.row -->
+						<div class="modal-body">
+							<p>Are you sure you want to delete it?
+							<p>
+						</div>
+						<div id="remove_div" class="modal-footer"></div>
+					</div>
 				</div>
 			</div>
 		</div>
