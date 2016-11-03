@@ -19,17 +19,26 @@ import com.smartloli.kafka.eagle.utils.GzipUtils;
 @Controller
 public class ClusterController {
 
-	private final static Logger LOG = LoggerFactory.getLogger(ClusterController.class);
+	private final static Logger LOG = LoggerFactory
+			.getLogger(ClusterController.class);
 
-	@RequestMapping(value = "/cluster", method = RequestMethod.GET)
+	@RequestMapping(value = "/cluster/info", method = RequestMethod.GET)
 	public ModelAndView clusterView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/cluster/cluster");
 		return mav;
 	}
 
+	@RequestMapping(value = "/cluster/zkcli", method = RequestMethod.GET)
+	public ModelAndView zkCliView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/cluster/zkcli");
+		return mav;
+	}
+
 	@RequestMapping(value = "/cluster/info/ajax", method = RequestMethod.GET)
-	public void clusterAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void clusterAjax(HttpServletResponse response,
+			HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setHeader("Charset", "utf-8");
@@ -40,8 +49,61 @@ public class ClusterController {
 		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
 		try {
-			byte[] output = GzipUtils.compressToByte(ClusterService.getCluster());
-			response.setContentLength(output == null ? "NULL".toCharArray().length :output.length);
+			byte[] output = GzipUtils
+					.compressToByte(ClusterService.getCluster());
+			response.setContentLength(output == null
+					? "NULL".toCharArray().length : output.length);
+			OutputStream out = response.getOutputStream();
+			out.write(output);
+
+			out.flush();
+			out.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	@RequestMapping(value = "/cluster/zk/islive/ajax", method = RequestMethod.GET)
+	public void zkCliLiveAjax(HttpServletResponse response,
+			HttpServletRequest request) {
+		response.setContentType("text/html;charset=utf-8");
+		response.setCharacterEncoding("utf-8");
+		response.setHeader("Charset", "utf-8");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Content-Encoding", "gzip");
+
+		try {
+			byte[] output = GzipUtils.compressToByte(
+					ClusterService.zkCliIsLive().toJSONString());
+			response.setContentLength(output == null
+					? "NULL".toCharArray().length : output.length);
+			OutputStream out = response.getOutputStream();
+			out.write(output);
+
+			out.flush();
+			out.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	@RequestMapping(value = "/cluster/zk/cmd/ajax", method = RequestMethod.GET)
+	public void zkCliCmdAjax(HttpServletResponse response,
+			HttpServletRequest request) {
+		response.setContentType("text/html;charset=utf-8");
+		response.setCharacterEncoding("utf-8");
+		response.setHeader("Charset", "utf-8");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Content-Encoding", "gzip");
+
+		String cmd = request.getParameter("cmd");
+		String type =  request.getParameter("type");
+		
+		try {
+			byte[] output = GzipUtils.compressToByte(
+					ClusterService.getZKMenu(cmd,type));
+			response.setContentLength(output == null
+					? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 

@@ -15,7 +15,7 @@
 	<!-- Top Menu Items -->
 	<ul class="nav navbar-right top-nav">
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.0.7 </a></li>
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.0.8 </a></li>
 	</ul>
 	<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
 	<div class="collapse navbar-collapse navbar-ex1-collapse">
@@ -33,8 +33,15 @@
 				</ul></li>
 			<li id="navbar_consumers"><a href="/ke/consumers"><i
 					class="fa fa-fw fa-users"></i> Consumers</a></li>
-			<li id="navbar_cluster"><a href="/ke/cluster"><i
-					class="fa fa-fw fa-cloud"></i> Cluster Info</a></li>
+			<li><a href="#" data-toggle="collapse" data-target="#demo2"><i
+					class="fa fa-fw fa-cloud"></i> Cluster Info <i
+					class="fa fa-fw fa-caret-down"></i></a>
+				<ul id="demo2" class="collapse">
+					<li id="navbar_cli"><a href="/ke/cluster/info"><i
+							class="fa fa-sitemap fa-fw"></i> ZK & Kafka</a></li>
+					<li id="navbar_zk"><a href="/ke/cluster/zkcli"><i
+							class="fa fa-terminal fa-fw"></i> ZkCli</a></li>
+				</ul></li>
 			<li><a href="#" data-toggle="collapse" data-target="#demo1"><i
 					class="fa fa-fw fa-bell"></i> Alarm <i
 					class="fa fa-fw fa-caret-down"></i></a>
