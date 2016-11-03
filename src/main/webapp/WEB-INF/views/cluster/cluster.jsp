@@ -13,7 +13,7 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<title>Cluster Info - KafkaEagle</title>
+<title>ZK & Kafka - KafkaEagle</title>
 <jsp:include page="../public/css.jsp"></jsp:include>
 </head>
 
@@ -24,7 +24,7 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">
-						Cluster Info <small>overview</small>
+						ZK & Kafka Info <small>overview</small>
 					</h1>
 				</div>
 				<!-- /.col-lg-12 -->

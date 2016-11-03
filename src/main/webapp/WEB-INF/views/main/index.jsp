@@ -78,7 +78,7 @@ path.link {
 								</div>
 							</div>
 						</div>
-						<a href="/ke/cluster">
+						<a href="/ke/cluster/info">
 							<div class="panel-footer">
 								<span class="pull-left">View Details</span> <span
 									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -122,7 +122,7 @@ path.link {
 								</div>
 							</div>
 						</div>
-						<a href="/ke/cluster">
+						<a href="/ke/cluster/info">
 							<div class="panel-footer">
 								<span class="pull-left">View Details</span> <span
 									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
