@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 	<!-- 添加调度的任务bean 配置对应的class -->
-	<bean id="offsetsSchedule" class="com.smartloli.kafka.eagle.quartz.OffsetsQuartz" />
+	<bean id="offsetsSchedule" class="org.smartloli.kafka.eagle.quartz.OffsetsQuartz" />
 	<!--配置调度具体执行的方法 -->
 	<!-- task1 -->
 	<bean id="offsetsDetail"

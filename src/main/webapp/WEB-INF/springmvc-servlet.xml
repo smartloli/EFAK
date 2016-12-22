@@ -12,7 +12,7 @@
    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<!-- 把标记了@Controller注解的类转换为bean -->
-	<context:component-scan base-package="com.smartloli.kafka.eagle" />
+	<context:component-scan base-package="org.smartloli.kafka.eagle" />
 	<!-- 开启注解 第一个是处理注解类、第二个是处理方法 -->
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
