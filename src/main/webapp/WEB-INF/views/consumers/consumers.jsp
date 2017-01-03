@@ -78,6 +78,7 @@ path.link {
 											<th>Group</th>
 											<th>Topics</th>
 											<th>Consumer Numbers</th>
+											<th>Active Numbers</th>
 										</tr>
 									</thead>
 								</table>

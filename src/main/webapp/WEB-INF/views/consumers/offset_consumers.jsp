@@ -49,8 +49,7 @@
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
-						<div id="offset_topic_info" class="panel-body">
-						</div>
+						<div id="offset_topic_info" class="panel-body"></div>
 						<!-- /.panel-body -->
 					</div>
 				</div>

@@ -108,6 +108,12 @@ public class ConsumersController {
 				obj.put("group", "<a class='link' href='#" + tmp2.getString("group") + "'>" + tmp2.getString("group") + "</a>");
 				obj.put("topic", tmp2.getString("topic").length() > 50 ? tmp2.getString("topic").substring(0, 50) + "..." : tmp2.getString("topic"));
 				obj.put("consumerNumber", tmp2.getInteger("consumerNumber"));
+				int activerNumber = tmp2.getInteger("activeNumber");
+				if (activerNumber > 0) {
+					obj.put("activeNumber", "<a class='btn btn-success btn-xs'>" + tmp2.getInteger("activeNumber") + "</a>");
+				} else {
+					obj.put("activeNumber", "<a class='btn btn-danger btn-xs'>" + tmp2.getInteger("activeNumber") + "</a>");
+				}
 				retArr.add(obj);
 			}
 			offset++;

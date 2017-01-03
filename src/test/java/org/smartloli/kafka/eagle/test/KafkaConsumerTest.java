@@ -34,7 +34,7 @@ public class KafkaConsumerTest extends Thread {
 	private static final int THREAD_PARALLEL_NUM = 6;
 
 	static {
-		props.put("group.id", "group2");
+		props.put("group.id", "group10");
 		props.put("zookeeper.connect", "master:2181");
 		props.put("zookeeper.session.timeout.ms", "40000");
 		props.put("zookeeper.sync.time.ms", "200");

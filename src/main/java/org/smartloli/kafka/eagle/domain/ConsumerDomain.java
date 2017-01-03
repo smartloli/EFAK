@@ -32,6 +32,15 @@ public class ConsumerDomain {
 	private String group;
 	private List<String> topic;
 	private int consumerNumber;
+	private int activeNumber;
+
+	public int getActiveNumber() {
+		return activeNumber;
+	}
+
+	public void setActiveNumber(int activeNumber) {
+		this.activeNumber = activeNumber;
+	}
 
 	public int getId() {
 		return id;

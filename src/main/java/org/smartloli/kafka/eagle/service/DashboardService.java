@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.domain.DashboardDomain;
+import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
@@ -60,11 +61,20 @@ public class DashboardService {
 		obj.put("name", "Kafka Brokers");
 		JSONArray arr = JSON.parseArray(kafka);
 		JSONArray arr2 = new JSONArray();
+		int count = 0;
 		for (Object tmp : arr) {
 			JSONObject obj1 = (JSONObject) tmp;
-			JSONObject obj2 = new JSONObject();
-			obj2.put("name", obj1.getString("host") + ":" + obj1.getInteger("port"));
-			arr2.add(obj2);
+			if (count > ConstantUtils.D3.SIZE) {
+				JSONObject obj2 = new JSONObject();
+				obj2.put("name", "...");
+				arr2.add(obj2);
+				break;
+			} else {
+				JSONObject obj2 = new JSONObject();
+				obj2.put("name", obj1.getString("host") + ":" + obj1.getInteger("port"));
+				arr2.add(obj2);
+			}
+			count++;
 		}
 		obj.put("children", arr2);
 		return obj.toJSONString();

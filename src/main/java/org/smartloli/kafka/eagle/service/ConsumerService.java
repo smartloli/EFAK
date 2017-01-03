@@ -99,9 +99,21 @@ public class ConsumerService {
 			consumer.setConsumerNumber(entry.getValue().size());
 			consumer.setTopic(entry.getValue());
 			consumer.setId(++id);
+			consumer.setActiveNumber(getActiveNumber(entry.getKey(), entry.getValue()));
 			list.add(consumer);
 		}
 		return list.toString();
+	}
+
+	public static int getActiveNumber(String group, List<String> topics) {
+		Map<String, List<String>> kafka = KafkaClusterUtils.getActiveTopic();
+		int sum = 0;
+		for (String topic : topics) {
+			if (kafka.containsKey(group + "_" + topic)) {
+				sum++;
+			}
+		}
+		return sum;
 	}
 
 	public static int getConsumerNumbers() {

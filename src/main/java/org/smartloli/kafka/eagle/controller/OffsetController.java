@@ -33,6 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
 import org.smartloli.kafka.eagle.service.OffsetService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 
@@ -42,7 +43,7 @@ public class OffsetController {
 	private final static Logger LOG = LoggerFactory.getLogger(OffsetController.class);
 
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/", method = RequestMethod.GET)
-	public ModelAndView activeConsumersView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
+	public ModelAndView consumersActiveView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
 		ModelAndView mav = new ModelAndView();
 		if (OffsetService.isGroupTopic(group, topic, ip)) {
@@ -54,7 +55,7 @@ public class OffsetController {
 	}
 
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/realtime", method = RequestMethod.GET)
-	public ModelAndView offsetsRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
+	public ModelAndView offsetRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
 		ModelAndView mav = new ModelAndView();
 		if (OffsetService.isGroupTopic(group, topic, ip)) {

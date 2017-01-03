@@ -45,7 +45,9 @@ $(document).ready(function() {
 				"mData" : 'topic'
 			}, {
 				"mData" : 'consumerNumber'
-			} ]
+			}, {
+				"mData" : 'activeNumber'
+			}  ]
 		});
 
 		function retrieveData(sSource, aoData, fnCallback) {
