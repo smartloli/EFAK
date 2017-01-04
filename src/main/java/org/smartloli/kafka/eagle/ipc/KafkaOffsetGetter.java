@@ -1,21 +1,39 @@
-package org.smartloli.kafka.eagle.test;
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.smartloli.kafka.eagle.ipc;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.protocol.types.Schema;
 import org.apache.kafka.common.protocol.types.Struct;
 import org.apache.kafka.common.protocol.types.Type;
-import org.apache.log4j.Logger;
 import org.smartloli.kafka.eagle.domain.offsets.KeyAndValueSchemasDomain;
 import org.smartloli.kafka.eagle.domain.offsets.MessageValueStructAndVersionDomain;
+import org.smartloli.kafka.eagle.domain.offsets.TopicAndGroupDomain;
+import org.smartloli.kafka.eagle.util.ConstantUtils;
+import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 import kafka.common.OffsetAndMetadata;
 import kafka.common.TopicAndPartition;
@@ -28,20 +46,17 @@ import kafka.message.MessageAndMetadata;
 import kafka.server.GroupTopicPartition;
 
 /**
- * @Date Mar 14, 2016
+ * New offset storage formats: kafka
+ * 
+ * @author smartloli.
  *
- * @Author dengjie
- *
- * @Note Use high consumer api to real-time consumer message from kafka
+ *         Created by Jan 3, 2017
  */
-public class KafkaConsumerTest extends Thread {
+public class KafkaOffsetGetter extends Thread {
 
-	private static final Logger LOG = Logger.getLogger(KafkaConsumerTest.class);
-	private ExecutorService executor;
-	private ConsumerConnector consumer;
-	private static Properties props = new Properties();
-	private static String topic = "__consumer_offsets";// ke_test1
-	private static final int THREAD_PARALLEL_NUM = 1;
+	private final static String consumerOffsetTopic = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
+	public static Map<GroupTopicPartition, OffsetAndMetadata> offsetMap = new ConcurrentHashMap<>();
+	public static Set<TopicAndGroupDomain> topicAndGroups = new HashSet<>();
 
 	// massive code stealing from kafka.server.OffsetManager
 	private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));
@@ -61,8 +76,9 @@ public class KafkaConsumerTest extends Thread {
 	private static Field VALUE_OFFSET_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("offset");
 	private static Field VALUE_METADATA_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("metadata");
 	private static Field VALUE_COMMIT_TIMESTAMP_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("commit_timestamp");
+	// private static Field VALUE_EXPIRE_TIMESTAMP_FIELD_V1 =
+	// OFFSET_COMMIT_VALUE_SCHEMA_V1.get("expire_timestamp");
 
-	// map of version to schemas
 	@SuppressWarnings("serial")
 	private static Map<Integer, KeyAndValueSchemasDomain> OFFSET_SCHEMAS = new HashMap<Integer, KeyAndValueSchemasDomain>() {
 		{
@@ -78,73 +94,24 @@ public class KafkaConsumerTest extends Thread {
 		}
 	};
 
-	static {
-		props.put("group.id", "group1");
-		props.put("zookeeper.connect", "slave01:2181");
-//		props.put("zookeeper.session.timeout.ms", "40000");
-//		props.put("zookeeper.sync.time.ms", "200");
-//		props.put("auto.commit.interval.ms", "1000");
-//		props.put("auto.offset.reset", "smallest");
-//		props.put("fetch.message.max.bytes", "10485760");
-		props.put("exclude.internal.topics", "false");
-	}
-
-	public static void main(String[] args) {
-		KafkaConsumerTest hl = new KafkaConsumerTest();
-		try {
-			hl.start();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return;
-		}
-	}
-
-	public void shutdown() {
-		if (consumer != null) {
-			consumer.shutdown();
-		}
-		if (executor != null) {
-			executor.shutdown();
-		}
-		try {
-			if (!executor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
-				LOG.info("Timed out waiting for consumer threads to shut down, exiting uncleanly");
-			}
-		} catch (InterruptedException e) {
-			LOG.error("Interrupted during shutdown, exiting uncleanly");
-		}
-	}
-
-	@Override
-	public void run() {
+	private static synchronized void startOffsetListener(ConsumerConnector consumerConnector) {
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
-		topicCountMap.put(topic, Integer.valueOf(THREAD_PARALLEL_NUM));
-		consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
-		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumer.createMessageStreams(topicCountMap);
-		List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
-		executor = Executors.newFixedThreadPool(THREAD_PARALLEL_NUM);
-		int threadNumber = 0;
-		for (final KafkaStream<byte[], byte[]> stream : streams) {
-			executor.submit(new KafkaConsumerThread(stream, threadNumber));
-			threadNumber++;
-		}
-	}
+		topicCountMap.put(consumerOffsetTopic, new Integer(1));
+		KafkaStream<byte[], byte[]> offsetMsgStream = consumerConnector.createMessageStreams(topicCountMap).get(consumerOffsetTopic).get(0);
 
-	class KafkaConsumerThread implements Runnable {
-		private KafkaStream<byte[], byte[]> stream;
-
-		public KafkaConsumerThread(KafkaStream<byte[], byte[]> stream, int a_threadNumber) {
-			this.stream = stream;
-		}
-
-		@Override
-		public void run() {
-			ConsumerIterator<byte[], byte[]> it = stream.iterator();
-			while (true) {
-				MessageAndMetadata<byte[], byte[]> mam = it.next();
-				GroupTopicPartition commitKey = readMessageKey(ByteBuffer.wrap(mam.key()));
-				OffsetAndMetadata commitValue = readMessageValue(ByteBuffer.wrap(mam.message()));
-				System.out.println(commitKey + "=>" + commitValue);
+		ConsumerIterator<byte[], byte[]> it = offsetMsgStream.iterator();
+		while (true) {
+			MessageAndMetadata<byte[], byte[]> offsetMsg = it.next();
+			if (ByteBuffer.wrap(offsetMsg.key()).getShort() < 2) {
+				GroupTopicPartition commitKey = readMessageKey(ByteBuffer.wrap(offsetMsg.key()));
+				OffsetAndMetadata commitValue = readMessageValue(ByteBuffer.wrap(offsetMsg.message()));
+				// System.out.println(commitKey + "=>" + commitValue);
+				offsetMap.put(commitKey, commitValue);
+				TopicAndGroupDomain tag = new TopicAndGroupDomain();
+				tag.setGroup(commitKey.topicPartition().topic());
+				tag.setTopic(commitKey.group());
+				topicAndGroups.add(tag);
+				// System.out.println(offsetMap);
 			}
 		}
 	}
@@ -178,9 +145,10 @@ public class KafkaConsumerTest extends Thread {
 				String metadata = structAndVersion.getValue().getString(VALUE_METADATA_FIELD_V1);
 				long commitTimestamp = structAndVersion.getValue().getLong(VALUE_COMMIT_TIMESTAMP_FIELD_V1);
 				return new OffsetAndMetadata(offset, metadata, commitTimestamp);
+			} else {
+				throw new IllegalStateException("Unknown offset message version: " + structAndVersion.getVersion());
 			}
 		}
-		return null;
 	}
 
 	private static MessageValueStructAndVersionDomain readMessageValueStruct(ByteBuffer buffer) {
@@ -196,6 +164,37 @@ public class KafkaConsumerTest extends Thread {
 			mvs.setVersion(version);
 		}
 		return mvs;
+	}
+
+	static {
+		KafkaOffsetGetter kafka = new KafkaOffsetGetter();
+		kafka.setName("Kafka_Offset_IPC");
+		kafka.start();
+	}
+
+	@Override
+	public void run() {
+		String zk = SystemConfigUtils.getProperty("kafka.zk.list");
+		Properties props = new Properties();
+		props.put("group.id", "ke_tmp_group");
+		props.put("zookeeper.connect", zk);
+		props.put("exclude.internal.topics", "false");
+		ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
+		startOffsetListener(consumer);
+	}
+
+	public static void main(String[] args) {
+		Properties props = new Properties();
+		props.put("group.id", "group10");
+		props.put("zookeeper.connect", "slave01:2181");
+		// props.put("zookeeper.session.timeout.ms", "40000");
+		// props.put("zookeeper.sync.time.ms", "200");
+		// props.put("auto.commit.interval.ms", "1000");
+		// props.put("auto.offset.reset", "smallest");
+		// props.put("fetch.message.max.bytes", "10485760");
+		props.put("exclude.internal.topics", "false");
+		ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
+		startOffsetListener(consumer);
 	}
 
 }

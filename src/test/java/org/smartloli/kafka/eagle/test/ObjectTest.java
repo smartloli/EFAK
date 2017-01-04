@@ -15,24 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.util;
+package org.smartloli.kafka.eagle.test;
+
+import org.smartloli.kafka.eagle.ipc.KafkaOffsetGetter;
 
 /**
  * TODO
  * 
  * @author smartloli.
  *
- *         Created by Jan 3, 2017
+ *         Created by Jan 4, 2017
  */
-public class ConstantUtils {
+public class ObjectTest {
 
-	public interface D3 {
-		public static int SIZE = 50;
-	}
-
-	public interface Kafka {
-		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
-		public final static int SINGLE_THREAD = 1;
+	public static void main(String[] args) {
+		while (true) {
+			System.out.println(KafkaOffsetGetter.offsetMap);
+		}
 	}
 
 }

@@ -15,7 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.util;
+package org.smartloli.kafka.eagle.domain.offsets;
+
+import com.google.gson.Gson;
 
 /**
  * TODO
@@ -24,15 +26,30 @@ package org.smartloli.kafka.eagle.util;
  *
  *         Created by Jan 3, 2017
  */
-public class ConstantUtils {
+public class TopicAndGroupDomain {
 
-	public interface D3 {
-		public static int SIZE = 50;
+	private String group;
+	private String topic;
+
+	public String getGroup() {
+		return group;
 	}
 
-	public interface Kafka {
-		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
-		public final static int SINGLE_THREAD = 1;
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
 	}
 
 }

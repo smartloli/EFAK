@@ -15,7 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.util;
+package org.smartloli.kafka.eagle.domain.offsets;
+
+import org.apache.kafka.common.protocol.types.Struct;
+
+import com.google.gson.Gson;
 
 /**
  * TODO
@@ -24,15 +28,30 @@ package org.smartloli.kafka.eagle.util;
  *
  *         Created by Jan 3, 2017
  */
-public class ConstantUtils {
+public class MessageValueStructAndVersionDomain {
 
-	public interface D3 {
-		public static int SIZE = 50;
+	private Struct value;
+	private Short version;
+
+	public Struct getValue() {
+		return value;
 	}
 
-	public interface Kafka {
-		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
-		public final static int SINGLE_THREAD = 1;
+	public void setValue(Struct value) {
+		this.value = value;
+	}
+
+	public Short getVersion() {
+		return version;
+	}
+
+	public void setVersion(Short version) {
+		this.version = version;
+	}
+
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
 	}
 
 }
