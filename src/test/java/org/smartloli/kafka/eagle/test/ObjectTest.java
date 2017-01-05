@@ -29,9 +29,16 @@ import org.smartloli.kafka.eagle.ipc.KafkaOffsetGetter;
 public class ObjectTest {
 
 	public static void main(String[] args) {
+		// KafkaOffsetGetter kafka = new KafkaOffsetGetter();
+		// kafka.setName("Kafka_Offset_IPC");
+		// kafka.start();
+
 		while (true) {
-			System.out.println(KafkaOffsetGetter.offsetMap);
+			if (KafkaOffsetGetter.offsetMap.size() > 0) {
+				System.out.println(KafkaOffsetGetter.offsetMap);
+			}
 		}
+
 	}
 
 }

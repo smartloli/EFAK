@@ -30,6 +30,10 @@ public class ConstantUtils {
 		public static int SIZE = 50;
 	}
 
+	public interface Separator {
+		public static String EIGHT = "________";
+	}
+
 	public interface Kafka {
 		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
 		public final static int SINGLE_THREAD = 1;

@@ -19,19 +19,19 @@ package org.smartloli.kafka.eagle.ipc;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.protocol.types.Schema;
 import org.apache.kafka.common.protocol.types.Struct;
 import org.apache.kafka.common.protocol.types.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.domain.offsets.KeyAndValueSchemasDomain;
 import org.smartloli.kafka.eagle.domain.offsets.MessageValueStructAndVersionDomain;
-import org.smartloli.kafka.eagle.domain.offsets.TopicAndGroupDomain;
 import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
@@ -54,9 +54,11 @@ import kafka.server.GroupTopicPartition;
  */
 public class KafkaOffsetGetter extends Thread {
 
+	private final static Logger LOG = LoggerFactory.getLogger(KafkaOffsetGetter.class);
+
 	private final static String consumerOffsetTopic = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
 	public static Map<GroupTopicPartition, OffsetAndMetadata> offsetMap = new ConcurrentHashMap<>();
-	public static Set<TopicAndGroupDomain> topicAndGroups = new HashSet<>();
+	public static Map<String, Integer> activeMap = new ConcurrentHashMap<>();
 
 	// massive code stealing from kafka.server.OffsetManager
 	private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));
@@ -103,15 +105,34 @@ public class KafkaOffsetGetter extends Thread {
 		while (true) {
 			MessageAndMetadata<byte[], byte[]> offsetMsg = it.next();
 			if (ByteBuffer.wrap(offsetMsg.key()).getShort() < 2) {
-				GroupTopicPartition commitKey = readMessageKey(ByteBuffer.wrap(offsetMsg.key()));
-				OffsetAndMetadata commitValue = readMessageValue(ByteBuffer.wrap(offsetMsg.message()));
-				// System.out.println(commitKey + "=>" + commitValue);
-				offsetMap.put(commitKey, commitValue);
-				TopicAndGroupDomain tag = new TopicAndGroupDomain();
-				tag.setGroup(commitKey.topicPartition().topic());
-				tag.setTopic(commitKey.group());
-				topicAndGroups.add(tag);
-				// System.out.println(offsetMap);
+				try {
+					GroupTopicPartition commitKey = readMessageKey(ByteBuffer.wrap(offsetMsg.key()));
+					if (offsetMsg.message() == null) {
+						continue;
+					}
+					OffsetAndMetadata commitValue = readMessageValue(ByteBuffer.wrap(offsetMsg.message()));
+					offsetMap.put(commitKey, commitValue);
+					// sub mill 
+					long mill = System.currentTimeMillis();
+					for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
+						String group = entry.getKey().group();
+						String topic = entry.getKey().topicPartition().topic();
+						int partition = entry.getKey().topicPartition().partition();
+						long timespan = entry.getValue().timestamp();
+						String key = group + ConstantUtils.Separator.EIGHT + topic + ConstantUtils.Separator.EIGHT + partition;
+						if (activeMap.containsKey(key)) {
+							if (timespan >= mill) {
+								activeMap.put(key, 1);
+							} else {
+								activeMap.put(key, 0);
+							}
+						} else {
+							activeMap.put(key, 1);
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -167,9 +188,13 @@ public class KafkaOffsetGetter extends Thread {
 	}
 
 	static {
+		LOG.info("Initialize KafkaOffsetGetter clazz.");
 		KafkaOffsetGetter kafka = new KafkaOffsetGetter();
-		kafka.setName("Kafka_Offset_IPC");
 		kafka.start();
+	}
+
+	public static void getInstance() {
+		LOG.info(KafkaOffsetGetter.class.getName());
 	}
 
 	@Override

@@ -185,6 +185,11 @@
 			<artifactId>mail</artifactId>
 			<version>1.4.7</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.thrift</groupId>
+			<artifactId>libthrift</artifactId>
+			<version>0.9.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

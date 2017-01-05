@@ -18,15 +18,21 @@
 package org.smartloli.kafka.eagle.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import kafka.common.OffsetAndMetadata;
+import kafka.server.GroupTopicPartition;
+
 import org.smartloli.kafka.eagle.domain.ConsumerDetailDomain;
 import org.smartloli.kafka.eagle.domain.ConsumerDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
+import org.smartloli.kafka.eagle.ipc.KafkaOffsetGetter;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
 
@@ -103,6 +109,58 @@ public class ConsumerService {
 			list.add(consumer);
 		}
 		return list.toString();
+	}
+
+	public static String getConsumer(String formatter) {
+		if ("kafka".equals(formatter)) {
+			return getKafkaConsumer();
+		} else {
+			return getConsumer();
+		}
+	}
+
+	private static String getKafkaConsumer() {
+		Map<GroupTopicPartition, OffsetAndMetadata> map = KafkaOffsetGetter.offsetMap;
+		List<ConsumerDomain> list = new ArrayList<ConsumerDomain>();
+		int id = 0;
+		Map<String, List<String>> tmp = new HashMap<>();
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : map.entrySet()) {
+			if (tmp.containsKey(entry.getKey().group())) {
+				List<String> topics = tmp.get(entry.getKey().group());
+				topics.add(entry.getKey().topicPartition().topic());
+			} else {
+				List<String> topics = new ArrayList<>();
+				topics.add(entry.getKey().topicPartition().topic());
+				tmp.put(entry.getKey().group(), topics);
+			}
+		}
+
+		for (Entry<String, List<String>> entry : tmp.entrySet()) {
+			ConsumerDomain consumer = new ConsumerDomain();
+			consumer.setGroup(entry.getKey());
+			consumer.setConsumerNumber(entry.getValue().size());
+			consumer.setTopic(entry.getValue());
+			consumer.setId(++id);
+			consumer.setActiveNumber(getKafkaActiveNumber(entry.getKey(), entry.getValue()));
+			list.add(consumer);
+		}
+		return list.toString();
+	}
+
+	private static int getKafkaActiveNumber(String group, List<String> topics) {
+		long currentTimeMills = System.currentTimeMillis();
+		Map<GroupTopicPartition, OffsetAndMetadata> map = KafkaOffsetGetter.offsetMap;
+		int sum = 0;
+		for (String topic : topics) {
+			for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : map.entrySet()) {
+				if (entry.getKey().group().equals(group) && entry.getKey().topicPartition().topic().equals(topic)) {
+					if (entry.getValue().timestamp() >= currentTimeMills) {
+						sum++;
+					}
+				}
+			}
+		}
+		return sum;
 	}
 
 	public static int getActiveNumber(String group, List<String> topics) {
