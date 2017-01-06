@@ -36,6 +36,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.service.ConsumerService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
+import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 @Controller
 public class ConsumersController {
@@ -50,17 +51,16 @@ public class ConsumersController {
 	}
 
 	@RequestMapping(value = "/consumers/info/ajax", method = RequestMethod.GET)
-	public void consumersAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void consumersGraphAjax(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setHeader("Charset", "utf-8");
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 		try {
-			byte[] output = GzipUtils.compressToByte(ConsumerService.getActiveTopic());
+			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage"); 
+			byte[] output = GzipUtils.compressToByte(ConsumerService.getActiveTopic(formatter));
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -73,15 +73,12 @@ public class ConsumersController {
 	}
 
 	@RequestMapping(value = "/consumer/list/table/ajax", method = RequestMethod.GET)
-	public void consumerListAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void consumerTableAjax(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setHeader("Charset", "utf-8");
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
-
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
 		String aoData = request.getParameter("aoData");
 		JSONArray jsonArray = JSON.parseArray(aoData);
@@ -97,7 +94,8 @@ public class ConsumersController {
 			}
 		}
 
-		JSONArray ret = JSON.parseArray(ConsumerService.getConsumer());
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		JSONArray ret = JSON.parseArray(ConsumerService.getConsumer(formatter));
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {
@@ -138,7 +136,7 @@ public class ConsumersController {
 	}
 
 	@RequestMapping(value = "/consumer/{group}/table/ajax", method = RequestMethod.GET)
-	public void consumerDetailListAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
+	public void consumerTableListAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setHeader("Charset", "utf-8");
@@ -162,7 +160,8 @@ public class ConsumersController {
 			}
 		}
 
-		JSONArray ret = JSON.parseArray(ConsumerService.getConsumerDetail(group, ip));
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		JSONArray ret = JSON.parseArray(ConsumerService.getConsumerDetail(formatter,group, ip));
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {

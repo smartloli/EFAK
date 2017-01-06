@@ -36,6 +36,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.service.OffsetService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
+import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 @Controller
 public class OffsetController {
@@ -46,7 +47,8 @@ public class OffsetController {
 	public ModelAndView consumersActiveView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
 		ModelAndView mav = new ModelAndView();
-		if (OffsetService.isGroupTopic(group, topic, ip)) {
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		if (OffsetService.isGroupTopic(formatter,group, topic, ip)) {
 			mav.setViewName("/consumers/offset_consumers");
 		} else {
 			mav.setViewName("/error/404");
@@ -58,7 +60,8 @@ public class OffsetController {
 	public ModelAndView offsetRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
 		ModelAndView mav = new ModelAndView();
-		if (OffsetService.isGroupTopic(group, topic, ip)) {
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		if (OffsetService.isGroupTopic(formatter,group, topic, ip)) {
 			mav.setViewName("/consumers/offset_realtime");
 		} else {
 			mav.setViewName("/error/404");
@@ -91,7 +94,8 @@ public class OffsetController {
 			}
 		}
 
-		JSONArray ret = JSON.parseArray(OffsetService.getLogSize(topic, group, ip));
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		JSONArray ret = JSON.parseArray(OffsetService.getLogSize(formatter,topic, group, ip));
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {

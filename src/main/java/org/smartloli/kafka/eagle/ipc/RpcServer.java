@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
- * TODO
+ * Providing rpc services inside access to offset in kafka.
  * 
  * @author smartloli.
  *

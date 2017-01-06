@@ -18,14 +18,20 @@
 package org.smartloli.kafka.eagle.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+
 import org.smartloli.kafka.eagle.domain.OffsetDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
+import org.smartloli.kafka.eagle.ipc.RpcClient;
+import org.smartloli.kafka.eagle.util.CalendarUtils;
 import org.smartloli.kafka.eagle.util.DBZKDataUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
@@ -48,6 +54,55 @@ public class OffsetService {
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
 			OffsetZkDomain offsetZk = KafkaClusterUtils.getOffset(topic, group, partitionInt);
+			OffsetDomain offset = new OffsetDomain();
+			long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partitionInt);
+			offset.setPartition(partitionInt);
+			offset.setLogSize(logSize);
+			offset.setCreate(offsetZk.getCreate());
+			offset.setModify(offsetZk.getModify());
+			offset.setOffset(offsetZk.getOffset());
+			offset.setLag(offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
+			offset.setOwner(offsetZk.getOwners());
+			list.add(offset);
+		}
+		return list.toString();
+	}
+	
+	public static String getLogSize(String formatter,String topic, String group, String ip) {
+		if("kafka".equals(formatter)){
+			return getKafkaLogSize(topic, group, ip);
+		}else{
+			return getLogSize(topic, group, ip);
+		}
+	}
+
+	public static OffsetZkDomain getKafkaOffset(String topic,String group,int partition){
+		JSONArray array = JSON.parseArray(RpcClient.getOffset());
+		OffsetZkDomain offsetZk = new OffsetZkDomain();
+		for(Object obj : array){
+			JSONObject object = (JSONObject) obj;
+			String _topic=object.getString("topic");
+			String _group = object.getString("group");
+			int _partition = object.getInteger("partition");
+			long timestamp = object.getLong("timestamp");
+			long offset = object.getLong("offset");
+			if(topic.equals(_topic)&&group.equals(_group)&&partition==_partition){
+				offsetZk.setOffset(offset);
+				offsetZk.setOwners("NA");
+				offsetZk.setCreate(CalendarUtils.timeSpan2StrDate(timestamp));
+				offsetZk.setModify(CalendarUtils.timeSpan2StrDate(timestamp));
+			}
+		}
+		return offsetZk;
+	}
+	
+	private static String getKafkaLogSize(String topic, String group, String ip) {
+		List<String> hosts = getBrokers(topic, group, ip);
+		List<String> partitions = KafkaClusterUtils.findTopicPartition(topic);
+		List<OffsetDomain> list = new ArrayList<OffsetDomain>();
+		for (String partition : partitions) {
+			int partitionInt = Integer.parseInt(partition);
+			OffsetZkDomain offsetZk = getKafkaOffset(topic, group, partitionInt);
 			OffsetDomain offset = new OffsetDomain();
 			long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partitionInt);
 			offset.setPartition(partitionInt);
@@ -111,6 +166,44 @@ public class OffsetService {
 		return status;
 	}
 
+	public static boolean isGroupTopic(String formatter, String group, String topic, String ip) {
+		if ("kafka".equals(formatter)) {
+			return isKafkaGroupTopic(group, topic, ip);
+		} else {
+			return isGroupTopic(group, topic, ip);
+		}
+	}
+
+	private static boolean isKafkaGroupTopic(String group, String topic, String ip) {
+		String key = group + "_" + topic + "_kafka_consumer_owners_" + ip;
+		boolean status = false;
+		if (lruCache.containsKey(key)) {
+			TupleDomain tuple = lruCache.get(key);
+			status = tuple.isStatus();
+			long end = System.currentTimeMillis();
+			if ((end - tuple.getTimespan()) / (1000 * 60.0) > 3) {// 1 mins
+				lruCache.remove(key);
+			}
+		} else {
+			Map<String, List<String>> type = new HashMap<String, List<String>>();
+			Gson gson = new Gson();
+			Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+			if (map.containsKey(group)) {
+				for (String _topic : map.get(group)) {
+					if (_topic.equals(topic)) {
+						status = true;
+						break;
+					}
+				}
+			}
+			TupleDomain tuple = new TupleDomain();
+			tuple.setStatus(status);
+			tuple.setTimespan(System.currentTimeMillis());
+			lruCache.put(key, tuple);
+		}
+		return status;
+	}
+
 	public static String getOffsetsGraph(String group, String topic) {
 		String ret = DBZKDataUtils.getOffsets(group, topic);
 		if (ret.length() > 0) {
@@ -118,5 +211,5 @@ public class OffsetService {
 		}
 		return ret;
 	}
-
+	
 }

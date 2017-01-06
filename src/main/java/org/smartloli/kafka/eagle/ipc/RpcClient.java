@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
- * TODO
+ * Rpc through the Kafka stored in the offset.
  * 
  * @author smartloli.
  *
@@ -70,9 +70,21 @@ public class RpcClient {
 		}
 		return ret;
 	}
-	
-	public static void main(String[] args) {
-		System.out.println("Info => " + getActiverConsumer());
+
+	public static String getConsumer() {
+		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
+		TProtocol protocol = new TCompactProtocol(transport);
+		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
+		String ret = "";
+		try {
+			transport.open();
+			ret = client.getConsumer();
+		} catch (Exception e) {
+			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
+		} finally {
+			transport.close();
+		}
+		return ret;
 	}
 
 }

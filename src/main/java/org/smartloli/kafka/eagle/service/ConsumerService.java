@@ -25,14 +25,12 @@ import java.util.Map.Entry;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import kafka.common.OffsetAndMetadata;
-import kafka.server.GroupTopicPartition;
+import com.google.gson.Gson;
 
 import org.smartloli.kafka.eagle.domain.ConsumerDetailDomain;
 import org.smartloli.kafka.eagle.domain.ConsumerDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
-import org.smartloli.kafka.eagle.ipc.KafkaOffsetGetter;
+import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
 
@@ -50,6 +48,43 @@ public class ConsumerService {
 	public static String getActiveTopic() {
 		JSONObject obj = new JSONObject();
 		obj.put("active", getActive());
+		return obj.toJSONString();
+	}
+
+	public static String getActiveTopic(String formatter) {
+		if ("kafka".equals(formatter)) {
+			return getKafkaActiveTopic();
+		} else {
+			return getActiveTopic();
+		}
+	}
+
+	private static String getKafkaActiveTopic() {
+		JSONObject obj = new JSONObject();
+		obj.put("active", getKafkaActive());
+		return obj.toJSONString();
+	}
+
+	private static Object getKafkaActive() {
+		Map<String, List<String>> type = new HashMap<String, List<String>>();
+		Gson gson = new Gson();
+		Map<String, List<String>> kafka = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
+		JSONObject obj = new JSONObject();
+		JSONArray arrParent = new JSONArray();
+		obj.put("name", "Active Topics");
+		for (Entry<String, List<String>> entry : kafka.entrySet()) {
+			JSONObject object = new JSONObject();
+			object.put("name", entry.getKey());
+			JSONArray arrChild = new JSONArray();
+			for (String str : entry.getValue()) {
+				JSONObject objectChild = new JSONObject();
+				objectChild.put("name", str);
+				arrChild.add(objectChild);
+			}
+			object.put("children", arrChild);
+			arrParent.add(object);
+		}
+		obj.put("children", arrParent);
 		return obj.toJSONString();
 	}
 
@@ -72,6 +107,52 @@ public class ConsumerService {
 		} else {
 			Map<String, List<String>> map = KafkaClusterUtils.getConsumers();
 			Map<String, List<String>> actvTopics = KafkaClusterUtils.getActiveTopic();
+			List<ConsumerDetailDomain> list = new ArrayList<ConsumerDetailDomain>();
+			int id = 0;
+			for (String topic : map.get(group)) {
+				ConsumerDetailDomain consumerDetail = new ConsumerDetailDomain();
+				consumerDetail.setId(++id);
+				consumerDetail.setTopic(topic);
+				if (actvTopics.containsKey(group + "_" + topic)) {
+					consumerDetail.setConsumering(true);
+				} else {
+					consumerDetail.setConsumering(false);
+				}
+				list.add(consumerDetail);
+			}
+			ret = list.toString();
+			TupleDomain tuple = new TupleDomain();
+			tuple.setRet(ret);
+			tuple.setTimespan(System.currentTimeMillis());
+			lruCache.put(key, tuple);
+		}
+
+		return ret;
+	}
+	
+	public static String getConsumerDetail(String formatter,String group, String ip) {
+		if("kafka".equals(formatter)){
+			return getKafkaConsumerDetail(group,ip);
+		}else{
+			return getConsumerDetail(group, ip);
+		}
+	}
+	
+	public static String getKafkaConsumerDetail(String group, String ip) {
+		String key = group + "_kafka_consumer_detail_" + ip;
+		String ret = "";
+		if (lruCache.containsKey(key)) {
+			TupleDomain tuple = lruCache.get(key);
+			ret = tuple.getRet();
+			long end = System.currentTimeMillis();
+			if ((end - tuple.getTimespan()) / (1000 * 60.0) > 1) {// 1 mins
+				lruCache.remove(key);
+			}
+		} else {
+			Map<String, List<String>> type = new HashMap<String, List<String>>();
+			Gson gson = new Gson();
+			Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+			Map<String, List<String>> actvTopics = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
 			List<ConsumerDetailDomain> list = new ArrayList<ConsumerDetailDomain>();
 			int id = 0;
 			for (String topic : map.get(group)) {
@@ -120,22 +201,12 @@ public class ConsumerService {
 	}
 
 	private static String getKafkaConsumer() {
-		Map<GroupTopicPartition, OffsetAndMetadata> map = KafkaOffsetGetter.offsetMap;
 		List<ConsumerDomain> list = new ArrayList<ConsumerDomain>();
+		Map<String, List<String>> type = new HashMap<String, List<String>>();
+		Gson gson = new Gson();
+		Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
 		int id = 0;
-		Map<String, List<String>> tmp = new HashMap<>();
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : map.entrySet()) {
-			if (tmp.containsKey(entry.getKey().group())) {
-				List<String> topics = tmp.get(entry.getKey().group());
-				topics.add(entry.getKey().topicPartition().topic());
-			} else {
-				List<String> topics = new ArrayList<>();
-				topics.add(entry.getKey().topicPartition().topic());
-				tmp.put(entry.getKey().group(), topics);
-			}
-		}
-
-		for (Entry<String, List<String>> entry : tmp.entrySet()) {
+		for (Entry<String, List<String>> entry : map.entrySet()) {
 			ConsumerDomain consumer = new ConsumerDomain();
 			consumer.setGroup(entry.getKey());
 			consumer.setConsumerNumber(entry.getValue().size());
@@ -148,16 +219,14 @@ public class ConsumerService {
 	}
 
 	private static int getKafkaActiveNumber(String group, List<String> topics) {
-		long currentTimeMills = System.currentTimeMillis();
-		Map<GroupTopicPartition, OffsetAndMetadata> map = KafkaOffsetGetter.offsetMap;
+		Map<String, List<String>> type = new HashMap<String, List<String>>();
+		Gson gson = new Gson();
+		Map<String, List<String>> map = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
 		int sum = 0;
 		for (String topic : topics) {
-			for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : map.entrySet()) {
-				if (entry.getKey().group().equals(group) && entry.getKey().topicPartition().topic().equals(topic)) {
-					if (entry.getValue().timestamp() >= currentTimeMills) {
-						sum++;
-					}
-				}
+			String key = group + "_" + topic;
+			if (map.containsKey(key)) {
+				sum++;
 			}
 		}
 		return sum;

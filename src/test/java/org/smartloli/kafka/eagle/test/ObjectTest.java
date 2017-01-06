@@ -17,7 +17,7 @@
  */
 package org.smartloli.kafka.eagle.test;
 
-import org.smartloli.kafka.eagle.ipc.KafkaOffsetGetter;
+import org.smartloli.kafka.eagle.service.ConsumerService;
 
 /**
  * TODO
@@ -29,16 +29,17 @@ import org.smartloli.kafka.eagle.ipc.KafkaOffsetGetter;
 public class ObjectTest {
 
 	public static void main(String[] args) {
-		// KafkaOffsetGetter kafka = new KafkaOffsetGetter();
-		// kafka.setName("Kafka_Offset_IPC");
-		// kafka.start();
-
-		while (true) {
-			if (KafkaOffsetGetter.offsetMap.size() > 0) {
-				System.out.println(KafkaOffsetGetter.offsetMap);
-			}
-		}
-
+		// Mill => 1483670359006
+		// GetMill => 1483670352215
+		// GetMill => 1483670351214
+		// Mill => 1483670358005
+		// GetMill => 1483670350212
+		// Mill => 1483670358004
+		// System.out.println("Mill =>
+		// "+CalendarUtils.timeSpan2StrDate(1483670358005L));
+		// System.out.println("GetMill =>
+		// "+CalendarUtils.timeSpan2StrDate(1483670351214L));
+		 System.out.println(ConsumerService.getConsumer("kafka"));
 	}
 
 }

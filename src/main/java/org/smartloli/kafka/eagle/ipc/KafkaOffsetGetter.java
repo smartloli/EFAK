@@ -20,7 +20,6 @@ package org.smartloli.kafka.eagle.ipc;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -57,8 +56,8 @@ public class KafkaOffsetGetter extends Thread {
 	private final static Logger LOG = LoggerFactory.getLogger(KafkaOffsetGetter.class);
 
 	private final static String consumerOffsetTopic = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
-	public static Map<GroupTopicPartition, OffsetAndMetadata> offsetMap = new ConcurrentHashMap<>();
-	public static Map<String, Integer> activeMap = new ConcurrentHashMap<>();
+	protected static Map<GroupTopicPartition, OffsetAndMetadata> offsetMap = new ConcurrentHashMap<>();
+	protected static Map<String, Boolean> activeMap = new ConcurrentHashMap<>();
 
 	// massive code stealing from kafka.server.OffsetManager
 	private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));
@@ -112,24 +111,6 @@ public class KafkaOffsetGetter extends Thread {
 					}
 					OffsetAndMetadata commitValue = readMessageValue(ByteBuffer.wrap(offsetMsg.message()));
 					offsetMap.put(commitKey, commitValue);
-					// sub mill 
-					long mill = System.currentTimeMillis();
-					for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
-						String group = entry.getKey().group();
-						String topic = entry.getKey().topicPartition().topic();
-						int partition = entry.getKey().topicPartition().partition();
-						long timespan = entry.getValue().timestamp();
-						String key = group + ConstantUtils.Separator.EIGHT + topic + ConstantUtils.Separator.EIGHT + partition;
-						if (activeMap.containsKey(key)) {
-							if (timespan >= mill) {
-								activeMap.put(key, 1);
-							} else {
-								activeMap.put(key, 0);
-							}
-						} else {
-							activeMap.put(key, 1);
-						}
-					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

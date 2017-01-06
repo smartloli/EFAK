@@ -37,6 +37,7 @@ public class ConstantUtils {
 	public interface Kafka {
 		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
 		public final static int SINGLE_THREAD = 1;
+		public final static int ACTIVER_INTERVAL = 10000;
 	}
 
 }

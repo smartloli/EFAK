@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.quartz;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,10 +29,14 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+
 import org.smartloli.kafka.eagle.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
+import org.smartloli.kafka.eagle.ipc.RpcClient;
+import org.smartloli.kafka.eagle.service.OffsetService;
 import org.smartloli.kafka.eagle.util.CalendarUtils;
 import org.smartloli.kafka.eagle.util.DBZKDataUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
@@ -60,7 +65,15 @@ public class OffsetsQuartz {
 		try {
 			List<String> hosts = getBrokers();
 			List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
-			Map<String, List<String>> consumers = KafkaClusterUtils.getConsumers();
+			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+			Map<String, List<String>> consumers = null;
+			if ("kafka".equals(formatter)) {
+				Map<String, List<String>> type = new HashMap<String, List<String>>();
+				Gson gson = new Gson();
+				consumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+			} else {
+				consumers = KafkaClusterUtils.getConsumers();
+			}
 			String statsPerDate = CalendarUtils.getStatsPerDate();
 			for (Entry<String, List<String>> entry : consumers.entrySet()) {
 				String group = entry.getKey();
@@ -69,7 +82,12 @@ public class OffsetsQuartz {
 					for (String partitionStr : KafkaClusterUtils.findTopicPartition(topic)) {
 						int partition = Integer.parseInt(partitionStr);
 						long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partition);
-						OffsetZkDomain offsetZk = KafkaClusterUtils.getOffset(topic, group, partition);
+						OffsetZkDomain offsetZk = null;
+						if ("kafka".equals(formatter)) {
+							offsetZk = OffsetService.getKafkaOffset(topic, group, partition);
+						} else {
+							offsetZk = KafkaClusterUtils.getOffset(topic, group, partition);
+						}
 						offsetSQLite.setGroup(group);
 						offsetSQLite.setCreated(statsPerDate);
 						offsetSQLite.setTopic(topic);
