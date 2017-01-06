@@ -46,7 +46,7 @@
 			<directory>src/main/resources/plugins/</directory>
 			<outputDirectory>/lib</outputDirectory>
 			<includes>
-				<include>kafka-eagel-plugins_fat.jar</include>
+				<include>*.jar</include>
 			</includes>
 		</fileSet>
 	</fileSets>

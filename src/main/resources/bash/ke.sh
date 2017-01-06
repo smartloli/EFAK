@@ -49,12 +49,18 @@ start()
 	LOG_DIR=${KE_HOME}/logs
 	
 	cd ${KE_HOME}
-	CLASS=com.smartloli.kafka.eagle.plugins.main.TomcatServerListen
+	CLASS=org.smartloli.kafka.eagle.plugins.main.TomcatServerListen
 	${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ke.out 2>&1
 	echo "*******************************************************************"
     echo "* Listen port has successed! *"
 	echo "*******************************************************************"
 	sleep 5
+	CLASS_IPC=org.smartloli.kafka.eagle.plugins.ipc.RpcServer
+	${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS_IPC > ${LOG_DIR}/ke.out 2>&1 < /dev/null &
+	echo "*******************************************************************"
+    echo "* Start kafka offset thrift server has successed! *"
+	echo "*******************************************************************"
+	sleep 1
 	rm -rf ${KE_HOME}/kms/logs/*
 	chmod +x ${KE_HOME}/kms/bin/*.sh
 	nohup ${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1
