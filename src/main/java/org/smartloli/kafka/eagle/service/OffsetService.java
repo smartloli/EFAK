@@ -86,9 +86,10 @@ public class OffsetService {
 			int _partition = object.getInteger("partition");
 			long timestamp = object.getLong("timestamp");
 			long offset = object.getLong("offset");
+			String owner = object.getString("owner");
 			if(topic.equals(_topic)&&group.equals(_group)&&partition==_partition){
 				offsetZk.setOffset(offset);
-				offsetZk.setOwners("NA");
+				offsetZk.setOwners(owner);
 				offsetZk.setCreate(CalendarUtils.timeSpan2StrDate(timestamp));
 				offsetZk.setModify(CalendarUtils.timeSpan2StrDate(timestamp));
 			}

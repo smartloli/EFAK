@@ -17,7 +17,9 @@
  */
 package org.smartloli.kafka.eagle.test;
 
-import org.smartloli.kafka.eagle.service.ConsumerService;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.UUID;
 
 /**
  * TODO
@@ -28,18 +30,19 @@ import org.smartloli.kafka.eagle.service.ConsumerService;
  */
 public class ObjectTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnknownHostException {
 		// Mill => 1483670359006
 		// GetMill => 1483670352215
 		// GetMill => 1483670351214
 		// Mill => 1483670358005
 		// GetMill => 1483670350212
 		// Mill => 1483670358004
-		// System.out.println("Mill =>
-		// "+CalendarUtils.timeSpan2StrDate(1483670358005L));
+		UUID uuid = UUID.randomUUID();
+		String consumerUuid = String.format("%s-%d-%s", InetAddress.getLocalHost().getHostName(), System.currentTimeMillis(), (uuid.getMostSignificantBits() + "").substring(0, 8));
+		System.out.println("Mill => " + consumerUuid);
 		// System.out.println("GetMill =>
 		// "+CalendarUtils.timeSpan2StrDate(1483670351214L));
-		 System.out.println(ConsumerService.getConsumer("kafka"));
+		// System.out.println(ConsumerService.getConsumer("kafka"));
 	}
 
 }

@@ -23,7 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.thrift.TException;
 import org.smartloli.kafka.eagle.util.ConstantUtils;
@@ -52,6 +54,7 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 	@Override
 	public String getOffset() throws TException {
 		JSONArray array = new JSONArray();
+		Map<String, Boolean> map = getActiver();
 		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
 			JSONObject object = new JSONObject();
 			object.put("group", entry.getKey().group());
@@ -59,6 +62,14 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 			object.put("partition", entry.getKey().topicPartition().partition());
 			object.put("offset", entry.getValue().offset());
 			object.put("timestamp", entry.getValue().timestamp());
+			String key = entry.getKey().group() + ConstantUtils.Separator.EIGHT + entry.getKey().topicPartition().topic() + ConstantUtils.Separator.EIGHT + entry.getKey().topicPartition().partition();
+			if (map.containsKey(key)) {
+				UUID uuid = UUID.randomUUID();
+				String threadId = String.format("%s-%d-%s-%d", entry.getKey().group(), System.currentTimeMillis(), (uuid.getMostSignificantBits() + "").substring(0, 8), entry.getKey().topicPartition().partition());
+				object.put("owner", threadId);
+			} else {
+				object.put("owner", "");
+			}
 			array.add(object);
 		}
 		return array.toJSONString();
@@ -96,6 +107,28 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 		return map.toString();
 	}
 
+	private Map<String, Boolean> getActiver() throws TException {
+		long mill = System.currentTimeMillis();
+		Map<String, Boolean> active = new ConcurrentHashMap<>();
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
+			String group = entry.getKey().group();
+			String topic = entry.getKey().topicPartition().topic();
+			int partition = entry.getKey().topicPartition().partition();
+			long timespan = entry.getValue().timestamp();
+			String key = group + ConstantUtils.Separator.EIGHT + topic + ConstantUtils.Separator.EIGHT + partition;
+			if (active.containsKey(key)) {
+				if ((mill - timespan) <= ConstantUtils.Kafka.ACTIVER_INTERVAL) {
+					active.put(key, true);
+				} else {
+					active.put(key, false);
+				}
+			} else {
+				active.put(key, true);
+			}
+		}
+		return active;
+	}
+
 	@Override
 	public String getActiverConsumer() throws TException {
 		long mill = System.currentTimeMillis();
@@ -131,9 +164,9 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 				}
 			}
 		}
-		
+
 		Map<String, List<String>> map2 = new HashMap<>();
-		for(Entry<String, Set<String>> entry:map.entrySet()){
+		for (Entry<String, Set<String>> entry : map.entrySet()) {
 			List<String> list = new ArrayList<>();
 			for (String topic : entry.getValue()) {
 				list.add(topic);
