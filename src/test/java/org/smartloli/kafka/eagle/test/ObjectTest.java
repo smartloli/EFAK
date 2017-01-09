@@ -17,9 +17,15 @@
  */
 package org.smartloli.kafka.eagle.test;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.smartloli.kafka.eagle.ipc.RpcClient;
+import org.smartloli.kafka.eagle.util.CalendarUtils;
+
+import com.google.gson.Gson;
 
 /**
  * TODO
@@ -37,12 +43,11 @@ public class ObjectTest {
 		// Mill => 1483670358005
 		// GetMill => 1483670350212
 		// Mill => 1483670358004
-		UUID uuid = UUID.randomUUID();
-		String consumerUuid = String.format("%s-%d-%s", InetAddress.getLocalHost().getHostName(), System.currentTimeMillis(), (uuid.getMostSignificantBits() + "").substring(0, 8));
-		System.out.println("Mill => " + consumerUuid);
-		// System.out.println("GetMill =>
-		// "+CalendarUtils.timeSpan2StrDate(1483670351214L));
-		// System.out.println(ConsumerService.getConsumer("kafka"));
+		System.out.println(CalendarUtils.timeSpan2StrDate(1483927797771L));
+		Map<String, List<String>> type = new HashMap<String, List<String>>();
+		Gson gson = new Gson();
+		Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+		System.out.println(map.size());
 	}
 
 }

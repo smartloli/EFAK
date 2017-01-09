@@ -48,10 +48,14 @@ public class DashboardService {
 		int brokers = JSON.parseArray(kafkaObject).size();
 		DashboardDomain dash = new DashboardDomain();
 		dash.setBrokers(brokers);
-		dash.setConsumers(0);
 		dash.setTopics(topics);
 		dash.setZks(zks);
-		dash.setConsumers(ConsumerService.getConsumerNumbers());
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		if ("kafka".equals(formatter)) {
+			dash.setConsumers(ConsumerService.getKafkaConsumerNumbers());
+		} else {
+			dash.setConsumers(ConsumerService.getConsumerNumbers());
+		}
 		return dash.toString();
 	}
 

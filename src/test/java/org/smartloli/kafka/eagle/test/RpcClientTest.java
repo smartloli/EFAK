@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.ipc;
+package org.smartloli.kafka.eagle.test;
 
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -24,6 +24,7 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.ipc.KafkaOffsetServer;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
@@ -33,11 +34,11 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
  *
  *         Created by Jan 5, 2017
  */
-public class RpcClient {
+public class RpcClientTest {
 
-	private final static Logger LOG = LoggerFactory.getLogger(RpcClient.class);
+	private final static Logger LOG = LoggerFactory.getLogger(RpcClientTest.class);
 	private final static int PORT = SystemConfigUtils.getIntProperty("kafka.eagle.offset.rpc.port");
-	private final static String ADDR = "127.0.0.1";
+	private final static String ADDR = "master";
 
 	public static void main(String[] args) {
 		System.out.println(getActiverConsumer());
@@ -90,5 +91,5 @@ public class RpcClient {
 		}
 		return ret;
 	}
-
+	
 }

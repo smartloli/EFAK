@@ -129,15 +129,15 @@ public class ConsumerService {
 
 		return ret;
 	}
-	
-	public static String getConsumerDetail(String formatter,String group, String ip) {
-		if("kafka".equals(formatter)){
-			return getKafkaConsumerDetail(group,ip);
-		}else{
+
+	public static String getConsumerDetail(String formatter, String group, String ip) {
+		if ("kafka".equals(formatter)) {
+			return getKafkaConsumerDetail(group, ip);
+		} else {
 			return getConsumerDetail(group, ip);
 		}
 	}
-	
+
 	public static String getKafkaConsumerDetail(String group, String ip) {
 		String key = group + "_kafka_consumer_detail_" + ip;
 		String ret = "";
@@ -245,6 +245,17 @@ public class ConsumerService {
 
 	public static int getConsumerNumbers() {
 		Map<String, List<String>> map = KafkaClusterUtils.getConsumers();
+		int count = 0;
+		for (Entry<String, List<String>> entry : map.entrySet()) {
+			count += entry.getValue().size();
+		}
+		return count;
+	}
+
+	public static int getKafkaConsumerNumbers() {
+		Map<String, List<String>> type = new HashMap<String, List<String>>();
+		Gson gson = new Gson();
+		Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
 		int count = 0;
 		for (Entry<String, List<String>> entry : map.entrySet()) {
 			count += entry.getValue().size();

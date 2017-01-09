@@ -11,7 +11,7 @@
 			<directory>src/main/resources/bash/</directory>
 			<outputDirectory>/bin</outputDirectory>
 			<includes>
-				<include>ke.sh</include>
+				<include>*.sh</include>
 			</includes>
 		</fileSet>
 		<fileSet>

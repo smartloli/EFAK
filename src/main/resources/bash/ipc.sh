@@ -3,24 +3,7 @@
 # source function library
 #. /etc/rc.d/init.d/functions
 
-COLOR_G="\x1b[0;32m"  # green
-COLOR_R="\x1b[1;31m"  # red
-RESET="\x1b[0m"
-STR_ERR="[Oops! Error occurred! Please see the message upside!]"
-STR_OK="[Job done!]"
-MSG_ERR=$COLOR_R$STR_ERR$RESET
-MSG_OK=$COLOR_G$STR_OK$RESET
-isexit()
-{
-	if [[ $1 -eq 0 ]];then
-		echo -e $MSG_OK
-	else
-		echo -e $MSG_ERR
-		exit 1
-	fi
-}
-
-DIALUP_PID=$KE_HOME/bin/ke.pid
+DIALUP_PID=$KE_HOME/bin/ipc.pid
 start()
 {
     echo -n $"Starting $prog: "
@@ -49,38 +32,14 @@ start()
 	LOG_DIR=${KE_HOME}/logs
 	
 	cd ${KE_HOME}
-	CLASS=org.smartloli.kafka.eagle.plugins.main.TomcatServerListen
-	${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ke.out 2>&1
-	echo "*******************************************************************"
-    echo "* Listen port has successed! *"
-	echo "*******************************************************************"
-	sleep 5
-	chmod +x ${KE_HOME}/bin/*.sh
-	${KE_HOME}/bin/ipc.sh start
-	echo "*******************************************************************"
-    echo "* Start kafka offset thrift server has successed! *"
-	echo "*******************************************************************"
-	sleep 1
-	rm -rf ${KE_HOME}/kms/logs/*
-	chmod +x ${KE_HOME}/kms/bin/*.sh
-	nohup ${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1
-	ret=$?
-	echo "Status Code["$ret"]"
-	isexit $ret
-	echo "*******************************************************************"
-    	echo "* KE service has started success! *"
-    	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke' *"
-	echo "*******************************************************************"
-    	echo "* <Usage> ke.sh [start|status|stop|restart|stats] </Usage> *"
-	echo "*******************************************************************"
-	ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}' > $DIALUP_PID
-	rm -rf ${LOG_DIR}/ke_console.out
-	ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out
+	CLASS=org.smartloli.kafka.eagle.plugins.ipc.RpcServer
+	nohup ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ipc.out 2>&1 < /dev/null & new_agent_pid=$!
+	echo "$new_agent_pid" > $DIALUP_PID
 }
 
 stop()
 {
-	 if [ -f $KE_HOME/bin/ke.pid ];then
+	 if [ -f $KE_HOME/bin/ipc.pid ];then
                     SPID=`cat $KE_HOME/bin/ipc.pid`
 					  if [ "$SPID" != "" ];then
                          ${KE_HOME}/kms/bin/shutdown.sh
@@ -93,8 +52,8 @@ stop()
 
 stats()
 {
-	if [ -f $KE_HOME/bin/ke.pid ];then
-                    SPID=`cat $KE_HOME/bin/ke.pid`
+	if [ -f $KE_HOME/bin/ipc.pid ];then
+                    SPID=`cat $KE_HOME/bin/ipc.pid`
 					  if [ "$SPID" != "" ];then
 						echo "===================== TCP Connections Count  =========================="
 						netstat -natp|awk '{print $7}'|sort|uniq -c|sort -rn|grep $SPID
@@ -147,7 +106,7 @@ CheckProcessStata()
 
 status()
 {
-  SPID=`cat $KE_HOME/bin/ke.pid`
+  SPID=`cat $KE_HOME/bin/ipc.pid`
   CheckProcessStata $SPID >/dev/null
   if [ $? != 0 ];then
 	echo "unixdialup:{$SPID}  Stopped ...."
