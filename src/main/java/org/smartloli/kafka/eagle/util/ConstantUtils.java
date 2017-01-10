@@ -27,7 +27,7 @@ package org.smartloli.kafka.eagle.util;
 public class ConstantUtils {
 
 	public interface D3 {
-		public static int SIZE = 50;
+		public static int SIZE = 40;
 	}
 
 	public interface Separator {

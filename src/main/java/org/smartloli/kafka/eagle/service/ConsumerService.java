@@ -73,24 +73,27 @@ public class ConsumerService {
 		JSONObject obj = new JSONObject();
 		JSONArray arrParent = new JSONArray();
 		obj.put("name", "Active Topics");
+		int count = 0;
 		for (Entry<String, List<String>> entry : kafka.entrySet()) {
 			JSONObject object = new JSONObject();
-			object.put("name", entry.getKey());
 			JSONArray arrChild = new JSONArray();
-			int count = 0;
-			for (String str : entry.getValue()) {
-				if (count > ConstantUtils.D3.SIZE) {
-					JSONObject objectChild = new JSONObject();
-					objectChild.put("name", "...");
-					arrChild.add(objectChild);
-					break;
-				} else {
+			if (count > ConstantUtils.D3.SIZE) {
+				object.put("name", "...");
+				JSONObject objectChild = new JSONObject();
+				objectChild.put("name", "...");
+				arrChild.add(objectChild);
+				object.put("children", arrChild);
+				arrParent.add(object);
+				break;
+			} else {
+				object.put("name", entry.getKey());
+				for (String str : entry.getValue()) {
 					JSONObject objectChild = new JSONObject();
 					objectChild.put("name", str);
 					arrChild.add(objectChild);
 				}
-				count++;
 			}
+			count++;
 			object.put("children", arrChild);
 			arrParent.add(object);
 		}
@@ -278,24 +281,27 @@ public class ConsumerService {
 		JSONObject obj = new JSONObject();
 		JSONArray arrParent = new JSONArray();
 		obj.put("name", "Active Topics");
+		int count = 0;
 		for (Entry<String, List<String>> entry : kafka.entrySet()) {
 			JSONObject object = new JSONObject();
-			object.put("name", entry.getKey());
 			JSONArray arrChild = new JSONArray();
-			int count = 0;
-			for (String str : entry.getValue()) {
-				if (count > ConstantUtils.D3.SIZE) {
-					JSONObject objectChild = new JSONObject();
-					objectChild.put("name", "...");
-					arrChild.add(objectChild);
-					break;
-				} else {
+			if (count > ConstantUtils.D3.SIZE) {
+				object.put("name", "...");
+				JSONObject objectChild = new JSONObject();
+				objectChild.put("name", "...");
+				arrChild.add(objectChild);
+				object.put("children", arrChild);
+				arrParent.add(object);
+				break;
+			} else {
+				object.put("name", entry.getKey());
+				for (String str : entry.getValue()) {
 					JSONObject objectChild = new JSONObject();
 					objectChild.put("name", str);
 					arrChild.add(objectChild);
 				}
-				count++;
 			}
+			count++;
 			object.put("children", arrChild);
 			arrParent.add(object);
 		}
