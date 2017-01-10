@@ -40,7 +40,7 @@ public class KafkaConsumerTest extends Thread {
 	private ExecutorService executor;
 	private ConsumerConnector consumer;
 	private static Properties props = new Properties();
-	private static String topic = "__consumer_offsets";// ke_test1
+	private static String topic = "ke_test1";// ke_test1
 	private static final int THREAD_PARALLEL_NUM = 1;
 
 	// massive code stealing from kafka.server.OffsetManager

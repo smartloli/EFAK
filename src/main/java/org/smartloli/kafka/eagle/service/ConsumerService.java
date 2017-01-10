@@ -31,6 +31,7 @@ import org.smartloli.kafka.eagle.domain.ConsumerDetailDomain;
 import org.smartloli.kafka.eagle.domain.ConsumerDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
+import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
 
@@ -76,10 +77,19 @@ public class ConsumerService {
 			JSONObject object = new JSONObject();
 			object.put("name", entry.getKey());
 			JSONArray arrChild = new JSONArray();
+			int count = 0;
 			for (String str : entry.getValue()) {
-				JSONObject objectChild = new JSONObject();
-				objectChild.put("name", str);
-				arrChild.add(objectChild);
+				if (count > ConstantUtils.D3.SIZE) {
+					JSONObject objectChild = new JSONObject();
+					objectChild.put("name", "...");
+					arrChild.add(objectChild);
+					break;
+				} else {
+					JSONObject objectChild = new JSONObject();
+					objectChild.put("name", str);
+					arrChild.add(objectChild);
+				}
+				count++;
 			}
 			object.put("children", arrChild);
 			arrParent.add(object);
@@ -272,10 +282,19 @@ public class ConsumerService {
 			JSONObject object = new JSONObject();
 			object.put("name", entry.getKey());
 			JSONArray arrChild = new JSONArray();
+			int count = 0;
 			for (String str : entry.getValue()) {
-				JSONObject objectChild = new JSONObject();
-				objectChild.put("name", str);
-				arrChild.add(objectChild);
+				if (count > ConstantUtils.D3.SIZE) {
+					JSONObject objectChild = new JSONObject();
+					objectChild.put("name", "...");
+					arrChild.add(objectChild);
+					break;
+				} else {
+					JSONObject objectChild = new JSONObject();
+					objectChild.put("name", str);
+					arrChild.add(objectChild);
+				}
+				count++;
 			}
 			object.put("children", arrChild);
 			arrParent.add(object);
