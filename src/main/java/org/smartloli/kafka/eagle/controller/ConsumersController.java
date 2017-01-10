@@ -34,6 +34,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import org.smartloli.kafka.eagle.domain.ConsumerPageDomain;
 import org.smartloli.kafka.eagle.service.ConsumerService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
@@ -59,7 +61,7 @@ public class ConsumersController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		try {
-			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage"); 
+			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 			byte[] output = GzipUtils.compressToByte(ConsumerService.getActiveTopic(formatter));
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
@@ -83,6 +85,7 @@ public class ConsumersController {
 		String aoData = request.getParameter("aoData");
 		JSONArray jsonArray = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+		String search = "";
 		for (Object obj : jsonArray) {
 			JSONObject jsonObj = (JSONObject) obj;
 			if ("sEcho".equals(jsonObj.getString("name"))) {
@@ -91,36 +94,40 @@ public class ConsumersController {
 				iDisplayStart = jsonObj.getIntValue("value");
 			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
 				iDisplayLength = jsonObj.getIntValue("value");
+			} else if ("sSearch".equals(jsonObj.getString("name"))) {
+				search = jsonObj.getString("value");
 			}
 		}
 
+		ConsumerPageDomain page = new ConsumerPageDomain();
+		page.setSearch(search);
+		page.setiDisplayLength(iDisplayLength);
+		page.setiDisplayStart(iDisplayStart);
+
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray ret = JSON.parseArray(ConsumerService.getConsumer(formatter));
-		int offset = 0;
+		int count = ConsumerService.getConsumerCount(formatter);
+		JSONArray ret = JSON.parseArray(ConsumerService.getConsumer(formatter, page));
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {
 			JSONObject tmp2 = (JSONObject) tmp;
-			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
-				JSONObject obj = new JSONObject();
-				obj.put("id", tmp2.getInteger("id"));
-				obj.put("group", "<a class='link' href='#" + tmp2.getString("group") + "'>" + tmp2.getString("group") + "</a>");
-				obj.put("topic", tmp2.getString("topic").length() > 50 ? tmp2.getString("topic").substring(0, 50) + "..." : tmp2.getString("topic"));
-				obj.put("consumerNumber", tmp2.getInteger("consumerNumber"));
-				int activerNumber = tmp2.getInteger("activeNumber");
-				if (activerNumber > 0) {
-					obj.put("activeNumber", "<a class='btn btn-success btn-xs'>" + tmp2.getInteger("activeNumber") + "</a>");
-				} else {
-					obj.put("activeNumber", "<a class='btn btn-danger btn-xs'>" + tmp2.getInteger("activeNumber") + "</a>");
-				}
-				retArr.add(obj);
+			JSONObject obj = new JSONObject();
+			obj.put("id", tmp2.getInteger("id"));
+			obj.put("group", "<a class='link' href='#" + tmp2.getString("group") + "'>" + tmp2.getString("group") + "</a>");
+			obj.put("topic", tmp2.getString("topic").length() > 50 ? tmp2.getString("topic").substring(0, 50) + "..." : tmp2.getString("topic"));
+			obj.put("consumerNumber", tmp2.getInteger("consumerNumber"));
+			int activerNumber = tmp2.getInteger("activeNumber");
+			if (activerNumber > 0) {
+				obj.put("activeNumber", "<a class='btn btn-success btn-xs'>" + tmp2.getInteger("activeNumber") + "</a>");
+			} else {
+				obj.put("activeNumber", "<a class='btn btn-danger btn-xs'>" + tmp2.getInteger("activeNumber") + "</a>");
 			}
-			offset++;
+			retArr.add(obj);
 		}
 
 		JSONObject obj = new JSONObject();
 		obj.put("sEcho", sEcho);
-		obj.put("iTotalRecords", ret.size());
-		obj.put("iTotalDisplayRecords", ret.size());
+		obj.put("iTotalRecords", count);
+		obj.put("iTotalDisplayRecords", count);
 		obj.put("aaData", retArr);
 		try {
 			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
@@ -161,7 +168,7 @@ public class ConsumersController {
 		}
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray ret = JSON.parseArray(ConsumerService.getConsumerDetail(formatter,group, ip));
+		JSONArray ret = JSON.parseArray(ConsumerService.getConsumerDetail(formatter, group, ip));
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {

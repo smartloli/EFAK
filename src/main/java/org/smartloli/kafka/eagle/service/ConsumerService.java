@@ -27,8 +27,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.domain.ConsumerDetailDomain;
 import org.smartloli.kafka.eagle.domain.ConsumerDomain;
+import org.smartloli.kafka.eagle.domain.ConsumerPageDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.util.ConstantUtils;
@@ -45,6 +48,7 @@ import org.smartloli.kafka.eagle.util.LRUCacheUtils;
 public class ConsumerService {
 
 	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
+	private final static Logger LOG = LoggerFactory.getLogger(ConsumerService.class);
 
 	public static String getActiveTopic() {
 		JSONObject obj = new JSONObject();
@@ -189,8 +193,8 @@ public class ConsumerService {
 		return ret;
 	}
 
-	public static String getConsumer() {
-		Map<String, List<String>> map = KafkaClusterUtils.getConsumers();
+	public static String getConsumer(ConsumerPageDomain page) {
+		Map<String, List<String>> map = KafkaClusterUtils.getConsumers(page);
 		List<ConsumerDomain> list = new ArrayList<ConsumerDomain>();
 		int id = 0;
 		for (Entry<String, List<String>> entry : map.entrySet()) {
@@ -205,19 +209,35 @@ public class ConsumerService {
 		return list.toString();
 	}
 
-	public static String getConsumer(String formatter) {
+	public static String getConsumer(String formatter, ConsumerPageDomain page) {
 		if ("kafka".equals(formatter)) {
-			return getKafkaConsumer();
+			return getKafkaConsumer(page);
 		} else {
-			return getConsumer();
+			return getConsumer(page);
 		}
 	}
 
-	private static String getKafkaConsumer() {
+	public static int getConsumerCount(String formatter) {
+		if ("kafka".equals(formatter)) {
+			Map<String, List<String>> map = new HashMap<>();
+			try {
+				Map<String, List<String>> type = new HashMap<String, List<String>>();
+				Gson gson = new Gson();
+				map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+			} catch (Exception e) {
+				LOG.error("Get Kafka topic offset has error,msg is " + e.getMessage());
+			}
+			return map.size();
+		} else {
+			return KafkaClusterUtils.getConsumers().size();
+		}
+	}
+
+	private static String getKafkaConsumer(ConsumerPageDomain page) {
 		List<ConsumerDomain> list = new ArrayList<ConsumerDomain>();
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+		Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumerPage(page), type.getClass());
 		int id = 0;
 		for (Entry<String, List<String>> entry : map.entrySet()) {
 			ConsumerDomain consumer = new ConsumerDomain();

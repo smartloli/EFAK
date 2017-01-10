@@ -37,6 +37,8 @@ public class KafkaOffsetServer {
 
 		public String getConsumer() throws org.apache.thrift.TException;
 
+		public String getConsumerPage(String search, int iDisplayStart, int iDisplayLength) throws org.apache.thrift.TException;
+
 		public String getActiverConsumer() throws org.apache.thrift.TException;
 
 	}
@@ -50,6 +52,8 @@ public class KafkaOffsetServer {
 		public void sql(String sql, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
 		public void getConsumer(org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+
+		public void getConsumerPage(String search, int iDisplayStart, int iDisplayLength, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
 		public void getActiverConsumer(org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
@@ -155,6 +159,28 @@ public class KafkaOffsetServer {
 				return result.success;
 			}
 			throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "getConsumer failed: unknown result");
+		}
+
+		public String getConsumerPage(String search, int iDisplayStart, int iDisplayLength) throws org.apache.thrift.TException {
+			send_getConsumerPage(search, iDisplayStart, iDisplayLength);
+			return recv_getConsumerPage();
+		}
+
+		public void send_getConsumerPage(String search, int iDisplayStart, int iDisplayLength) throws org.apache.thrift.TException {
+			getConsumerPage_args args = new getConsumerPage_args();
+			args.setSearch(search);
+			args.setIDisplayStart(iDisplayStart);
+			args.setIDisplayLength(iDisplayLength);
+			sendBase("getConsumerPage", args);
+		}
+
+		public String recv_getConsumerPage() throws org.apache.thrift.TException {
+			getConsumerPage_result result = new getConsumerPage_result();
+			receiveBase(result, "getConsumerPage");
+			if (result.isSetSuccess()) {
+				return result.success;
+			}
+			throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "getConsumerPage failed: unknown result");
 		}
 
 		public String getActiverConsumer() throws org.apache.thrift.TException {
@@ -331,6 +357,46 @@ public class KafkaOffsetServer {
 			}
 		}
 
+		public void getConsumerPage(String search, int iDisplayStart, int iDisplayLength, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+			checkReady();
+			getConsumerPage_call method_call = new getConsumerPage_call(search, iDisplayStart, iDisplayLength, resultHandler, this, ___protocolFactory, ___transport);
+			this.___currentMethod = method_call;
+			___manager.call(method_call);
+		}
+
+		public static class getConsumerPage_call extends org.apache.thrift.async.TAsyncMethodCall {
+			private String search;
+			private int iDisplayStart;
+			private int iDisplayLength;
+
+			public getConsumerPage_call(String search, int iDisplayStart, int iDisplayLength, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client,
+					org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+				super(client, protocolFactory, transport, resultHandler, false);
+				this.search = search;
+				this.iDisplayStart = iDisplayStart;
+				this.iDisplayLength = iDisplayLength;
+			}
+
+			public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+				prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("getConsumerPage", org.apache.thrift.protocol.TMessageType.CALL, 0));
+				getConsumerPage_args args = new getConsumerPage_args();
+				args.setSearch(search);
+				args.setIDisplayStart(iDisplayStart);
+				args.setIDisplayLength(iDisplayLength);
+				args.write(prot);
+				prot.writeMessageEnd();
+			}
+
+			public String getResult() throws org.apache.thrift.TException {
+				if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+					throw new IllegalStateException("Method call not finished!");
+				}
+				org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+				org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+				return (new Client(prot)).recv_getConsumerPage();
+			}
+		}
+
 		public void getActiverConsumer(org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
 			checkReady();
 			getActiverConsumer_call method_call = new getActiverConsumer_call(resultHandler, this, ___protocolFactory, ___transport);
@@ -380,6 +446,7 @@ public class KafkaOffsetServer {
 			processMap.put("getOffset", new getOffset());
 			processMap.put("sql", new sql());
 			processMap.put("getConsumer", new getConsumer());
+			processMap.put("getConsumerPage", new getConsumerPage());
 			processMap.put("getActiverConsumer", new getActiverConsumer());
 			return processMap;
 		}
@@ -464,6 +531,26 @@ public class KafkaOffsetServer {
 			}
 		}
 
+		public static class getConsumerPage<I extends Iface> extends org.apache.thrift.ProcessFunction<I, getConsumerPage_args> {
+			public getConsumerPage() {
+				super("getConsumerPage");
+			}
+
+			public getConsumerPage_args getEmptyArgsInstance() {
+				return new getConsumerPage_args();
+			}
+
+			protected boolean isOneway() {
+				return false;
+			}
+
+			public getConsumerPage_result getResult(I iface, getConsumerPage_args args) throws org.apache.thrift.TException {
+				getConsumerPage_result result = new getConsumerPage_result();
+				result.success = iface.getConsumerPage(args.search, args.iDisplayStart, args.iDisplayLength);
+				return result;
+			}
+		}
+
 		public static class getActiverConsumer<I extends Iface> extends org.apache.thrift.ProcessFunction<I, getActiverConsumer_args> {
 			public getActiverConsumer() {
 				super("getActiverConsumer");
@@ -503,6 +590,7 @@ public class KafkaOffsetServer {
 			processMap.put("getOffset", new getOffset());
 			processMap.put("sql", new sql());
 			processMap.put("getConsumer", new getConsumer());
+			processMap.put("getConsumerPage", new getConsumerPage());
 			processMap.put("getActiverConsumer", new getActiverConsumer());
 			return processMap;
 		}
@@ -716,6 +804,59 @@ public class KafkaOffsetServer {
 
 			public void start(I iface, getConsumer_args args, org.apache.thrift.async.AsyncMethodCallback<String> resultHandler) throws TException {
 				iface.getConsumer(resultHandler);
+			}
+		}
+
+		public static class getConsumerPage<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, getConsumerPage_args, String> {
+			public getConsumerPage() {
+				super("getConsumerPage");
+			}
+
+			public getConsumerPage_args getEmptyArgsInstance() {
+				return new getConsumerPage_args();
+			}
+
+			public AsyncMethodCallback<String> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
+				final org.apache.thrift.AsyncProcessFunction fcall = this;
+				return new AsyncMethodCallback<String>() {
+					public void onComplete(String o) {
+						getConsumerPage_result result = new getConsumerPage_result();
+						result.success = o;
+						try {
+							fcall.sendResponse(fb, result, org.apache.thrift.protocol.TMessageType.REPLY, seqid);
+							return;
+						} catch (Exception e) {
+							LOGGER.error("Exception writing to internal frame buffer", e);
+						}
+						fb.close();
+					}
+
+					@SuppressWarnings("unused")
+					public void onError(Exception e) {
+						byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
+						org.apache.thrift.TBase msg;
+						getConsumerPage_result result = new getConsumerPage_result();
+						{
+							msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
+							msg = (org.apache.thrift.TBase) new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
+						}
+						try {
+							fcall.sendResponse(fb, msg, msgType, seqid);
+							return;
+						} catch (Exception ex) {
+							LOGGER.error("Exception writing to internal frame buffer", ex);
+						}
+						fb.close();
+					}
+				};
+			}
+
+			protected boolean isOneway() {
+				return false;
+			}
+
+			public void start(I iface, getConsumerPage_args args, org.apache.thrift.async.AsyncMethodCallback<String> resultHandler) throws TException {
+				iface.getConsumerPage(args.search, args.iDisplayStart, args.iDisplayLength, resultHandler);
 			}
 		}
 
@@ -3673,6 +3814,933 @@ public class KafkaOffsetServer {
 
 			@Override
 			public void read(org.apache.thrift.protocol.TProtocol prot, getConsumer_result struct) throws org.apache.thrift.TException {
+				TTupleProtocol iprot = (TTupleProtocol) prot;
+				BitSet incoming = iprot.readBitSet(1);
+				if (incoming.get(0)) {
+					struct.success = iprot.readString();
+					struct.setSuccessIsSet(true);
+				}
+			}
+		}
+
+	}
+
+	@SuppressWarnings("serial")
+	public static class getConsumerPage_args implements org.apache.thrift.TBase<getConsumerPage_args, getConsumerPage_args._Fields>, java.io.Serializable, Cloneable, Comparable<getConsumerPage_args> {
+		private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("getConsumerPage_args");
+
+		private static final org.apache.thrift.protocol.TField SEARCH_FIELD_DESC = new org.apache.thrift.protocol.TField("search", org.apache.thrift.protocol.TType.STRING, (short) 1);
+		private static final org.apache.thrift.protocol.TField I_DISPLAY_START_FIELD_DESC = new org.apache.thrift.protocol.TField("iDisplayStart", org.apache.thrift.protocol.TType.I32, (short) 2);
+		private static final org.apache.thrift.protocol.TField I_DISPLAY_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("iDisplayLength", org.apache.thrift.protocol.TType.I32, (short) 3);
+
+		private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+		static {
+			schemes.put(StandardScheme.class, new getConsumerPage_argsStandardSchemeFactory());
+			schemes.put(TupleScheme.class, new getConsumerPage_argsTupleSchemeFactory());
+		}
+
+		public String search; // required
+		public int iDisplayStart; // required
+		public int iDisplayLength; // required
+
+		/**
+		 * The set of fields this struct contains, along with convenience
+		 * methods for finding and manipulating them.
+		 */
+		public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+			SEARCH((short) 1, "search"), I_DISPLAY_START((short) 2, "iDisplayStart"), I_DISPLAY_LENGTH((short) 3, "iDisplayLength");
+
+			private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+			static {
+				for (_Fields field : EnumSet.allOf(_Fields.class)) {
+					byName.put(field.getFieldName(), field);
+				}
+			}
+
+			/**
+			 * Find the _Fields constant that matches fieldId, or null if its
+			 * not found.
+			 */
+			public static _Fields findByThriftId(int fieldId) {
+				switch (fieldId) {
+				case 1: // SEARCH
+					return SEARCH;
+				case 2: // I_DISPLAY_START
+					return I_DISPLAY_START;
+				case 3: // I_DISPLAY_LENGTH
+					return I_DISPLAY_LENGTH;
+				default:
+					return null;
+				}
+			}
+
+			/**
+			 * Find the _Fields constant that matches fieldId, throwing an
+			 * exception if it is not found.
+			 */
+			public static _Fields findByThriftIdOrThrow(int fieldId) {
+				_Fields fields = findByThriftId(fieldId);
+				if (fields == null)
+					throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+				return fields;
+			}
+
+			/**
+			 * Find the _Fields constant that matches name, or null if its not
+			 * found.
+			 */
+			public static _Fields findByName(String name) {
+				return byName.get(name);
+			}
+
+			private final short _thriftId;
+			private final String _fieldName;
+
+			_Fields(short thriftId, String fieldName) {
+				_thriftId = thriftId;
+				_fieldName = fieldName;
+			}
+
+			public short getThriftFieldId() {
+				return _thriftId;
+			}
+
+			public String getFieldName() {
+				return _fieldName;
+			}
+		}
+
+		// isset id assignments
+		private static final int __IDISPLAYSTART_ISSET_ID = 0;
+		private static final int __IDISPLAYLENGTH_ISSET_ID = 1;
+		private byte __isset_bitfield = 0;
+		public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+		static {
+			Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+			tmpMap.put(_Fields.SEARCH, new org.apache.thrift.meta_data.FieldMetaData("search", org.apache.thrift.TFieldRequirementType.DEFAULT, new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+			tmpMap.put(_Fields.I_DISPLAY_START,
+					new org.apache.thrift.meta_data.FieldMetaData("iDisplayStart", org.apache.thrift.TFieldRequirementType.DEFAULT, new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+			tmpMap.put(_Fields.I_DISPLAY_LENGTH,
+					new org.apache.thrift.meta_data.FieldMetaData("iDisplayLength", org.apache.thrift.TFieldRequirementType.DEFAULT, new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+			metaDataMap = Collections.unmodifiableMap(tmpMap);
+			org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getConsumerPage_args.class, metaDataMap);
+		}
+
+		public getConsumerPage_args() {
+		}
+
+		public getConsumerPage_args(String search, int iDisplayStart, int iDisplayLength) {
+			this();
+			this.search = search;
+			this.iDisplayStart = iDisplayStart;
+			setIDisplayStartIsSet(true);
+			this.iDisplayLength = iDisplayLength;
+			setIDisplayLengthIsSet(true);
+		}
+
+		/**
+		 * Performs a deep copy on <i>other</i>.
+		 */
+		public getConsumerPage_args(getConsumerPage_args other) {
+			__isset_bitfield = other.__isset_bitfield;
+			if (other.isSetSearch()) {
+				this.search = other.search;
+			}
+			this.iDisplayStart = other.iDisplayStart;
+			this.iDisplayLength = other.iDisplayLength;
+		}
+
+		public getConsumerPage_args deepCopy() {
+			return new getConsumerPage_args(this);
+		}
+
+		@Override
+		public void clear() {
+			this.search = null;
+			setIDisplayStartIsSet(false);
+			this.iDisplayStart = 0;
+			setIDisplayLengthIsSet(false);
+			this.iDisplayLength = 0;
+		}
+
+		public String getSearch() {
+			return this.search;
+		}
+
+		public getConsumerPage_args setSearch(String search) {
+			this.search = search;
+			return this;
+		}
+
+		public void unsetSearch() {
+			this.search = null;
+		}
+
+		/**
+		 * Returns true if field search is set (has been assigned a value) and
+		 * false otherwise
+		 */
+		public boolean isSetSearch() {
+			return this.search != null;
+		}
+
+		public void setSearchIsSet(boolean value) {
+			if (!value) {
+				this.search = null;
+			}
+		}
+
+		public int getIDisplayStart() {
+			return this.iDisplayStart;
+		}
+
+		public getConsumerPage_args setIDisplayStart(int iDisplayStart) {
+			this.iDisplayStart = iDisplayStart;
+			setIDisplayStartIsSet(true);
+			return this;
+		}
+
+		public void unsetIDisplayStart() {
+			__isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __IDISPLAYSTART_ISSET_ID);
+		}
+
+		/**
+		 * Returns true if field iDisplayStart is set (has been assigned a
+		 * value) and false otherwise
+		 */
+		public boolean isSetIDisplayStart() {
+			return EncodingUtils.testBit(__isset_bitfield, __IDISPLAYSTART_ISSET_ID);
+		}
+
+		public void setIDisplayStartIsSet(boolean value) {
+			__isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __IDISPLAYSTART_ISSET_ID, value);
+		}
+
+		public int getIDisplayLength() {
+			return this.iDisplayLength;
+		}
+
+		public getConsumerPage_args setIDisplayLength(int iDisplayLength) {
+			this.iDisplayLength = iDisplayLength;
+			setIDisplayLengthIsSet(true);
+			return this;
+		}
+
+		public void unsetIDisplayLength() {
+			__isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __IDISPLAYLENGTH_ISSET_ID);
+		}
+
+		/**
+		 * Returns true if field iDisplayLength is set (has been assigned a
+		 * value) and false otherwise
+		 */
+		public boolean isSetIDisplayLength() {
+			return EncodingUtils.testBit(__isset_bitfield, __IDISPLAYLENGTH_ISSET_ID);
+		}
+
+		public void setIDisplayLengthIsSet(boolean value) {
+			__isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __IDISPLAYLENGTH_ISSET_ID, value);
+		}
+
+		public void setFieldValue(_Fields field, Object value) {
+			switch (field) {
+			case SEARCH:
+				if (value == null) {
+					unsetSearch();
+				} else {
+					setSearch((String) value);
+				}
+				break;
+
+			case I_DISPLAY_START:
+				if (value == null) {
+					unsetIDisplayStart();
+				} else {
+					setIDisplayStart((Integer) value);
+				}
+				break;
+
+			case I_DISPLAY_LENGTH:
+				if (value == null) {
+					unsetIDisplayLength();
+				} else {
+					setIDisplayLength((Integer) value);
+				}
+				break;
+
+			}
+		}
+
+		public Object getFieldValue(_Fields field) {
+			switch (field) {
+			case SEARCH:
+				return getSearch();
+
+			case I_DISPLAY_START:
+				return Integer.valueOf(getIDisplayStart());
+
+			case I_DISPLAY_LENGTH:
+				return Integer.valueOf(getIDisplayLength());
+
+			}
+			throw new IllegalStateException();
+		}
+
+		/**
+		 * Returns true if field corresponding to fieldID is set (has been
+		 * assigned a value) and false otherwise
+		 */
+		public boolean isSet(_Fields field) {
+			if (field == null) {
+				throw new IllegalArgumentException();
+			}
+
+			switch (field) {
+			case SEARCH:
+				return isSetSearch();
+			case I_DISPLAY_START:
+				return isSetIDisplayStart();
+			case I_DISPLAY_LENGTH:
+				return isSetIDisplayLength();
+			}
+			throw new IllegalStateException();
+		}
+
+		@Override
+		public boolean equals(Object that) {
+			if (that == null)
+				return false;
+			if (that instanceof getConsumerPage_args)
+				return this.equals((getConsumerPage_args) that);
+			return false;
+		}
+
+		public boolean equals(getConsumerPage_args that) {
+			if (that == null)
+				return false;
+
+			boolean this_present_search = true && this.isSetSearch();
+			boolean that_present_search = true && that.isSetSearch();
+			if (this_present_search || that_present_search) {
+				if (!(this_present_search && that_present_search))
+					return false;
+				if (!this.search.equals(that.search))
+					return false;
+			}
+
+			boolean this_present_iDisplayStart = true;
+			boolean that_present_iDisplayStart = true;
+			if (this_present_iDisplayStart || that_present_iDisplayStart) {
+				if (!(this_present_iDisplayStart && that_present_iDisplayStart))
+					return false;
+				if (this.iDisplayStart != that.iDisplayStart)
+					return false;
+			}
+
+			boolean this_present_iDisplayLength = true;
+			boolean that_present_iDisplayLength = true;
+			if (this_present_iDisplayLength || that_present_iDisplayLength) {
+				if (!(this_present_iDisplayLength && that_present_iDisplayLength))
+					return false;
+				if (this.iDisplayLength != that.iDisplayLength)
+					return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			return 0;
+		}
+
+		@Override
+		public int compareTo(getConsumerPage_args other) {
+			if (!getClass().equals(other.getClass())) {
+				return getClass().getName().compareTo(other.getClass().getName());
+			}
+
+			int lastComparison = 0;
+
+			lastComparison = Boolean.valueOf(isSetSearch()).compareTo(other.isSetSearch());
+			if (lastComparison != 0) {
+				return lastComparison;
+			}
+			if (isSetSearch()) {
+				lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.search, other.search);
+				if (lastComparison != 0) {
+					return lastComparison;
+				}
+			}
+			lastComparison = Boolean.valueOf(isSetIDisplayStart()).compareTo(other.isSetIDisplayStart());
+			if (lastComparison != 0) {
+				return lastComparison;
+			}
+			if (isSetIDisplayStart()) {
+				lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.iDisplayStart, other.iDisplayStart);
+				if (lastComparison != 0) {
+					return lastComparison;
+				}
+			}
+			lastComparison = Boolean.valueOf(isSetIDisplayLength()).compareTo(other.isSetIDisplayLength());
+			if (lastComparison != 0) {
+				return lastComparison;
+			}
+			if (isSetIDisplayLength()) {
+				lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.iDisplayLength, other.iDisplayLength);
+				if (lastComparison != 0) {
+					return lastComparison;
+				}
+			}
+			return 0;
+		}
+
+		public _Fields fieldForId(int fieldId) {
+			return _Fields.findByThriftId(fieldId);
+		}
+
+		public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+			schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+		}
+
+		public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+			schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder("getConsumerPage_args(");
+			boolean first = true;
+
+			sb.append("search:");
+			if (this.search == null) {
+				sb.append("null");
+			} else {
+				sb.append(this.search);
+			}
+			first = false;
+			if (!first)
+				sb.append(", ");
+			sb.append("iDisplayStart:");
+			sb.append(this.iDisplayStart);
+			first = false;
+			if (!first)
+				sb.append(", ");
+			sb.append("iDisplayLength:");
+			sb.append(this.iDisplayLength);
+			first = false;
+			sb.append(")");
+			return sb.toString();
+		}
+
+		public void validate() throws org.apache.thrift.TException {
+			// check for required fields
+			// check for sub-struct validity
+		}
+
+		private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+			try {
+				write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+			} catch (org.apache.thrift.TException te) {
+				throw new java.io.IOException(te);
+			}
+		}
+
+		private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+			try {
+				// it doesn't seem like you should have to do this, but java
+				// serialization is wacky, and doesn't call the default
+				// constructor.
+				__isset_bitfield = 0;
+				read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+			} catch (org.apache.thrift.TException te) {
+				throw new java.io.IOException(te);
+			}
+		}
+
+		private static class getConsumerPage_argsStandardSchemeFactory implements SchemeFactory {
+			public getConsumerPage_argsStandardScheme getScheme() {
+				return new getConsumerPage_argsStandardScheme();
+			}
+		}
+
+		private static class getConsumerPage_argsStandardScheme extends StandardScheme<getConsumerPage_args> {
+
+			public void read(org.apache.thrift.protocol.TProtocol iprot, getConsumerPage_args struct) throws org.apache.thrift.TException {
+				org.apache.thrift.protocol.TField schemeField;
+				iprot.readStructBegin();
+				while (true) {
+					schemeField = iprot.readFieldBegin();
+					if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
+						break;
+					}
+					switch (schemeField.id) {
+					case 1: // SEARCH
+						if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+							struct.search = iprot.readString();
+							struct.setSearchIsSet(true);
+						} else {
+							org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+						}
+						break;
+					case 2: // I_DISPLAY_START
+						if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+							struct.iDisplayStart = iprot.readI32();
+							struct.setIDisplayStartIsSet(true);
+						} else {
+							org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+						}
+						break;
+					case 3: // I_DISPLAY_LENGTH
+						if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+							struct.iDisplayLength = iprot.readI32();
+							struct.setIDisplayLengthIsSet(true);
+						} else {
+							org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+						}
+						break;
+					default:
+						org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+					}
+					iprot.readFieldEnd();
+				}
+				iprot.readStructEnd();
+
+				// check for required fields of primitive type, which can't be
+				// checked in the validate method
+				struct.validate();
+			}
+
+			public void write(org.apache.thrift.protocol.TProtocol oprot, getConsumerPage_args struct) throws org.apache.thrift.TException {
+				struct.validate();
+
+				oprot.writeStructBegin(STRUCT_DESC);
+				if (struct.search != null) {
+					oprot.writeFieldBegin(SEARCH_FIELD_DESC);
+					oprot.writeString(struct.search);
+					oprot.writeFieldEnd();
+				}
+				oprot.writeFieldBegin(I_DISPLAY_START_FIELD_DESC);
+				oprot.writeI32(struct.iDisplayStart);
+				oprot.writeFieldEnd();
+				oprot.writeFieldBegin(I_DISPLAY_LENGTH_FIELD_DESC);
+				oprot.writeI32(struct.iDisplayLength);
+				oprot.writeFieldEnd();
+				oprot.writeFieldStop();
+				oprot.writeStructEnd();
+			}
+
+		}
+
+		private static class getConsumerPage_argsTupleSchemeFactory implements SchemeFactory {
+			public getConsumerPage_argsTupleScheme getScheme() {
+				return new getConsumerPage_argsTupleScheme();
+			}
+		}
+
+		private static class getConsumerPage_argsTupleScheme extends TupleScheme<getConsumerPage_args> {
+
+			@Override
+			public void write(org.apache.thrift.protocol.TProtocol prot, getConsumerPage_args struct) throws org.apache.thrift.TException {
+				TTupleProtocol oprot = (TTupleProtocol) prot;
+				BitSet optionals = new BitSet();
+				if (struct.isSetSearch()) {
+					optionals.set(0);
+				}
+				if (struct.isSetIDisplayStart()) {
+					optionals.set(1);
+				}
+				if (struct.isSetIDisplayLength()) {
+					optionals.set(2);
+				}
+				oprot.writeBitSet(optionals, 3);
+				if (struct.isSetSearch()) {
+					oprot.writeString(struct.search);
+				}
+				if (struct.isSetIDisplayStart()) {
+					oprot.writeI32(struct.iDisplayStart);
+				}
+				if (struct.isSetIDisplayLength()) {
+					oprot.writeI32(struct.iDisplayLength);
+				}
+			}
+
+			@Override
+			public void read(org.apache.thrift.protocol.TProtocol prot, getConsumerPage_args struct) throws org.apache.thrift.TException {
+				TTupleProtocol iprot = (TTupleProtocol) prot;
+				BitSet incoming = iprot.readBitSet(3);
+				if (incoming.get(0)) {
+					struct.search = iprot.readString();
+					struct.setSearchIsSet(true);
+				}
+				if (incoming.get(1)) {
+					struct.iDisplayStart = iprot.readI32();
+					struct.setIDisplayStartIsSet(true);
+				}
+				if (incoming.get(2)) {
+					struct.iDisplayLength = iprot.readI32();
+					struct.setIDisplayLengthIsSet(true);
+				}
+			}
+		}
+
+	}
+
+	@SuppressWarnings("serial")
+	public static class getConsumerPage_result implements org.apache.thrift.TBase<getConsumerPage_result, getConsumerPage_result._Fields>, java.io.Serializable, Cloneable, Comparable<getConsumerPage_result> {
+		private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("getConsumerPage_result");
+
+		private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short) 0);
+
+		private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+		static {
+			schemes.put(StandardScheme.class, new getConsumerPage_resultStandardSchemeFactory());
+			schemes.put(TupleScheme.class, new getConsumerPage_resultTupleSchemeFactory());
+		}
+
+		public String success; // required
+
+		/**
+		 * The set of fields this struct contains, along with convenience
+		 * methods for finding and manipulating them.
+		 */
+		public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+			SUCCESS((short) 0, "success");
+
+			private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+			static {
+				for (_Fields field : EnumSet.allOf(_Fields.class)) {
+					byName.put(field.getFieldName(), field);
+				}
+			}
+
+			/**
+			 * Find the _Fields constant that matches fieldId, or null if its
+			 * not found.
+			 */
+			public static _Fields findByThriftId(int fieldId) {
+				switch (fieldId) {
+				case 0: // SUCCESS
+					return SUCCESS;
+				default:
+					return null;
+				}
+			}
+
+			/**
+			 * Find the _Fields constant that matches fieldId, throwing an
+			 * exception if it is not found.
+			 */
+			public static _Fields findByThriftIdOrThrow(int fieldId) {
+				_Fields fields = findByThriftId(fieldId);
+				if (fields == null)
+					throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+				return fields;
+			}
+
+			/**
+			 * Find the _Fields constant that matches name, or null if its not
+			 * found.
+			 */
+			public static _Fields findByName(String name) {
+				return byName.get(name);
+			}
+
+			private final short _thriftId;
+			private final String _fieldName;
+
+			_Fields(short thriftId, String fieldName) {
+				_thriftId = thriftId;
+				_fieldName = fieldName;
+			}
+
+			public short getThriftFieldId() {
+				return _thriftId;
+			}
+
+			public String getFieldName() {
+				return _fieldName;
+			}
+		}
+
+		// isset id assignments
+		public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+		static {
+			Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+			tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+			metaDataMap = Collections.unmodifiableMap(tmpMap);
+			org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getConsumerPage_result.class, metaDataMap);
+		}
+
+		public getConsumerPage_result() {
+		}
+
+		public getConsumerPage_result(String success) {
+			this();
+			this.success = success;
+		}
+
+		/**
+		 * Performs a deep copy on <i>other</i>.
+		 */
+		public getConsumerPage_result(getConsumerPage_result other) {
+			if (other.isSetSuccess()) {
+				this.success = other.success;
+			}
+		}
+
+		public getConsumerPage_result deepCopy() {
+			return new getConsumerPage_result(this);
+		}
+
+		@Override
+		public void clear() {
+			this.success = null;
+		}
+
+		public String getSuccess() {
+			return this.success;
+		}
+
+		public getConsumerPage_result setSuccess(String success) {
+			this.success = success;
+			return this;
+		}
+
+		public void unsetSuccess() {
+			this.success = null;
+		}
+
+		/**
+		 * Returns true if field success is set (has been assigned a value) and
+		 * false otherwise
+		 */
+		public boolean isSetSuccess() {
+			return this.success != null;
+		}
+
+		public void setSuccessIsSet(boolean value) {
+			if (!value) {
+				this.success = null;
+			}
+		}
+
+		public void setFieldValue(_Fields field, Object value) {
+			switch (field) {
+			case SUCCESS:
+				if (value == null) {
+					unsetSuccess();
+				} else {
+					setSuccess((String) value);
+				}
+				break;
+
+			}
+		}
+
+		public Object getFieldValue(_Fields field) {
+			switch (field) {
+			case SUCCESS:
+				return getSuccess();
+
+			}
+			throw new IllegalStateException();
+		}
+
+		/**
+		 * Returns true if field corresponding to fieldID is set (has been
+		 * assigned a value) and false otherwise
+		 */
+		public boolean isSet(_Fields field) {
+			if (field == null) {
+				throw new IllegalArgumentException();
+			}
+
+			switch (field) {
+			case SUCCESS:
+				return isSetSuccess();
+			}
+			throw new IllegalStateException();
+		}
+
+		@Override
+		public boolean equals(Object that) {
+			if (that == null)
+				return false;
+			if (that instanceof getConsumerPage_result)
+				return this.equals((getConsumerPage_result) that);
+			return false;
+		}
+
+		public boolean equals(getConsumerPage_result that) {
+			if (that == null)
+				return false;
+
+			boolean this_present_success = true && this.isSetSuccess();
+			boolean that_present_success = true && that.isSetSuccess();
+			if (this_present_success || that_present_success) {
+				if (!(this_present_success && that_present_success))
+					return false;
+				if (!this.success.equals(that.success))
+					return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			return 0;
+		}
+
+		@Override
+		public int compareTo(getConsumerPage_result other) {
+			if (!getClass().equals(other.getClass())) {
+				return getClass().getName().compareTo(other.getClass().getName());
+			}
+
+			int lastComparison = 0;
+
+			lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(other.isSetSuccess());
+			if (lastComparison != 0) {
+				return lastComparison;
+			}
+			if (isSetSuccess()) {
+				lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, other.success);
+				if (lastComparison != 0) {
+					return lastComparison;
+				}
+			}
+			return 0;
+		}
+
+		public _Fields fieldForId(int fieldId) {
+			return _Fields.findByThriftId(fieldId);
+		}
+
+		public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+			schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+		}
+
+		public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+			schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+		}
+
+		@SuppressWarnings("unused")
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder("getConsumerPage_result(");
+			boolean first = true;
+
+			sb.append("success:");
+			if (this.success == null) {
+				sb.append("null");
+			} else {
+				sb.append(this.success);
+			}
+			first = false;
+			sb.append(")");
+			return sb.toString();
+		}
+
+		public void validate() throws org.apache.thrift.TException {
+			// check for required fields
+			// check for sub-struct validity
+		}
+
+		private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+			try {
+				write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+			} catch (org.apache.thrift.TException te) {
+				throw new java.io.IOException(te);
+			}
+		}
+
+		private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+			try {
+				read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+			} catch (org.apache.thrift.TException te) {
+				throw new java.io.IOException(te);
+			}
+		}
+
+		private static class getConsumerPage_resultStandardSchemeFactory implements SchemeFactory {
+			public getConsumerPage_resultStandardScheme getScheme() {
+				return new getConsumerPage_resultStandardScheme();
+			}
+		}
+
+		private static class getConsumerPage_resultStandardScheme extends StandardScheme<getConsumerPage_result> {
+
+			public void read(org.apache.thrift.protocol.TProtocol iprot, getConsumerPage_result struct) throws org.apache.thrift.TException {
+				org.apache.thrift.protocol.TField schemeField;
+				iprot.readStructBegin();
+				while (true) {
+					schemeField = iprot.readFieldBegin();
+					if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
+						break;
+					}
+					switch (schemeField.id) {
+					case 0: // SUCCESS
+						if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+							struct.success = iprot.readString();
+							struct.setSuccessIsSet(true);
+						} else {
+							org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+						}
+						break;
+					default:
+						org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+					}
+					iprot.readFieldEnd();
+				}
+				iprot.readStructEnd();
+
+				// check for required fields of primitive type, which can't be
+				// checked in the validate method
+				struct.validate();
+			}
+
+			public void write(org.apache.thrift.protocol.TProtocol oprot, getConsumerPage_result struct) throws org.apache.thrift.TException {
+				struct.validate();
+
+				oprot.writeStructBegin(STRUCT_DESC);
+				if (struct.success != null) {
+					oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+					oprot.writeString(struct.success);
+					oprot.writeFieldEnd();
+				}
+				oprot.writeFieldStop();
+				oprot.writeStructEnd();
+			}
+
+		}
+
+		private static class getConsumerPage_resultTupleSchemeFactory implements SchemeFactory {
+			public getConsumerPage_resultTupleScheme getScheme() {
+				return new getConsumerPage_resultTupleScheme();
+			}
+		}
+
+		private static class getConsumerPage_resultTupleScheme extends TupleScheme<getConsumerPage_result> {
+
+			@Override
+			public void write(org.apache.thrift.protocol.TProtocol prot, getConsumerPage_result struct) throws org.apache.thrift.TException {
+				TTupleProtocol oprot = (TTupleProtocol) prot;
+				BitSet optionals = new BitSet();
+				if (struct.isSetSuccess()) {
+					optionals.set(0);
+				}
+				oprot.writeBitSet(optionals, 1);
+				if (struct.isSetSuccess()) {
+					oprot.writeString(struct.success);
+				}
+			}
+
+			@Override
+			public void read(org.apache.thrift.protocol.TProtocol prot, getConsumerPage_result struct) throws org.apache.thrift.TException {
 				TTupleProtocol iprot = (TTupleProtocol) prot;
 				BitSet incoming = iprot.readBitSet(1);
 				if (incoming.get(0)) {

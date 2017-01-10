@@ -24,6 +24,7 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.domain.ConsumerPageDomain;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
@@ -40,9 +41,9 @@ public class RpcClient {
 	private final static String ADDR = "127.0.0.1";
 
 	public static void main(String[] args) {
-		System.out.println(getActiverConsumer());
+		System.out.println(getConsumer());
 	}
-	
+
 	public static String getOffset() {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
@@ -68,7 +69,7 @@ public class RpcClient {
 			transport.open();
 			ret = client.getActiverConsumer();
 		} catch (Exception e) {
-			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
+			LOG.error("Rpc Client getActiver has error,msg is " + e.getMessage());
 		} finally {
 			transport.close();
 		}
@@ -84,7 +85,23 @@ public class RpcClient {
 			transport.open();
 			ret = client.getConsumer();
 		} catch (Exception e) {
-			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
+			LOG.error("Rpc Client getConsumer has error,msg is " + e.getMessage());
+		} finally {
+			transport.close();
+		}
+		return ret;
+	}
+
+	public static String getConsumerPage(ConsumerPageDomain page) {
+		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
+		TProtocol protocol = new TCompactProtocol(transport);
+		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
+		String ret = "";
+		try {
+			transport.open();
+			ret = client.getConsumerPage(page.getSearch(), page.getiDisplayStart(), page.getiDisplayLength());
+		} catch (Exception e) {
+			LOG.error("Rpc Client getConsumerPage has error,msg is " + e.getMessage());
 		} finally {
 			transport.close();
 		}

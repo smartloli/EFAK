@@ -44,6 +44,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.domain.BrokersDomain;
+import org.smartloli.kafka.eagle.domain.ConsumerPageDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.domain.PartitionsDomain;
 
@@ -237,6 +238,48 @@ public class KafkaClusterUtils {
 					mapConsumers.put(group, list);
 				} else {
 					LOG.error("Consumer Path[" + path + "] is not exist.");
+				}
+			}
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
+		} finally {
+			if (zkc != null) {
+				zkPool.release(zkc);
+				zkc = null;
+			}
+		}
+		return mapConsumers;
+	}
+
+	public static Map<String, List<String>> getConsumers(ConsumerPageDomain page) {
+		ZkClient zkc = zkPool.getZkClient();
+		Map<String, List<String>> mapConsumers = new HashMap<String, List<String>>();
+		try {
+			if (page.getSearch().length() > 0) {
+				String path = CONSUMERS_PATH + "/" + page.getSearch() + "/owners";
+				if (ZkUtils.pathExists(zkc, path)) {
+					Seq<String> tmp = ZkUtils.getChildren(zkc, path);
+					List<String> list = JavaConversions.seqAsJavaList(tmp);
+					mapConsumers.put(page.getSearch(), list);
+				} else {
+					LOG.error("Consumer Path[" + path + "] is not exist.");
+				}
+			} else {
+				Seq<String> seq = ZkUtils.getChildren(zkc, CONSUMERS_PATH);
+				List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+				int offset = 0;
+				for (String group : listSeq) {
+					if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
+						String path = CONSUMERS_PATH + "/" + group + "/owners";
+						if (ZkUtils.pathExists(zkc, path)) {
+							Seq<String> tmp = ZkUtils.getChildren(zkc, path);
+							List<String> list = JavaConversions.seqAsJavaList(tmp);
+							mapConsumers.put(group, list);
+						} else {
+							LOG.error("Consumer Path[" + path + "] is not exist.");
+						}
+					}
+					offset++;
 				}
 			}
 		} catch (Exception ex) {

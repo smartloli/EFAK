@@ -30,7 +30,7 @@ $(document).ready(function() {
 
 		// Initialize consumer table list --start
 		$("#result").dataTable({
-			"searching" : false,
+			//"searching" : false,
 			"bSort" : false,
 			"bLengthChange" : false,
 			"bProcessing" : true,

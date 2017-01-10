@@ -15,15 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.test;
-
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.smartloli.kafka.eagle.ipc.RpcClient;
-import org.smartloli.kafka.eagle.util.CalendarUtils;
+package org.smartloli.kafka.eagle.domain;
 
 import com.google.gson.Gson;
 
@@ -32,22 +24,41 @@ import com.google.gson.Gson;
  * 
  * @author smartloli.
  *
- *         Created by Jan 4, 2017
+ *         Created by Jan 10, 2017
  */
-public class ObjectTest {
+public class ConsumerPageDomain {
 
-	public static void main(String[] args) throws UnknownHostException {
-		// Mill => 1483670359006
-		// GetMill => 1483670352215
-		// GetMill => 1483670351214
-		// Mill => 1483670358005
-		// GetMill => 1483670350212
-		// Mill => 1483670358004
-		System.out.println(CalendarUtils.timeSpan2StrDate(1483927797771L));
-		Map<String, List<String>> type = new HashMap<String, List<String>>();
-		Gson gson = new Gson();
-		 Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
-		System.out.println(map.size());
+	private String search;
+	private int iDisplayStart;
+	private int iDisplayLength;
+
+	public String getSearch() {
+		return search;
+	}
+
+	public void setSearch(String search) {
+		this.search = search;
+	}
+
+	public int getiDisplayStart() {
+		return iDisplayStart;
+	}
+
+	public void setiDisplayStart(int iDisplayStart) {
+		this.iDisplayStart = iDisplayStart;
+	}
+
+	public int getiDisplayLength() {
+		return iDisplayLength;
+	}
+
+	public void setiDisplayLength(int iDisplayLength) {
+		this.iDisplayLength = iDisplayLength;
+	}
+
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
 	}
 
 }

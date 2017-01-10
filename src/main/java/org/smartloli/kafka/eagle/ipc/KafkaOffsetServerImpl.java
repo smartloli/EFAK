@@ -177,4 +177,46 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 		return map2.toString();
 	}
 
+	@Override
+	public String getConsumerPage(String search, int iDisplayStart, int iDisplayLength) throws TException {
+		Map<String, Set<String>> map = new HashMap<>();
+		int offset = 0;
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
+			String group = entry.getKey().group();
+			String topic = entry.getKey().topicPartition().topic();
+			if (search.length() > 0 && search.equals(group)) {
+				if (map.containsKey(group)) {
+					Set<String> set = map.get(group);
+					set.add(topic);
+				} else {
+					Set<String> set = new HashSet<>();
+					set.add(topic);
+					map.put(group, set);
+				}
+				break;
+			} else if (search.length() == 0) {
+				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+					if (map.containsKey(group)) {
+						Set<String> set = map.get(group);
+						set.add(topic);
+					} else {
+						Set<String> set = new HashSet<>();
+						set.add(topic);
+						map.put(group, set);
+					}
+				}
+				offset++;
+			}
+		}
+		Map<String, List<String>> map2 = new HashMap<>();
+		for (Entry<String, Set<String>> entry : map.entrySet()) {
+			List<String> list = new ArrayList<>();
+			for (String topic : entry.getValue()) {
+				list.add(topic);
+			}
+			map2.put(entry.getKey(), list);
+		}
+		return map.toString();
+	}
+
 }
