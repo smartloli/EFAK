@@ -39,7 +39,13 @@ public class ZookeeperUtils {
 		String ret = "";
 		Socket sock = null;
 		try {
-			sock = new Socket(host, Integer.parseInt(port));
+			String tmp = "";
+			if (port.contains("/")) {
+				tmp = port.split("/")[0];
+			} else {
+				tmp = port;
+			}
+			sock = new Socket(host, Integer.parseInt(tmp));
 		} catch (Exception e) {
 			LOG.error("Socket[" + host + ":" + port + "] connect refused");
 			return "death";

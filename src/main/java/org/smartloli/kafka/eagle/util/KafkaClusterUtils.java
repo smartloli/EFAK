@@ -68,7 +68,7 @@ public class KafkaClusterUtils {
 	private final static String BROKER_TOPICS_PATH = "/brokers/topics";
 
 	public static void main(String[] args) {
-		// System.out.println(ZkUtils.BrokerIdsPath());
+		System.out.println(getZkInfo());
 	}
 
 	public static JSONObject zkCliIsLive() {
@@ -230,9 +230,14 @@ public class KafkaClusterUtils {
 			Seq<String> seq = ZkUtils.getChildren(zkc, CONSUMERS_PATH);
 			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
 			for (String group : listSeq) {
-				Seq<String> tmp = ZkUtils.getChildren(zkc, CONSUMERS_PATH + "/" + group + "/owners");
-				List<String> list = JavaConversions.seqAsJavaList(tmp);
-				mapConsumers.put(group, list);
+				String path = CONSUMERS_PATH + "/" + group + "/owners";
+				if (ZkUtils.pathExists(zkc, path)) {
+					Seq<String> tmp = ZkUtils.getChildren(zkc, path);
+					List<String> list = JavaConversions.seqAsJavaList(tmp);
+					mapConsumers.put(group, list);
+				} else {
+					LOG.error("Consumer Path[" + path + "] is not exist.");
+				}
 			}
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
