@@ -22,7 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Datetime tools.
+ * Convert the date or time to the specified format.
  *
  * @author smartloli.
  *
@@ -30,21 +30,25 @@ import java.util.Date;
  */
 public class CalendarUtils {
 
+	/** Get the end of the day, accurate to minute. */
 	public static String getCurrentEndDate() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		return df.format(new Date());
 	}
 
+	/** Get the start of the day, accurate to minute. */
 	public static String getCurrentStartDate() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:00");
 		return df.format(new Date());
 	}
 
+	/** Get the corresponding string per minute. */
 	public static String getStatsPerDate() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		return df.format(new Date());
 	}
 
+	/** Get the date of yesterday, accurate to seconds. */
 	public static String getYestoday() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
 		Calendar calendar = Calendar.getInstance();
@@ -54,10 +58,12 @@ public class CalendarUtils {
 		return df.format(calendar.getTime());
 	}
 
+	/** Gets the current time stamp. */
 	public static long getTime() {
 		return new Date().getTime();
 	}
 
+	/** Get the date of yesterday. */
 	public static String getLastDay() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		Calendar calendar = Calendar.getInstance();
@@ -67,6 +73,7 @@ public class CalendarUtils {
 		return df.format(calendar.getTime());
 	}
 
+	/** Get the date of last month */
 	public static String[] getLastMonth() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		Calendar calendarFirstDay = Calendar.getInstance();
@@ -78,6 +85,13 @@ public class CalendarUtils {
 		return new String[] { df.format(calendarFirstDay.getTime()), df.format(calendarLastDay.getTime()) };
 	}
 
+	/**
+	 * Convert time stamp into Chinese time.
+	 * 
+	 * @param date
+	 *            Time stamp.
+	 * @return Character.
+	 */
 	public static String time2StrDate(long date) {
 		long day = date / (3600 * 24);
 		long hour = (date - 3600 * 24 * day) / (60 * 60);
@@ -86,6 +100,7 @@ public class CalendarUtils {
 		return day + "天" + hour + "时" + min + "分" + sec + "秒";
 	}
 
+	/**  */
 	public static String timeSpan2StrDate(long date) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return df.format(new Date(date));
@@ -107,7 +122,7 @@ public class CalendarUtils {
 	}
 
 	public static void main(String[] args) {
-		// System.out.println(getZkHour());// 2505600
+		System.out.println(getLastDay());// 2505600
 	}
 
 }
