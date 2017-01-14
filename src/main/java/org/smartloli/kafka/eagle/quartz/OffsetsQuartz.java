@@ -17,7 +17,9 @@
  */
 package org.smartloli.kafka.eagle.quartz;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,6 @@ import org.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.service.OffsetService;
-import org.smartloli.kafka.eagle.util.CalendarUtils;
 import org.smartloli.kafka.eagle.util.DBZKDataUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
@@ -58,7 +59,12 @@ public class OffsetsQuartz {
 	@Deprecated
 	public void cleanHistoryData() {
 		// Nothing to do
-		System.out.println(CalendarUtils.getStatsPerDate());
+	}
+
+	/** Get the corresponding string per minute. */
+	private String getStatsPerDate() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		return df.format(new Date());
 	}
 
 	public void jobQuartz() {
@@ -74,7 +80,7 @@ public class OffsetsQuartz {
 			} else {
 				consumers = KafkaClusterUtils.getConsumers();
 			}
-			String statsPerDate = CalendarUtils.getStatsPerDate();
+			String statsPerDate = getStatsPerDate();
 			for (Entry<String, List<String>> entry : consumers.entrySet()) {
 				String group = entry.getKey();
 				for (String topic : entry.getValue()) {

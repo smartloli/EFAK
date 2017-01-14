@@ -90,8 +90,8 @@ public class OffsetService {
 			if(topic.equals(_topic)&&group.equals(_group)&&partition==_partition){
 				offsetZk.setOffset(offset);
 				offsetZk.setOwners(owner);
-				offsetZk.setCreate(CalendarUtils.timeSpan2StrDate(timestamp));
-				offsetZk.setModify(CalendarUtils.timeSpan2StrDate(timestamp));
+				offsetZk.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
+				offsetZk.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
 			}
 		}
 		return offsetZk;

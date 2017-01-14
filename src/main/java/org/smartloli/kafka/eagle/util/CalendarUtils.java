@@ -30,27 +30,9 @@ import java.util.Date;
  */
 public class CalendarUtils {
 
-	/** Get the end of the day, accurate to minute. */
-	public static String getCurrentEndDate() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		return df.format(new Date());
-	}
-
-	/** Get the start of the day, accurate to minute. */
-	public static String getCurrentStartDate() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:00");
-		return df.format(new Date());
-	}
-
-	/** Get the corresponding string per minute. */
-	public static String getStatsPerDate() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		return df.format(new Date());
-	}
-
 	/** Get the date of yesterday, accurate to seconds. */
 	public static String getYestoday() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Calendar calendar = Calendar.getInstance();
 		Date curr = new Date();
 		calendar.setTime(curr);
@@ -86,43 +68,58 @@ public class CalendarUtils {
 	}
 
 	/**
-	 * Convert time stamp into Chinese time.
+	 * Convert time mill into ? day ? hour ? min ? sec.
 	 * 
-	 * @param date
-	 *            Time stamp.
-	 * @return Character.
+	 * @param timeMill
+	 *            Time mill.
+	 * @return Character,from "3600 sec" to "0 Day 1 Hour 0 Min 0 Sec".
 	 */
-	public static String time2StrDate(long date) {
-		long day = date / (3600 * 24);
-		long hour = (date - 3600 * 24 * day) / (60 * 60);
-		long min = (date - 3600 * 24 * day - 3600 * hour) / 60;
-		long sec = date - 3600 * 24 * day - 3600 * hour - 60 * min;
-		return day + "天" + hour + "时" + min + "分" + sec + "秒";
-	}
-
-	/**  */
-	public static String timeSpan2StrDate(long date) {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return df.format(new Date(date));
+	public static String convertTimeMill2Date(long timeMill) {
+		long day = timeMill / (3600 * 24);
+		long hour = (timeMill - 3600 * 24 * day) / (60 * 60);
+		long min = (timeMill - 3600 * 24 * day - 3600 * hour) / 60;
+		long sec = timeMill - 3600 * 24 * day - 3600 * hour - 60 * min;
+		return day + "Day" + hour + "Hour" + min + "min" + sec + "sec";
 	}
 
 	/**
-	 * yyyy-MM-dd HH:mm:ss
+	 * Convert unix time to date,default is yyyy-MM-dd HH:mm:ss.
 	 * 
-	 * @return
+	 * @param unixTime
+	 * @return 1907-01-01 00:00:00
 	 */
-	public static String getNormalDate() {
+	public static String convertUnixTime2Date(long unixtime) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return df.format(new Date(unixtime));
+	}
+
+	/** Get the date of the day,accurate to seconds. */
+	public static String getDate() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return df.format(new Date());
 	}
 
-	public static String getZkHour() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHH");
-		return df.format(new Date());
+	/**
+	 * Convert unix time to formatter date.
+	 * 
+	 * @param unixtime
+	 * @param formatter
+	 * @return Date String.
+	 */
+	public static String convertUnixTime(long unixtime, String formatter) {
+		SimpleDateFormat df = new SimpleDateFormat(formatter);
+		return df.format(new Date(unixtime));
 	}
 
-	public static void main(String[] args) {
-		System.out.println(getLastDay());// 2505600
+	/**
+	 * Convert unix time to date,default is yyyy-MM-dd HH:mm:ss.
+	 * 
+	 * @param unixtime
+	 * @return Date String.
+	 */
+	public static String convertUnixTime(long unixtime) {
+		String formatter = "yyyy-MM-dd HH:mm:ss";
+		return convertUnixTime(unixtime, formatter);
 	}
 
 }

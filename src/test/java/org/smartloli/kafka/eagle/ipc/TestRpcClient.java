@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.test;
+package org.smartloli.kafka.eagle.ipc;
 
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -34,9 +34,9 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
  *
  *         Created by Jan 5, 2017
  */
-public class RpcClientTest {
+public class TestRpcClient {
 
-	private final static Logger LOG = LoggerFactory.getLogger(RpcClientTest.class);
+	private final static Logger LOG = LoggerFactory.getLogger(TestRpcClient.class);
 	private final static int PORT = SystemConfigUtils.getIntProperty("kafka.eagle.offset.rpc.port");
 	private final static String ADDR = "master";
 
@@ -44,6 +44,7 @@ public class RpcClientTest {
 		System.out.println(getActiverConsumer());
 	}
 	
+	/** Get offset from kafka topic. */
 	public static String getOffset() {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
@@ -60,6 +61,7 @@ public class RpcClientTest {
 		return ret;
 	}
 
+	/** Get activer consumer from kafka topic.*/
 	public static String getActiverConsumer() {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
@@ -76,6 +78,7 @@ public class RpcClientTest {
 		return ret;
 	}
 
+	/** Get consumer information from kafka topic. */
 	public static String getConsumer() {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);

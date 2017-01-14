@@ -145,8 +145,8 @@ public class KafkaClusterUtils {
 			offsetZk.setOwners("");
 		}
 		offsetZk.setOffset(offsetSize);
-		offsetZk.setCreate(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
-		offsetZk.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
+		offsetZk.setCreate(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
+		offsetZk.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
 		if (zkc != null) {
 			zkPool.releaseZKSerializer(zkc);
 			zkc = null;
@@ -373,8 +373,8 @@ public class KafkaClusterUtils {
 				try {
 					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, BROKER_IDS_PATH + "/" + ids);
 					BrokersDomain broker = new BrokersDomain();
-					broker.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
-					broker.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
+					broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
+					broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
 					String host = JSON.parseObject(tuple._1.get()).getString("host");
 					int port = JSON.parseObject(tuple._1.get()).getInteger("port");
 					broker.setHost(host);
@@ -410,8 +410,8 @@ public class KafkaClusterUtils {
 					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, BROKER_TOPICS_PATH + "/" + topic);
 					PartitionsDomain partition = new PartitionsDomain();
 					partition.setId(++id);
-					partition.setCreated(CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
-					partition.setModify(CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
+					partition.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
+					partition.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
 					partition.setTopic(topic);
 					JSONObject partitionObject = JSON.parseObject(tuple._1.get()).getJSONObject("partitions");
 					partition.setPartitionNumbers(partitionObject.size());

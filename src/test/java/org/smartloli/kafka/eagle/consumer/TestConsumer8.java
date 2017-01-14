@@ -1,4 +1,21 @@
-package org.smartloli.kafka.eagle.test;
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.smartloli.kafka.eagle.consumer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,15 +35,15 @@ import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
 
 /**
- * @Date Mar 14, 2016
+ * Use high consumer api to real-time consumer message from kafka8
  *
- * @Author dengjie
+ * @author smartloli.
  *
- * @Note Use high consumer api to real-time consumer message from kafka
+ *         Created by Mar 14, 2016
  */
-public class KafkaConsumerTest extends Thread {
+public class TestConsumer8 extends Thread {
 
-	private static final Logger LOG = Logger.getLogger(KafkaConsumerTest.class);
+	private static final Logger LOG = Logger.getLogger(TestConsumer8.class);
 	private ExecutorService executor;
 	private ConsumerConnector consumer;
 	private static Properties props = new Properties();
@@ -44,7 +61,7 @@ public class KafkaConsumerTest extends Thread {
 	}
 
 	public static void main(String[] args) {
-		KafkaConsumerTest hl = new KafkaConsumerTest();
+		TestConsumer8 hl = new TestConsumer8();
 		try {
 			hl.start();
 		} catch (Exception ex) {
@@ -53,6 +70,7 @@ public class KafkaConsumerTest extends Thread {
 		}
 	}
 
+	/** Close kafka consumer client. */
 	public void shutdown() {
 		if (consumer != null) {
 			consumer.shutdown();
@@ -69,6 +87,7 @@ public class KafkaConsumerTest extends Thread {
 		}
 	}
 
+	/** Run kafka consumer thread. */
 	@Override
 	public void run() {
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
@@ -84,13 +103,16 @@ public class KafkaConsumerTest extends Thread {
 		}
 	}
 
+	/** Child consumer clazz & implements Runnable clazz to start thread. */
 	class KafkaConsumerThread implements Runnable {
 		private KafkaStream<byte[], byte[]> stream;
 
+		/** Consumer thread construction method. */
 		public KafkaConsumerThread(KafkaStream<byte[], byte[]> stream, int a_threadNumber) {
 			this.stream = stream;
 		}
 
+		/** Foreach message & print result.*/
 		@Override
 		public void run() {
 			ConsumerIterator<byte[], byte[]> it = stream.iterator();

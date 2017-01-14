@@ -17,7 +17,9 @@
  */
 package org.smartloli.kafka.eagle.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import kafka.utils.ZkUtils;
@@ -52,6 +54,11 @@ public class DBZKDataUtils {
 	private final static String TAB_OFFSETS = "offsets";
 	private final static String TAB_ALARM = "alarm";
 
+	private static String getZkHour() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHH");
+		return df.format(new Date());
+	}
+	
 	public static String getAlarm() {
 		JSONArray array = new JSONArray();
 		if (zkc == null) {
@@ -70,8 +77,8 @@ public class DBZKDataUtils {
 						object.put("group", group);
 						object.put("topic", topic);
 						Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, path + "/" + group + "/" + topic);
-						object.put("created", CalendarUtils.timeSpan2StrDate(tuple._2.getCtime()));
-						object.put("modify", CalendarUtils.timeSpan2StrDate(tuple._2.getMtime()));
+						object.put("created", CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
+						object.put("modify", CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
 						long lag = JSON.parseObject(tuple._1.get()).getLong("lag");
 						String owner = JSON.parseObject(tuple._1.get()).getString("owner");
 						object.put("lag", lag);
@@ -100,7 +107,7 @@ public class DBZKDataUtils {
 			try {
 				Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, path);
 				JSONObject obj = JSON.parseObject(tuple._1.get());
-				if (CalendarUtils.getZkHour().equals(obj.getString("hour"))) {
+				if (getZkHour().equals(obj.getString("hour"))) {
 					data = obj.toJSONString();
 				}
 			} catch (Exception ex) {
@@ -131,7 +138,7 @@ public class DBZKDataUtils {
 	}
 
 	public static void insert(List<OffsetsSQLiteDomain> list) {
-		String hour = CalendarUtils.getZkHour();
+		String hour = getZkHour();
 		for (OffsetsSQLiteDomain offset : list) {
 			JSONObject obj = new JSONObject();
 			obj.put("hour", hour);

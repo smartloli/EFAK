@@ -120,7 +120,7 @@ public class AlarmController {
 		} catch (Exception ex) {
 			LOG.error("Parse long has error,msg is " + ex.getMessage());
 		}
-		alarm.setModifyDate(CalendarUtils.getNormalDate());
+		alarm.setModifyDate(CalendarUtils.getDate());
 		alarm.setOwners(ke_topic_email);
 
 		Map<String, Object> map = AlarmService.addAlarm(alarm);

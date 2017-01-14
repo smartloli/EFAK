@@ -33,28 +33,37 @@ public class GzipUtils {
 	private static final String UTF_16 = "UTF-16";
 
 	/**
-	 * English : Strings compress to bytes
+	 * Strings compress to bytes.
 	 * 
+	 * @param str
+	 * @return byte[]
 	 */
 	public static byte[] compressToByte(String str) {
-		if (str == null || str.length() == 0) {
-			return null;
-		}
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		GZIPOutputStream gzip;
-		try {
-			gzip = new GZIPOutputStream(out);
-			gzip.write(str.getBytes(UTF_16));
-			gzip.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return out.toByteArray();
+		return compressToByte(str, UTF_16);
 	}
 
+	// public static byte[] compressToByte(String str) {
+	// if (str == null || str.length() == 0) {
+	// return null;
+	// }
+	// ByteArrayOutputStream out = new ByteArrayOutputStream();
+	// GZIPOutputStream gzip;
+	// try {
+	// gzip = new GZIPOutputStream(out);
+	// gzip.write(str.getBytes(UTF_16));
+	// gzip.close();
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	// return out.toByteArray();
+	// }
+
 	/**
-	 * English : Strings compress to bytes
+	 * Strings compress to bytes.
 	 * 
+	 * @param str
+	 * @param encoding
+	 * @return byte[]
 	 */
 	public static byte[] compressToByte(String str, String encoding) {
 		if (str == null || str.length() == 0) {
