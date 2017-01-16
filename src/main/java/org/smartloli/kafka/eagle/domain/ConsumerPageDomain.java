@@ -20,7 +20,7 @@ package org.smartloli.kafka.eagle.domain;
 import com.google.gson.Gson;
 
 /**
- * TODO
+ * Definition consumer page information.
  * 
  * @author smartloli.
  *

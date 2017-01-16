@@ -22,7 +22,7 @@ import org.apache.kafka.common.protocol.types.Schema;
 import com.google.gson.Gson;
 
 /**
- * TODO
+ * K&V schema storage offset in Kafka topic.
  * 
  * @author smartloli.
  *

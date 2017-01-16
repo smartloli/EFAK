@@ -26,18 +26,23 @@ import org.smartloli.kafka.eagle.util.KafkaMetaUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
 
 /**
+ * Kafka topic service api.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 14, 2016
  */
 public class TopicService {
 
+	/** Cache to the specified map collection to prevent frequent refresh. */
 	private static LRUCacheUtils<String, TupleDomain> map = new LRUCacheUtils<String, TupleDomain>(100000);
 
+	/** Get all the topic under Kafka in partition. */
 	public static String list() {
 		return KafkaClusterUtils.getAllPartitions();
 	}
 
+	/** Get metadata in topic. */
 	public static String topicMeta(String topicName, String ip) {
 		String key = topicName + "_meta_" + ip;
 		String ret = "";
@@ -58,6 +63,7 @@ public class TopicService {
 		return ret;
 	}
 
+	/** Find topic name in all topics. */
 	public static boolean findTopicName(String topicName, String ip) {
 		String key = topicName + "_check_" + ip;
 		boolean ret = false;

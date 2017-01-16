@@ -26,7 +26,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
-import org.smartloli.kafka.eagle.util.DBZKDataUtils;
+import org.smartloli.kafka.eagle.util.ZKDataUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
 
@@ -38,8 +38,11 @@ import org.smartloli.kafka.eagle.util.LRUCacheUtils;
  *         Created by Sep 6, 2016
  */
 public class AlarmService {
+
+	/** Cache to the specified map collection to prevent frequent refresh. */
 	private static LRUCacheUtils<String, TupleDomain> map = new LRUCacheUtils<String, TupleDomain>(100000);
 
+	/** Get alarmer topics. */
 	public static String getTopics(String ip) {
 		String key = "alarm_topic_" + ip;
 		String ret = "";
@@ -68,9 +71,18 @@ public class AlarmService {
 		return ret;
 	}
 
+	/**
+	 * Add alarmer information.
+	 * 
+	 * @param alarm
+	 *            AlarmDomain object
+	 * @return Map.
+	 * 
+	 * @see org.smartloli.kafka.eagle.domain.AlarmDomain
+	 */
 	public static Map<String, Object> addAlarm(AlarmDomain alarm) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		int status = DBZKDataUtils.insertAlarmConfigure(alarm);
+		int status = ZKDataUtils.insertAlarmConfigure(alarm);
 		if (status == -1) {
 			map.put("status", "error");
 			map.put("info", "insert [" + alarm + "] has error!");
@@ -81,12 +93,19 @@ public class AlarmService {
 		return map;
 	}
 
+	/** Get alarmer datasets. */
 	public static String list() {
-		return DBZKDataUtils.getAlarm();
+		return ZKDataUtils.getAlarm();
 	}
 
+	/**
+	 * Group and topic as a condition to delete alarmer.
+	 * 
+	 * @param group
+	 * @param topic
+	 */
 	public static void delete(String group, String topic) {
-		DBZKDataUtils.delete(group, topic, "alarm");
+		ZKDataUtils.delete(group, topic, "alarm");
 	}
 
 }

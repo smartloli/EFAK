@@ -37,20 +37,24 @@ import kafka.common.OffsetAndMetadata;
 import kafka.server.GroupTopicPartition;
 
 /**
- * TODO
+ * Implements kafka rpc api.
  * 
  * @author smartloli.
  *
  *         Created by Jan 5, 2017
+ * 
+ * @see org.smartloli.kafka.eagle.ipc.KafkaOffsetServer
  */
 public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOffsetServer.Iface {
 
+	/** According to group, topic & partition to get the topic data in Kafka. */
 	@Override
 	public String query(String group, String topic, int partition) throws TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/** Get offset in Kafka topic. */
 	@Override
 	public String getOffset() throws TException {
 		JSONArray array = new JSONArray();
@@ -75,12 +79,14 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 		return array.toJSONString();
 	}
 
+	/** Using SQL to get data from Kafka in topic. */
 	@Override
 	public String sql(String sql) throws TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/** Get consumer from Kafka in topic. */
 	@Override
 	public String getConsumer() throws TException {
 		Map<String, Set<String>> map = new HashMap<>();
@@ -107,6 +113,7 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 		return map.toString();
 	}
 
+	/** Get activer from Kafka in topic. */
 	private Map<String, Boolean> getActiver() throws TException {
 		long mill = System.currentTimeMillis();
 		Map<String, Boolean> active = new ConcurrentHashMap<>();
@@ -129,6 +136,7 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 		return active;
 	}
 
+	/** Get active consumer from Kafka in topic. */
 	@Override
 	public String getActiverConsumer() throws TException {
 		long mill = System.currentTimeMillis();
@@ -177,6 +185,7 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 		return map2.toString();
 	}
 
+	/** Get consumer page data from Kafka in topic. */
 	@Override
 	public String getConsumerPage(String search, int iDisplayStart, int iDisplayLength) throws TException {
 		Map<String, Set<String>> map = new HashMap<>();

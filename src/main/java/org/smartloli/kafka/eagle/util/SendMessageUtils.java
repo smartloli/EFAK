@@ -20,10 +20,23 @@ package org.smartloli.kafka.eagle.util;
 import org.smartloli.kafka.eagle.domain.MailSenderDomain;
 import org.smartloli.kafka.eagle.service.MailSenderService;
 
+/**
+ * Send email message tools clazz.
+ * 
+ * @author smartloli.
+ * 
+ *         Created by Aug 15, 2016
+ */
 public class SendMessageUtils {
 
+	/**
+	 * Send message.
+	 * 
+	 * @param toAddress
+	 * @param subject
+	 * @param content
+	 */
 	public static void send(String toAddress, String subject, String content) {
-
 		MailSenderDomain mailInfo = new MailSenderDomain();
 		mailInfo.setMailServerHost(SystemConfigUtils.getProperty("kafka.eagel.mail.server.host"));
 		mailInfo.setMailServerPort(SystemConfigUtils.getProperty("kafka.eagel.mail.server.port"));
@@ -36,7 +49,6 @@ public class SendMessageUtils {
 		mailInfo.setContent(content);
 		MailSenderService sms = new MailSenderService();
 		sms.sendHtmlMail(mailInfo);// send html format
-
 	}
 
 }

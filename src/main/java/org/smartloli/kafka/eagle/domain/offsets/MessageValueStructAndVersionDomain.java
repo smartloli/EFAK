@@ -22,7 +22,7 @@ import org.apache.kafka.common.protocol.types.Struct;
 import com.google.gson.Gson;
 
 /**
- * TODO
+ * Topic __consumer_offsets consumer message include struct & version data.
  * 
  * @author smartloli.
  *

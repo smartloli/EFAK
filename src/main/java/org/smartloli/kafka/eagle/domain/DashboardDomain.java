@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.domain;
 import com.google.gson.Gson;
 
 /**
+ * Definition dashboard information.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 13, 2016

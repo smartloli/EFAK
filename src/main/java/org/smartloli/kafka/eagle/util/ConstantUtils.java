@@ -18,7 +18,7 @@
 package org.smartloli.kafka.eagle.util;
 
 /**
- * TODO
+ * Define constants in the system.
  * 
  * @author smartloli.
  *
@@ -26,14 +26,17 @@ package org.smartloli.kafka.eagle.util;
  */
 public class ConstantUtils {
 
+	/** D3 data plugin size. */
 	public interface D3 {
 		public static int SIZE = 40;
 	}
 
+	/** Custom variable separator. */
 	public interface Separator {
 		public static String EIGHT = "________";
 	}
 
+	/** Kafka parameter setting. */
 	public interface Kafka {
 		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
 		public final static int SINGLE_THREAD = 1;

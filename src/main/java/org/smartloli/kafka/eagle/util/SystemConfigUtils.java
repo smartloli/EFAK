@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is the single entry point for accessing configuration properties.
+ * Provide the single entry point for accessing configuration properties.
  * 
  * @author smartloli.
  * 
@@ -42,6 +42,7 @@ public final class SystemConfigUtils {
 		getReources("system-config.properties");
 	}
 
+	/** Load profiles from different operate systems. */
 	private static void getReources(String name) {
 		try {
 			try {
@@ -67,30 +68,39 @@ public final class SystemConfigUtils {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Load system name has error,msg is " + e.getMessage());
 		}
 	}
 
 	/**
-	 * Reload special property file
+	 * Reload special property file.
 	 * 
 	 * @param name
+	 *            System configure name.
 	 */
 	public static void reload(String name) {
 		mConfig.clear();
 		getReources(name);
 	}
 
+	/** Construction method. */
 	private SystemConfigUtils() {
 	}
 
-	/**
-	 * Retrieve a property value
-	 */
+	/** Retrieve a property value. */
 	public static String getProperty(String key) {
 		return mConfig.getProperty(key);
 	}
 
+	/**
+	 * Retrieve a property value & default value.
+	 * 
+	 * @param key
+	 *            Retrieve key
+	 * @param defaultValue
+	 *            Return default retrieve value
+	 * @return String.
+	 */
 	public static String getProperty(String key, String defaultValue) {
 		LOG.debug("Fetching property [" + key + "=" + mConfig.getProperty(key) + "]");
 		String value = SystemConfigUtils.getProperty(key);
@@ -100,16 +110,12 @@ public final class SystemConfigUtils {
 		return value;
 	}
 
-	/**
-	 * Retrieve a property as a boolean ... defaults to false if not present.
-	 */
+	/** Retrieve a property as a boolean ... defaults to false if not present. */
 	public static boolean getBooleanProperty(String name) {
 		return getBooleanProperty(name, false);
 	}
 
-	/**
-	 * Retrieve a property as a boolean with specified default if not present.
-	 */
+	/** Retrieve a property as a boolean with specified default if not present. */
 	public static boolean getBooleanProperty(String name, boolean defaultValue) {
 		String value = SystemConfigUtils.getProperty(name);
 		if (value == null) {
@@ -118,20 +124,17 @@ public final class SystemConfigUtils {
 		return Boolean.valueOf(value).booleanValue();
 	}
 
-	/**
-	 * Retrieve a property as a int,defaults to 0 if not present.
-	 */
+	/** Retrieve a property as a int,defaults to 0 if not present. */
 	public static int getIntProperty(String name) {
 		return getIntProperty(name, 0);
 	}
 
+	/** Retrieve a property as a long,defaults to 0L if not present. */
 	public static Long getLongProperty(String name) {
 		return getLongProperty(name, 0L);
 	}
 
-	/**
-	 * Retrieve a property as a int
-	 */
+	/** Retrieve a property as a int. */
 	public static int getIntProperty(String name, int defaultValue) {
 		String value = SystemConfigUtils.getProperty(name);
 		if (value == null) {
@@ -145,6 +148,7 @@ public final class SystemConfigUtils {
 		}
 	}
 
+	/** Retrieve a property as a long. */
 	public static Long getLongProperty(String name, Long defaultValue) {
 		String value = SystemConfigUtils.getProperty(name);
 		if (value == null) {
@@ -158,9 +162,7 @@ public final class SystemConfigUtils {
 		}
 	}
 
-	/**
-	 * 
-	 */
+	/** Retrieve a property as a int array. */
 	public static int[] getIntPropertyArray(String name, int[] defaultValue, String splitStr) {
 		String value = SystemConfigUtils.getProperty(name);
 		if (value == null) {
@@ -178,8 +180,7 @@ public final class SystemConfigUtils {
 		}
 	}
 
-	/**
-	 */
+	/** Retrieve a property as a boolean array. */
 	public static boolean[] getBooleanPropertyArray(String name, boolean[] defaultValue, String splitStr) {
 		String value = SystemConfigUtils.getProperty(name);
 		if (value == null) {
@@ -198,8 +199,7 @@ public final class SystemConfigUtils {
 		}
 	}
 
-	/**
-	 */
+	/** Retrieve a property as a array. */
 	public static String[] getPropertyArray(String name, String[] defaultValue, String splitStr) {
 		String value = SystemConfigUtils.getProperty(name);
 		if (value == null) {
@@ -213,8 +213,7 @@ public final class SystemConfigUtils {
 		}
 	}
 
-	/**
-	 */
+	/** Retrieve a property as a array,no default value. */
 	public static String[] getPropertyArray(String name, String splitStr) {
 		String value = SystemConfigUtils.getProperty(name);
 		if (value == null) {
@@ -228,13 +227,12 @@ public final class SystemConfigUtils {
 		}
 	}
 
-	/**
-	 * Retrieve all property keys
-	 */
+	/** Retrieve all property keys. */
 	public static Enumeration<Object> keys() {
 		return mConfig.keys();
 	}
 
+	/** Retrieve map property keys. */
 	public static Map<String, String> getPropertyMap(String name) {
 		String[] maps = getPropertyArray(name, ",");
 		Map<String, String> map = new HashMap<String, String>();
@@ -247,7 +245,6 @@ public final class SystemConfigUtils {
 			}
 		} catch (Exception e) {
 			LOG.error("Get PropertyMap info has error,key is :" + name);
-			e.printStackTrace();
 		}
 		return map;
 	}

@@ -19,6 +19,13 @@ package org.smartloli.kafka.eagle.domain;
 
 import java.util.Properties;
 
+/**
+ * Definition email sender information.
+ * 
+ * @author smartloli.
+ * 
+ *         Created by Aug 15, 2016
+ */
 public class MailSenderDomain {
 	private String mailServerHost;
 	private String mailServerPort = "25";

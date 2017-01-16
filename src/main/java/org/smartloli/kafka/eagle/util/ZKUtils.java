@@ -26,15 +26,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ZK tools class.
+ * ZK tools class & get cluster health status.
  *
  * @author smartloli.
  *
  *         Created by Sep 9, 2016
  */
-public class ZookeeperUtils {
-	private final static Logger LOG = LoggerFactory.getLogger(ZookeeperUtils.class);
+public class ZKUtils {
+	private final static Logger LOG = LoggerFactory.getLogger(ZKUtils.class);
 
+	/**
+	 * Get zookeeper health status.
+	 * 
+	 * @param host
+	 *            Zookeeper host
+	 * @param port
+	 *            Zookeeper port
+	 * @return String.
+	 */
 	public static String serverStatus(String host, String port) {
 		String ret = "";
 		Socket sock = null;

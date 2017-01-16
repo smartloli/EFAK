@@ -33,7 +33,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.domain.AlarmDomain;
-import org.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
+import org.smartloli.kafka.eagle.domain.OffsetsLiteDomain;
 
 import scala.Option;
 import scala.Tuple2;
@@ -41,30 +41,36 @@ import scala.collection.JavaConversions;
 import scala.collection.Seq;
 
 /**
+ * Storing metadata to zookeeper and providing read and write methods.
+ * 
  * @author smartloli.
  *
  *         Created by Sep 12, 2016
  */
-public class DBZKDataUtils {
+public class ZKDataUtils {
 
-	private final static Logger LOG = LoggerFactory.getLogger(DBZKDataUtils.class);
+	private final static Logger LOG = LoggerFactory.getLogger(ZKDataUtils.class);
 	private static ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
 	private static ZkClient zkc = null;
-	private final static String KE_PATH = "/kafka_eagle";
-	private final static String TAB_OFFSETS = "offsets";
-	private final static String TAB_ALARM = "alarm";
+	private final static String KE_ROOT_PATH = "/kafka_eagle";
+	private final static String STORE_OFFSETS = "offsets";
+	private final static String STORE_ALARM = "alarm";
 
+	/**
+	 * According to the date of each hour to statistics the consume rate data.
+	 */
 	private static String getZkHour() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHH");
 		return df.format(new Date());
 	}
-	
+
+	/** Get alarmer information. */
 	public static String getAlarm() {
 		JSONArray array = new JSONArray();
 		if (zkc == null) {
 			zkc = zkPool.getZkClient();
 		}
-		String path = KE_PATH + "/" + TAB_ALARM;
+		String path = KE_ROOT_PATH + "/" + STORE_ALARM;
 		if (ZkUtils.pathExists(zkc, path)) {
 			Seq<String> seq = ZkUtils.getChildren(zkc, path);
 			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
@@ -97,12 +103,21 @@ public class DBZKDataUtils {
 		return array.toJSONString();
 	}
 
+	/**
+	 * Get consumer data that has group and topic as the only sign.
+	 * 
+	 * @param group
+	 *            Consumer group.
+	 * @param topic
+	 *            Consumer topic.
+	 * @return String.
+	 */
 	public static String getOffsets(String group, String topic) {
 		String data = "";
 		if (zkc == null) {
 			zkc = zkPool.getZkClient();
 		}
-		String path = KE_PATH + "/" + TAB_OFFSETS + "/" + group + "/" + topic;
+		String path = KE_ROOT_PATH + "/" + STORE_OFFSETS + "/" + group + "/" + topic;
 		if (ZkUtils.pathExists(zkc, path)) {
 			try {
 				Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, path);
@@ -121,15 +136,23 @@ public class DBZKDataUtils {
 		return data;
 	}
 
+	/**
+	 * Update metadata information in ke root path in zookeeper.
+	 * 
+	 * @param data
+	 *            Update datasets.
+	 * @param path
+	 *            Update datasets path.
+	 */
 	private static void update(String data, String path) {
 		if (zkc == null) {
 			zkc = zkPool.getZkClient();
 		}
-		if (!ZkUtils.pathExists(zkc, KE_PATH + "/" + path)) {
-			ZkUtils.createPersistentPath(zkc, KE_PATH + "/" + path, "");
+		if (!ZkUtils.pathExists(zkc, KE_ROOT_PATH + "/" + path)) {
+			ZkUtils.createPersistentPath(zkc, KE_ROOT_PATH + "/" + path, "");
 		}
-		if (ZkUtils.pathExists(zkc, KE_PATH + "/" + path)) {
-			ZkUtils.updatePersistentPath(zkc, KE_PATH + "/" + path, data);
+		if (ZkUtils.pathExists(zkc, KE_ROOT_PATH + "/" + path)) {
+			ZkUtils.updatePersistentPath(zkc, KE_ROOT_PATH + "/" + path, data);
 		}
 		if (zkc != null) {
 			zkPool.release(zkc);
@@ -137,9 +160,15 @@ public class DBZKDataUtils {
 		}
 	}
 
-	public static void insert(List<OffsetsSQLiteDomain> list) {
+	/**
+	 * Insert new datasets.
+	 * 
+	 * @param list
+	 *            New datasets.
+	 */
+	public static void insert(List<OffsetsLiteDomain> list) {
 		String hour = getZkHour();
-		for (OffsetsSQLiteDomain offset : list) {
+		for (OffsetsLiteDomain offset : list) {
 			JSONObject obj = new JSONObject();
 			obj.put("hour", hour);
 
@@ -164,17 +193,28 @@ public class DBZKDataUtils {
 			} else {
 				obj.put("data", Arrays.asList(object));
 			}
-			update(obj.toJSONString(), TAB_OFFSETS + "/" + offset.getGroup() + "/" + offset.getTopic());
+			update(obj.toJSONString(), STORE_OFFSETS + "/" + offset.getGroup() + "/" + offset.getTopic());
 		}
 	}
 
+	/**
+	 * Delete the metadata information in the Ke root directory in zookeeper,
+	 * with group and topic as the only sign.
+	 * 
+	 * @param group
+	 *            Consumer group.
+	 * @param topic
+	 *            Consumer topic.
+	 * @param theme
+	 *            Consumer theme.
+	 */
 	public static void delete(String group, String topic, String theme) {
 		if (zkc == null) {
 			zkc = zkPool.getZkClient();
 		}
 		String path = theme + "/" + group + "/" + topic;
-		if (ZkUtils.pathExists(zkc, KE_PATH + "/" + path)) {
-			ZkUtils.deletePath(zkc, KE_PATH + "/" + path);
+		if (ZkUtils.pathExists(zkc, KE_ROOT_PATH + "/" + path)) {
+			ZkUtils.deletePath(zkc, KE_ROOT_PATH + "/" + path);
 		}
 		if (zkc != null) {
 			zkPool.release(zkc);
@@ -182,14 +222,21 @@ public class DBZKDataUtils {
 		}
 	}
 
+	/**
+	 * Insert new alarmer configure information.
+	 * 
+	 * @param alarm
+	 *            New configure object.
+	 * @return Integer.
+	 */
 	public static int insertAlarmConfigure(AlarmDomain alarm) {
 		JSONObject object = new JSONObject();
 		object.put("lag", alarm.getLag());
 		object.put("owner", alarm.getOwners());
 		try {
-			update(object.toJSONString(), TAB_ALARM + "/" + alarm.getGroup() + "/" + alarm.getTopics());
+			update(object.toJSONString(), STORE_ALARM + "/" + alarm.getGroup() + "/" + alarm.getTopics());
 		} catch (Exception ex) {
-			LOG.error("[ZK.insertAlarm] has error,msg is " + ex.getMessage());
+			LOG.error("Insert alarmer configure object has error,msg is " + ex.getMessage());
 			return -1;
 		}
 		return 0;

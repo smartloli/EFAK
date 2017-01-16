@@ -26,12 +26,15 @@ import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
+ * Kafka Eagle dashboard data generator.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 12, 2016
  */
 public class DashboardService {
 
+	/** Get kafka & dashboard dataset. */
 	public static String getDashboard() {
 		JSONObject obj = new JSONObject();
 		obj.put("kafka", getKafka());
@@ -40,6 +43,7 @@ public class DashboardService {
 		return obj.toJSONString();
 	}
 
+	/** Get dashboard data. */
 	private static String dashboard() {
 		int zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",").length;
 		String topicObject = KafkaClusterUtils.getAllPartitions();
@@ -59,6 +63,7 @@ public class DashboardService {
 		return dash.toString();
 	}
 
+	/** Get kafka data. */
 	private static String getKafka() {
 		String kafka = KafkaClusterUtils.getAllBrokersInfo();
 		JSONObject obj = new JSONObject();

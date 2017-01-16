@@ -20,10 +20,11 @@ package org.smartloli.kafka.eagle.domain;
 import com.google.gson.Gson;
 
 /**
+ * Definition Kafka consumer detail information.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 16, 2016
- *
  */
 public class ConsumerDetailDomain {
 

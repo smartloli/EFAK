@@ -23,8 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,11 +31,17 @@ import org.springframework.web.servlet.ModelAndView;
 import org.smartloli.kafka.eagle.service.DashboardService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 
+/**
+ * Dashboard controller to viewer data.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Sep 6, 2016
+ */
 @Controller
 public class DashboardController {
 
-	private final static Logger LOG = LoggerFactory.getLogger(DashboardController.class);
-
+	/** Index viewer. */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView indexView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -45,6 +49,7 @@ public class DashboardController {
 		return mav;
 	}
 
+	/** Get data from Kafka in dashboard by ajax. */
 	@RequestMapping(value = "/dash/kafka/ajax", method = RequestMethod.GET)
 	public void dashboardAjax(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -53,12 +58,9 @@ public class DashboardController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
-
 		try {
 			byte[] output = GzipUtils.compressToByte(DashboardService.getDashboard());
-			response.setContentLength(output == null ? "NULL".toCharArray().length :output.length);
+			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 

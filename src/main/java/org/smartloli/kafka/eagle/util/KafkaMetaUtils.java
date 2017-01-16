@@ -38,7 +38,7 @@ import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 
 /**
- * As kafka low api to get meta data.
+ * As kafka low api to get metadata.
  *
  * @author smartloli.
  *
@@ -48,6 +48,13 @@ public class KafkaMetaUtils {
 
 	private static Logger LOG = LoggerFactory.getLogger(KafkaMetaUtils.class);
 
+	/**
+	 * Find leader through topic.
+	 * 
+	 * @param topic
+	 * @return List
+	 * @see org.smartloli.kafka.eagle.domain.KafkaMetaDomain
+	 */
 	public static List<KafkaMetaDomain> findLeader(String topic) {
 		List<KafkaMetaDomain> list = new ArrayList<>();
 
@@ -96,6 +103,7 @@ public class KafkaMetaUtils {
 		return list;
 	}
 
+	/** Get kafka brokers from zookeeper. */
 	private static List<KafkaBrokerDomain> getBrokers() {
 		String brokersStr = KafkaClusterUtils.getAllBrokersInfo();
 		List<KafkaBrokerDomain> brokers = new ArrayList<KafkaBrokerDomain>();
@@ -108,10 +116,6 @@ public class KafkaMetaUtils {
 			brokers.add(broker);
 		}
 		return brokers;
-	}
-
-	public static void main(String[] args) {
-		System.out.println(findLeader("boyaa_mf_test12345"));
 	}
 
 }

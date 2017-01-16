@@ -20,11 +20,13 @@ package org.smartloli.kafka.eagle.domain;
 import com.google.gson.Gson;
 
 /**
+ * Definition offset lite information.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 18, 2016
  */
-public class OffsetsSQLiteDomain {
+public class OffsetsLiteDomain {
 
 	private String group = "";
 	private String topic = "";

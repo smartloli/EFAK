@@ -23,6 +23,8 @@ import java.util.Set;
 import com.google.gson.Gson;
 
 /**
+ * Definition Kafka partition information.
+ * 
  * @author smartloli.
  *
  *         Created by Mar 30, 2016

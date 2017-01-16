@@ -25,14 +25,18 @@ import scala.Option;
 import scala.Tuple2;
 
 /**
+ * Zookeeper terminal operation command clazz.
+ * 
  * @author smartloli.
  *
  *         Created by Nov 3, 2016
  */
 public class ZKCliUtils {
 
+	/** Instance zk pool. */
 	private static ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
 
+	/** Zookeeper ls command. */
 	public static String ls(String cmd) {
 		String ret = "";
 		ZkClient zkc = zkPool.getZkClient();
@@ -47,6 +51,7 @@ public class ZKCliUtils {
 		return ret;
 	}
 
+	/** Zookeeper delete command. */
 	public static String delete(String cmd) {
 		String ret = "";
 		ZkClient zkc = zkPool.getZkClient();
@@ -65,13 +70,13 @@ public class ZKCliUtils {
 		return ret;
 	}
 
+	/** Zookeeper get command. */
 	public static String get(String cmd) {
 		String ret = "";
 		ZkClient zkc = zkPool.getZkClientSerializer();
 		boolean status = ZkUtils.pathExists(zkc, cmd);
 		if (status) {
-			Tuple2<Option<String>, Stat> tuple2 = ZkUtils.readDataMaybeNull(zkc,
-					cmd);
+			Tuple2<Option<String>, Stat> tuple2 = ZkUtils.readDataMaybeNull(zkc, cmd);
 			ret += tuple2._1.get() + "\n";
 			ret += "cZxid = " + tuple2._2.getCzxid() + "\n";
 			ret += "ctime = " + tuple2._2.getCtime() + "\n";
@@ -91,9 +96,4 @@ public class ZKCliUtils {
 		}
 		return ret;
 	}
-
-	public static void main(String[] args) {
-		System.out.println(get("/kafka_eagle/offsets/group2/ke_test1"));
-	}
-
 }

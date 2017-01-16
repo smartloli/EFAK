@@ -22,6 +22,8 @@ import java.util.List;
 import com.google.gson.Gson;
 
 /**
+ * Definition Kafka consumer information.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 16, 2016

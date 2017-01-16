@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.domain;
 import com.google.gson.Gson;
 
 /**
+ * Definition Kafka offset information.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 16, 2016

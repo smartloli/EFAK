@@ -54,7 +54,8 @@ import scala.collection.JavaConversions;
 import scala.collection.Seq;
 
 /**
- * Get kafka cluster info,include topic,broker list and partitions.
+ * Get kafka cluster info,include topic,broker list and partitions from
+ * zookeeper.
  *
  * @author smartloli.
  *
@@ -68,10 +69,7 @@ public class KafkaClusterUtils {
 	private final static String BROKER_IDS_PATH = "/brokers/ids";
 	private final static String BROKER_TOPICS_PATH = "/brokers/topics";
 
-	public static void main(String[] args) {
-		System.out.println(getZkInfo());
-	}
-
+	/** Judge whether the zkcli is active. */
 	public static JSONObject zkCliIsLive() {
 		JSONObject object = new JSONObject();
 		ZkClient zkc = zkPool.getZkClient();
@@ -89,6 +87,14 @@ public class KafkaClusterUtils {
 		return object;
 	}
 
+	/**
+	 * Topic and partition information in the zookeeper cluster are selected by
+	 * topic.
+	 * 
+	 * @param topic
+	 *            Selected condition.
+	 * @return List.
+	 */
 	public static List<String> findTopicPartition(String topic) {
 		ZkClient zkc = zkPool.getZkClient();
 		Seq<String> seq = ZkUtils.getChildren(zkc, BROKER_TOPICS_PATH + "/" + topic + "/partitions");
@@ -101,6 +107,16 @@ public class KafkaClusterUtils {
 		return listSeq;
 	}
 
+	/**
+	 * According to topic and group to find out whether the conditions are
+	 * consumers.
+	 * 
+	 * @param topic
+	 *            Filter topic.
+	 * @param group
+	 *            Filter group
+	 * @return Boolean.
+	 */
 	public static boolean findTopicIsConsumer(String topic, String group) {
 		ZkClient zkc = zkPool.getZkClient();
 		String ownersPath = CONSUMERS_PATH + "/" + group + "/owners/" + topic;
@@ -112,6 +128,19 @@ public class KafkaClusterUtils {
 		return status;
 	}
 
+	/**
+	 * According to group, topic and partition to get offset from zookeeper.
+	 * 
+	 * @param topic
+	 *            Filter topic.
+	 * @param group
+	 *            Filter group.
+	 * @param partition
+	 *            Filter partition.
+	 * @return OffsetZkDomain.
+	 * 
+	 * @see org.smartloli.kafka.eagle.domain.OffsetZkDomain
+	 */
 	public static OffsetZkDomain getOffset(String topic, String group, int partition) {
 		ZkClient zkc = zkPool.getZkClientSerializer();
 		OffsetZkDomain offsetZk = new OffsetZkDomain();
@@ -122,7 +151,7 @@ public class KafkaClusterUtils {
 			if (ZkUtils.pathExists(zkc, offsetPath)) {
 				tuple = ZkUtils.readDataMaybeNull(zkc, offsetPath);
 			} else {
-				LOG.info("partition[" + partition + "],offsetPath[" + offsetPath + "] is not exist!");
+				LOG.info("Partition[" + partition + "],OffsetPath[" + offsetPath + "] is not exist!");
 				if (zkc != null) {
 					zkPool.releaseZKSerializer(zkc);
 					zkc = null;
@@ -130,7 +159,7 @@ public class KafkaClusterUtils {
 				return offsetZk;
 			}
 		} catch (Exception ex) {
-			LOG.error("partition[" + partition + "],get offset has error,msg is " + ex.getMessage());
+			LOG.error("Partition[" + partition + "],get offset has error,msg is " + ex.getMessage());
 			if (zkc != null) {
 				zkPool.releaseZKSerializer(zkc);
 				zkc = null;
@@ -154,6 +183,17 @@ public class KafkaClusterUtils {
 		return offsetZk;
 	}
 
+	/**
+	 * Use Kafka low consumer API & get logsize size from zookeeper.
+	 * 
+	 * @param hosts
+	 *            Zookeeper host list.
+	 * @param topic
+	 *            Appoint topic.
+	 * @param partition
+	 *            Appoint partition.
+	 * @return Long.
+	 */
 	public static long getLogSize(List<String> hosts, String topic, int partition) {
 		LOG.info("Find leader hosts [" + hosts + "]");
 		PartitionMetadata metadata = findLeader(hosts, topic, partition);
@@ -193,6 +233,15 @@ public class KafkaClusterUtils {
 		return ret;
 	}
 
+	/**
+	 * Use Kafka low level consumer API to find leader.
+	 * 
+	 * @param a_seedBrokers
+	 * @param a_topic
+	 * @param a_partition
+	 * @return PartitionMetadata.
+	 * @see kafka.javaapi.PartitionMetadata
+	 */
 	private static PartitionMetadata findLeader(List<String> a_seedBrokers, String a_topic, int a_partition) {
 		PartitionMetadata returnMetaData = null;
 		loop: for (String seed : a_seedBrokers) {
@@ -224,6 +273,7 @@ public class KafkaClusterUtils {
 		return returnMetaData;
 	}
 
+	/** Obtaining kafka consumer information from zookeeper. */
 	public static Map<String, List<String>> getConsumers() {
 		ZkClient zkc = zkPool.getZkClient();
 		Map<String, List<String>> mapConsumers = new HashMap<String, List<String>>();
@@ -251,6 +301,7 @@ public class KafkaClusterUtils {
 		return mapConsumers;
 	}
 
+	/** Obtaining kafka consumer page information from zookeeper. */
 	public static Map<String, List<String>> getConsumers(ConsumerPageDomain page) {
 		ZkClient zkc = zkPool.getZkClient();
 		Map<String, List<String>> mapConsumers = new HashMap<String, List<String>>();
@@ -293,11 +344,7 @@ public class KafkaClusterUtils {
 		return mapConsumers;
 	}
 
-	/**
-	 * Get kafka active consumer topic
-	 * 
-	 * @return
-	 */
+	/** Get kafka active consumer topic. */
 	public static Map<String, List<String>> getActiveTopic() {
 		ZkClient zkc = zkPool.getZkClientSerializer();
 		Map<String, List<String>> actvTopic = new HashMap<String, List<String>>();
@@ -337,11 +384,7 @@ public class KafkaClusterUtils {
 		return actvTopic;
 	}
 
-	/**
-	 * Get zks info
-	 * 
-	 * @return
-	 */
+	/** Get zookeeper cluster information. */
 	public static String getZkInfo() {
 		String[] zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",");
 		JSONArray arr = new JSONArray();
@@ -351,17 +394,13 @@ public class KafkaClusterUtils {
 			obj.put("id", id++);
 			obj.put("ip", zk.split(":")[0]);
 			obj.put("port", zk.split(":")[1]);
-			obj.put("mode", ZookeeperUtils.serverStatus(zk.split(":")[0], zk.split(":")[1]));
+			obj.put("mode", ZKUtils.serverStatus(zk.split(":")[0], zk.split(":")[1]));
 			arr.add(obj);
 		}
 		return arr.toJSONString();
 	}
 
-	/**
-	 * Get all broker list
-	 * 
-	 * @return
-	 */
+	/** Get all broker list from zookeeper. */
 	public static String getAllBrokersInfo() {
 		ZkClient zkc = zkPool.getZkClientSerializer();
 		List<BrokersDomain> list = new ArrayList<BrokersDomain>();
@@ -393,11 +432,7 @@ public class KafkaClusterUtils {
 		return list.toString();
 	}
 
-	/**
-	 * Get topic info from zookeeper
-	 * 
-	 * @return
-	 */
+	/** Get all topic info from zookeeper. */
 	public static String getAllPartitions() {
 		ZkClient zkc = zkPool.getZkClientSerializer();
 		List<PartitionsDomain> list = new ArrayList<PartitionsDomain>();
@@ -429,6 +464,13 @@ public class KafkaClusterUtils {
 		return list.toString();
 	}
 
+	/**
+	 * According to topic and partition to obtain Replicas & Isr.
+	 * 
+	 * @param topic
+	 * @param partitionid
+	 * @return String.
+	 */
 	public static String geyReplicasIsr(String topic, int partitionid) {
 		ZkClient zkc = zkPool.getZkClientSerializer();
 		Seq<Object> seq = ZkUtils.getInSyncReplicasForPartition(zkc, topic, partitionid);

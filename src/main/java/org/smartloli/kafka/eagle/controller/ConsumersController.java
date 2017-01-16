@@ -40,11 +40,19 @@ import org.smartloli.kafka.eagle.service.ConsumerService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
+/**
+ * Kafka consumer controller to viewer data.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Sep 6, 2016
+ */
 @Controller
 public class ConsumersController {
 
 	private final static Logger LOG = LoggerFactory.getLogger(ConsumersController.class);
 
+	/** Consumer viewer. */
 	@RequestMapping(value = "/consumers", method = RequestMethod.GET)
 	public ModelAndView consumersView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -52,6 +60,7 @@ public class ConsumersController {
 		return mav;
 	}
 
+	/** Get consumer data by ajax. */
 	@RequestMapping(value = "/consumers/info/ajax", method = RequestMethod.GET)
 	public void consumersGraphAjax(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -74,6 +83,7 @@ public class ConsumersController {
 		}
 	}
 
+	/** Get consumer datasets by ajax. */
 	@RequestMapping(value = "/consumer/list/table/ajax", method = RequestMethod.GET)
 	public void consumerTableAjax(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -142,6 +152,7 @@ public class ConsumersController {
 		}
 	}
 
+	/** Get consumer data through group by ajax. */
 	@RequestMapping(value = "/consumer/{group}/table/ajax", method = RequestMethod.GET)
 	public void consumerTableListAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");

@@ -15,41 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.quartz;
 
 /**
- * Definition Kafka broker information.
+ * Test OffsetsQuartz clazz.
  * 
  * @author smartloli.
  *
- *         Created by Aug 15, 2016
+ *         Created by Jan 16, 2017
  */
-public class KafkaBrokerDomain {
-
-	private String host;
-	private int port;
-
-	public String getHost() {
-		return host;
+public class TestOffsetsQuartz {
+	public static void main(String[] args) {
+		OffsetsQuartz offsets = new OffsetsQuartz();
+		offsets.jobQuartz();
 	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
-	}
-
 }

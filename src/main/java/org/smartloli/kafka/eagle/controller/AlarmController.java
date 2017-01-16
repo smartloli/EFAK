@@ -40,11 +40,19 @@ import org.smartloli.kafka.eagle.service.AlarmService;
 import org.smartloli.kafka.eagle.util.CalendarUtils;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 
+/**
+ * Alarm controller to viewer data.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Sep 6, 2016
+ */
 @Controller
 public class AlarmController {
 
 	private final static Logger LOG = LoggerFactory.getLogger(AlarmController.class);
 
+	/** Add alarmer viewer. */
 	@RequestMapping(value = "/alarm/add", method = RequestMethod.GET)
 	public ModelAndView addView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -52,13 +60,15 @@ public class AlarmController {
 		return mav;
 	}
 
+	/** Modify alarmer viewer. */
 	@RequestMapping(value = "/alarm/modify", method = RequestMethod.GET)
-	public ModelAndView indexView(HttpSession session) {
+	public ModelAndView modifyView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/alarm/modify");
 		return mav;
 	}
 
+	/** Create alarmer success viewer. */
 	@RequestMapping(value = "/alarm/create/success", method = RequestMethod.GET)
 	public ModelAndView successView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -66,6 +76,7 @@ public class AlarmController {
 		return mav;
 	}
 
+	/** Create alarmer failed viewer. */
 	@RequestMapping(value = "/alarm/create/failed", method = RequestMethod.GET)
 	public ModelAndView failedView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -73,6 +84,7 @@ public class AlarmController {
 		return mav;
 	}
 
+	/** Get alarmer monitor topic by ajax. */
 	@RequestMapping(value = "/alarm/topic/ajax", method = RequestMethod.GET)
 	public void alarmTopicAjax(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -97,6 +109,7 @@ public class AlarmController {
 		}
 	}
 
+	/** Add alarmer form. */
 	@RequestMapping(value = "/alarm/add/form", method = RequestMethod.POST)
 	public ModelAndView alarmAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
@@ -136,6 +149,7 @@ public class AlarmController {
 		return mav;
 	}
 
+	/** Get alarmer datasets by ajax. */
 	@RequestMapping(value = "/alarm/list/table/ajax", method = RequestMethod.GET)
 	public void alarmTopicListAjax(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -143,9 +157,6 @@ public class AlarmController {
 		response.setHeader("Charset", "utf-8");
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
-
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
 		String aoData = request.getParameter("aoData");
 		JSONArray jsonArray = JSON.parseArray(aoData);
@@ -213,6 +224,7 @@ public class AlarmController {
 		}
 	}
 
+	/** Delete alarmer. */
 	@RequestMapping(value = "/alarm/{group}/{topic}/del", method = RequestMethod.GET)
 	public ModelAndView alarmDelete(@PathVariable("group") String group, @PathVariable("topic") String topic) {
 		AlarmService.delete(group, topic);

@@ -15,41 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.util;
 
 /**
- * Definition Kafka broker information.
+ * Test ZKPoolUtils clazz
  * 
  * @author smartloli.
  *
- *         Created by Aug 15, 2016
+ *         Created by Jan 16, 2017
  */
-public class KafkaBrokerDomain {
-
-	private String host;
-	private int port;
-
-	public String getHost() {
-		return host;
+public class TestZKPoolUtils {
+	public static void main(String[] args) {
+		
 	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
-	}
-
 }

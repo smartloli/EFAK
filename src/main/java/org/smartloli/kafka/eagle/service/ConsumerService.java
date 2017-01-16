@@ -47,15 +47,19 @@ import org.smartloli.kafka.eagle.util.LRUCacheUtils;
  */
 public class ConsumerService {
 
-	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
 	private final static Logger LOG = LoggerFactory.getLogger(ConsumerService.class);
 
+	/** Cache to the specified map collection to prevent frequent refresh. */
+	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
+
+	/** Get active topic from kafka cluster. */
 	public static String getActiveTopic() {
 		JSONObject obj = new JSONObject();
 		obj.put("active", getActive());
 		return obj.toJSONString();
 	}
 
+	/** Storage offset in kafka or zookeeper. */
 	public static String getActiveTopic(String formatter) {
 		if ("kafka".equals(formatter)) {
 			return getKafkaActiveTopic();
@@ -64,12 +68,14 @@ public class ConsumerService {
 		}
 	}
 
+	/** Get active topic from kafka cluster & storage offset in kafka topic. */
 	private static String getKafkaActiveTopic() {
 		JSONObject obj = new JSONObject();
 		obj.put("active", getKafkaActive());
 		return obj.toJSONString();
 	}
 
+	/** Get active grahp data & storage offset in kafka topic. */
 	private static Object getKafkaActive() {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
@@ -105,12 +111,7 @@ public class ConsumerService {
 		return obj.toJSONString();
 	}
 
-	/**
-	 * List the name of the topic in the consumer and whether the topic is
-	 * consuming.
-	 * 
-	 * @return
-	 */
+	/** List the name of the topic in the consumer detail information. */
 	public static String getConsumerDetail(String group, String ip) {
 		String key = group + "_consumer_detail_" + ip;
 		String ret = "";
@@ -147,6 +148,7 @@ public class ConsumerService {
 		return ret;
 	}
 
+	/** Judge consumer storage offset in kafka or zookeeper. */
 	public static String getConsumerDetail(String formatter, String group, String ip) {
 		if ("kafka".equals(formatter)) {
 			return getKafkaConsumerDetail(group, ip);
@@ -155,6 +157,7 @@ public class ConsumerService {
 		}
 	}
 
+	/** Get consumer detail from kafka topic. */
 	public static String getKafkaConsumerDetail(String group, String ip) {
 		String key = group + "_kafka_consumer_detail_" + ip;
 		String ret = "";
@@ -193,6 +196,7 @@ public class ConsumerService {
 		return ret;
 	}
 
+	/** Get consumers from zookeeper. */
 	public static String getConsumer(ConsumerPageDomain page) {
 		Map<String, List<String>> map = KafkaClusterUtils.getConsumers(page);
 		List<ConsumerDomain> list = new ArrayList<ConsumerDomain>();
@@ -209,6 +213,7 @@ public class ConsumerService {
 		return list.toString();
 	}
 
+	/** Judge consumers storage offset in kafka or zookeeper. */
 	public static String getConsumer(String formatter, ConsumerPageDomain page) {
 		if ("kafka".equals(formatter)) {
 			return getKafkaConsumer(page);
@@ -217,6 +222,7 @@ public class ConsumerService {
 		}
 	}
 
+	/** Get consumer size from kafka topic. */
 	public static int getConsumerCount(String formatter) {
 		if ("kafka".equals(formatter)) {
 			Map<String, List<String>> map = new HashMap<>();
@@ -233,6 +239,7 @@ public class ConsumerService {
 		}
 	}
 
+	/** Get kafka consumer & storage offset in kafka topic. */
 	private static String getKafkaConsumer(ConsumerPageDomain page) {
 		List<ConsumerDomain> list = new ArrayList<ConsumerDomain>();
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
@@ -251,6 +258,7 @@ public class ConsumerService {
 		return list.toString();
 	}
 
+	/** Get kafka active number & storage offset in kafka topic. */
 	private static int getKafkaActiveNumber(String group, List<String> topics) {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
@@ -265,6 +273,7 @@ public class ConsumerService {
 		return sum;
 	}
 
+	/** Get kafka active number & storage offset in zookeeper. */
 	public static int getActiveNumber(String group, List<String> topics) {
 		Map<String, List<String>> kafka = KafkaClusterUtils.getActiveTopic();
 		int sum = 0;
@@ -276,6 +285,7 @@ public class ConsumerService {
 		return sum;
 	}
 
+	/** Get consumer number from zookeeper. */
 	public static int getConsumerNumbers() {
 		Map<String, List<String>> map = KafkaClusterUtils.getConsumers();
 		int count = 0;
@@ -285,6 +295,7 @@ public class ConsumerService {
 		return count;
 	}
 
+	/** Get consumer number from kafka topic. */
 	public static int getKafkaConsumerNumbers() {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
@@ -296,6 +307,7 @@ public class ConsumerService {
 		return count;
 	}
 
+	/** Get active graph from zookeeper. */
 	private static String getActive() {
 		Map<String, List<String>> kafka = KafkaClusterUtils.getActiveTopic();
 		JSONObject obj = new JSONObject();

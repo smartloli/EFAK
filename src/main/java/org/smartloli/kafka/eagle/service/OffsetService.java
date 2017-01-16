@@ -32,7 +32,7 @@ import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.util.CalendarUtils;
-import org.smartloli.kafka.eagle.util.DBZKDataUtils;
+import org.smartloli.kafka.eagle.util.ZKDataUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
 
@@ -206,7 +206,7 @@ public class OffsetService {
 	}
 
 	public static String getOffsetsGraph(String group, String topic) {
-		String ret = DBZKDataUtils.getOffsets(group, topic);
+		String ret = ZKDataUtils.getOffsets(group, topic);
 		if (ret.length() > 0) {
 			ret = JSON.parseObject(ret).getString("data");
 		}

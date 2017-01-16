@@ -20,6 +20,13 @@ package org.smartloli.kafka.eagle.domain;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
+/**
+ * Definition email sa information.
+ * 
+ * @author smartloli.
+ * 
+ *         Created by Aug 15, 2016
+ */
 public class SaAuthenticatorDomain extends Authenticator {
 	String userName = null;
 	String password = null;

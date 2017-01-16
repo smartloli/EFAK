@@ -25,22 +25,38 @@ import com.alibaba.fastjson.JSON;
 import kafka.admin.TopicCommand;
 
 /**
+ * Kafka command tool clazz.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 15, 2016
  */
 public class KafkaCommandUtils {
 
+	/** Use command list kafka all topic. */
 	public static void list() {
 		String[] options = new String[] { "--list", "--zookeeper", "master:2181" };
 		TopicCommand.main(options);
 	}
 
+	/** Describe some topic information from kafka. */
 	public static void describe() {
-		String[] options = new String[] { "--describe", "--zookeeper", "dn1:2181,dn2:2181,dn3:2181", "--topic=boyaa_mf_test12345" };
+		String[] options = new String[] { "--describe", "--zookeeper", "dn1:2181,dn2:2181,dn3:2181", "--topic=ke_test12345" };
 		TopicCommand.main(options);
 	}
 
+	/**
+	 * Create topic to kafka cluster, it is worth noting that the backup number
+	 * must be less than or equal to brokers data.
+	 * 
+	 * @param topicName
+	 *            Create topic name.
+	 * @param partitions
+	 *            Create topic partitions.
+	 * @param replic
+	 *            Replic numbers.
+	 * @return Map.
+	 */
 	public static Map<String, Object> create(String topicName, String partitions, String replic) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		int brokers = JSON.parseArray(KafkaClusterUtils.getAllBrokersInfo()).size();
@@ -55,10 +71,6 @@ public class KafkaCommandUtils {
 		map.put("status", "success");
 		map.put("info", "Create topic[" + topicName + "] has successed,partitions numbers is [" + partitions + "],replication-factor numbers is [" + replic + "]");
 		return map;
-	}
-
-	public static void main(String[] args) {
-		describe();
 	}
 
 }

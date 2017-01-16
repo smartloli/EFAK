@@ -55,11 +55,15 @@ public class KafkaOffsetGetter extends Thread {
 
 	private final static Logger LOG = LoggerFactory.getLogger(KafkaOffsetGetter.class);
 
+	/** Consumer offsets in kafka topic. */
 	private final static String consumerOffsetTopic = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
+	/** Store consumer offset in memory. */
 	protected static Map<GroupTopicPartition, OffsetAndMetadata> offsetMap = new ConcurrentHashMap<>();
+	/** Store active consumer in memory. */
 	protected static Map<String, Boolean> activeMap = new ConcurrentHashMap<>();
 
-	// massive code stealing from kafka.server.OffsetManager
+	/** ============================ Start Filter ========================= */
+	/** massive code stealing from kafka.server.OffsetManager */
 	private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));
 	private static Field KEY_GROUP_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("group");
 	private static Field KEY_TOPIC_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("topic");
@@ -79,7 +83,9 @@ public class KafkaOffsetGetter extends Thread {
 	private static Field VALUE_COMMIT_TIMESTAMP_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("commit_timestamp");
 	// private static Field VALUE_EXPIRE_TIMESTAMP_FIELD_V1 =
 	// OFFSET_COMMIT_VALUE_SCHEMA_V1.get("expire_timestamp");
+	/** ============================ End Filter ========================= */
 
+	/** Kafka offset memory in schema. */
 	@SuppressWarnings("serial")
 	private static Map<Integer, KeyAndValueSchemasDomain> OFFSET_SCHEMAS = new HashMap<Integer, KeyAndValueSchemasDomain>() {
 		{
@@ -95,6 +101,7 @@ public class KafkaOffsetGetter extends Thread {
 		}
 	};
 
+	/** Listening offset thread method. */
 	private static synchronized void startOffsetListener(ConsumerConnector consumerConnector) {
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
 		topicCountMap.put(consumerOffsetTopic, new Integer(1));
@@ -118,10 +125,12 @@ public class KafkaOffsetGetter extends Thread {
 		}
 	}
 
+	/** Get instance K&V schema. */
 	private static KeyAndValueSchemasDomain schemaFor(int version) {
 		return OFFSET_SCHEMAS.get(version);
 	}
 
+	/** Analysis of Kafka data in topic in buffer. */
 	private static GroupTopicPartition readMessageKey(ByteBuffer buffer) {
 		short version = buffer.getShort();
 		Schema keySchema = schemaFor(version).getKeySchema();
@@ -132,6 +141,7 @@ public class KafkaOffsetGetter extends Thread {
 		return new GroupTopicPartition(group, new TopicAndPartition(topic, partition));
 	}
 
+	/** Analysis of buffer data in metadata in Kafka. */
 	private static OffsetAndMetadata readMessageValue(ByteBuffer buffer) {
 		MessageValueStructAndVersionDomain structAndVersion = readMessageValueStruct(buffer);
 		if (structAndVersion.getValue() == null) {
@@ -153,6 +163,7 @@ public class KafkaOffsetGetter extends Thread {
 		}
 	}
 
+	/** Analysis of struct data structure in metadata in Kafka. */
 	private static MessageValueStructAndVersionDomain readMessageValueStruct(ByteBuffer buffer) {
 		MessageValueStructAndVersionDomain mvs = new MessageValueStructAndVersionDomain();
 		if (buffer == null) {
@@ -174,10 +185,12 @@ public class KafkaOffsetGetter extends Thread {
 		kafka.start();
 	}
 
+	/** Instance KafkaOffsetGetter clazz. */
 	public static void getInstance() {
 		LOG.info(KafkaOffsetGetter.class.getName());
 	}
 
+	/** Run method for running thread. */
 	@Override
 	public void run() {
 		String zk = SystemConfigUtils.getProperty("kafka.zk.list");
@@ -188,19 +201,4 @@ public class KafkaOffsetGetter extends Thread {
 		ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
 		startOffsetListener(consumer);
 	}
-
-	public static void main(String[] args) {
-		Properties props = new Properties();
-		props.put("group.id", "group10");
-		props.put("zookeeper.connect", "slave01:2181");
-		// props.put("zookeeper.session.timeout.ms", "40000");
-		// props.put("zookeeper.sync.time.ms", "200");
-		// props.put("auto.commit.interval.ms", "1000");
-		// props.put("auto.offset.reset", "smallest");
-		// props.put("fetch.message.max.bytes", "10485760");
-		props.put("exclude.internal.topics", "false");
-		ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
-		startOffsetListener(consumer);
-	}
-
 }

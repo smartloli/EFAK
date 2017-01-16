@@ -33,20 +33,20 @@ import org.slf4j.LoggerFactory;
  *         Created by Aug 14, 2016
  */
 public final class ZKPoolUtils {
-	private final static Logger LOG = LoggerFactory
-			.getLogger(ZKPoolUtils.class);
+	private final static Logger LOG = LoggerFactory.getLogger(ZKPoolUtils.class);
 	private String zkInfo = SystemConfigUtils.getProperty("kafka.zk.list");;
 
 	private Vector<ZkClient> pool;
 	private Vector<ZkClient> poolZKSerializer;
-	private int poolSize = SystemConfigUtils
-			.getIntProperty("kafka.zk.limit.size");
+	private int poolSize = SystemConfigUtils.getIntProperty("kafka.zk.limit.size");
 	private static ZKPoolUtils instance = null;
 
+	/** Construction method. */
 	private ZKPoolUtils() {
 		initZKPoolUtils();
 	}
 
+	/** Initialization ZkClient pool size. */
 	private void initZKPoolUtils() {
 		LOG.info("Initialization ZkClient pool size [" + poolSize + "]");
 		pool = new Vector<ZkClient>(poolSize);
@@ -55,9 +55,7 @@ public final class ZKPoolUtils {
 		addZkSerializerClient();
 	}
 
-	/**
-	 * Init ZkClient pool numbers
-	 */
+	/** Init ZkClient pool numbers. */
 	private void addZkClient() {
 		ZkClient zkc = null;
 		for (int i = 0; i < poolSize; i++) {
@@ -70,12 +68,12 @@ public final class ZKPoolUtils {
 		}
 	}
 
+	/** Add serializer zkclient. */
 	private void addZkSerializerClient() {
 		ZkClient zkSerializer = null;
 		for (int i = 0; i < poolSize; i++) {
 			try {
-				zkSerializer = new ZkClient(zkInfo, Integer.MAX_VALUE, 100000,
-						ZKStringSerializer$.MODULE$);
+				zkSerializer = new ZkClient(zkInfo, Integer.MAX_VALUE, 100000, ZKStringSerializer$.MODULE$);
 				poolZKSerializer.add(zkSerializer);
 			} catch (Exception ex) {
 				LOG.error(ex.getMessage());
@@ -83,45 +81,33 @@ public final class ZKPoolUtils {
 		}
 	}
 
-	/**
-	 * Release ZkClient Serializer object
-	 * 
-	 * @param zkc
-	 */
+	/** Release ZkClient Serializer object. */
 	public synchronized void releaseZKSerializer(ZkClient zkc) {
 		if (poolZKSerializer.size() < 25) {
 			poolZKSerializer.add(zkc);
 		}
 		String osName = System.getProperties().getProperty("os.name");
 		if (osName.contains("Linux")) {
-			LOG.debug("release poolZKSerializer,and available size ["
-					+ poolZKSerializer.size() + "]");
+			LOG.debug("Release poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
 		} else {
-			LOG.info("release poolZKSerializer,and available size ["
-					+ poolZKSerializer.size() + "]");
+			LOG.info("Release poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
 		}
 	}
 
-	/**
-	 * Release ZkClient object
-	 * 
-	 * @param zkc
-	 */
+	/** Release ZkClient object. */
 	public synchronized void release(ZkClient zkc) {
 		if (pool.size() < 25) {
 			pool.add(zkc);
 		}
 		String osName = System.getProperties().getProperty("os.name");
 		if (osName.contains("Linux")) {
-			LOG.debug("release pool,and available size [" + pool.size() + "]");
+			LOG.debug("Release pool,and available size [" + pool.size() + "]");
 		} else {
-			LOG.info("release pool,and available size [" + pool.size() + "]");
+			LOG.info("Release pool,and available size [" + pool.size() + "]");
 		}
 	}
 
-	/**
-	 * Close ZkClient pool
-	 */
+	/** Close ZkClient pool. */
 	public synchronized void closePool() {
 		if (pool != null && pool.size() > 0) {
 			for (int i = 0; i < pool.size(); i++) {
@@ -149,11 +135,7 @@ public final class ZKPoolUtils {
 		instance = null;
 	}
 
-	/**
-	 * Reback pool one of ZkClient object
-	 * 
-	 * @return
-	 */
+	/** Reback pool one of ZkClient object. */
 	public synchronized ZkClient getZkClient() {
 		ZkClient zkc = null;
 		try {
@@ -162,11 +144,9 @@ public final class ZKPoolUtils {
 				pool.remove(0);
 				String osName = System.getProperties().getProperty("os.name");
 				if (osName.contains("Linux")) {
-					LOG.debug("get pool,and available size [" + pool.size()
-							+ "]");
+					LOG.debug("Get pool,and available size [" + pool.size() + "]");
 				} else {
-					LOG.info("get pool,and available size [" + pool.size()
-							+ "]");
+					LOG.info("Get pool,and available size [" + pool.size() + "]");
 				}
 			} else {
 				addZkClient();
@@ -174,11 +154,9 @@ public final class ZKPoolUtils {
 				pool.remove(0);
 				String osName = System.getProperties().getProperty("os.name");
 				if (osName.contains("Linux")) {
-					LOG.debug("get pool,and available size [" + pool.size()
-							+ "]");
+					LOG.debug("Get pool,and available size [" + pool.size() + "]");
 				} else {
-					LOG.warn("get pool,and available size [" + pool.size()
-							+ "]");
+					LOG.warn("Get pool,and available size [" + pool.size() + "]");
 				}
 			}
 		} catch (Exception e) {
@@ -187,17 +165,16 @@ public final class ZKPoolUtils {
 		return zkc;
 	}
 
+	/** Get zk client by serializer. */
 	public synchronized ZkClient getZkClientSerializer() {
 		if (poolZKSerializer.size() > 0) {
 			ZkClient zkc = poolZKSerializer.get(0);
 			poolZKSerializer.remove(0);
 			String osName = System.getProperties().getProperty("os.name");
 			if (osName.contains("Linux")) {
-				LOG.debug("get poolZKSerializer,and available size ["
-						+ poolZKSerializer.size() + "]");
+				LOG.debug("Get poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
 			} else {
-				LOG.info("get poolZKSerializer,and available size ["
-						+ poolZKSerializer.size() + "]");
+				LOG.info("Get poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
 			}
 			return zkc;
 		} else {
@@ -206,21 +183,15 @@ public final class ZKPoolUtils {
 			poolZKSerializer.remove(0);
 			String osName = System.getProperties().getProperty("os.name");
 			if (osName.contains("Linux")) {
-				LOG.debug("get poolZKSerializer,and available size ["
-						+ poolZKSerializer.size() + "]");
+				LOG.debug("get poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
 			} else {
-				LOG.warn("get poolZKSerializer,and available size ["
-						+ poolZKSerializer.size() + "]");
+				LOG.warn("get poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
 			}
 			return zkc;
 		}
 	}
 
-	/**
-	 * Single model get ZkClient object
-	 * 
-	 * @return
-	 */
+	/** Single model get ZkClient object. */
 	public synchronized static ZKPoolUtils getInstance() {
 		if (instance == null) {
 			instance = new ZKPoolUtils();

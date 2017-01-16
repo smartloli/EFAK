@@ -35,11 +35,11 @@ import com.google.gson.Gson;
 
 import org.smartloli.kafka.eagle.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
-import org.smartloli.kafka.eagle.domain.OffsetsSQLiteDomain;
+import org.smartloli.kafka.eagle.domain.OffsetsLiteDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.service.OffsetService;
-import org.smartloli.kafka.eagle.util.DBZKDataUtils;
+import org.smartloli.kafka.eagle.util.ZKDataUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
 import org.smartloli.kafka.eagle.util.SendMessageUtils;
@@ -53,8 +53,11 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
  *         Created by Aug 18, 2016
  */
 public class OffsetsQuartz {
-	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
+
 	private static Logger LOG = LoggerFactory.getLogger(OffsetsQuartz.class);
+
+	/** Cache to the specified map collection to prevent frequent refresh. */
+	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
 
 	@Deprecated
 	public void cleanHistoryData() {
@@ -67,10 +70,11 @@ public class OffsetsQuartz {
 		return df.format(new Date());
 	}
 
+	/** Perform offset statistical tasks on time. */
 	public void jobQuartz() {
 		try {
 			List<String> hosts = getBrokers();
-			List<OffsetsSQLiteDomain> list = new ArrayList<OffsetsSQLiteDomain>();
+			List<OffsetsLiteDomain> list = new ArrayList<OffsetsLiteDomain>();
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 			Map<String, List<String>> consumers = null;
 			if ("kafka".equals(formatter)) {
@@ -84,7 +88,7 @@ public class OffsetsQuartz {
 			for (Entry<String, List<String>> entry : consumers.entrySet()) {
 				String group = entry.getKey();
 				for (String topic : entry.getValue()) {
-					OffsetsSQLiteDomain offsetSQLite = new OffsetsSQLiteDomain();
+					OffsetsLiteDomain offsetSQLite = new OffsetsLiteDomain();
 					for (String partitionStr : KafkaClusterUtils.findTopicPartition(topic)) {
 						int partition = Integer.parseInt(partitionStr);
 						long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partition);
@@ -109,12 +113,12 @@ public class OffsetsQuartz {
 					list.add(offsetSQLite);
 				}
 			}
-			DBZKDataUtils.insert(list);
+			ZKDataUtils.insert(list);
 			boolean alarmEnable = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
 			if (alarmEnable) {
 				List<AlarmDomain> listAlarm = alarmConfigure();
 				for (AlarmDomain alarm : listAlarm) {
-					for (OffsetsSQLiteDomain offset : list) {
+					for (OffsetsLiteDomain offset : list) {
 						if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
 							try {
 								SendMessageUtils.send(alarm.getOwners(), "Alarm Lag",
@@ -131,6 +135,7 @@ public class OffsetsQuartz {
 		}
 	}
 
+	/** Get kafka brokers. */
 	private static List<String> getBrokers() {
 		// Add LRUCache per 3 min
 		String key = "group_topic_offset_graph_consumer_brokers";
@@ -160,8 +165,9 @@ public class OffsetsQuartz {
 		return list;
 	}
 
+	/** Get alarmer configure. */
 	private static List<AlarmDomain> alarmConfigure() {
-		String ret = DBZKDataUtils.getAlarm();
+		String ret = ZKDataUtils.getAlarm();
 		List<AlarmDomain> list = new ArrayList<>();
 		JSONArray array = JSON.parseArray(ret);
 		for (Object object : array) {
@@ -174,10 +180,5 @@ public class OffsetsQuartz {
 			list.add(alarm);
 		}
 		return list;
-	}
-
-	public static void main(String[] args) {
-		OffsetsQuartz offsets = new OffsetsQuartz();
-		offsets.jobQuartz();
 	}
 }

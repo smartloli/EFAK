@@ -22,12 +22,15 @@ import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.ZKCliUtils;
 
 /**
+ * Kafka & Zookeeper service to oprate related cluster.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 12, 2016
  */
 public class ClusterService {
 
+	/** Get kafka & zookeeper cluster information. */
 	public static String getCluster() {
 		String zk = KafkaClusterUtils.getZkInfo();
 		String kafka = KafkaClusterUtils.getAllBrokersInfo();
@@ -37,10 +40,12 @@ public class ClusterService {
 		return obj.toJSONString();
 	}
 
+	/** Get zookeeper whether live. */
 	public static JSONObject zkCliIsLive() {
 		return KafkaClusterUtils.zkCliIsLive();
 	}
 
+	/** Get zookeeper menu. */
 	public static String getZKMenu(String cmd, String type) {
 		String ret = "";
 		if ("ls".equals(type)) {
@@ -61,6 +66,7 @@ public class ClusterService {
 		return ret;
 	}
 
+	/** Delete zookeeper metadata & use command. */
 	private static Object delete(String cmd) {
 		String ret = "";
 		String[] len = cmd.replaceAll(" ", "").split("delete");
@@ -73,6 +79,7 @@ public class ClusterService {
 		return ret;
 	}
 
+	/** Get command & obtain information from zookeeper. */
 	private static Object get(String cmd) {
 		String ret = "";
 		String[] len = cmd.replaceAll(" ", "").split("get");
@@ -85,6 +92,7 @@ public class ClusterService {
 		return ret;
 	}
 
+	/** Zookeeper ls command to list information. */
 	private static String ls(String cmd) {
 		String ret = "";
 		String[] len = cmd.replaceAll(" ", "").split("ls");

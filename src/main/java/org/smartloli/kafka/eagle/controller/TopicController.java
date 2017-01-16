@@ -39,11 +39,19 @@ import org.smartloli.kafka.eagle.service.TopicService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 import org.smartloli.kafka.eagle.util.KafkaCommandUtils;
 
+/**
+ * Kafka topic controller to viewer data.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Sep 6, 2016
+ */
 @Controller
 public class TopicController {
 
 	private final static Logger LOG = LoggerFactory.getLogger(TopicController.class);
 
+	/** Topic create viewer. */
 	@RequestMapping(value = "/topic/create", method = RequestMethod.GET)
 	public ModelAndView topicCreateView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -51,6 +59,7 @@ public class TopicController {
 		return mav;
 	}
 
+	/** Topic list viewer. */
 	@RequestMapping(value = "/topic/list", method = RequestMethod.GET)
 	public ModelAndView topicListView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -58,6 +67,7 @@ public class TopicController {
 		return mav;
 	}
 
+	/** Topic metadata viewer. */
 	@RequestMapping(value = "/topic/meta/{tname}/", method = RequestMethod.GET)
 	public ModelAndView topicMetaView(@PathVariable("tname") String tname, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
@@ -73,6 +83,7 @@ public class TopicController {
 		return mav;
 	}
 
+	/** Create topic success viewer. */
 	@RequestMapping(value = "/topic/create/success", method = RequestMethod.GET)
 	public ModelAndView successView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -80,6 +91,7 @@ public class TopicController {
 		return mav;
 	}
 
+	/** Create topic failed viewer. */
 	@RequestMapping(value = "/topic/create/failed", method = RequestMethod.GET)
 	public ModelAndView failedView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -87,6 +99,7 @@ public class TopicController {
 		return mav;
 	}
 
+	/** Get topic metadata by ajax. */
 	@RequestMapping(value = "/topic/meta/{tname}/ajax", method = RequestMethod.GET)
 	public void topicMetaAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -148,6 +161,7 @@ public class TopicController {
 		}
 	}
 
+	/** Get topic datasets by ajax. */
 	@RequestMapping(value = "/topic/list/table/ajax", method = RequestMethod.GET)
 	public void topicListAjax(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -155,9 +169,6 @@ public class TopicController {
 		response.setHeader("Charset", "utf-8");
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
-
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
 		String aoData = request.getParameter("aoData");
 		JSONArray jsonArray = JSON.parseArray(aoData);
@@ -223,6 +234,7 @@ public class TopicController {
 		}
 	}
 
+	/** Create topic form. */
 	@RequestMapping(value = "/topic/create/form", method = RequestMethod.POST)
 	public ModelAndView topicAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();

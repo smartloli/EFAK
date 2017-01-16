@@ -20,7 +20,7 @@ package org.smartloli.kafka.eagle.domain.offsets;
 import com.google.gson.Gson;
 
 /**
- * TODO
+ * Default topic & group tuple.
  * 
  * @author smartloli.
  *

@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.domain;
 import com.google.gson.Gson;
 
 /**
+ * Definition alarmer information.
+ * 
  * @author smartloli.
  *
  *         Created by Sep 7, 2016

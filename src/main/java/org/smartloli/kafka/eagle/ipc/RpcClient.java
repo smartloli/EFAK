@@ -37,13 +37,12 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 public class RpcClient {
 
 	private final static Logger LOG = LoggerFactory.getLogger(RpcClient.class);
+	/** Rpc client port. */
 	private final static int PORT = SystemConfigUtils.getIntProperty("kafka.eagle.offset.rpc.port");
+	/** Rpc server address. */
 	private final static String ADDR = "127.0.0.1";
 
-	public static void main(String[] args) {
-		System.out.println(getConsumer());
-	}
-
+	/** Get consumer offset from Rpc server. */
 	public static String getOffset() {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
@@ -60,6 +59,7 @@ public class RpcClient {
 		return ret;
 	}
 
+	/** Get activer consumer data from Rpc server. */
 	public static String getActiverConsumer() {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
@@ -76,6 +76,7 @@ public class RpcClient {
 		return ret;
 	}
 
+	/** Get consumer data from Rpc server. */
 	public static String getConsumer() {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
@@ -92,6 +93,7 @@ public class RpcClient {
 		return ret;
 	}
 
+	/** Get consumer page from Rpc server. */
 	public static String getConsumerPage(ConsumerPageDomain page) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);

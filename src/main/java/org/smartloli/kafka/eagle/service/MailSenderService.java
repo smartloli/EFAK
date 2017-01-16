@@ -35,8 +35,16 @@ import javax.mail.internet.MimeMultipart;
 import org.smartloli.kafka.eagle.domain.MailSenderDomain;
 import org.smartloli.kafka.eagle.domain.SaAuthenticatorDomain;
 
+/**
+ * Sender email service api.
+ * 
+ * @author smartloli.
+ * 
+ *         Created by Aug 15, 2016
+ */
 public class MailSenderService {
 
+	/** Send mail as text. */
 	public boolean sendTextMail(MailSenderDomain mailInfo) {
 		SaAuthenticatorDomain authenticator = null;
 		Properties pro = mailInfo.getProperties();
@@ -62,9 +70,7 @@ public class MailSenderService {
 		return false;
 	}
 
-	/**
-	 * Send mail as html 
-	 */
+	/** Send mail as html. */
 	public boolean sendHtmlMail(MailSenderDomain mailInfo) {
 		SaAuthenticatorDomain authenticator = null;
 		Properties pro = mailInfo.getProperties();

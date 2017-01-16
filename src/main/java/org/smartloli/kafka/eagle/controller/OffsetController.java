@@ -38,17 +38,25 @@ import org.smartloli.kafka.eagle.service.OffsetService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
+/**
+ * Kafka offset controller to viewer data.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Sep 6, 2016
+ */
 @Controller
 public class OffsetController {
 
 	private final static Logger LOG = LoggerFactory.getLogger(OffsetController.class);
 
+	/** Consumer viewer. */
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/", method = RequestMethod.GET)
 	public ModelAndView consumersActiveView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
 		ModelAndView mav = new ModelAndView();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if (OffsetService.isGroupTopic(formatter,group, topic, ip)) {
+		if (OffsetService.isGroupTopic(formatter, group, topic, ip)) {
 			mav.setViewName("/consumers/offset_consumers");
 		} else {
 			mav.setViewName("/error/404");
@@ -56,12 +64,13 @@ public class OffsetController {
 		return mav;
 	}
 
+	/** Get real-time offset data from Kafka by ajax. */
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/realtime", method = RequestMethod.GET)
 	public ModelAndView offsetRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
 		ModelAndView mav = new ModelAndView();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if (OffsetService.isGroupTopic(formatter,group, topic, ip)) {
+		if (OffsetService.isGroupTopic(formatter, group, topic, ip)) {
 			mav.setViewName("/consumers/offset_realtime");
 		} else {
 			mav.setViewName("/error/404");
@@ -69,6 +78,7 @@ public class OffsetController {
 		return mav;
 	}
 
+	/** Get detail offset from Kafka by ajax. */
 	@RequestMapping(value = "/consumer/offset/{group}/{topic}/ajax", method = RequestMethod.GET)
 	public void offsetDetailAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -95,7 +105,7 @@ public class OffsetController {
 		}
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray ret = JSON.parseArray(OffsetService.getLogSize(formatter,topic, group, ip));
+		JSONArray ret = JSON.parseArray(OffsetService.getLogSize(formatter, topic, group, ip));
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {
@@ -140,6 +150,7 @@ public class OffsetController {
 		}
 	}
 
+	/** Get real-time offset graph data from Kafka by ajax. */
 	@RequestMapping(value = "/consumer/offset/{group}/{topic}/realtime/ajax", method = RequestMethod.GET)
 	public void offsetGraphAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
@@ -147,9 +158,6 @@ public class OffsetController {
 		response.setHeader("Charset", "utf-8");
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
-
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
 		try {
 			byte[] output = GzipUtils.compressToByte(OffsetService.getOffsetsGraph(group, topic));

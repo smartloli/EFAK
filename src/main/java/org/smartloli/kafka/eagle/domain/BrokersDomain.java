@@ -20,10 +20,11 @@ package org.smartloli.kafka.eagle.domain;
 import com.google.gson.Gson;
 
 /**
+ * Definition Kafka brokers information.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 17, 2016
- *
  */
 public class BrokersDomain {
 

@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.domain;
 import com.google.gson.Gson;
 
 /**
+ * Definition memory tuple information.
+ * 
  * @author smartloli.
  *
  *         Created by May 5, 2016

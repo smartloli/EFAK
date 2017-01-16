@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.domain;
 import com.google.gson.Gson;
 
 /**
+ * Definition Kafka metadata information.
+ * 
  * @author smartloli.
  *
  *         Created by Aug 15, 2016
