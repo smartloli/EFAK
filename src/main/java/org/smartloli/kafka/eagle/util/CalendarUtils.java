@@ -84,9 +84,4 @@ public class CalendarUtils {
 		return df.format(new Date());
 	}
 
-	/** Gets the current time stamp. */
-	public static long getTime() {
-		return new Date().getTime();
-	}
-
 }

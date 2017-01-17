@@ -63,7 +63,7 @@ public class KafkaOffsetGetter extends Thread {
 	protected static Map<String, Boolean> activeMap = new ConcurrentHashMap<>();
 
 	/** ============================ Start Filter ========================= */
-	/** massive code stealing from kafka.server.OffsetManager */
+	/** Massive code stealing from kafka.server.OffsetManager */
 	private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));
 	private static Field KEY_GROUP_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("group");
 	private static Field KEY_TOPIC_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("topic");
@@ -81,8 +81,6 @@ public class KafkaOffsetGetter extends Thread {
 	private static Field VALUE_OFFSET_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("offset");
 	private static Field VALUE_METADATA_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("metadata");
 	private static Field VALUE_COMMIT_TIMESTAMP_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("commit_timestamp");
-	// private static Field VALUE_EXPIRE_TIMESTAMP_FIELD_V1 =
-	// OFFSET_COMMIT_VALUE_SCHEMA_V1.get("expire_timestamp");
 	/** ============================ End Filter ========================= */
 
 	/** Kafka offset memory in schema. */
