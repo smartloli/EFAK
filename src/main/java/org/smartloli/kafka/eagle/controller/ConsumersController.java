@@ -23,8 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +49,9 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 @Controller
 public class ConsumersController {
 
-	private final static Logger LOG = LoggerFactory.getLogger(ConsumersController.class);
+	/** Kafka consumer service interface. */
+	@Autowired
+	private ConsumerService consumerService;
 
 	/** Consumer viewer. */
 	@RequestMapping(value = "/consumers", method = RequestMethod.GET)
@@ -71,7 +72,7 @@ public class ConsumersController {
 
 		try {
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-			byte[] output = GzipUtils.compressToByte(ConsumerService.getActiveTopic(formatter));
+			byte[] output = GzipUtils.compressToByte(consumerService.getActiveTopic(formatter));
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -115,8 +116,8 @@ public class ConsumersController {
 		page.setiDisplayStart(iDisplayStart);
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		int count = ConsumerService.getConsumerCount(formatter);
-		JSONArray ret = JSON.parseArray(ConsumerService.getConsumer(formatter, page));
+		int count = consumerService.getConsumerCount(formatter);
+		JSONArray ret = JSON.parseArray(consumerService.getConsumer(formatter, page));
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {
 			JSONObject tmp2 = (JSONObject) tmp;
@@ -161,9 +162,6 @@ public class ConsumersController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
-
 		String aoData = request.getParameter("aoData");
 		JSONArray jsonArray = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -179,7 +177,7 @@ public class ConsumersController {
 		}
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray ret = JSON.parseArray(ConsumerService.getConsumerDetail(formatter, group, ip));
+		JSONArray ret = JSON.parseArray(consumerService.getConsumerDetail(formatter, group));
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {

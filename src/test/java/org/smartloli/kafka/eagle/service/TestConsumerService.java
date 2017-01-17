@@ -27,7 +27,7 @@ package org.smartloli.kafka.eagle.service;
 public class TestConsumerService {
 
 	public static void main(String[] args) {
-		System.out.println(ConsumerService.getActiveTopic());
+		System.out.println();
 	}
 	
 }

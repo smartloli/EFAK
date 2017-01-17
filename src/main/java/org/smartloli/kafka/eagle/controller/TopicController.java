@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
 import org.smartloli.kafka.eagle.service.TopicService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 import org.smartloli.kafka.eagle.util.KafkaCommandUtils;
@@ -50,6 +52,10 @@ import org.smartloli.kafka.eagle.util.KafkaCommandUtils;
 public class TopicController {
 
 	private final static Logger LOG = LoggerFactory.getLogger(TopicController.class);
+
+	/** Kafka topic service interface. */
+	@Autowired
+	private TopicService topicService;
 
 	/** Topic create viewer. */
 	@RequestMapping(value = "/topic/create", method = RequestMethod.GET)
@@ -74,7 +80,7 @@ public class TopicController {
 		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
 
 		ModelAndView mav = new ModelAndView();
-		if (TopicService.findTopicName(tname, ip)) {
+		if (topicService.hasTopic(tname, ip)) {
 			mav.setViewName("/topic/topic_meta");
 		} else {
 			mav.setViewName("/error/404");
@@ -108,9 +114,6 @@ public class TopicController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
-
 		String aoData = request.getParameter("aoData");
 		JSONArray jsonArray = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -125,7 +128,7 @@ public class TopicController {
 			}
 		}
 
-		String str = TopicService.topicMeta(tname, ip);
+		String str = topicService.metadata(tname);
 		JSONArray ret = JSON.parseArray(str);
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
@@ -187,7 +190,7 @@ public class TopicController {
 			}
 		}
 
-		JSONArray ret = JSON.parseArray(TopicService.list());
+		JSONArray ret = JSON.parseArray(topicService.list());
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {

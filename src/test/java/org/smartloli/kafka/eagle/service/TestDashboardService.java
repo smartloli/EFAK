@@ -27,7 +27,7 @@ package org.smartloli.kafka.eagle.service;
 public class TestDashboardService {
 
 	public static void main(String[] args) {
-		System.out.println(DashboardService.getDashboard());
+		System.out.println();
 	}
 	
 }

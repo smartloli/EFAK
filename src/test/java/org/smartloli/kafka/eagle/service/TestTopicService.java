@@ -27,7 +27,7 @@ package org.smartloli.kafka.eagle.service;
 public class TestTopicService {
 
 	public static void main(String[] args) {
-		System.out.println(TopicService.list());
+		System.out.println();
 	}
 	
 }

@@ -18,16 +18,16 @@
 package org.smartloli.kafka.eagle.service;
 
 /**
-* TODO
-* 
-* @author smartloli.
-*
-* Created by Jan 16, 2017
-*/
+ * Test TestAlarmService interface.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Jan 16, 2017
+ */
 public class TestAlarmService {
-	
+
 	public static void main(String[] args) {
-		System.out.println(AlarmService.list());
+		System.out.println();
 	}
 
 }

@@ -38,8 +38,8 @@ import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.domain.OffsetsLiteDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
-import org.smartloli.kafka.eagle.service.OffsetService;
 import org.smartloli.kafka.eagle.util.ZKDataUtils;
+import org.smartloli.kafka.eagle.util.CalendarUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
 import org.smartloli.kafka.eagle.util.SendMessageUtils;
@@ -94,7 +94,7 @@ public class OffsetsQuartz {
 						long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partition);
 						OffsetZkDomain offsetZk = null;
 						if ("kafka".equals(formatter)) {
-							offsetZk = OffsetService.getKafkaOffset(topic, group, partition);
+							offsetZk = getKafkaOffset(topic, group, partition);
 						} else {
 							offsetZk = KafkaClusterUtils.getOffset(topic, group, partition);
 						}
@@ -180,5 +180,26 @@ public class OffsetsQuartz {
 			list.add(alarm);
 		}
 		return list;
+	}
+	
+	private static OffsetZkDomain getKafkaOffset(String topic, String group, int partition) {
+		JSONArray array = JSON.parseArray(RpcClient.getOffset());
+		OffsetZkDomain offsetZk = new OffsetZkDomain();
+		for (Object obj : array) {
+			JSONObject object = (JSONObject) obj;
+			String _topic = object.getString("topic");
+			String _group = object.getString("group");
+			int _partition = object.getInteger("partition");
+			long timestamp = object.getLong("timestamp");
+			long offset = object.getLong("offset");
+			String owner = object.getString("owner");
+			if (topic.equals(_topic) && group.equals(_group) && partition == _partition) {
+				offsetZk.setOffset(offset);
+				offsetZk.setOwners(owner);
+				offsetZk.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
+				offsetZk.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
+			}
+		}
+		return offsetZk;
 	}
 }

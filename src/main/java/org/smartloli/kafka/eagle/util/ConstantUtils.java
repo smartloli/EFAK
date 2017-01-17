@@ -28,12 +28,12 @@ public class ConstantUtils {
 
 	/** D3 data plugin size. */
 	public interface D3 {
-		public static int SIZE = 40;
+		public final static int SIZE = 40;
 	}
 
 	/** Custom variable separator. */
 	public interface Separator {
-		public static String EIGHT = "________";
+		public final static String EIGHT = "________";
 	}
 
 	/** Kafka parameter setting. */

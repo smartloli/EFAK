@@ -23,11 +23,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-
 import org.smartloli.kafka.eagle.service.DashboardService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 
@@ -40,6 +40,10 @@ import org.smartloli.kafka.eagle.util.GzipUtils;
  */
 @Controller
 public class DashboardController {
+
+	/** Kafka Eagle dashboard data generator interface. */
+	@Autowired
+	private DashboardService dashboradService;
 
 	/** Index viewer. */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -59,7 +63,7 @@ public class DashboardController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		try {
-			byte[] output = GzipUtils.compressToByte(DashboardService.getDashboard());
+			byte[] output = GzipUtils.compressToByte(dashboradService.getDashboard());
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

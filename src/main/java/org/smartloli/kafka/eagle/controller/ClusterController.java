@@ -23,11 +23,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-
 import org.smartloli.kafka.eagle.service.ClusterService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 
@@ -41,6 +41,9 @@ import org.smartloli.kafka.eagle.util.GzipUtils;
 @Controller
 public class ClusterController {
 
+	@Autowired
+	private ClusterService clusterService;
+	
 	/** Cluster viewer. */
 	@RequestMapping(value = "/cluster/info", method = RequestMethod.GET)
 	public ModelAndView clusterView(HttpSession session) {
@@ -67,7 +70,7 @@ public class ClusterController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		try {
-			byte[] output = GzipUtils.compressToByte(ClusterService.getCluster());
+			byte[] output = GzipUtils.compressToByte(clusterService.get());
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -89,7 +92,7 @@ public class ClusterController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		try {
-			byte[] output = GzipUtils.compressToByte(ClusterService.zkCliIsLive().toJSONString());
+			byte[] output = GzipUtils.compressToByte(clusterService.status().toJSONString());
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -114,7 +117,7 @@ public class ClusterController {
 		String type = request.getParameter("type");
 
 		try {
-			byte[] output = GzipUtils.compressToByte(ClusterService.getZKMenu(cmd, type));
+			byte[] output = GzipUtils.compressToByte(clusterService.execute(cmd, type));
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

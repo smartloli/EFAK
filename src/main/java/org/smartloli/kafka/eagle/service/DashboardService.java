@@ -17,76 +17,16 @@
  */
 package org.smartloli.kafka.eagle.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import org.smartloli.kafka.eagle.domain.DashboardDomain;
-import org.smartloli.kafka.eagle.util.ConstantUtils;
-import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
-import org.smartloli.kafka.eagle.util.SystemConfigUtils;
-
 /**
- * Kafka Eagle dashboard data generator.
+ * Kafka Eagle dashboard data generator interface.
  * 
  * @author smartloli.
  *
- *         Created by Aug 12, 2016
+ *         Created by Jan 17, 2017
  */
-public class DashboardService {
+public interface DashboardService {
 
-	/** Get kafka & dashboard dataset. */
-	public static String getDashboard() {
-		JSONObject obj = new JSONObject();
-		obj.put("kafka", getKafka());
-		obj.put("dashboard", dashboard());
-
-		return obj.toJSONString();
-	}
-
-	/** Get dashboard data. */
-	private static String dashboard() {
-		int zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",").length;
-		String topicObject = KafkaClusterUtils.getAllPartitions();
-		int topics = JSON.parseArray(topicObject).size();
-		String kafkaObject = KafkaClusterUtils.getAllBrokersInfo();
-		int brokers = JSON.parseArray(kafkaObject).size();
-		DashboardDomain dash = new DashboardDomain();
-		dash.setBrokers(brokers);
-		dash.setTopics(topics);
-		dash.setZks(zks);
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if ("kafka".equals(formatter)) {
-			dash.setConsumers(ConsumerService.getKafkaConsumerNumbers());
-		} else {
-			dash.setConsumers(ConsumerService.getConsumerNumbers());
-		}
-		return dash.toString();
-	}
-
-	/** Get kafka data. */
-	private static String getKafka() {
-		String kafka = KafkaClusterUtils.getAllBrokersInfo();
-		JSONObject obj = new JSONObject();
-		obj.put("name", "Kafka Brokers");
-		JSONArray arr = JSON.parseArray(kafka);
-		JSONArray arr2 = new JSONArray();
-		int count = 0;
-		for (Object tmp : arr) {
-			JSONObject obj1 = (JSONObject) tmp;
-			if (count > ConstantUtils.D3.SIZE) {
-				JSONObject obj2 = new JSONObject();
-				obj2.put("name", "...");
-				arr2.add(obj2);
-				break;
-			} else {
-				JSONObject obj2 = new JSONObject();
-				obj2.put("name", obj1.getString("host") + ":" + obj1.getInteger("port"));
-				arr2.add(obj2);
-			}
-			count++;
-		}
-		obj.put("children", arr2);
-		return obj.toJSONString();
-	}
+	/** Get kafka & dashboard dataset interface. */
+	public String getDashboard();
 
 }

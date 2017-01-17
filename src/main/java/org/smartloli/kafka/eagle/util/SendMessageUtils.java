@@ -18,7 +18,7 @@
 package org.smartloli.kafka.eagle.util;
 
 import org.smartloli.kafka.eagle.domain.MailSenderDomain;
-import org.smartloli.kafka.eagle.service.MailSenderService;
+import org.smartloli.kafka.eagle.service.impl.MailSenderServiceImpl;
 
 /**
  * Send email message tools clazz.
@@ -47,7 +47,7 @@ public class SendMessageUtils {
 		mailInfo.setToAddress(toAddress);
 		mailInfo.setSubject(subject);
 		mailInfo.setContent(content);
-		MailSenderService sms = new MailSenderService();
+		MailSenderServiceImpl sms = new MailSenderServiceImpl();
 		sms.sendHtmlMail(mailInfo);// send html format
 	}
 

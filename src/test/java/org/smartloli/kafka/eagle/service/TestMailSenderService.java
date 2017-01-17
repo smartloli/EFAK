@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.service;
 
+import org.smartloli.kafka.eagle.service.impl.MailSenderServiceImpl;
+
 /**
  * Test MailSenderService clazz
  * 
@@ -27,7 +29,7 @@ package org.smartloli.kafka.eagle.service;
 public class TestMailSenderService {
 
 	public static void main(String[] args) {
-		System.out.println(MailSenderService.class.getName());
+		System.out.println(MailSenderServiceImpl.class.getName());
 	}
 
 }

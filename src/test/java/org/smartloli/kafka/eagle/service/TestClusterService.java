@@ -18,7 +18,7 @@
 package org.smartloli.kafka.eagle.service;
 
 /**
- * TODO
+ * Test ClusterService interface.
  * 
  * @author smartloli.
  *
@@ -27,7 +27,7 @@ package org.smartloli.kafka.eagle.service;
 public class TestClusterService {
 
 	public static void main(String[] args) {
-		System.out.println(ClusterService.getCluster());
+		System.out.println();
 	}
 
 }

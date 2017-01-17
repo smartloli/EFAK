@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +52,10 @@ import org.smartloli.kafka.eagle.util.GzipUtils;
 public class AlarmController {
 
 	private final static Logger LOG = LoggerFactory.getLogger(AlarmController.class);
+
+	/** Use alarmer service interface to operate this method. */
+	@Autowired
+	private AlarmService alarmService;
 
 	/** Add alarmer viewer. */
 	@RequestMapping(value = "/alarm/add", method = RequestMethod.GET)
@@ -93,11 +98,8 @@ public class AlarmController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
-
 		try {
-			byte[] output = GzipUtils.compressToByte(AlarmService.getTopics(ip));
+			byte[] output = GzipUtils.compressToByte(alarmService.get());
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -136,7 +138,7 @@ public class AlarmController {
 		alarm.setModifyDate(CalendarUtils.getDate());
 		alarm.setOwners(ke_topic_email);
 
-		Map<String, Object> map = AlarmService.addAlarm(alarm);
+		Map<String, Object> map = alarmService.add(alarm);
 		if ("success".equals(map.get("status"))) {
 			session.removeAttribute("Alarm_Submit_Status");
 			session.setAttribute("Alarm_Submit_Status", map.get("info"));
@@ -175,7 +177,7 @@ public class AlarmController {
 			}
 		}
 
-		JSONArray ret = JSON.parseArray(AlarmService.list());
+		JSONArray ret = JSON.parseArray(alarmService.list());
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {
@@ -227,7 +229,7 @@ public class AlarmController {
 	/** Delete alarmer. */
 	@RequestMapping(value = "/alarm/{group}/{topic}/del", method = RequestMethod.GET)
 	public ModelAndView alarmDelete(@PathVariable("group") String group, @PathVariable("topic") String topic) {
-		AlarmService.delete(group, topic);
+		alarmService.delete(group, topic);
 		return new ModelAndView("redirect:/alarm/modify");
 	}
 }

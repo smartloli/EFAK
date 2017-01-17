@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.service;
+package org.smartloli.kafka.eagle.service.impl;
 
 import java.util.Date;
 import java.util.Properties;
@@ -42,7 +42,7 @@ import org.smartloli.kafka.eagle.domain.SaAuthenticatorDomain;
  * 
  *         Created by Aug 15, 2016
  */
-public class MailSenderService {
+public class MailSenderServiceImpl {
 
 	/** Send mail as text. */
 	public boolean sendTextMail(MailSenderDomain mailInfo) {

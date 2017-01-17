@@ -22,8 +22,7 @@ import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,15 +47,16 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 @Controller
 public class OffsetController {
 
-	private final static Logger LOG = LoggerFactory.getLogger(OffsetController.class);
+	/** Offsets consumer data interface. */
+	@Autowired
+	private OffsetService offsetService;
 
 	/** Consumer viewer. */
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/", method = RequestMethod.GET)
 	public ModelAndView consumersActiveView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
-		String ip = request.getHeader("x-forwarded-for");
 		ModelAndView mav = new ModelAndView();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if (OffsetService.isGroupTopic(formatter, group, topic, ip)) {
+		if (offsetService.hasGroupTopic(formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_consumers");
 		} else {
 			mav.setViewName("/error/404");
@@ -67,10 +67,9 @@ public class OffsetController {
 	/** Get real-time offset data from Kafka by ajax. */
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/realtime", method = RequestMethod.GET)
 	public ModelAndView offsetRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
-		String ip = request.getHeader("x-forwarded-for");
 		ModelAndView mav = new ModelAndView();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if (OffsetService.isGroupTopic(formatter, group, topic, ip)) {
+		if (offsetService.hasGroupTopic(formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_realtime");
 		} else {
 			mav.setViewName("/error/404");
@@ -87,9 +86,6 @@ public class OffsetController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
-
 		String aoData = request.getParameter("aoData");
 		JSONArray jsonArray = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -105,7 +101,7 @@ public class OffsetController {
 		}
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray ret = JSON.parseArray(OffsetService.getLogSize(formatter, topic, group, ip));
+		JSONArray ret = JSON.parseArray(offsetService.getLogSize(formatter, topic, group));
 		int offset = 0;
 		JSONArray retArr = new JSONArray();
 		for (Object tmp : ret) {
@@ -160,7 +156,7 @@ public class OffsetController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		try {
-			byte[] output = GzipUtils.compressToByte(OffsetService.getOffsetsGraph(group, topic));
+			byte[] output = GzipUtils.compressToByte(offsetService.getOffsetsGraph(group, topic));
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

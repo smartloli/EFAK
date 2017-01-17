@@ -18,91 +18,23 @@
 package org.smartloli.kafka.eagle.service;
 
 import com.alibaba.fastjson.JSONObject;
-import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
-import org.smartloli.kafka.eagle.util.ZKCliUtils;
 
 /**
- * Kafka & Zookeeper service to oprate related cluster.
+ * Kafka & Zookeeper service api.
  * 
  * @author smartloli.
  *
- *         Created by Aug 12, 2016
+ *         Created by Jan 17, 2017
  */
-public class ClusterService {
+public interface ClusterService {
 
-	/** Get kafka & zookeeper cluster information. */
-	public static String getCluster() {
-		String zk = KafkaClusterUtils.getZkInfo();
-		String kafka = KafkaClusterUtils.getAllBrokersInfo();
-		JSONObject obj = new JSONObject();
-		obj.put("zk", zk);
-		obj.put("kafka", kafka);
-		return obj.toJSONString();
-	}
+	/** Execute zookeeper comand interface */
+	public String execute(String cmd, String type);
 
-	/** Get zookeeper whether live. */
-	public static JSONObject zkCliIsLive() {
-		return KafkaClusterUtils.zkCliIsLive();
-	}
+	/** Get Kafka & Zookeeper interface. */
+	public String get();
 
-	/** Get zookeeper menu. */
-	public static String getZKMenu(String cmd, String type) {
-		String ret = "";
-		if ("ls".equals(type)) {
-			JSONObject object = new JSONObject();
-			object.put("result", ls(cmd));
-			ret = object.toJSONString();
-		} else if ("delete".equals(type)) {
-			JSONObject object = new JSONObject();
-			object.put("result", delete(cmd));
-			ret = object.toJSONString();
-		} else if ("get".equals(type)) {
-			JSONObject object = new JSONObject();
-			object.put("result", get(cmd));
-			ret = object.toJSONString();
-		} else {
-			ret = "Invalid command";
-		}
-		return ret;
-	}
-
-	/** Delete zookeeper metadata & use command. */
-	private static Object delete(String cmd) {
-		String ret = "";
-		String[] len = cmd.replaceAll(" ", "").split("delete");
-		if (len.length == 0) {
-			return cmd + " has error";
-		} else {
-			String command = len[1];
-			ret = ZKCliUtils.delete(command);
-		}
-		return ret;
-	}
-
-	/** Get command & obtain information from zookeeper. */
-	private static Object get(String cmd) {
-		String ret = "";
-		String[] len = cmd.replaceAll(" ", "").split("get");
-		if (len.length == 0) {
-			return cmd + " has error";
-		} else {
-			String command = len[1];
-			ret = ZKCliUtils.get(command);
-		}
-		return ret;
-	}
-
-	/** Zookeeper ls command to list information. */
-	private static String ls(String cmd) {
-		String ret = "";
-		String[] len = cmd.replaceAll(" ", "").split("ls");
-		if (len.length == 0) {
-			return cmd + " has error";
-		} else {
-			String command = len[1];
-			ret = ZKCliUtils.ls(command);
-		}
-		return ret;
-	}
-
+	/** Get Zookkeeper status interface. */
+	public JSONObject status();
+	
 }
