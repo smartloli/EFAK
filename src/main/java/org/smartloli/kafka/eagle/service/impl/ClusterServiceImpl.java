@@ -58,7 +58,7 @@ public class ClusterServiceImpl implements ClusterService {
 
 	/** Get kafka & zookeeper cluster information. */
 	public String get() {
-		String zk = KafkaClusterUtils.getZkInfo();
+		String zk = KafkaClusterUtils.getZkCluster();
 		String kafka = KafkaClusterUtils.getAllBrokersInfo();
 		JSONObject obj = new JSONObject();
 		obj.put("zk", zk);
@@ -68,7 +68,7 @@ public class ClusterServiceImpl implements ClusterService {
 
 	/** Get Zookeeper whether live. */
 	public JSONObject status() {
-		return KafkaClusterUtils.zkCliIsLive();
+		return KafkaClusterUtils.zkCliStatus();
 	}
 
 	/** Delete zookeeper metadata & use command. */

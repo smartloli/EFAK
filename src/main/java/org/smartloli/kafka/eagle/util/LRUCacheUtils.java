@@ -29,8 +29,8 @@ import java.util.Set;
  *         Created by Mar 24, 2016
  */
 public class LRUCacheUtils<K, V> {
-	private final int MAX_CACHE_SIZE;
 	private final float DEFAULT_LOAD_FACTOR = 0.75f;
+	private final int MAX_CACHE_SIZE;
 	LinkedHashMap<K, V> map;
 
 	/**
@@ -46,9 +46,11 @@ public class LRUCacheUtils<K, V> {
 	@SuppressWarnings({ "unchecked", "serial", "rawtypes" })
 	public LRUCacheUtils(int cacheSize) {
 		MAX_CACHE_SIZE = cacheSize;
-		// CacheSize and loading factor calculated by capactiy HashMap, +1 to
-		// ensure that when the cacheSize does not trigger the HashMap limit
-		// will trigger the expansion
+		/**
+		 * CacheSize and loading factor calculated by capactiy HashMap, +1 to
+		 * ensure that when the cacheSize does not trigger the HashMap limit
+		 * will trigger the expansion.
+		 */
 		int capacity = (int) Math.ceil(MAX_CACHE_SIZE / DEFAULT_LOAD_FACTOR) + 1;
 		map = new LinkedHashMap(capacity, DEFAULT_LOAD_FACTOR, true) {
 			@Override
@@ -59,52 +61,24 @@ public class LRUCacheUtils<K, V> {
 	}
 
 	/**
-     * Associates the specified value with the specified key in this map.
-     * If the map previously contained a mapping for the key, the old
-     * value is replaced.
-     *
-     * @param key key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
-     * @return the previous value associated with <tt>key</tt>, or
-     *         <tt>null</tt> if there was no mapping for <tt>key</tt>.
-     *         (A <tt>null</tt> return can also indicate that the map
-     *         previously associated <tt>null</tt> with <tt>key</tt>.)
-     */
-	public synchronized void put(K key, V value) {
-		map.put(key, value);
+	 * Removes all of the mappings from this map. The map will be empty after
+	 * this call returns.
+	 */
+	public synchronized void clear() {
+		map.clear();
 	}
 
 	/**
-     * Returns the value to which the specified key is mapped,
-     * or {@code null} if this map contains no mapping for the key.
-     *
-     * <p>More formally, if this map contains a mapping from a key
-     * {@code k} to a value {@code v} such that {@code (key==null ? k==null :
-     * key.equals(k))}, then this method returns {@code v}; otherwise
-     * it returns {@code null}.  (There can be at most one such mapping.)
-     *
-     * <p>A return value of {@code null} does not <i>necessarily</i>
-     * indicate that the map contains no mapping for the key; it's also
-     * possible that the map explicitly maps the key to {@code null}.
-     * The {@link #containsKey containsKey} operation may be used to
-     * distinguish these two cases.
-     */
-	public synchronized V get(K key) {
-		return map.get(key);
-	}
-
-	/**
-	 * Removes the mapping for the specified key from this map if present.
+	 * Returns <tt>true</tt> if this map contains a mapping for the specified
+	 * key.
 	 *
 	 * @param key
-	 *            key whose mapping is to be removed from the map
-	 * @return the previous value associated with <tt>key</tt>, or <tt>null</tt>
-	 *         if there was no mapping for <tt>key</tt>. (A <tt>null</tt> return
-	 *         can also indicate that the map previously associated
-	 *         <tt>null</tt> with <tt>key</tt>.)
+	 *            The key whose presence in this map is to be tested
+	 * @return <tt>true</tt> if this map contains a mapping for the specified
+	 *         key.
 	 */
-	public synchronized void remove(K key) {
-		map.remove(key);
+	public synchronized boolean containsKey(K key) {
+		return map.containsKey(key);
 	}
 
 	/**
@@ -126,32 +100,64 @@ public class LRUCacheUtils<K, V> {
 	}
 
 	/**
-     * Returns the number of key-value mappings in this map.
-     *
-     * @return the number of key-value mappings in this map
-     */
+	 * Returns the value to which the specified key is mapped, or {@code null}
+	 * if this map contains no mapping for the key.
+	 *
+	 * <p>
+	 * More formally, if this map contains a mapping from a key {@code k} to a
+	 * value {@code v} such that {@code (key==null ? k==null :
+	 * key.equals(k))}, then this method returns {@code v}; otherwise it returns
+	 * {@code null}. (There can be at most one such mapping.)
+	 *
+	 * <p>
+	 * A return value of {@code null} does not <i>necessarily</i> indicate that
+	 * the map contains no mapping for the key; it's also possible that the map
+	 * explicitly maps the key to {@code null}. The {@link #containsKey
+	 * containsKey} operation may be used to distinguish these two cases.
+	 */
+	public synchronized V get(K key) {
+		return map.get(key);
+	}
+
+	/**
+	 * Associates the specified value with the specified key in this map. If the
+	 * map previously contained a mapping for the key, the old value is
+	 * replaced.
+	 *
+	 * @param key
+	 *            key with which the specified value is to be associated
+	 * @param value
+	 *            value to be associated with the specified key
+	 * @return the previous value associated with <tt>key</tt>, or <tt>null</tt>
+	 *         if there was no mapping for <tt>key</tt>. (A <tt>null</tt> return
+	 *         can also indicate that the map previously associated
+	 *         <tt>null</tt> with <tt>key</tt>.)
+	 */
+	public synchronized void put(K key, V value) {
+		map.put(key, value);
+	}
+
+	/**
+	 * Removes the mapping for the specified key from this map if present.
+	 *
+	 * @param key
+	 *            key whose mapping is to be removed from the map
+	 * @return the previous value associated with <tt>key</tt>, or <tt>null</tt>
+	 *         if there was no mapping for <tt>key</tt>. (A <tt>null</tt> return
+	 *         can also indicate that the map previously associated
+	 *         <tt>null</tt> with <tt>key</tt>.)
+	 */
+	public synchronized void remove(K key) {
+		map.remove(key);
+	}
+
+	/**
+	 * Returns the number of key-value mappings in this map.
+	 *
+	 * @return the number of key-value mappings in this map
+	 */
 	public synchronized int size() {
 		return map.size();
-	}
-
-	/**
-     * Removes all of the mappings from this map.
-     * The map will be empty after this call returns.
-     */
-	public synchronized void clear() {
-		map.clear();
-	}
-
-	/**
-     * Returns <tt>true</tt> if this map contains a mapping for the
-     * specified key.
-     *
-     * @param   key   The key whose presence in this map is to be tested
-     * @return <tt>true</tt> if this map contains a mapping for the specified
-     * key.
-     */
-	public synchronized boolean containsKey(K key) {
-		return map.containsKey(key);
 	}
 
 	@SuppressWarnings("rawtypes")

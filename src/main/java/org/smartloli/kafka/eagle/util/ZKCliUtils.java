@@ -36,21 +36,6 @@ public class ZKCliUtils {
 	/** Instance zk pool. */
 	private static ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
 
-	/** Zookeeper ls command. */
-	public static String ls(String cmd) {
-		String ret = "";
-		ZkClient zkc = zkPool.getZkClient();
-		boolean status = ZkUtils.pathExists(zkc, cmd);
-		if (status) {
-			ret = zkc.getChildren(cmd).toString();
-		}
-		if (zkc != null) {
-			zkPool.release(zkc);
-			zkc = null;
-		}
-		return ret;
-	}
-
 	/** Zookeeper delete command. */
 	public static String delete(String cmd) {
 		String ret = "";
@@ -92,6 +77,21 @@ public class ZKCliUtils {
 		}
 		if (zkc != null) {
 			zkPool.releaseZKSerializer(zkc);
+			zkc = null;
+		}
+		return ret;
+	}
+
+	/** Zookeeper ls command. */
+	public static String ls(String cmd) {
+		String ret = "";
+		ZkClient zkc = zkPool.getZkClient();
+		boolean status = ZkUtils.pathExists(zkc, cmd);
+		if (status) {
+			ret = zkc.getChildren(cmd).toString();
+		}
+		if (zkc != null) {
+			zkPool.release(zkc);
 			zkc = null;
 		}
 		return ret;

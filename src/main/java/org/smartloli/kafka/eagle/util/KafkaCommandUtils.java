@@ -33,18 +33,6 @@ import kafka.admin.TopicCommand;
  */
 public class KafkaCommandUtils {
 
-	/** Use command list kafka all topic. */
-	public static void list() {
-		String[] options = new String[] { "--list", "--zookeeper", "master:2181" };
-		TopicCommand.main(options);
-	}
-
-	/** Describe some topic information from kafka. */
-	public static void describe() {
-		String[] options = new String[] { "--describe", "--zookeeper", "dn1:2181,dn2:2181,dn3:2181", "--topic=ke_test12345" };
-		TopicCommand.main(options);
-	}
-
 	/**
 	 * Create topic to kafka cluster, it is worth noting that the backup number
 	 * must be less than or equal to brokers data.
@@ -71,6 +59,18 @@ public class KafkaCommandUtils {
 		map.put("status", "success");
 		map.put("info", "Create topic[" + topicName + "] has successed,partitions numbers is [" + partitions + "],replication-factor numbers is [" + replic + "]");
 		return map;
+	}
+
+	/** Describe some topic information from kafka. */
+	public static void describe() {
+		String[] options = new String[] { "--describe", "--zookeeper", "dn1:2181,dn2:2181,dn3:2181", "--topic=ke_test12345" };
+		TopicCommand.main(options);
+	}
+
+	/** Use command list kafka all topic. */
+	public static void list() {
+		String[] options = new String[] { "--list", "--zookeeper", "master:2181" };
+		TopicCommand.main(options);
 	}
 
 }

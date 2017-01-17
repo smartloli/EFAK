@@ -72,44 +72,6 @@ public final class SystemConfigUtils {
 		}
 	}
 
-	/**
-	 * Reload special property file.
-	 * 
-	 * @param name
-	 *            System configure name.
-	 */
-	public static void reload(String name) {
-		mConfig.clear();
-		getReources(name);
-	}
-
-	/** Construction method. */
-	private SystemConfigUtils() {
-	}
-
-	/** Retrieve a property value. */
-	public static String getProperty(String key) {
-		return mConfig.getProperty(key);
-	}
-
-	/**
-	 * Retrieve a property value & default value.
-	 * 
-	 * @param key
-	 *            Retrieve key
-	 * @param defaultValue
-	 *            Return default retrieve value
-	 * @return String.
-	 */
-	public static String getProperty(String key, String defaultValue) {
-		LOG.debug("Fetching property [" + key + "=" + mConfig.getProperty(key) + "]");
-		String value = SystemConfigUtils.getProperty(key);
-		if (value == null) {
-			return defaultValue;
-		}
-		return value;
-	}
-
 	/** Retrieve a property as a boolean ... defaults to false if not present. */
 	public static boolean getBooleanProperty(String name) {
 		return getBooleanProperty(name, false);
@@ -124,14 +86,28 @@ public final class SystemConfigUtils {
 		return Boolean.valueOf(value).booleanValue();
 	}
 
+	/** Retrieve a property as a boolean array. */
+	public static boolean[] getBooleanPropertyArray(String name, boolean[] defaultValue, String splitStr) {
+		String value = SystemConfigUtils.getProperty(name);
+		if (value == null) {
+			return defaultValue;
+		}
+		try {
+			String[] propertyArray = value.split(splitStr);
+			boolean[] result = new boolean[propertyArray.length];
+			for (int i = 0; i < propertyArray.length; i++) {
+				result[i] = Boolean.valueOf(propertyArray[i]).booleanValue();
+			}
+			return result;
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			return defaultValue;
+		}
+	}
+
 	/** Retrieve a property as a int,defaults to 0 if not present. */
 	public static int getIntProperty(String name) {
 		return getIntProperty(name, 0);
-	}
-
-	/** Retrieve a property as a long,defaults to 0L if not present. */
-	public static Long getLongProperty(String name) {
-		return getLongProperty(name, 0L);
 	}
 
 	/** Retrieve a property as a int. */
@@ -142,20 +118,6 @@ public final class SystemConfigUtils {
 		}
 		try {
 			return Integer.parseInt(value);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			return defaultValue;
-		}
-	}
-
-	/** Retrieve a property as a long. */
-	public static Long getLongProperty(String name, Long defaultValue) {
-		String value = SystemConfigUtils.getProperty(name);
-		if (value == null) {
-			return defaultValue;
-		}
-		try {
-			return Long.parseLong(value);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			return defaultValue;
@@ -180,23 +142,46 @@ public final class SystemConfigUtils {
 		}
 	}
 
-	/** Retrieve a property as a boolean array. */
-	public static boolean[] getBooleanPropertyArray(String name, boolean[] defaultValue, String splitStr) {
+	/** Retrieve a property as a long,defaults to 0L if not present. */
+	public static Long getLongProperty(String name) {
+		return getLongProperty(name, 0L);
+	}
+
+	/** Retrieve a property as a long. */
+	public static Long getLongProperty(String name, Long defaultValue) {
 		String value = SystemConfigUtils.getProperty(name);
 		if (value == null) {
 			return defaultValue;
 		}
 		try {
-			String[] propertyArray = value.split(splitStr);
-			boolean[] result = new boolean[propertyArray.length];
-			for (int i = 0; i < propertyArray.length; i++) {
-				result[i] = Boolean.valueOf(propertyArray[i]).booleanValue();
-			}
-			return result;
+			return Long.parseLong(value);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			return defaultValue;
 		}
+	}
+
+	/** Retrieve a property value. */
+	public static String getProperty(String key) {
+		return mConfig.getProperty(key);
+	}
+
+	/**
+	 * Retrieve a property value & default value.
+	 * 
+	 * @param key
+	 *            Retrieve key
+	 * @param defaultValue
+	 *            Return default retrieve value
+	 * @return String.
+	 */
+	public static String getProperty(String key, String defaultValue) {
+		LOG.debug("Fetching property [" + key + "=" + mConfig.getProperty(key) + "]");
+		String value = SystemConfigUtils.getProperty(key);
+		if (value == null) {
+			return defaultValue;
+		}
+		return value;
 	}
 
 	/** Retrieve a property as a array. */
@@ -227,11 +212,6 @@ public final class SystemConfigUtils {
 		}
 	}
 
-	/** Retrieve all property keys. */
-	public static Enumeration<Object> keys() {
-		return mConfig.keys();
-	}
-
 	/** Retrieve map property keys. */
 	public static Map<String, String> getPropertyMap(String name) {
 		String[] maps = getPropertyArray(name, ",");
@@ -247,5 +227,25 @@ public final class SystemConfigUtils {
 			LOG.error("Get PropertyMap info has error,key is :" + name);
 		}
 		return map;
+	}
+
+	/** Retrieve all property keys. */
+	public static Enumeration<Object> keys() {
+		return mConfig.keys();
+	}
+
+	/**
+	 * Reload special property file.
+	 * 
+	 * @param name
+	 *            System configure name.
+	 */
+	public static void reload(String name) {
+		mConfig.clear();
+		getReources(name);
+	}
+
+	/** Construction method. */
+	private SystemConfigUtils() {
 	}
 }

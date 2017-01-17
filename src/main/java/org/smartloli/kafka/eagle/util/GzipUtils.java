@@ -42,22 +42,6 @@ public class GzipUtils {
 		return compressToByte(str, UTF_16);
 	}
 
-	// public static byte[] compressToByte(String str) {
-	// if (str == null || str.length() == 0) {
-	// return null;
-	// }
-	// ByteArrayOutputStream out = new ByteArrayOutputStream();
-	// GZIPOutputStream gzip;
-	// try {
-	// gzip = new GZIPOutputStream(out);
-	// gzip.write(str.getBytes(UTF_16));
-	// gzip.close();
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// }
-	// return out.toByteArray();
-	// }
-
 	/**
 	 * Strings compress to bytes.
 	 * 

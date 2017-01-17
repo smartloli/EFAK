@@ -31,16 +31,16 @@ public class ConstantUtils {
 		public final static int SIZE = 40;
 	}
 
-	/** Custom variable separator. */
-	public interface Separator {
-		public final static String EIGHT = "________";
-	}
-
 	/** Kafka parameter setting. */
 	public interface Kafka {
 		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
 		public final static int SINGLE_THREAD = 1;
 		public final static int ACTIVER_INTERVAL = 10000;
+	}
+
+	/** Custom variable separator. */
+	public interface Separator {
+		public final static String EIGHT = "________";
 	}
 
 }

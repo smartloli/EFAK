@@ -18,7 +18,6 @@
 package org.smartloli.kafka.eagle.util;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -29,43 +28,6 @@ import java.util.Date;
  *         Created by Nov 6, 2015
  */
 public class CalendarUtils {
-
-	/** Get the date of yesterday, accurate to seconds. */
-	public static String getYestoday() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Calendar calendar = Calendar.getInstance();
-		Date curr = new Date();
-		calendar.setTime(curr);
-		calendar.add(Calendar.DAY_OF_MONTH, -1);
-		return df.format(calendar.getTime());
-	}
-
-	/** Gets the current time stamp. */
-	public static long getTime() {
-		return new Date().getTime();
-	}
-
-	/** Get the date of yesterday. */
-	public static String getLastDay() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		Calendar calendar = Calendar.getInstance();
-		Date curr = new Date();
-		calendar.setTime(curr);
-		calendar.add(Calendar.DAY_OF_MONTH, -1);
-		return df.format(calendar.getTime());
-	}
-
-	/** Get the date of last month */
-	public static String[] getLastMonth() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		Calendar calendarFirstDay = Calendar.getInstance();
-		calendarFirstDay.add(Calendar.MONTH, -1);
-		calendarFirstDay.set(Calendar.DAY_OF_MONTH, 1);
-		Calendar calendarLastDay = Calendar.getInstance();
-		calendarLastDay.set(Calendar.DAY_OF_MONTH, 1);
-		calendarLastDay.add(Calendar.DATE, -1);
-		return new String[] { df.format(calendarFirstDay.getTime()), df.format(calendarLastDay.getTime()) };
-	}
 
 	/**
 	 * Convert time mill into ? day ? hour ? min ? sec.
@@ -85,18 +47,12 @@ public class CalendarUtils {
 	/**
 	 * Convert unix time to date,default is yyyy-MM-dd HH:mm:ss.
 	 * 
-	 * @param unixTime
-	 * @return 1907-01-01 00:00:00
+	 * @param unixtime
+	 * @return Date String.
 	 */
-	public static String convertUnixTime2Date(long unixtime) {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return df.format(new Date(unixtime));
-	}
-
-	/** Get the date of the day,accurate to seconds. */
-	public static String getDate() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return df.format(new Date());
+	public static String convertUnixTime(long unixtime) {
+		String formatter = "yyyy-MM-dd HH:mm:ss";
+		return convertUnixTime(unixtime, formatter);
 	}
 
 	/**
@@ -114,12 +70,23 @@ public class CalendarUtils {
 	/**
 	 * Convert unix time to date,default is yyyy-MM-dd HH:mm:ss.
 	 * 
-	 * @param unixtime
-	 * @return Date String.
+	 * @param unixTime
+	 * @return 1907-01-01 00:00:00
 	 */
-	public static String convertUnixTime(long unixtime) {
-		String formatter = "yyyy-MM-dd HH:mm:ss";
-		return convertUnixTime(unixtime, formatter);
+	public static String convertUnixTime2Date(long unixtime) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return df.format(new Date(unixtime));
+	}
+
+	/** Get the date of the day,accurate to seconds. */
+	public static String getDate() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return df.format(new Date());
+	}
+
+	/** Gets the current time stamp. */
+	public static long getTime() {
+		return new Date().getTime();
 	}
 
 }

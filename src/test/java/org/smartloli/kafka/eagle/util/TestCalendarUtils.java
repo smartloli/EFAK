@@ -26,6 +26,6 @@ package org.smartloli.kafka.eagle.util;
  */
 public class TestCalendarUtils {
 	public static void main(String[] args) {
-		System.out.println(CalendarUtils.getYestoday());
+		System.out.println();
 	}
 }

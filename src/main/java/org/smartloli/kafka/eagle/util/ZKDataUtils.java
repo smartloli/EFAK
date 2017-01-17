@@ -50,18 +50,37 @@ import scala.collection.Seq;
 public class ZKDataUtils {
 
 	private final static Logger LOG = LoggerFactory.getLogger(ZKDataUtils.class);
-	private static ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
-	private static ZkClient zkc = null;
 	private final static String KE_ROOT_PATH = "/kafka_eagle";
 	private final static String STORE_OFFSETS = "offsets";
 	private final static String STORE_ALARM = "alarm";
+	/** Request memory space. */
+	private static ZkClient zkc = null;
+	/** Instance Zookeeper client. */
+	private static ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
 
 	/**
-	 * According to the date of each hour to statistics the consume rate data.
+	 * Delete the metadata information in the Ke root directory in zookeeper,
+	 * with group and topic as the only sign.
+	 * 
+	 * @param group
+	 *            Consumer group.
+	 * @param topic
+	 *            Consumer topic.
+	 * @param theme
+	 *            Consumer theme.
 	 */
-	private static String getZkHour() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHH");
-		return df.format(new Date());
+	public static void delete(String group, String topic, String theme) {
+		if (zkc == null) {
+			zkc = zkPool.getZkClient();
+		}
+		String path = theme + "/" + group + "/" + topic;
+		if (ZkUtils.pathExists(zkc, KE_ROOT_PATH + "/" + path)) {
+			ZkUtils.deletePath(zkc, KE_ROOT_PATH + "/" + path);
+		}
+		if (zkc != null) {
+			zkPool.release(zkc);
+			zkc = null;
+		}
 	}
 
 	/** Get alarmer information. */
@@ -137,27 +156,11 @@ public class ZKDataUtils {
 	}
 
 	/**
-	 * Update metadata information in ke root path in zookeeper.
-	 * 
-	 * @param data
-	 *            Update datasets.
-	 * @param path
-	 *            Update datasets path.
+	 * According to the date of each hour to statistics the consume rate data.
 	 */
-	private static void update(String data, String path) {
-		if (zkc == null) {
-			zkc = zkPool.getZkClient();
-		}
-		if (!ZkUtils.pathExists(zkc, KE_ROOT_PATH + "/" + path)) {
-			ZkUtils.createPersistentPath(zkc, KE_ROOT_PATH + "/" + path, "");
-		}
-		if (ZkUtils.pathExists(zkc, KE_ROOT_PATH + "/" + path)) {
-			ZkUtils.updatePersistentPath(zkc, KE_ROOT_PATH + "/" + path, data);
-		}
-		if (zkc != null) {
-			zkPool.release(zkc);
-			zkc = null;
-		}
+	private static String getZkHour() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHH");
+		return df.format(new Date());
 	}
 
 	/**
@@ -171,7 +174,7 @@ public class ZKDataUtils {
 		for (OffsetsLiteDomain offset : list) {
 			JSONObject obj = new JSONObject();
 			obj.put("hour", hour);
-
+	
 			JSONObject object = new JSONObject();
 			object.put("lag", offset.getLag());
 			object.put("lagsize", offset.getLogSize());
@@ -198,31 +201,6 @@ public class ZKDataUtils {
 	}
 
 	/**
-	 * Delete the metadata information in the Ke root directory in zookeeper,
-	 * with group and topic as the only sign.
-	 * 
-	 * @param group
-	 *            Consumer group.
-	 * @param topic
-	 *            Consumer topic.
-	 * @param theme
-	 *            Consumer theme.
-	 */
-	public static void delete(String group, String topic, String theme) {
-		if (zkc == null) {
-			zkc = zkPool.getZkClient();
-		}
-		String path = theme + "/" + group + "/" + topic;
-		if (ZkUtils.pathExists(zkc, KE_ROOT_PATH + "/" + path)) {
-			ZkUtils.deletePath(zkc, KE_ROOT_PATH + "/" + path);
-		}
-		if (zkc != null) {
-			zkPool.release(zkc);
-			zkc = null;
-		}
-	}
-
-	/**
 	 * Insert new alarmer configure information.
 	 * 
 	 * @param alarm
@@ -240,6 +218,30 @@ public class ZKDataUtils {
 			return -1;
 		}
 		return 0;
+	}
+
+	/**
+	 * Update metadata information in ke root path in zookeeper.
+	 * 
+	 * @param data
+	 *            Update datasets.
+	 * @param path
+	 *            Update datasets path.
+	 */
+	private static void update(String data, String path) {
+		if (zkc == null) {
+			zkc = zkPool.getZkClient();
+		}
+		if (!ZkUtils.pathExists(zkc, KE_ROOT_PATH + "/" + path)) {
+			ZkUtils.createPersistentPath(zkc, KE_ROOT_PATH + "/" + path, "");
+		}
+		if (ZkUtils.pathExists(zkc, KE_ROOT_PATH + "/" + path)) {
+			ZkUtils.updatePersistentPath(zkc, KE_ROOT_PATH + "/" + path, data);
+		}
+		if (zkc != null) {
+			zkPool.release(zkc);
+			zkc = null;
+		}
 	}
 
 }
