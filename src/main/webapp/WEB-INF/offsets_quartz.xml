@@ -2,9 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-	<!-- 添加调度的任务bean 配置对应的class -->
+	<!-- Add scheduling task bean configuration corresponding to class. -->
 	<bean id="offsetsSchedule" class="org.smartloli.kafka.eagle.quartz.OffsetsQuartz" />
-	<!--配置调度具体执行的方法 -->
+	<!-- Method for configuring scheduling specific execution. -->
 	<!-- task1 -->
 	<bean id="offsetsDetail"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -12,36 +12,21 @@
 		<property name="targetMethod" value="jobQuartz" />
 		<property name="concurrent" value="false" />
 	</bean>
-	<!--配置调度执行的触发的时间 -->
+	<!-- Configure the trigger time for scheduling execution. -->
 	<bean id="offsetsTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="offsetsDetail" />
 		<property name="cronExpression">
-			<!-- 每5min执行任务调度 -->
+			<!-- Perform task scheduling per 5min. -->
 			<value>0 0/5 * * * ?</value>
 		</property>
 	</bean>
-	<!-- task2 -->
-	<bean id="offsetsDetail2"
-		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="offsetsSchedule" />
-		<property name="targetMethod" value="cleanHistoryData" />
-		<property name="concurrent" value="false" />
-	</bean>
-	<!--配置调度执行的触发的时间 -->
-	<bean id="offsetsTrigger2" class="org.springframework.scheduling.quartz.CronTriggerBean">
-		<property name="jobDetail" ref="offsetsDetail2" />
-		<property name="cronExpression">
-			<!-- 每天0:03:00点执行任务调度 -->
-			<value>0 3 0 * * ?</value>
-		</property>
-	</bean>
-	<!-- quartz的调度工厂 调度工厂只能有一个，多个调度任务在list中添加 -->
+	<!-- Quartz scheduling factory scheduling plant can only have one, multiple 
+		scheduling tasks added in list. -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-				<!-- 所有的调度列表 -->
+				<!-- All scheduling lists. -->
 				<ref local="offsetsTrigger" />
-				<ref local="offsetsTrigger2" />
 			</list>
 		</property>
 	</bean>

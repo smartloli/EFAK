@@ -15,36 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.util;
+package org.smartloli.kafka.eagle.factory;
 
 /**
- * Define constants in the system.
+ * Test Provider clazz.
  * 
  * @author smartloli.
  *
- *         Created by Jan 3, 2017
+ *         Created by Jan 17, 2017
  */
-public class ConstantUtils {
-
-	/** D3 data plugin size. */
-	public interface D3 {
-		public final static int SIZE = 40;
+public class TestProvider {
+	public static void main(String[] args) {
+		MailProvider provider = new SendMailFactory();
+		provider.create().send("810371213@qq.com","test alarm","server is aaaaaa");
 	}
-
-	/** Kafka parameter setting. */
-	public interface Kafka {
-		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
-		public final static int SINGLE_THREAD = 1;
-		public final static int ACTIVER_INTERVAL = 10000;
-	}
-
-	public interface Mail {
-		public final static String[] ARGS = new String[] { "toAddress", "subject", "content" };
-	}
-
-	/** Custom variable separator. */
-	public interface Separator {
-		public final static String EIGHT = "________";
-	}
-
 }

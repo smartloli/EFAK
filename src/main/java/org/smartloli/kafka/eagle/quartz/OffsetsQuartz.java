@@ -37,12 +37,13 @@ import org.smartloli.kafka.eagle.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.domain.OffsetsLiteDomain;
 import org.smartloli.kafka.eagle.domain.TupleDomain;
+import org.smartloli.kafka.eagle.factory.MailProvider;
+import org.smartloli.kafka.eagle.factory.SendMailFactory;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.util.ZKDataUtils;
 import org.smartloli.kafka.eagle.util.CalendarUtils;
 import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.LRUCacheUtils;
-import org.smartloli.kafka.eagle.util.SendMessageUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
@@ -58,11 +59,6 @@ public class OffsetsQuartz {
 
 	/** Cache to the specified map collection to prevent frequent refresh. */
 	private static LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
-
-	@Deprecated
-	public void cleanHistoryData() {
-		// Nothing to do
-	}
 
 	/** Get the corresponding string per minute. */
 	private String getStatsPerDate() {
@@ -121,7 +117,8 @@ public class OffsetsQuartz {
 					for (OffsetsLiteDomain offset : list) {
 						if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
 							try {
-								SendMessageUtils.send(alarm.getOwners(), "Alarm Lag",
+								MailProvider provider = new SendMailFactory();
+								provider.create().send(alarm.getOwners(), "Alarm Lag",
 										"Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].");
 							} catch (Exception ex) {
 								LOG.error("Topic[" + alarm.getTopics() + "] Send alarm mail has error,msg is " + ex.getMessage());
@@ -181,7 +178,7 @@ public class OffsetsQuartz {
 		}
 		return list;
 	}
-	
+
 	private static OffsetZkDomain getKafkaOffset(String topic, String group, int partition) {
 		JSONArray array = JSON.parseArray(RpcClient.getOffset());
 		OffsetZkDomain offsetZk = new OffsetZkDomain();

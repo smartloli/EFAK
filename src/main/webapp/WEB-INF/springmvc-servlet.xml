@@ -11,9 +11,10 @@
    http://www.springframework.org/schema/context    
    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<!-- 把标记了@Controller注解的类转换为bean -->
+	<!-- Converts the class marked with the @Controller annotation to bean. -->
 	<context:component-scan base-package="org.smartloli.kafka.eagle" />
-	<!-- 开启注解 第一个是处理注解类、第二个是处理方法 -->
+	<!-- The first one is to annotate the annotations and the second one is 
+		the processing method. -->
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
 	<bean
@@ -35,7 +36,7 @@
 	<mvc:resources mapping="/media/**" location="/WEB-INF/media/" />
 
 	<!-- ViewResolver -->
-	<!-- 过滤掉.jsp的后缀，在指定目录下新建页面 -->
+	<!-- Filter out the suffix *.jsp, the specified directory in the new page -->
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="viewClass"
