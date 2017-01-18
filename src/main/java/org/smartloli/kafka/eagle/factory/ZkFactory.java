@@ -18,11 +18,13 @@
 package org.smartloli.kafka.eagle.factory;
 
 /**
- * TODO
+ * Zookeeper factory implements ZkProvider service.
  * 
  * @author smartloli.
  *
  *         Created by Jan 18, 2017
+ *         
+ *  @see org.smartloli.kafka.eagle.factory.ZkProvider
  */
 public class ZkFactory implements ZkProvider {
 

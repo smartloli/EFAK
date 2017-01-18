@@ -25,7 +25,7 @@ import org.smartloli.kafka.eagle.domain.OffsetsLiteDomain;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * TODO
+ * ZkService operate comand and get metadata from zookeeper interface.
  * 
  * @author smartloli.
  *

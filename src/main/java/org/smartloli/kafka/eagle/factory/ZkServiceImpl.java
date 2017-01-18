@@ -47,11 +47,13 @@ import scala.collection.JavaConversions;
 import scala.collection.Seq;
 
 /**
- * TODO
+ * Implements ZkService all method.
  * 
  * @author smartloli.
  *
  *         Created by Jan 18, 2017
+ * 
+ * @see org.smartloli.kafka.eagle.factory.ZkService
  */
 public class ZkServiceImpl implements ZkService {
 
@@ -202,7 +204,7 @@ public class ZkServiceImpl implements ZkService {
 		for (OffsetsLiteDomain offset : list) {
 			JSONObject obj = new JSONObject();
 			obj.put("hour", hour);
-	
+
 			JSONObject object = new JSONObject();
 			object.put("lag", offset.getLag());
 			object.put("lagsize", offset.getLogSize());
@@ -318,7 +320,7 @@ public class ZkServiceImpl implements ZkService {
 			outstream.write("stat".getBytes());
 			outstream.flush();
 			sock.shutdownOutput();
-	
+
 			reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			String line;
 			while ((line = reader.readLine()) != null) {

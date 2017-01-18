@@ -25,7 +25,7 @@ import org.smartloli.kafka.eagle.domain.KafkaMetaDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 
 /**
- * TODO
+ * Kafka group,topic and partition interface.
  * 
  * @author smartloli.
  *

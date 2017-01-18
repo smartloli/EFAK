@@ -18,11 +18,13 @@
 package org.smartloli.kafka.eagle.factory;
 
 /**
- * TODO
+ * Zookeeper provider ZkService visitor enter.
  * 
  * @author smartloli.
  *
  *         Created by Jan 18, 2017
+ *         
+ * @see org.smartloli.kafka.eagle.factory.ZkService
  */
 public interface ZkProvider {
 	public ZkService create();

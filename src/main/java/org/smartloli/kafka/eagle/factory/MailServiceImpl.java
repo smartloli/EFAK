@@ -27,11 +27,13 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 import com.google.gson.Gson;
 
 /**
- * TODO
+ * Implements MailService all method.
  * 
  * @author smartloli.
  *
  *         Created by Jan 17, 2017
+ * 
+ * @see org.smartloli.kafka.eagle.factory.MailService
  */
 public class MailServiceImpl implements MailService {
 

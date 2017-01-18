@@ -18,13 +18,15 @@
 package org.smartloli.kafka.eagle.factory;
 
 /**
-* TODO
-* 
-* @author smartloli.
-*
-* Created by Jan 18, 2017
-*/
-public class KafkaFactory implements KafkaProvider{
+ * Kafka factory implements KafkaProvider service.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Jan 18, 2017
+ *         
+ * @see org.smartloli.kafka.eagle.factory.KafkaProvider
+ */
+public class KafkaFactory implements KafkaProvider {
 
 	@Override
 	public KafkaService create() {

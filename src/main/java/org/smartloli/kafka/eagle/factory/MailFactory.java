@@ -18,13 +18,15 @@
 package org.smartloli.kafka.eagle.factory;
 
 /**
-* TODO
-* 
-* @author smartloli.
-*
-* Created by Jan 17, 2017
-*/
-public class MailFactory implements MailProvider{
+ * Mail factory implements MailProvider service.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Jan 17, 2017
+ * 
+ * @see org.smartloli.kafka.eagle.factory.MailProvider
+ */
+public class MailFactory implements MailProvider {
 
 	@Override
 	public MailService create() {

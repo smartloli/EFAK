@@ -61,11 +61,13 @@ import scala.collection.JavaConversions;
 import scala.collection.Seq;
 
 /**
- * TODO
+ * Implements KafkaService all method.
  * 
  * @author smartloli.
  *
  *         Created by Jan 18, 2017
+ * 
+ * @see org.smartloli.kafka.eagle.factory.KafkaService
  */
 public class KafkaServiceImpl implements KafkaService {
 
@@ -75,7 +77,7 @@ public class KafkaServiceImpl implements KafkaService {
 	private final Logger LOG = LoggerFactory.getLogger(KafkaServiceImpl.class);
 	/** Instance Zookeeper client pool. */
 	private ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
-	
+
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
 

@@ -18,7 +18,7 @@
 package org.smartloli.kafka.eagle.factory;
 
 /**
- * TODO
+ * Mail send message interface.
  * 
  * @author smartloli.
  *

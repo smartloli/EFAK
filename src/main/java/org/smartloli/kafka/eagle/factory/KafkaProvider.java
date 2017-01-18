@@ -18,11 +18,13 @@
 package org.smartloli.kafka.eagle.factory;
 
 /**
- * TODO
+ * Kafka provider KafkaService visitor enter.
  * 
  * @author smartloli.
  *
  *         Created by Jan 18, 2017
+ * 
+ * @see org.smartloli.kafka.eagle.factory.KafkaService
  */
 public interface KafkaProvider {
 	public KafkaService create();

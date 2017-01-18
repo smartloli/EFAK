@@ -18,11 +18,13 @@
 package org.smartloli.kafka.eagle.factory;
 
 /**
- * TODO
+ * Mail provider MailService visitor enter.
  * 
  * @author smartloli.
  *
  *         Created by Jan 17, 2017
+ * 
+ * @see org.smartloli.kafka.eagle.factory.MailService
  */
 public interface MailProvider {
 	public MailService create();
