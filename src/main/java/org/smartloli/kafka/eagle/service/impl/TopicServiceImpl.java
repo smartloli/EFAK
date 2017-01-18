@@ -21,9 +21,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import org.smartloli.kafka.eagle.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.factory.KafkaService;
 import org.smartloli.kafka.eagle.service.TopicService;
-import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
-import org.smartloli.kafka.eagle.util.KafkaMetaUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -36,10 +36,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class TopicServiceImpl implements TopicService {
 
+	/** Kafka service interface. */
+	private KafkaService kafkaService = new KafkaFactory().create();
+
 	/** Find topic name in all topics. */
 	public boolean hasTopic(String topicName, String ip) {
 		boolean ret = false;
-		JSONArray arr = JSON.parseArray(KafkaClusterUtils.getAllPartitions());
+		JSONArray arr = JSON.parseArray(kafkaService.getAllPartitions());
 		for (Object object : arr) {
 			JSONObject obj = (JSONObject) object;
 			String topic = obj.getString("topic");
@@ -53,12 +56,12 @@ public class TopicServiceImpl implements TopicService {
 
 	/** Get metadata in topic. */
 	public String metadata(String topicName) {
-		return KafkaMetaUtils.findLeader(topicName).toString();
+		return kafkaService.findLeader(topicName).toString();
 	}
 
 	/** List all the topic under Kafka in partition. */
 	public String list() {
-		return KafkaClusterUtils.getAllPartitions();
+		return kafkaService.getAllPartitions();
 	}
 
 }

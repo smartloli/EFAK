@@ -15,28 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.util;
-
-import java.util.HashSet;
-import java.util.Set;
+package org.smartloli.kafka.eagle.factory;
 
 /**
- * Test Mail server whether send message success.
+ * Test Provider clazz.
  * 
  * @author smartloli.
  *
- *         Created by Jan 14, 2017
+ *         Created by Jan 17, 2017
  */
-public class TestSendMessageUtils {
+public class TestKafkaProvider {
 	public static void main(String[] args) {
-		String subject = "Alarm Lag";
-		String content = "Lag exceeds a specified threshold : Msg is somethings test...";
-		Set<String> set = new HashSet<String>();
-		set.add("smartdengjie@gmail.com");
-		int count = 0;
-		for (String sender : set) {
-			SendMessageUtils.send(sender, subject, content);
-			System.out.println("sender count[" + (++count) + "]");
-		}
+		KafkaService kafkaService = new KafkaFactory().create();
+		System.out.println(kafkaService.getAllPartitions());
 	}
 }

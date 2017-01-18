@@ -15,19 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.util;
+package org.smartloli.kafka.eagle.factory;
 
 /**
-* Test ZK data operate clazz
-* 
-* @author smartloli.
-*
-* Created by Jan 16, 2017
-*/
-public class TestZKDataUtils {
-	
+ * Test Provider clazz.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Jan 17, 2017
+ */
+public class TestZkProvider {
 	public static void main(String[] args) {
-		System.out.println(ZKDataUtils.getAlarm());
+		ZkService zkService = new ZkFactory().create();
+		System.out.println(zkService.zkCluster());
 	}
-
 }

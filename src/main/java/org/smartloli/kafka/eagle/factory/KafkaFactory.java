@@ -15,19 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.util;
+package org.smartloli.kafka.eagle.factory;
 
 /**
- * Test kafka cluster clazz.
- * 
- * @author smartloli.
- *
- *         Created by Jan 16, 2017
- */
-public class TestKafkaClusterUtils {
+* TODO
+* 
+* @author smartloli.
+*
+* Created by Jan 18, 2017
+*/
+public class KafkaFactory implements KafkaProvider{
 
-	public static void main(String[] args) {
-		System.out.println(KafkaClusterUtils.getActiveTopic());
+	@Override
+	public KafkaService create() {
+		return new KafkaServiceImpl();
 	}
 
 }

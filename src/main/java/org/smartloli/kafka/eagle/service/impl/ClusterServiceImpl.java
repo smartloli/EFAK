@@ -19,9 +19,11 @@ package org.smartloli.kafka.eagle.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 
+import org.smartloli.kafka.eagle.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.factory.KafkaService;
+import org.smartloli.kafka.eagle.factory.ZkFactory;
+import org.smartloli.kafka.eagle.factory.ZkService;
 import org.smartloli.kafka.eagle.service.ClusterService;
-import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
-import org.smartloli.kafka.eagle.util.ZKCliUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,6 +36,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ClusterServiceImpl implements ClusterService {
+
+	/** Kafka service interface. */
+	private KafkaService kafkaService = new KafkaFactory().create();
+	/** Zookeeper service interface. */
+	private ZkService zkService = new ZkFactory().create();
 
 	/** Execute zookeeper comand. */
 	public String execute(String cmd, String type) {
@@ -58,8 +65,8 @@ public class ClusterServiceImpl implements ClusterService {
 
 	/** Get kafka & zookeeper cluster information. */
 	public String get() {
-		String zk = KafkaClusterUtils.getZkCluster();
-		String kafka = KafkaClusterUtils.getAllBrokersInfo();
+		String zk = zkService.zkCluster();
+		String kafka = kafkaService.getAllBrokersInfo();
 		JSONObject obj = new JSONObject();
 		obj.put("zk", zk);
 		obj.put("kafka", kafka);
@@ -68,7 +75,7 @@ public class ClusterServiceImpl implements ClusterService {
 
 	/** Get Zookeeper whether live. */
 	public JSONObject status() {
-		return KafkaClusterUtils.zkCliStatus();
+		return zkService.zkCliStatus();
 	}
 
 	/** Delete zookeeper metadata & use command. */
@@ -79,7 +86,7 @@ public class ClusterServiceImpl implements ClusterService {
 			return cmd + " has error";
 		} else {
 			String command = len[1];
-			ret = ZKCliUtils.delete(command);
+			ret = zkService.delete(command);
 		}
 		return ret;
 	}
@@ -92,7 +99,7 @@ public class ClusterServiceImpl implements ClusterService {
 			return cmd + " has error";
 		} else {
 			String command = len[1];
-			ret = ZKCliUtils.get(command);
+			ret = zkService.get(command);
 		}
 		return ret;
 	}
@@ -105,7 +112,7 @@ public class ClusterServiceImpl implements ClusterService {
 			return cmd + " has error";
 		} else {
 			String command = len[1];
-			ret = ZKCliUtils.ls(command);
+			ret = zkService.ls(command);
 		}
 		return ret;
 	}

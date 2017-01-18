@@ -37,9 +37,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import org.smartloli.kafka.eagle.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.factory.KafkaService;
 import org.smartloli.kafka.eagle.service.TopicService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
-import org.smartloli.kafka.eagle.util.KafkaCommandUtils;
 
 /**
  * Kafka topic controller to viewer data.
@@ -56,6 +57,9 @@ public class TopicController {
 	/** Kafka topic service interface. */
 	@Autowired
 	private TopicService topicService;
+
+	/** Kafka service interface. */
+	private KafkaService kafkaService = new KafkaFactory().create();
 
 	/** Topic create viewer. */
 	@RequestMapping(value = "/topic/create", method = RequestMethod.GET)
@@ -244,7 +248,7 @@ public class TopicController {
 		String ke_topic_name = request.getParameter("ke_topic_name");
 		String ke_topic_partition = request.getParameter("ke_topic_partition");
 		String ke_topic_repli = request.getParameter("ke_topic_repli");
-		Map<String, Object> map = KafkaCommandUtils.create(ke_topic_name, ke_topic_partition, ke_topic_repli);
+		Map<String, Object> map = kafkaService.create(ke_topic_name, ke_topic_partition, ke_topic_repli);
 		if ("success".equals(map.get("status"))) {
 			session.removeAttribute("Submit_Status");
 			session.setAttribute("Submit_Status", map.get("info"));

@@ -18,15 +18,12 @@
 package org.smartloli.kafka.eagle.factory;
 
 /**
- * Test Provider clazz.
+ * TODO
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by Jan 18, 2017
  */
-public class TestProvider {
-	public static void main(String[] args) {
-		MailProvider provider = new SendMailFactory();
-		provider.create().send("810371213@qq.com","test alarm","server is aaaaaa");
-	}
+public interface KafkaProvider {
+	public KafkaService create();
 }

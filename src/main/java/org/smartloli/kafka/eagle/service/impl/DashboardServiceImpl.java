@@ -28,10 +28,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.domain.DashboardDomain;
+import org.smartloli.kafka.eagle.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.factory.KafkaService;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.service.DashboardService;
 import org.smartloli.kafka.eagle.util.ConstantUtils;
-import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 import org.springframework.stereotype.Service;
 
@@ -45,12 +46,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class DashboardServiceImpl implements DashboardService {
 
+	/** Kafka service interface. */
+	private KafkaService kafkaService = new KafkaFactory().create();
+
 	/** Get dashboard data. */
 	private String panel() {
 		int zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",").length;
-		String topicObject = KafkaClusterUtils.getAllPartitions();
+		String topicObject = kafkaService.getAllPartitions();
 		int topics = JSON.parseArray(topicObject).size();
-		String kafkaObject = KafkaClusterUtils.getAllBrokersInfo();
+		String kafkaObject = kafkaService.getAllBrokersInfo();
 		int brokers = JSON.parseArray(kafkaObject).size();
 		DashboardDomain dash = new DashboardDomain();
 		dash.setBrokers(brokers);
@@ -67,7 +71,7 @@ public class DashboardServiceImpl implements DashboardService {
 
 	/** Get consumer number from zookeeper. */
 	private int getConsumerNumbers() {
-		Map<String, List<String>> map = KafkaClusterUtils.getConsumers();
+		Map<String, List<String>> map = kafkaService.getConsumers();
 		int count = 0;
 		for (Entry<String, List<String>> entry : map.entrySet()) {
 			count += entry.getValue().size();
@@ -97,7 +101,7 @@ public class DashboardServiceImpl implements DashboardService {
 
 	/** Get kafka data. */
 	private String kafkaBrokersGraph() {
-		String kafka = KafkaClusterUtils.getAllBrokersInfo();
+		String kafka = kafkaService.getAllBrokersInfo();
 		JSONObject obj = new JSONObject();
 		obj.put("name", "Kafka Brokers");
 		JSONArray arr = JSON.parseArray(kafka);

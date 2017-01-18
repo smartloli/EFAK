@@ -22,10 +22,13 @@ package org.smartloli.kafka.eagle.factory;
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by Jan 18, 2017
  */
-public interface Sender {
+public class ZkFactory implements ZkProvider {
 
-	public void send(String... args);
+	@Override
+	public ZkService create() {
+		return new ZkServiceImpl();
+	}
 
 }

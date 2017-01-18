@@ -33,9 +33,9 @@ import com.google.gson.Gson;
  *
  *         Created by Jan 17, 2017
  */
-public class MailSender implements Sender {
+public class MailServiceImpl implements MailService {
 
-	private final Logger LOG = LoggerFactory.getLogger(MailSender.class);
+	private final Logger LOG = LoggerFactory.getLogger(MailServiceImpl.class);
 
 	@Override
 	public void send(String... args) {

@@ -27,7 +27,6 @@ package org.smartloli.kafka.eagle.util;
 public class TestKafkaCommandUtils {
 	
 	public static void main(String[] args) {
-		KafkaCommandUtils.list();
 	}
 
 }

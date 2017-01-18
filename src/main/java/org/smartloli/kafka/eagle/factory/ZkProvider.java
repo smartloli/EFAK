@@ -15,19 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.util;
+package org.smartloli.kafka.eagle.factory;
 
 /**
-* Test KafkaMetaUtils clazz
-* 
-* @author smartloli.
-*
-* Created by Jan 16, 2017
-*/
-public class TestKafkaMetaUtils {
-	
-	public static void main(String[] args) {
-		System.out.println(KafkaMetaUtils.findLeader("ke_test12345"));
-	}
-
+ * TODO
+ * 
+ * @author smartloli.
+ *
+ *         Created by Jan 18, 2017
+ */
+public interface ZkProvider {
+	public ZkService create();
 }

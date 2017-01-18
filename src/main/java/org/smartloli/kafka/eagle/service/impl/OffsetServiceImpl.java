@@ -29,12 +29,14 @@ import com.google.gson.Gson;
 
 import org.smartloli.kafka.eagle.domain.OffsetDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
+import org.smartloli.kafka.eagle.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.factory.KafkaService;
+import org.smartloli.kafka.eagle.factory.ZkFactory;
+import org.smartloli.kafka.eagle.factory.ZkService;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.service.OffsetService;
 import org.smartloli.kafka.eagle.util.CalendarUtils;
-import org.smartloli.kafka.eagle.util.ZKDataUtils;
 import org.springframework.stereotype.Service;
-import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 
 /**
  * Offsets consumer data.
@@ -46,9 +48,15 @@ import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 @Service
 public class OffsetServiceImpl implements OffsetService {
 
+	/** Kafka service interface. */
+	private KafkaService kafkaService = new KafkaFactory().create();
+	
+	/** Zookeeper service interface. */
+	private ZkService zkService = new ZkFactory().create();
+
 	/** Get Kafka brokers. */
 	private List<String> getBrokers(String topic, String group) {
-		JSONArray arr = JSON.parseArray(KafkaClusterUtils.getAllBrokersInfo());
+		JSONArray arr = JSON.parseArray(kafkaService.getAllBrokersInfo());
 		List<String> list = new ArrayList<String>();
 		for (Object object : arr) {
 			JSONObject obj = (JSONObject) object;
@@ -62,13 +70,13 @@ public class OffsetServiceImpl implements OffsetService {
 	/** Get Kafka logsize from Kafka topic. */
 	private String getKafkaLogSize(String topic, String group) {
 		List<String> hosts = getBrokers(topic, group);
-		List<String> partitions = KafkaClusterUtils.findTopicPartition(topic);
+		List<String> partitions = kafkaService.findTopicPartition(topic);
 		List<OffsetDomain> list = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
 			OffsetZkDomain offsetZk = getKafkaOffset(topic, group, partitionInt);
 			OffsetDomain offset = new OffsetDomain();
-			long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partitionInt);
+			long logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
 			offset.setPartition(partitionInt);
 			offset.setLogSize(logSize);
 			offset.setCreate(offsetZk.getCreate());
@@ -106,13 +114,13 @@ public class OffsetServiceImpl implements OffsetService {
 	/** Get logsize from zookeeper. */
 	private String getLogSize(String topic, String group) {
 		List<String> hosts = getBrokers(topic, group);
-		List<String> partitions = KafkaClusterUtils.findTopicPartition(topic);
+		List<String> partitions = kafkaService.findTopicPartition(topic);
 		List<OffsetDomain> list = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
-			OffsetZkDomain offsetZk = KafkaClusterUtils.getOffset(topic, group, partitionInt);
+			OffsetZkDomain offsetZk = kafkaService.getOffset(topic, group, partitionInt);
 			OffsetDomain offset = new OffsetDomain();
-			long logSize = KafkaClusterUtils.getLogSize(hosts, topic, partitionInt);
+			long logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
 			offset.setPartition(partitionInt);
 			offset.setLogSize(logSize);
 			offset.setCreate(offsetZk.getCreate());
@@ -136,7 +144,7 @@ public class OffsetServiceImpl implements OffsetService {
 
 	/** Get Kafka offset graph data from Zookeeper. */
 	public String getOffsetsGraph(String group, String topic) {
-		String ret = ZKDataUtils.getOffsets(group, topic);
+		String ret = zkService.getOffsets(group, topic);
 		if (ret.length() > 0) {
 			ret = JSON.parseObject(ret).getString("data");
 		}
@@ -145,7 +153,7 @@ public class OffsetServiceImpl implements OffsetService {
 
 	/** Judge group & topic from Zookeeper has exist. */
 	private boolean hasGroupTopic(String group, String topic) {
-		return KafkaClusterUtils.findTopicIsConsumer(topic, group);
+		return kafkaService.findTopicAndGroupExist(topic, group);
 	}
 
 	/** Judge group & topic exist Kafka topic or Zookeeper. */

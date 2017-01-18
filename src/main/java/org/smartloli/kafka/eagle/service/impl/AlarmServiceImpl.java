@@ -25,10 +25,12 @@ import java.util.Map.Entry;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.domain.AlarmDomain;
+import org.smartloli.kafka.eagle.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.factory.KafkaService;
+import org.smartloli.kafka.eagle.factory.ZkFactory;
+import org.smartloli.kafka.eagle.factory.ZkService;
 import org.smartloli.kafka.eagle.service.AlarmService;
-import org.smartloli.kafka.eagle.util.ZKDataUtils;
 import org.springframework.stereotype.Service;
-import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 
 /**
  * Alarm implements service to get configure info.
@@ -40,6 +42,12 @@ import org.smartloli.kafka.eagle.util.KafkaClusterUtils;
 @Service
 public class AlarmServiceImpl implements AlarmService {
 
+	/** Kafka service interface. */
+	private KafkaService kafkaService = new KafkaFactory().create();
+	
+	/** Zookeeper service interface. */
+	private ZkService zkService = new ZkFactory().create();
+	
 	/**
 	 * Add alarmer information.
 	 * 
@@ -51,7 +59,7 @@ public class AlarmServiceImpl implements AlarmService {
 	 */
 	public Map<String, Object> add(AlarmDomain alarm) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		int status = ZKDataUtils.insertAlarmConfigure(alarm);
+		int status = zkService.insertAlarmConfigure(alarm);
 		if (status == -1) {
 			map.put("status", "error");
 			map.put("info", "insert [" + alarm + "] has error!");
@@ -69,12 +77,12 @@ public class AlarmServiceImpl implements AlarmService {
 	 * @param topic
 	 */
 	public void delete(String group, String topic) {
-		ZKDataUtils.delete(group, topic, "alarm");
+		zkService.remove(group, topic, "alarm");
 	}
 
 	/** Get alarmer topics. */
 	public String get() {
-		Map<String, List<String>> tmp = KafkaClusterUtils.getConsumers();
+		Map<String, List<String>> tmp = kafkaService.getConsumers();
 		JSONArray retArray = new JSONArray();
 		for (Entry<String, List<String>> entry : tmp.entrySet()) {
 			JSONObject retObj = new JSONObject();
@@ -87,7 +95,7 @@ public class AlarmServiceImpl implements AlarmService {
 
 	/** List alarmer datasets. */
 	public String list() {
-		return ZKDataUtils.getAlarm();
+		return zkService.getAlarm();
 	}
 
 }

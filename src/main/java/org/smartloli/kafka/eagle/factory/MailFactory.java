@@ -15,17 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.util;
+package org.smartloli.kafka.eagle.factory;
 
 /**
- * Test ZKCliUtils clazz.
- * 
- * @author smartloli.
- *
- *         Created by Jan 16, 2017
- */
-public class TestZKCliUtils {
-	public static void main(String[] args) {
-		System.out.println(ZKCliUtils.get("/kafka_eagle/offsets/group2/ke_test1"));
+* TODO
+* 
+* @author smartloli.
+*
+* Created by Jan 17, 2017
+*/
+public class MailFactory implements MailProvider{
+
+	@Override
+	public MailService create() {
+		return new MailServiceImpl();
 	}
+
 }

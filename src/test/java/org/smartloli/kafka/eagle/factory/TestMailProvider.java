@@ -18,17 +18,15 @@
 package org.smartloli.kafka.eagle.factory;
 
 /**
-* TODO
-* 
-* @author smartloli.
-*
-* Created by Jan 17, 2017
-*/
-public class SendMailFactory implements MailProvider{
-
-	@Override
-	public Sender create() {
-		return new MailSender();
+ * Test Provider clazz.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Jan 17, 2017
+ */
+public class TestMailProvider {
+	public static void main(String[] args) {
+		MailProvider provider = new MailFactory();
+		provider.create().send("810371213@qq.com","test alarm","server is aaaaaa");
 	}
-
 }

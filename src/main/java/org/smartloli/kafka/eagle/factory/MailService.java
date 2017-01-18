@@ -24,6 +24,8 @@ package org.smartloli.kafka.eagle.factory;
  *
  *         Created by Jan 17, 2017
  */
-public interface MailProvider {
-	public MailService create();
+public interface MailService {
+
+	public void send(String... args);
+
 }

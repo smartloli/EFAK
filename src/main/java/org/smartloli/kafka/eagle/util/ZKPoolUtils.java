@@ -33,25 +33,25 @@ import org.slf4j.LoggerFactory;
  *         Created by Aug 14, 2016
  */
 public final class ZKPoolUtils {
-	
+
 	private final static Logger LOG = LoggerFactory.getLogger(ZKPoolUtils.class);
 	private static ZKPoolUtils instance = null;
 	/** Zookeeper client connection pool. */
-	private Vector<ZkClient> pool;
+	private Vector<ZkClient> zkCliPool;
 	/** Set pool max size. */
-	private int poolSize = SystemConfigUtils.getIntProperty("kafka.zk.limit.size");
+	private int zkCliPoolSize = SystemConfigUtils.getIntProperty("kafka.zk.limit.size");
 	/** Serializer Zookeeper client pool. */
-	private Vector<ZkClient> poolZKSerializer;
+	private Vector<ZkClient> zkCliPoolSerializer;
 	/** Get Zookeeper client address. */
 	private String zkCliAddress = SystemConfigUtils.getProperty("kafka.zk.list");
 
 	/** Init ZkClient pool numbers. */
 	private void addZkClient() {
 		ZkClient zkc = null;
-		for (int i = 0; i < poolSize; i++) {
+		for (int i = 0; i < zkCliPoolSize; i++) {
 			try {
 				zkc = new ZkClient(zkCliAddress);
-				pool.add(zkc);
+				zkCliPool.add(zkc);
 			} catch (Exception ex) {
 				LOG.error(ex.getMessage());
 			}
@@ -61,10 +61,10 @@ public final class ZKPoolUtils {
 	/** Add serializer zkclient. */
 	private void addZkSerializerClient() {
 		ZkClient zkSerializer = null;
-		for (int i = 0; i < poolSize; i++) {
+		for (int i = 0; i < zkCliPoolSize; i++) {
 			try {
 				zkSerializer = new ZkClient(zkCliAddress, Integer.MAX_VALUE, 100000, ZKStringSerializer$.MODULE$);
-				poolZKSerializer.add(zkSerializer);
+				zkCliPoolSerializer.add(zkSerializer);
 			} catch (Exception ex) {
 				LOG.error(ex.getMessage());
 			}
@@ -73,26 +73,26 @@ public final class ZKPoolUtils {
 
 	/** Close ZkClient pool. */
 	public synchronized void closePool() {
-		if (pool != null && pool.size() > 0) {
-			for (int i = 0; i < pool.size(); i++) {
+		if (zkCliPool != null && zkCliPool.size() > 0) {
+			for (int i = 0; i < zkCliPool.size(); i++) {
 				try {
-					pool.get(i).close();
+					zkCliPool.get(i).close();
 				} catch (Exception ex) {
 					LOG.error(ex.getMessage());
 				} finally {
-					pool.remove(i);
+					zkCliPool.remove(i);
 				}
 			}
 		}
-	
-		if (poolZKSerializer != null && poolZKSerializer.size() > 0) {
-			for (int i = 0; i < poolZKSerializer.size(); i++) {
+
+		if (zkCliPoolSerializer != null && zkCliPoolSerializer.size() > 0) {
+			for (int i = 0; i < zkCliPoolSerializer.size(); i++) {
 				try {
-					poolZKSerializer.get(i).close();
+					zkCliPoolSerializer.get(i).close();
 				} catch (Exception ex) {
 					LOG.error(ex.getMessage());
 				} finally {
-					poolZKSerializer.remove(i);
+					zkCliPoolSerializer.remove(i);
 				}
 			}
 		}
@@ -111,24 +111,24 @@ public final class ZKPoolUtils {
 	public synchronized ZkClient getZkClient() {
 		ZkClient zkc = null;
 		try {
-			if (pool.size() > 0) {
-				zkc = pool.get(0);
-				pool.remove(0);
+			if (zkCliPool.size() > 0) {
+				zkc = zkCliPool.get(0);
+				zkCliPool.remove(0);
 				String osName = System.getProperties().getProperty("os.name");
 				if (osName.contains("Linux")) {
-					LOG.debug("Get pool,and available size [" + pool.size() + "]");
+					LOG.debug("Get pool,and available size [" + zkCliPool.size() + "]");
 				} else {
-					LOG.info("Get pool,and available size [" + pool.size() + "]");
+					LOG.info("Get pool,and available size [" + zkCliPool.size() + "]");
 				}
 			} else {
 				addZkClient();
-				zkc = pool.get(0);
-				pool.remove(0);
+				zkc = zkCliPool.get(0);
+				zkCliPool.remove(0);
 				String osName = System.getProperties().getProperty("os.name");
 				if (osName.contains("Linux")) {
-					LOG.debug("Get pool,and available size [" + pool.size() + "]");
+					LOG.debug("Get pool,and available size [" + zkCliPool.size() + "]");
 				} else {
-					LOG.warn("Get pool,and available size [" + pool.size() + "]");
+					LOG.warn("Get pool,and available size [" + zkCliPool.size() + "]");
 				}
 			}
 		} catch (Exception e) {
@@ -139,25 +139,25 @@ public final class ZKPoolUtils {
 
 	/** Get zk client by serializer. */
 	public synchronized ZkClient getZkClientSerializer() {
-		if (poolZKSerializer.size() > 0) {
-			ZkClient zkc = poolZKSerializer.get(0);
-			poolZKSerializer.remove(0);
+		if (zkCliPoolSerializer.size() > 0) {
+			ZkClient zkc = zkCliPoolSerializer.get(0);
+			zkCliPoolSerializer.remove(0);
 			String osName = System.getProperties().getProperty("os.name");
 			if (osName.contains("Linux")) {
-				LOG.debug("Get poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
+				LOG.debug("Get poolZKSerializer,and available size [" + zkCliPoolSerializer.size() + "]");
 			} else {
-				LOG.info("Get poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
+				LOG.info("Get poolZKSerializer,and available size [" + zkCliPoolSerializer.size() + "]");
 			}
 			return zkc;
 		} else {
 			addZkSerializerClient();
-			ZkClient zkc = poolZKSerializer.get(0);
-			poolZKSerializer.remove(0);
+			ZkClient zkc = zkCliPoolSerializer.get(0);
+			zkCliPoolSerializer.remove(0);
 			String osName = System.getProperties().getProperty("os.name");
 			if (osName.contains("Linux")) {
-				LOG.debug("get poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
+				LOG.debug("get poolZKSerializer,and available size [" + zkCliPoolSerializer.size() + "]");
 			} else {
-				LOG.warn("get poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
+				LOG.warn("get poolZKSerializer,and available size [" + zkCliPoolSerializer.size() + "]");
 			}
 			return zkc;
 		}
@@ -165,36 +165,36 @@ public final class ZKPoolUtils {
 
 	/** Initialization ZkClient pool size. */
 	private void initZKPoolUtils() {
-		LOG.info("Initialization ZkClient pool size [" + poolSize + "]");
-		pool = new Vector<ZkClient>(poolSize);
-		poolZKSerializer = new Vector<ZkClient>(poolSize);
+		LOG.info("Initialization ZkClient pool size [" + zkCliPoolSize + "]");
+		zkCliPool = new Vector<ZkClient>(zkCliPoolSize);
+		zkCliPoolSerializer = new Vector<ZkClient>(zkCliPoolSize);
 		addZkClient();
 		addZkSerializerClient();
 	}
 
 	/** Release ZkClient object. */
 	public synchronized void release(ZkClient zkc) {
-		if (pool.size() < 25) {
-			pool.add(zkc);
+		if (zkCliPool.size() < 25) {
+			zkCliPool.add(zkc);
 		}
 		String osName = System.getProperties().getProperty("os.name");
 		if (osName.contains("Linux")) {
-			LOG.debug("Release pool,and available size [" + pool.size() + "]");
+			LOG.debug("Release pool,and available size [" + zkCliPool.size() + "]");
 		} else {
-			LOG.info("Release pool,and available size [" + pool.size() + "]");
+			LOG.info("Release pool,and available size [" + zkCliPool.size() + "]");
 		}
 	}
 
 	/** Release ZkClient Serializer object. */
 	public synchronized void releaseZKSerializer(ZkClient zkc) {
-		if (poolZKSerializer.size() < 25) {
-			poolZKSerializer.add(zkc);
+		if (zkCliPoolSerializer.size() < 25) {
+			zkCliPoolSerializer.add(zkc);
 		}
 		String osName = System.getProperties().getProperty("os.name");
 		if (osName.contains("Linux")) {
-			LOG.debug("Release poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
+			LOG.debug("Release poolZKSerializer,and available size [" + zkCliPoolSerializer.size() + "]");
 		} else {
-			LOG.info("Release poolZKSerializer,and available size [" + poolZKSerializer.size() + "]");
+			LOG.info("Release poolZKSerializer,and available size [" + zkCliPoolSerializer.size() + "]");
 		}
 	}
 
