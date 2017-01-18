@@ -24,11 +24,14 @@ import java.util.Map.Entry;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+
 import org.smartloli.kafka.eagle.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.factory.KafkaService;
 import org.smartloli.kafka.eagle.factory.ZkFactory;
 import org.smartloli.kafka.eagle.factory.ZkService;
+import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.service.AlarmService;
 import org.springframework.stereotype.Service;
 
@@ -44,10 +47,10 @@ public class AlarmServiceImpl implements AlarmService {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
-	
+
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
-	
+
 	/**
 	 * Add alarmer information.
 	 * 
@@ -80,9 +83,31 @@ public class AlarmServiceImpl implements AlarmService {
 		zkService.remove(group, topic, "alarm");
 	}
 
+	public String get(String formatter) {
+		if ("kafka".equals(formatter)) {
+			return getKafka();
+		} else {
+			return get();
+		}
+	}
+
 	/** Get alarmer topics. */
-	public String get() {
+	private String get() {
 		Map<String, List<String>> tmp = kafkaService.getConsumers();
+		JSONArray retArray = new JSONArray();
+		for (Entry<String, List<String>> entry : tmp.entrySet()) {
+			JSONObject retObj = new JSONObject();
+			retObj.put("group", entry.getKey());
+			retObj.put("topics", entry.getValue());
+			retArray.add(retObj);
+		}
+		return retArray.toJSONString();
+	}
+
+	private String getKafka() {
+		Map<String, List<String>> type = new HashMap<String, List<String>>();
+		Gson gson = new Gson();
+		Map<String, List<String>> tmp = gson.fromJson(RpcClient.getConsumer(), type.getClass());
 		JSONArray retArray = new JSONArray();
 		for (Entry<String, List<String>> entry : tmp.entrySet()) {
 			JSONObject retObj = new JSONObject();

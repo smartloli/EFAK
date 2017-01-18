@@ -37,7 +37,7 @@ public interface AlarmService {
 	public void delete(String group, String topic);
 
 	/** Get alarmer interface. */
-	public String get();
+	public String get(String formatter);
 
 	/** List alarmer information. */
 	public String list();

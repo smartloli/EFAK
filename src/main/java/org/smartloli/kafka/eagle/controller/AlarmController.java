@@ -40,6 +40,7 @@ import org.smartloli.kafka.eagle.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.service.AlarmService;
 import org.smartloli.kafka.eagle.util.CalendarUtils;
 import org.smartloli.kafka.eagle.util.GzipUtils;
+import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
  * Alarm controller to viewer data.
@@ -98,8 +99,9 @@ public class AlarmController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		try {
-			byte[] output = GzipUtils.compressToByte(alarmService.get());
+			byte[] output = GzipUtils.compressToByte(alarmService.get(formatter));
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
