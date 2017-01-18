@@ -16,18 +16,7 @@ $(document).ready(function() {
 					}
 				}
 			});
-		} else if (command.indexOf("delete") > -1) {
-			$.ajax({
-				type : 'get',
-				dataType : 'json',
-				url : '/ke/cluster/zk/cmd/ajax?cmd=' + command + '&type=delete',
-				success : function(datas) {
-					if (datas != null) {
-						term.echo(new String(datas.result));
-					}
-				}
-			});
-		} else if (command.indexOf("get") > -1) {
+		}  else if (command.indexOf("get") > -1) {
 			$.ajax({
 				type : 'get',
 				dataType : 'json',
@@ -39,7 +28,7 @@ $(document).ready(function() {
 				}
 			});
 		} else {
-			throw new Error("Currently only supports ls, delete, get commands, example: ls / ");
+			throw new Error("Currently only supports ls, get commands, example: ls / ");
 		}
 	}
 
