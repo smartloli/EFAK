@@ -99,11 +99,11 @@ public class KafkaServiceImpl implements KafkaService {
 				String port = seed.split(":")[1];
 				consumer = new SimpleConsumer(ip, Integer.parseInt(port), 10000, 64 * 1024, "leaderLookup");
 				List<String> topics = Collections.singletonList(a_topic);
-				TopicMetadataRequest req = new TopicMetadataRequest(topics);
-				kafka.javaapi.TopicMetadataResponse resp = consumer.send(req);
+				TopicMetadataRequest topicMetaReqst = new TopicMetadataRequest(topics);
+				kafka.javaapi.TopicMetadataResponse resp = consumer.send(topicMetaReqst);
 
-				List<TopicMetadata> metaData = resp.topicsMetadata();
-				for (TopicMetadata item : metaData) {
+				List<TopicMetadata> topicMetadatas = resp.topicsMetadata();
+				for (TopicMetadata item : topicMetadatas) {
 					for (PartitionMetadata part : item.partitionsMetadata()) {
 						if (part.partitionId() == a_partition) {
 							returnMetaData = part;
@@ -150,12 +150,12 @@ public class KafkaServiceImpl implements KafkaService {
 	 */
 	public List<String> findTopicPartition(String topic) {
 		ZkClient zkc = zkPool.getZkClient();
-		Seq<String> seq = ZkUtils.getChildren(zkc, BROKER_TOPICS_PATH + "/" + topic + "/partitions");
-		List<String> topicAndPartitions = JavaConversions.seqAsJavaList(seq);
+		Seq<String> brokerTopicsPaths = ZkUtils.getChildren(zkc, BROKER_TOPICS_PATH + "/" + topic + "/partitions");
+		List<String> topicAndPartitions = JavaConversions.seqAsJavaList(brokerTopicsPaths);
 		if (zkc != null) {
 			zkPool.release(zkc);
 			zkc = null;
-			seq = null;
+			brokerTopicsPaths = null;
 		}
 		return topicAndPartitions;
 	}
