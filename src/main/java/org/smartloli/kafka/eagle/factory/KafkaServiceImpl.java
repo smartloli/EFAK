@@ -100,9 +100,9 @@ public class KafkaServiceImpl implements KafkaService {
 				consumer = new SimpleConsumer(ip, Integer.parseInt(port), 10000, 64 * 1024, "leaderLookup");
 				List<String> topics = Collections.singletonList(a_topic);
 				TopicMetadataRequest topicMetaReqst = new TopicMetadataRequest(topics);
-				kafka.javaapi.TopicMetadataResponse resp = consumer.send(topicMetaReqst);
+				kafka.javaapi.TopicMetadataResponse topicMetaResp = consumer.send(topicMetaReqst);
 
-				List<TopicMetadata> topicMetadatas = resp.topicsMetadata();
+				List<TopicMetadata> topicMetadatas = topicMetaResp.topicsMetadata();
 				for (TopicMetadata item : topicMetadatas) {
 					for (PartitionMetadata part : item.partitionsMetadata()) {
 						if (part.partitionId() == a_partition) {
