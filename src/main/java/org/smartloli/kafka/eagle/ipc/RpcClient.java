@@ -24,7 +24,7 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.domain.ConsumerPageDomain;
+import org.smartloli.kafka.eagle.domain.PageParamDomain;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
@@ -94,7 +94,7 @@ public class RpcClient {
 	}
 
 	/** Get consumer page from Rpc server. */
-	public static String getConsumerPage(ConsumerPageDomain page) {
+	public static String getConsumerPage(PageParamDomain page) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);

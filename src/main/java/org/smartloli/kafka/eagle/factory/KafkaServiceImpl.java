@@ -29,9 +29,9 @@ import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.domain.BrokersDomain;
-import org.smartloli.kafka.eagle.domain.ConsumerPageDomain;
-import org.smartloli.kafka.eagle.domain.KafkaBrokerDomain;
-import org.smartloli.kafka.eagle.domain.KafkaMetaDomain;
+import org.smartloli.kafka.eagle.domain.PageParamDomain;
+import org.smartloli.kafka.eagle.domain.HostsDomain;
+import org.smartloli.kafka.eagle.domain.MetadataDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.domain.PartitionsDomain;
 import org.smartloli.kafka.eagle.util.CalendarUtils;
@@ -293,7 +293,7 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Obtaining kafka consumer page information from zookeeper. */
-	public Map<String, List<String>> getConsumers(ConsumerPageDomain page) {
+	public Map<String, List<String>> getConsumers(PageParamDomain page) {
 		ZkClient zkc = zkPool.getZkClient();
 		Map<String, List<String>> mapConsumers = new HashMap<String, List<String>>();
 		try {
@@ -525,13 +525,13 @@ public class KafkaServiceImpl implements KafkaService {
 	 * 
 	 * @param topic
 	 * @return List
-	 * @see org.smartloli.kafka.eagle.domain.KafkaMetaDomain
+	 * @see org.smartloli.kafka.eagle.domain.MetadataDomain
 	 */
-	public List<KafkaMetaDomain> findLeader(String topic) {
-		List<KafkaMetaDomain> list = new ArrayList<>();
+	public List<MetadataDomain> findLeader(String topic) {
+		List<MetadataDomain> list = new ArrayList<>();
 
 		SimpleConsumer consumer = null;
-		for (KafkaBrokerDomain broker : getBrokers()) {
+		for (HostsDomain broker : getBrokers()) {
 			try {
 				consumer = new SimpleConsumer(broker.getHost(), broker.getPort(), 100000, 64 * 1024, "leaderLookup");
 				if (consumer != null) {
@@ -557,7 +557,7 @@ public class KafkaServiceImpl implements KafkaService {
 		List<TopicMetadata> metaData = resp.topicsMetadata();
 		for (TopicMetadata item : metaData) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
-				KafkaMetaDomain kMeta = new KafkaMetaDomain();
+				MetadataDomain kMeta = new MetadataDomain();
 				kMeta.setIsr(geyReplicasIsr(topic, part.partitionId()));
 				kMeta.setLeader(part.leader() == null ? -1 : part.leader().id());
 				kMeta.setPartitionId(part.partitionId());
@@ -576,13 +576,13 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get kafka brokers from zookeeper. */
-	private List<KafkaBrokerDomain> getBrokers() {
+	private List<HostsDomain> getBrokers() {
 		String brokersStr = getAllBrokersInfo();
-		List<KafkaBrokerDomain> brokers = new ArrayList<KafkaBrokerDomain>();
+		List<HostsDomain> brokers = new ArrayList<HostsDomain>();
 		JSONArray arr = JSON.parseArray(brokersStr);
 		for (Object object : arr) {
 			JSONObject obj = (JSONObject) object;
-			KafkaBrokerDomain broker = new KafkaBrokerDomain();
+			HostsDomain broker = new HostsDomain();
 			broker.setHost(obj.getString("host"));
 			broker.setPort(obj.getInteger("port"));
 			brokers.add(broker);

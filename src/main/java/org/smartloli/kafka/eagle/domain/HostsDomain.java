@@ -26,7 +26,7 @@ import com.google.gson.Gson;
  *
  *         Created by Aug 15, 2016
  */
-public class KafkaBrokerDomain {
+public class HostsDomain {
 
 	private String host;
 	private int port;

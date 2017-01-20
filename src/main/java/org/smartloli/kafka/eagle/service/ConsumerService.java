@@ -17,7 +17,7 @@
  */
 package org.smartloli.kafka.eagle.service;
 
-import org.smartloli.kafka.eagle.domain.ConsumerPageDomain;
+import org.smartloli.kafka.eagle.domain.PageParamDomain;
 
 /**
  * Kafka consumer data interface.
@@ -41,7 +41,7 @@ public interface ConsumerService {
 	public String getConsumerDetail(String formatter, String group);
 
 	/** Judge consumers storage offset in kafka or zookeeper interface. */
-	public String getConsumer(String formatter, ConsumerPageDomain page);
+	public String getConsumer(String formatter, PageParamDomain page);
 
 	/** Get consumer size from kafka topic interface. */
 	public int getConsumerCount(String formatter);

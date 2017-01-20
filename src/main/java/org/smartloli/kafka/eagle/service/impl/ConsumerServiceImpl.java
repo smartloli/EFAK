@@ -29,9 +29,9 @@ import com.google.gson.Gson;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.domain.ConsumerDetailDomain;
+import org.smartloli.kafka.eagle.domain.TopicConsumerDomain;
 import org.smartloli.kafka.eagle.domain.ConsumerDomain;
-import org.smartloli.kafka.eagle.domain.ConsumerPageDomain;
+import org.smartloli.kafka.eagle.domain.PageParamDomain;
 import org.smartloli.kafka.eagle.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.factory.KafkaService;
 import org.smartloli.kafka.eagle.ipc.RpcClient;
@@ -117,7 +117,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get consumers from zookeeper. */
-	private String getConsumer(ConsumerPageDomain page) {
+	private String getConsumer(PageParamDomain page) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(page);
 		List<ConsumerDomain> consumerPages = new ArrayList<ConsumerDomain>();
 		int id = 0;
@@ -134,7 +134,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Judge consumers storage offset in kafka or zookeeper. */
-	public String getConsumer(String formatter, ConsumerPageDomain page) {
+	public String getConsumer(String formatter, PageParamDomain page) {
 		if ("kafka".equals(formatter)) {
 			return getKafkaConsumer(page);
 		} else {
@@ -163,10 +163,10 @@ public class ConsumerServiceImpl implements ConsumerService {
 	private String getConsumerDetail(String group) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers();
 		Map<String, List<String>> actvTopics = kafkaService.getActiveTopic();
-		List<ConsumerDetailDomain> kafkaConsumerDetails = new ArrayList<ConsumerDetailDomain>();
+		List<TopicConsumerDomain> kafkaConsumerDetails = new ArrayList<TopicConsumerDomain>();
 		int id = 0;
 		for (String topic : consumers.get(group)) {
-			ConsumerDetailDomain consumerDetail = new ConsumerDetailDomain();
+			TopicConsumerDomain consumerDetail = new TopicConsumerDomain();
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
 			if (actvTopics.containsKey(group + "_" + topic)) {
@@ -247,7 +247,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get kafka consumer & storage offset in kafka topic. */
-	private String getKafkaConsumer(ConsumerPageDomain page) {
+	private String getKafkaConsumer(PageParamDomain page) {
 		List<ConsumerDomain> kafkaConsumerPages = new ArrayList<ConsumerDomain>();
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
@@ -271,10 +271,10 @@ public class ConsumerServiceImpl implements ConsumerService {
 		Gson gson = new Gson();
 		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
 		Map<String, List<String>> actvTopics = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
-		List<ConsumerDetailDomain> kafkaConsumerPages = new ArrayList<ConsumerDetailDomain>();
+		List<TopicConsumerDomain> kafkaConsumerPages = new ArrayList<TopicConsumerDomain>();
 		int id = 0;
 		for (String topic : consumers.get(group)) {
-			ConsumerDetailDomain consumerDetail = new ConsumerDetailDomain();
+			TopicConsumerDomain consumerDetail = new TopicConsumerDomain();
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
 			if (actvTopics.containsKey(group + "_" + topic)) {

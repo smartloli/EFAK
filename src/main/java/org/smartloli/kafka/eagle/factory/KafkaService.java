@@ -20,8 +20,8 @@ package org.smartloli.kafka.eagle.factory;
 import java.util.List;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.domain.ConsumerPageDomain;
-import org.smartloli.kafka.eagle.domain.KafkaMetaDomain;
+import org.smartloli.kafka.eagle.domain.PageParamDomain;
+import org.smartloli.kafka.eagle.domain.MetadataDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 
 /**
@@ -52,7 +52,7 @@ public interface KafkaService {
 	public Map<String, List<String>> getConsumers();
 
 	/** Obtaining kafka consumer page information from zookeeper. */
-	public Map<String, List<String>> getConsumers(ConsumerPageDomain page);
+	public Map<String, List<String>> getConsumers(PageParamDomain page);
 
 	/** Use Kafka low consumer API & get logsize size from zookeeper. */
 	public long getLogSize(List<String> hosts, String topic, int partition);
@@ -67,5 +67,5 @@ public interface KafkaService {
 	public Map<String, Object> create(String topicName, String partitions, String replic);
 
 	/** Find leader through topic. */
-	public List<KafkaMetaDomain> findLeader(String topic);
+	public List<MetadataDomain> findLeader(String topic);
 }

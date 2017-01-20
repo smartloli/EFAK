@@ -26,7 +26,7 @@ import com.google.gson.Gson;
  *
  *         Created by Aug 16, 2016
  */
-public class ConsumerDetailDomain {
+public class TopicConsumerDomain {
 
 	private int id;
 	private String topic;

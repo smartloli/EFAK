@@ -26,7 +26,7 @@ import com.google.gson.Gson;
  *
  *         Created by Aug 15, 2016
  */
-public class KafkaMetaDomain {
+public class MetadataDomain {
 
 	private int partitionId;
 	private int leader;

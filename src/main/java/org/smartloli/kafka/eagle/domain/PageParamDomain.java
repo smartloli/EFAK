@@ -26,7 +26,7 @@ import com.google.gson.Gson;
  *
  *         Created by Jan 10, 2017
  */
-public class ConsumerPageDomain {
+public class PageParamDomain {
 
 	private String search;
 	private int iDisplayStart;
