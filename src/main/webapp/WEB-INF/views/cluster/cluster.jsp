@@ -92,6 +92,6 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/cluster.js" name="loader" />
+	<jsp:param value="main/cluster/cluster.js" name="loader" />
 </jsp:include>
 </html>

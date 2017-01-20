@@ -33,6 +33,6 @@
 
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/404.js" name="loader" />
+	<jsp:param value="main/error/error.js" name="loader" />
 </jsp:include>
 </html>

@@ -110,6 +110,6 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/offset.realtime.js" name="loader" />
+	<jsp:param value="main/consumer/offset.realtime.js" name="loader" />
 </jsp:include>
 </html>

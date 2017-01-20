@@ -69,6 +69,6 @@
 </body>
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="plugins/terminal/jquery.terminal.min.js" name="loader" />
-	<jsp:param value="main/zkcli.js" name="loader" />
+	<jsp:param value="main/cluster/zkcli.js" name="loader" />
 </jsp:include>
 </html>
