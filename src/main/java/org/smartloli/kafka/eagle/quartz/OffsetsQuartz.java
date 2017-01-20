@@ -70,19 +70,19 @@ public class OffsetsQuartz {
 
 	/** Get alarmer configure. */
 	private List<AlarmDomain> alarmConfigure() {
-		String ret = zkService.getAlarm();
-		List<AlarmDomain> list = new ArrayList<>();
-		JSONArray array = JSON.parseArray(ret);
-		for (Object object : array) {
+		String alarmer = zkService.getAlarm();
+		List<AlarmDomain> targets = new ArrayList<>();
+		JSONArray alarmers = JSON.parseArray(alarmer);
+		for (Object object : alarmers) {
 			AlarmDomain alarm = new AlarmDomain();
-			JSONObject obj = (JSONObject) object;
-			alarm.setGroup(obj.getString("group"));
-			alarm.setTopics(obj.getString("topic"));
-			alarm.setLag(obj.getLong("lag"));
-			alarm.setOwners(obj.getString("owner"));
-			list.add(alarm);
+			JSONObject alarmSerialize = (JSONObject) object;
+			alarm.setGroup(alarmSerialize.getString("group"));
+			alarm.setTopics(alarmSerialize.getString("topic"));
+			alarm.setLag(alarmSerialize.getLong("lag"));
+			alarm.setOwners(alarmSerialize.getString("owner"));
+			targets.add(alarm);
 		}
-		return list;
+		return targets;
 	}
 
 	/** Get kafka brokers. */
@@ -104,36 +104,36 @@ public class OffsetsQuartz {
 			tuple.setTimespan(System.currentTimeMillis());
 			lruCache.put(key, tuple);
 		}
-		JSONArray arr = JSON.parseArray(brokers);
-		List<String> list = new ArrayList<String>();
-		for (Object object : arr) {
-			JSONObject obj = (JSONObject) object;
-			String host = obj.getString("host");
-			int port = obj.getInteger("port");
-			list.add(host + ":" + port);
+		JSONArray kafkaBrokers = JSON.parseArray(brokers);
+		List<String> targets = new ArrayList<String>();
+		for (Object object : kafkaBrokers) {
+			JSONObject kafkaBroker = (JSONObject) object;
+			String host = kafkaBroker.getString("host");
+			int port = kafkaBroker.getInteger("port");
+			targets.add(host + ":" + port);
 		}
-		return list;
+		return targets;
 	}
 
 	private static OffsetZkDomain getKafkaOffset(String topic, String group, int partition) {
-		JSONArray array = JSON.parseArray(RpcClient.getOffset());
-		OffsetZkDomain offsetZk = new OffsetZkDomain();
-		for (Object obj : array) {
-			JSONObject object = (JSONObject) obj;
-			String _topic = object.getString("topic");
-			String _group = object.getString("group");
-			int _partition = object.getInteger("partition");
-			long timestamp = object.getLong("timestamp");
-			long offset = object.getLong("offset");
-			String owner = object.getString("owner");
+		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset());
+		OffsetZkDomain targets = new OffsetZkDomain();
+		for (Object object : kafkaOffsets) {
+			JSONObject kafkaOffset = (JSONObject) object;
+			String _topic = kafkaOffset.getString("topic");
+			String _group = kafkaOffset.getString("group");
+			int _partition = kafkaOffset.getInteger("partition");
+			long timestamp = kafkaOffset.getLong("timestamp");
+			long offset = kafkaOffset.getLong("offset");
+			String owner = kafkaOffset.getString("owner");
 			if (topic.equals(_topic) && group.equals(_group) && partition == _partition) {
-				offsetZk.setOffset(offset);
-				offsetZk.setOwners(owner);
-				offsetZk.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
-				offsetZk.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
+				targets.setOffset(offset);
+				targets.setOwners(owner);
+				targets.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
+				targets.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
 			}
 		}
-		return offsetZk;
+		return targets;
 	}
 
 	/** Get the corresponding string per minute. */
@@ -146,7 +146,7 @@ public class OffsetsQuartz {
 	public void jobQuartz() {
 		try {
 			List<String> hosts = getBrokers();
-			List<OffsetsLiteDomain> list = new ArrayList<OffsetsLiteDomain>();
+			List<OffsetsLiteDomain> offsetLites = new ArrayList<OffsetsLiteDomain>();
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 			Map<String, List<String>> consumers = null;
 			if ("kafka".equals(formatter)) {
@@ -182,15 +182,15 @@ public class OffsetsQuartz {
 						offsetSQLite.setLogSize(logSize + offsetSQLite.getLogSize());
 						offsetSQLite.setOffsets(offsetZk.getOffset() + offsetSQLite.getOffsets());
 					}
-					list.add(offsetSQLite);
+					offsetLites.add(offsetSQLite);
 				}
 			}
-			zkService.insert(list);
-			boolean alarmEnable = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
-			if (alarmEnable) {
-				List<AlarmDomain> listAlarm = alarmConfigure();
-				for (AlarmDomain alarm : listAlarm) {
-					for (OffsetsLiteDomain offset : list) {
+			zkService.insert(offsetLites);
+			boolean enableAlarm = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
+			if (enableAlarm) {
+				List<AlarmDomain> alarmers = alarmConfigure();
+				for (AlarmDomain alarm : alarmers) {
+					for (OffsetsLiteDomain offset : offsetLites) {
 						if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
 							try {
 								MailProvider provider = new MailFactory();
@@ -204,7 +204,7 @@ public class OffsetsQuartz {
 				}
 			}
 		} catch (Exception ex) {
-			LOG.error("[Quartz.offsets] has error,msg is " + ex.getMessage());
+			LOG.error("Quartz statistics offset has error,msg is " + ex.getMessage());
 		}
 	}
 }

@@ -44,77 +44,47 @@ public class ClusterServiceImpl implements ClusterService {
 
 	/** Execute zookeeper comand. */
 	public String execute(String cmd, String type) {
-		String ret = "";
-		if ("ls".equals(type)) {
-			JSONObject object = new JSONObject();
-			object.put("result", ls(cmd));
-			ret = object.toJSONString();
-		} else if ("delete".equals(type)) {
-			JSONObject object = new JSONObject();
-			object.put("result", delete(cmd));
-			ret = object.toJSONString();
-		} else if ("get".equals(type)) {
-			JSONObject object = new JSONObject();
-			object.put("result", get(cmd));
-			ret = object.toJSONString();
+		String target = "";
+		String[] len = cmd.replaceAll(" ", "").split(type);
+		if (len.length == 0) {
+			return cmd + " has error";
 		} else {
-			ret = "Invalid command";
+			JSONObject object = new JSONObject();
+			String command = len[1];
+			switch (type) {
+			case "delete":
+				object.put("result", zkService.delete(command));
+				target = object.toJSONString();
+				break;
+			case "get":
+				object.put("result", zkService.get(command));
+				target = object.toJSONString();
+				break;
+			case "ls":
+				object.put("result", zkService.ls(command));
+				target = object.toJSONString();
+				break;
+			default:
+				target = "Invalid command";
+				break;
+			}
 		}
-		return ret;
+		return target;
 	}
 
 	/** Get kafka & zookeeper cluster information. */
 	public String get() {
-		String zk = zkService.zkCluster();
-		String kafka = kafkaService.getAllBrokersInfo();
-		JSONObject obj = new JSONObject();
-		obj.put("zk", zk);
-		obj.put("kafka", kafka);
-		return obj.toJSONString();
+		String zkCluster = zkService.zkCluster();
+		String kafkaBrokers = kafkaService.getAllBrokersInfo();
+		JSONObject target = new JSONObject();
+		target.put("zk", zkCluster);
+		target.put("kafka", kafkaBrokers);
+		return target.toJSONString();
 	}
 
 	/** Get Zookeeper whether live. */
 	public JSONObject status() {
 		return zkService.zkCliStatus();
-	}
-
-	/** Delete zookeeper metadata & use command. */
-	private Object delete(String cmd) {
-		String ret = "";
-		String[] len = cmd.replaceAll(" ", "").split("delete");
-		if (len.length == 0) {
-			return cmd + " has error";
-		} else {
-			String command = len[1];
-			ret = zkService.delete(command);
-		}
-		return ret;
-	}
-
-	/** Get command & obtain information from zookeeper. */
-	private Object get(String cmd) {
-		String ret = "";
-		String[] len = cmd.replaceAll(" ", "").split("get");
-		if (len.length == 0) {
-			return cmd + " has error";
-		} else {
-			String command = len[1];
-			ret = zkService.get(command);
-		}
-		return ret;
-	}
-
-	/** Zookeeper ls command to list information. */
-	private String ls(String cmd) {
-		String ret = "";
-		String[] len = cmd.replaceAll(" ", "").split("ls");
-		if (len.length == 0) {
-			return cmd + " has error";
-		} else {
-			String command = len[1];
-			ret = zkService.ls(command);
-		}
-		return ret;
 	}
 
 }

@@ -38,10 +38,10 @@ public class TestRpcClient {
 
 	private final static Logger LOG = LoggerFactory.getLogger(TestRpcClient.class);
 	private final static int PORT = SystemConfigUtils.getIntProperty("kafka.eagle.offset.rpc.port");
-	private final static String ADDR = "master";
+	private final static String ADDR = "127.0.0.1";
 
 	public static void main(String[] args) {
-		System.out.println(getActiverConsumer());
+		System.out.println(getConsumer());
 	}
 	
 	/** Get offset from kafka topic. */

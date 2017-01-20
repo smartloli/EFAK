@@ -56,9 +56,55 @@ public class ConsumerServiceImpl implements ConsumerService {
 
 	/** Get active topic graph data from kafka cluster. */
 	public String getActiveGraph() {
-		JSONObject obj = new JSONObject();
-		obj.put("active", getActiveGraphData());
-		return obj.toJSONString();
+		JSONObject target = new JSONObject();
+		target.put("active", getActiveGraphDatasets());
+		return target.toJSONString();
+	}
+
+	/** Get active graph from zookeeper. */
+	private String getActiveGraphDatasets() {
+		Map<String, List<String>> activeTopics = kafkaService.getActiveTopic();
+		JSONObject target = new JSONObject();
+		JSONArray targets = new JSONArray();
+		target.put("name", "Active Topics");
+		int count = 0;
+		for (Entry<String, List<String>> entry : activeTopics.entrySet()) {
+			JSONObject subTarget = new JSONObject();
+			JSONArray subTargets = new JSONArray();
+			if (count > ConstantUtils.D3.SIZE) {
+				subTarget.put("name", "...");
+				JSONObject subInSubTarget = new JSONObject();
+				subInSubTarget.put("name", "...");
+				subTargets.add(subInSubTarget);
+				subTarget.put("children", subTargets);
+				targets.add(subTarget);
+				break;
+			} else {
+				subTarget.put("name", entry.getKey());
+				for (String str : entry.getValue()) {
+					JSONObject subInSubTarget = new JSONObject();
+					subInSubTarget.put("name", str);
+					subTargets.add(subInSubTarget);
+				}
+			}
+			count++;
+			subTarget.put("children", subTargets);
+			targets.add(subTarget);
+		}
+		target.put("children", targets);
+		return target.toJSONString();
+	}
+
+	/** Get kafka active number & storage offset in zookeeper. */
+	private int getActiveNumber(String group, List<String> topics) {
+		Map<String, List<String>> activeTopics = kafkaService.getActiveTopic();
+		int sum = 0;
+		for (String topic : topics) {
+			if (activeTopics.containsKey(group + "_" + topic)) {
+				sum++;
+			}
+		}
+		return sum;
 	}
 
 	/** Storage offset in kafka or zookeeper. */
@@ -70,93 +116,21 @@ public class ConsumerServiceImpl implements ConsumerService {
 		}
 	}
 
-	/** Get active grahp data & storage offset in kafka topic. */
-	private Object getKafkaActive() {
-		Map<String, List<String>> type = new HashMap<String, List<String>>();
-		Gson gson = new Gson();
-		Map<String, List<String>> kafka = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
-		JSONObject obj = new JSONObject();
-		JSONArray arrParent = new JSONArray();
-		obj.put("name", "Active Topics");
-		int count = 0;
-		for (Entry<String, List<String>> entry : kafka.entrySet()) {
-			JSONObject object = new JSONObject();
-			JSONArray arrChild = new JSONArray();
-			if (count > ConstantUtils.D3.SIZE) {
-				object.put("name", "...");
-				JSONObject objectChild = new JSONObject();
-				objectChild.put("name", "...");
-				arrChild.add(objectChild);
-				object.put("children", arrChild);
-				arrParent.add(object);
-				break;
-			} else {
-				object.put("name", entry.getKey());
-				for (String str : entry.getValue()) {
-					JSONObject objectChild = new JSONObject();
-					objectChild.put("name", str);
-					arrChild.add(objectChild);
-				}
-			}
-			count++;
-			object.put("children", arrChild);
-			arrParent.add(object);
-		}
-		obj.put("children", arrParent);
-		return obj.toJSONString();
-	}
-
-	/** Get active topic from kafka cluster & storage offset in kafka topic. */
-	private String getKafkaActiveTopic() {
-		JSONObject obj = new JSONObject();
-		obj.put("active", getKafkaActive());
-		return obj.toJSONString();
-	}
-
-	/** List the name of the topic in the consumer detail information. */
-	private String getConsumerDetail(String group) {
-		Map<String, List<String>> map = kafkaService.getConsumers();
-		Map<String, List<String>> actvTopics = kafkaService.getActiveTopic();
-		List<ConsumerDetailDomain> list = new ArrayList<ConsumerDetailDomain>();
-		int id = 0;
-		for (String topic : map.get(group)) {
-			ConsumerDetailDomain consumerDetail = new ConsumerDetailDomain();
-			consumerDetail.setId(++id);
-			consumerDetail.setTopic(topic);
-			if (actvTopics.containsKey(group + "_" + topic)) {
-				consumerDetail.setConsumering(true);
-			} else {
-				consumerDetail.setConsumering(false);
-			}
-			list.add(consumerDetail);
-		}
-		return list.toString();
-	}
-
-	/** Judge consumer storage offset in kafka or zookeeper. */
-	public String getConsumerDetail(String formatter, String group) {
-		if ("kafka".equals(formatter)) {
-			return getKafkaConsumerDetail(group);
-		} else {
-			return getConsumerDetail(group);
-		}
-	}
-
 	/** Get consumers from zookeeper. */
 	private String getConsumer(ConsumerPageDomain page) {
-		Map<String, List<String>> map = kafkaService.getConsumers(page);
-		List<ConsumerDomain> list = new ArrayList<ConsumerDomain>();
+		Map<String, List<String>> consumers = kafkaService.getConsumers(page);
+		List<ConsumerDomain> consumerPages = new ArrayList<ConsumerDomain>();
 		int id = 0;
-		for (Entry<String, List<String>> entry : map.entrySet()) {
+		for (Entry<String, List<String>> entry : consumers.entrySet()) {
 			ConsumerDomain consumer = new ConsumerDomain();
 			consumer.setGroup(entry.getKey());
 			consumer.setConsumerNumber(entry.getValue().size());
 			consumer.setTopic(entry.getValue());
 			consumer.setId(++id);
 			consumer.setActiveNumber(getActiveNumber(entry.getKey(), entry.getValue()));
-			list.add(consumer);
+			consumerPages.add(consumer);
 		}
-		return list.toString();
+		return consumerPages.toString();
 	}
 
 	/** Judge consumers storage offset in kafka or zookeeper. */
@@ -171,48 +145,27 @@ public class ConsumerServiceImpl implements ConsumerService {
 	/** Get consumer size from kafka topic. */
 	public int getConsumerCount(String formatter) {
 		if ("kafka".equals(formatter)) {
-			Map<String, List<String>> map = new HashMap<>();
+			Map<String, List<String>> consumers = new HashMap<>();
 			try {
 				Map<String, List<String>> type = new HashMap<String, List<String>>();
 				Gson gson = new Gson();
-				map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+				consumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
 			} catch (Exception e) {
 				LOG.error("Get Kafka topic offset has error,msg is " + e.getMessage());
 			}
-			return map.size();
+			return consumers.size();
 		} else {
 			return kafkaService.getConsumers().size();
 		}
 	}
 
-	/** Get kafka consumer & storage offset in kafka topic. */
-	private String getKafkaConsumer(ConsumerPageDomain page) {
-		List<ConsumerDomain> list = new ArrayList<ConsumerDomain>();
-		Map<String, List<String>> type = new HashMap<String, List<String>>();
-		Gson gson = new Gson();
-		Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumerPage(page), type.getClass());
+	/** List the name of the topic in the consumer detail information. */
+	private String getConsumerDetail(String group) {
+		Map<String, List<String>> consumers = kafkaService.getConsumers();
+		Map<String, List<String>> actvTopics = kafkaService.getActiveTopic();
+		List<ConsumerDetailDomain> kafkaConsumerDetails = new ArrayList<ConsumerDetailDomain>();
 		int id = 0;
-		for (Entry<String, List<String>> entry : map.entrySet()) {
-			ConsumerDomain consumer = new ConsumerDomain();
-			consumer.setGroup(entry.getKey());
-			consumer.setConsumerNumber(entry.getValue().size());
-			consumer.setTopic(entry.getValue());
-			consumer.setId(++id);
-			consumer.setActiveNumber(getKafkaActiveNumber(entry.getKey(), entry.getValue()));
-			list.add(consumer);
-		}
-		return list.toString();
-	}
-
-	/** Get consumer detail from kafka topic. */
-	private String getKafkaConsumerDetail(String group) {
-		Map<String, List<String>> type = new HashMap<String, List<String>>();
-		Gson gson = new Gson();
-		Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
-		Map<String, List<String>> actvTopics = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
-		List<ConsumerDetailDomain> list = new ArrayList<ConsumerDetailDomain>();
-		int id = 0;
-		for (String topic : map.get(group)) {
+		for (String topic : consumers.get(group)) {
 			ConsumerDetailDomain consumerDetail = new ConsumerDetailDomain();
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
@@ -221,70 +174,117 @@ public class ConsumerServiceImpl implements ConsumerService {
 			} else {
 				consumerDetail.setConsumering(false);
 			}
-			list.add(consumerDetail);
+			kafkaConsumerDetails.add(consumerDetail);
 		}
-		return list.toString();
+		return kafkaConsumerDetails.toString();
 	}
 
-	/** Get kafka active number & storage offset in zookeeper. */
-	private int getActiveNumber(String group, List<String> topics) {
-		Map<String, List<String>> kafka = kafkaService.getActiveTopic();
-		int sum = 0;
-		for (String topic : topics) {
-			if (kafka.containsKey(group + "_" + topic)) {
-				sum++;
-			}
+	/** Judge consumer storage offset in kafka or zookeeper. */
+	public String getConsumerDetail(String formatter, String group) {
+		if ("kafka".equals(formatter)) {
+			return getKafkaConsumerDetail(group);
+		} else {
+			return getConsumerDetail(group);
 		}
-		return sum;
+	}
+
+	/** Get active grahp data & storage offset in kafka topic. */
+	private Object getKafkaActive() {
+		Map<String, List<String>> type = new HashMap<String, List<String>>();
+		Gson gson = new Gson();
+		Map<String, List<String>> activerConsumers = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
+		JSONObject target = new JSONObject();
+		JSONArray targets = new JSONArray();
+		target.put("name", "Active Topics");
+		int count = 0;
+		for (Entry<String, List<String>> entry : activerConsumers.entrySet()) {
+			JSONObject subTarget = new JSONObject();
+			JSONArray subTargets = new JSONArray();
+			if (count > ConstantUtils.D3.SIZE) {
+				subTarget.put("name", "...");
+				JSONObject subInSubTarget = new JSONObject();
+				subInSubTarget.put("name", "...");
+				subTargets.add(subInSubTarget);
+				subTarget.put("children", subTargets);
+				targets.add(subTarget);
+				break;
+			} else {
+				subTarget.put("name", entry.getKey());
+				for (String str : entry.getValue()) {
+					JSONObject subInSubTarget = new JSONObject();
+					subInSubTarget.put("name", str);
+					subTargets.add(subInSubTarget);
+				}
+			}
+			count++;
+			subTarget.put("children", subTargets);
+			targets.add(subTarget);
+		}
+		target.put("children", targets);
+		return target.toJSONString();
 	}
 
 	/** Get kafka active number & storage offset in kafka topic. */
 	private int getKafkaActiveNumber(String group, List<String> topics) {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> map = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
+		Map<String, List<String>> activerConsumers = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
 		int sum = 0;
 		for (String topic : topics) {
 			String key = group + "_" + topic;
-			if (map.containsKey(key)) {
+			if (activerConsumers.containsKey(key)) {
 				sum++;
 			}
 		}
 		return sum;
 	}
 
-	/** Get active graph from zookeeper. */
-	private String getActiveGraphData() {
-		Map<String, List<String>> kafka = kafkaService.getActiveTopic();
-		JSONObject obj = new JSONObject();
-		JSONArray arrParent = new JSONArray();
-		obj.put("name", "Active Topics");
-		int count = 0;
-		for (Entry<String, List<String>> entry : kafka.entrySet()) {
-			JSONObject object = new JSONObject();
-			JSONArray arrChild = new JSONArray();
-			if (count > ConstantUtils.D3.SIZE) {
-				object.put("name", "...");
-				JSONObject objectChild = new JSONObject();
-				objectChild.put("name", "...");
-				arrChild.add(objectChild);
-				object.put("children", arrChild);
-				arrParent.add(object);
-				break;
-			} else {
-				object.put("name", entry.getKey());
-				for (String str : entry.getValue()) {
-					JSONObject objectChild = new JSONObject();
-					objectChild.put("name", str);
-					arrChild.add(objectChild);
-				}
-			}
-			count++;
-			object.put("children", arrChild);
-			arrParent.add(object);
+	/** Get active topic from kafka cluster & storage offset in kafka topic. */
+	private String getKafkaActiveTopic() {
+		JSONObject target = new JSONObject();
+		target.put("active", getKafkaActive());
+		return target.toJSONString();
+	}
+
+	/** Get kafka consumer & storage offset in kafka topic. */
+	private String getKafkaConsumer(ConsumerPageDomain page) {
+		List<ConsumerDomain> kafkaConsumerPages = new ArrayList<ConsumerDomain>();
+		Map<String, List<String>> type = new HashMap<String, List<String>>();
+		Gson gson = new Gson();
+		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumerPage(page), type.getClass());
+		int id = 0;
+		for (Entry<String, List<String>> entry : consumers.entrySet()) {
+			ConsumerDomain consumer = new ConsumerDomain();
+			consumer.setGroup(entry.getKey());
+			consumer.setConsumerNumber(entry.getValue().size());
+			consumer.setTopic(entry.getValue());
+			consumer.setId(++id);
+			consumer.setActiveNumber(getKafkaActiveNumber(entry.getKey(), entry.getValue()));
+			kafkaConsumerPages.add(consumer);
 		}
-		obj.put("children", arrParent);
-		return obj.toJSONString();
+		return kafkaConsumerPages.toString();
+	}
+
+	/** Get consumer detail from kafka topic. */
+	private String getKafkaConsumerDetail(String group) {
+		Map<String, List<String>> type = new HashMap<String, List<String>>();
+		Gson gson = new Gson();
+		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+		Map<String, List<String>> actvTopics = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
+		List<ConsumerDetailDomain> kafkaConsumerPages = new ArrayList<ConsumerDetailDomain>();
+		int id = 0;
+		for (String topic : consumers.get(group)) {
+			ConsumerDetailDomain consumerDetail = new ConsumerDetailDomain();
+			consumerDetail.setId(++id);
+			consumerDetail.setTopic(topic);
+			if (actvTopics.containsKey(group + "_" + topic)) {
+				consumerDetail.setConsumering(true);
+			} else {
+				consumerDetail.setConsumering(false);
+			}
+			kafkaConsumerPages.add(consumerDetail);
+		}
+		return kafkaConsumerPages.toString();
 	}
 
 }

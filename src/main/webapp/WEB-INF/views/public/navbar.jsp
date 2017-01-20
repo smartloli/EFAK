@@ -34,7 +34,7 @@
 			<li id="navbar_consumers"><a href="/ke/consumers"><i
 					class="fa fa-fw fa-users"></i> Consumers</a></li>
 			<li><a href="#" data-toggle="collapse" data-target="#demo2"><i
-					class="fa fa-fw fa-cloud"></i> Cluster Info <i
+					class="fa fa-fw fa-cloud"></i> Cluster <i
 					class="fa fa-fw fa-caret-down"></i></a>
 				<ul id="demo2" class="collapse">
 					<li id="navbar_cli"><a href="/ke/cluster/info"><i

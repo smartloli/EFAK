@@ -57,9 +57,9 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 	/** Get offset in Kafka topic. */
 	@Override
 	public String getOffset() throws TException {
-		JSONArray array = new JSONArray();
-		Map<String, Boolean> map = getActiver();
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
+		JSONArray targets = new JSONArray();
+		Map<String, Boolean> activer = getActiver();
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
 			JSONObject object = new JSONObject();
 			object.put("group", entry.getKey().group());
 			object.put("topic", entry.getKey().topicPartition().topic());
@@ -67,16 +67,16 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 			object.put("offset", entry.getValue().offset());
 			object.put("timestamp", entry.getValue().timestamp());
 			String key = entry.getKey().group() + ConstantUtils.Separator.EIGHT + entry.getKey().topicPartition().topic() + ConstantUtils.Separator.EIGHT + entry.getKey().topicPartition().partition();
-			if (map.containsKey(key)) {
+			if (activer.containsKey(key)) {
 				UUID uuid = UUID.randomUUID();
 				String threadId = String.format("%s-%d-%s-%d", entry.getKey().group(), System.currentTimeMillis(), (uuid.getMostSignificantBits() + "").substring(0, 8), entry.getKey().topicPartition().partition());
 				object.put("owner", threadId);
 			} else {
 				object.put("owner", "");
 			}
-			array.add(object);
+			targets.add(object);
 		}
-		return array.toJSONString();
+		return targets.toJSONString();
 	}
 
 	/** Using SQL to get data from Kafka in topic. */
@@ -89,35 +89,36 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 	/** Get consumer from Kafka in topic. */
 	@Override
 	public String getConsumer() throws TException {
-		Map<String, Set<String>> map = new HashMap<>();
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
+		Map<String, Set<String>> targets = new HashMap<>();
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
 			String group = entry.getKey().group();
 			String topic = entry.getKey().topicPartition().topic();
-			if (map.containsKey(group)) {
-				Set<String> set = map.get(group);
+			if (targets.containsKey(group)) {
+				Set<String> set = targets.get(group);
 				set.add(topic);
 			} else {
 				Set<String> set = new HashSet<>();
 				set.add(topic);
-				map.put(group, set);
+				targets.put(group, set);
 			}
 		}
-		Map<String, List<String>> map2 = new HashMap<>();
-		for (Entry<String, Set<String>> entry : map.entrySet()) {
-			List<String> list = new ArrayList<>();
+		/** Convert Set to List. */
+		Map<String, List<String>> targets2 = new HashMap<>();
+		for (Entry<String, Set<String>> entry : targets.entrySet()) {
+			List<String> topics = new ArrayList<>();
 			for (String topic : entry.getValue()) {
-				list.add(topic);
+				topics.add(topic);
 			}
-			map2.put(entry.getKey(), list);
+			targets2.put(entry.getKey(), topics);
 		}
-		return map.toString();
+		return targets2.toString();
 	}
 
 	/** Get activer from Kafka in topic. */
 	private Map<String, Boolean> getActiver() throws TException {
 		long mill = System.currentTimeMillis();
 		Map<String, Boolean> active = new ConcurrentHashMap<>();
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
 			String group = entry.getKey().group();
 			String topic = entry.getKey().topicPartition().topic();
 			int partition = entry.getKey().topicPartition().partition();
@@ -140,92 +141,92 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 	@Override
 	public String getActiverConsumer() throws TException {
 		long mill = System.currentTimeMillis();
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
 			String group = entry.getKey().group();
 			String topic = entry.getKey().topicPartition().topic();
 			int partition = entry.getKey().topicPartition().partition();
 			long timespan = entry.getValue().timestamp();
 			String key = group + ConstantUtils.Separator.EIGHT + topic + ConstantUtils.Separator.EIGHT + partition;
-			if (activeMap.containsKey(key)) {
+			if (kafkaActiveConsumers.containsKey(key)) {
 				if ((mill - timespan) <= ConstantUtils.Kafka.ACTIVER_INTERVAL) {
-					activeMap.put(key, true);
+					kafkaActiveConsumers.put(key, true);
 				} else {
-					activeMap.put(key, false);
+					kafkaActiveConsumers.put(key, false);
 				}
 			} else {
-				activeMap.put(key, true);
+				kafkaActiveConsumers.put(key, true);
 			}
 		}
 
-		Map<String, Set<String>> map = new HashMap<>();
-		for (Entry<String, Boolean> entry : activeMap.entrySet()) {
+		Map<String, Set<String>> target = new HashMap<>();
+		for (Entry<String, Boolean> entry : kafkaActiveConsumers.entrySet()) {
 			if (entry.getValue()) {
-				String[] kk = entry.getKey().split(ConstantUtils.Separator.EIGHT);
-				String key = kk[0] + "_" + kk[1];
-				String topic = kk[1];
-				if (map.containsKey(key)) {
-					map.get(key).add(topic);
+				String[] keys = entry.getKey().split(ConstantUtils.Separator.EIGHT);
+				String key = keys[0] + "_" + keys[1];
+				String topic = keys[1];
+				if (target.containsKey(key)) {
+					target.get(key).add(topic);
 				} else {
-					Set<String> list = new HashSet<>();
-					list.add(topic);
-					map.put(key, list);
+					Set<String> topics = new HashSet<>();
+					topics.add(topic);
+					target.put(key, topics);
 				}
 			}
 		}
 
-		Map<String, List<String>> map2 = new HashMap<>();
-		for (Entry<String, Set<String>> entry : map.entrySet()) {
-			List<String> list = new ArrayList<>();
+		Map<String, List<String>> target2 = new HashMap<>();
+		for (Entry<String, Set<String>> entry : target.entrySet()) {
+			List<String> topics = new ArrayList<>();
 			for (String topic : entry.getValue()) {
-				list.add(topic);
+				topics.add(topic);
 			}
-			map2.put(entry.getKey(), list);
+			target2.put(entry.getKey(), topics);
 		}
 
-		return map2.toString();
+		return target2.toString();
 	}
 
 	/** Get consumer page data from Kafka in topic. */
 	@Override
 	public String getConsumerPage(String search, int iDisplayStart, int iDisplayLength) throws TException {
-		Map<String, Set<String>> map = new HashMap<>();
+		Map<String, Set<String>> targets = new HashMap<>();
 		int offset = 0;
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : offsetMap.entrySet()) {
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
 			String group = entry.getKey().group();
 			String topic = entry.getKey().topicPartition().topic();
 			if (search.length() > 0 && search.equals(group)) {
-				if (map.containsKey(group)) {
-					Set<String> set = map.get(group);
-					set.add(topic);
+				if (targets.containsKey(group)) {
+					Set<String> topics = targets.get(group);
+					topics.add(topic);
 				} else {
-					Set<String> set = new HashSet<>();
-					set.add(topic);
-					map.put(group, set);
+					Set<String> topics = new HashSet<>();
+					topics.add(topic);
+					targets.put(group, topics);
 				}
 				break;
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
-					if (map.containsKey(group)) {
-						Set<String> set = map.get(group);
-						set.add(topic);
+					if (targets.containsKey(group)) {
+						Set<String> topics = targets.get(group);
+						topics.add(topic);
 					} else {
-						Set<String> set = new HashSet<>();
-						set.add(topic);
-						map.put(group, set);
+						Set<String> topics = new HashSet<>();
+						topics.add(topic);
+						targets.put(group, topics);
 					}
 				}
 				offset++;
 			}
 		}
-		Map<String, List<String>> map2 = new HashMap<>();
-		for (Entry<String, Set<String>> entry : map.entrySet()) {
-			List<String> list = new ArrayList<>();
+		Map<String, List<String>> targets2 = new HashMap<>();
+		for (Entry<String, Set<String>> entry : targets.entrySet()) {
+			List<String> topics = new ArrayList<>();
 			for (String topic : entry.getValue()) {
-				list.add(topic);
+				topics.add(topic);
 			}
-			map2.put(entry.getKey(), list);
+			targets2.put(entry.getKey(), topics);
 		}
-		return map.toString();
+		return targets2.toString();
 	}
 
 }

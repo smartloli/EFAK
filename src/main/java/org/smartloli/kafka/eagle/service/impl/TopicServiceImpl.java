@@ -41,17 +41,17 @@ public class TopicServiceImpl implements TopicService {
 
 	/** Find topic name in all topics. */
 	public boolean hasTopic(String topicName, String ip) {
-		boolean ret = false;
-		JSONArray arr = JSON.parseArray(kafkaService.getAllPartitions());
-		for (Object object : arr) {
-			JSONObject obj = (JSONObject) object;
-			String topic = obj.getString("topic");
+		boolean target = false;
+		JSONArray topicAndPartitions = JSON.parseArray(kafkaService.getAllPartitions());
+		for (Object topicAndPartition : topicAndPartitions) {
+			JSONObject object = (JSONObject) topicAndPartition;
+			String topic = object.getString("topic");
 			if (topicName.equals(topic)) {
-				ret = true;
+				target = true;
 				break;
 			}
 		}
-		return ret;
+		return target;
 	}
 
 	/** Get metadata in topic. */

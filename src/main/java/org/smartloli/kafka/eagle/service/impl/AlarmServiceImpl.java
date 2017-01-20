@@ -61,16 +61,16 @@ public class AlarmServiceImpl implements AlarmService {
 	 * @see org.smartloli.kafka.eagle.domain.AlarmDomain
 	 */
 	public Map<String, Object> add(AlarmDomain alarm) {
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> alarmStates = new HashMap<String, Object>();
 		int status = zkService.insertAlarmConfigure(alarm);
 		if (status == -1) {
-			map.put("status", "error");
-			map.put("info", "insert [" + alarm + "] has error!");
+			alarmStates.put("status", "error");
+			alarmStates.put("info", "insert [" + alarm + "] has error!");
 		} else {
-			map.put("status", "success");
-			map.put("info", "insert success!");
+			alarmStates.put("status", "success");
+			alarmStates.put("info", "insert success!");
 		}
-		return map;
+		return alarmStates;
 	}
 
 	/**
@@ -93,29 +93,29 @@ public class AlarmServiceImpl implements AlarmService {
 
 	/** Get alarmer topics. */
 	private String get() {
-		Map<String, List<String>> tmp = kafkaService.getConsumers();
-		JSONArray retArray = new JSONArray();
-		for (Entry<String, List<String>> entry : tmp.entrySet()) {
-			JSONObject retObj = new JSONObject();
-			retObj.put("group", entry.getKey());
-			retObj.put("topics", entry.getValue());
-			retArray.add(retObj);
+		Map<String, List<String>> consumers = kafkaService.getConsumers();
+		JSONArray topics = new JSONArray();
+		for (Entry<String, List<String>> entry : consumers.entrySet()) {
+			JSONObject groupAndTopics = new JSONObject();
+			groupAndTopics.put("group", entry.getKey());
+			groupAndTopics.put("topics", entry.getValue());
+			topics.add(groupAndTopics);
 		}
-		return retArray.toJSONString();
+		return topics.toJSONString();
 	}
 
 	private String getKafka() {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> tmp = gson.fromJson(RpcClient.getConsumer(), type.getClass());
-		JSONArray retArray = new JSONArray();
-		for (Entry<String, List<String>> entry : tmp.entrySet()) {
-			JSONObject retObj = new JSONObject();
-			retObj.put("group", entry.getKey());
-			retObj.put("topics", entry.getValue());
-			retArray.add(retObj);
+		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+		JSONArray topics = new JSONArray();
+		for (Entry<String, List<String>> entry : consumers.entrySet()) {
+			JSONObject groupAndTopics = new JSONObject();
+			groupAndTopics.put("group", entry.getKey());
+			groupAndTopics.put("topics", entry.getValue());
+			topics.add(groupAndTopics);
 		}
-		return retArray.toJSONString();
+		return topics.toJSONString();
 	}
 
 	/** List alarmer datasets. */

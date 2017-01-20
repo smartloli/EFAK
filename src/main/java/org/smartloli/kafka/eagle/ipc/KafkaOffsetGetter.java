@@ -56,11 +56,11 @@ public class KafkaOffsetGetter extends Thread {
 	private final static Logger LOG = LoggerFactory.getLogger(KafkaOffsetGetter.class);
 
 	/** Consumer offsets in kafka topic. */
-	private final static String consumerOffsetTopic = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
+	private final static String CONSUMER_OFFSET_TOPIC = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
 	/** Store consumer offset in memory. */
-	protected static Map<GroupTopicPartition, OffsetAndMetadata> offsetMap = new ConcurrentHashMap<>();
+	protected static Map<GroupTopicPartition, OffsetAndMetadata> kafkaConsumerOffsets = new ConcurrentHashMap<>();
 	/** Store active consumer in memory. */
-	protected static Map<String, Boolean> activeMap = new ConcurrentHashMap<>();
+	protected static Map<String, Boolean> kafkaActiveConsumers = new ConcurrentHashMap<>();
 
 	/** ============================ Start Filter ========================= */
 	/** Massive code stealing from kafka.server.OffsetManager */
@@ -102,8 +102,8 @@ public class KafkaOffsetGetter extends Thread {
 	/** Listening offset thread method. */
 	private static synchronized void startOffsetListener(ConsumerConnector consumerConnector) {
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
-		topicCountMap.put(consumerOffsetTopic, new Integer(1));
-		KafkaStream<byte[], byte[]> offsetMsgStream = consumerConnector.createMessageStreams(topicCountMap).get(consumerOffsetTopic).get(0);
+		topicCountMap.put(CONSUMER_OFFSET_TOPIC, new Integer(1));
+		KafkaStream<byte[], byte[]> offsetMsgStream = consumerConnector.createMessageStreams(topicCountMap).get(CONSUMER_OFFSET_TOPIC).get(0);
 
 		ConsumerIterator<byte[], byte[]> it = offsetMsgStream.iterator();
 		while (true) {
@@ -115,7 +115,7 @@ public class KafkaOffsetGetter extends Thread {
 						continue;
 					}
 					OffsetAndMetadata commitValue = readMessageValue(ByteBuffer.wrap(offsetMsg.message()));
-					offsetMap.put(commitKey, commitValue);
+					kafkaConsumerOffsets.put(commitKey, commitValue);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

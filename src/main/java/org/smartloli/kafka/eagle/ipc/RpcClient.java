@@ -47,16 +47,16 @@ public class RpcClient {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
-		String ret = "";
+		String target = "";
 		try {
 			transport.open();
-			ret = client.getOffset();
+			target = client.getOffset();
 		} catch (Exception e) {
 			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
 		} finally {
 			transport.close();
 		}
-		return ret;
+		return target;
 	}
 
 	/** Get activer consumer data from Rpc server. */
@@ -64,16 +64,16 @@ public class RpcClient {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
-		String ret = "";
+		String target = "";
 		try {
 			transport.open();
-			ret = client.getActiverConsumer();
+			target = client.getActiverConsumer();
 		} catch (Exception e) {
 			LOG.error("Rpc Client getActiver has error,msg is " + e.getMessage());
 		} finally {
 			transport.close();
 		}
-		return ret;
+		return target;
 	}
 
 	/** Get consumer data from Rpc server. */
@@ -81,16 +81,16 @@ public class RpcClient {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
-		String ret = "";
+		String target = "";
 		try {
 			transport.open();
-			ret = client.getConsumer();
+			target = client.getConsumer();
 		} catch (Exception e) {
 			LOG.error("Rpc Client getConsumer has error,msg is " + e.getMessage());
 		} finally {
 			transport.close();
 		}
-		return ret;
+		return target;
 	}
 
 	/** Get consumer page from Rpc server. */
@@ -98,16 +98,16 @@ public class RpcClient {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
-		String ret = "";
+		String target = "";
 		try {
 			transport.open();
-			ret = client.getConsumerPage(page.getSearch(), page.getiDisplayStart(), page.getiDisplayLength());
+			target = client.getConsumerPage(page.getSearch(), page.getiDisplayStart(), page.getiDisplayLength());
 		} catch (Exception e) {
 			LOG.error("Rpc Client getConsumerPage has error,msg is " + e.getMessage());
 		} finally {
 			transport.close();
 		}
-		return ret;
+		return target;
 	}
 
 }

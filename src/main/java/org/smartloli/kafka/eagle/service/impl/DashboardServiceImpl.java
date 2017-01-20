@@ -49,31 +49,11 @@ public class DashboardServiceImpl implements DashboardService {
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
-	/** Get dashboard data. */
-	private String panel() {
-		int zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",").length;
-		String topicObject = kafkaService.getAllPartitions();
-		int topics = JSON.parseArray(topicObject).size();
-		String kafkaObject = kafkaService.getAllBrokersInfo();
-		int brokers = JSON.parseArray(kafkaObject).size();
-		DashboardDomain dash = new DashboardDomain();
-		dash.setBrokers(brokers);
-		dash.setTopics(topics);
-		dash.setZks(zks);
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if ("kafka".equals(formatter)) {
-			dash.setConsumers(getKafkaConsumerNumbers());
-		} else {
-			dash.setConsumers(getConsumerNumbers());
-		}
-		return dash.toString();
-	}
-
 	/** Get consumer number from zookeeper. */
 	private int getConsumerNumbers() {
-		Map<String, List<String>> map = kafkaService.getConsumers();
+		Map<String, List<String>> consumers = kafkaService.getConsumers();
 		int count = 0;
-		for (Entry<String, List<String>> entry : map.entrySet()) {
+		for (Entry<String, List<String>> entry : consumers.entrySet()) {
 			count += entry.getValue().size();
 		}
 		return count;
@@ -81,19 +61,19 @@ public class DashboardServiceImpl implements DashboardService {
 
 	/** Get kafka & dashboard dataset. */
 	public String getDashboard() {
-		JSONObject obj = new JSONObject();
-		obj.put("kafka", kafkaBrokersGraph());
-		obj.put("dashboard", panel());
-		return obj.toJSONString();
+		JSONObject target = new JSONObject();
+		target.put("kafka", kafkaBrokersGraph());
+		target.put("dashboard", panel());
+		return target.toJSONString();
 	}
 
 	/** Get consumer number from kafka topic. */
 	private int getKafkaConsumerNumbers() {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+		Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
 		int count = 0;
-		for (Entry<String, List<String>> entry : map.entrySet()) {
+		for (Entry<String, List<String>> entry : kafkaConsumers.entrySet()) {
 			count += entry.getValue().size();
 		}
 		return count;
@@ -102,27 +82,47 @@ public class DashboardServiceImpl implements DashboardService {
 	/** Get kafka data. */
 	private String kafkaBrokersGraph() {
 		String kafka = kafkaService.getAllBrokersInfo();
-		JSONObject obj = new JSONObject();
-		obj.put("name", "Kafka Brokers");
-		JSONArray arr = JSON.parseArray(kafka);
-		JSONArray arr2 = new JSONArray();
+		JSONObject target = new JSONObject();
+		target.put("name", "Kafka Brokers");
+		JSONArray targets1 = JSON.parseArray(kafka);
+		JSONArray targets2 = new JSONArray();
 		int count = 0;
-		for (Object tmp : arr) {
-			JSONObject obj1 = (JSONObject) tmp;
+		for (Object object : targets1) {
+			JSONObject subTarget = (JSONObject) object;
 			if (count > ConstantUtils.D3.SIZE) {
-				JSONObject obj2 = new JSONObject();
-				obj2.put("name", "...");
-				arr2.add(obj2);
+				JSONObject subTarget2 = new JSONObject();
+				subTarget2.put("name", "...");
+				targets2.add(subTarget2);
 				break;
 			} else {
-				JSONObject obj2 = new JSONObject();
-				obj2.put("name", obj1.getString("host") + ":" + obj1.getInteger("port"));
-				arr2.add(obj2);
+				JSONObject subTarget2 = new JSONObject();
+				subTarget2.put("name", subTarget.getString("host") + ":" + subTarget.getInteger("port"));
+				targets2.add(subTarget2);
 			}
 			count++;
 		}
-		obj.put("children", arr2);
-		return obj.toJSONString();
+		target.put("children", targets2);
+		return target.toJSONString();
+	}
+
+	/** Get dashboard data. */
+	private String panel() {
+		int zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",").length;
+		String topciAndPartitions = kafkaService.getAllPartitions();
+		int topicSize = JSON.parseArray(topciAndPartitions).size();
+		String kafkaBrokers = kafkaService.getAllBrokersInfo();
+		int brokerSize = JSON.parseArray(kafkaBrokers).size();
+		DashboardDomain dashboard = new DashboardDomain();
+		dashboard.setBrokers(brokerSize);
+		dashboard.setTopics(topicSize);
+		dashboard.setZks(zks);
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		if ("kafka".equals(formatter)) {
+			dashboard.setConsumers(getKafkaConsumerNumbers());
+		} else {
+			dashboard.setConsumers(getConsumerNumbers());
+		}
+		return dashboard.toString();
 	}
 
 }

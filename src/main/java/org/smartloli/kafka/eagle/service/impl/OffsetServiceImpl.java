@@ -50,28 +50,28 @@ public class OffsetServiceImpl implements OffsetService {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
-	
+
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
 
 	/** Get Kafka brokers. */
 	private List<String> getBrokers(String topic, String group) {
-		JSONArray arr = JSON.parseArray(kafkaService.getAllBrokersInfo());
-		List<String> list = new ArrayList<String>();
-		for (Object object : arr) {
-			JSONObject obj = (JSONObject) object;
-			String host = obj.getString("host");
-			int port = obj.getInteger("port");
-			list.add(host + ":" + port);
+		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo());
+		List<String> targets = new ArrayList<String>();
+		for (Object object : brokers) {
+			JSONObject target = (JSONObject) object;
+			String host = target.getString("host");
+			int port = target.getInteger("port");
+			targets.add(host + ":" + port);
 		}
-		return list;
+		return targets;
 	}
 
 	/** Get Kafka logsize from Kafka topic. */
 	private String getKafkaLogSize(String topic, String group) {
 		List<String> hosts = getBrokers(topic, group);
 		List<String> partitions = kafkaService.findTopicPartition(topic);
-		List<OffsetDomain> list = new ArrayList<OffsetDomain>();
+		List<OffsetDomain> targets = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
 			OffsetZkDomain offsetZk = getKafkaOffset(topic, group, partitionInt);
@@ -84,17 +84,17 @@ public class OffsetServiceImpl implements OffsetService {
 			offset.setOffset(offsetZk.getOffset());
 			offset.setLag(offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
 			offset.setOwner(offsetZk.getOwners());
-			list.add(offset);
+			targets.add(offset);
 		}
-		return list.toString();
+		return targets.toString();
 	}
 
 	/** Get Kafka offset from Kafka topic. */
 	private OffsetZkDomain getKafkaOffset(String topic, String group, int partition) {
-		JSONArray array = JSON.parseArray(RpcClient.getOffset());
-		OffsetZkDomain offsetZk = new OffsetZkDomain();
-		for (Object obj : array) {
-			JSONObject object = (JSONObject) obj;
+		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset());
+		OffsetZkDomain targetOffset = new OffsetZkDomain();
+		for (Object kafkaOffset : kafkaOffsets) {
+			JSONObject object = (JSONObject) kafkaOffset;
 			String _topic = object.getString("topic");
 			String _group = object.getString("group");
 			int _partition = object.getInteger("partition");
@@ -102,20 +102,20 @@ public class OffsetServiceImpl implements OffsetService {
 			long offset = object.getLong("offset");
 			String owner = object.getString("owner");
 			if (topic.equals(_topic) && group.equals(_group) && partition == _partition) {
-				offsetZk.setOffset(offset);
-				offsetZk.setOwners(owner);
-				offsetZk.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
-				offsetZk.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
+				targetOffset.setOffset(offset);
+				targetOffset.setOwners(owner);
+				targetOffset.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
+				targetOffset.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
 			}
 		}
-		return offsetZk;
+		return targetOffset;
 	}
 
 	/** Get logsize from zookeeper. */
 	private String getLogSize(String topic, String group) {
 		List<String> hosts = getBrokers(topic, group);
 		List<String> partitions = kafkaService.findTopicPartition(topic);
-		List<OffsetDomain> list = new ArrayList<OffsetDomain>();
+		List<OffsetDomain> targets = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
 			OffsetZkDomain offsetZk = kafkaService.getOffset(topic, group, partitionInt);
@@ -128,9 +128,9 @@ public class OffsetServiceImpl implements OffsetService {
 			offset.setOffset(offsetZk.getOffset());
 			offset.setLag(offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
 			offset.setOwner(offsetZk.getOwners());
-			list.add(offset);
+			targets.add(offset);
 		}
-		return list.toString();
+		return targets.toString();
 	}
 
 	/** Get logsize from Kafka topic or Zookeeper. */
@@ -144,11 +144,11 @@ public class OffsetServiceImpl implements OffsetService {
 
 	/** Get Kafka offset graph data from Zookeeper. */
 	public String getOffsetsGraph(String group, String topic) {
-		String ret = zkService.getOffsets(group, topic);
-		if (ret.length() > 0) {
-			ret = JSON.parseObject(ret).getString("data");
+		String target = zkService.getOffsets(group, topic);
+		if (target.length() > 0) {
+			target = JSON.parseObject(target).getString("data");
 		}
-		return ret;
+		return target;
 	}
 
 	/** Judge group & topic from Zookeeper has exist. */
@@ -170,9 +170,9 @@ public class OffsetServiceImpl implements OffsetService {
 		boolean status = false;
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> map = gson.fromJson(RpcClient.getConsumer(), type.getClass());
-		if (map.containsKey(group)) {
-			for (String _topic : map.get(group)) {
+		Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+		if (kafkaConsumers.containsKey(group)) {
+			for (String _topic : kafkaConsumers.get(group)) {
 				if (_topic.equals(topic)) {
 					status = true;
 					break;
