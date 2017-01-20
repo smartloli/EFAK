@@ -115,18 +115,18 @@ public class ZkServiceImpl implements ZkService {
 
 	/** Get alarmer information. */
 	public String getAlarm() {
-		JSONArray array = new JSONArray();
+		JSONArray targets = new JSONArray();
 		if (zkc == null) {
 			zkc = zkPool.getZkClient();
 		}
 		String path = KE_ROOT_PATH + "/" + STORE_ALARM;
 		if (ZkUtils.pathExists(zkc, path)) {
-			Seq<String> seq = ZkUtils.getChildren(zkc, path);
-			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
-			for (String group : listSeq) {
-				Seq<String> seq2 = ZkUtils.getChildren(zkc, path + "/" + group);
-				List<String> listSeq2 = JavaConversions.seqAsJavaList(seq2);
-				for (String topic : listSeq2) {
+			Seq<String> alarmPaths = ZkUtils.getChildren(zkc, path);
+			List<String> groups = JavaConversions.seqAsJavaList(alarmPaths);
+			for (String group : groups) {
+				Seq<String> subGroups = ZkUtils.getChildren(zkc, path + "/" + group);
+				List<String> topics = JavaConversions.seqAsJavaList(subGroups);
+				for (String topic : topics) {
 					try {
 						JSONObject object = new JSONObject();
 						object.put("group", group);
@@ -138,7 +138,7 @@ public class ZkServiceImpl implements ZkService {
 						String owner = JSON.parseObject(tuple._1.get()).getString("owner");
 						object.put("lag", lag);
 						object.put("owner", owner);
-						array.add(object);
+						targets.add(object);
 					} catch (Exception ex) {
 						LOG.error("[ZK.getAlarm] has error,msg is " + ex.getMessage());
 					}
@@ -149,7 +149,7 @@ public class ZkServiceImpl implements ZkService {
 			zkPool.release(zkc);
 			zkc = null;
 		}
-		return array.toJSONString();
+		return targets.toJSONString();
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class ZkServiceImpl implements ZkService {
 	 * @return String.
 	 */
 	public String getOffsets(String group, String topic) {
-		String data = "";
+		String target = "";
 		if (zkc == null) {
 			zkc = zkPool.getZkClient();
 		}
@@ -170,9 +170,9 @@ public class ZkServiceImpl implements ZkService {
 		if (ZkUtils.pathExists(zkc, path)) {
 			try {
 				Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, path);
-				JSONObject obj = JSON.parseObject(tuple._1.get());
-				if (getZkHour().equals(obj.getString("hour"))) {
-					data = obj.toJSONString();
+				JSONObject object = JSON.parseObject(tuple._1.get());
+				if (getZkHour().equals(object.getString("hour"))) {
+					target = object.toJSONString();
 				}
 			} catch (Exception ex) {
 				LOG.error("[ZK.getOffsets] has error,msg is " + ex.getMessage());
@@ -182,7 +182,7 @@ public class ZkServiceImpl implements ZkService {
 			zkPool.release(zkc);
 			zkc = null;
 		}
-		return data;
+		return target;
 	}
 
 	/**
@@ -202,31 +202,31 @@ public class ZkServiceImpl implements ZkService {
 	public void insert(List<OffsetsLiteDomain> list) {
 		String hour = getZkHour();
 		for (OffsetsLiteDomain offset : list) {
-			JSONObject obj = new JSONObject();
-			obj.put("hour", hour);
+			JSONObject target = new JSONObject();
+			target.put("hour", hour);
 
 			JSONObject object = new JSONObject();
 			object.put("lag", offset.getLag());
 			object.put("lagsize", offset.getLogSize());
 			object.put("offsets", offset.getOffsets());
 			object.put("created", offset.getCreated());
-			String json = getOffsets(offset.getGroup(), offset.getTopic());
-			JSONObject tmp = JSON.parseObject(json);
-			JSONArray zkArrayData = new JSONArray();
-			if (tmp != null && tmp.size() > 0) {
-				String zkHour = tmp.getString("hour");
+			String offsets = getOffsets(offset.getGroup(), offset.getTopic());
+			JSONObject offsetsFormmatter = JSON.parseObject(offsets);
+			JSONArray offsetsOutputs = new JSONArray();
+			if (offsetsFormmatter != null && offsetsFormmatter.size() > 0) {
+				String zkHour = offsetsFormmatter.getString("hour");
 				if (hour.equals(zkHour)) {
-					String zkData = tmp.getString("data");
-					zkArrayData = JSON.parseArray(zkData);
+					String zkData = offsetsFormmatter.getString("data");
+					offsetsOutputs = JSON.parseArray(zkData);
 				}
 			}
-			if (zkArrayData.size() > 0) {
-				zkArrayData.add(object);
-				obj.put("data", zkArrayData);
+			if (offsetsOutputs.size() > 0) {
+				offsetsOutputs.add(object);
+				target.put("data", offsetsOutputs);
 			} else {
-				obj.put("data", Arrays.asList(object));
+				target.put("data", Arrays.asList(object));
 			}
-			update(obj.toJSONString(), STORE_OFFSETS + "/" + offset.getGroup() + "/" + offset.getTopic());
+			update(target.toJSONString(), STORE_OFFSETS + "/" + offset.getGroup() + "/" + offset.getTopic());
 		}
 	}
 
@@ -252,17 +252,17 @@ public class ZkServiceImpl implements ZkService {
 
 	/** Zookeeper ls command. */
 	public String ls(String cmd) {
-		String ret = "";
+		String target = "";
 		ZkClient zkc = zkPool.getZkClient();
 		boolean status = ZkUtils.pathExists(zkc, cmd);
 		if (status) {
-			ret = zkc.getChildren(cmd).toString();
+			target = zkc.getChildren(cmd).toString();
 		}
 		if (zkc != null) {
 			zkPool.release(zkc);
 			zkc = null;
 		}
-		return ret;
+		return target;
 	}
 
 	/**
@@ -300,7 +300,7 @@ public class ZkServiceImpl implements ZkService {
 	 * @return String.
 	 */
 	public String status(String host, String port) {
-		String ret = "";
+		String target = "";
 		Socket sock = null;
 		try {
 			String tmp = "";
@@ -325,7 +325,7 @@ public class ZkServiceImpl implements ZkService {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				if (line.indexOf("Mode: ") != -1) {
-					ret = line.replaceAll("Mode: ", "").trim();
+					target = line.replaceAll("Mode: ", "").trim();
 				}
 			}
 		} catch (Exception ex) {
@@ -341,7 +341,7 @@ public class ZkServiceImpl implements ZkService {
 				LOG.error("Close read has error,msg is " + ex.getMessage());
 			}
 		}
-		return ret;
+		return target;
 	}
 
 	/**
@@ -371,34 +371,34 @@ public class ZkServiceImpl implements ZkService {
 	/** Get zookeeper cluster information. */
 	public String zkCluster() {
 		String[] zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",");
-		JSONArray arr = new JSONArray();
+		JSONArray targets = new JSONArray();
 		int id = 1;
 		for (String zk : zks) {
-			JSONObject obj = new JSONObject();
-			obj.put("id", id++);
-			obj.put("ip", zk.split(":")[0]);
-			obj.put("port", zk.split(":")[1]);
-			obj.put("mode", status(zk.split(":")[0], zk.split(":")[1]));
-			arr.add(obj);
+			JSONObject object = new JSONObject();
+			object.put("id", id++);
+			object.put("ip", zk.split(":")[0]);
+			object.put("port", zk.split(":")[1]);
+			object.put("mode", status(zk.split(":")[0], zk.split(":")[1]));
+			targets.add(object);
 		}
-		return arr.toJSONString();
+		return targets.toJSONString();
 	}
 
 	/** Judge whether the zkcli is active. */
 	public JSONObject zkCliStatus() {
-		JSONObject object = new JSONObject();
+		JSONObject target = new JSONObject();
 		ZkClient zkc = zkPool.getZkClient();
 		if (zkc != null) {
-			object.put("live", true);
-			object.put("list", SystemConfigUtils.getProperty("kafka.zk.list"));
+			target.put("live", true);
+			target.put("list", SystemConfigUtils.getProperty("kafka.zk.list"));
 		} else {
-			object.put("live", false);
-			object.put("list", SystemConfigUtils.getProperty("kafka.zk.list"));
+			target.put("live", false);
+			target.put("list", SystemConfigUtils.getProperty("kafka.zk.list"));
 		}
 		if (zkc != null) {
 			zkPool.release(zkc);
 			zkc = null;
 		}
-		return object;
+		return target;
 	}
 }

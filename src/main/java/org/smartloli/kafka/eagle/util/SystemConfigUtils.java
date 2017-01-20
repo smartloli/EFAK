@@ -52,8 +52,8 @@ public final class SystemConfigUtils {
 				} else {
 					mConfig.load(new FileInputStream(System.getProperty("user.dir") + "/conf/" + name));
 				}
-			} catch (Exception exp1) {
-				exp1.printStackTrace();
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 			LOG.info("Successfully loaded default properties.");
 
@@ -72,12 +72,16 @@ public final class SystemConfigUtils {
 		}
 	}
 
-	/** Retrieve a property as a boolean ... defaults to false if not present. */
+	/**
+	 * Retrieve a property as a boolean ... defaults to false if not present.
+	 */
 	public static boolean getBooleanProperty(String name) {
 		return getBooleanProperty(name, false);
 	}
 
-	/** Retrieve a property as a boolean with specified default if not present. */
+	/**
+	 * Retrieve a property as a boolean with specified default if not present.
+	 */
 	public static boolean getBooleanProperty(String name, boolean defaultValue) {
 		String value = SystemConfigUtils.getProperty(name);
 		if (value == null) {
