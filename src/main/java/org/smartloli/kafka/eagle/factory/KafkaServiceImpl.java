@@ -151,42 +151,42 @@ public class KafkaServiceImpl implements KafkaService {
 	public List<String> findTopicPartition(String topic) {
 		ZkClient zkc = zkPool.getZkClient();
 		Seq<String> seq = ZkUtils.getChildren(zkc, BROKER_TOPICS_PATH + "/" + topic + "/partitions");
-		List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+		List<String> topicAndPartitions = JavaConversions.seqAsJavaList(seq);
 		if (zkc != null) {
 			zkPool.release(zkc);
 			zkc = null;
 			seq = null;
 		}
-		return listSeq;
+		return topicAndPartitions;
 	}
 
 	/** Get kafka active consumer topic. */
 	public Map<String, List<String>> getActiveTopic() {
 		ZkClient zkc = zkPool.getZkClientSerializer();
-		Map<String, List<String>> actvTopic = new HashMap<String, List<String>>();
+		Map<String, List<String>> actvTopics = new HashMap<String, List<String>>();
 		try {
-			Seq<String> seq = ZkUtils.getChildren(zkc, CONSUMERS_PATH);
-			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
-			JSONArray arr = new JSONArray();
-			for (String group : listSeq) {
-				scala.collection.mutable.Map<String, scala.collection.immutable.List<ConsumerThreadId>> map = ZkUtils.getConsumersPerTopic(zkc, group, false);
-				for (Entry<String, ?> entry : JavaConversions.mapAsJavaMap(map).entrySet()) {
-					JSONObject obj = new JSONObject();
-					obj.put("topic", entry.getKey());
-					obj.put("group", group);
-					arr.add(obj);
+			Seq<String> subConsumerPaths = ZkUtils.getChildren(zkc, CONSUMERS_PATH);
+			List<String> groups = JavaConversions.seqAsJavaList(subConsumerPaths);
+			JSONArray groupsAndTopics = new JSONArray();
+			for (String group : groups) {
+				scala.collection.mutable.Map<String, scala.collection.immutable.List<ConsumerThreadId>> topics = ZkUtils.getConsumersPerTopic(zkc, group, false);
+				for (Entry<String, ?> entry : JavaConversions.mapAsJavaMap(topics).entrySet()) {
+					JSONObject groupAndTopic = new JSONObject();
+					groupAndTopic.put("topic", entry.getKey());
+					groupAndTopic.put("group", group);
+					groupsAndTopics.add(groupAndTopic);
 				}
 			}
-			for (Object object : arr) {
-				JSONObject obj = (JSONObject) object;
-				String group = obj.getString("group");
-				String topic = obj.getString("topic");
-				if (actvTopic.containsKey(group + "_" + topic)) {
-					actvTopic.get(group + "_" + topic).add(topic);
+			for (Object object : groupsAndTopics) {
+				JSONObject groupAndTopic = (JSONObject) object;
+				String group = groupAndTopic.getString("group");
+				String topic = groupAndTopic.getString("topic");
+				if (actvTopics.containsKey(group + "_" + topic)) {
+					actvTopics.get(group + "_" + topic).add(topic);
 				} else {
 					List<String> topics = new ArrayList<String>();
 					topics.add(topic);
-					actvTopic.put(group + "_" + topic, topics);
+					actvTopics.put(group + "_" + topic, topics);
 				}
 			}
 		} catch (Exception ex) {
@@ -197,18 +197,18 @@ public class KafkaServiceImpl implements KafkaService {
 				zkc = null;
 			}
 		}
-		return actvTopic;
+		return actvTopics;
 	}
 
 	/** Get all broker list from zookeeper. */
 	public String getAllBrokersInfo() {
 		ZkClient zkc = zkPool.getZkClientSerializer();
-		List<BrokersDomain> list = new ArrayList<BrokersDomain>();
+		List<BrokersDomain> targets = new ArrayList<BrokersDomain>();
 		if (ZkUtils.pathExists(zkc, BROKER_IDS_PATH)) {
-			Seq<String> seq = ZkUtils.getChildren(zkc, BROKER_IDS_PATH);
-			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+			Seq<String> subBrokerIdsPaths = ZkUtils.getChildren(zkc, BROKER_IDS_PATH);
+			List<String> brokerIdss = JavaConversions.seqAsJavaList(subBrokerIdsPaths);
 			int id = 0;
-			for (String ids : listSeq) {
+			for (String ids : brokerIdss) {
 				try {
 					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, BROKER_IDS_PATH + "/" + ids);
 					BrokersDomain broker = new BrokersDomain();
@@ -219,7 +219,7 @@ public class KafkaServiceImpl implements KafkaService {
 					broker.setHost(host);
 					broker.setPort(port);
 					broker.setId(++id);
-					list.add(broker);
+					targets.add(broker);
 				} catch (Exception ex) {
 					LOG.error(ex.getMessage());
 				}
@@ -229,18 +229,18 @@ public class KafkaServiceImpl implements KafkaService {
 			zkPool.releaseZKSerializer(zkc);
 			zkc = null;
 		}
-		return list.toString();
+		return targets.toString();
 	}
 
 	/** Get all topic info from zookeeper. */
 	public String getAllPartitions() {
 		ZkClient zkc = zkPool.getZkClientSerializer();
-		List<PartitionsDomain> list = new ArrayList<PartitionsDomain>();
+		List<PartitionsDomain> targets = new ArrayList<PartitionsDomain>();
 		if (ZkUtils.pathExists(zkc, BROKER_TOPICS_PATH)) {
-			Seq<String> seq = ZkUtils.getChildren(zkc, BROKER_TOPICS_PATH);
-			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+			Seq<String> subBrokerTopicsPaths = ZkUtils.getChildren(zkc, BROKER_TOPICS_PATH);
+			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
 			int id = 0;
-			for (String topic : listSeq) {
+			for (String topic : topics) {
 				try {
 					Tuple2<Option<String>, Stat> tuple = ZkUtils.readDataMaybeNull(zkc, BROKER_TOPICS_PATH + "/" + topic);
 					PartitionsDomain partition = new PartitionsDomain();
@@ -251,7 +251,7 @@ public class KafkaServiceImpl implements KafkaService {
 					JSONObject partitionObject = JSON.parseObject(tuple._1.get()).getJSONObject("partitions");
 					partition.setPartitionNumbers(partitionObject.size());
 					partition.setPartitions(partitionObject.keySet());
-					list.add(partition);
+					targets.add(partition);
 				} catch (Exception ex) {
 					LOG.error(ex.getMessage());
 				}
@@ -261,22 +261,22 @@ public class KafkaServiceImpl implements KafkaService {
 			zkPool.releaseZKSerializer(zkc);
 			zkc = null;
 		}
-		return list.toString();
+		return targets.toString();
 	}
 
 	/** Obtaining kafka consumer information from zookeeper. */
 	public Map<String, List<String>> getConsumers() {
 		ZkClient zkc = zkPool.getZkClient();
-		Map<String, List<String>> mapConsumers = new HashMap<String, List<String>>();
+		Map<String, List<String>> consumers = new HashMap<String, List<String>>();
 		try {
-			Seq<String> seq = ZkUtils.getChildren(zkc, CONSUMERS_PATH);
-			List<String> listSeq = JavaConversions.seqAsJavaList(seq);
-			for (String group : listSeq) {
+			Seq<String> subConsumerPaths = ZkUtils.getChildren(zkc, CONSUMERS_PATH);
+			List<String> groups = JavaConversions.seqAsJavaList(subConsumerPaths);
+			for (String group : groups) {
 				String path = CONSUMERS_PATH + "/" + group + "/owners";
 				if (ZkUtils.pathExists(zkc, path)) {
-					Seq<String> tmp = ZkUtils.getChildren(zkc, path);
-					List<String> list = JavaConversions.seqAsJavaList(tmp);
-					mapConsumers.put(group, list);
+					Seq<String> owners = ZkUtils.getChildren(zkc, path);
+					List<String> ownersSerialize = JavaConversions.seqAsJavaList(owners);
+					consumers.put(group, ownersSerialize);
 				} else {
 					LOG.error("Consumer Path[" + path + "] is not exist.");
 				}
@@ -289,34 +289,34 @@ public class KafkaServiceImpl implements KafkaService {
 				zkc = null;
 			}
 		}
-		return mapConsumers;
+		return consumers;
 	}
 
 	/** Obtaining kafka consumer page information from zookeeper. */
 	public Map<String, List<String>> getConsumers(PageParamDomain page) {
 		ZkClient zkc = zkPool.getZkClient();
-		Map<String, List<String>> mapConsumers = new HashMap<String, List<String>>();
+		Map<String, List<String>> consumers = new HashMap<String, List<String>>();
 		try {
 			if (page.getSearch().length() > 0) {
 				String path = CONSUMERS_PATH + "/" + page.getSearch() + "/owners";
 				if (ZkUtils.pathExists(zkc, path)) {
-					Seq<String> tmp = ZkUtils.getChildren(zkc, path);
-					List<String> list = JavaConversions.seqAsJavaList(tmp);
-					mapConsumers.put(page.getSearch(), list);
+					Seq<String> owners = ZkUtils.getChildren(zkc, path);
+					List<String> ownersSerialize = JavaConversions.seqAsJavaList(owners);
+					consumers.put(page.getSearch(), ownersSerialize);
 				} else {
 					LOG.error("Consumer Path[" + path + "] is not exist.");
 				}
 			} else {
-				Seq<String> seq = ZkUtils.getChildren(zkc, CONSUMERS_PATH);
-				List<String> listSeq = JavaConversions.seqAsJavaList(seq);
+				Seq<String> subConsumersPaths = ZkUtils.getChildren(zkc, CONSUMERS_PATH);
+				List<String> groups = JavaConversions.seqAsJavaList(subConsumersPaths);
 				int offset = 0;
-				for (String group : listSeq) {
+				for (String group : groups) {
 					if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
 						String path = CONSUMERS_PATH + "/" + group + "/owners";
 						if (ZkUtils.pathExists(zkc, path)) {
-							Seq<String> tmp = ZkUtils.getChildren(zkc, path);
-							List<String> list = JavaConversions.seqAsJavaList(tmp);
-							mapConsumers.put(group, list);
+							Seq<String> owners = ZkUtils.getChildren(zkc, path);
+							List<String> ownersSerialize = JavaConversions.seqAsJavaList(owners);
+							consumers.put(group, ownersSerialize);
 						} else {
 							LOG.error("Consumer Path[" + path + "] is not exist.");
 						}
@@ -332,7 +332,7 @@ public class KafkaServiceImpl implements KafkaService {
 				zkc = null;
 			}
 		}
-		return mapConsumers;
+		return consumers;
 	}
 
 	/**
@@ -449,47 +449,47 @@ public class KafkaServiceImpl implements KafkaService {
 	 */
 	public String geyReplicasIsr(String topic, int partitionid) {
 		ZkClient zkc = zkPool.getZkClientSerializer();
-		Seq<Object> seq = ZkUtils.getInSyncReplicasForPartition(zkc, topic, partitionid);
-		List<Object> listSeq = JavaConversions.seqAsJavaList(seq);
+		Seq<Object> repclicasAndPartition = ZkUtils.getInSyncReplicasForPartition(zkc, topic, partitionid);
+		List<Object> targets = JavaConversions.seqAsJavaList(repclicasAndPartition);
 		if (zkc != null) {
 			zkPool.releaseZKSerializer(zkc);
 			zkc = null;
 		}
-		return listSeq.toString();
+		return targets.toString();
 	}
 
 	/** Get zookeeper cluster information. */
 	public String zkCluster() {
 		String[] zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",");
-		JSONArray arr = new JSONArray();
+		JSONArray targets = new JSONArray();
 		int id = 1;
 		for (String zk : zks) {
-			JSONObject obj = new JSONObject();
-			obj.put("id", id++);
-			obj.put("ip", zk.split(":")[0]);
-			obj.put("port", zk.split(":")[1]);
-			obj.put("mode", zkService.status(zk.split(":")[0], zk.split(":")[1]));
-			arr.add(obj);
+			JSONObject object = new JSONObject();
+			object.put("id", id++);
+			object.put("ip", zk.split(":")[0]);
+			object.put("port", zk.split(":")[1]);
+			object.put("mode", zkService.status(zk.split(":")[0], zk.split(":")[1]));
+			targets.add(object);
 		}
-		return arr.toJSONString();
+		return targets.toJSONString();
 	}
 
 	/** Judge whether the zkcli is active. */
 	public JSONObject zkCliStatus() {
-		JSONObject object = new JSONObject();
+		JSONObject target = new JSONObject();
 		ZkClient zkc = zkPool.getZkClient();
 		if (zkc != null) {
-			object.put("live", true);
-			object.put("list", SystemConfigUtils.getProperty("kafka.zk.list"));
+			target.put("live", true);
+			target.put("list", SystemConfigUtils.getProperty("kafka.zk.list"));
 		} else {
-			object.put("live", false);
-			object.put("list", SystemConfigUtils.getProperty("kafka.zk.list"));
+			target.put("live", false);
+			target.put("list", SystemConfigUtils.getProperty("kafka.zk.list"));
 		}
 		if (zkc != null) {
 			zkPool.release(zkc);
 			zkc = null;
 		}
-		return object;
+		return target;
 	}
 
 	/**
@@ -505,19 +505,19 @@ public class KafkaServiceImpl implements KafkaService {
 	 * @return Map.
 	 */
 	public Map<String, Object> create(String topicName, String partitions, String replic) {
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> targets = new HashMap<String, Object>();
 		int brokers = JSON.parseArray(getAllBrokersInfo()).size();
 		if (Integer.parseInt(replic) > brokers) {
-			map.put("status", "error");
-			map.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
-			return map;
+			targets.put("status", "error");
+			targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
+			return targets;
 		}
 		String zks = SystemConfigUtils.getProperty("kafka.zk.list");
 		String[] options = new String[] { "--create", "--zookeeper", zks, "--partitions", partitions, "--topic", topicName, "--replication-factor", replic };
 		TopicCommand.main(options);
-		map.put("status", "success");
-		map.put("info", "Create topic[" + topicName + "] has successed,partitions numbers is [" + partitions + "],replication-factor numbers is [" + replic + "]");
-		return map;
+		targets.put("status", "success");
+		targets.put("info", "Create topic[" + topicName + "] has successed,partitions numbers is [" + partitions + "],replication-factor numbers is [" + replic + "]");
+		return targets;
 	}
 
 	/**
@@ -528,7 +528,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 * @see org.smartloli.kafka.eagle.domain.MetadataDomain
 	 */
 	public List<MetadataDomain> findLeader(String topic) {
-		List<MetadataDomain> list = new ArrayList<>();
+		List<MetadataDomain> targets = new ArrayList<>();
 
 		SimpleConsumer consumer = null;
 		for (HostsDomain broker : getBrokers()) {
@@ -544,50 +544,49 @@ public class KafkaServiceImpl implements KafkaService {
 
 		if (consumer == null) {
 			LOG.error("Connection [SimpleConsumer] has failed,please check brokers.");
-			return list;
+			return targets;
 		}
 
 		List<String> topics = Collections.singletonList(topic);
-		TopicMetadataRequest req = new TopicMetadataRequest(topics);
-		TopicMetadataResponse resp = consumer.send(req);
-		if (resp == null) {
+		TopicMetadataRequest topicMetaReqst = new TopicMetadataRequest(topics);
+		TopicMetadataResponse topicMetaRespn = consumer.send(topicMetaReqst);
+		if (topicMetaRespn == null) {
 			LOG.error("Get [TopicMetadataResponse] has null.");
-			return list;
+			return targets;
 		}
-		List<TopicMetadata> metaData = resp.topicsMetadata();
-		for (TopicMetadata item : metaData) {
+		List<TopicMetadata> topicsMeta = topicMetaRespn.topicsMetadata();
+		for (TopicMetadata item : topicsMeta) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
-				MetadataDomain kMeta = new MetadataDomain();
-				kMeta.setIsr(geyReplicasIsr(topic, part.partitionId()));
-				kMeta.setLeader(part.leader() == null ? -1 : part.leader().id());
-				kMeta.setPartitionId(part.partitionId());
-				List<Integer> repliList = new ArrayList<>();
+				MetadataDomain metadata = new MetadataDomain();
+				metadata.setIsr(geyReplicasIsr(topic, part.partitionId()));
+				metadata.setLeader(part.leader() == null ? -1 : part.leader().id());
+				metadata.setPartitionId(part.partitionId());
+				List<Integer> replicases = new ArrayList<>();
 				for (Broker repli : part.replicas()) {
-					repliList.add(repli.id());
+					replicases.add(repli.id());
 				}
-				kMeta.setReplicas(repliList.toString());
-				list.add(kMeta);
+				metadata.setReplicas(replicases.toString());
+				targets.add(metadata);
 			}
 		}
 		if (consumer != null) {
 			consumer.close();
 		}
-		return list;
+		return targets;
 	}
 
 	/** Get kafka brokers from zookeeper. */
 	private List<HostsDomain> getBrokers() {
-		String brokersStr = getAllBrokersInfo();
-		List<HostsDomain> brokers = new ArrayList<HostsDomain>();
-		JSONArray arr = JSON.parseArray(brokersStr);
-		for (Object object : arr) {
-			JSONObject obj = (JSONObject) object;
-			HostsDomain broker = new HostsDomain();
-			broker.setHost(obj.getString("host"));
-			broker.setPort(obj.getInteger("port"));
-			brokers.add(broker);
+		List<HostsDomain> targets = new ArrayList<HostsDomain>();
+		JSONArray brokers = JSON.parseArray(getAllBrokersInfo());
+		for (Object object : brokers) {
+			JSONObject broker = (JSONObject) object;
+			HostsDomain host = new HostsDomain();
+			host.setHost(broker.getString("host"));
+			host.setPort(broker.getInteger("port"));
+			targets.add(host);
 		}
-		return brokers;
+		return targets;
 	}
 
 }
