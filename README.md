@@ -20,8 +20,8 @@ Here are a few Kafka Eagle system screenshots:
 # Kafka Offset Types
 
 Kafka is designed to be flexible on how the offsets are managed. Consumer can choose arbitrary storage and format to persist kafka offsets. Kafka Eagle currently support following popular storage format:
-  * Zookeeper Old version of Kafka (0.8.2 before) default storage in Zookeeper.
-  * Kafka New version of Kafka (0.10.0 in the future) default recommend stotage Kafka Topic(__consumer_offsets).
+  * Zookeeper. Old version of Kafka (0.8.2 before) default storage in Zookeeper.
+  * Kafka. New version of Kafka (0.10.0 in the future) default recommend storage in Kafka Topic(__consumer_offsets).
   
 Each runtime instance of Kafka Eagle can only support a single type of storage format.
 
