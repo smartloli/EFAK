@@ -1,2 +1,44 @@
-# kafka-eagle
-Used to monitor the consumption status of Kafka clusters, as well as offsets, metadata and other information.
+# Kafka Eagle
+
+This is an monitor system and monitor your kafka clusters, and visual consumer thread,offsets,owners etc.
+
+When you install ![Kafka Eagle](http://download.smartloli.org/), you can see the current consumer group,for each group the topics that they are consuming and the offsets, lag, logsize position of the group in each topic. This is useful to understand how fast you are consuming from a message queue and how quick the message queue is increase. This will help you debuging kafka producers and consumers or just to have an idea of what is going on in your system.
+
+The system shows the trend of consumer and producer trends on the same day, so you can see what happened that day.
+
+Here are a few Kafka Eagle system screenshots:
+
+# List of Consumer Groups & Active Group Graph
+// TBD 
+
+# List of Topics Consumer threads
+// TBD
+
+# Consumer & Producer Rate Chart
+// TBD
+
+# Kafka Offset Types
+
+Kafka is designed to be flexible on how the offsets are managed. Consumer can choose arbitrary storage and format to persist kafka offsets. Kafka Eagle currently support following popular storage format:
+  * Zookeeper Old version of Kafka (0.8.2 before) default storage in Zookeeper.
+  * Kafka New version of Kafka (0.10.0 in the future) default recommend stotage Kafka Topic(__consumer_offsets).
+  
+Each runtime instance of Kafka Eagle can only support a single type of storage format.
+
+# Quickstart
+
+Please read ![Kafka Eagle Install](https://ke.smartloli.org/2.Install/2.Installing.html) for setting up and running Kafka Eagle.
+
+# More Information
+
+Please see the ![Kafka Eagle Manual](https://ke.smartloli.org) for for more information including:
+  * System environment settings and installation instructions.
+  * Information about how to use script command.
+  * Visual group,topic,offset metadata information etc.
+  * Metadata collection and log change information.
+ 
+# Contributing
+
+The Kafka Eagle is released under the Apache License and we welcome any contributions within this license. Any pull request is welcome and will be reviewed and merged as quickly as possible.
+
+Since this is an open source tool, please comply with the relevant laws and regulations, the use of civilization.
