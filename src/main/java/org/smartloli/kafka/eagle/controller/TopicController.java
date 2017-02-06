@@ -119,44 +119,44 @@ public class TopicController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		String aoData = request.getParameter("aoData");
-		JSONArray jsonArray = JSON.parseArray(aoData);
+		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
-		for (Object obj : jsonArray) {
-			JSONObject jsonObj = (JSONObject) obj;
-			if ("sEcho".equals(jsonObj.getString("name"))) {
-				sEcho = jsonObj.getIntValue("value");
-			} else if ("iDisplayStart".equals(jsonObj.getString("name"))) {
-				iDisplayStart = jsonObj.getIntValue("value");
-			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
-				iDisplayLength = jsonObj.getIntValue("value");
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
 			}
 		}
 
-		String str = topicService.metadata(tname);
-		JSONArray ret = JSON.parseArray(str);
+		String metadata = topicService.metadata(tname);
+		JSONArray metadatas = JSON.parseArray(metadata);
 		int offset = 0;
-		JSONArray retArr = new JSONArray();
-		for (Object tmp : ret) {
-			JSONObject tmp2 = (JSONObject) tmp;
+		JSONArray aaDatas = new JSONArray();
+		for (Object object : metadatas) {
+			JSONObject meta = (JSONObject) object;
 			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 				JSONObject obj = new JSONObject();
 				obj.put("topic", tname);
-				obj.put("partition", tmp2.getInteger("partitionId"));
-				obj.put("leader", tmp2.getInteger("leader"));
-				obj.put("replicas", tmp2.getString("replicas"));
-				obj.put("isr", tmp2.getString("isr"));
-				retArr.add(obj);
+				obj.put("partition", meta.getInteger("partitionId"));
+				obj.put("leader", meta.getInteger("leader"));
+				obj.put("replicas", meta.getString("replicas"));
+				obj.put("isr", meta.getString("isr"));
+				aaDatas.add(obj);
 			}
 			offset++;
 		}
 
-		JSONObject obj = new JSONObject();
-		obj.put("sEcho", sEcho);
-		obj.put("iTotalRecords", ret.size());
-		obj.put("iTotalDisplayRecords", ret.size());
-		obj.put("aaData", retArr);
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", metadatas.size());
+		target.put("iTotalDisplayRecords", metadatas.size());
+		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			byte[] output = GzipUtils.compressToByte(target.toJSONString());
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -178,58 +178,58 @@ public class TopicController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		String aoData = request.getParameter("aoData");
-		JSONArray jsonArray = JSON.parseArray(aoData);
+		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
 		String search = "";
-		for (Object obj : jsonArray) {
-			JSONObject jsonObj = (JSONObject) obj;
-			if ("sEcho".equals(jsonObj.getString("name"))) {
-				sEcho = jsonObj.getIntValue("value");
-			} else if ("iDisplayStart".equals(jsonObj.getString("name"))) {
-				iDisplayStart = jsonObj.getIntValue("value");
-			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
-				iDisplayLength = jsonObj.getIntValue("value");
-			} else if ("sSearch".equals(jsonObj.getString("name"))) {
-				search = jsonObj.getString("value");
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
+			} else if ("sSearch".equals(param.getString("name"))) {
+				search = param.getString("value");
 			}
 		}
 
-		JSONArray ret = JSON.parseArray(topicService.list());
+		JSONArray topics = JSON.parseArray(topicService.list());
 		int offset = 0;
-		JSONArray retArr = new JSONArray();
-		for (Object tmp : ret) {
-			JSONObject tmp2 = (JSONObject) tmp;
-			if (search.length() > 0 && search.equals(tmp2.getString("topic"))) {
+		JSONArray aaDatas = new JSONArray();
+		for (Object object : topics) {
+			JSONObject topic = (JSONObject) object;
+			if (search.length() > 0 && search.equals(topic.getString("topic"))) {
 				JSONObject obj = new JSONObject();
-				obj.put("id", tmp2.getInteger("id"));
-				obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "/' target='_blank'>" + tmp2.getString("topic") + "</a>");
-				obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
-				obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
-				obj.put("created", tmp2.getString("created"));
-				obj.put("modify", tmp2.getString("modify"));
-				retArr.add(obj);
+				obj.put("id", topic.getInteger("id"));
+				obj.put("topic", "<a href='/ke/topic/meta/" + topic.getString("topic") + "/' target='_blank'>" + topic.getString("topic") + "</a>");
+				obj.put("partitions", topic.getString("partitions").length() > 50 ? topic.getString("partitions").substring(0, 50) + "..." : topic.getString("partitions"));
+				obj.put("partitionNumbers", topic.getInteger("partitionNumbers"));
+				obj.put("created", topic.getString("created"));
+				obj.put("modify", topic.getString("modify"));
+				aaDatas.add(obj);
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 					JSONObject obj = new JSONObject();
-					obj.put("id", tmp2.getInteger("id"));
-					obj.put("topic", "<a href='/ke/topic/meta/" + tmp2.getString("topic") + "/' target='_blank'>" + tmp2.getString("topic") + "</a>");
-					obj.put("partitions", tmp2.getString("partitions").length() > 50 ? tmp2.getString("partitions").substring(0, 50) + "..." : tmp2.getString("partitions"));
-					obj.put("partitionNumbers", tmp2.getInteger("partitionNumbers"));
-					obj.put("created", tmp2.getString("created"));
-					obj.put("modify", tmp2.getString("modify"));
-					retArr.add(obj);
+					obj.put("id", topic.getInteger("id"));
+					obj.put("topic", "<a href='/ke/topic/meta/" + topic.getString("topic") + "/' target='_blank'>" + topic.getString("topic") + "</a>");
+					obj.put("partitions", topic.getString("partitions").length() > 50 ? topic.getString("partitions").substring(0, 50) + "..." : topic.getString("partitions"));
+					obj.put("partitionNumbers", topic.getInteger("partitionNumbers"));
+					obj.put("created", topic.getString("created"));
+					obj.put("modify", topic.getString("modify"));
+					aaDatas.add(obj);
 				}
 				offset++;
 			}
 		}
 
-		JSONObject obj = new JSONObject();
-		obj.put("sEcho", sEcho);
-		obj.put("iTotalRecords", ret.size());
-		obj.put("iTotalDisplayRecords", ret.size());
-		obj.put("aaData", retArr);
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", topics.size());
+		target.put("iTotalDisplayRecords", topics.size());
+		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			byte[] output = GzipUtils.compressToByte(target.toJSONString());
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -248,14 +248,14 @@ public class TopicController {
 		String ke_topic_name = request.getParameter("ke_topic_name");
 		String ke_topic_partition = request.getParameter("ke_topic_partition");
 		String ke_topic_repli = request.getParameter("ke_topic_repli");
-		Map<String, Object> map = kafkaService.create(ke_topic_name, ke_topic_partition, ke_topic_repli);
-		if ("success".equals(map.get("status"))) {
+		Map<String, Object> respons = kafkaService.create(ke_topic_name, ke_topic_partition, ke_topic_repli);
+		if ("success".equals(respons.get("status"))) {
 			session.removeAttribute("Submit_Status");
-			session.setAttribute("Submit_Status", map.get("info"));
+			session.setAttribute("Submit_Status", respons.get("info"));
 			mav.setViewName("redirect:/topic/create/success");
 		} else {
 			session.removeAttribute("Submit_Status");
-			session.setAttribute("Submit_Status", map.get("info"));
+			session.setAttribute("Submit_Status", respons.get("info"));
 			mav.setViewName("redirect:/topic/create/failed");
 		}
 		return mav;

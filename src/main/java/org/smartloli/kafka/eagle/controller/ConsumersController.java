@@ -94,19 +94,19 @@ public class ConsumersController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		String aoData = request.getParameter("aoData");
-		JSONArray jsonArray = JSON.parseArray(aoData);
+		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
 		String search = "";
-		for (Object obj : jsonArray) {
-			JSONObject jsonObj = (JSONObject) obj;
-			if ("sEcho".equals(jsonObj.getString("name"))) {
-				sEcho = jsonObj.getIntValue("value");
-			} else if ("iDisplayStart".equals(jsonObj.getString("name"))) {
-				iDisplayStart = jsonObj.getIntValue("value");
-			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
-				iDisplayLength = jsonObj.getIntValue("value");
-			} else if ("sSearch".equals(jsonObj.getString("name"))) {
-				search = jsonObj.getString("value");
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
+			} else if ("sSearch".equals(param.getString("name"))) {
+				search = param.getString("value");
 			}
 		}
 
@@ -117,31 +117,31 @@ public class ConsumersController {
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		int count = consumerService.getConsumerCount(formatter);
-		JSONArray ret = JSON.parseArray(consumerService.getConsumer(formatter, page));
-		JSONArray retArr = new JSONArray();
-		for (Object tmp : ret) {
-			JSONObject tmp2 = (JSONObject) tmp;
+		JSONArray consumers = JSON.parseArray(consumerService.getConsumer(formatter, page));
+		JSONArray aaDatas = new JSONArray();
+		for (Object object : consumers) {
+			JSONObject consumer = (JSONObject) object;
 			JSONObject obj = new JSONObject();
-			obj.put("id", tmp2.getInteger("id"));
-			obj.put("group", "<a class='link' href='#" + tmp2.getString("group") + "'>" + tmp2.getString("group") + "</a>");
-			obj.put("topic", tmp2.getString("topic").length() > 50 ? tmp2.getString("topic").substring(0, 50) + "..." : tmp2.getString("topic"));
-			obj.put("consumerNumber", tmp2.getInteger("consumerNumber"));
-			int activerNumber = tmp2.getInteger("activeNumber");
+			obj.put("id", consumer.getInteger("id"));
+			obj.put("group", "<a class='link' href='#" + consumer.getString("group") + "'>" + consumer.getString("group") + "</a>");
+			obj.put("topic", consumer.getString("topic").length() > 50 ? consumer.getString("topic").substring(0, 50) + "..." : consumer.getString("topic"));
+			obj.put("consumerNumber", consumer.getInteger("consumerNumber"));
+			int activerNumber = consumer.getInteger("activeNumber");
 			if (activerNumber > 0) {
-				obj.put("activeNumber", "<a class='btn btn-success btn-xs'>" + tmp2.getInteger("activeNumber") + "</a>");
+				obj.put("activeNumber", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeNumber") + "</a>");
 			} else {
-				obj.put("activeNumber", "<a class='btn btn-danger btn-xs'>" + tmp2.getInteger("activeNumber") + "</a>");
+				obj.put("activeNumber", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeNumber") + "</a>");
 			}
-			retArr.add(obj);
+			aaDatas.add(obj);
 		}
 
-		JSONObject obj = new JSONObject();
-		obj.put("sEcho", sEcho);
-		obj.put("iTotalRecords", count);
-		obj.put("iTotalDisplayRecords", count);
-		obj.put("aaData", retArr);
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", count);
+		target.put("iTotalDisplayRecords", count);
+		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			byte[] output = GzipUtils.compressToByte(target.toJSONString());
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -163,47 +163,47 @@ public class ConsumersController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		String aoData = request.getParameter("aoData");
-		JSONArray jsonArray = JSON.parseArray(aoData);
+		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
-		for (Object obj : jsonArray) {
-			JSONObject jsonObj = (JSONObject) obj;
-			if ("sEcho".equals(jsonObj.getString("name"))) {
-				sEcho = jsonObj.getIntValue("value");
-			} else if ("iDisplayStart".equals(jsonObj.getString("name"))) {
-				iDisplayStart = jsonObj.getIntValue("value");
-			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
-				iDisplayLength = jsonObj.getIntValue("value");
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
 			}
 		}
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray ret = JSON.parseArray(consumerService.getConsumerDetail(formatter, group));
+		JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(formatter, group));
 		int offset = 0;
-		JSONArray retArr = new JSONArray();
-		for (Object tmp : ret) {
-			JSONObject tmp2 = (JSONObject) tmp;
+		JSONArray aaDatas = new JSONArray();
+		for (Object object : consumerDetails) {
+			JSONObject consumerDetail = (JSONObject) object;
 			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 				JSONObject obj = new JSONObject();
-				String topic = tmp2.getString("topic");
-				obj.put("id", tmp2.getInteger("id"));
+				String topic = consumerDetail.getString("topic");
+				obj.put("id", consumerDetail.getInteger("id"));
 				obj.put("topic", topic);
-				if (tmp2.getBoolean("isConsumering")) {
+				if (consumerDetail.getBoolean("isConsumering")) {
 					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-success btn-xs'>Running</a>");
 				} else {
 					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-danger btn-xs'>Pending</a>");
 				}
-				retArr.add(obj);
+				aaDatas.add(obj);
 			}
 			offset++;
 		}
 
-		JSONObject obj = new JSONObject();
-		obj.put("sEcho", sEcho);
-		obj.put("iTotalRecords", ret.size());
-		obj.put("iTotalDisplayRecords", ret.size());
-		obj.put("aaData", retArr);
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", consumerDetails.size());
+		target.put("iTotalDisplayRecords", consumerDetails.size());
+		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			byte[] output = GzipUtils.compressToByte(target.toJSONString());
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

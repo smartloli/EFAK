@@ -163,60 +163,60 @@ public class AlarmController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		String aoData = request.getParameter("aoData");
-		JSONArray jsonArray = JSON.parseArray(aoData);
+		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
 		String search = "";
-		for (Object obj : jsonArray) {
-			JSONObject jsonObj = (JSONObject) obj;
-			if ("sEcho".equals(jsonObj.getString("name"))) {
-				sEcho = jsonObj.getIntValue("value");
-			} else if ("iDisplayStart".equals(jsonObj.getString("name"))) {
-				iDisplayStart = jsonObj.getIntValue("value");
-			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
-				iDisplayLength = jsonObj.getIntValue("value");
-			} else if ("sSearch".equals(jsonObj.getString("name"))) {
-				search = jsonObj.getString("value");
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
+			} else if ("sSearch".equals(param.getString("name"))) {
+				search = param.getString("value");
 			}
 		}
 
-		JSONArray ret = JSON.parseArray(alarmService.list());
+		JSONArray alarms = JSON.parseArray(alarmService.list());
 		int offset = 0;
-		JSONArray retArr = new JSONArray();
-		for (Object tmp : ret) {
-			JSONObject tmp2 = (JSONObject) tmp;
-			if (search.length() > 0 && search.equals(tmp2.getString("topic"))) {
+		JSONArray aaDatas = new JSONArray();
+		for (Object object : alarms) {
+			JSONObject alarm = (JSONObject) object;
+			if (search.length() > 0 && search.equals(alarm.getString("topic"))) {
 				JSONObject obj = new JSONObject();
-				obj.put("group", tmp2.getString("group"));
-				obj.put("topic", tmp2.getString("topic"));
-				obj.put("lag", tmp2.getLong("lag"));
-				obj.put("owner", tmp2.getString("owner"));
-				obj.put("created", tmp2.getString("created"));
-				obj.put("modify", tmp2.getString("modify"));
-				obj.put("operate", "<a name='remove' href='#" + tmp2.getString("group") + "/" + tmp2.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
-				retArr.add(obj);
+				obj.put("group", alarm.getString("group"));
+				obj.put("topic", alarm.getString("topic"));
+				obj.put("lag", alarm.getLong("lag"));
+				obj.put("owner", alarm.getString("owner"));
+				obj.put("created", alarm.getString("created"));
+				obj.put("modify", alarm.getString("modify"));
+				obj.put("operate", "<a name='remove' href='#" + alarm.getString("group") + "/" + alarm.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
+				aaDatas.add(obj);
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 					JSONObject obj = new JSONObject();
-					obj.put("group", tmp2.getString("group"));
-					obj.put("topic", tmp2.getString("topic"));
-					obj.put("lag", tmp2.getLong("lag"));
-					obj.put("owner", tmp2.getString("owner"));
-					obj.put("created", tmp2.getString("created"));
-					obj.put("modify", tmp2.getString("modify"));
-					obj.put("operate", "<a name='remove' href='#" + tmp2.getString("group") + "/" + tmp2.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
-					retArr.add(obj);
+					obj.put("group", alarm.getString("group"));
+					obj.put("topic", alarm.getString("topic"));
+					obj.put("lag", alarm.getLong("lag"));
+					obj.put("owner", alarm.getString("owner"));
+					obj.put("created", alarm.getString("created"));
+					obj.put("modify", alarm.getString("modify"));
+					obj.put("operate", "<a name='remove' href='#" + alarm.getString("group") + "/" + alarm.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
+					aaDatas.add(obj);
 				}
 				offset++;
 			}
 		}
 
-		JSONObject obj = new JSONObject();
-		obj.put("sEcho", sEcho);
-		obj.put("iTotalRecords", ret.size());
-		obj.put("iTotalDisplayRecords", ret.size());
-		obj.put("aaData", retArr);
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", alarms.size());
+		target.put("iTotalDisplayRecords", alarms.size());
+		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			byte[] output = GzipUtils.compressToByte(target.toJSONString());
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

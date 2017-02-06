@@ -87,54 +87,54 @@ public class OffsetController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		String aoData = request.getParameter("aoData");
-		JSONArray jsonArray = JSON.parseArray(aoData);
+		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
-		for (Object obj : jsonArray) {
-			JSONObject jsonObj = (JSONObject) obj;
-			if ("sEcho".equals(jsonObj.getString("name"))) {
-				sEcho = jsonObj.getIntValue("value");
-			} else if ("iDisplayStart".equals(jsonObj.getString("name"))) {
-				iDisplayStart = jsonObj.getIntValue("value");
-			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
-				iDisplayLength = jsonObj.getIntValue("value");
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
 			}
 		}
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray ret = JSON.parseArray(offsetService.getLogSize(formatter, topic, group));
+		JSONArray logSizes = JSON.parseArray(offsetService.getLogSize(formatter, topic, group));
 		int offset = 0;
-		JSONArray retArr = new JSONArray();
-		for (Object tmp : ret) {
-			JSONObject tmp2 = (JSONObject) tmp;
+		JSONArray aaDatas = new JSONArray();
+		for (Object object : logSizes) {
+			JSONObject logSize = (JSONObject) object;
 			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 				JSONObject obj = new JSONObject();
-				obj.put("partition", tmp2.getInteger("partition"));
-				if (tmp2.getLong("logSize") == 0) {
+				obj.put("partition", logSize.getInteger("partition"));
+				if (logSize.getLong("logSize") == 0) {
 					obj.put("logsize", "<a class='btn btn-warning btn-xs'>0</a>");
 				} else {
-					obj.put("logsize", tmp2.getLong("logSize"));
+					obj.put("logsize", logSize.getLong("logSize"));
 				}
-				if (tmp2.getLong("offset") == -1) {
+				if (logSize.getLong("offset") == -1) {
 					obj.put("offset", "<a class='btn btn-warning btn-xs'>0</a>");
 				} else {
-					obj.put("offset", "<a class='btn btn-success btn-xs'>" + tmp2.getLong("offset") + "</a>");
+					obj.put("offset", "<a class='btn btn-success btn-xs'>" + logSize.getLong("offset") + "</a>");
 				}
-				obj.put("lag", "<a class='btn btn-danger btn-xs'>" + tmp2.getLong("lag") + "</a>");
-				obj.put("owner", tmp2.getString("owner"));
-				obj.put("created", tmp2.getString("create"));
-				obj.put("modify", tmp2.getString("modify"));
-				retArr.add(obj);
+				obj.put("lag", "<a class='btn btn-danger btn-xs'>" + logSize.getLong("lag") + "</a>");
+				obj.put("owner", logSize.getString("owner"));
+				obj.put("created", logSize.getString("create"));
+				obj.put("modify", logSize.getString("modify"));
+				aaDatas.add(obj);
 			}
 			offset++;
 		}
 
-		JSONObject obj = new JSONObject();
-		obj.put("sEcho", sEcho);
-		obj.put("iTotalRecords", ret.size());
-		obj.put("iTotalDisplayRecords", ret.size());
-		obj.put("aaData", retArr);
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", logSizes.size());
+		target.put("iTotalDisplayRecords", logSizes.size());
+		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			byte[] output = GzipUtils.compressToByte(target.toJSONString());
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

@@ -66,31 +66,6 @@ public class ClusterController {
 		return mav;
 	}
 
-	// /** Get cluster data by ajax. */
-	// @RequestMapping(value = "/cluster/info/{type}/ajax", method =
-	// RequestMethod.GET)
-	// public void clusterAjax(@PathVariable("type") String type,
-	// HttpServletResponse response, HttpServletRequest request) {
-	// response.setContentType("text/html;charset=utf-8");
-	// response.setCharacterEncoding("utf-8");
-	// response.setHeader("Charset", "utf-8");
-	// response.setHeader("Cache-Control", "no-cache");
-	// response.setHeader("Content-Encoding", "gzip");
-	//
-	// try {
-	// byte[] output = GzipUtils.compressToByte(clusterService.get(type));
-	// response.setContentLength(output == null ? "NULL".toCharArray().length :
-	// output.length);
-	// OutputStream out = response.getOutputStream();
-	// out.write(output);
-	//
-	// out.flush();
-	// out.close();
-	// } catch (Exception ex) {
-	// ex.printStackTrace();
-	// }
-	// }
-
 	/** Get cluster data by ajax. */
 	@RequestMapping(value = "/cluster/info/{type}/ajax", method = RequestMethod.GET)
 	public void clusterAjax(@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
@@ -101,75 +76,75 @@ public class ClusterController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		String aoData = request.getParameter("aoData");
-		JSONArray jsonArray = JSON.parseArray(aoData);
+		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
 		String search = "";
-		for (Object obj : jsonArray) {
-			JSONObject jsonObj = (JSONObject) obj;
-			if ("sEcho".equals(jsonObj.getString("name"))) {
-				sEcho = jsonObj.getIntValue("value");
-			} else if ("iDisplayStart".equals(jsonObj.getString("name"))) {
-				iDisplayStart = jsonObj.getIntValue("value");
-			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
-				iDisplayLength = jsonObj.getIntValue("value");
-			} else if ("sSearch".equals(jsonObj.getString("name"))) {
-				search = jsonObj.getString("value");
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
+			} else if ("sSearch".equals(param.getString("name"))) {
+				search = param.getString("value");
 			}
 		}
 
-		JSONObject target = JSON.parseObject(clusterService.get(type));
-		JSONArray ret = target.getJSONArray(type);
+		JSONObject deserializeClusters = JSON.parseObject(clusterService.get(type));
+		JSONArray clusters = deserializeClusters.getJSONArray(type);
 		int offset = 0;
-		JSONArray retArr = new JSONArray();
-		for (Object tmp : ret) {
-			JSONObject tmp2 = (JSONObject) tmp;
-			if (search.length() > 0 && search.equals(tmp2.getString("host"))) {
+		JSONArray aaDatas = new JSONArray();
+		for (Object object : clusters) {
+			JSONObject cluster = (JSONObject) object;
+			if (search.length() > 0 && search.equals(cluster.getString("host"))) {
 				JSONObject obj = new JSONObject();
-				obj.put("id", tmp2.getInteger("id"));
-				obj.put("port", tmp2.getInteger("port"));
-				obj.put("ip", tmp2.getString("host"));
+				obj.put("id", cluster.getInteger("id"));
+				obj.put("port", cluster.getInteger("port"));
+				obj.put("ip", cluster.getString("host"));
 				if ("kafka".equals(type)) {
-					obj.put("created", tmp2.getString("created"));
-					obj.put("modify", tmp2.getString("modify"));
+					obj.put("created", cluster.getString("created"));
+					obj.put("modify", cluster.getString("modify"));
 				} else if ("zk".equals(type)) {
-					String mode = tmp2.getString("mode");
+					String mode = cluster.getString("mode");
 					if ("death".equals(mode)) {
-						obj.put("mode", "<a class='btn btn-danger btn-xs'>" + tmp2.getString("mode") + "</a>");
+						obj.put("mode", "<a class='btn btn-danger btn-xs'>" + mode + "</a>");
 					} else {
-						obj.put("mode", "<a class='btn btn-success btn-xs'>" + tmp2.getString("mode") + "</a>");
+						obj.put("mode", "<a class='btn btn-success btn-xs'>" + mode + "</a>");
 					}
 				}
-				retArr.add(obj);
+				aaDatas.add(obj);
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 					JSONObject obj = new JSONObject();
-					obj.put("id", tmp2.getInteger("id"));
-					obj.put("port", tmp2.getInteger("port"));
-					obj.put("ip", tmp2.getString("host"));
+					obj.put("id", cluster.getInteger("id"));
+					obj.put("port", cluster.getInteger("port"));
+					obj.put("ip", cluster.getString("host"));
 					if ("kafka".equals(type)) {
-						obj.put("created", tmp2.getString("created"));
-						obj.put("modify", tmp2.getString("modify"));
+						obj.put("created", cluster.getString("created"));
+						obj.put("modify", cluster.getString("modify"));
 					} else if ("zk".equals(type)) {
-						String mode = tmp2.getString("mode");
+						String mode = cluster.getString("mode");
 						if ("death".equals(mode)) {
-							obj.put("mode", "<a class='btn btn-danger btn-xs'>" + tmp2.getString("mode") + "</a>");
+							obj.put("mode", "<a class='btn btn-danger btn-xs'>" + mode + "</a>");
 						} else {
-							obj.put("mode", "<a class='btn btn-success btn-xs'>" + tmp2.getString("mode") + "</a>");
+							obj.put("mode", "<a class='btn btn-success btn-xs'>" + mode + "</a>");
 						}
 					}
-					retArr.add(obj);
+					aaDatas.add(obj);
 				}
 				offset++;
 			}
 		}
 
-		JSONObject obj = new JSONObject();
-		obj.put("sEcho", sEcho);
-		obj.put("iTotalRecords", ret.size());
-		obj.put("iTotalDisplayRecords", ret.size());
-		obj.put("aaData", retArr);
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", clusters.size());
+		target.put("iTotalDisplayRecords", clusters.size());
+		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			byte[] output = GzipUtils.compressToByte(target.toJSONString());
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
