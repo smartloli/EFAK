@@ -15,6 +15,7 @@
 
 <title>ZK & Kafka - KafkaEagle</title>
 <jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/tcss.jsp"></jsp:include>
 </head>
 
 <body>
@@ -58,6 +59,15 @@
 						<div class="panel-body">
 							<div id="kafka_cluster_info">
 								<table id="kafka_tab" class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>IP</th>
+											<th>Port</th>
+											<th>Created</th>
+											<th>Modify</th>
+										</tr>
+									</thead>
 								</table>
 							</div>
 						</div>
@@ -78,6 +88,14 @@
 						<div class="panel-body">
 							<div id="zookeeper_cluster_info">
 								<table id="zk_tab" class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>IP</th>
+											<th>Port</th>
+											<th>Mode</th>
+										</tr>
+									</thead>
 								</table>
 							</div>
 						</div>
@@ -94,4 +112,5 @@
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="main/cluster/cluster.js" name="loader" />
 </jsp:include>
+<jsp:include page="../public/tscript.jsp"></jsp:include>
 </html>

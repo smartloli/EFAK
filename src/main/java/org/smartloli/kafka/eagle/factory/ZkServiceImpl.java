@@ -376,7 +376,7 @@ public class ZkServiceImpl implements ZkService {
 		for (String zk : zks) {
 			JSONObject object = new JSONObject();
 			object.put("id", id++);
-			object.put("ip", zk.split(":")[0]);
+			object.put("host", zk.split(":")[0]);
 			object.put("port", zk.split(":")[1]);
 			object.put("mode", status(zk.split(":")[0], zk.split(":")[1]));
 			targets.add(object);

@@ -125,12 +125,12 @@ public class AlarmController {
 		JSONArray groups = JSON.parseArray(ke_group_alarms);
 		AlarmDomain alarm = new AlarmDomain();
 		for (Object object : groups) {
-			JSONObject obj = (JSONObject) object;
-			alarm.setGroup(obj.getString("name"));
+			JSONObject group = (JSONObject) object;
+			alarm.setGroup(group.getString("name"));
 		}
 		for (Object object : topics) {
-			JSONObject obj = (JSONObject) object;
-			alarm.setTopics(obj.getString("name"));
+			JSONObject topic = (JSONObject) object;
+			alarm.setTopics(topic.getString("name"));
 		}
 		try {
 			alarm.setLag(Long.parseLong(ke_topic_lag));
@@ -140,14 +140,14 @@ public class AlarmController {
 		alarm.setModifyDate(CalendarUtils.getDate());
 		alarm.setOwners(ke_topic_email);
 
-		Map<String, Object> map = alarmService.add(alarm);
-		if ("success".equals(map.get("status"))) {
+		Map<String, Object> respons = alarmService.add(alarm);
+		if ("success".equals(respons.get("status"))) {
 			session.removeAttribute("Alarm_Submit_Status");
-			session.setAttribute("Alarm_Submit_Status", map.get("info"));
+			session.setAttribute("Alarm_Submit_Status", respons.get("info"));
 			mav.setViewName("redirect:/alarm/create/success");
 		} else {
 			session.removeAttribute("Alarm_Submit_Status");
-			session.setAttribute("Alarm_Submit_Status", map.get("info"));
+			session.setAttribute("Alarm_Submit_Status", respons.get("info"));
 			mav.setViewName("redirect:/alarm/create/failed");
 		}
 		return mav;

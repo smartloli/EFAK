@@ -25,9 +25,15 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import org.smartloli.kafka.eagle.service.ClusterService;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 
@@ -43,7 +49,7 @@ public class ClusterController {
 
 	@Autowired
 	private ClusterService clusterService;
-	
+
 	/** Cluster viewer. */
 	@RequestMapping(value = "/cluster/info", method = RequestMethod.GET)
 	public ModelAndView clusterView(HttpSession session) {
@@ -60,18 +66,111 @@ public class ClusterController {
 		return mav;
 	}
 
+	// /** Get cluster data by ajax. */
+	// @RequestMapping(value = "/cluster/info/{type}/ajax", method =
+	// RequestMethod.GET)
+	// public void clusterAjax(@PathVariable("type") String type,
+	// HttpServletResponse response, HttpServletRequest request) {
+	// response.setContentType("text/html;charset=utf-8");
+	// response.setCharacterEncoding("utf-8");
+	// response.setHeader("Charset", "utf-8");
+	// response.setHeader("Cache-Control", "no-cache");
+	// response.setHeader("Content-Encoding", "gzip");
+	//
+	// try {
+	// byte[] output = GzipUtils.compressToByte(clusterService.get(type));
+	// response.setContentLength(output == null ? "NULL".toCharArray().length :
+	// output.length);
+	// OutputStream out = response.getOutputStream();
+	// out.write(output);
+	//
+	// out.flush();
+	// out.close();
+	// } catch (Exception ex) {
+	// ex.printStackTrace();
+	// }
+	// }
+
 	/** Get cluster data by ajax. */
-	@RequestMapping(value = "/cluster/info/ajax", method = RequestMethod.GET)
-	public void clusterAjax(HttpServletResponse response, HttpServletRequest request) {
+	@RequestMapping(value = "/cluster/info/{type}/ajax", method = RequestMethod.GET)
+	public void clusterAjax(@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("text/html;charset=utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setHeader("Charset", "utf-8");
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
+		String aoData = request.getParameter("aoData");
+		JSONArray jsonArray = JSON.parseArray(aoData);
+		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+		String search = "";
+		for (Object obj : jsonArray) {
+			JSONObject jsonObj = (JSONObject) obj;
+			if ("sEcho".equals(jsonObj.getString("name"))) {
+				sEcho = jsonObj.getIntValue("value");
+			} else if ("iDisplayStart".equals(jsonObj.getString("name"))) {
+				iDisplayStart = jsonObj.getIntValue("value");
+			} else if ("iDisplayLength".equals(jsonObj.getString("name"))) {
+				iDisplayLength = jsonObj.getIntValue("value");
+			} else if ("sSearch".equals(jsonObj.getString("name"))) {
+				search = jsonObj.getString("value");
+			}
+		}
+
+		JSONObject target = JSON.parseObject(clusterService.get(type));
+		JSONArray ret = target.getJSONArray(type);
+		int offset = 0;
+		JSONArray retArr = new JSONArray();
+		for (Object tmp : ret) {
+			JSONObject tmp2 = (JSONObject) tmp;
+			if (search.length() > 0 && search.equals(tmp2.getString("host"))) {
+				JSONObject obj = new JSONObject();
+				obj.put("id", tmp2.getInteger("id"));
+				obj.put("port", tmp2.getInteger("port"));
+				obj.put("ip", tmp2.getString("host"));
+				if ("kafka".equals(type)) {
+					obj.put("created", tmp2.getString("created"));
+					obj.put("modify", tmp2.getString("modify"));
+				} else if ("zk".equals(type)) {
+					String mode = tmp2.getString("mode");
+					if ("death".equals(mode)) {
+						obj.put("mode", "<a class='btn btn-danger btn-xs'>" + tmp2.getString("mode") + "</a>");
+					} else {
+						obj.put("mode", "<a class='btn btn-success btn-xs'>" + tmp2.getString("mode") + "</a>");
+					}
+				}
+				retArr.add(obj);
+			} else if (search.length() == 0) {
+				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+					JSONObject obj = new JSONObject();
+					obj.put("id", tmp2.getInteger("id"));
+					obj.put("port", tmp2.getInteger("port"));
+					obj.put("ip", tmp2.getString("host"));
+					if ("kafka".equals(type)) {
+						obj.put("created", tmp2.getString("created"));
+						obj.put("modify", tmp2.getString("modify"));
+					} else if ("zk".equals(type)) {
+						String mode = tmp2.getString("mode");
+						if ("death".equals(mode)) {
+							obj.put("mode", "<a class='btn btn-danger btn-xs'>" + tmp2.getString("mode") + "</a>");
+						} else {
+							obj.put("mode", "<a class='btn btn-success btn-xs'>" + tmp2.getString("mode") + "</a>");
+						}
+					}
+					retArr.add(obj);
+				}
+				offset++;
+			}
+		}
+
+		JSONObject obj = new JSONObject();
+		obj.put("sEcho", sEcho);
+		obj.put("iTotalRecords", ret.size());
+		obj.put("iTotalDisplayRecords", ret.size());
+		obj.put("aaData", retArr);
 		try {
-			byte[] output = GzipUtils.compressToByte(clusterService.get());
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
+			byte[] output = GzipUtils.compressToByte(obj.toJSONString());
+			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 

@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.factory.KafkaFactory;
@@ -73,12 +74,15 @@ public class ClusterServiceImpl implements ClusterService {
 	}
 
 	/** Get kafka & zookeeper cluster information. */
-	public String get() {
-		String zkCluster = zkService.zkCluster();
-		String kafkaBrokers = kafkaService.getAllBrokersInfo();
+	public String get(String type) {
 		JSONObject target = new JSONObject();
-		target.put("zk", zkCluster);
-		target.put("kafka", kafkaBrokers);
+		if ("zk".equals(type)) {
+			String zkCluster = zkService.zkCluster();
+			target.put("zk", JSON.parseArray(zkCluster));
+		} else if ("kafka".equals(type)) {
+			String kafkaBrokers = kafkaService.getAllBrokersInfo();
+			target.put("kafka", JSON.parseArray(kafkaBrokers));
+		}
 		return target.toJSONString();
 	}
 

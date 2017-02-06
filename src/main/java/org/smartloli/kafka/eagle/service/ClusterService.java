@@ -32,7 +32,7 @@ public interface ClusterService {
 	public String execute(String cmd, String type);
 
 	/** Get Kafka & Zookeeper interface. */
-	public String get();
+	public String get(String type);
 
 	/** Get Zookkeeper status interface. */
 	public JSONObject status();

@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.service;
 
+import org.smartloli.kafka.eagle.service.impl.ClusterServiceImpl;
+
 /**
  * Test ClusterService interface.
  * 
@@ -27,7 +29,8 @@ package org.smartloli.kafka.eagle.service;
 public class TestClusterService {
 
 	public static void main(String[] args) {
-		System.out.println();
+		ClusterServiceImpl clusterServiceImpl = new ClusterServiceImpl(); 
+		System.out.println(clusterServiceImpl.get("zk"));
 	}
 
 }
