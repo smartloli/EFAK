@@ -47,12 +47,12 @@ public class TestConsumer8 extends Thread {
 	private ExecutorService executor;
 	private ConsumerConnector consumer;
 	private static Properties props = new Properties();
-	private static String topic = "ke_test1";// ke_test1
+	private static String topic = "kv2_topic";// ke_test1
 	private static final int THREAD_PARALLEL_NUM = 1;
 
 	static {
 		props.put("group.id", "group1");
-		props.put("zookeeper.connect", "master:2181");
+		props.put("zookeeper.connect", "slave01:2181");
 		props.put("zookeeper.session.timeout.ms", "40000");
 		props.put("zookeeper.sync.time.ms", "200");
 		props.put("auto.commit.interval.ms", "1000");
