@@ -29,6 +29,12 @@ Each runtime instance of Kafka Eagle can only support a single type of storage f
 
 Please read [Kafka Eagle Install](https://ke.smartloli.org/2.Install/2.Installing.html) for setting up and running Kafka Eagle.
 
+# Deploy
+
+The project is a maven project that uses the Maven command to pack the deployment as follows:
+```bash
+mvn clean && mvn package
+```
 # More Information
 
 Please see the [Kafka Eagle Manual](https://ke.smartloli.org) for for more information including:
