@@ -35,6 +35,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.service.ClusterService;
+import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 
 /**
@@ -42,7 +43,9 @@ import org.smartloli.kafka.eagle.util.GzipUtils;
  * 
  * @author smartloli.
  *
- *         Created by Sep 6, 2016
+ *         Created by Sep 6, 2016.
+ * 
+ *         Update by hexiang 20170216
  */
 @Controller
 public class ClusterController {
@@ -92,7 +95,10 @@ public class ClusterController {
 			}
 		}
 
-		JSONObject deserializeClusters = JSON.parseObject(clusterService.get(type));
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+
+		JSONObject deserializeClusters = JSON.parseObject(clusterService.get(clusterAlias, type));
 		JSONArray clusters = deserializeClusters.getJSONArray(type);
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
@@ -165,8 +171,11 @@ public class ClusterController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+
 		try {
-			byte[] output = GzipUtils.compressToByte(clusterService.status().toJSONString());
+			byte[] output = GzipUtils.compressToByte(clusterService.status(clusterAlias).toJSONString());
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -190,8 +199,11 @@ public class ClusterController {
 		String cmd = request.getParameter("cmd");
 		String type = request.getParameter("type");
 
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		
 		try {
-			byte[] output = GzipUtils.compressToByte(clusterService.execute(cmd, type));
+			byte[] output = GzipUtils.compressToByte(clusterService.execute(clusterAlias,cmd, type));
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

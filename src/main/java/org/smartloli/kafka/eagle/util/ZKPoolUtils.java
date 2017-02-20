@@ -17,6 +17,9 @@
  */
 package org.smartloli.kafka.eagle.util;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import kafka.utils.ZKStringSerializer$;
@@ -30,73 +33,48 @@ import org.slf4j.LoggerFactory;
  *
  * @author smartloli.
  *
- *         Created by Aug 14, 2016
+ *         Created by Aug 14, 2016.
+ * 
+ *         Update by hexiang 20170216
  */
 public final class ZKPoolUtils {
 
 	private final static Logger LOG = LoggerFactory.getLogger(ZKPoolUtils.class);
 	private static ZKPoolUtils instance = null;
 	/** Zookeeper client connection pool. */
-	private Vector<ZkClient> zkCliPool;
+	private static Map<String, Vector<ZkClient>> zkCliPools = new HashMap<>();
 	/** Set pool max size. */
-	private int zkCliPoolSize = SystemConfigUtils.getIntProperty("kafka.zk.limit.size");
+	private final static int zkCliPoolSize = SystemConfigUtils.getIntProperty("kafka.zk.limit.size");
 	/** Serializer Zookeeper client pool. */
-	private Vector<ZkClient> zkCliPoolSerializer;
-	/** Get Zookeeper client address. */
-	private String zkCliAddress = SystemConfigUtils.getProperty("kafka.zk.list");
+	private static Map<String, Vector<ZkClient>> zkCliPoolsSerializer = new HashMap<>();
+
+	private static Map<String, String> clusterAliass = new HashMap<>();
 
 	/** Init ZkClient pool numbers. */
-	private void addZkClient() {
-		ZkClient zkc = null;
-		for (int i = 0; i < zkCliPoolSize; i++) {
-			try {
-				zkc = new ZkClient(zkCliAddress);
-				zkCliPool.add(zkc);
-			} catch (Exception ex) {
-				LOG.error(ex.getMessage());
-			}
+	static {
+		for (String clusterAlias : SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",")) {
+			clusterAliass.put(clusterAlias, SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
 		}
-	}
-
-	/** Add serializer zkclient. */
-	private void addZkSerializerClient() {
-		ZkClient zkSerializer = null;
-		for (int i = 0; i < zkCliPoolSize; i++) {
-			try {
-				zkSerializer = new ZkClient(zkCliAddress, Integer.MAX_VALUE, 100000, ZKStringSerializer$.MODULE$);
-				zkCliPoolSerializer.add(zkSerializer);
-			} catch (Exception ex) {
-				LOG.error(ex.getMessage());
-			}
-		}
-	}
-
-	/** Close ZkClient pool. */
-	public synchronized void closePool() {
-		if (zkCliPool != null && zkCliPool.size() > 0) {
-			for (int i = 0; i < zkCliPool.size(); i++) {
+		for (Entry<String, String> entry : clusterAliass.entrySet()) {
+			Vector<ZkClient> zkCliPool = new Vector<ZkClient>(zkCliPoolSize);
+			Vector<ZkClient> zkCliPoolSerializer = new Vector<ZkClient>(zkCliPoolSize);
+			ZkClient zkc = null;
+			ZkClient zkSerializer = null;
+			for (int i = 0; i < zkCliPoolSize; i++) {
 				try {
-					zkCliPool.get(i).close();
+					zkc = new ZkClient(entry.getValue());
+					zkCliPool.add(zkc);
+
+					zkSerializer = new ZkClient(entry.getValue(), Integer.MAX_VALUE, 100000, ZKStringSerializer$.MODULE$);
+					zkCliPoolSerializer.add(zkSerializer);
 				} catch (Exception ex) {
 					LOG.error(ex.getMessage());
-				} finally {
-					zkCliPool.remove(i);
 				}
 			}
+			zkCliPools.put(entry.getKey(), zkCliPool);
+			zkCliPoolsSerializer.put(entry.getKey(), zkCliPoolSerializer);
 		}
 
-		if (zkCliPoolSerializer != null && zkCliPoolSerializer.size() > 0) {
-			for (int i = 0; i < zkCliPoolSerializer.size(); i++) {
-				try {
-					zkCliPoolSerializer.get(i).close();
-				} catch (Exception ex) {
-					LOG.error(ex.getMessage());
-				} finally {
-					zkCliPoolSerializer.remove(i);
-				}
-			}
-		}
-		instance = null;
 	}
 
 	/** Single model get ZkClient object. */
@@ -108,7 +86,8 @@ public final class ZKPoolUtils {
 	}
 
 	/** Reback pool one of ZkClient object. */
-	public synchronized ZkClient getZkClient() {
+	public synchronized ZkClient getZkClient(String clusterAlias) {
+		Vector<ZkClient> zkCliPool = zkCliPools.get(clusterAlias);
 		ZkClient zkc = null;
 		try {
 			if (zkCliPool.size() > 0) {
@@ -121,7 +100,15 @@ public final class ZKPoolUtils {
 					LOG.info("Get pool,and available size [" + zkCliPool.size() + "]");
 				}
 			} else {
-				addZkClient();
+				for (int i = 0; i < zkCliPoolSize; i++) {
+					try {
+						zkc = new ZkClient(clusterAliass.get(clusterAlias));
+						zkCliPool.add(zkc);
+					} catch (Exception ex) {
+						LOG.error(ex.getMessage());
+					}
+				}
+
 				zkc = zkCliPool.get(0);
 				zkCliPool.remove(0);
 				String osName = System.getProperties().getProperty("os.name");
@@ -138,7 +125,9 @@ public final class ZKPoolUtils {
 	}
 
 	/** Get zk client by serializer. */
-	public synchronized ZkClient getZkClientSerializer() {
+	public synchronized ZkClient getZkClientSerializer(String clusterAlias) {
+		Vector<ZkClient> zkCliPoolSerializer = zkCliPoolsSerializer.get(clusterAlias);
+		ZkClient zkSerializer = null;
 		if (zkCliPoolSerializer.size() > 0) {
 			ZkClient zkc = zkCliPoolSerializer.get(0);
 			zkCliPoolSerializer.remove(0);
@@ -150,7 +139,15 @@ public final class ZKPoolUtils {
 			}
 			return zkc;
 		} else {
-			addZkSerializerClient();
+			for (int i = 0; i < zkCliPoolSize; i++) {
+				try {
+					zkSerializer = new ZkClient(clusterAliass.get(clusterAlias), Integer.MAX_VALUE, 100000, ZKStringSerializer$.MODULE$);
+					zkCliPoolSerializer.add(zkSerializer);
+				} catch (Exception e) {
+					LOG.error(e.getMessage());
+				}
+			}
+
 			ZkClient zkc = zkCliPoolSerializer.get(0);
 			zkCliPoolSerializer.remove(0);
 			String osName = System.getProperties().getProperty("os.name");
@@ -163,18 +160,10 @@ public final class ZKPoolUtils {
 		}
 	}
 
-	/** Initialization ZkClient pool size. */
-	private void initZKPoolUtils() {
-		LOG.info("Initialization ZkClient pool size [" + zkCliPoolSize + "]");
-		zkCliPool = new Vector<ZkClient>(zkCliPoolSize);
-		zkCliPoolSerializer = new Vector<ZkClient>(zkCliPoolSize);
-		addZkClient();
-		addZkSerializerClient();
-	}
-
 	/** Release ZkClient object. */
-	public synchronized void release(ZkClient zkc) {
-		if (zkCliPool.size() < 25) {
+	public synchronized void release(String clusterAlias, ZkClient zkc) {
+		Vector<ZkClient> zkCliPool = zkCliPools.get(clusterAlias);
+		if (zkCliPool.size() < zkCliPoolSize) {
 			zkCliPool.add(zkc);
 		}
 		String osName = System.getProperties().getProperty("os.name");
@@ -186,8 +175,9 @@ public final class ZKPoolUtils {
 	}
 
 	/** Release ZkClient Serializer object. */
-	public synchronized void releaseZKSerializer(ZkClient zkc) {
-		if (zkCliPoolSerializer.size() < 25) {
+	public synchronized void releaseZKSerializer(String clusterAlias, ZkClient zkc) {
+		Vector<ZkClient> zkCliPoolSerializer = zkCliPoolsSerializer.get(clusterAlias);
+		if (zkCliPoolSerializer.size() < zkCliPoolSize) {
 			zkCliPoolSerializer.add(zkc);
 		}
 		String osName = System.getProperties().getProperty("os.name");
@@ -200,7 +190,6 @@ public final class ZKPoolUtils {
 
 	/** Construction method. */
 	private ZKPoolUtils() {
-		initZKPoolUtils();
 	}
 
 }

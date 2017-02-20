@@ -24,17 +24,19 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by Jan 17, 2017.
+ *         
+ *         Update by hexiang 20170216
  */
 public interface ClusterService {
 
 	/** Execute zookeeper comand interface */
-	public String execute(String cmd, String type);
+	public String execute(String clusterAlias,String cmd, String type);
 
 	/** Get Kafka & Zookeeper interface. */
-	public String get(String type);
+	public String get(String clusterAlias,String type);
 
 	/** Get Zookkeeper status interface. */
-	public JSONObject status();
+	public JSONObject status(String clusterAlias);
 	
 }

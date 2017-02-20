@@ -21,6 +21,7 @@ import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,6 +35,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.service.OffsetService;
+import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
@@ -42,7 +44,9 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
  * 
  * @author smartloli.
  *
- *         Created by Sep 6, 2016
+ *         Created by Sep 6, 2016.
+ *         
+ *         Update by hexiang 20170216
  */
 @Controller
 public class OffsetController {
@@ -55,8 +59,10 @@ public class OffsetController {
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/", method = RequestMethod.GET)
 	public ModelAndView consumersActiveView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if (offsetService.hasGroupTopic(formatter, group, topic)) {
+		if (offsetService.hasGroupTopic(clusterAlias,formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_consumers");
 		} else {
 			mav.setViewName("/error/404");
@@ -68,8 +74,10 @@ public class OffsetController {
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/realtime", method = RequestMethod.GET)
 	public ModelAndView offsetRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if (offsetService.hasGroupTopic(formatter, group, topic)) {
+		if (offsetService.hasGroupTopic(clusterAlias,formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_realtime");
 		} else {
 			mav.setViewName("/error/404");
@@ -100,8 +108,11 @@ public class OffsetController {
 			}
 		}
 
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray logSizes = JSON.parseArray(offsetService.getLogSize(formatter, topic, group));
+		JSONArray logSizes = JSON.parseArray(offsetService.getLogSize(clusterAlias,formatter, topic, group));
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : logSizes) {
@@ -155,8 +166,11 @@ public class OffsetController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		
 		try {
-			byte[] output = GzipUtils.compressToByte(offsetService.getOffsetsGraph(group, topic));
+			byte[] output = GzipUtils.compressToByte(offsetService.getOffsetsGraph(clusterAlias,group, topic));
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

@@ -39,6 +39,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.service.AlarmService;
 import org.smartloli.kafka.eagle.util.CalendarUtils;
+import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
@@ -47,7 +48,9 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
  * 
  * @author smartloli.
  *
- *         Created by Sep 6, 2016
+ *         Created by Sep 6, 2016.
+ * 
+ *         Update by hexiang 20170216
  */
 @Controller
 public class AlarmController {
@@ -99,9 +102,12 @@ public class AlarmController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		try {
-			byte[] output = GzipUtils.compressToByte(alarmService.get(formatter));
+			byte[] output = GzipUtils.compressToByte(alarmService.get(clusterAlias, formatter));
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -140,7 +146,8 @@ public class AlarmController {
 		alarm.setModifyDate(CalendarUtils.getDate());
 		alarm.setOwners(ke_topic_email);
 
-		Map<String, Object> respons = alarmService.add(alarm);
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		Map<String, Object> respons = alarmService.add(clusterAlias, alarm);
 		if ("success".equals(respons.get("status"))) {
 			session.removeAttribute("Alarm_Submit_Status");
 			session.setAttribute("Alarm_Submit_Status", respons.get("info"));
@@ -179,7 +186,10 @@ public class AlarmController {
 			}
 		}
 
-		JSONArray alarms = JSON.parseArray(alarmService.list());
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+
+		JSONArray alarms = JSON.parseArray(alarmService.list(clusterAlias));
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : alarms) {
@@ -230,8 +240,11 @@ public class AlarmController {
 
 	/** Delete alarmer. */
 	@RequestMapping(value = "/alarm/{group}/{topic}/del", method = RequestMethod.GET)
-	public ModelAndView alarmDelete(@PathVariable("group") String group, @PathVariable("topic") String topic) {
-		alarmService.delete(group, topic);
+	public ModelAndView alarmDelete(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+
+		alarmService.delete(clusterAlias, group, topic);
 		return new ModelAndView("redirect:/alarm/modify");
 	}
 }

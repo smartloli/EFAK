@@ -27,6 +27,6 @@ package org.smartloli.kafka.eagle.factory;
 public class TestKafkaProvider {
 	public static void main(String[] args) {
 		KafkaService kafkaService = new KafkaFactory().create();
-		System.out.println(kafkaService.getAllPartitions());
+		System.out.println(kafkaService.getAllPartitions("cluster1"));
 	}
 }

@@ -22,17 +22,19 @@ package org.smartloli.kafka.eagle.service;
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by Jan 17, 2017.
+ *         
+ *         Update by hexiang 20170216
  */
 public interface OffsetService {
 
 	/** Get logsize from Kafka topic or Zookeeper interface. */
-	public String getLogSize(String formatter, String topic, String group);
+	public String getLogSize(String clusterAlias,String formatter, String topic, String group);
 
 	/** Get Kafka offset graph data from Zookeeper interface. */
-	public String getOffsetsGraph(String group, String topic);
+	public String getOffsetsGraph(String clusterAlias,String group, String topic);
 
 	/** Judge group & topic exist Kafka topic or Zookeeper interface. */
-	public boolean hasGroupTopic(String formatter, String group, String topic);
+	public boolean hasGroupTopic(String clusterAlias,String formatter, String group, String topic);
 
 }

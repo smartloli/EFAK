@@ -22,11 +22,13 @@ package org.smartloli.kafka.eagle.service;
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by Jan 17, 2017.
+ *         
+ *         Update by hexiang 20170216
  */
 public interface DashboardService {
 
 	/** Get kafka & dashboard dataset interface. */
-	public String getDashboard();
+	public String getDashboard(String clusterAlias);
 
 }

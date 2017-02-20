@@ -30,42 +30,44 @@ import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
  * @author smartloli.
  *
  *         Created by Jan 18, 2017
+ * 
+ *         Update by hexiang 20170216
  */
 public interface KafkaService {
 
 	/** Find topic and group exist in zookeeper. */
-	public boolean findTopicAndGroupExist(String topic, String group);
+	public boolean findTopicAndGroupExist(String clusterAlias, String topic, String group);
 
 	/** Obtaining metadata in zookeeper by topic. */
-	public List<String> findTopicPartition(String topic);
+	public List<String> findTopicPartition(String clusterAlias, String topic);
 
 	/** Get kafka active consumer topic. */
-	public Map<String, List<String>> getActiveTopic();
+	public Map<String, List<String>> getActiveTopic(String clusterAlias);
 
 	/** Get all broker list from zookeeper. */
-	public String getAllBrokersInfo();
+	public String getAllBrokersInfo(String clusterAlias);
 
 	/** Get all topic info from zookeeper. */
-	public String getAllPartitions();
+	public String getAllPartitions(String clusterAlias);
 
 	/** Obtaining kafka consumer information from zookeeper. */
-	public Map<String, List<String>> getConsumers();
+	public Map<String, List<String>> getConsumers(String clusterAlias);
 
 	/** Obtaining kafka consumer page information from zookeeper. */
-	public Map<String, List<String>> getConsumers(PageParamDomain page);
+	public Map<String, List<String>> getConsumers(String clusterAlias, PageParamDomain page);
 
 	/** Use Kafka low consumer API & get logsize size from zookeeper. */
 	public long getLogSize(List<String> hosts, String topic, int partition);
 
 	/** According to group, topic and partition to get offset from zookeeper. */
-	public OffsetZkDomain getOffset(String topic, String group, int partition);
+	public OffsetZkDomain getOffset(String clusterAlias, String topic, String group, int partition);
 
 	/** According to topic and partition to obtain Replicas & Isr. */
-	public String geyReplicasIsr(String topic, int partitionid);
+	public String geyReplicasIsr(String clusterAlias, String topic, int partitionid);
 
 	/** Use kafka console comand to create topic. */
-	public Map<String, Object> create(String topicName, String partitions, String replic);
+	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic);
 
 	/** Find leader through topic. */
-	public List<MetadataDomain> findLeader(String topic);
+	public List<MetadataDomain> findLeader(String clusterAlias, String topic);
 }

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.smartloli.kafka.eagle.service.DashboardService;
+import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 
 /**
@@ -36,7 +37,9 @@ import org.smartloli.kafka.eagle.util.GzipUtils;
  * 
  * @author smartloli.
  *
- *         Created by Sep 6, 2016
+ *         Created by Sep 6, 2016.
+ * 
+ *         Update by hexiang 20170216
  */
 @Controller
 public class DashboardController {
@@ -62,8 +65,16 @@ public class DashboardController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
+		String clusterAlias = "";
 		try {
-			byte[] output = GzipUtils.compressToByte(dashboradService.getDashboard());
+			HttpSession session = request.getSession();
+			clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		try {
+			byte[] output = GzipUtils.compressToByte(dashboradService.getDashboard(clusterAlias));
 			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);

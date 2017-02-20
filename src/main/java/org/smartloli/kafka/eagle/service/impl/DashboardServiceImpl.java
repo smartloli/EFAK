@@ -41,7 +41,9 @@ import org.springframework.stereotype.Service;
  * 
  * @author smartloli.
  *
- *         Created by Aug 12, 2016
+ *         Created by Aug 12, 2016.
+ *         
+ *         Update by hexiang 20170216
  */
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -50,8 +52,8 @@ public class DashboardServiceImpl implements DashboardService {
 	private KafkaService kafkaService = new KafkaFactory().create();
 
 	/** Get consumer number from zookeeper. */
-	private int getConsumerNumbers() {
-		Map<String, List<String>> consumers = kafkaService.getConsumers();
+	private int getConsumerNumbers(String clusterAlias) {
+		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
 		int count = 0;
 		for (Entry<String, List<String>> entry : consumers.entrySet()) {
 			count += entry.getValue().size();
@@ -60,10 +62,10 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	/** Get kafka & dashboard dataset. */
-	public String getDashboard() {
+	public String getDashboard(String clusterAlias) {
 		JSONObject target = new JSONObject();
-		target.put("kafka", kafkaBrokersGraph());
-		target.put("dashboard", panel());
+		target.put("kafka", kafkaBrokersGraph(clusterAlias));
+		target.put("dashboard", panel(clusterAlias));
 		return target.toJSONString();
 	}
 
@@ -80,8 +82,8 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	/** Get kafka data. */
-	private String kafkaBrokersGraph() {
-		String kafka = kafkaService.getAllBrokersInfo();
+	private String kafkaBrokersGraph(String clusterAlias) {
+		String kafka = kafkaService.getAllBrokersInfo(clusterAlias);
 		JSONObject target = new JSONObject();
 		target.put("name", "Kafka Brokers");
 		JSONArray targets1 = JSON.parseArray(kafka);
@@ -106,11 +108,11 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	/** Get dashboard data. */
-	private String panel() {
-		int zks = SystemConfigUtils.getPropertyArray("kafka.zk.list", ",").length;
-		String topciAndPartitions = kafkaService.getAllPartitions();
+	private String panel(String clusterAlias) {
+		int zks = SystemConfigUtils.getPropertyArray(clusterAlias+".zk.list", ",").length;
+		String topciAndPartitions = kafkaService.getAllPartitions(clusterAlias);
 		int topicSize = JSON.parseArray(topciAndPartitions).size();
-		String kafkaBrokers = kafkaService.getAllBrokersInfo();
+		String kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);
 		int brokerSize = JSON.parseArray(kafkaBrokers).size();
 		DashboardDomain dashboard = new DashboardDomain();
 		dashboard.setBrokers(brokerSize);
@@ -120,7 +122,7 @@ public class DashboardServiceImpl implements DashboardService {
 		if ("kafka".equals(formatter)) {
 			dashboard.setConsumers(getKafkaConsumerNumbers());
 		} else {
-			dashboard.setConsumers(getConsumerNumbers());
+			dashboard.setConsumers(getConsumerNumbers(clusterAlias));
 		}
 		return dashboard.toString();
 	}

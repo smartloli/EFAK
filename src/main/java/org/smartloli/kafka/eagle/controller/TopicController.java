@@ -24,8 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +38,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.factory.KafkaService;
 import org.smartloli.kafka.eagle.service.TopicService;
+import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 
 /**
@@ -47,12 +46,12 @@ import org.smartloli.kafka.eagle.util.GzipUtils;
  * 
  * @author smartloli.
  *
- *         Created by Sep 6, 2016
+ *         Created by Sep 6, 2016.
+ * 
+ *         Update by hexiang 20170216
  */
 @Controller
 public class TopicController {
-
-	private final static Logger LOG = LoggerFactory.getLogger(TopicController.class);
 
 	/** Kafka topic service interface. */
 	@Autowired
@@ -80,11 +79,10 @@ public class TopicController {
 	/** Topic metadata viewer. */
 	@RequestMapping(value = "/topic/meta/{tname}/", method = RequestMethod.GET)
 	public ModelAndView topicMetaView(@PathVariable("tname") String tname, HttpServletRequest request) {
-		String ip = request.getHeader("x-forwarded-for");
-		LOG.info("IP:" + (ip == null ? request.getRemoteAddr() : ip));
-
 		ModelAndView mav = new ModelAndView();
-		if (topicService.hasTopic(tname, ip)) {
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		if (topicService.hasTopic(clusterAlias, tname)) {
 			mav.setViewName("/topic/topic_meta");
 		} else {
 			mav.setViewName("/error/404");
@@ -132,7 +130,10 @@ public class TopicController {
 			}
 		}
 
-		String metadata = topicService.metadata(tname);
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+
+		String metadata = topicService.metadata(clusterAlias, tname);
 		JSONArray metadatas = JSON.parseArray(metadata);
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
@@ -194,7 +195,10 @@ public class TopicController {
 			}
 		}
 
-		JSONArray topics = JSON.parseArray(topicService.list());
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+
+		JSONArray topics = JSON.parseArray(topicService.list(clusterAlias));
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : topics) {
@@ -248,7 +252,8 @@ public class TopicController {
 		String ke_topic_name = request.getParameter("ke_topic_name");
 		String ke_topic_partition = request.getParameter("ke_topic_partition");
 		String ke_topic_repli = request.getParameter("ke_topic_repli");
-		Map<String, Object> respons = kafkaService.create(ke_topic_name, ke_topic_partition, ke_topic_repli);
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		Map<String, Object> respons = kafkaService.create(clusterAlias, ke_topic_name, ke_topic_partition, ke_topic_repli);
 		if ("success".equals(respons.get("status"))) {
 			session.removeAttribute("Submit_Status");
 			session.setAttribute("Submit_Status", respons.get("info"));

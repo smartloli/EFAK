@@ -44,7 +44,9 @@ import org.springframework.stereotype.Service;
  *
  * @author smartloli.
  *
- *         Created by Aug 15, 2016
+ *         Created by Aug 15, 2016.
+ *         
+ *         Update by hexiang 20170216
  */
 @Service
 public class ConsumerServiceImpl implements ConsumerService {
@@ -55,15 +57,15 @@ public class ConsumerServiceImpl implements ConsumerService {
 	private KafkaService kafkaService = new KafkaFactory().create();
 
 	/** Get active topic graph data from kafka cluster. */
-	public String getActiveGraph() {
+	public String getActiveGraph(String clusterAlias) {
 		JSONObject target = new JSONObject();
-		target.put("active", getActiveGraphDatasets());
+		target.put("active", getActiveGraphDatasets(clusterAlias));
 		return target.toJSONString();
 	}
 
 	/** Get active graph from zookeeper. */
-	private String getActiveGraphDatasets() {
-		Map<String, List<String>> activeTopics = kafkaService.getActiveTopic();
+	private String getActiveGraphDatasets(String clusterAlias) {
+		Map<String, List<String>> activeTopics = kafkaService.getActiveTopic(clusterAlias);
 		JSONObject target = new JSONObject();
 		JSONArray targets = new JSONArray();
 		target.put("name", "Active Topics");
@@ -96,8 +98,8 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get kafka active number & storage offset in zookeeper. */
-	private int getActiveNumber(String group, List<String> topics) {
-		Map<String, List<String>> activeTopics = kafkaService.getActiveTopic();
+	private int getActiveNumber(String clusterAlias,String group, List<String> topics) {
+		Map<String, List<String>> activeTopics = kafkaService.getActiveTopic(clusterAlias);
 		int sum = 0;
 		for (String topic : topics) {
 			if (activeTopics.containsKey(group + "_" + topic)) {
@@ -108,17 +110,17 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Storage offset in kafka or zookeeper. */
-	public String getActiveTopic(String formatter) {
+	public String getActiveTopic(String clusterAlias,String formatter) {
 		if ("kafka".equals(formatter)) {
 			return getKafkaActiveTopic();
 		} else {
-			return getActiveGraph();
+			return getActiveGraph(clusterAlias);
 		}
 	}
 
 	/** Get consumers from zookeeper. */
-	private String getConsumer(PageParamDomain page) {
-		Map<String, List<String>> consumers = kafkaService.getConsumers(page);
+	private String getConsumer(String clusterAlias,PageParamDomain page) {
+		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias,page);
 		List<ConsumerDomain> consumerPages = new ArrayList<ConsumerDomain>();
 		int id = 0;
 		for (Entry<String, List<String>> entry : consumers.entrySet()) {
@@ -127,23 +129,23 @@ public class ConsumerServiceImpl implements ConsumerService {
 			consumer.setConsumerNumber(entry.getValue().size());
 			consumer.setTopic(entry.getValue());
 			consumer.setId(++id);
-			consumer.setActiveNumber(getActiveNumber(entry.getKey(), entry.getValue()));
+			consumer.setActiveNumber(getActiveNumber(clusterAlias,entry.getKey(), entry.getValue()));
 			consumerPages.add(consumer);
 		}
 		return consumerPages.toString();
 	}
 
 	/** Judge consumers storage offset in kafka or zookeeper. */
-	public String getConsumer(String formatter, PageParamDomain page) {
+	public String getConsumer(String clusterAlias,String formatter, PageParamDomain page) {
 		if ("kafka".equals(formatter)) {
 			return getKafkaConsumer(page);
 		} else {
-			return getConsumer(page);
+			return getConsumer(clusterAlias,page);
 		}
 	}
 
 	/** Get consumer size from kafka topic. */
-	public int getConsumerCount(String formatter) {
+	public int getConsumerCount(String clusterAlias,String formatter) {
 		if ("kafka".equals(formatter)) {
 			Map<String, List<String>> consumers = new HashMap<>();
 			try {
@@ -155,14 +157,14 @@ public class ConsumerServiceImpl implements ConsumerService {
 			}
 			return consumers.size();
 		} else {
-			return kafkaService.getConsumers().size();
+			return kafkaService.getConsumers(clusterAlias).size();
 		}
 	}
 
 	/** List the name of the topic in the consumer detail information. */
-	private String getConsumerDetail(String group) {
-		Map<String, List<String>> consumers = kafkaService.getConsumers();
-		Map<String, List<String>> actvTopics = kafkaService.getActiveTopic();
+	private String getConsumerDetail(String clusterAlias,String group) {
+		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
+		Map<String, List<String>> actvTopics = kafkaService.getActiveTopic(clusterAlias);
 		List<TopicConsumerDomain> kafkaConsumerDetails = new ArrayList<TopicConsumerDomain>();
 		int id = 0;
 		for (String topic : consumers.get(group)) {
@@ -180,11 +182,11 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Judge consumer storage offset in kafka or zookeeper. */
-	public String getConsumerDetail(String formatter, String group) {
+	public String getConsumerDetail(String clusterAlias,String formatter, String group) {
 		if ("kafka".equals(formatter)) {
 			return getKafkaConsumerDetail(group);
 		} else {
-			return getConsumerDetail(group);
+			return getConsumerDetail(clusterAlias,group);
 		}
 	}
 

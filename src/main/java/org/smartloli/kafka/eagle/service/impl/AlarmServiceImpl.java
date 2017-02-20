@@ -40,7 +40,9 @@ import org.springframework.stereotype.Service;
  *
  * @Author smartloli.
  *
- *         Created by Sep 6, 2016
+ *         Created by Sep 6, 2016.
+ *         
+ *         Update by hexiang 20170216
  */
 @Service
 public class AlarmServiceImpl implements AlarmService {
@@ -60,9 +62,9 @@ public class AlarmServiceImpl implements AlarmService {
 	 * 
 	 * @see org.smartloli.kafka.eagle.domain.AlarmDomain
 	 */
-	public Map<String, Object> add(AlarmDomain alarm) {
+	public Map<String, Object> add(String clusterAlias,AlarmDomain alarm) {
 		Map<String, Object> alarmStates = new HashMap<String, Object>();
-		int status = zkService.insertAlarmConfigure(alarm);
+		int status = zkService.insertAlarmConfigure(clusterAlias,alarm);
 		if (status == -1) {
 			alarmStates.put("status", "error");
 			alarmStates.put("info", "insert [" + alarm + "] has error!");
@@ -79,21 +81,21 @@ public class AlarmServiceImpl implements AlarmService {
 	 * @param group
 	 * @param topic
 	 */
-	public void delete(String group, String topic) {
-		zkService.remove(group, topic, "alarm");
+	public void delete(String clusterAlias,String group, String topic) {
+		zkService.remove(clusterAlias,group, topic, "alarm");
 	}
 
-	public String get(String formatter) {
+	public String get(String clusterAlias,String formatter) {
 		if ("kafka".equals(formatter)) {
 			return getKafka();
 		} else {
-			return get();
+			return get(clusterAlias);
 		}
 	}
 
 	/** Get alarmer topics. */
-	private String get() {
-		Map<String, List<String>> consumers = kafkaService.getConsumers();
+	private String get(String clusterAlias) {
+		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
 		JSONArray topics = new JSONArray();
 		for (Entry<String, List<String>> entry : consumers.entrySet()) {
 			JSONObject groupAndTopics = new JSONObject();
@@ -119,8 +121,8 @@ public class AlarmServiceImpl implements AlarmService {
 	}
 
 	/** List alarmer datasets. */
-	public String list() {
-		return zkService.getAlarm();
+	public String list(String clusterAlias) {
+		return zkService.getAlarm(clusterAlias);
 	}
 
 }

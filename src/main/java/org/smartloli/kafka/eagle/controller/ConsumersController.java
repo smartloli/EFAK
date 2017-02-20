@@ -36,6 +36,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.domain.PageParamDomain;
 import org.smartloli.kafka.eagle.service.ConsumerService;
+import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.GzipUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
@@ -44,7 +45,9 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
  * 
  * @author smartloli.
  *
- *         Created by Sep 6, 2016
+ *         Created by Sep 6, 2016.
+ *         
+ *         Update by hexiang 20170216
  */
 @Controller
 public class ConsumersController {
@@ -70,9 +73,12 @@ public class ConsumersController {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Content-Encoding", "gzip");
 
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		
 		try {
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-			byte[] output = GzipUtils.compressToByte(consumerService.getActiveTopic(formatter));
+			byte[] output = GzipUtils.compressToByte(consumerService.getActiveTopic(clusterAlias,formatter));
 			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
@@ -115,9 +121,12 @@ public class ConsumersController {
 		page.setiDisplayLength(iDisplayLength);
 		page.setiDisplayStart(iDisplayStart);
 
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		int count = consumerService.getConsumerCount(formatter);
-		JSONArray consumers = JSON.parseArray(consumerService.getConsumer(formatter, page));
+		int count = consumerService.getConsumerCount(clusterAlias,formatter);
+		JSONArray consumers = JSON.parseArray(consumerService.getConsumer(clusterAlias,formatter, page));
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : consumers) {
 			JSONObject consumer = (JSONObject) object;
@@ -176,8 +185,11 @@ public class ConsumersController {
 			}
 		}
 
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(formatter, group));
+		JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(clusterAlias,formatter, group));
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : consumerDetails) {

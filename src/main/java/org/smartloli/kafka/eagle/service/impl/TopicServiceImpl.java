@@ -31,7 +31,9 @@ import org.springframework.stereotype.Service;
  * 
  * @author smartloli.
  *
- *         Created by Aug 14, 2016
+ *         Created by Aug 14, 2016.
+ *         
+ *         Update by hexiang 20170216
  */
 @Service
 public class TopicServiceImpl implements TopicService {
@@ -40,9 +42,9 @@ public class TopicServiceImpl implements TopicService {
 	private KafkaService kafkaService = new KafkaFactory().create();
 
 	/** Find topic name in all topics. */
-	public boolean hasTopic(String topicName, String ip) {
+	public boolean hasTopic(String clusterAlias,String topicName) {
 		boolean target = false;
-		JSONArray topicAndPartitions = JSON.parseArray(kafkaService.getAllPartitions());
+		JSONArray topicAndPartitions = JSON.parseArray(kafkaService.getAllPartitions(clusterAlias));
 		for (Object topicAndPartition : topicAndPartitions) {
 			JSONObject object = (JSONObject) topicAndPartition;
 			String topic = object.getString("topic");
@@ -55,13 +57,13 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	/** Get metadata in topic. */
-	public String metadata(String topicName) {
-		return kafkaService.findLeader(topicName).toString();
+	public String metadata(String clusterAlias,String topicName) {
+		return kafkaService.findLeader(clusterAlias,topicName).toString();
 	}
 
 	/** List all the topic under Kafka in partition. */
-	public String list() {
-		return kafkaService.getAllPartitions();
+	public String list(String clusterAlias) {
+		return kafkaService.getAllPartitions(clusterAlias);
 	}
 
 }

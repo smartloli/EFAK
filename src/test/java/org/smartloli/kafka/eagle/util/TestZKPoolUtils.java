@@ -26,6 +26,6 @@ package org.smartloli.kafka.eagle.util;
  */
 public class TestZKPoolUtils {
 	public static void main(String[] args) {
-		
+		System.out.println(SystemConfigUtils.getPropertyMap("kafka.eagle.zk.cluster.alias"));
 	}
 }

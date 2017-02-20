@@ -22,17 +22,19 @@ package org.smartloli.kafka.eagle.service;
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by Jan 17, 2017.
+ *         
+ *         Update by hexiang 20170216
  */
 public interface TopicService {
-	
+
 	/** Find topic name in all topics. */
-	public boolean hasTopic(String topicName, String ip);
+	public boolean hasTopic(String clusterAlias, String topicName);
 
 	/** Get metadata in topic. */
-	public String metadata(String topicName);
+	public String metadata(String clusterAlias, String topicName);
 
 	/** List all the topic under Kafka in partition. */
-	public String list();
-	
+	public String list(String clusterAlias);
+
 }

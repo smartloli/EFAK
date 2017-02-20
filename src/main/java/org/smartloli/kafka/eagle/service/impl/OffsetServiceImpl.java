@@ -43,7 +43,9 @@ import org.springframework.stereotype.Service;
  *
  * @author smartloli.
  *
- *         Created by Aug 16, 2016
+ *         Created by Aug 16, 2016.
+ *         
+ *         Update by hexiang 20170216
  */
 @Service
 public class OffsetServiceImpl implements OffsetService {
@@ -55,8 +57,8 @@ public class OffsetServiceImpl implements OffsetService {
 	private ZkService zkService = new ZkFactory().create();
 
 	/** Get Kafka brokers. */
-	private List<String> getBrokers(String topic, String group) {
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo());
+	private List<String> getBrokers(String clusterAlias, String topic, String group) {
+		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
 		List<String> targets = new ArrayList<String>();
 		for (Object object : brokers) {
 			JSONObject target = (JSONObject) object;
@@ -68,9 +70,9 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get Kafka logsize from Kafka topic. */
-	private String getKafkaLogSize(String topic, String group) {
-		List<String> hosts = getBrokers(topic, group);
-		List<String> partitions = kafkaService.findTopicPartition(topic);
+	private String getKafkaLogSize(String clusterAlias, String topic, String group) {
+		List<String> hosts = getBrokers(clusterAlias, topic, group);
+		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
 		List<OffsetDomain> targets = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
@@ -112,13 +114,13 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get logsize from zookeeper. */
-	private String getLogSize(String topic, String group) {
-		List<String> hosts = getBrokers(topic, group);
-		List<String> partitions = kafkaService.findTopicPartition(topic);
+	private String getLogSize(String clusterAlias, String topic, String group) {
+		List<String> hosts = getBrokers(clusterAlias, topic, group);
+		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
 		List<OffsetDomain> targets = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
-			OffsetZkDomain offsetZk = kafkaService.getOffset(topic, group, partitionInt);
+			OffsetZkDomain offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partitionInt);
 			OffsetDomain offset = new OffsetDomain();
 			long logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
 			offset.setPartition(partitionInt);
@@ -134,17 +136,17 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get logsize from Kafka topic or Zookeeper. */
-	public String getLogSize(String formatter, String topic, String group) {
+	public String getLogSize(String clusterAlias, String formatter, String topic, String group) {
 		if ("kafka".equals(formatter)) {
-			return getKafkaLogSize(topic, group);
+			return getKafkaLogSize(clusterAlias,topic, group);
 		} else {
-			return getLogSize(topic, group);
+			return getLogSize(clusterAlias, topic, group);
 		}
 	}
 
 	/** Get Kafka offset graph data from Zookeeper. */
-	public String getOffsetsGraph(String group, String topic) {
-		String target = zkService.getOffsets(group, topic);
+	public String getOffsetsGraph(String clusterAlias,String group, String topic) {
+		String target = zkService.getOffsets(clusterAlias,group, topic);
 		if (target.length() > 0) {
 			target = JSON.parseObject(target).getString("data");
 		}
@@ -152,16 +154,16 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Judge group & topic from Zookeeper has exist. */
-	private boolean hasGroupTopic(String group, String topic) {
-		return kafkaService.findTopicAndGroupExist(topic, group);
+	private boolean hasGroupTopic(String clusterAlias,String group, String topic) {
+		return kafkaService.findTopicAndGroupExist(clusterAlias,topic, group);
 	}
 
 	/** Judge group & topic exist Kafka topic or Zookeeper. */
-	public boolean hasGroupTopic(String formatter, String group, String topic) {
+	public boolean hasGroupTopic(String clusterAlias,String formatter, String group, String topic) {
 		if ("kafka".equals(formatter)) {
 			return hasKafkaGroupTopic(group, topic);
 		} else {
-			return hasGroupTopic(group, topic);
+			return hasGroupTopic(clusterAlias,group, topic);
 		}
 	}
 

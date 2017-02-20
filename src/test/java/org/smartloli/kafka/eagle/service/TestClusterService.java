@@ -30,7 +30,7 @@ public class TestClusterService {
 
 	public static void main(String[] args) {
 		ClusterServiceImpl clusterServiceImpl = new ClusterServiceImpl(); 
-		System.out.println(clusterServiceImpl.get("zk"));
+		System.out.println(clusterServiceImpl.get("cluster1","kafka"));
 	}
 
 }

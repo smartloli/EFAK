@@ -27,6 +27,6 @@ package org.smartloli.kafka.eagle.factory;
 public class TestZkProvider {
 	public static void main(String[] args) {
 		ZkService zkService = new ZkFactory().create();
-		System.out.println(zkService.zkCluster());
+		System.out.println(zkService.zkCluster("cluster1"));
 	}
 }

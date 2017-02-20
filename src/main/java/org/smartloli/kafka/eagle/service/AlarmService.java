@@ -26,20 +26,22 @@ import org.smartloli.kafka.eagle.domain.AlarmDomain;
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by Jan 17, 2017.
+ *         
+ *         Update by hexiang 20170216
  */
 public interface AlarmService {
 
 	/** Add alarmer interface. */
-	public Map<String, Object> add(AlarmDomain alarm);
+	public Map<String, Object> add(String clusterAlias,AlarmDomain alarm);
 
 	/** Delete alarmer interface. */
-	public void delete(String group, String topic);
+	public void delete(String clusterAlias,String group, String topic);
 
 	/** Get alarmer interface. */
-	public String get(String formatter);
+	public String get(String clusterAlias,String formatter);
 
 	/** List alarmer information. */
-	public String list();
+	public String list(String clusterAlias);
 
 }

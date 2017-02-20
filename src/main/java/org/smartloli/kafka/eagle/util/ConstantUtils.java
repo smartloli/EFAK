@@ -47,4 +47,8 @@ public class ConstantUtils {
 		public final static String EIGHT = "________";
 	}
 
+	public interface SessionAlias {
+		public final static String CLUSTER_ALIAS = "clusterAlias";
+	}
+
 }

@@ -23,6 +23,13 @@
 	<!-- HandlerMapping -->
 	<bean
 		class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:mapping path="/" />
+			<bean class="org.smartloli.kafka.eagle.controller.aop.AccountInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
 
 	<!-- HandlerAdapter -->
 	<bean

@@ -24,26 +24,28 @@ import org.smartloli.kafka.eagle.domain.PageParamDomain;
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by Jan 17, 2017.
+ *         
+ *         Update by hexiang 20170216
  */
 public interface ConsumerService {
 
 	/** Get active topic graph data interface. */
-	public String getActiveGraph();
+	public String getActiveGraph(String clusterAlias);
 
 	/** Storage offset in kafka or zookeeper interface. */
-	public String getActiveTopic(String formatter);
+	public String getActiveTopic(String clusterAlias,String formatter);
 
 	/**
 	 * Judge consumer detail information storage offset in kafka or zookeeper
 	 * interface.
 	 */
-	public String getConsumerDetail(String formatter, String group);
+	public String getConsumerDetail(String clusterAlias,String formatter, String group);
 
 	/** Judge consumers storage offset in kafka or zookeeper interface. */
-	public String getConsumer(String formatter, PageParamDomain page);
+	public String getConsumer(String clusterAlias,String formatter, PageParamDomain page);
 
 	/** Get consumer size from kafka topic interface. */
-	public int getConsumerCount(String formatter);
+	public int getConsumerCount(String clusterAlias,String formatter);
 	
 }
