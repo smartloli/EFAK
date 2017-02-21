@@ -15,7 +15,10 @@
 	<!-- Top Menu Items -->
 	<ul class="nav navbar-right top-nav">
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.0.9 </a></li>
+			data-toggle="dropdown"><i class="fa fa-sitemap"></i>
+				${clusterAlias} </a></li>
+		<li class="dropdown"><a href="#" class="dropdown-toggle"
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.1.0 </a></li>
 	</ul>
 	<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
 	<div class="collapse navbar-collapse navbar-ex1-collapse">
@@ -39,6 +42,8 @@
 				<ul id="demo2" class="collapse">
 					<li id="navbar_cli"><a href="/ke/cluster/info"><i
 							class="fa fa-sitemap fa-fw"></i> ZK & Kafka</a></li>
+					<li id="navbar_cli"><a href="/ke/cluster/multi"><i
+							class="fa fa-maxcdn fa-fw"></i> Multi-Clusters</a></li>
 					<li id="navbar_zk"><a href="/ke/cluster/zkcli"><i
 							class="fa fa-terminal fa-fw"></i> ZkCli</a></li>
 				</ul></li>

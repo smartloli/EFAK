@@ -15,35 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.service;
+package org.smartloli.kafka.eagle.util;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * Kafka & Zookeeper service api.
+ * Test encrypt tools clazz.
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017.
- * 
- *         Update by hexiang 20170216
+ *         Created by Feb 21, 2017
  */
-public interface ClusterService {
+public class TestEncryptUtils {
 
-	/** Execute zookeeper comand interface */
-	public String execute(String clusterAlias, String cmd, String type);
-
-	/** Get Kafka & Zookeeper interface. */
-	public String get(String clusterAlias, String type);
-
-	/** Get Zookkeeper status interface. */
-	public JSONObject status(String clusterAlias);
-
-	/** Get multi cluster aliass interface. */
-	public JSONArray clusterAliass();
-
-	/** Checked cluster alias is exist interface. */
-	public boolean hasClusterAlias(String clusterAlias);
+	public static void main(String[] args) {
+		JSONObject object = new JSONObject();
+		object.put("id", 1);
+		object.put("age", 22);
+		object.put("tm", CalendarUtils.getDate());
+		KeDataUtils.write("cluster1_" + CalendarUtils.getCustomDate("yyyyMMdd"), object.toJSONString());
+	}
 
 }

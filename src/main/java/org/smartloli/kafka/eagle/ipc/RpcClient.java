@@ -43,14 +43,14 @@ public class RpcClient {
 	private final static String ADDR = "127.0.0.1";
 
 	/** Get consumer offset from Rpc server. */
-	public static String getOffset() {
+	public static String getOffset(String clusterAlias) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String target = "";
 		try {
 			transport.open();
-			target = client.getOffset();
+			target = client.getOffset(clusterAlias);
 		} catch (Exception e) {
 			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
 		} finally {
@@ -60,14 +60,14 @@ public class RpcClient {
 	}
 
 	/** Get activer consumer data from Rpc server. */
-	public static String getActiverConsumer() {
+	public static String getActiverConsumer(String clusterAlias) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String target = "";
 		try {
 			transport.open();
-			target = client.getActiverConsumer();
+			target = client.getActiverConsumer(clusterAlias);
 		} catch (Exception e) {
 			LOG.error("Rpc Client getActiver has error,msg is " + e.getMessage());
 		} finally {
@@ -77,14 +77,14 @@ public class RpcClient {
 	}
 
 	/** Get consumer data from Rpc server. */
-	public static String getConsumer() {
+	public static String getConsumer(String clusterAlias) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String target = "";
 		try {
 			transport.open();
-			target = client.getConsumer();
+			target = client.getConsumer(clusterAlias);
 		} catch (Exception e) {
 			LOG.error("Rpc Client getConsumer has error,msg is " + e.getMessage());
 		} finally {
@@ -94,14 +94,14 @@ public class RpcClient {
 	}
 
 	/** Get consumer page from Rpc server. */
-	public static String getConsumerPage(PageParamDomain page) {
+	public static String getConsumerPage(PageParamDomain page, String clusterAlias) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String target = "";
 		try {
 			transport.open();
-			target = client.getConsumerPage(page.getSearch(), page.getiDisplayStart(), page.getiDisplayLength());
+			target = client.getConsumerPage(page.getSearch(), page.getiDisplayStart(), page.getiDisplayLength(), clusterAlias);
 		} catch (Exception e) {
 			LOG.error("Rpc Client getConsumerPage has error,msg is " + e.getMessage());
 		} finally {

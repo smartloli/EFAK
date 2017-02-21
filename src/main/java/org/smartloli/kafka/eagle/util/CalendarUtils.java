@@ -84,4 +84,10 @@ public class CalendarUtils {
 		return df.format(new Date());
 	}
 
+	/** Get custom date,like yyyy/mm/dd etc. */
+	public static String getCustomDate(String formatter) {
+		SimpleDateFormat df = new SimpleDateFormat(formatter);
+		return df.format(new Date());
+	}
+
 }

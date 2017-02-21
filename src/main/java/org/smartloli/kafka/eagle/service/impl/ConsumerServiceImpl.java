@@ -112,7 +112,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 	/** Storage offset in kafka or zookeeper. */
 	public String getActiveTopic(String clusterAlias,String formatter) {
 		if ("kafka".equals(formatter)) {
-			return getKafkaActiveTopic();
+			return getKafkaActiveTopic(clusterAlias);
 		} else {
 			return getActiveGraph(clusterAlias);
 		}
@@ -138,7 +138,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 	/** Judge consumers storage offset in kafka or zookeeper. */
 	public String getConsumer(String clusterAlias,String formatter, PageParamDomain page) {
 		if ("kafka".equals(formatter)) {
-			return getKafkaConsumer(page);
+			return getKafkaConsumer(page,clusterAlias);
 		} else {
 			return getConsumer(clusterAlias,page);
 		}
@@ -151,7 +151,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 			try {
 				Map<String, List<String>> type = new HashMap<String, List<String>>();
 				Gson gson = new Gson();
-				consumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+				consumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
 			} catch (Exception e) {
 				LOG.error("Get Kafka topic offset has error,msg is " + e.getMessage());
 			}
@@ -184,17 +184,17 @@ public class ConsumerServiceImpl implements ConsumerService {
 	/** Judge consumer storage offset in kafka or zookeeper. */
 	public String getConsumerDetail(String clusterAlias,String formatter, String group) {
 		if ("kafka".equals(formatter)) {
-			return getKafkaConsumerDetail(group);
+			return getKafkaConsumerDetail(clusterAlias,group);
 		} else {
 			return getConsumerDetail(clusterAlias,group);
 		}
 	}
 
 	/** Get active grahp data & storage offset in kafka topic. */
-	private Object getKafkaActive() {
+	private Object getKafkaActive(String clusterAlias) {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> activerConsumers = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
+		Map<String, List<String>> activerConsumers = gson.fromJson(RpcClient.getActiverConsumer(clusterAlias), type.getClass());
 		JSONObject target = new JSONObject();
 		JSONArray targets = new JSONArray();
 		target.put("name", "Active Topics");
@@ -227,10 +227,10 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get kafka active number & storage offset in kafka topic. */
-	private int getKafkaActiveNumber(String group, List<String> topics) {
+	private int getKafkaActiveNumber(String clusterAlias,String group, List<String> topics) {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> activerConsumers = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
+		Map<String, List<String>> activerConsumers = gson.fromJson(RpcClient.getActiverConsumer(clusterAlias), type.getClass());
 		int sum = 0;
 		for (String topic : topics) {
 			String key = group + "_" + topic;
@@ -242,18 +242,18 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get active topic from kafka cluster & storage offset in kafka topic. */
-	private String getKafkaActiveTopic() {
+	private String getKafkaActiveTopic(String clusterAlias) {
 		JSONObject target = new JSONObject();
-		target.put("active", getKafkaActive());
+		target.put("active", getKafkaActive(clusterAlias));
 		return target.toJSONString();
 	}
 
 	/** Get kafka consumer & storage offset in kafka topic. */
-	private String getKafkaConsumer(PageParamDomain page) {
+	private String getKafkaConsumer(PageParamDomain page,String clusterAlias) {
 		List<ConsumerDomain> kafkaConsumerPages = new ArrayList<ConsumerDomain>();
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumerPage(page), type.getClass());
+		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumerPage(page,clusterAlias), type.getClass());
 		int id = 0;
 		for (Entry<String, List<String>> entry : consumers.entrySet()) {
 			ConsumerDomain consumer = new ConsumerDomain();
@@ -261,18 +261,18 @@ public class ConsumerServiceImpl implements ConsumerService {
 			consumer.setConsumerNumber(entry.getValue().size());
 			consumer.setTopic(entry.getValue());
 			consumer.setId(++id);
-			consumer.setActiveNumber(getKafkaActiveNumber(entry.getKey(), entry.getValue()));
+			consumer.setActiveNumber(getKafkaActiveNumber(clusterAlias,entry.getKey(), entry.getValue()));
 			kafkaConsumerPages.add(consumer);
 		}
 		return kafkaConsumerPages.toString();
 	}
 
 	/** Get consumer detail from kafka topic. */
-	private String getKafkaConsumerDetail(String group) {
+	private String getKafkaConsumerDetail(String clusterAlias,String group) {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
-		Map<String, List<String>> actvTopics = gson.fromJson(RpcClient.getActiverConsumer(), type.getClass());
+		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
+		Map<String, List<String>> actvTopics = gson.fromJson(RpcClient.getActiverConsumer(clusterAlias), type.getClass());
 		List<TopicConsumerDomain> kafkaConsumerPages = new ArrayList<TopicConsumerDomain>();
 		int id = 0;
 		for (String topic : consumers.get(group)) {

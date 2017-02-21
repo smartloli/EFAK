@@ -44,7 +44,7 @@ import org.springframework.stereotype.Service;
  * @author smartloli.
  *
  *         Created by Aug 16, 2016.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 @Service
@@ -76,7 +76,7 @@ public class OffsetServiceImpl implements OffsetService {
 		List<OffsetDomain> targets = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
-			OffsetZkDomain offsetZk = getKafkaOffset(topic, group, partitionInt);
+			OffsetZkDomain offsetZk = getKafkaOffset(clusterAlias, topic, group, partitionInt);
 			OffsetDomain offset = new OffsetDomain();
 			long logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
 			offset.setPartition(partitionInt);
@@ -92,8 +92,8 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get Kafka offset from Kafka topic. */
-	private OffsetZkDomain getKafkaOffset(String topic, String group, int partition) {
-		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset());
+	private OffsetZkDomain getKafkaOffset(String clusterAlias, String topic, String group, int partition) {
+		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias));
 		OffsetZkDomain targetOffset = new OffsetZkDomain();
 		for (Object kafkaOffset : kafkaOffsets) {
 			JSONObject object = (JSONObject) kafkaOffset;
@@ -138,15 +138,15 @@ public class OffsetServiceImpl implements OffsetService {
 	/** Get logsize from Kafka topic or Zookeeper. */
 	public String getLogSize(String clusterAlias, String formatter, String topic, String group) {
 		if ("kafka".equals(formatter)) {
-			return getKafkaLogSize(clusterAlias,topic, group);
+			return getKafkaLogSize(clusterAlias, topic, group);
 		} else {
 			return getLogSize(clusterAlias, topic, group);
 		}
 	}
 
 	/** Get Kafka offset graph data from Zookeeper. */
-	public String getOffsetsGraph(String clusterAlias,String group, String topic) {
-		String target = zkService.getOffsets(clusterAlias,group, topic);
+	public String getOffsetsGraph(String clusterAlias, String group, String topic) {
+		String target = zkService.getOffsets(clusterAlias, group, topic);
 		if (target.length() > 0) {
 			target = JSON.parseObject(target).getString("data");
 		}
@@ -154,25 +154,25 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Judge group & topic from Zookeeper has exist. */
-	private boolean hasGroupTopic(String clusterAlias,String group, String topic) {
-		return kafkaService.findTopicAndGroupExist(clusterAlias,topic, group);
+	private boolean hasGroupTopic(String clusterAlias, String group, String topic) {
+		return kafkaService.findTopicAndGroupExist(clusterAlias, topic, group);
 	}
 
 	/** Judge group & topic exist Kafka topic or Zookeeper. */
-	public boolean hasGroupTopic(String clusterAlias,String formatter, String group, String topic) {
+	public boolean hasGroupTopic(String clusterAlias, String formatter, String group, String topic) {
 		if ("kafka".equals(formatter)) {
-			return hasKafkaGroupTopic(group, topic);
+			return hasKafkaGroupTopic(clusterAlias, group, topic);
 		} else {
-			return hasGroupTopic(clusterAlias,group, topic);
+			return hasGroupTopic(clusterAlias, group, topic);
 		}
 	}
 
 	/** Judge group & topic from Kafka topic has exist. */
-	private boolean hasKafkaGroupTopic(String group, String topic) {
+	private boolean hasKafkaGroupTopic(String clusterAlias, String group, String topic) {
 		boolean status = false;
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+		Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
 		if (kafkaConsumers.containsKey(group)) {
 			for (String _topic : kafkaConsumers.get(group)) {
 				if (_topic.equals(topic)) {

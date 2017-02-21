@@ -87,7 +87,7 @@ public class AlarmServiceImpl implements AlarmService {
 
 	public String get(String clusterAlias,String formatter) {
 		if ("kafka".equals(formatter)) {
-			return getKafka();
+			return getKafka(clusterAlias);
 		} else {
 			return get(clusterAlias);
 		}
@@ -106,10 +106,10 @@ public class AlarmServiceImpl implements AlarmService {
 		return topics.toJSONString();
 	}
 
-	private String getKafka() {
+	private String getKafka(String clusterAlias) {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+		Map<String, List<String>> consumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
 		JSONArray topics = new JSONArray();
 		for (Entry<String, List<String>> entry : consumers.entrySet()) {
 			JSONObject groupAndTopics = new JSONObject();

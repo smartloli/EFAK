@@ -70,10 +70,10 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	/** Get consumer number from kafka topic. */
-	private int getKafkaConsumerNumbers() {
+	private int getKafkaConsumerNumbers(String clusterAlias) {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+		Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
 		int count = 0;
 		for (Entry<String, List<String>> entry : kafkaConsumers.entrySet()) {
 			count += entry.getValue().size();
@@ -120,7 +120,7 @@ public class DashboardServiceImpl implements DashboardService {
 		dashboard.setZks(zks);
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		if ("kafka".equals(formatter)) {
-			dashboard.setConsumers(getKafkaConsumerNumbers());
+			dashboard.setConsumers(getKafkaConsumerNumbers(clusterAlias));
 		} else {
 			dashboard.setConsumers(getConsumerNumbers(clusterAlias));
 		}

@@ -37,9 +37,19 @@ public class AccountInterceptor extends HandlerInterceptorAdapter {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
-		String defaultClusterAlias = clusterAliass[0];
-		request.getSession().setAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
+		try {
+			Object object = request.getSession().getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS);
+			if (object == null) {
+				String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+				String defaultClusterAlias = clusterAliass[0];
+				request.getSession().setAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
+			}
+		} catch (Exception e) {
+			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+			String defaultClusterAlias = clusterAliass[0];
+			request.getSession().setAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
+			e.printStackTrace();
+		}
 		return true;
 	}
 

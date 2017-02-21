@@ -62,6 +62,9 @@ public class OffsetsQuartz {
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
+	/** Kafka Eagle interface. */
+	//private KeService keService = new KeFactory().create();
+
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
 
@@ -69,8 +72,8 @@ public class OffsetsQuartz {
 	private LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
 
 	/** Get alarmer configure. */
-	private List<AlarmDomain> alarmConfigure() {
-		String alarmer = zkService.getAlarm();
+	private List<AlarmDomain> alarmConfigure(String clusterAlias) {
+		String alarmer = zkService.getAlarm(clusterAlias);
 		List<AlarmDomain> targets = new ArrayList<>();
 		JSONArray alarmers = JSON.parseArray(alarmer);
 		for (Object object : alarmers) {
@@ -85,8 +88,27 @@ public class OffsetsQuartz {
 		return targets;
 	}
 
+	private void alert(String clusterAlias, List<OffsetsLiteDomain> offsetLites) {
+		boolean enableAlarm = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
+		if (enableAlarm) {
+			List<AlarmDomain> alarmers = alarmConfigure(clusterAlias);
+			for (AlarmDomain alarm : alarmers) {
+				for (OffsetsLiteDomain offset : offsetLites) {
+					if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
+						try {
+							MailProvider provider = new MailFactory();
+							provider.create().send(alarm.getOwners(), "Alarm Lag", "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].");
+						} catch (Exception ex) {
+							LOG.error("Topic[" + alarm.getTopics() + "] Send alarm mail has error,msg is " + ex.getMessage());
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/** Get kafka brokers. */
-	private List<String> getBrokers() {
+	private List<String> getBrokers(String clusterAlias) {
 		// Add LRUCache per 3 min
 		String key = "group_topic_offset_graph_consumer_brokers";
 		String brokers = "";
@@ -98,7 +120,7 @@ public class OffsetsQuartz {
 				lruCache.remove(key);
 			}
 		} else {
-			brokers = kafkaService.getAllBrokersInfo();
+			brokers = kafkaService.getAllBrokersInfo(clusterAlias);
 			TupleDomain tuple = new TupleDomain();
 			tuple.setRet(brokers);
 			tuple.setTimespan(System.currentTimeMillis());
@@ -115,8 +137,8 @@ public class OffsetsQuartz {
 		return targets;
 	}
 
-	private static OffsetZkDomain getKafkaOffset(String topic, String group, int partition) {
-		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset());
+	private static OffsetZkDomain getKafkaOffset(String clusterAlias,String topic, String group, int partition) {
+		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias));
 		OffsetZkDomain targets = new OffsetZkDomain();
 		for (Object object : kafkaOffsets) {
 			JSONObject kafkaOffset = (JSONObject) object;
@@ -142,33 +164,40 @@ public class OffsetsQuartz {
 		return df.format(new Date());
 	}
 
-	/** Perform offset statistical tasks on time. */
 	public void jobQuartz() {
+		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+		for (String clusterAlias : clusterAliass) {
+			execute(clusterAlias);
+		}
+	}
+
+	/** Perform offset statistical tasks on time. */
+	private void execute(String clusterAlias) {
 		try {
-			List<String> hosts = getBrokers();
+			List<String> hosts = getBrokers(clusterAlias);
 			List<OffsetsLiteDomain> offsetLites = new ArrayList<OffsetsLiteDomain>();
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 			Map<String, List<String>> consumers = null;
 			if ("kafka".equals(formatter)) {
 				Map<String, List<String>> type = new HashMap<String, List<String>>();
 				Gson gson = new Gson();
-				consumers = gson.fromJson(RpcClient.getConsumer(), type.getClass());
+				consumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
 			} else {
-				consumers = kafkaService.getConsumers();
+				consumers = kafkaService.getConsumers(clusterAlias);
 			}
 			String statsPerDate = getStatsPerDate();
 			for (Entry<String, List<String>> entry : consumers.entrySet()) {
 				String group = entry.getKey();
 				for (String topic : entry.getValue()) {
 					OffsetsLiteDomain offsetSQLite = new OffsetsLiteDomain();
-					for (String partitionStr : kafkaService.findTopicPartition(topic)) {
+					for (String partitionStr : kafkaService.findTopicPartition(clusterAlias, topic)) {
 						int partition = Integer.parseInt(partitionStr);
 						long logSize = kafkaService.getLogSize(hosts, topic, partition);
 						OffsetZkDomain offsetZk = null;
 						if ("kafka".equals(formatter)) {
-							offsetZk = getKafkaOffset(topic, group, partition);
+							offsetZk = getKafkaOffset(clusterAlias,topic, group, partition);
 						} else {
-							offsetZk = kafkaService.getOffset(topic, group, partition);
+							offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partition);
 						}
 						offsetSQLite.setGroup(group);
 						offsetSQLite.setCreated(statsPerDate);
@@ -185,24 +214,12 @@ public class OffsetsQuartz {
 					offsetLites.add(offsetSQLite);
 				}
 			}
-			zkService.insert(offsetLites);
-			boolean enableAlarm = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
-			if (enableAlarm) {
-				List<AlarmDomain> alarmers = alarmConfigure();
-				for (AlarmDomain alarm : alarmers) {
-					for (OffsetsLiteDomain offset : offsetLites) {
-						if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
-							try {
-								MailProvider provider = new MailFactory();
-								provider.create().send(alarm.getOwners(), "Alarm Lag",
-										"Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].");
-							} catch (Exception ex) {
-								LOG.error("Topic[" + alarm.getTopics() + "] Send alarm mail has error,msg is " + ex.getMessage());
-							}
-						}
-					}
-				}
-			}
+			// Plan A: Storage into zookeeper.
+			zkService.insert(clusterAlias, offsetLites);
+
+			// Plan B: Storage single file.
+			// keService.write(clusterAlias, offsetLites.toString());
+			alert(clusterAlias, offsetLites);
 		} catch (Exception ex) {
 			LOG.error("Quartz statistics offset has error,msg is " + ex.getMessage());
 		}

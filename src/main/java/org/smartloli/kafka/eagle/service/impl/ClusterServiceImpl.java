@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.factory.KafkaFactory;
@@ -25,6 +26,7 @@ import org.smartloli.kafka.eagle.factory.KafkaService;
 import org.smartloli.kafka.eagle.factory.ZkFactory;
 import org.smartloli.kafka.eagle.factory.ZkService;
 import org.smartloli.kafka.eagle.service.ClusterService;
+import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,7 +35,7 @@ import org.springframework.stereotype.Service;
  * @author smartloli.
  *
  *         Created by Aug 12, 2016.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 
@@ -45,8 +47,23 @@ public class ClusterServiceImpl implements ClusterService {
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
 
+	@Override
+	public JSONArray clusterAliass() {
+		String[] multiClusters = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+		JSONArray aliass = new JSONArray();
+		int i = 1;
+		for (String cluster : multiClusters) {
+			JSONObject object = new JSONObject();
+			object.put("id", i++);
+			object.put("clusterAlias", cluster);
+			object.put("zkhost", SystemConfigUtils.getProperty(cluster + ".zk.list"));
+			aliass.add(object);
+		}
+		return aliass;
+	}
+
 	/** Execute zookeeper comand. */
-	public String execute(String clusterAlias,String cmd, String type) {
+	public String execute(String clusterAlias, String cmd, String type) {
 		String target = "";
 		String[] len = cmd.replaceAll(" ", "").split(type);
 		if (len.length == 0) {
@@ -56,15 +73,15 @@ public class ClusterServiceImpl implements ClusterService {
 			String command = len[1];
 			switch (type) {
 			case "delete":
-				object.put("result", zkService.delete(clusterAlias,command));
+				object.put("result", zkService.delete(clusterAlias, command));
 				target = object.toJSONString();
 				break;
 			case "get":
-				object.put("result", zkService.get(clusterAlias,command));
+				object.put("result", zkService.get(clusterAlias, command));
 				target = object.toJSONString();
 				break;
 			case "ls":
-				object.put("result", zkService.ls(clusterAlias,command));
+				object.put("result", zkService.ls(clusterAlias, command));
 				target = object.toJSONString();
 				break;
 			default:
@@ -76,7 +93,7 @@ public class ClusterServiceImpl implements ClusterService {
 	}
 
 	/** Get kafka & zookeeper cluster information. */
-	public String get(String clusterAlias,String type) {
+	public String get(String clusterAlias, String type) {
 		JSONObject target = new JSONObject();
 		if ("zk".equals(type)) {
 			String zkCluster = zkService.zkCluster(clusterAlias);
@@ -86,6 +103,17 @@ public class ClusterServiceImpl implements ClusterService {
 			target.put("kafka", JSON.parseArray(kafkaBrokers));
 		}
 		return target.toJSONString();
+	}
+
+	@Override
+	public boolean hasClusterAlias(String clusterAlias) {
+		String[] multiClusters = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+		for (String cluster : multiClusters) {
+			if (cluster.equals(clusterAlias)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/** Get Zookeeper whether live. */

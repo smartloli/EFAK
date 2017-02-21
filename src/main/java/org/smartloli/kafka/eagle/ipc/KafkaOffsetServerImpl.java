@@ -42,24 +42,22 @@ import kafka.server.GroupTopicPartition;
  * @author smartloli.
  *
  *         Created by Jan 5, 2017
- * 
- * @see org.smartloli.kafka.eagle.ipc.KafkaOffsetServer
  */
 public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOffsetServer.Iface {
 
 	/** According to group, topic & partition to get the topic data in Kafka. */
 	@Override
-	public String query(String group, String topic, int partition) throws TException {
+	public String query(String group, String topic, int partition, String clusterAlias) throws TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/** Get offset in Kafka topic. */
 	@Override
-	public String getOffset() throws TException {
+	public String getOffset(String clusterAlias) throws TException {
 		JSONArray targets = new JSONArray();
-		Map<String, Boolean> activer = getActiver();
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
+		Map<String, Boolean> activer = getActiver(clusterAlias);
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : multiKafkaConsumerOffsets.get(clusterAlias).entrySet()) {
 			JSONObject object = new JSONObject();
 			object.put("group", entry.getKey().group());
 			object.put("topic", entry.getKey().topicPartition().topic());
@@ -81,28 +79,27 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 
 	/** Using SQL to get data from Kafka in topic. */
 	@Override
-	public String sql(String sql) throws TException {
+	public String sql(String sql, String clusterAlias) throws TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/** Get consumer from Kafka in topic. */
 	@Override
-	public String getConsumer() throws TException {
+	public String getConsumer(String clusterAlias) throws TException {
 		Map<String, Set<String>> targets = new HashMap<>();
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : multiKafkaConsumerOffsets.get(clusterAlias).entrySet()) {
 			String group = entry.getKey().group();
 			String topic = entry.getKey().topicPartition().topic();
 			if (targets.containsKey(group)) {
-				Set<String> set = targets.get(group);
-				set.add(topic);
+				Set<String> topics = targets.get(group);
+				topics.add(topic);
 			} else {
-				Set<String> set = new HashSet<>();
-				set.add(topic);
-				targets.put(group, set);
+				Set<String> topics = new HashSet<>();
+				topics.add(topic);
+				targets.put(group, topics);
 			}
 		}
-		/** Convert Set to List. */
 		Map<String, List<String>> targets2 = new HashMap<>();
 		for (Entry<String, Set<String>> entry : targets.entrySet()) {
 			List<String> topics = new ArrayList<>();
@@ -115,10 +112,10 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 	}
 
 	/** Get activer from Kafka in topic. */
-	private Map<String, Boolean> getActiver() throws TException {
+	private Map<String, Boolean> getActiver(String clusterAlias) throws TException {
 		long mill = System.currentTimeMillis();
 		Map<String, Boolean> active = new ConcurrentHashMap<>();
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : multiKafkaConsumerOffsets.get(clusterAlias).entrySet()) {
 			String group = entry.getKey().group();
 			String topic = entry.getKey().topicPartition().topic();
 			int partition = entry.getKey().topicPartition().partition();
@@ -139,59 +136,67 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 
 	/** Get active consumer from Kafka in topic. */
 	@Override
-	public String getActiverConsumer() throws TException {
+	public String getActiverConsumer(String clusterAlias) throws TException {
 		long mill = System.currentTimeMillis();
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : multiKafkaConsumerOffsets.get(clusterAlias).entrySet()) {
 			String group = entry.getKey().group();
 			String topic = entry.getKey().topicPartition().topic();
 			int partition = entry.getKey().topicPartition().partition();
 			long timespan = entry.getValue().timestamp();
 			String key = group + ConstantUtils.Separator.EIGHT + topic + ConstantUtils.Separator.EIGHT + partition;
-			if (kafkaActiveConsumers.containsKey(key)) {
-				if ((mill - timespan) <= ConstantUtils.Kafka.ACTIVER_INTERVAL) {
-					kafkaActiveConsumers.put(key, true);
+			if (multiKafkaActiveConsumers.containsKey(clusterAlias)) {
+				Map<String, Boolean> kafkaActiveConsumers = multiKafkaActiveConsumers.get(clusterAlias);
+				if (kafkaActiveConsumers.containsKey(key)) {
+					if ((mill - timespan) <= ConstantUtils.Kafka.ACTIVER_INTERVAL) {
+						kafkaActiveConsumers.put(key, true);
+					} else {
+						kafkaActiveConsumers.put(key, false);
+					}
 				} else {
-					kafkaActiveConsumers.put(key, false);
+					kafkaActiveConsumers.put(key, true);
 				}
 			} else {
+				Map<String, Boolean> kafkaActiveConsumers = new ConcurrentHashMap<>();
 				kafkaActiveConsumers.put(key, true);
+				multiKafkaActiveConsumers.put(clusterAlias, kafkaActiveConsumers);
 			}
+
 		}
 
-		Map<String, Set<String>> target = new HashMap<>();
-		for (Entry<String, Boolean> entry : kafkaActiveConsumers.entrySet()) {
+		Map<String, Set<String>> targets = new HashMap<>();
+		for (Entry<String, Boolean> entry : multiKafkaActiveConsumers.get(clusterAlias).entrySet()) {
 			if (entry.getValue()) {
-				String[] keys = entry.getKey().split(ConstantUtils.Separator.EIGHT);
-				String key = keys[0] + "_" + keys[1];
-				String topic = keys[1];
-				if (target.containsKey(key)) {
-					target.get(key).add(topic);
+				String[] kk = entry.getKey().split(ConstantUtils.Separator.EIGHT);
+				String key = kk[0] + "_" + kk[1];
+				String topic = kk[1];
+				if (targets.containsKey(key)) {
+					targets.get(key).add(topic);
 				} else {
 					Set<String> topics = new HashSet<>();
 					topics.add(topic);
-					target.put(key, topics);
+					targets.put(key, topics);
 				}
 			}
 		}
 
-		Map<String, List<String>> target2 = new HashMap<>();
-		for (Entry<String, Set<String>> entry : target.entrySet()) {
+		Map<String, List<String>> targets2 = new HashMap<>();
+		for (Entry<String, Set<String>> entry : targets.entrySet()) {
 			List<String> topics = new ArrayList<>();
 			for (String topic : entry.getValue()) {
 				topics.add(topic);
 			}
-			target2.put(entry.getKey(), topics);
+			targets2.put(entry.getKey(), topics);
 		}
 
-		return target2.toString();
+		return targets2.toString();
 	}
 
 	/** Get consumer page data from Kafka in topic. */
 	@Override
-	public String getConsumerPage(String search, int iDisplayStart, int iDisplayLength) throws TException {
+	public String getConsumerPage(String search, int iDisplayStart, int iDisplayLength, String clusterAlias) throws TException {
 		Map<String, Set<String>> targets = new HashMap<>();
 		int offset = 0;
-		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : kafkaConsumerOffsets.entrySet()) {
+		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : multiKafkaConsumerOffsets.get(clusterAlias).entrySet()) {
 			String group = entry.getKey().group();
 			String topic = entry.getKey().topicPartition().topic();
 			if (search.length() > 0 && search.equals(group)) {

@@ -15,35 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.service;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+package org.smartloli.kafka.eagle.factory;
 
 /**
- * Kafka & Zookeeper service api.
+ * Test Provider clazz.
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017.
- * 
- *         Update by hexiang 20170216
+ *         Created by Jan 17, 2017
  */
-public interface ClusterService {
-
-	/** Execute zookeeper comand interface */
-	public String execute(String clusterAlias, String cmd, String type);
-
-	/** Get Kafka & Zookeeper interface. */
-	public String get(String clusterAlias, String type);
-
-	/** Get Zookkeeper status interface. */
-	public JSONObject status(String clusterAlias);
-
-	/** Get multi cluster aliass interface. */
-	public JSONArray clusterAliass();
-
-	/** Checked cluster alias is exist interface. */
-	public boolean hasClusterAlias(String clusterAlias);
-
+public class TestKeProvider {
+	public static void main(String[] args) {
+		KeService keService = new KeFactory().create();
+		System.out.println(keService.read("cluster1_20170221"));
+	}
 }

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
- * Providing RPC services inside access to offset in kafka.
+ * Providing rpc services inside access to offset in kafka.
  * 
  * @author smartloli.
  *
@@ -38,7 +38,6 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 public class RpcServer {
 	private static Logger LOG = LoggerFactory.getLogger(RpcServer.class);
 
-	/** Rpc server start method. */
 	private void start(int port) throws TTransportException {
 		TNonblockingServerSocket socket = new TNonblockingServerSocket(port);
 		final KafkaOffsetServer.Processor processor = new KafkaOffsetServer.Processor(new KafkaOffsetServerImpl());
@@ -46,7 +45,7 @@ public class RpcServer {
 		/**
 		 * Binary coded format efficient, intensive data transmission, The use
 		 * of non blocking mode of transmission, according to the size of the
-		 * block, similar to the Java of NIO.
+		 * block, similar to the Java of NIO
 		 */
 		arg.protocolFactory(new TCompactProtocol.Factory());
 		arg.transportFactory(new TFramedTransport.Factory());
@@ -55,7 +54,6 @@ public class RpcServer {
 		server.serve();
 	}
 
-	/** Start Rpc server main enter method. */
 	public static void main(String[] args) {
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		if ("kafka".equals(formatter)) {

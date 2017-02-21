@@ -58,12 +58,14 @@ public class KafkaOffsetGetter extends Thread {
 	/** Consumer offsets in kafka topic. */
 	private final static String CONSUMER_OFFSET_TOPIC = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
 	/** Store consumer offset in memory. */
-	protected static Map<GroupTopicPartition, OffsetAndMetadata> kafkaConsumerOffsets = new ConcurrentHashMap<>();
-	/** Store active consumer in memory. */
-	protected static Map<String, Boolean> kafkaActiveConsumers = new ConcurrentHashMap<>();
+	private static Map<GroupTopicPartition, OffsetAndMetadata> kafkaConsumerOffsets = new ConcurrentHashMap<>();
+
+	/** Multi cluster information. */
+	protected static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new ConcurrentHashMap<>();
+	protected static Map<String, Map<String, Boolean>> multiKafkaActiveConsumers = new ConcurrentHashMap<>();
 
 	/** ============================ Start Filter ========================= */
-	/** Massive code stealing from kafka.server.OffsetManager */
+	// massive code stealing from kafka.server.OffsetManager
 	private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));
 	private static Field KEY_GROUP_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("group");
 	private static Field KEY_TOPIC_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("topic");
@@ -82,7 +84,7 @@ public class KafkaOffsetGetter extends Thread {
 	private static Field VALUE_METADATA_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("metadata");
 	private static Field VALUE_COMMIT_TIMESTAMP_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("commit_timestamp");
 	/** ============================ End Filter ========================= */
-
+	
 	/** Kafka offset memory in schema. */
 	@SuppressWarnings("serial")
 	private static Map<Integer, KeyAndValueSchemasDomain> OFFSET_SCHEMAS = new HashMap<Integer, KeyAndValueSchemasDomain>() {
@@ -100,7 +102,7 @@ public class KafkaOffsetGetter extends Thread {
 	};
 
 	/** Listening offset thread method. */
-	private static synchronized void startOffsetListener(ConsumerConnector consumerConnector) {
+	private static synchronized void startOffsetListener(String clusterAlias, ConsumerConnector consumerConnector) {
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
 		topicCountMap.put(CONSUMER_OFFSET_TOPIC, new Integer(1));
 		KafkaStream<byte[], byte[]> offsetMsgStream = consumerConnector.createMessageStreams(topicCountMap).get(CONSUMER_OFFSET_TOPIC).get(0);
@@ -115,7 +117,12 @@ public class KafkaOffsetGetter extends Thread {
 						continue;
 					}
 					OffsetAndMetadata commitValue = readMessageValue(ByteBuffer.wrap(offsetMsg.message()));
-					kafkaConsumerOffsets.put(commitKey, commitValue);
+					if (multiKafkaConsumerOffsets.containsKey(clusterAlias)) {
+						multiKafkaConsumerOffsets.get(clusterAlias).put(commitKey, commitValue);
+					} else {
+						kafkaConsumerOffsets.put(commitKey, commitValue);
+						multiKafkaConsumerOffsets.put(clusterAlias, kafkaConsumerOffsets);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -191,12 +198,16 @@ public class KafkaOffsetGetter extends Thread {
 	/** Run method for running thread. */
 	@Override
 	public void run() {
-		String zk = SystemConfigUtils.getProperty("kafka.zk.list");
-		Properties props = new Properties();
-		props.put("group.id", "ke_tmp_group");
-		props.put("zookeeper.connect", zk);
-		props.put("exclude.internal.topics", "false");
-		ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
-		startOffsetListener(consumer);
+		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+		for (String clusterAlias : clusterAliass) {
+			String zk = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
+			Properties props = new Properties();
+			props.put("group.id", "ke_tmp_group");
+			props.put("zookeeper.connect", zk);
+			props.put("exclude.internal.topics", "false");
+			ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
+			startOffsetListener(clusterAlias, consumer);
+		}
 	}
+
 }

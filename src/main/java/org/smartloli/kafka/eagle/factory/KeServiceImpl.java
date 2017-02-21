@@ -15,35 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.service;
+package org.smartloli.kafka.eagle.factory;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import org.smartloli.kafka.eagle.util.CalendarUtils;
+import org.smartloli.kafka.eagle.util.KeDataUtils;
 
 /**
- * Kafka & Zookeeper service api.
+ * Implements KeService all method.
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017.
- * 
- *         Update by hexiang 20170216
+ *         Created by Feb 21, 2017
  */
-public interface ClusterService {
+public class KeServiceImpl implements KeService {
 
-	/** Execute zookeeper comand interface */
-	public String execute(String clusterAlias, String cmd, String type);
+	/** Write dataset to storage. */
+	public void write(String name, String data) {
+		String suffix = CalendarUtils.getCustomDate("yyyyMMdd");
+		KeDataUtils.write(name + "_" + suffix, data);
+	}
 
-	/** Get Kafka & Zookeeper interface. */
-	public String get(String clusterAlias, String type);
-
-	/** Get Zookkeeper status interface. */
-	public JSONObject status(String clusterAlias);
-
-	/** Get multi cluster aliass interface. */
-	public JSONArray clusterAliass();
-
-	/** Checked cluster alias is exist interface. */
-	public boolean hasClusterAlias(String clusterAlias);
+	/** Read dataset from storage. */
+	public String read(String... args) {
+		String name = args[0];
+		return KeDataUtils.read(name);
+	}
 
 }

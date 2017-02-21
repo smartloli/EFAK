@@ -41,18 +41,18 @@ public class TestRpcClient {
 	private final static String ADDR = "127.0.0.1";
 
 	public static void main(String[] args) {
-		System.out.println(getConsumer());
+		System.out.println(getConsumer("cluster1"));
 	}
-	
+
 	/** Get offset from kafka topic. */
-	public static String getOffset() {
+	public static String getOffset(String clusterAlias) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String ret = "";
 		try {
 			transport.open();
-			ret = client.getOffset();
+			ret = client.getOffset(clusterAlias);
 		} catch (Exception e) {
 			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
 		} finally {
@@ -61,15 +61,15 @@ public class TestRpcClient {
 		return ret;
 	}
 
-	/** Get activer consumer from kafka topic.*/
-	public static String getActiverConsumer() {
+	/** Get activer consumer from kafka topic. */
+	public static String getActiverConsumer(String clusterAlias) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String ret = "";
 		try {
 			transport.open();
-			ret = client.getActiverConsumer();
+			ret = client.getActiverConsumer(clusterAlias);
 		} catch (Exception e) {
 			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
 		} finally {
@@ -79,14 +79,14 @@ public class TestRpcClient {
 	}
 
 	/** Get consumer information from kafka topic. */
-	public static String getConsumer() {
+	public static String getConsumer(String clusterAlias) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String ret = "";
 		try {
 			transport.open();
-			ret = client.getConsumer();
+			ret = client.getConsumer(clusterAlias);
 		} catch (Exception e) {
 			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
 		} finally {
@@ -94,5 +94,5 @@ public class TestRpcClient {
 		}
 		return ret;
 	}
-	
+
 }
