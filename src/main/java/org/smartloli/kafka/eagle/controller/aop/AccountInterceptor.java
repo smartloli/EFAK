@@ -27,7 +27,7 @@ import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
 /**
- * Handler url request and check whether has logined .
+ * Handler url request and check whether has session .
  *
  * @author smartloli.
  *

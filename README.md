@@ -48,3 +48,11 @@ Please see the [Kafka Eagle Manual](https://ke.smartloli.org) for for more infor
 The Kafka Eagle is released under the Apache License and we welcome any contributions within this license. Any pull request is welcome and will be reviewed and merged as quickly as possible.
 
 Since this is an open source tool, please comply with the relevant laws and regulations, the use of civilization.
+
+# Committers
+
+Thanks to the following members for maintaining the project:
+
+|Alias |Github|Email|
+|--|--|--|
+|hexiang|[hexian55](https://github.com/hexian55)|hexiang55@gmail.com|
