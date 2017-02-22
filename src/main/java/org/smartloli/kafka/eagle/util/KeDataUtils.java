@@ -38,27 +38,6 @@ public class KeDataUtils {
 
 	private final static Logger LOG = LoggerFactory.getLogger(KeDataUtils.class);
 
-	/** Write dataset to storage. */
-	public static void write(String name, String data) {
-		try {
-			String osName = System.getProperties().getProperty("os.name");
-			String root = System.getProperty("user.dir");
-			String pathname = "";
-			if (osName.contains("Mac") || osName.contains("Win")) {
-				pathname = root + "/src/main/resources/" + name + ".ke";
-			} else {
-				pathname = root + "/data/" + name + ".ke";
-			}
-			File f = new File(pathname);
-			if (!f.exists()) {
-				f.createNewFile();
-			}
-			Files.append(EncryptUtils.encode(data) + "\r\n", f, Charsets.UTF_8);
-		} catch (Exception ex) {
-			LOG.error("Write dataset to kafka eagle storage has error,msg is " + ex.getMessage());
-		}
-	}
-
 	/** Read dataset from storage. */
 	public static String read(String name) {
 		List<String> target = new ArrayList<>();
@@ -78,8 +57,29 @@ public class KeDataUtils {
 		} catch (Exception ex) {
 			LOG.error("read dataset to kafka eagle storage has error,msg is " + ex.getMessage());
 		}
-
+	
 		return target.toString();
+	}
+
+	/** Write dataset to storage. */
+	public static void write(String name, String data) {
+		try {
+			String osName = System.getProperties().getProperty("os.name");
+			String root = System.getProperty("user.dir");
+			String pathname = "";
+			if (osName.contains("Mac") || osName.contains("Win")) {
+				pathname = root + "/src/main/resources/" + name + ".ke";
+			} else {
+				pathname = root + "/data/" + name + ".ke";
+			}
+			File f = new File(pathname);
+			if (!f.exists()) {
+				f.createNewFile();
+			}
+			Files.append(EncryptUtils.encode(data) + "\r\n", f, Charsets.UTF_8);
+		} catch (Exception ex) {
+			LOG.error("Write dataset to kafka eagle storage has error,msg is " + ex.getMessage());
+		}
 	}
 
 }

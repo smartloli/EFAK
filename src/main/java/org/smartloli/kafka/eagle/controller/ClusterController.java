@@ -170,6 +170,93 @@ public class ClusterController {
 		}
 	}
 
+	/** Change cluster viewer address. */
+	@RequestMapping(value = "/cluster/info/{clusterAlias}/change", method = RequestMethod.GET)
+	public ModelAndView clusterCutAjax(@PathVariable("clusterAlias") String clusterAlias, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+		response.setContentType("text/html;charset=utf-8");
+		response.setCharacterEncoding("utf-8");
+		response.setHeader("Charset", "utf-8");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Content-Encoding", "gzip");
+	
+		if (!clusterService.hasClusterAlias(clusterAlias)) {
+			return new ModelAndView("redirect:/error/404");
+		} else {
+			session.removeAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS);
+			session.setAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS, clusterAlias);
+			return new ModelAndView("redirect:/");
+		}
+	}
+
+	/** Get multicluster information. */
+	@RequestMapping(value = "/cluster/info/multicluster/ajax", method = RequestMethod.GET)
+	public void multiClusterAjax(HttpServletResponse response, HttpServletRequest request) {
+		response.setContentType("text/html;charset=utf-8");
+		response.setCharacterEncoding("utf-8");
+		response.setHeader("Charset", "utf-8");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Content-Encoding", "gzip");
+	
+		String aoData = request.getParameter("aoData");
+		JSONArray params = JSON.parseArray(aoData);
+		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+		String search = "";
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
+			} else if ("sSearch".equals(param.getString("name"))) {
+				search = param.getString("value");
+			}
+		}
+	
+		JSONArray clusterAliass = clusterService.clusterAliass();
+		int offset = 0;
+		JSONArray aaDatas = new JSONArray();
+		for (Object object : clusterAliass) {
+			JSONObject cluster = (JSONObject) object;
+			if (search.length() > 0 && cluster.getString("clusterAlias").contains(search)) {
+				JSONObject target = new JSONObject();
+				target.put("id", cluster.getInteger("id"));
+				target.put("clusterAlias", cluster.getString("clusterAlias"));
+				target.put("zkhost", cluster.getString("zkhost"));
+				target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='btn btn-primary btn-xs'>Change</a>");
+				aaDatas.add(target);
+			} else if (search.length() == 0) {
+				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+					JSONObject target = new JSONObject();
+					target.put("id", cluster.getInteger("id"));
+					target.put("clusterAlias", cluster.getString("clusterAlias"));
+					target.put("zkhost", cluster.getString("zkhost"));
+					target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='btn btn-primary btn-xs'>Change</a>");
+					aaDatas.add(target);
+				}
+				offset++;
+			}
+		}
+	
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", clusterAliass.size());
+		target.put("iTotalDisplayRecords", clusterAliass.size());
+		target.put("aaData", aaDatas);
+		try {
+			byte[] output = GzipUtils.compressToByte(target.toJSONString());
+			response.setContentLength(output.length);
+			OutputStream out = response.getOutputStream();
+			out.write(output);
+	
+			out.flush();
+			out.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	/** Get zookeeper client whether live data by ajax. */
 	@RequestMapping(value = "/cluster/zk/islive/ajax", method = RequestMethod.GET)
 	public void zkCliLiveAjax(HttpServletResponse response, HttpServletRequest request) {
@@ -220,93 +307,6 @@ public class ClusterController {
 			out.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
-	}
-
-	/** Get multicluster information. */
-	@RequestMapping(value = "/cluster/info/multicluster/ajax", method = RequestMethod.GET)
-	public void getMultiClusterAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
-		String aoData = request.getParameter("aoData");
-		JSONArray params = JSON.parseArray(aoData);
-		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
-		String search = "";
-		for (Object object : params) {
-			JSONObject param = (JSONObject) object;
-			if ("sEcho".equals(param.getString("name"))) {
-				sEcho = param.getIntValue("value");
-			} else if ("iDisplayStart".equals(param.getString("name"))) {
-				iDisplayStart = param.getIntValue("value");
-			} else if ("iDisplayLength".equals(param.getString("name"))) {
-				iDisplayLength = param.getIntValue("value");
-			} else if ("sSearch".equals(param.getString("name"))) {
-				search = param.getString("value");
-			}
-		}
-
-		JSONArray clusterAliass = clusterService.clusterAliass();
-		int offset = 0;
-		JSONArray aaDatas = new JSONArray();
-		for (Object object : clusterAliass) {
-			JSONObject cluster = (JSONObject) object;
-			if (search.length() > 0 && search.contains(cluster.getString("clusterAlias"))) {
-				JSONObject target = new JSONObject();
-				target.put("id", cluster.getInteger("id"));
-				target.put("clusterAlias", cluster.getString("clusterAlias"));
-				target.put("zkhost", cluster.getString("zkhost"));
-				target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='btn btn-primary btn-xs'>Change</a>");
-				aaDatas.add(target);
-			} else if (search.length() == 0) {
-				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
-					JSONObject target = new JSONObject();
-					target.put("id", cluster.getInteger("id"));
-					target.put("clusterAlias", cluster.getString("clusterAlias"));
-					target.put("zkhost", cluster.getString("zkhost"));
-					target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='btn btn-primary btn-xs'>Change</a>");
-					aaDatas.add(target);
-				}
-				offset++;
-			}
-		}
-
-		JSONObject target = new JSONObject();
-		target.put("sEcho", sEcho);
-		target.put("iTotalRecords", clusterAliass.size());
-		target.put("iTotalDisplayRecords", clusterAliass.size());
-		target.put("aaData", aaDatas);
-		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	/** Change cluster viewer address. */
-	@RequestMapping(value = "/cluster/info/{clusterAlias}/change", method = RequestMethod.GET)
-	public ModelAndView changeClusterAjax(@PathVariable("clusterAlias") String clusterAlias, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
-		if (!clusterService.hasClusterAlias(clusterAlias)) {
-			return new ModelAndView("redirect:/error/404");
-		} else {
-			session.removeAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS);
-			session.setAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS, clusterAlias);
-			return new ModelAndView("redirect:/");
 		}
 	}
 

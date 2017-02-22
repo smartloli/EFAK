@@ -37,24 +37,16 @@ public class EncryptUtils {
 	private static final String ALGORITHM_DES = "DES/CBC/PKCS5Padding";
 	private final static String KEY = "___KE___";
 
-	/** Encode dataset. */
-	public static String encode(String data) {
-		if (data == null)
-			return null;
-		try {
-			DESKeySpec dks = new DESKeySpec(KEY.getBytes());
-			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-			Key secretKey = keyFactory.generateSecret(dks);
-			Cipher cipher = Cipher.getInstance(ALGORITHM_DES);
-			IvParameterSpec iv = new IvParameterSpec(KEY.getBytes());
-			AlgorithmParameterSpec paramSpec = iv;
-			cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
-			byte[] bytes = cipher.doFinal(data.getBytes());
-			return byte2hex(bytes);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return data;
+	private static String byte2hex(byte[] b) {
+		StringBuilder hs = new StringBuilder();
+		String stmp;
+		for (int n = 0; b != null && n < b.length; n++) {
+			stmp = Integer.toHexString(b[n] & 0XFF);
+			if (stmp.length() == 1)
+				hs.append('0');
+			hs.append(stmp);
 		}
+		return hs.toString().toUpperCase();
 	}
 
 	/** Decode dataset. */
@@ -76,16 +68,24 @@ public class EncryptUtils {
 		}
 	}
 
-	private static String byte2hex(byte[] b) {
-		StringBuilder hs = new StringBuilder();
-		String stmp;
-		for (int n = 0; b != null && n < b.length; n++) {
-			stmp = Integer.toHexString(b[n] & 0XFF);
-			if (stmp.length() == 1)
-				hs.append('0');
-			hs.append(stmp);
+	/** Encode dataset. */
+	public static String encode(String data) {
+		if (data == null)
+			return null;
+		try {
+			DESKeySpec dks = new DESKeySpec(KEY.getBytes());
+			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+			Key secretKey = keyFactory.generateSecret(dks);
+			Cipher cipher = Cipher.getInstance(ALGORITHM_DES);
+			IvParameterSpec iv = new IvParameterSpec(KEY.getBytes());
+			AlgorithmParameterSpec paramSpec = iv;
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
+			byte[] bytes = cipher.doFinal(data.getBytes());
+			return byte2hex(bytes);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return data;
 		}
-		return hs.toString().toUpperCase();
 	}
 
 	private static byte[] hex2byte(byte[] b) {

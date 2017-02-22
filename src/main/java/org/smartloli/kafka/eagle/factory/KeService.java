@@ -26,10 +26,10 @@ package org.smartloli.kafka.eagle.factory;
  */
 public interface KeService {
 
-	/** Write statistics data to storage. */
-	public void write(String name, String data);
-
 	/** Read statistics data from storage. */
 	public String read(String... args);
+
+	/** Write statistics data to storage. */
+	public void write(String name, String data);
 
 }

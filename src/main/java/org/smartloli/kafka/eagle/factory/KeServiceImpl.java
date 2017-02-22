@@ -29,16 +29,16 @@ import org.smartloli.kafka.eagle.util.KeDataUtils;
  */
 public class KeServiceImpl implements KeService {
 
-	/** Write dataset to storage. */
-	public void write(String name, String data) {
-		String suffix = CalendarUtils.getCustomDate("yyyyMMdd");
-		KeDataUtils.write(name + "_" + suffix, data);
-	}
-
 	/** Read dataset from storage. */
 	public String read(String... args) {
 		String name = args[0];
 		return KeDataUtils.read(name);
+	}
+
+	/** Write dataset to storage. */
+	public void write(String name, String data) {
+		String suffix = CalendarUtils.getCustomDate("yyyyMMdd");
+		KeDataUtils.write(name + "_" + suffix, data);
 	}
 
 }
