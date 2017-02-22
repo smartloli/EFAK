@@ -51,7 +51,7 @@ Since this is an open source tool, please comply with the relevant laws and regu
 
 # Committers
 
-Thanks to the following members for maintaining the project:
+Thanks to the following members for maintaining the project.
 
 |Alias |Github |Email |
 |:-- |:-- |:-- |
