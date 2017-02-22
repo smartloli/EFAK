@@ -41,10 +41,12 @@ public class RpcClient {
 	private final static int PORT = SystemConfigUtils.getIntProperty("kafka.eagle.offset.rpc.port");
 	/** Rpc server address. */
 	private final static String ADDR = "127.0.0.1";
+	/** Rpc timeout. */
+	private final static int TIMEOUT = SystemConfigUtils.getIntProperty("kafka.eagle.offset.rpc.timeout");
 
 	/** Get consumer offset from Rpc server. */
 	public static String getOffset(String clusterAlias) {
-		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
+		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, TIMEOUT));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String target = "";
@@ -61,7 +63,7 @@ public class RpcClient {
 
 	/** Get activer consumer data from Rpc server. */
 	public static String getActiverConsumer(String clusterAlias) {
-		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
+		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, TIMEOUT));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String target = "";
@@ -78,7 +80,7 @@ public class RpcClient {
 
 	/** Get consumer data from Rpc server. */
 	public static String getConsumer(String clusterAlias) {
-		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
+		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, TIMEOUT));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String target = "";
@@ -95,7 +97,7 @@ public class RpcClient {
 
 	/** Get consumer page from Rpc server. */
 	public static String getConsumerPage(PageParamDomain page, String clusterAlias) {
-		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
+		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, TIMEOUT));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String target = "";
