@@ -53,6 +53,7 @@ Since this is an open source tool, please comply with the relevant laws and regu
 
 Thanks to the following members for maintaining the project:
 
-|Alias |Github|Email|
-|--|--|--|
+|Alias |Github |Email |
+|:-- |:-- |:-- |
+|smartloli|[smartloli](https://github.com/smartloli)|smartloli.org@gmail.com|
 |hexiang|[hexian55](https://github.com/hexian55)|hexiang55@gmail.com|
