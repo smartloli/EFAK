@@ -66,7 +66,7 @@ import scala.collection.Seq;
  * @author smartloli.
  *
  *         Created by Jan 18, 2017.
- *         
+ * 
  *         Update by hexiang 20170216
  * 
  * @see org.smartloli.kafka.eagle.factory.KafkaService
@@ -482,13 +482,13 @@ public class KafkaServiceImpl implements KafkaService {
 		ZkClient zkc = zkPool.getZkClient(clusterAlias);
 		if (zkc != null) {
 			target.put("live", true);
-			target.put("list", SystemConfigUtils.getProperty(clusterAlias+".zk.list"));
+			target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
 		} else {
 			target.put("live", false);
-			target.put("list", SystemConfigUtils.getProperty(clusterAlias+".zk.list"));
+			target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
 		}
 		if (zkc != null) {
-			zkPool.release(clusterAlias,zkc);
+			zkPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
 		return target;
@@ -506,7 +506,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 *            Replic numbers.
 	 * @return Map.
 	 */
-	public Map<String, Object> create(String clusterAlias,String topicName, String partitions, String replic) {
+	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic) {
 		Map<String, Object> targets = new HashMap<String, Object>();
 		int brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias)).size();
 		if (Integer.parseInt(replic) > brokers) {
@@ -514,7 +514,7 @@ public class KafkaServiceImpl implements KafkaService {
 			targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
 			return targets;
 		}
-		String zks = SystemConfigUtils.getProperty("kafka.zk.list");
+		String zks = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
 		String[] options = new String[] { "--create", "--zookeeper", zks, "--partitions", partitions, "--topic", topicName, "--replication-factor", replic };
 		TopicCommand.main(options);
 		targets.put("status", "success");
@@ -529,7 +529,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 * @return List
 	 * @see org.smartloli.kafka.eagle.domain.MetadataDomain
 	 */
-	public List<MetadataDomain> findLeader(String clusterAlias,String topic) {
+	public List<MetadataDomain> findLeader(String clusterAlias, String topic) {
 		List<MetadataDomain> targets = new ArrayList<>();
 
 		SimpleConsumer consumer = null;
@@ -560,7 +560,7 @@ public class KafkaServiceImpl implements KafkaService {
 		for (TopicMetadata item : topicsMeta) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
 				MetadataDomain metadata = new MetadataDomain();
-				metadata.setIsr(geyReplicasIsr(clusterAlias,topic, part.partitionId()));
+				metadata.setIsr(geyReplicasIsr(clusterAlias, topic, part.partitionId()));
 				metadata.setLeader(part.leader() == null ? -1 : part.leader().id());
 				metadata.setPartitionId(part.partitionId());
 				List<Integer> replicases = new ArrayList<>();
