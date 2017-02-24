@@ -68,6 +68,14 @@ public class TopicController {
 		return mav;
 	}
 
+	/** Topic message viewer. */
+	@RequestMapping(value = "/topic/message", method = RequestMethod.GET)
+	public ModelAndView topicMessageView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/topic/msg");
+		return mav;
+	}
+
 	/** Topic list viewer. */
 	@RequestMapping(value = "/topic/list", method = RequestMethod.GET)
 	public ModelAndView topicListView(HttpSession session) {

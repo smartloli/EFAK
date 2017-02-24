@@ -30,9 +30,11 @@
 					class="fa fa-fw fa-caret-down"></i></a>
 				<ul id="demo" class="collapse">
 					<li id="navbar_create"><a href="/ke/topic/create"><i
-							class="fa fa-plus-square-o fa-fw"></i> Create</a></li>
+							class="fa fa-edit fa-fw"></i> Create</a></li>
 					<li id="navbar_list"><a href="/ke/topic/list"><i
 							class="fa fa-table fa-fw"></i> List</a></li>
+					<li id="navbar_list"><a href="/ke/topic/message"><i
+							class="fa fa-file-text fa-fw"></i> Message</a></li>
 				</ul></li>
 			<li id="navbar_consumers"><a href="/ke/consumers"><i
 					class="fa fa-fw fa-users"></i> Consumers</a></li>

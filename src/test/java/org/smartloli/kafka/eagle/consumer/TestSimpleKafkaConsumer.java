@@ -49,7 +49,7 @@ import kafka.message.MessageAndOffset;
  *         Created by Mar 14, 2016
  */
 public class TestSimpleKafkaConsumer extends Thread {
-	private static Logger log = LoggerFactory.getLogger(TestSimpleKafkaConsumer.class);
+	private static Logger LOG = LoggerFactory.getLogger(TestSimpleKafkaConsumer.class);
 	private List<HostsDomain> m_replicaBrokers = new ArrayList<HostsDomain>();
 	private static int buff_size = 64 * 1024;
 	private static int fetch_size = 1000 * 1000 * 1000;
@@ -67,23 +67,23 @@ public class TestSimpleKafkaConsumer extends Thread {
 	public void run() {
 		List<HostsDomain> seeds = new ArrayList<>();
 		HostsDomain host = new HostsDomain();
-		host.setHost("slave01");
-		host.setPort(9094);
+		host.setHost("master");
+		host.setPort(9092);
 		seeds.add(host);
 		HostsDomain host1 = new HostsDomain();
 		host1.setHost("slave01");
-		host1.setPort(9095);
+		host1.setPort(9092);
 		seeds.add(host1);
 		long a_readOffset = 10L;
 
-		consumer(0, "ke_test1", seeds, a_readOffset);
+		consumer(0, "mf.ip_login", seeds, a_readOffset);
 	}
 
 	public static String consumer(int _partition, String _topic, List<HostsDomain> seeds, long a_readOffset) {
 		String msg = "";
 		TestSimpleKafkaConsumer example = new TestSimpleKafkaConsumer();
 		// Max read number
-		long maxReads = 1L;
+		long maxReads = 3L;
 		// To subscribe to the topic
 		String topic = _topic;
 		// Find partition
@@ -91,7 +91,7 @@ public class TestSimpleKafkaConsumer extends Thread {
 		try {
 			msg = example.run(maxReads, topic, partition, seeds, a_readOffset);
 		} catch (Exception e) {
-			log.error("[SimapleConsumer.consumer] Oops:" + e);
+			LOG.error("[SimapleConsumer.consumer] Oops:" + e);
 			e.printStackTrace();
 		}
 		return msg;
@@ -101,11 +101,11 @@ public class TestSimpleKafkaConsumer extends Thread {
 		// Get point topic partition's meta
 		PartitionMetadata metadata = findLeader(a_seedBrokers, a_topic, a_partition);
 		if (metadata == null) {
-			log.error("[SimpleKafkaConsumer.run()] - Can't find metadata for Topic and Partition. Exiting");
+			LOG.error("[SimpleKafkaConsumer.run()] - Can't find metadata for Topic and Partition. Exiting");
 			return null;
 		}
 		if (metadata.leader() == null) {
-			log.error("[SimpleKafkaConsumer.run()] - Can't find Leader for Topic and Partition. Exiting");
+			LOG.error("[SimpleKafkaConsumer.run()] - Can't find Leader for Topic and Partition. Exiting");
 			return null;
 		}
 		String leadBroker = metadata.leader().host();
@@ -132,7 +132,7 @@ public class TestSimpleKafkaConsumer extends Thread {
 				numErrors++;
 				// Something went wrong!
 				short code = fetchResponse.errorCode(a_topic, a_partition);
-				log.error("[SimpleKafkaConsumer.run()] - Error fetching data from the Broker:" + leadBroker + " Reason: " + code);
+				LOG.error("[SimpleKafkaConsumer.run()] - Error fetching data from the Broker:" + leadBroker + ":" + a_port + " Reason: " + code);
 				if (numErrors > 5)
 					break;
 				if (code == ErrorMapping.OffsetOutOfRangeCode()) {
@@ -152,7 +152,7 @@ public class TestSimpleKafkaConsumer extends Thread {
 			for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(a_topic, a_partition)) {
 				long currentOffset = messageAndOffset.offset();
 				if (currentOffset < readOffset) {
-					log.info("[SimpleKafkaConsumer.run()] - Found an old offset: " + currentOffset + " Expecting: " + readOffset);
+					LOG.info("[SimpleKafkaConsumer.run()] - Found an old offset: " + currentOffset + " Expecting: " + readOffset);
 					continue;
 				}
 
@@ -188,7 +188,7 @@ public class TestSimpleKafkaConsumer extends Thread {
 		OffsetResponse response = consumer.getOffsetsBefore(request);
 
 		if (response.hasError()) {
-			log.info("[SimpleKafkaConsumer.getLastOffset()] - Error fetching data Offset Data the Broker. Reason: " + response.errorCode(topic, partition));
+			LOG.info("[SimpleKafkaConsumer.getLastOffset()] - Error fetching data Offset Data the Broker. Reason: " + response.errorCode(topic, partition));
 			return 0;
 		}
 		long[] offsets = response.offsets(topic, partition);
@@ -252,7 +252,7 @@ public class TestSimpleKafkaConsumer extends Thread {
 					}
 				}
 			} catch (Exception e) {
-				log.error("Error communicating with Broker [" + seed + "] to find Leader for [" + a_topic + ", " + a_partition + "] Reason: " + e);
+				LOG.error("Error communicating with Broker [" + seed + "] to find Leader for [" + a_topic + ", " + a_partition + "] Reason: " + e);
 			} finally {
 				if (consumer != null)
 					consumer.close();
