@@ -53,51 +53,11 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-filter fa-fw"></i> Condition
+							<i class="fa fa-tasks fa-fw"></i> Kafka Query SQL
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div class="form-group">
-								<label>Type (*)</label> <input id="ke_condition"
-									name="ke_condition" class="form-control" maxlength=50 value="1"><input
-									id="ke_conditions" name="ke_conditions" type="hidden">
-								<label for="inputError" class="control-label text-danger"><i
-									class="fa fa-info-circle"></i> Select the condition you need to
-									query .</label>
-							</div>
-							<div id="ke_customer_filter">
-								<div class="form-group">
-									<label>Topic Name (*)</label> <input id="ke_topic"
-										name="ke_topic" class="form-control" maxlength=50 value="">
-									<label for="inputError" class="control-label text-danger"><i
-										class="fa fa-info-circle"></i> Write the topic you need to
-										query .</label>
-								</div>
-								<div class="form-group">
-									<label>Partitions (*)</label> <input id="ke_topic_lag"
-										name="ke_topic_lag" class="form-control" maxlength=50
-										value="0,1,2,3,4,5"> <label for="inputError"
-										class="control-label text-danger"><i
-										class="fa fa-info-circle"></i> Setting the topic partitions,
-										such as "0,1,2,3,4,5" .</label>
-								</div>
-								<div class="form-group">
-									<label>Offsets (*)</label> <input id="ke_topic_lag"
-										name="ke_topic_lag" class="form-control" maxlength=50
-										value="0,10"> <label for="inputError"
-										class="control-label text-danger"><i
-										class="fa fa-info-circle"></i> Setting the topic offset you
-										need to query, start and end offset you can write like this
-										"0,10" . Query maximum record cannot exceed 5000 .</label>
-								</div>
-								<button type="submit" class="btn btn-success">Query</button>
-								<div id="alert_mssage" style="display: none"
-									class="alert alert-danger">
-									<label>Oops! Please make some changes . (*) is required
-										.</label>
-								</div>
-							</div>
 							<div id="ke_sql_query">
 								<form>
 									<textarea id="code" name="code"></textarea>

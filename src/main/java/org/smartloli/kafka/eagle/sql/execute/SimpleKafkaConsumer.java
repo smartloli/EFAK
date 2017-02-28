@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.consumer;
+package org.smartloli.kafka.eagle.sql.execute;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.domain.HostsDomain;
+import org.smartloli.kafka.eagle.domain.KafkaSqlDomain;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -51,41 +52,30 @@ import kafka.message.MessageAndOffset;
  *
  *         Created by Mar 14, 2016
  */
-public class TestSimpleKafkaConsumer extends Thread {
-	private static Logger LOG = LoggerFactory.getLogger(TestSimpleKafkaConsumer.class);
+public class SimpleKafkaConsumer {
+	private static Logger LOG = LoggerFactory.getLogger(SimpleKafkaConsumer.class);
 	private List<HostsDomain> m_replicaBrokers = new ArrayList<HostsDomain>();
 	private static int buff_size = 64 * 1024;
 	private static int fetch_size = 1000 * 1000 * 1000;
 	private static int timeout = 100000;
 	private static int maxSize = 5000;
 
-	public TestSimpleKafkaConsumer() {
+	public SimpleKafkaConsumer() {
 		m_replicaBrokers = new ArrayList<HostsDomain>();
 	}
 
-	public static void main(String[] args) {
-		new TestSimpleKafkaConsumer().start();
-	}
-
-	@Override
-	public void run() {
-		List<HostsDomain> seeds = new ArrayList<>();
-		HostsDomain host = new HostsDomain();
-		host.setHost("master");
-		host.setPort(9092);
-		seeds.add(host);
-		HostsDomain host1 = new HostsDomain();
-		host1.setHost("slave01");
-		host1.setPort(9092);
-		seeds.add(host1);
-
-		JSONArray topics = consumer(0, "mf.ip_login", seeds);
-		System.out.println(topics.size());
+	public static List<JSONArray> start(KafkaSqlDomain kafkaSql) {
+		List<JSONArray> messages = new ArrayList<>();
+		List<HostsDomain> seeds = kafkaSql.getSeeds();
+		for (int partition : kafkaSql.getPartition()) {
+			messages.add(consumer(partition, kafkaSql.getTableName(), seeds));
+		}
+		return messages;
 	}
 
 	public static JSONArray consumer(int _partition, String _topic, List<HostsDomain> seeds) {
 		JSONArray msg = null;
-		TestSimpleKafkaConsumer example = new TestSimpleKafkaConsumer();
+		SimpleKafkaConsumer example = new SimpleKafkaConsumer();
 		// Max read number
 		long maxReads = 3L;
 		// To subscribe to the topic
@@ -168,7 +158,6 @@ public class TestSimpleKafkaConsumer extends Thread {
 				byte[] bytes = new byte[payload.limit()];
 				payload.get(bytes);
 				JSONObject topic = new JSONObject();
-				topic.put("topic", a_topic);
 				topic.put("partition", a_partition);
 				topic.put("offset", messageAndOffset.offset());
 				topic.put("msg", new String(bytes, "UTF-8"));

@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.data.Stat;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.domain.BrokersDomain;
 import org.smartloli.kafka.eagle.domain.PageParamDomain;
 import org.smartloli.kafka.eagle.domain.HostsDomain;
+import org.smartloli.kafka.eagle.domain.KafkaSqlDomain;
 import org.smartloli.kafka.eagle.domain.MetadataDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.domain.PartitionsDomain;
@@ -589,6 +592,55 @@ public class KafkaServiceImpl implements KafkaService {
 			targets.add(host);
 		}
 		return targets;
+	}
+
+	/** Convert query sql to object. */
+	public KafkaSqlDomain parseSql(String clusterAlias, String sql) {
+		return segments(clusterAlias, prepare(sql));
+	}
+
+	private String prepare(String sql) {
+		sql = sql.trim();
+		sql = sql.toLowerCase();
+		sql = sql.replaceAll("\\s+", " ");
+		return sql;
+	}
+
+	private KafkaSqlDomain segments(String clusterAlias, String sql) {
+		KafkaSqlDomain kafkaSql = new KafkaSqlDomain();
+		kafkaSql.setSql(sql);
+		if (sql.contains("and")) {
+			sql = sql.split("and")[0];
+		} else if (sql.contains("group by")) {
+			sql = sql.split("group")[0];
+		} else if (sql.contains("limit")) {
+			sql = sql.split("limit")[0];
+		}
+		kafkaSql.getSchema().put("partition", "integer");
+		kafkaSql.getSchema().put("offset", "bigint");
+		kafkaSql.getSchema().put("msg", "varchar");
+		if (!sql.startsWith("select")) {
+			kafkaSql.setStatus(false);
+			return kafkaSql;
+		} else {
+			kafkaSql.setStatus(true);
+			Matcher matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(sql);
+			if (matcher.find()) {
+				kafkaSql.setTableName(matcher.group(1).trim().replaceAll("\"", ""));
+				if (matcher.group(2).trim().startsWith("\"partition\"")) {
+					String[] columns = matcher.group(2).trim().split("in")[1].replace("(", "").replace(")", "").trim().split(",");
+					for (String column : columns) {
+						try {
+							kafkaSql.getPartition().add(Integer.parseInt(column));
+						} catch (Exception e) {
+							LOG.error("Parse parition[" + column + "] has error,msg is " + e.getMessage());
+						}
+					}
+				}
+			}
+			kafkaSql.setSeeds(getBrokers(clusterAlias));
+		}
+		return kafkaSql;
 	}
 
 }

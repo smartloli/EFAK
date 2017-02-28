@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.domain.PageParamDomain;
+import org.smartloli.kafka.eagle.domain.KafkaSqlDomain;
 import org.smartloli.kafka.eagle.domain.MetadataDomain;
 import org.smartloli.kafka.eagle.domain.OffsetZkDomain;
 
@@ -70,4 +71,7 @@ public interface KafkaService {
 
 	/** Find leader through topic. */
 	public List<MetadataDomain> findLeader(String clusterAlias, String topic);
+
+	/** Convert query kafka to topic in the sql message for standard sql. */
+	public KafkaSqlDomain parseSql(String clusterAlias,String sql);
 }
