@@ -29,6 +29,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
@@ -272,6 +273,95 @@ public class TopicController {
 			mav.setViewName("redirect:/topic/create/failed");
 		}
 		return mav;
+	}
+
+	/** Logical execute kafka sql. */
+	@RequestMapping(value = "/topic/logical/commit/", method = RequestMethod.GET)
+	public void topicSqlLogicalAjax(@RequestParam String sql, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+		response.setContentType("text/html;charset=utf-8");
+		response.setCharacterEncoding("utf-8");
+		response.setHeader("Charset", "utf-8");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Content-Encoding", "gzip");
+
+		try {
+			String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+			String target = topicService.execute(clusterAlias, sql);
+			JSONObject result = JSON.parseObject(target);
+
+			byte[] output = GzipUtils.compressToByte(result.toJSONString());
+			response.setContentLength(output.length);
+			OutputStream out = response.getOutputStream();
+			out.write(output);
+
+			out.flush();
+			out.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get topic message by ajax. */
+	@RequestMapping(value = "/topic/physics/commit/", method = RequestMethod.GET)
+	public void topicSqlPhysicsAjax(@RequestParam String sql, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+		response.setContentType("text/html;charset=utf-8");
+		response.setCharacterEncoding("utf-8");
+		response.setHeader("Charset", "utf-8");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Content-Encoding", "gzip");
+
+		String aoData = request.getParameter("aoData");
+		JSONArray params = JSON.parseArray(aoData);
+		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
+			}
+		}
+
+		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+
+		String text = topicService.execute(clusterAlias, sql);
+		JSONObject result = JSON.parseObject(text);
+
+		JSONArray topics = JSON.parseArray(result.getString("msg"));
+		JSONArray aaDatas = new JSONArray();
+		int offset = 0;
+		if (topics != null) {
+			for (Object object : topics) {
+				JSONObject topic = (JSONObject) object;
+				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+					JSONObject obj = new JSONObject();
+					for (String key : topic.keySet()) {
+						obj.put(key, topic.get(key));
+					}
+					aaDatas.add(obj);
+				}
+				offset++;
+			}
+		}
+
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", topics.size());
+		target.put("iTotalDisplayRecords", topics.size());
+		target.put("aaData", aaDatas);
+		try {
+			byte[] output = GzipUtils.compressToByte(target.toJSONString());
+			response.setContentLength(output.length);
+			OutputStream out = response.getOutputStream();
+			out.write(output);
+
+			out.flush();
+			out.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 }

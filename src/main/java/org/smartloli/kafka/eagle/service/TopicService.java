@@ -23,7 +23,7 @@ package org.smartloli.kafka.eagle.service;
  * @author smartloli.
  *
  *         Created by Jan 17, 2017.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 public interface TopicService {
@@ -36,5 +36,8 @@ public interface TopicService {
 
 	/** List all the topic under Kafka in partition. */
 	public String list(String clusterAlias);
+
+	/** Execute kafka query sql. */
+	public String execute(String clusterAlias, String sql);
 
 }

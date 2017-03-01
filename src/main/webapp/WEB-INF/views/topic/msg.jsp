@@ -43,8 +43,7 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Filter the
-							desired topic message results based on conditions.</strong>
+						<i class="fa fa-info-circle"></i> Sample SQL query: <strong>SELECT "partition","offset","msg" FROM "KE_Test_Topic_NAME" WHERE "partition" IN (0,1,2) AND "offsets"=10001 limit 10</strong>
 					</div>
 				</div>
 			</div>
@@ -62,7 +61,7 @@
 								<form>
 									<textarea id="code" name="code"></textarea>
 								</form>
-								<button type="submit" class="btn btn-success">Query</button>
+								<a name="run_task" class="btn btn-success">Query</a>
 							</div>
 
 						</div>
@@ -72,6 +71,36 @@
 				<!-- /.col-lg-4 -->
 			</div>
 			<!-- /.row -->
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<i class="fa fa-comments fa-fw"></i> Tasks Job Info
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div>
+								<ul id="result_tab" class="nav nav-tabs">
+									<li class="active"><a href="#log_textarea"
+										data-toggle="tab">Logs</a></li>
+									<li><a href="#result_textarea" data-toggle="tab">Result</a></li>
+								</ul>
+							</div>
+							<div class="tab-content">
+								<div id="log_textarea" class="tab-pane fade in active">
+									<form>
+										<textarea id="job_info" name="job_info"></textarea>
+									</form>
+								</div>
+								<div id="result_textarea" class="tab-pane fade"></div>
+							</div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+			</div>
 		</div>
 		<!-- /#page-wrapper -->
 	</div>

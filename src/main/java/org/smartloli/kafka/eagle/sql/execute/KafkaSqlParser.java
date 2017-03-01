@@ -26,7 +26,9 @@ import org.smartloli.kafka.eagle.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.factory.KafkaService;
 import org.smartloli.kafka.eagle.sql.tool.JSqlUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Pre processing the SQL submitted by the client.
@@ -38,18 +40,48 @@ import com.alibaba.fastjson.JSONArray;
 public class KafkaSqlParser {
 
 	private final static Logger LOG = LoggerFactory.getLogger(KafkaSqlParser.class);
+	private static KafkaService kafkaService = new KafkaFactory().create();
 
 	public static String execute(String clusterAlias, String sql) {
-		String results = "";
+		JSONObject status = new JSONObject();
 		try {
-			KafkaService kafkaService = new KafkaFactory().create();
 			KafkaSqlDomain kafkaSql = kafkaService.parseSql(clusterAlias, sql);
 			LOG.info("KafkaSqlParser - SQL[" + kafkaSql.getSql() + "]");
-			List<JSONArray> dataSets = SimpleKafkaConsumer.start(kafkaSql);
-			results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
+			if (kafkaSql.isStatus()) {
+				if (!hasTopic(clusterAlias, kafkaSql.getTableName())) {
+					status.put("error", true);
+					status.put("msg", "ERROR - Topic[" + kafkaSql.getTableName() + "] not exist.");
+				} else {
+					long start = System.currentTimeMillis();
+					List<JSONArray> dataSets = SimpleKafkaConsumer.start(kafkaSql);
+					String results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
+					long end = System.currentTimeMillis();
+					status.put("error", false);
+					status.put("msg", results);
+					status.put("status", "Finished by [" + (end - start) / 1000.0 + "s].");
+				}
+			} else {
+				status.put("error", true);
+				status.put("msg", "ERROR - SQL[" + kafkaSql.getSql() + "] has error,please start with select.");
+			}
 		} catch (Exception e) {
+			status.put("error", true);
+			status.put("msg", e.getMessage());
 			LOG.error("Execute sql to query kafka topic has error,msg is " + e.getMessage());
 		}
-		return results;
+		return status.toJSONString();
 	}
+
+	private static boolean hasTopic(String clusterAlias, String topic) {
+		String topics = kafkaService.getAllPartitions(clusterAlias);
+		JSONArray topicDataSets = JSON.parseArray(topics);
+		for (Object object : topicDataSets) {
+			JSONObject topicDataSet = (JSONObject) object;
+			if (topicDataSet.getString("topic").equals(topic)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

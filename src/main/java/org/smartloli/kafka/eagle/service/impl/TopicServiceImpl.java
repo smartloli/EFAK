@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.factory.KafkaService;
 import org.smartloli.kafka.eagle.service.TopicService;
+import org.smartloli.kafka.eagle.sql.execute.KafkaSqlParser;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,7 +33,7 @@ import org.springframework.stereotype.Service;
  * @author smartloli.
  *
  *         Created by Aug 14, 2016.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 @Service
@@ -42,7 +43,7 @@ public class TopicServiceImpl implements TopicService {
 	private KafkaService kafkaService = new KafkaFactory().create();
 
 	/** Find topic name in all topics. */
-	public boolean hasTopic(String clusterAlias,String topicName) {
+	public boolean hasTopic(String clusterAlias, String topicName) {
 		boolean target = false;
 		JSONArray topicAndPartitions = JSON.parseArray(kafkaService.getAllPartitions(clusterAlias));
 		for (Object topicAndPartition : topicAndPartitions) {
@@ -57,13 +58,18 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	/** Get metadata in topic. */
-	public String metadata(String clusterAlias,String topicName) {
-		return kafkaService.findLeader(clusterAlias,topicName).toString();
+	public String metadata(String clusterAlias, String topicName) {
+		return kafkaService.findLeader(clusterAlias, topicName).toString();
 	}
 
 	/** List all the topic under Kafka in partition. */
 	public String list(String clusterAlias) {
 		return kafkaService.getAllPartitions(clusterAlias);
+	}
+
+	/** Execute kafka execute query sql and viewer topic message. */
+	public String execute(String clusterAlias, String sql) {
+		return KafkaSqlParser.execute(clusterAlias, sql);
 	}
 
 }
