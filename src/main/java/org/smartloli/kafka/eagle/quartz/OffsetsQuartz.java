@@ -63,7 +63,7 @@ public class OffsetsQuartz {
 	private KafkaService kafkaService = new KafkaFactory().create();
 
 	/** Kafka Eagle interface. */
-	//private KeService keService = new KeFactory().create();
+	// private KeService keService = new KeFactory().create();
 
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
@@ -137,8 +137,8 @@ public class OffsetsQuartz {
 		return targets;
 	}
 
-	private static OffsetZkDomain getKafkaOffset(String clusterAlias,String topic, String group, int partition) {
-		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias));
+	private static OffsetZkDomain getKafkaOffset(String clusterAlias, String bootstrapServers, String topic, String group, int partition) {
+		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias, bootstrapServers));
 		OffsetZkDomain targets = new OffsetZkDomain();
 		for (Object object : kafkaOffsets) {
 			JSONObject kafkaOffset = (JSONObject) object;
@@ -195,7 +195,12 @@ public class OffsetsQuartz {
 						long logSize = kafkaService.getLogSize(hosts, topic, partition);
 						OffsetZkDomain offsetZk = null;
 						if ("kafka".equals(formatter)) {
-							offsetZk = getKafkaOffset(clusterAlias,topic, group, partition);
+							String bootstrapServers = "";
+							for (String host : hosts) {
+								bootstrapServers += host + ",";
+							}
+							bootstrapServers = bootstrapServers.substring(0, bootstrapServers.length() - 1);
+							offsetZk = getKafkaOffset(clusterAlias,bootstrapServers, topic, group, partition);
 						} else {
 							offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partition);
 						}

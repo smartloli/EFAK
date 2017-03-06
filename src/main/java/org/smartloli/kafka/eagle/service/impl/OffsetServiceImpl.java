@@ -72,11 +72,16 @@ public class OffsetServiceImpl implements OffsetService {
 	/** Get Kafka logsize from Kafka topic. */
 	private String getKafkaLogSize(String clusterAlias, String topic, String group) {
 		List<String> hosts = getBrokers(clusterAlias, topic, group);
+		String bootstrapServers = "";
+		for (String host : hosts) {
+			bootstrapServers += host + ",";
+		}
+		bootstrapServers = bootstrapServers.substring(0, bootstrapServers.length() - 1);
 		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
 		List<OffsetDomain> targets = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
-			OffsetZkDomain offsetZk = getKafkaOffset(clusterAlias, topic, group, partitionInt);
+			OffsetZkDomain offsetZk = getKafkaOffset(clusterAlias, bootstrapServers, topic, group, partitionInt);
 			OffsetDomain offset = new OffsetDomain();
 			long logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
 			offset.setPartition(partitionInt);
@@ -92,8 +97,8 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get Kafka offset from Kafka topic. */
-	private OffsetZkDomain getKafkaOffset(String clusterAlias, String topic, String group, int partition) {
-		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias));
+	private OffsetZkDomain getKafkaOffset(String clusterAlias, String bootstrapServers, String topic, String group, int partition) {
+		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias, bootstrapServers));
 		OffsetZkDomain targetOffset = new OffsetZkDomain();
 		for (Object kafkaOffset : kafkaOffsets) {
 			JSONObject object = (JSONObject) kafkaOffset;

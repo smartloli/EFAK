@@ -19,10 +19,18 @@ package org.smartloli.kafka.eagle.controller.aop;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import org.smartloli.kafka.eagle.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.factory.KafkaService;
+import org.smartloli.kafka.eagle.ipc.RpcClient;
 import org.smartloli.kafka.eagle.util.ConstantUtils;
 import org.smartloli.kafka.eagle.util.SystemConfigUtils;
 
@@ -35,6 +43,10 @@ import org.smartloli.kafka.eagle.util.SystemConfigUtils;
  */
 public class AccountInterceptor extends HandlerInterceptorAdapter {
 
+	/** Kafka service interface. */
+	private KafkaService kafkaService = new KafkaFactory().create();
+	private int count = 0;
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		try {
@@ -43,6 +55,23 @@ public class AccountInterceptor extends HandlerInterceptorAdapter {
 				String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 				String defaultClusterAlias = clusterAliass[0];
 				request.getSession().setAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
+			}
+			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+			if ("kafka".equals(formatter) && count == 0) {
+				HttpSession session = request.getSession();
+				String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+				String brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+				JSONArray kafkaBrokers = JSON.parseArray(brokers);
+				String bootstrapServers = "";
+				for (Object subObject : kafkaBrokers) {
+					JSONObject kafkaBroker = (JSONObject) subObject;
+					String host = kafkaBroker.getString("host");
+					int port = kafkaBroker.getInteger("port");
+					bootstrapServers += host + ":" + port + ",";
+				}
+				bootstrapServers = bootstrapServers.substring(0, bootstrapServers.length() - 1);
+				RpcClient.system(bootstrapServers);
+				count++;
 			}
 		} catch (Exception e) {
 			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");

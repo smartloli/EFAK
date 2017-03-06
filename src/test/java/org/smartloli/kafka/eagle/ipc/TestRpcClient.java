@@ -45,14 +45,14 @@ public class TestRpcClient {
 	}
 
 	/** Get offset from kafka topic. */
-	public static String getOffset(String clusterAlias) {
+	public static String getOffset(String clusterAlias,String bootstrapServers) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, 30000));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String ret = "";
 		try {
 			transport.open();
-			ret = client.getOffset(clusterAlias);
+			ret = client.getOffset(clusterAlias,bootstrapServers);
 		} catch (Exception e) {
 			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
 		} finally {

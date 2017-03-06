@@ -45,14 +45,14 @@ public class RpcClient {
 	private final static int TIMEOUT = SystemConfigUtils.getIntProperty("kafka.eagle.offset.rpc.timeout");
 
 	/** Get consumer offset from Rpc server. */
-	public static String getOffset(String clusterAlias) {
+	public static String getOffset(String clusterAlias, String bootstrapServers) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, TIMEOUT));
 		TProtocol protocol = new TCompactProtocol(transport);
 		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
 		String target = "";
 		try {
 			transport.open();
-			target = client.getOffset(clusterAlias);
+			target = client.getOffset(clusterAlias, bootstrapServers);
 		} catch (Exception e) {
 			LOG.error("Rpc Client getOffset has error,msg is " + e.getMessage());
 		} finally {
@@ -110,6 +110,21 @@ public class RpcClient {
 			transport.close();
 		}
 		return target;
+	}
+	
+	/** Get consumer system topic from Rpc server. */
+	public static void system(String bootstrapServers) {
+		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, TIMEOUT));
+		TProtocol protocol = new TCompactProtocol(transport);
+		KafkaOffsetServer.Client client = new KafkaOffsetServer.Client(protocol);
+		try {
+			transport.open();
+			client.system(bootstrapServers);
+		} catch (Exception e) {
+			LOG.error("Rpc Client system topic has error,msg is " + e.getMessage());
+		} finally {
+			transport.close();
+		}
 	}
 
 }

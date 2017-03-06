@@ -45,16 +45,9 @@ import kafka.server.GroupTopicPartition;
  */
 public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOffsetServer.Iface {
 
-	/** According to group, topic & partition to get the topic data in Kafka. */
-	@Override
-	public String query(String group, String topic, int partition, String clusterAlias) throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	/** Get offset in Kafka topic. */
 	@Override
-	public String getOffset(String clusterAlias) throws TException {
+	public String getOffset(String clusterAlias,String bootstrapServers) throws TException {
 		JSONArray targets = new JSONArray();
 		Map<String, Boolean> activer = getActiver(clusterAlias);
 		for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : multiKafkaConsumerOffsets.get(clusterAlias).entrySet()) {
@@ -232,6 +225,12 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 			targets2.put(entry.getKey(), topics);
 		}
 		return targets2.toString();
+	}
+
+	@Override
+	public void system(String bootstrapServers) throws TException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
