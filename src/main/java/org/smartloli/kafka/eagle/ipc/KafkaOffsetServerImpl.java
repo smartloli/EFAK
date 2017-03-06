@@ -230,7 +230,6 @@ public class KafkaOffsetServerImpl extends KafkaOffsetGetter implements KafkaOff
 	@Override
 	public void system(String bootstrapServers) throws TException {
 		// TODO Auto-generated method stub
-		
 	}
 
 }
