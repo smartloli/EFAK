@@ -26,6 +26,6 @@ package org.smartloli.kafka.eagle.factory;
  */
 public interface MailService {
 
-	public void send(String... args);
+	public boolean send(String subject, String address, String content, String attachment);
 
 }

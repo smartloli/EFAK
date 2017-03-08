@@ -33,7 +33,7 @@ import kafka.producer.ProducerConfig;
  *
  *         Created by Mar 14, 2016
  */
-public class TestPartitionerProducer {
+public class TestPartitionerProducer8 {
 
 	private static JSONArray dataSets = new JSONArray();
 	static {
@@ -57,7 +57,7 @@ public class TestPartitionerProducer {
 		props.put("metadata.broker.list", "slave01:9094,slave01:9095");
 		props.put("partitioner.class", "org.smartloli.kafka.eagle.consumer.TestSimplePartitioner");
 		Producer<String, String> producer = new Producer<String, String>(new ProducerConfig(props));
-		String topic = "kv2_topic";
+		String topic = "ke_test";
 		int i = 0;
 		for (Object object : dataSets) {
 			String k = "key" + i;

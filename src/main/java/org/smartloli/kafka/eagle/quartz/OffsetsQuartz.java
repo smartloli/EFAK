@@ -97,7 +97,10 @@ public class OffsetsQuartz {
 					if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
 						try {
 							MailProvider provider = new MailFactory();
-							provider.create().send(alarm.getOwners(), "Alarm Lag", "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].");
+							String subject = "Alarm Lag Alert";
+							String address = alarm.getOwners();
+							String content = "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].";
+							provider.create().send(subject, address, content, "");
 						} catch (Exception ex) {
 							LOG.error("Topic[" + alarm.getTopics() + "] Send alarm mail has error,msg is " + ex.getMessage());
 						}
@@ -200,7 +203,7 @@ public class OffsetsQuartz {
 								bootstrapServers += host + ",";
 							}
 							bootstrapServers = bootstrapServers.substring(0, bootstrapServers.length() - 1);
-							offsetZk = getKafkaOffset(clusterAlias,bootstrapServers, topic, group, partition);
+							offsetZk = getKafkaOffset(clusterAlias, bootstrapServers, topic, group, partition);
 						} else {
 							offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partition);
 						}

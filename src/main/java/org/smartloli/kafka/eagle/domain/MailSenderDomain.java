@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.domain;
 
+import java.io.File;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -37,6 +39,15 @@ public class MailSenderDomain {
 	private String subject;
 	private String content;
 	private String[] attachFileNames;
+	private List<File> fileList;
+
+	public List<File> getFileList() {
+		return fileList;
+	}
+
+	public void setFileList(List<File> fileList) {
+		this.fileList = fileList;
+	}
 
 	public Properties getProperties() {
 		Properties p = new Properties();

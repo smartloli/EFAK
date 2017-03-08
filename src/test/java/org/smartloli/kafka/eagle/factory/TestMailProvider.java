@@ -27,6 +27,6 @@ package org.smartloli.kafka.eagle.factory;
 public class TestMailProvider {
 	public static void main(String[] args) {
 		MailProvider provider = new MailFactory();
-		provider.create().send("810371213@qq.com","test alarm","server is aaaaaa");
+		provider.create().send("test alarm", "810371213@qq.com,  1164907115@qq.com", "server is aaaaaa", "");
 	}
 }

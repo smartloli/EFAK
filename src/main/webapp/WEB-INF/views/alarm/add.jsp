@@ -116,7 +116,6 @@
 	<jsp:param value="main/alarm/add.js" name="loader" />
 </jsp:include>
 <script type="text/javascript">
-	//验证提交表单内容
 	function contextFormValid() {
 		var ke_topic_lag = $("#ke_topic_lag").val();
 		var ke_topic_email = $("#ke_topic_email").val();
@@ -144,14 +143,15 @@
 			}, 3000);
 			return false;
 		}
-		var re = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
-		if (!re.test(ke_topic_email)) {
+		var reg = /^((([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6}\, ))*(([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})))$/;
+		if (!reg.test(ke_topic_email)) {
 			$("#alert_mssage").show();
 			setTimeout(function() {
 				$("#alert_mssage").hide()
 			}, 3000);
 			return false;
 		}
+		
 		$('#ke_topic_alarms').val(ke_topic_alarms);
 		$('#ke_group_alarms').val(ke_group_alarms);
 		return true;
