@@ -25,6 +25,10 @@ Kafka is designed to be flexible on how the offsets are managed. Consumer can ch
   
 Each runtime instance of Kafka Eagle can only support a single type of storage format.
 
+# Kafka SQL
+
+Use the SQL statement to query the topic message log, and visualize the results, you can read [Kafka SQL](https://ke.smartloli.org/3.Manuals/9.KafkaSQL.html) to view the syntax.
+
 # Quickstart
 
 Please read [Kafka Eagle Install](https://ke.smartloli.org/2.Install/2.Installing.html) for setting up and running Kafka Eagle.
