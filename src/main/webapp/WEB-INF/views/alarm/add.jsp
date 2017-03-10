@@ -143,7 +143,7 @@
 			}, 3000);
 			return false;
 		}
-		var reg = /^((([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6}\, ))*(([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})))$/;
+		var reg = /^((([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6}\, ))*(([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})))$/;
 		if (!reg.test(ke_topic_email)) {
 			$("#alert_mssage").show();
 			setTimeout(function() {
