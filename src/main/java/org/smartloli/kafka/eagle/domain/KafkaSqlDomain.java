@@ -34,10 +34,28 @@ public class KafkaSqlDomain {
 
 	private List<Integer> partition = new ArrayList<>();
 	private String sql;
+	private String metaSql;
 	private JSONObject schema = new JSONObject();
 	private String tableName;
+	private String topic;
 	private boolean status;
 	private List<HostsDomain> seeds = new ArrayList<>();
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	public String getMetaSql() {
+		return metaSql;
+	}
+
+	public void setMetaSql(String metaSql) {
+		this.metaSql = metaSql;
+	}
 
 	public List<HostsDomain> getSeeds() {
 		return seeds;

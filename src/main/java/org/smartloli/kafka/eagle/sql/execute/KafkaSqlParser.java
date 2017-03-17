@@ -48,7 +48,7 @@ public class KafkaSqlParser {
 			KafkaSqlDomain kafkaSql = kafkaService.parseSql(clusterAlias, sql);
 			LOG.info("KafkaSqlParser - SQL[" + kafkaSql.getSql() + "]");
 			if (kafkaSql.isStatus()) {
-				if (!hasTopic(clusterAlias, kafkaSql.getTableName())) {
+				if (!hasTopic(clusterAlias, kafkaSql)) {
 					status.put("error", true);
 					status.put("msg", "ERROR - Topic[" + kafkaSql.getTableName() + "] not exist.");
 				} else {
@@ -72,12 +72,13 @@ public class KafkaSqlParser {
 		return status.toJSONString();
 	}
 
-	private static boolean hasTopic(String clusterAlias, String topic) {
+	private static boolean hasTopic(String clusterAlias, KafkaSqlDomain kafkaSql) {
 		String topics = kafkaService.getAllPartitions(clusterAlias);
 		JSONArray topicDataSets = JSON.parseArray(topics);
 		for (Object object : topicDataSets) {
 			JSONObject topicDataSet = (JSONObject) object;
-			if (topicDataSet.getString("topic").equals(topic)) {
+			if (kafkaSql.getMetaSql().contains(topicDataSet.getString("topic"))) {
+				kafkaSql.setTopic(topicDataSet.getString("topic"));
 				return true;
 			}
 		}

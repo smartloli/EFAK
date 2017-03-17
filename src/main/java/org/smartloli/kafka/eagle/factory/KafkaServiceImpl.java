@@ -601,13 +601,14 @@ public class KafkaServiceImpl implements KafkaService {
 
 	private String prepare(String sql) {
 		sql = sql.trim();
-		sql = sql.toLowerCase();
 		sql = sql.replaceAll("\\s+", " ");
 		return sql;
 	}
 
 	private KafkaSqlDomain segments(String clusterAlias, String sql) {
 		KafkaSqlDomain kafkaSql = new KafkaSqlDomain();
+		kafkaSql.setMetaSql(sql);
+		sql = sql.toLowerCase();
 		kafkaSql.setSql(sql);
 		if (sql.contains("and")) {
 			sql = sql.split("and")[0];

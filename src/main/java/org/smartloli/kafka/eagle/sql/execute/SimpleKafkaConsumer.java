@@ -68,7 +68,7 @@ public class SimpleKafkaConsumer {
 		List<JSONArray> messages = new ArrayList<>();
 		List<HostsDomain> seeds = kafkaSql.getSeeds();
 		for (int partition : kafkaSql.getPartition()) {
-			messages.add(consumer(partition, kafkaSql.getTableName(), seeds));
+			messages.add(consumer(partition, kafkaSql.getTopic(), seeds));
 		}
 		return messages;
 	}
