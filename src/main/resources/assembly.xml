@@ -15,7 +15,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>src/main/resources</directory>
+			<directory>src/main/resources/conf/</directory>
 			<outputDirectory>/conf</outputDirectory>
 			<includes>
 				<include>system-config.properties</include>
