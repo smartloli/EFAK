@@ -17,8 +17,6 @@
  */
 package org.smartloli.kafka.eagle.factory;
 
-import kafka.admin.TopicCommand;
-
 /**
  * Test Provider clazz.
  * 
@@ -28,12 +26,11 @@ import kafka.admin.TopicCommand;
  */
 public class TestKafkaProvider {
 	public static void main(String[] args) {
-		testGetAllPartitions();
-		String[] options = new String[] { "--alter", "--zookeeper", "slave01:2181","--partitions","6",  "--topic", "KE_TTT_1200" };
-		TopicCommand.main(options);
+		KafkaServiceImpl ksi = new KafkaServiceImpl();
+		System.out.println(ksi.findTopicPartition("cluster1", "ke_test"));
 	}
 
-	private static void testGetAllPartitions() {
+	public static void testGetAllPartitions() {
 		KafkaService kafkaService = new KafkaFactory().create();
 		System.out.println(kafkaService.getAllPartitions("cluster1"));
 	}
