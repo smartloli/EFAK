@@ -42,12 +42,5 @@
 				<include>ke.war</include>
 			</includes>
 		</fileSet>
-		<fileSet>
-			<directory>src/main/resources/plugins/</directory>
-			<outputDirectory>/lib</outputDirectory>
-			<includes>
-				<include>*.jar</include>
-			</includes>
-		</fileSet>
 	</fileSets>
 </assembly>

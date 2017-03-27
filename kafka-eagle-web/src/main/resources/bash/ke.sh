@@ -47,6 +47,8 @@ start()
 	cd $KE_HOME/kms/webapps/ke
 	${JAVA_HOME}/bin/jar -xvf $KE_HOME/kms/webapps/ke.war
 
+	sleep 2
+	
 	for f in $KE_HOME/kms/webapps/ke/WEB-INF/lib/*.jar; do
   		CLASSPATH=${CLASSPATH}:$f;
 	done
