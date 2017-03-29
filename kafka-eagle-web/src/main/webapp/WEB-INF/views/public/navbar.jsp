@@ -18,7 +18,7 @@
 			data-toggle="dropdown"><i class="fa fa-sitemap"></i>
 				${clusterAlias} </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.1.1 </a></li>
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.1.2 </a></li>
 	</ul>
 	<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
 	<div class="collapse navbar-collapse navbar-ex1-collapse">

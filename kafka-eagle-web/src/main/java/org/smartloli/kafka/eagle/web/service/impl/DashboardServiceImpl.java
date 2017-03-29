@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.domain.DashboardDomain;
 import org.smartloli.kafka.eagle.common.util.ConstantUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -42,11 +44,13 @@ import org.springframework.stereotype.Service;
  * @author smartloli.
  *
  *         Created by Aug 12, 2016.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 @Service
 public class DashboardServiceImpl implements DashboardService {
+
+	private final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
@@ -73,10 +77,15 @@ public class DashboardServiceImpl implements DashboardService {
 	private int getKafkaConsumerNumbers(String clusterAlias) {
 		Map<String, List<String>> type = new HashMap<String, List<String>>();
 		Gson gson = new Gson();
-		Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
 		int count = 0;
-		for (Entry<String, List<String>> entry : kafkaConsumers.entrySet()) {
-			count += entry.getValue().size();
+		try {
+			Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
+			for (Entry<String, List<String>> entry : kafkaConsumers.entrySet()) {
+				count += entry.getValue().size();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("Dashboard get kafka consumers from rpc has error,msg is " + e.getMessage());
 		}
 		return count;
 	}
@@ -109,7 +118,7 @@ public class DashboardServiceImpl implements DashboardService {
 
 	/** Get dashboard data. */
 	private String panel(String clusterAlias) {
-		int zks = SystemConfigUtils.getPropertyArray(clusterAlias+".zk.list", ",").length;
+		int zks = SystemConfigUtils.getPropertyArray(clusterAlias + ".zk.list", ",").length;
 		String topciAndPartitions = kafkaService.getAllPartitions(clusterAlias);
 		int topicSize = JSON.parseArray(topciAndPartitions).size();
 		String kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);

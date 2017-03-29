@@ -35,6 +35,7 @@ start()
 	CLASS=org.smartloli.kafka.eagle.core.ipc.RpcServer
 	nohup ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ipc.out 2>&1 < /dev/null & new_agent_pid=$!
 	echo "$new_agent_pid" > $DIALUP_PID
+	echo "RpcServer start successed"
 }
 
 stop()
@@ -42,10 +43,9 @@ stop()
 	 if [ -f $KE_HOME/bin/ipc.pid ];then
                     SPID=`cat $KE_HOME/bin/ipc.pid`
 					  if [ "$SPID" != "" ];then
-                         ${KE_HOME}/kms/bin/shutdown.sh
                          kill -9  $SPID
 						 echo  > $DIALUP_PID
-						 echo "stop success"
+						 echo "RpcServer stop successed"
 					  fi
 	 fi
 }
