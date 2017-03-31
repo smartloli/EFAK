@@ -99,7 +99,8 @@ public class OffsetsQuartz {
 							MailProvider provider = new MailFactory();
 							String subject = "Alarm Lag Alert";
 							String address = alarm.getOwners();
-							String content = "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].";
+							String content = "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is ["
+									+ alarm.getLag() + "].";
 							provider.create().send(subject, address, content, "");
 						} catch (Exception ex) {
 							LOG.error("Topic[" + alarm.getTopics() + "] Send alarm mail has error,msg is " + ex.getMessage());
@@ -184,7 +185,11 @@ public class OffsetsQuartz {
 			if ("kafka".equals(formatter)) {
 				Map<String, List<String>> type = new HashMap<String, List<String>>();
 				Gson gson = new Gson();
-				consumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
+				try {
+					consumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
+				} catch (Exception e) {
+					LOG.error("Get consumer info from RpcClient has error,msg is " + e.getMessage());
+				}
 			} else {
 				consumers = kafkaService.getConsumers(clusterAlias);
 			}

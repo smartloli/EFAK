@@ -35,7 +35,7 @@
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
 						<i class="fa fa-info-circle"></i> <strong>List the
-							current consumers's realtime offsets of topic.</strong>
+							current consumers's application realtime offsets of topic.</strong>
 					</div>
 				</div>
 			</div>
