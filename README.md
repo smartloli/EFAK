@@ -31,7 +31,7 @@ Use the SQL statement to query the topic message log, and visualize the results,
 
 # Quickstart
 
-Please read [Kafka Eagle Install](https://ke.smartloli.org/2.Install/2.Installing.html) for setting up and running Kafka Eagle.
+Please read [Kafka Eagle Install](https://ke.smartloli.org/2.Install/2.Installing.html) for setting up and running Kafka Eagle. It is worth noting that, please use ```chrome``` to access Kafka Eagle.
 
 # Deploy
 
