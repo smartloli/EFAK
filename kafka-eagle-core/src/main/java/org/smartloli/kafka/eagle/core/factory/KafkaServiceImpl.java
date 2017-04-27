@@ -23,10 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.I0Itec.zkclient.ZkClient;
+import org.apache.kafka.common.security.JaasUtils;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import kafka.admin.AdminUtils;
+import kafka.admin.RackAwareMode;
 import kafka.admin.TopicCommand;
 import kafka.api.OffsetRequest;
 import kafka.api.PartitionOffsetRequestInfo;
@@ -448,7 +452,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 */
 	public String geyReplicasIsr(String clusterAlias, String topic, int partitionid) {
 		ZkClient zkc = zkPool.getZkClientSerializer(clusterAlias);
-		Seq<Object> repclicasAndPartition = ZkUtils.apply(zkc, false).getInSyncReplicasForPartition( topic, partitionid);
+		Seq<Object> repclicasAndPartition = ZkUtils.apply(zkc, false).getInSyncReplicasForPartition(topic, partitionid);
 		List<Object> targets = JavaConversions.seqAsJavaList(repclicasAndPartition);
 		if (zkc != null) {
 			zkPool.releaseZKSerializer(clusterAlias, zkc);
@@ -511,9 +515,18 @@ public class KafkaServiceImpl implements KafkaService {
 			targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
 			return targets;
 		}
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		String zks = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
-		String[] options = new String[]{"--create", "--zookeeper", zks, "--partitions", partitions, "--topic", topicName, "--replication-factor", replic};
-		TopicCommand.main(options);
+		if ("kafka".equals(formatter)) {
+			ZkUtils zkUtils = ZkUtils.apply(zks, 30000, 30000, JaasUtils.isZkSecurityEnabled());
+			AdminUtils.createTopic(zkUtils, topicName, Integer.parseInt(partitions), Integer.parseInt(replic), new Properties(), RackAwareMode.Enforced$.MODULE$);
+			if (zkUtils != null) {
+				zkUtils.close();
+			}
+		} else {
+			String[] options = new String[]{"--create", "--zookeeper", zks, "--partitions", partitions, "--topic", topicName, "--replication-factor", replic};
+			TopicCommand.main(options);
+		}
 		targets.put("status", "success");
 		targets.put("info", "Create topic[" + topicName + "] has successed,partitions numbers is [" + partitions + "],replication-factor numbers is [" + replic + "]");
 		return targets;
