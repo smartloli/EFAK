@@ -42,9 +42,9 @@ $(document).ready(function() {
 			}, {
 				"mData" : 'group'
 			}, {
-				"mData" : 'topic'
+				"mData" : 'topics'
 			}, {
-				"mData" : 'consumerNumber'
+				"mData" : 'node'
 			}, {
 				"mData" : 'activeNumber'
 			}  ]
@@ -177,7 +177,6 @@ $(document).ready(function() {
 	var offset = 0;
 	$(document).on('click', 'a[class=link]', function() {
 		var group = $(this).html();
-		console.log("group->" + group);
 		$('#doc_info').modal({
 			backdrop : 'static',
 			keyboard : false
@@ -189,7 +188,7 @@ $(document).ready(function() {
 			transform : 'translateX(-50%) translateY(-50%)'
 		});
 
-		$("#consumer_detail_children").append("<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr><th>ID</th><th>Topic</th><th>Consumering</th></tr></thead></table></div>");
+		$("#consumer_detail_children").append("<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr><th>ID</th><th>Topic</th><th>Consumer Status</th></tr></thead></table></div>");
 		if (offset > 0) {
 			$("#div_children" + (offset - 1)).remove();
 		}

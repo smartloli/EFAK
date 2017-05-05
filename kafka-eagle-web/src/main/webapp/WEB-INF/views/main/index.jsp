@@ -140,7 +140,7 @@ path.link {
 								</div>
 								<div class="col-xs-9 text-right">
 									<div id="consumers_count" class="huge">0</div>
-									<div>Consumers</div>
+									<div>ConsumerGroups</div>
 								</div>
 							</div>
 						</div>

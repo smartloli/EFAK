@@ -20,14 +20,19 @@ package org.smartloli.kafka.eagle.core.factory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.I0Itec.zkclient.ZkClient;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.common.Node;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.security.JaasUtils;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
@@ -41,6 +46,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import kafka.admin.AdminClient;
+import kafka.admin.AdminClient.ConsumerGroupSummary;
+import kafka.admin.AdminClient.ConsumerSummary;
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
 import kafka.admin.TopicCommand;
@@ -49,6 +57,7 @@ import kafka.api.PartitionOffsetRequestInfo;
 import kafka.cluster.BrokerEndPoint;
 import kafka.common.TopicAndPartition;
 import kafka.consumer.ConsumerThreadId;
+import kafka.coordinator.GroupOverview;
 import kafka.javaapi.OffsetResponse;
 import kafka.javaapi.PartitionMetadata;
 import kafka.javaapi.TopicMetadata;
@@ -58,6 +67,7 @@ import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.utils.ZkUtils;
 import scala.Option;
 import scala.Tuple2;
+import scala.collection.Iterator;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 
@@ -532,6 +542,30 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets;
 	}
 
+	/** Delete topic to kafka cluster. */
+	public Map<String, Object> delete(String clusterAlias, String topicName) {
+		Map<String, Object> targets = new HashMap<String, Object>();
+		ZkClient zkc = zkPool.getZkClient(clusterAlias);
+		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		String zks = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
+		if ("kafka".equals(formatter)) {
+			ZkUtils zkUtils = ZkUtils.apply(zks, 30000, 30000, JaasUtils.isZkSecurityEnabled());
+			AdminUtils.deleteTopic(zkUtils, topicName);
+			if (zkUtils != null) {
+				zkUtils.close();
+			}
+		} else {
+			String[] options = new String[]{"--delete", "--zookeeper", zks, "--topic", topicName};
+			TopicCommand.main(options);
+		}
+		targets.put("status", zkc.deleteRecursive(ZkUtils.getTopicPath(topicName)) == true ? "success" : "failed");
+		if (zkc != null) {
+			zkPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return targets;
+	}
+
 	/**
 	 * Find leader through topic.
 	 * 
@@ -601,6 +635,16 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets;
 	}
 
+	private String parseBrokerServer(String clusterAlias) {
+		String brokerServer = "";
+		JSONArray brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias));
+		for (Object object : brokers) {
+			JSONObject broker = (JSONObject) object;
+			brokerServer += broker.getString("host") + ":" + broker.getInteger("port") + ",";
+		}
+		return brokerServer.substring(0, brokerServer.length() - 1);
+	}
+
 	/** Convert query sql to object. */
 	public KafkaSqlDomain parseSql(String clusterAlias, String sql) {
 		return segments(clusterAlias, prepare(sql));
@@ -649,6 +693,155 @@ public class KafkaServiceImpl implements KafkaService {
 			kafkaSql.setSeeds(getBrokers(clusterAlias));
 		}
 		return kafkaSql;
+	}
+
+	/** Get kafka 0.10.x activer topics. */
+	public Set<String> getKafkaActiverTopics(String clusterAlias, String group) {
+		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group);
+		Set<String> topics = new HashSet<>();
+		for (Object object : consumerGroups) {
+			JSONObject consumerGroup = (JSONObject) object;
+			for (Object topicObject : consumerGroup.getJSONArray("topicSub")) {
+				JSONObject topic = (JSONObject) topicObject;
+				if (consumerGroup.getString("owner") != "" || consumerGroup.getString("owner") != null) {
+					topics.add(topic.getString("topic"));
+				}
+			}
+		}
+		return topics;
+	}
+
+	/** Get kafka 0.10.x consumer metadata. */
+	public String getKafkaConsumer(String clusterAlias) {
+		Properties prop = new Properties();
+		JSONArray consumerGroups = new JSONArray();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+		try {
+			AdminClient adminClient = AdminClient.create(prop);
+			scala.collection.immutable.Map<Node, scala.collection.immutable.List<GroupOverview>> opts = adminClient.listAllConsumerGroups();
+			Iterator<Tuple2<Node, scala.collection.immutable.List<GroupOverview>>> groupOverview = opts.iterator();
+			while (groupOverview.hasNext()) {
+				Tuple2<Node, scala.collection.immutable.List<GroupOverview>> tuple = groupOverview.next();
+				String node = tuple._1.host() + ":" + tuple._1.port();
+				Iterator<GroupOverview> groups = tuple._2.iterator();
+				while (groups.hasNext()) {
+					GroupOverview group = groups.next();
+					JSONObject consumerGroup = new JSONObject();
+					String groupId = group.groupId();
+					if (!groupId.contains("kafka.eagle")) {
+						consumerGroup.put("group", groupId);
+						consumerGroup.put("node", node);
+						consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId));
+						consumerGroups.add(consumerGroup);
+					}
+				}
+			}
+			adminClient.close();
+		} catch (Exception e) {
+			LOG.error("Get kafka consumer has error,msg is " + e.getMessage());
+		}
+		return consumerGroups.toJSONString();
+	}
+
+	/** Get kafka 0.10.x consumer metadata. */
+	private JSONArray getKafkaMetadata(String bootstrapServers, String group) {
+		Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		JSONArray consumerGroups = new JSONArray();
+		try {
+			AdminClient adminClient = AdminClient.create(prop);
+			ConsumerGroupSummary cgs = adminClient.describeConsumerGroup(group);
+			Option<scala.collection.immutable.List<ConsumerSummary>> opts = cgs.consumers();
+			Iterator<ConsumerSummary> consumerSummarys = opts.get().iterator();
+			while (consumerSummarys.hasNext()) {
+				ConsumerSummary consumerSummary = consumerSummarys.next();
+				Iterator<TopicPartition> topics = consumerSummary.assignment().iterator();
+				JSONObject topicSub = new JSONObject();
+				JSONArray topicSubs = new JSONArray();
+				while (topics.hasNext()) {
+					JSONObject object = new JSONObject();
+					TopicPartition topic = topics.next();
+					object.put("topic", topic.topic());
+					object.put("partition", topic.partition());
+					topicSubs.add(object);
+				}
+				topicSub.put("owner", consumerSummary.consumerId());
+				topicSub.put("node", consumerSummary.host().replaceAll("/", ""));
+				topicSub.put("topicSub", topicSubs);
+				consumerGroups.add(topicSub);
+			}
+			adminClient.close();
+		} catch (Exception e) {
+			LOG.error("Get kafka consumer metadata has error, msg is " + e.getMessage());
+		}
+		return consumerGroups;
+	}
+
+	/** Get kafka 0.10.x consumer pages. */
+	public String getKafkaActiverSize(String clusterAlias, String group) {
+		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group);
+		int activerCounter = 0;
+		Set<String> topics = new HashSet<>();
+		for (Object object : consumerGroups) {
+			JSONObject consumerGroup = (JSONObject) object;
+			if (consumerGroup.getString("owner") != "" || consumerGroup.getString("owner") != null) {
+				activerCounter++;
+			}
+			for (Object topicObject : consumerGroup.getJSONArray("topicSub")) {
+				JSONObject topic = (JSONObject) topicObject;
+				topics.add(topic.getString("topic"));
+			}
+		}
+		JSONObject activerAndTopics = new JSONObject();
+		activerAndTopics.put("activers", activerCounter);
+		activerAndTopics.put("topics", topics.size());
+		return activerAndTopics.toJSONString();
+	}
+
+	/** Get kafka 0.10.x consumer groups. */
+	public int getKafkaConsumerGroups(String clusterAlias) {
+		Properties prop = new Properties();
+		int counter = 0;
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+		try {
+			AdminClient adminClient = AdminClient.create(prop);
+			scala.collection.immutable.Map<Node, scala.collection.immutable.List<GroupOverview>> opts = adminClient.listAllConsumerGroups();
+			Iterator<Tuple2<Node, scala.collection.immutable.List<GroupOverview>>> groupOverview = opts.iterator();
+			while (groupOverview.hasNext()) {
+				Tuple2<Node, scala.collection.immutable.List<GroupOverview>> tuple = groupOverview.next();
+				Iterator<GroupOverview> groups = tuple._2.iterator();
+				while (groups.hasNext()) {
+					GroupOverview group = groups.next();
+					String groupId = group.groupId();
+					if (!groupId.contains("kafka.eagle")) {
+						counter++;
+					}
+				}
+			}
+			adminClient.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return counter;
+	}
+
+	/** Get kafka 0.10.x consumer topic information. */
+	public Set<String> getKafkaConsumerTopic(String clusterAlias, String group) {
+		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group);
+		Set<String> topics = new HashSet<>();
+		for (Object object : consumerGroups) {
+			JSONObject consumerGroup = (JSONObject) object;
+			for (Object topicObject : consumerGroup.getJSONArray("topicSub")) {
+				JSONObject topic = (JSONObject) topicObject;
+				topics.add(topic.getString("topic"));
+			}
+		}
+		return topics;
+	}
+
+	/** Get kafka 0.10.x consumer group and topic. */
+	public String getKafkaConsumerGroupTopic(String clusterAlias, String group) {
+		return getKafkaMetadata(parseBrokerServer(clusterAlias), group).toJSONString();
 	}
 
 }

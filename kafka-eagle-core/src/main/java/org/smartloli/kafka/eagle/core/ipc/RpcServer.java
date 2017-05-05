@@ -40,7 +40,7 @@ public class RpcServer {
 
 	private void start(int port) throws TTransportException {
 		TNonblockingServerSocket socket = new TNonblockingServerSocket(port);
-		final KafkaOffsetServer.Processor processor = new KafkaOffsetServer.Processor(new KafkaOffsetServerImpl());
+		final OffsetMetadataServer.Processor processor = new OffsetMetadataServer.Processor(new OffsetMetadataServerImpl());
 		THsHaServer.Args arg = new THsHaServer.Args(socket);
 		/**
 		 * Binary coded format efficient, intensive data transmission, The use

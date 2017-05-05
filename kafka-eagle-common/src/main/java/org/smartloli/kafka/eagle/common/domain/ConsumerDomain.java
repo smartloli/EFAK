@@ -17,8 +17,6 @@
  */
 package org.smartloli.kafka.eagle.common.domain;
 
-import java.util.List;
-
 import com.google.gson.Gson;
 
 /**
@@ -32,8 +30,8 @@ public class ConsumerDomain {
 
 	private int id;
 	private String group;
-	private List<String> topic;
-	private int consumerNumber;
+	private int topics;
+	private String node;
 	private int activeNumber;
 
 	public int getActiveNumber() {
@@ -60,20 +58,20 @@ public class ConsumerDomain {
 		this.group = group;
 	}
 
-	public List<String> getTopic() {
-		return topic;
+	public int getTopics() {
+		return topics;
 	}
 
-	public void setTopic(List<String> topic) {
-		this.topic = topic;
+	public void setTopics(int topics) {
+		this.topics = topics;
 	}
 
-	public int getConsumerNumber() {
-		return consumerNumber;
+	public String getNode() {
+		return node;
 	}
 
-	public void setConsumerNumber(int consumerNumber) {
-		this.consumerNumber = consumerNumber;
+	public void setNode(String node) {
+		this.node = node;
 	}
 
 	@Override

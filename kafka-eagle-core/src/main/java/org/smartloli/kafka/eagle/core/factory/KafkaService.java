@@ -19,6 +19,7 @@ package org.smartloli.kafka.eagle.core.factory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.smartloli.kafka.eagle.common.domain.KafkaSqlDomain;
 import org.smartloli.kafka.eagle.common.domain.MetadataDomain;
@@ -69,9 +70,31 @@ public interface KafkaService {
 	/** Use kafka console comand to create topic. */
 	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic);
 
+	/** Use kafka console command to delete topic. */
+	public Map<String, Object> delete(String clusterAlias, String topicName);
+
 	/** Find leader through topic. */
 	public List<MetadataDomain> findLeader(String clusterAlias, String topic);
 
 	/** Convert query kafka to topic in the sql message for standard sql. */
-	public KafkaSqlDomain parseSql(String clusterAlias,String sql);
+	public KafkaSqlDomain parseSql(String clusterAlias, String sql);
+
+	/** Get kafka 0.10.x active consumer group & topics. */
+	public Set<String> getKafkaActiverTopics(String clusterAlias, String group);
+
+	/** Get kafka 0.10.x consumer group & topic information. */
+	public String getKafkaConsumer(String clusterAlias);
+
+	/** Get kafka consumer information pages. */
+	public String getKafkaActiverSize(String clusterAlias, String group);
+
+	/** Get kafka consumer groups. */
+	public int getKafkaConsumerGroups(String clusterAlias);
+
+	/** Get kafka consumer topics. */
+	public Set<String> getKafkaConsumerTopic(String clusterAlias, String group);
+
+	/** Get kafka consumer group & topic. */
+	public String getKafkaConsumerGroupTopic(String clusterAlias, String group);
+
 }

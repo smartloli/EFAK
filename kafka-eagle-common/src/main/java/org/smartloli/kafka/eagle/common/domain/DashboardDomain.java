@@ -28,10 +28,10 @@ import com.google.gson.Gson;
  */
 public class DashboardDomain {
 
-	private int brokers;
-	private int topics;
-	private int zks;
-	private int consumers;
+	private int brokers = 0;
+	private int topics = 0;
+	private int zks = 0;
+	private int consumers = 0;
 
 	public int getBrokers() {
 		return brokers;

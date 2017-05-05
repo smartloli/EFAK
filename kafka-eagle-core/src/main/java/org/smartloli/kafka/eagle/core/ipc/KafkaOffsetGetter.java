@@ -58,8 +58,9 @@ public class KafkaOffsetGetter extends Thread {
 
 	/** Consumer offsets in kafka topic. */
 	private final static String CONSUMER_OFFSET_TOPIC = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
-	/** Store consumer offset in memory. */
-	private static Map<GroupTopicPartition, OffsetAndMetadata> kafkaConsumerOffsets = new ConcurrentHashMap<>();
+	// /** Store consumer offset in memory. */
+	// private static Map<GroupTopicPartition, OffsetAndMetadata>
+	// kafkaConsumerOffsets = new ConcurrentHashMap<>();
 
 	/** Multi cluster information. */
 	protected static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new ConcurrentHashMap<>();
@@ -122,6 +123,7 @@ public class KafkaOffsetGetter extends Thread {
 					if (multiKafkaConsumerOffsets.containsKey(clusterAlias)) {
 						multiKafkaConsumerOffsets.get(clusterAlias).put(commitKey, commitValue);
 					} else {
+						Map<GroupTopicPartition, OffsetAndMetadata> kafkaConsumerOffsets = new ConcurrentHashMap<>();
 						kafkaConsumerOffsets.put(commitKey, commitValue);
 						multiKafkaConsumerOffsets.put(clusterAlias, kafkaConsumerOffsets);
 					}

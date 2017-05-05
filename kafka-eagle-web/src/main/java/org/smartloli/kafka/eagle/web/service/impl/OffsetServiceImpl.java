@@ -18,14 +18,12 @@
 package org.smartloli.kafka.eagle.web.service.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
 
 import org.smartloli.kafka.eagle.common.domain.OffsetDomain;
 import org.smartloli.kafka.eagle.common.domain.OffsetZkDomain;
@@ -72,16 +70,11 @@ public class OffsetServiceImpl implements OffsetService {
 	/** Get Kafka logsize from Kafka topic. */
 	private String getKafkaLogSize(String clusterAlias, String topic, String group) {
 		List<String> hosts = getBrokers(clusterAlias, topic, group);
-		String bootstrapServers = "";
-		for (String host : hosts) {
-			bootstrapServers += host + ",";
-		}
-		bootstrapServers = bootstrapServers.substring(0, bootstrapServers.length() - 1);
 		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
 		List<OffsetDomain> targets = new ArrayList<OffsetDomain>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
-			OffsetZkDomain offsetZk = getKafkaOffset(clusterAlias, bootstrapServers, topic, group, partitionInt);
+			OffsetZkDomain offsetZk = getKafkaOffset(clusterAlias, topic, group, partitionInt);
 			OffsetDomain offset = new OffsetDomain();
 			long logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
 			offset.setPartition(partitionInt);
@@ -97,8 +90,8 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get Kafka offset from Kafka topic. */
-	private OffsetZkDomain getKafkaOffset(String clusterAlias, String bootstrapServers, String topic, String group, int partition) {
-		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias, bootstrapServers));
+	private OffsetZkDomain getKafkaOffset(String clusterAlias, String topic, String group, int partition) {
+		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias));
 		OffsetZkDomain targetOffset = new OffsetZkDomain();
 		for (Object kafkaOffset : kafkaOffsets) {
 			JSONObject object = (JSONObject) kafkaOffset;
@@ -107,12 +100,20 @@ public class OffsetServiceImpl implements OffsetService {
 			int _partition = object.getInteger("partition");
 			long timestamp = object.getLong("timestamp");
 			long offset = object.getLong("offset");
-			String owner = object.getString("owner");
 			if (topic.equals(_topic) && group.equals(_group) && partition == _partition) {
 				targetOffset.setOffset(offset);
-				targetOffset.setOwners(owner);
 				targetOffset.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
 				targetOffset.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
+				JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumerGroupTopic(clusterAlias, group));
+				for (Object consumerObject : consumerGroups) {
+					JSONObject consumerGroup = (JSONObject) consumerObject;
+					for (Object topicSubObject : consumerGroup.getJSONArray("topicSub")) {
+						JSONObject topicSub = (JSONObject) topicSubObject;
+						if (topic.equals(topicSub.getString("topic")) && partition == topicSub.getInteger("partition")) {
+							targetOffset.setOwners(consumerGroup.getString("node") + "-" + consumerGroup.getString("owner"));
+						}
+					}
+				}
 			}
 		}
 		return targetOffset;
@@ -175,16 +176,9 @@ public class OffsetServiceImpl implements OffsetService {
 	/** Judge group & topic from Kafka topic has exist. */
 	private boolean hasKafkaGroupTopic(String clusterAlias, String group, String topic) {
 		boolean status = false;
-		Map<String, List<String>> type = new HashMap<String, List<String>>();
-		Gson gson = new Gson();
-		Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
-		if (kafkaConsumers.containsKey(group)) {
-			for (String _topic : kafkaConsumers.get(group)) {
-				if (_topic.equals(topic)) {
-					status = true;
-					break;
-				}
-			}
+		Set<String> topics = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
+		if (topics.contains(topic)) {
+			status = true;
 		}
 		return status;
 	}

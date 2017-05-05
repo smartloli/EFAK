@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.ipc;
+package org.smartloli.kafka.eagle.ipc;
 
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -25,6 +25,7 @@ import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.core.ipc.OffsetMetadataServer;
 
 /**
  * Rpc through the Kafka stored in the offset.
@@ -33,9 +34,9 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
  *
  *         Created by Jan 5, 2017
  */
-public class RpcClient {
+public class TestRpcClient {
 
-	private final static Logger LOG = LoggerFactory.getLogger(RpcClient.class);
+	private final static Logger LOG = LoggerFactory.getLogger(TestRpcClient.class);
 	/** Rpc client port. */
 	private final static int PORT = SystemConfigUtils.getIntProperty("kafka.eagle.offset.rpc.port");
 	/** Rpc server address. */
@@ -43,6 +44,10 @@ public class RpcClient {
 	/** Rpc timeout. */
 	private final static int TIMEOUT = SystemConfigUtils.getIntProperty("kafka.eagle.offset.rpc.timeout");
 
+	public static void main(String[] args) {
+		System.out.println(getOffset("cluster1"));
+	}
+	
 	/** Get consumer offset from Rpc server. */
 	public static String getOffset(String clusterAlias) {
 		TTransport transport = new TFramedTransport(new TSocket(ADDR, PORT, TIMEOUT));

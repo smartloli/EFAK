@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
 
 import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailProvider;
@@ -142,7 +141,7 @@ public class OffsetsQuartz {
 	}
 
 	private static OffsetZkDomain getKafkaOffset(String clusterAlias, String bootstrapServers, String topic, String group, int partition) {
-		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias, bootstrapServers));
+		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias));
 		OffsetZkDomain targets = new OffsetZkDomain();
 		for (Object object : kafkaOffsets) {
 			JSONObject kafkaOffset = (JSONObject) object;
@@ -151,10 +150,8 @@ public class OffsetsQuartz {
 			int _partition = kafkaOffset.getInteger("partition");
 			long timestamp = kafkaOffset.getLong("timestamp");
 			long offset = kafkaOffset.getLong("offset");
-			String owner = kafkaOffset.getString("owner");
 			if (topic.equals(_topic) && group.equals(_group) && partition == _partition) {
 				targets.setOffset(offset);
-				targets.setOwners(owner);
 				targets.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
 				targets.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
 			}
@@ -183,10 +180,19 @@ public class OffsetsQuartz {
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 			Map<String, List<String>> consumers = null;
 			if ("kafka".equals(formatter)) {
-				Map<String, List<String>> type = new HashMap<String, List<String>>();
-				Gson gson = new Gson();
+				Map<String, List<String>> consumerGroupMap = new HashMap<String, List<String>>();
 				try {
-					consumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
+					JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+					for (Object object : consumerGroups) {
+						JSONObject consumerGroup = (JSONObject) object;
+						String group = consumerGroup.getString("consumerGroup");
+						List<String> topics = new ArrayList<>();
+						for (String topic : kafkaService.getKafkaConsumerTopic(clusterAlias, group)) {
+							topics.add(topic);
+						}
+						consumerGroupMap.put(group, topics);
+					}
+					consumers = consumerGroupMap;
 				} catch (Exception e) {
 					LOG.error("Get consumer info from RpcClient has error,msg is " + e.getMessage());
 				}

@@ -20,21 +20,16 @@ package org.smartloli.kafka.eagle.web.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.domain.DashboardDomain;
 import org.smartloli.kafka.eagle.common.util.ConstantUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.ipc.RpcClient;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
 import org.springframework.stereotype.Service;
 
@@ -49,8 +44,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DashboardServiceImpl implements DashboardService {
-
-	private final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
@@ -71,23 +64,6 @@ public class DashboardServiceImpl implements DashboardService {
 		target.put("kafka", kafkaBrokersGraph(clusterAlias));
 		target.put("dashboard", panel(clusterAlias));
 		return target.toJSONString();
-	}
-
-	/** Get consumer number from kafka topic. */
-	private int getKafkaConsumerNumbers(String clusterAlias) {
-		Map<String, List<String>> type = new HashMap<String, List<String>>();
-		Gson gson = new Gson();
-		int count = 0;
-		try {
-			Map<String, List<String>> kafkaConsumers = gson.fromJson(RpcClient.getConsumer(clusterAlias), type.getClass());
-			for (Entry<String, List<String>> entry : kafkaConsumers.entrySet()) {
-				count += entry.getValue().size();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOG.error("Dashboard get kafka consumers from rpc has error,msg is " + e.getMessage());
-		}
-		return count;
 	}
 
 	/** Get kafka data. */
@@ -129,7 +105,7 @@ public class DashboardServiceImpl implements DashboardService {
 		dashboard.setZks(zks);
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		if ("kafka".equals(formatter)) {
-			dashboard.setConsumers(getKafkaConsumerNumbers(clusterAlias));
+			dashboard.setConsumers(kafkaService.getKafkaConsumerGroups(clusterAlias));
 		} else {
 			dashboard.setConsumers(getConsumerNumbers(clusterAlias));
 		}

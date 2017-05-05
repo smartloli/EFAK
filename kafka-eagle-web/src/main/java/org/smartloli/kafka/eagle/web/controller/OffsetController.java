@@ -132,6 +132,7 @@ public class OffsetController {
 				}
 				obj.put("lag", "<a class='btn btn-danger btn-xs'>" + logSize.getLong("lag") + "</a>");
 				obj.put("owner", logSize.getString("owner"));
+				obj.put("node", logSize.getString("node"));
 				obj.put("created", logSize.getString("create"));
 				obj.put("modify", logSize.getString("modify"));
 				aaDatas.add(obj);

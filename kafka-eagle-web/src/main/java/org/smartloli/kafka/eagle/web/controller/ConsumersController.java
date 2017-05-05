@@ -133,8 +133,8 @@ public class ConsumersController {
 			JSONObject obj = new JSONObject();
 			obj.put("id", consumer.getInteger("id"));
 			obj.put("group", "<a class='link' href='#" + consumer.getString("group") + "'>" + consumer.getString("group") + "</a>");
-			obj.put("topic", consumer.getString("topic").length() > 50 ? consumer.getString("topic").substring(0, 50) + "..." : consumer.getString("topic"));
-			obj.put("consumerNumber", consumer.getInteger("consumerNumber"));
+			obj.put("topics", consumer.getInteger("topics"));
+			obj.put("node", consumer.getString("node"));
 			int activerNumber = consumer.getInteger("activeNumber");
 			if (activerNumber > 0) {
 				obj.put("activeNumber", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeNumber") + "</a>");

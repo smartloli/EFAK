@@ -38,6 +38,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.common.util.ConstantUtils;
 import org.smartloli.kafka.eagle.common.util.GzipUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.service.TopicService;
@@ -220,6 +221,7 @@ public class TopicController {
 				obj.put("partitionNumbers", topic.getInteger("partitionNumbers"));
 				obj.put("created", topic.getString("created"));
 				obj.put("modify", topic.getString("modify"));
+				obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
 				aaDatas.add(obj);
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
@@ -230,6 +232,7 @@ public class TopicController {
 					obj.put("partitionNumbers", topic.getInteger("partitionNumbers"));
 					obj.put("created", topic.getString("created"));
 					obj.put("modify", topic.getString("modify"));
+					obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
 					aaDatas.add(obj);
 				}
 				offset++;
@@ -271,6 +274,25 @@ public class TopicController {
 			session.removeAttribute("Submit_Status");
 			session.setAttribute("Submit_Status", respons.get("info"));
 			mav.setViewName("redirect:/topic/create/failed");
+		}
+		return mav;
+	}
+
+	/** Delete topic. */
+	@RequestMapping(value = "/topic/{topicName}/{token}/delete", method = RequestMethod.GET)
+	public ModelAndView topicDelete(@PathVariable("topicName") String topicName, @PathVariable("token") String token, HttpSession session, HttpServletResponse response,
+			HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		if (SystemConfigUtils.getProperty("kafka.eagle.topic.token").equals(token)) {
+			String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+			Map<String, Object> respons = kafkaService.delete(clusterAlias, topicName);
+			if ("success".equals(respons.get("status"))) {
+				mav.setViewName("redirect:/topic/list");
+			} else {
+				mav.setViewName("redirect:/errors/500");
+			}
+		} else {
+			mav.setViewName("redirect:/errors/500");
 		}
 		return mav;
 	}
