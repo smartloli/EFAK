@@ -1,20 +1,11 @@
-sudo: false
 language: java
 
 jdk:
   - oraclejdk7
   - oraclejdk8
 
-deploy:
-  provider: script
-  script: 
-	- "pwd && ll"
-	- "cp .travis.settings.xml /usr/local/maven/conf/settings.xml"
-  	- "echo 'copy setting'"
-	- "ll /usr/local/maven/conf/ && cat /usr/local/maven/conf/settings.xml"
-  skip_cleanup: true
-  on:
-    tags: true
-  
+sudo : false
+script : cp .travis.settings.xml /usr/local/maven/conf/settings.xml
+
 after_success:
   - mvn clean && mvn test
