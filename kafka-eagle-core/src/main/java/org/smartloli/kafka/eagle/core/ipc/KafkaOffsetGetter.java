@@ -58,16 +58,11 @@ public class KafkaOffsetGetter extends Thread {
 
 	/** Consumer offsets in kafka topic. */
 	private final static String CONSUMER_OFFSET_TOPIC = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
-	// /** Store consumer offset in memory. */
-	// private static Map<GroupTopicPartition, OffsetAndMetadata>
-	// kafkaConsumerOffsets = new ConcurrentHashMap<>();
 
 	/** Multi cluster information. */
 	protected static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new ConcurrentHashMap<>();
-	protected static Map<String, Map<String, Boolean>> multiKafkaActiveConsumers = new ConcurrentHashMap<>();
 
 	/** ============================ Start Filter ========================= */
-	// massive code stealing from kafka.server.OffsetManager
 	private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));
 	private static Field KEY_GROUP_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("group");
 	private static Field KEY_TOPIC_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("topic");

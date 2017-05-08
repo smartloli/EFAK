@@ -44,23 +44,6 @@ import kafka.coordinator.GroupTopicPartition;
  */
 public class OffsetMetadataServerImpl extends KafkaOffsetGetter implements OffsetMetadataServer.Iface {
 
-	/** Load kafka eagle system consumer topic. */
-	public void system(String bootstrapServers) throws TException {
-		Properties props = new Properties();
-		props.put("bootstrap.servers", bootstrapServers);
-		props.put("group.id", "kafka.eagle");
-		props.put("enable.auto.commit", "true");
-		props.put("auto.commit.interval.ms", "1000");
-		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-		consumer.subscribe(Arrays.asList("__system.topic__"));
-		ConsumerRecords<String, String> records = consumer.poll(100);
-		for (ConsumerRecord<String, String> record : records)
-			System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
-		consumer.close();
-	}
-
 	/** Get kafka offset metadata from topic(__consumer_offsets). */
 	public String getOffset(String clusterAlias) throws TException {
 		if (multiKafkaConsumerOffsets.containsKey(clusterAlias)) {
@@ -77,6 +60,23 @@ public class OffsetMetadataServerImpl extends KafkaOffsetGetter implements Offse
 			return targets.toJSONString();
 		}
 		return "";
+	}
+
+	/** Load kafka eagle system consumer topic. */
+	public void system(String bootstrapServers) throws TException {
+		Properties props = new Properties();
+		props.put("bootstrap.servers", bootstrapServers);
+		props.put("group.id", "kafka.eagle");
+		props.put("enable.auto.commit", "true");
+		props.put("auto.commit.interval.ms", "1000");
+		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		consumer.subscribe(Arrays.asList("__system.topic__"));
+		ConsumerRecords<String, String> records = consumer.poll(100);
+		for (ConsumerRecord<String, String> record : records)
+			System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
+		consumer.close();
 	}
 
 }
