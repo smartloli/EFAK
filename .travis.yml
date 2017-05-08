@@ -1,10 +1,9 @@
-language: java
-
-jdk:
-  - oraclejdk8
-
-sudo : false
-script : cp .travis.settings.xml /usr/local/maven/conf/settings.xml
-
-after_success:
-  - mvn clean && mvn test
+language: java  
+jdk:  
+  - oraclejdk8  
+before_install:  
+  - "echo skipped"  
+install:  
+  - "echo skipped"  
+script:  
+  - mvn install -Dmaven.javadoc.skip=true  
