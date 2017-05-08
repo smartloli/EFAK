@@ -1,0 +1,27 @@
+# Common
+/.project
+/.settings/
+/deploy
+/build/
+**/node
+**/node_modules
+**/jsdoc
+classes/
+out/
+target/
+logs/
+/src/main/webapp/lib/js/**/*.js
+/src/main/webapp/lib/js/**/*.map
+/src/main/webapp/lib/css/**/*.css
+
+# IDEA
+*.iml
+*.ipr
+*.iws
+.idea
+/.idea
+/**/.idea
+out
+test-output
+atlassian-ide-plugin.xml
+.gradletasknamecache

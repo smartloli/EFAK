@@ -204,6 +204,7 @@ public class KafkaOffsetGetter extends Thread {
 			props.put("group.id", "kafka.eagle.system.group");
 			props.put("zookeeper.connect", zk);
 			props.put("exclude.internal.topics", "false");
+			props.put("socket.timeout.ms", "5000");
 			ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
 			startOffsetListener(clusterAlias, consumer);
 		}
