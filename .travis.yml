@@ -5,7 +5,7 @@ jdk:
 
 deploy:
   provider: script
-  script: "cp .travis.settings.xml $HOME/.m2/settings.xml && mvn deploy"
+  script: "cp .travis.settings.xml /usr/local/maven/conf/settings.xml && mvn deploy"
   skip_cleanup: true
   on:
     tags: true
