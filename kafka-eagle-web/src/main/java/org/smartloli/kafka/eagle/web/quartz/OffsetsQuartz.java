@@ -37,9 +37,7 @@ import org.smartloli.kafka.eagle.api.email.MailProvider;
 import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.common.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.common.domain.OffsetsLiteDomain;
-import org.smartloli.kafka.eagle.common.domain.TupleDomain;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.LRUCacheUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -68,7 +66,8 @@ public class OffsetsQuartz {
 	private ZkService zkService = new ZkFactory().create();
 
 	/** Cache to the specified map collection to prevent frequent refresh. */
-	private LRUCacheUtils<String, TupleDomain> lruCache = new LRUCacheUtils<String, TupleDomain>(100000);
+	// private LRUCacheUtils<String, TupleDomain> lruCache = new
+	// LRUCacheUtils<String, TupleDomain>(100000);
 
 	/** Get alarmer configure. */
 	private List<AlarmDomain> alarmConfigure(String clusterAlias) {
@@ -112,23 +111,7 @@ public class OffsetsQuartz {
 
 	/** Get kafka brokers. */
 	private List<String> getBrokers(String clusterAlias) {
-		// Add LRUCache per 3 min
-		String key = "group_topic_offset_graph_consumer_brokers";
-		String brokers = "";
-		if (lruCache.containsKey(key)) {
-			TupleDomain tuple = lruCache.get(key);
-			brokers = tuple.getRet();
-			long end = System.currentTimeMillis();
-			if ((end - tuple.getTimespan()) / (1000 * 60.0) > 30) {// 30 mins
-				lruCache.remove(key);
-			}
-		} else {
-			brokers = kafkaService.getAllBrokersInfo(clusterAlias);
-			TupleDomain tuple = new TupleDomain();
-			tuple.setRet(brokers);
-			tuple.setTimespan(System.currentTimeMillis());
-			lruCache.put(key, tuple);
-		}
+		String brokers = kafkaService.getAllBrokersInfo(clusterAlias);;
 		JSONArray kafkaBrokers = JSON.parseArray(brokers);
 		List<String> targets = new ArrayList<String>();
 		for (Object object : kafkaBrokers) {
@@ -185,7 +168,7 @@ public class OffsetsQuartz {
 					JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
 					for (Object object : consumerGroups) {
 						JSONObject consumerGroup = (JSONObject) object;
-						String group = consumerGroup.getString("consumerGroup");
+						String group = consumerGroup.getString("group");
 						List<String> topics = new ArrayList<>();
 						for (String topic : kafkaService.getKafkaConsumerTopic(clusterAlias, group)) {
 							topics.add(topic);

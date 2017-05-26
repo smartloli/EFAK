@@ -32,7 +32,6 @@ import org.smartloli.kafka.eagle.common.util.ConstantUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.ipc.RpcClient;
 
 /**
  * Handler url request and check whether has session .
@@ -70,7 +69,7 @@ public class AccountInterceptor extends HandlerInterceptorAdapter {
 					bootstrapServers += host + ":" + port + ",";
 				}
 				bootstrapServers = bootstrapServers.substring(0, bootstrapServers.length() - 1);
-				RpcClient.system(bootstrapServers);
+				//RpcClient.system(bootstrapServers);
 				count++;
 			}
 		} catch (Exception e) {

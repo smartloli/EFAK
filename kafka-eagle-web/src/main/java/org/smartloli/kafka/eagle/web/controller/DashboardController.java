@@ -75,7 +75,8 @@ public class DashboardController {
 
 		try {
 			byte[] output = GzipUtils.compressToByte(dashboradService.getDashboard(clusterAlias));
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
+			output = output == null ? "".getBytes() : output;
+			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 

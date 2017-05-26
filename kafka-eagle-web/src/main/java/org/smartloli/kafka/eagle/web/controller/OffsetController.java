@@ -45,7 +45,7 @@ import org.smartloli.kafka.eagle.web.service.OffsetService;
  * @author smartloli.
  *
  *         Created by Sep 6, 2016.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 @Controller
@@ -62,7 +62,7 @@ public class OffsetController {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if (offsetService.hasGroupTopic(clusterAlias,formatter, group, topic)) {
+		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_consumers");
 		} else {
 			mav.setViewName("/error/404");
@@ -77,7 +77,7 @@ public class OffsetController {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		if (offsetService.hasGroupTopic(clusterAlias,formatter, group, topic)) {
+		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_realtime");
 		} else {
 			mav.setViewName("/error/404");
@@ -110,9 +110,9 @@ public class OffsetController {
 
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
-		
+
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray logSizes = JSON.parseArray(offsetService.getLogSize(clusterAlias,formatter, topic, group));
+		JSONArray logSizes = JSON.parseArray(offsetService.getLogSize(clusterAlias, formatter, topic, group));
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : logSizes) {
@@ -169,10 +169,11 @@ public class OffsetController {
 
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
-		
+
 		try {
-			byte[] output = GzipUtils.compressToByte(offsetService.getOffsetsGraph(clusterAlias,group, topic));
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
+			byte[] output = GzipUtils.compressToByte(offsetService.getOffsetsGraph(clusterAlias, group, topic));
+			output = output == null ? "".getBytes() : output;
+			response.setContentLength(output.length);
 			OutputStream out = response.getOutputStream();
 			out.write(output);
 
