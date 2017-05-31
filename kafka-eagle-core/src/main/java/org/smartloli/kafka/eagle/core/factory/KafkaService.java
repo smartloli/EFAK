@@ -64,8 +64,11 @@ public interface KafkaService {
 	/** According to group, topic and partition to get offset from zookeeper. */
 	public OffsetZkDomain getOffset(String clusterAlias, String topic, String group, int partition);
 
+	/** Get kafka 0.10.x offset from topic. */
+	public String getKafkaOffset(String clusterAlias);
+
 	/** According to topic and partition to obtain Replicas & Isr. */
-	public String geyReplicasIsr(String clusterAlias, String topic, int partitionid);
+	public String getReplicasIsr(String clusterAlias, String topic, int partitionid);
 
 	/** Use kafka console comand to create topic. */
 	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic);

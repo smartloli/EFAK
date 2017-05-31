@@ -60,7 +60,7 @@ public class KafkaOffsetGetter extends Thread {
 	private final static String CONSUMER_OFFSET_TOPIC = ConstantUtils.Kafka.CONSUMER_OFFSET_TOPIC;
 
 	/** Multi cluster information. */
-	protected static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new ConcurrentHashMap<>();
+	public static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new ConcurrentHashMap<>();
 
 	/** ============================ Start Filter ========================= */
 	private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));

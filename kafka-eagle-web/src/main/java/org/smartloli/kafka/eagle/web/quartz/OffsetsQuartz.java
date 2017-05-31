@@ -43,7 +43,6 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.ZkFactory;
 import org.smartloli.kafka.eagle.core.factory.ZkService;
-import org.smartloli.kafka.eagle.core.ipc.RpcClient;
 
 /**
  * Per 5 mins to stats offsets to offsets table.
@@ -64,10 +63,6 @@ public class OffsetsQuartz {
 
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
-
-	/** Cache to the specified map collection to prevent frequent refresh. */
-	// private LRUCacheUtils<String, TupleDomain> lruCache = new
-	// LRUCacheUtils<String, TupleDomain>(100000);
 
 	/** Get alarmer configure. */
 	private List<AlarmDomain> alarmConfigure(String clusterAlias) {
@@ -123,8 +118,8 @@ public class OffsetsQuartz {
 		return targets;
 	}
 
-	private static OffsetZkDomain getKafkaOffset(String clusterAlias, String bootstrapServers, String topic, String group, int partition) {
-		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias));
+	private OffsetZkDomain getKafkaOffset(String clusterAlias, String bootstrapServers, String topic, String group, int partition) {
+		JSONArray kafkaOffsets = JSON.parseArray(kafkaService.getKafkaOffset(clusterAlias));
 		OffsetZkDomain targets = new OffsetZkDomain();
 		for (Object object : kafkaOffsets) {
 			JSONObject kafkaOffset = (JSONObject) object;

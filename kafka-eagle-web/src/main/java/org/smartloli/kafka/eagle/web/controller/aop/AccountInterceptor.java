@@ -69,7 +69,6 @@ public class AccountInterceptor extends HandlerInterceptorAdapter {
 					bootstrapServers += host + ":" + port + ",";
 				}
 				bootstrapServers = bootstrapServers.substring(0, bootstrapServers.length() - 1);
-				//RpcClient.system(bootstrapServers);
 				count++;
 			}
 		} catch (Exception e) {

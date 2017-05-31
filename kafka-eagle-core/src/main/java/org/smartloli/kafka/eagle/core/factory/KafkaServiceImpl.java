@@ -41,6 +41,7 @@ import org.smartloli.kafka.eagle.common.domain.*;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
+import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -55,9 +56,11 @@ import kafka.admin.TopicCommand;
 import kafka.api.OffsetRequest;
 import kafka.api.PartitionOffsetRequestInfo;
 import kafka.cluster.BrokerEndPoint;
+import kafka.common.OffsetAndMetadata;
 import kafka.common.TopicAndPartition;
 import kafka.consumer.ConsumerThreadId;
 import kafka.coordinator.GroupOverview;
+import kafka.coordinator.GroupTopicPartition;
 import kafka.javaapi.OffsetResponse;
 import kafka.javaapi.PartitionMetadata;
 import kafka.javaapi.TopicMetadata;
@@ -460,7 +463,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 * @param partitionid
 	 * @return String.
 	 */
-	public String geyReplicasIsr(String clusterAlias, String topic, int partitionid) {
+	public String getReplicasIsr(String clusterAlias, String topic, int partitionid) {
 		ZkClient zkc = zkPool.getZkClientSerializer(clusterAlias);
 		Seq<Object> repclicasAndPartition = ZkUtils.apply(zkc, false).getInSyncReplicasForPartition(topic, partitionid);
 		List<Object> targets = JavaConversions.seqAsJavaList(repclicasAndPartition);
@@ -604,7 +607,7 @@ public class KafkaServiceImpl implements KafkaService {
 		for (TopicMetadata item : topicsMeta) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
 				MetadataDomain metadata = new MetadataDomain();
-				metadata.setIsr(geyReplicasIsr(clusterAlias, topic, part.partitionId()));
+				metadata.setIsr(getReplicasIsr(clusterAlias, topic, part.partitionId()));
 				metadata.setLeader(part.leader() == null ? -1 : part.leader().id());
 				metadata.setPartitionId(part.partitionId());
 				List<Integer> replicases = new ArrayList<>();
@@ -842,6 +845,24 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Get kafka 0.10.x consumer group and topic. */
 	public String getKafkaConsumerGroupTopic(String clusterAlias, String group) {
 		return getKafkaMetadata(parseBrokerServer(clusterAlias), group).toJSONString();
+	}
+
+	/** Get kafka 0.10.x offset from topic. */
+	public String getKafkaOffset(String clusterAlias) {
+		if (KafkaOffsetGetter.multiKafkaConsumerOffsets.containsKey(clusterAlias)) {
+			JSONArray targets = new JSONArray();
+			for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : KafkaOffsetGetter.multiKafkaConsumerOffsets.get(clusterAlias).entrySet()) {
+				JSONObject object = new JSONObject();
+				object.put("group", entry.getKey().group());
+				object.put("topic", entry.getKey().topicPartition().topic());
+				object.put("partition", entry.getKey().topicPartition().partition());
+				object.put("offset", entry.getValue().offset());
+				object.put("timestamp", entry.getValue().commitTimestamp());
+				targets.add(object);
+			}
+			return targets.toJSONString();
+		}
+		return "";
 	}
 
 }

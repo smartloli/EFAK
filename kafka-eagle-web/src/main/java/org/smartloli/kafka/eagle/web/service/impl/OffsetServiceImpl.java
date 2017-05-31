@@ -32,7 +32,6 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.ZkFactory;
 import org.smartloli.kafka.eagle.core.factory.ZkService;
-import org.smartloli.kafka.eagle.core.ipc.RpcClient;
 import org.smartloli.kafka.eagle.web.service.OffsetService;
 import org.springframework.stereotype.Service;
 
@@ -91,7 +90,7 @@ public class OffsetServiceImpl implements OffsetService {
 
 	/** Get Kafka offset from Kafka topic. */
 	private OffsetZkDomain getKafkaOffset(String clusterAlias, String topic, String group, int partition) {
-		JSONArray kafkaOffsets = JSON.parseArray(RpcClient.getOffset(clusterAlias));
+		JSONArray kafkaOffsets = JSON.parseArray(kafkaService.getKafkaOffset(clusterAlias));
 		OffsetZkDomain targetOffset = new OffsetZkDomain();
 		for (Object kafkaOffset : kafkaOffsets) {
 			JSONObject object = (JSONObject) kafkaOffset;
