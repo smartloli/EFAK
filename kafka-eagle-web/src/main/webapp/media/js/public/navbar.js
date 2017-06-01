@@ -16,5 +16,15 @@ $(document).ready(function() {
 	} else if (ret.indexOf("/alarm") > -1) {
 		$("#demo1").addClass('collapse in');
 		$("#demo1").attr("aria-expanded", true);
+	}else if (ret.indexOf("/system") > -1) {
+		$("#demo3").addClass('collapse in');
+		$("#demo3").attr("aria-expanded", true);
 	}
+	
+	$(document).on('click', 'a[name=ke_account_reset]', function() {
+		$('#ke_account_reset_dialog').modal('show');
+		$(".modal-backdrop").css({
+			"z-index": "999"
+		});
+	});
 });

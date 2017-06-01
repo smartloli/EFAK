@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.ConstantUtils;
+import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.AlarmService;
@@ -63,6 +64,7 @@ public class AlarmController {
 	private AlarmService alarmService;
 
 	/** Add alarmer viewer. */
+	@RequiresPermissions("/alarm/add")
 	@RequestMapping(value = "/alarm/add", method = RequestMethod.GET)
 	public ModelAndView addView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -71,6 +73,7 @@ public class AlarmController {
 	}
 
 	/** Modify alarmer viewer. */
+	@RequiresPermissions("/alarm/modify")
 	@RequestMapping(value = "/alarm/modify", method = RequestMethod.GET)
 	public ModelAndView modifyView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -104,7 +107,7 @@ public class AlarmController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		try {
@@ -147,7 +150,7 @@ public class AlarmController {
 		alarm.setModifyDate(CalendarUtils.getDate());
 		alarm.setOwners(ke_topic_email);
 
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 		Map<String, Object> respons = alarmService.add(clusterAlias, alarm);
 		if ("success".equals(respons.get("status"))) {
 			session.removeAttribute("Alarm_Submit_Status");
@@ -188,7 +191,7 @@ public class AlarmController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		JSONArray alarms = JSON.parseArray(alarmService.list(clusterAlias));
 		int offset = 0;
@@ -243,7 +246,7 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/{group}/{topic}/del", method = RequestMethod.GET)
 	public ModelAndView alarmDelete(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		alarmService.delete(clusterAlias, group, topic);
 		return new ModelAndView("redirect:/alarm/modify");

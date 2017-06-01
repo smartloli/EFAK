@@ -15,30 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.factory;
+package org.smartloli.kafka.eagle.web.service;
 
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.KeDataUtils;
+import java.util.List;
+import java.util.Map;
+
+import org.smartloli.kafka.eagle.web.pojo.Signiner;
 
 /**
- * Implements KeService all method.
+ * AccountService interface to deal with UserDao
  * 
  * @author smartloli.
  *
- *         Created by Feb 21, 2017
+ *         Created by May 16, 2017
  */
-public class KeServiceImpl implements KeService {
+public interface AccountService {
 
-	/** Read dataset from storage. */
-	public String read(String... args) {
-		String name = args[0];
-		return KeDataUtils.read(name);
-	}
+	public Signiner login(String username, String password);
+	
+	public int reset(Signiner signin);
 
-	/** Write dataset to storage. */
-	public void write(String name, String data) {
-		String suffix = CalendarUtils.getCustomDate("yyyyMMdd");
-		KeDataUtils.write(name + "_" + suffix, data);
-	}
+	public Signiner findUserByRtxNo(int rtxno);
 
+	public List<Signiner> findUserBySearch(Map<String, Object> params);
+
+	public int userCounts();
+	
+	public int insertUser(Signiner signin);
 }

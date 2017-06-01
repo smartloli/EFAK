@@ -62,13 +62,12 @@ start()
 	echo "*******************************************************************"
     echo "* Listen port has successed! *"
 	echo "*******************************************************************"
-	sleep 5
-	chmod +x ${KE_HOME}/bin/*.sh
-	${KE_HOME}/bin/ipc.sh start
-	echo "*******************************************************************"
-    echo "* Start kafka offset thrift server has successed! *"
-	echo "*******************************************************************"
-	sleep 1
+	sleep 3
+	rm -rf ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/*.properties
+	rm -rf ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/*.xml
+	cp ${KE_HOME}/conf/*.properties ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/
+	cp ${KE_HOME}/conf/*.xml ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/
+	sleep 3
 	rm -rf ${KE_HOME}/kms/logs/*
 	chmod +x ${KE_HOME}/kms/bin/*.sh
 	nohup ${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1
@@ -89,11 +88,10 @@ start()
 stop()
 {
 	 if [ -f $KE_HOME/bin/ke.pid ];then
-                    SPID=`cat $KE_HOME/bin/ipc.pid`
+	 				SPID=`cat $KE_HOME/bin/ke.pid`
 					  if [ "$SPID" != "" ];then
                          ${KE_HOME}/kms/bin/shutdown.sh
                          kill -9  $SPID
-						 echo  > $DIALUP_PID
 						 echo "stop success"
 					  fi
 	 fi

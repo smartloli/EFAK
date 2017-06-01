@@ -35,7 +35,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.common.domain.PageParamDomain;
-import org.smartloli.kafka.eagle.common.util.ConstantUtils;
+import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
@@ -74,7 +74,7 @@ public class ConsumersController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 		
 		try {
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
@@ -122,7 +122,7 @@ public class ConsumersController {
 		page.setiDisplayStart(iDisplayStart);
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 		
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		int count = consumerService.getConsumerCount(clusterAlias,formatter);
@@ -186,7 +186,7 @@ public class ConsumersController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 		
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(clusterAlias,formatter, group));

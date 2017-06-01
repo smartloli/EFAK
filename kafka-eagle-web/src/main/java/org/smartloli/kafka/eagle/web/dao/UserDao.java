@@ -15,21 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.factory;
+package org.smartloli.kafka.eagle.web.dao;
 
-import org.smartloli.kafka.eagle.core.factory.KeFactory;
-import org.smartloli.kafka.eagle.core.factory.KeService;
+import java.util.List;
+import java.util.Map;
+
+import org.smartloli.kafka.eagle.web.pojo.Signiner;
 
 /**
- * Test Provider clazz.
+ * User interface definition
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by May 16, 2017
  */
-public class TestKeProvider {
-	public static void main(String[] args) {
-		KeService keService = new KeFactory().create();
-		System.out.println(keService.read("cluster1_20170221"));
-	}
+public interface UserDao {
+	
+	public Signiner login(Signiner signin);
+
+	public int reset(Signiner signin);
+
+	public List<Signiner> findUserByRtxNo(int rtxno);
+
+	public List<Signiner> findUserBySearch(Map<String, Object> params);
+
+	public int userCounts();
+
+	public int insertUser(Signiner signin);
 }

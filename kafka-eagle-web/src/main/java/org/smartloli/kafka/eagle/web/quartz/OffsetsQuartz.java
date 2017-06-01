@@ -58,9 +58,6 @@ public class OffsetsQuartz {
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
-	/** Kafka Eagle interface. */
-	// private KeService keService = new KeFactory().create();
-
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
 
@@ -172,7 +169,7 @@ public class OffsetsQuartz {
 					}
 					consumers = consumerGroupMap;
 				} catch (Exception e) {
-					LOG.error("Get consumer info from RpcClient has error,msg is " + e.getMessage());
+					LOG.error("Get consumer info from [kafkaService.getKafkaConsumer] has error,msg is " + e.getMessage());
 				}
 			} else {
 				consumers = kafkaService.getConsumers(clusterAlias);

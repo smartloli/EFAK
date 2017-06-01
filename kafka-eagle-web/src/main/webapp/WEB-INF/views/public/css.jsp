@@ -7,4 +7,16 @@
 <link href="/ke/media/css/public/codemirror.css" rel="stylesheet"/>
 <link href="/ke/media/css/public/show-hint.css" rel="stylesheet"/>
 <link href="/ke/media/css/public/jquery.terminal.min.css" rel="stylesheet"/>
+<link href="/ke/media/css/public/bootstrap-treeview.min.css" rel="stylesheet"/>
 <link rel="shortcut icon" href="/ke/media/img/favicon.ico" />
+<%
+	String[] loader = request.getParameterValues("css");
+	if (loader == null) {
+		return;
+	}
+	for (String s : loader) {
+%>
+<link href="/ke/media/css/<%=s%>" rel="stylesheet"/>
+<%
+	}
+%>

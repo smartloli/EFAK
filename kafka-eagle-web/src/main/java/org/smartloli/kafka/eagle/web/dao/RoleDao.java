@@ -15,21 +15,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.factory;
+package org.smartloli.kafka.eagle.web.dao;
+
+import java.util.List;
+
+import org.smartloli.kafka.eagle.web.pojo.Role;
+import org.smartloli.kafka.eagle.web.pojo.RoleResource;
+import org.smartloli.kafka.eagle.web.pojo.UserRole;
 
 /**
- * Kafka eagle storage statistics data interface.
+ * Role interface definition
  * 
  * @author smartloli.
  *
- *         Created by Feb 21, 2017
+ *         Created by May 24, 2017
  */
-public interface KeService {
+public interface RoleDao {
 
-	/** Read statistics data from storage. */
-	public String read(String... args);
+	public List<Role> getRoles();
 
-	/** Write statistics data to storage. */
-	public void write(String name, String data);
+	public List<RoleResource> findRoleResourcesByRoleId(int roleId);
+
+	public int insertRoleResource(RoleResource roleResource);
+
+	public int deleteRoleResource(RoleResource roleResource);
+
+	public List<UserRole> findRoleByUserId(int userId);
+
+	public int insertUserRole(UserRole userRole);
+
+	public int deleteUserRole(UserRole userRole);
 
 }

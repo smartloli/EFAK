@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.smartloli.kafka.eagle.web.dao.UserDao">
+
+	<resultMap type="org.smartloli.kafka.eagle.web.pojo.Signiner" id="signin">
+		<result property="id" column="id" />
+		<result property="rtxno" column="rtxno" />
+		<result property="username" column="username" />
+		<result property="password" column="password" />
+		<result property="realname" column="realname" />
+		<result property="email" column="email" />
+	</resultMap>
+
+	<select id="login" parameterType="org.smartloli.kafka.eagle.web.pojo.Signiner"
+		resultMap="signin">
+		select * from ke_users where (rtxno=#{username} or
+		username=#{username}) and
+		password=#{password}
+	</select>
+
+	<update id="reset" parameterType="org.smartloli.kafka.eagle.web.pojo.Signiner">
+		update ke_users set
+		password=#{password} where rtxno=#{rtxno}
+	</update>
+
+	<select id="findUserByRtxNo" parameterType="Integer" resultMap="signin">
+		select * from ke_users where rtxno=#{rtxno}
+	</select>
+
+	<select id="findUserBySearch" parameterType="map" resultMap="signin">
+		select * from ke_users
+		<where>
+			<if test="search!=null and search!=''">
+				rtxno=#{search} or username=#{search} or
+				realname=#{search} or email=#{search}
+			</if>
+		</where>
+		order by rtxno desc limit #{start},#{size}
+	</select>
+
+	<select id="userCounts" resultType="int">
+		select count(*) from ke_users
+	</select>
+
+	<insert id="insertUser" parameterType="org.smartloli.kafka.eagle.web.pojo.Signiner">
+		insert into
+		ke_users(rtxno,username,password,email,realname)
+		value(#{rtxno},#{username},#{password},#{email},#{realname})
+	</insert>
+
+</mapper>

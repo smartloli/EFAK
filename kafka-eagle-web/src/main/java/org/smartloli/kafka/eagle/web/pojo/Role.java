@@ -15,17 +15,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.factory;
+package org.smartloli.kafka.eagle.web.pojo;
+
+import com.google.gson.Gson;
 
 /**
- * Ke provider KeService visitor enter.
+ * The role entity corresponds to the role table in the database.
  * 
  * @author smartloli.
  *
- *         Created by Feb 21, 2017
- * 
- * @see org.smartloli.kafka.eagle.core.factory.KeService
+ *         Created by May 24, 2017
  */
-public interface KeProvider {
-	public KeService create();
+public class Role {
+
+	private int id;
+	private String roleName;
+	private String roleDescriber;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
+
+	public String getRoleDescriber() {
+		return roleDescriber;
+	}
+
+	public void setRoleDescriber(String roleDescriber) {
+		this.roleDescriber = roleDescriber;
+	}
+
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
+	}
+
 }

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import org.smartloli.kafka.eagle.common.util.ConstantUtils;
+import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
 
@@ -68,7 +68,7 @@ public class DashboardController {
 		String clusterAlias = "";
 		try {
 			HttpSession session = request.getSession();
-			clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+			clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

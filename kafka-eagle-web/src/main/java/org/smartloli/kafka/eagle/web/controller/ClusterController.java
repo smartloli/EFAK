@@ -34,7 +34,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import org.smartloli.kafka.eagle.common.util.ConstantUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.web.service.ClusterService;
 
@@ -70,6 +71,7 @@ public class ClusterController {
 	}
 
 	/** Zookeeper client viewer. */
+	@RequiresPermissions("/cluster/zkcli")
 	@RequestMapping(value = "/cluster/zkcli", method = RequestMethod.GET)
 	public ModelAndView zkCliView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
@@ -104,7 +106,7 @@ public class ClusterController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		JSONObject deserializeClusters = JSON.parseObject(clusterService.get(clusterAlias, type));
 		JSONArray clusters = deserializeClusters.getJSONArray(type);
@@ -182,8 +184,8 @@ public class ClusterController {
 		if (!clusterService.hasClusterAlias(clusterAlias)) {
 			return new ModelAndView("redirect:/error/404");
 		} else {
-			session.removeAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS);
-			session.setAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS, clusterAlias);
+			session.removeAttribute(Constants.SessionAlias.CLUSTER_ALIAS);
+			session.setAttribute(Constants.SessionAlias.CLUSTER_ALIAS, clusterAlias);
 			return new ModelAndView("redirect:/");
 		}
 	}
@@ -267,7 +269,7 @@ public class ClusterController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
 			byte[] output = GzipUtils.compressToByte(clusterService.status(clusterAlias).toJSONString());
@@ -295,7 +297,7 @@ public class ClusterController {
 		String type = request.getParameter("type");
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
 			byte[] output = GzipUtils.compressToByte(clusterService.execute(clusterAlias, cmd, type));

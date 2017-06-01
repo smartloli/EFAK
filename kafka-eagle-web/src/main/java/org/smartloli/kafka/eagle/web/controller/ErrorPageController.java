@@ -35,6 +35,14 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/errors")
 public class ErrorPageController {
 
+	/** 403 error page viewer. */
+	@RequestMapping(value = "/403", method = RequestMethod.GET)
+	public ModelAndView e403(HttpServletResponse response) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/error/403");
+		return mav;
+	}
+	
 	/** 404 error page viewer. */
 	@RequestMapping(value = "/404", method = RequestMethod.GET)
 	public ModelAndView e404(HttpServletResponse response) throws Exception {

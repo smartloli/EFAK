@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.smartloli.kafka.eagle.web.dao.RoleDao">
+
+	<resultMap type="org.smartloli.kafka.eagle.web.pojo.Role" id="role">
+		<result property="id" column="id" />
+		<result property="roleName" column="name" />
+		<result property="roleDescriber" column="description" />
+	</resultMap>
+
+	<resultMap type="org.smartloli.kafka.eagle.web.pojo.RoleResource" id="roleResource">
+		<result property="roleId" column="role_id" />
+		<result property="resourceId" column="resource_id" />
+	</resultMap>
+
+	<resultMap type="org.smartloli.kafka.eagle.web.pojo.UserRole" id="userRole">
+		<result property="userId" column="user_id" />
+		<result property="roleId" column="role_id" />
+	</resultMap>
+
+	<select id="getRoles" resultMap="role">
+		select `id`,`name`,description
+		from ke_p_role
+	</select>
+
+	<select id="findRoleResourcesByRoleId" parameterType="int"
+		resultMap="roleResource">
+		select role_id,resource_id
+		from ke_role_resource where
+		role_id=#{roleId}
+	</select>
+
+	<insert id="insertRoleResource" parameterType="org.smartloli.kafka.eagle.web.pojo.RoleResource">
+		insert into
+		ke_role_resource(role_id,resource_id) value(#{roleId},#{resourceId})
+	</insert>
+
+	<delete id="deleteRoleResource" parameterType="org.smartloli.kafka.eagle.web.pojo.RoleResource">
+		delete from
+		ke_role_resource where role_id=#{roleId} and resource_id=#{resourceId}
+	</delete>
+
+	<select id="findRoleByUserId" parameterType="int" resultMap="userRole">
+		select user_id,role_id from ke_user_role where user_id=#{userId}
+	</select>
+
+	<insert id="insertUserRole" parameterType="org.smartloli.kafka.eagle.web.pojo.UserRole">
+		insert into
+		ke_user_role(user_id,role_id) value(#{userId},#{roleId})
+	</insert>
+
+	<delete id="deleteUserRole" parameterType="org.smartloli.kafka.eagle.web.pojo.UserRole">
+		delete from
+		ke_user_role where user_id=#{userId} and role_id=#{roleId}
+	</delete>
+</mapper>

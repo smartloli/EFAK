@@ -15,20 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.factory;
+package org.smartloli.kafka.eagle.web.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.smartloli.kafka.eagle.web.sso.pojo.Resources;
 
 /**
- * Ke factory implements KeProvider service.
+ * ResourceService interface to deal with ResourcesDao
  * 
  * @author smartloli.
  *
- *         Created by Feb 21, 2017
+ *         Created by May 18, 2017
  */
-public class KeFactory implements KeProvider {
+public interface ResourceService {
+	public List<Integer> findRoleIdByUserId(int userId);
 
-	@Override
-	public KeService create() {
-		return new KeServiceImpl();
-	}
+	public List<Integer> findResourceIdByRole(int roleId);
 
+	public List<Resources> getUserResources(int userId);
+
+	public String getResourcesTree();
+
+	public int insertResource(Map<String, Object> params);
+
+	public List<Resources> getResourceParent();
+
+	public List<Resources> findResourceByParentId(int parentId);
+
+	public int deleteParentOrChildByResId(Map<String, Object> params);
 }

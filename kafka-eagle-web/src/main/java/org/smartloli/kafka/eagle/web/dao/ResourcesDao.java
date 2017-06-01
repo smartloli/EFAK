@@ -15,40 +15,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.util;
+package org.smartloli.kafka.eagle.web.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import org.smartloli.kafka.eagle.web.sso.pojo.Resources;
 
 /**
- * Define constants in the system.
+ * Resource interface definition
  * 
  * @author smartloli.
  *
- *         Created by Jan 3, 2017
+ *         Created by May 18, 2017
  */
-public class ConstantUtils {
+public interface ResourcesDao {
 
-	/** D3 data plugin size. */
-	public interface D3 {
-		public final static int SIZE = 40;
-	}
+	public List<Integer> findRoleIdByUserId(int userId);
 
-	/** Kafka parameter setting. */
-	public interface Kafka {
-		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
-		public final static int SINGLE_THREAD = 1;
-		public final static int ACTIVER_INTERVAL = 10000;
-	}
+	public List<Integer> findResourceIdByRole(int roleId);
 
-	public interface Mail {
-		public final static String[] ARGS = new String[] { "toAddress", "subject", "content" };
-	}
+	public Resources getUserResources(int resourceId);
 
-	/** Custom variable separator. */
-	public interface Separator {
-		public final static String EIGHT = "________";
-	}
+	public List<Resources> getResourcesTree();
 
-	public interface SessionAlias {
-		public final static String CLUSTER_ALIAS = "clusterAlias";
-	}
-
+	public int insertResource(Map<String,Object> params);
+	
+	public List<Resources> getResourceParent();
+	
+	public List<Resources> findResourceByParentId(int parentId);
+	
+	public int deleteParentOrChildByResId(Map<String,Object> params);
+	
 }

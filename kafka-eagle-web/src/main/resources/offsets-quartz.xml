@@ -13,7 +13,7 @@
 		<property name="concurrent" value="false" />
 	</bean>
 	<!-- Configure the trigger time for scheduling execution. -->
-	<bean id="offsetsTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	<bean id="offsetsTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="offsetsDetail" />
 		<property name="cronExpression">
 			<!-- Perform task scheduling per 5min. -->

@@ -34,7 +34,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import org.smartloli.kafka.eagle.common.util.ConstantUtils;
+import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.OffsetService;
@@ -60,7 +60,7 @@ public class OffsetController {
 	public ModelAndView consumersActiveView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_consumers");
@@ -75,7 +75,7 @@ public class OffsetController {
 	public ModelAndView offsetRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_realtime");
@@ -109,7 +109,7 @@ public class OffsetController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		JSONArray logSizes = JSON.parseArray(offsetService.getLogSize(clusterAlias, formatter, topic, group));
@@ -168,7 +168,7 @@ public class OffsetController {
 		response.setHeader("Content-Encoding", "gzip");
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(ConstantUtils.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
 			byte[] output = GzipUtils.compressToByte(offsetService.getOffsetsGraph(clusterAlias, group, topic));

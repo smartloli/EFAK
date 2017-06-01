@@ -4,16 +4,36 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="    
    http://www.springframework.org/schema/beans    
    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd    
    http://www.springframework.org/schema/mvc    
    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd    
    http://www.springframework.org/schema/context    
-   http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd	
+   http://www.springframework.org/schema/aop	
+   http://www.springframework.org/schema/aop/spring-aop-3.1.xsd	
+   http://www.springframework.org/schema/tx	
+   http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
-	<!-- Converts the class marked with the @Controller annotation to bean. -->
-	<context:component-scan base-package="org.smartloli.kafka.eagle.web" />
+	<context:component-scan base-package="org.smartloli.kafka.eagle.web.controller" />
+	<bean id="mappingJacksonHttpMessageConverter"
+		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="mappingJacksonHttpMessageConverter" />	<!-- JSON Convert -->
+			</list>
+		</property>
+	</bean>
 	<!-- The first one is to annotate the annotations and the second one is 
 		the processing method. -->
 	<bean
@@ -23,22 +43,10 @@
 	<!-- HandlerMapping -->
 	<bean
 		class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
-	<mvc:interceptors>
-		<mvc:interceptor>
-			<mvc:mapping path="/**" />
-			<mvc:mapping path="/" />
-			<bean class="org.smartloli.kafka.eagle.web.controller.aop.AccountInterceptor"></bean>
-		</mvc:interceptor>
-	</mvc:interceptors>
 
 	<!-- HandlerAdapter -->
 	<bean
 		class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
-
-	<bean id="multipartResolver"
-		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-		<property name="maxUploadSize" value="10485760" />
-	</bean>
 
 	<mvc:annotation-driven />
 	<mvc:resources mapping="/media/**" location="/WEB-INF/media/" />
@@ -51,5 +59,21 @@
 			value="org.springframework.web.servlet.view.JstlView" />
 		<property name="prefix" value="/WEB-INF/views/" />
 		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<aop:config proxy-target-class="true" />
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor">
+		<property name="proxyTargetClass" value="true" />
+	</bean>
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.apache.shiro.authz.UnauthorizedException">redirect:/errors/403</prop>
+			</props>
+		</property>
 	</bean>
 </beans> 
