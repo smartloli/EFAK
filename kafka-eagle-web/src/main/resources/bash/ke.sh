@@ -92,6 +92,7 @@ stop()
 					  if [ "$SPID" != "" ];then
                          ${KE_HOME}/kms/bin/shutdown.sh
                          kill -9  $SPID
+                         echo > $DIALUP_PID
 						 echo "stop success"
 					  fi
 	 fi
