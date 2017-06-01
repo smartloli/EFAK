@@ -77,6 +77,7 @@ start()
 	echo "*******************************************************************"
     	echo "* KE service has started success! *"
     	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke' *"
+    	echo "* Account:admin ,Password:123456                          *"
 	echo "*******************************************************************"
     	echo "* <Usage> ke.sh [start|status|stop|restart|stats] </Usage> *"
 	echo "*******************************************************************"
