@@ -17,8 +17,6 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
-import java.io.OutputStream;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -36,7 +34,6 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.common.domain.PageParamDomain;
 import org.smartloli.kafka.eagle.common.util.Constants;
-import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
 
@@ -67,24 +64,13 @@ public class ConsumersController {
 	/** Get consumer data by ajax. */
 	@RequestMapping(value = "/consumers/info/ajax", method = RequestMethod.GET)
 	public void consumersGraphAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 		
 		try {
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-			byte[] output = GzipUtils.compressToByte(consumerService.getActiveTopic(clusterAlias,formatter));
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = consumerService.getActiveTopic(clusterAlias,formatter).getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -93,12 +79,6 @@ public class ConsumersController {
 	/** Get consumer datasets by ajax. */
 	@RequestMapping(value = "/consumer/list/table/ajax", method = RequestMethod.GET)
 	public void consumerTableAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -150,13 +130,8 @@ public class ConsumersController {
 		target.put("iTotalDisplayRecords", count);
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -165,12 +140,6 @@ public class ConsumersController {
 	/** Get consumer data through group by ajax. */
 	@RequestMapping(value = "/consumer/{group}/table/ajax", method = RequestMethod.GET)
 	public void consumerTableListAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -215,13 +184,8 @@ public class ConsumersController {
 		target.put("iTotalDisplayRecords", consumerDetails.size());
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

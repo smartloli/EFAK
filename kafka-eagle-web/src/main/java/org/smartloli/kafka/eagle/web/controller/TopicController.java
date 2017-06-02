@@ -17,7 +17,6 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
-import java.io.OutputStream;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +37,6 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.util.Constants;
-import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -123,12 +121,6 @@ public class TopicController {
 	/** Get topic metadata by ajax. */
 	@RequestMapping(value = "/topic/meta/{tname}/ajax", method = RequestMethod.GET)
 	public void topicMetaAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -170,13 +162,8 @@ public class TopicController {
 		target.put("iTotalDisplayRecords", metadatas.size());
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -185,12 +172,6 @@ public class TopicController {
 	/** Get topic datasets by ajax. */
 	@RequestMapping(value = "/topic/list/table/ajax", method = RequestMethod.GET)
 	public void topicListAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -248,13 +229,8 @@ public class TopicController {
 		target.put("iTotalDisplayRecords", topics.size());
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -303,24 +279,13 @@ public class TopicController {
 	/** Logical execute kafka sql. */
 	@RequestMapping(value = "/topic/logical/commit/", method = RequestMethod.GET)
 	public void topicSqlLogicalAjax(@RequestParam String sql, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		try {
 			String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 			String target = topicService.execute(clusterAlias, sql);
 			JSONObject result = JSON.parseObject(target);
 
-			byte[] output = GzipUtils.compressToByte(result.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = result.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -329,12 +294,6 @@ public class TopicController {
 	/** Get topic message by ajax. */
 	@RequestMapping(value = "/topic/physics/commit/", method = RequestMethod.GET)
 	public void topicSqlPhysicsAjax(@RequestParam String sql, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -377,13 +336,8 @@ public class TopicController {
 		target.put("iTotalDisplayRecords", topics.size());
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

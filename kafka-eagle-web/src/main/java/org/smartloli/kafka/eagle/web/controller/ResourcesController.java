@@ -17,7 +17,6 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.web.service.ResourceService;
 import org.smartloli.kafka.eagle.web.sso.filter.SSORealm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,20 +62,9 @@ public class ResourcesController {
 	/** Resource graph. */
 	@RequestMapping(value = "/resource/graph/ajax", method = RequestMethod.GET)
 	public void resGraphAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		try {
-			byte[] output = GzipUtils.compressToByte(resourceService.getResourcesTree());
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = resourceService.getResourcesTree().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -143,20 +130,9 @@ public class ResourcesController {
 	/** Get parent resource. */
 	@RequestMapping(value = "/resource/parent/ajax", method = RequestMethod.GET)
 	public void resParentAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		try {
-			byte[] output = GzipUtils.compressToByte(resourceService.getResourceParent().toString());
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = resourceService.getResourceParent().toString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -165,20 +141,9 @@ public class ResourcesController {
 	/** Get children resource by parent id. */
 	@RequestMapping(value = "/resource/child/{parentId}/ajax", method = RequestMethod.GET)
 	public void resChildAjax(@PathVariable("parentId") int parentId, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		try {
-			byte[] output = GzipUtils.compressToByte(resourceService.findResourceByParentId(parentId).toString());
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = resourceService.findResourceByParentId(parentId).toString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

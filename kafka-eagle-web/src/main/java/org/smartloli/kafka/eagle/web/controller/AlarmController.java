@@ -17,7 +17,6 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
-import java.io.OutputStream;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +40,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.Constants;
-import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.AlarmService;
 
@@ -100,24 +98,14 @@ public class AlarmController {
 	/** Get alarmer monitor topic by ajax. */
 	@RequestMapping(value = "/alarm/topic/ajax", method = RequestMethod.GET)
 	public void alarmTopicAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
 
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		try {
-			byte[] output = GzipUtils.compressToByte(alarmService.get(clusterAlias, formatter));
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = alarmService.get(clusterAlias, formatter).getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -167,12 +155,6 @@ public class AlarmController {
 	/** Get alarmer datasets by ajax. */
 	@RequestMapping(value = "/alarm/list/table/ajax", method = RequestMethod.GET)
 	public void alarmTopicListAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -230,13 +212,8 @@ public class AlarmController {
 		target.put("iTotalDisplayRecords", alarms.size());
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

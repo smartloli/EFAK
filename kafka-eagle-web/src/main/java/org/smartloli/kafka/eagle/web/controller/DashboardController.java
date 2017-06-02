@@ -17,8 +17,6 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
-import java.io.OutputStream;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.smartloli.kafka.eagle.common.util.Constants;
-import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
 
 /**
@@ -59,29 +56,12 @@ public class DashboardController {
 	/** Get data from Kafka in dashboard by ajax. */
 	@RequestMapping(value = "/dash/kafka/ajax", method = RequestMethod.GET)
 	public void dashboardAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
-		String clusterAlias = "";
-		try {
-			HttpSession session = request.getSession();
-			clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
-			byte[] output = GzipUtils.compressToByte(dashboradService.getDashboard(clusterAlias));
-			output = output == null ? "".getBytes() : output;
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = dashboradService.getDashboard(clusterAlias).getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

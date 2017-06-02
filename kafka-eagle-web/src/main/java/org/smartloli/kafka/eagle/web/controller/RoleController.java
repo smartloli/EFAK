@@ -17,7 +17,6 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -29,7 +28,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailService;
-import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.web.pojo.RoleResource;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.pojo.UserRole;
@@ -121,12 +119,6 @@ public class RoleController {
 	/** Get the roles that the user owns. */
 	@RequestMapping(value = "/user/role/table/ajax", method = RequestMethod.GET)
 	public void getUserRoleAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -169,13 +161,8 @@ public class RoleController {
 		target.put("iTotalDisplayRecords", count);
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -185,12 +172,6 @@ public class RoleController {
 	@SuppressWarnings("unused")
 	@RequestMapping(value = "/role/table/ajax", method = RequestMethod.GET)
 	public void getRolesAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -226,13 +207,8 @@ public class RoleController {
 		target.put("iTotalDisplayRecords", count);
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -241,20 +217,9 @@ public class RoleController {
 	/** Obtain the resources it owns through the role id. */
 	@RequestMapping(value = "/role/resource/{roleId}/ajax", method = RequestMethod.GET)
 	public void roleResourceAjax(@PathVariable("roleId") int roleId, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		try {
-			byte[] output = GzipUtils.compressToByte(roleService.getRoleTree(roleId));
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = roleService.getRoleTree(roleId).getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -264,12 +229,6 @@ public class RoleController {
 	@RequestMapping(value = "/user/role/{action}/{userId}/{roleId}/ajax", method = RequestMethod.GET)
 	public void changeUserRoleAjax(@PathVariable("action") String action, @PathVariable("userId") int userId, @PathVariable("roleId") int roleId, HttpServletResponse response,
 			HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		try {
 			UserRole userRole = new UserRole();
 			userRole.setUserId(userId);
@@ -292,13 +251,8 @@ public class RoleController {
 				}
 			}
 			object.put("code", code);
-			byte[] output = GzipUtils.compressToByte(object.toJSONString());
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -307,23 +261,12 @@ public class RoleController {
 	/** Get the corresponding roles through the user id. */
 	@RequestMapping(value = "/user/role/{userId}/ajax", method = RequestMethod.GET)
 	public void userRoleAjax(@PathVariable("userId") int userId, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		try {
 			JSONObject object = new JSONObject();
 			object.put("role", roleService.getRoles());
 			object.put("userRole", roleService.findRoleByUserId(userId));
-			byte[] output = GzipUtils.compressToByte(object.toJSONString());
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -333,12 +276,6 @@ public class RoleController {
 	@RequestMapping(value = "/role/{action}/{roleId}/{resourceId}/", method = RequestMethod.GET)
 	public void changeRoleResource(@PathVariable("action") String action, @PathVariable("roleId") int roleId, @PathVariable("resourceId") int resourceId,
 			HttpServletResponse response) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		try {
 			JSONObject object = new JSONObject();
 			RoleResource roleResource = new RoleResource();
@@ -363,13 +300,8 @@ public class RoleController {
 					object.put("info", "Delete role has failed.");
 				}
 			}
-			byte[] output = GzipUtils.compressToByte(object.toJSONString());
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

@@ -17,8 +17,6 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
-import java.io.OutputStream;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -36,7 +34,6 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.util.Constants;
-import org.smartloli.kafka.eagle.common.util.GzipUtils;
 import org.smartloli.kafka.eagle.web.service.ClusterService;
 
 /**
@@ -82,12 +79,6 @@ public class ClusterController {
 	/** Get cluster data by ajax. */
 	@RequestMapping(value = "/cluster/info/{type}/ajax", method = RequestMethod.GET)
 	public void clusterAjax(@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -160,13 +151,8 @@ public class ClusterController {
 		target.put("iTotalDisplayRecords", clusters.size());
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -174,13 +160,7 @@ public class ClusterController {
 
 	/** Change cluster viewer address. */
 	@RequestMapping(value = "/cluster/info/{clusterAlias}/change", method = RequestMethod.GET)
-	public ModelAndView clusterCutAjax(@PathVariable("clusterAlias") String clusterAlias, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-	
+	public ModelAndView clusterChangeAjax(@PathVariable("clusterAlias") String clusterAlias, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		if (!clusterService.hasClusterAlias(clusterAlias)) {
 			return new ModelAndView("redirect:/error/404");
 		} else {
@@ -193,12 +173,6 @@ public class ClusterController {
 	/** Get multicluster information. */
 	@RequestMapping(value = "/cluster/info/multicluster/ajax", method = RequestMethod.GET)
 	public void multiClusterAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-	
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -247,13 +221,8 @@ public class ClusterController {
 		target.put("iTotalDisplayRecords", clusterAliass.size());
 		target.put("aaData", aaDatas);
 		try {
-			byte[] output = GzipUtils.compressToByte(target.toJSONString());
-			response.setContentLength(output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-	
-			out.flush();
-			out.close();
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -262,23 +231,12 @@ public class ClusterController {
 	/** Get zookeeper client whether live data by ajax. */
 	@RequestMapping(value = "/cluster/zk/islive/ajax", method = RequestMethod.GET)
 	public void zkCliLiveAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
-			byte[] output = GzipUtils.compressToByte(clusterService.status(clusterAlias).toJSONString());
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = clusterService.status(clusterAlias).toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -287,12 +245,6 @@ public class ClusterController {
 	/** Execute zookeeper command by ajax. */
 	@RequestMapping(value = "/cluster/zk/cmd/ajax", method = RequestMethod.GET)
 	public void zkCliCmdAjax(HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("text/html;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Charset", "utf-8");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Encoding", "gzip");
-
 		String cmd = request.getParameter("cmd");
 		String type = request.getParameter("type");
 
@@ -300,13 +252,8 @@ public class ClusterController {
 		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
-			byte[] output = GzipUtils.compressToByte(clusterService.execute(clusterAlias, cmd, type));
-			response.setContentLength(output == null ? "NULL".toCharArray().length : output.length);
-			OutputStream out = response.getOutputStream();
-			out.write(output);
-
-			out.flush();
-			out.close();
+			byte[] output = clusterService.execute(clusterAlias, cmd, type).getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
