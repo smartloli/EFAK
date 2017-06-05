@@ -164,7 +164,6 @@ public class SimpleKafkaConsumer {
 				topics.add(topic);
 
 				numRead++;
-				a_maxReads--;
 			}
 
 			if (numRead == 0) {
@@ -174,6 +173,7 @@ public class SimpleKafkaConsumer {
 					ie.printStackTrace();
 				}
 			}
+			a_maxReads--;
 		}
 		if (consumer != null)
 			consumer.close();
