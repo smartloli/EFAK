@@ -32,7 +32,7 @@ import org.smartloli.kafka.eagle.web.pojo.Signiner;
 public interface AccountService {
 
 	public Signiner login(String username, String password);
-	
+
 	public int reset(Signiner signin);
 
 	public Signiner findUserByRtxNo(int rtxno);
@@ -40,6 +40,12 @@ public interface AccountService {
 	public List<Signiner> findUserBySearch(Map<String, Object> params);
 
 	public int userCounts();
-	
+
 	public int insertUser(Signiner signin);
+
+	public int modify(Signiner signin);
+
+	public int delete(Signiner signin);
+	
+	public String findUserById(int id);
 }

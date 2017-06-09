@@ -133,7 +133,7 @@
 					</div>
 				</div>
 			</div>
-			<!-- modal -->
+			<!-- modal setting -->
 			<div class="modal fade" aria-labelledby="keModalLabel"
 				aria-hidden="true" id="ke_setting_dialog" tabindex="-1"
 				role="dialog">
@@ -157,6 +157,68 @@
 					</div>
 				</div>
 			</div>
+			<!-- modal modify -->
+			<div class="modal fade" aria-labelledby="keModalLabel"
+				aria-hidden="true" id="ke_user_modify_dialog" tabindex="-1"
+				role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabel">
+								Modify User
+							</h4>
+						</div>
+						<!-- /.row -->
+						<form role="form" action="/ke/system/user/modify/" method="post"
+							onsubmit="return contextModifyFormValid();return false;">
+							<fieldset class="form-horizontal">
+								<div class="form-group">
+									<label for="path" class="col-sm-2 control-label">RtxNo</label>
+									<div class="col-sm-9">
+										<input id="ke_user_id_modify" name="ke_user_id_modify"
+											type="hidden" class="form-control" placeholder="1000">
+										<input id="ke_rtxno_name_modify" name="ke_rtxno_name_modify" type="text"
+											class="form-control" placeholder="1000">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="path" class="col-sm-2 control-label">RealName</label>
+									<div class="col-sm-9">
+										<input id="ke_real_name_modify" name="ke_real_name_modify" type="text"
+											class="form-control" placeholder="萝莉">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="path" class="col-sm-2 control-label">UserName</label>
+									<div class="col-sm-9">
+										<input id="ke_user_name_modify" name="ke_user_name_modify" type="text"
+											class="form-control" placeholder="smartloli">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="path" class="col-sm-2 control-label">Email</label>
+									<div class="col-sm-9">
+										<input id="ke_user_email_modify" name="ke_user_email_modify" type="text"
+											class="form-control" placeholder="smartloli@email.com">
+									</div>
+								</div>
+								<div id="alert_mssage_modify" style="display: none"
+									class="alert alert-danger">
+									<label> Oops! Please make some changes .</label>
+								</div>
+							</fieldset>
+
+							<div id="remove_div" class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Cancle</button>
+								<button type="submit" class="btn btn-primary" id="create-btn">Submit
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 			<!-- /#page-wrapper -->
 		</div>
 	</div>
@@ -175,6 +237,22 @@
 			$("#alert_mssage").show();
 			setTimeout(function() {
 				$("#alert_mssage").hide()
+			}, 3000);
+			return false;
+		}
+
+		return true;
+	}
+	
+	function contextModifyFormValid() {
+		var ke_rtxno_name_modify = $("#ke_rtxno_name_modify").val();
+		var ke_real_name_modify = $("#ke_real_name_modify").val();
+		var ke_user_name_modify = $("#ke_user_name_modify").val();
+		var ke_user_email_modify = $("#ke_user_email_modify").val();
+		if (ke_rtxno_name_modify.length == 0 || ke_real_name_modify.length == 0 || ke_user_name_modify.length == 0 || ke_user_email_modify.length == 0) {
+			$("#alert_mssage_modify").show();
+			setTimeout(function() {
+				$("#alert_mssage_modify").hide()
 			}, 3000);
 			return false;
 		}

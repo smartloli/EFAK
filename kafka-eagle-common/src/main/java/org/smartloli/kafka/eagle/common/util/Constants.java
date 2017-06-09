@@ -60,4 +60,8 @@ public class Constants {
 		public static String ERROR_LOGIN = "error_msg";
 	}
 
+	/** Role Administrator. */
+	public interface Role {
+		public static String ADMIN = "admin";
+	}
 }

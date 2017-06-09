@@ -100,13 +100,13 @@ public class JSqlUtils {
 
 	private static File createTempJson() throws IOException {
 		JSONObject object = new JSONObject();
-		object.put("version", "1.0");
+		object.put("version", "2.0");
 		object.put("defaultSchema", "db");
 		JSONArray array = new JSONArray();
 		JSONObject tmp = new JSONObject();
 		tmp.put("name", "db");
 		tmp.put("type", "custom");
-		tmp.put("factory", "org.smartloli.kafka.eagle.sql.schema.JSqlSchemaFactory");
+		tmp.put("factory", "org.smartloli.kafka.eagle.core.sql.schema.JSqlSchemaFactory");
 		JSONObject tmp2 = new JSONObject();
 		tmp.put("operand", tmp2.put("database", "calcite_memory_db"));
 		array.add(tmp);

@@ -42,4 +42,10 @@ public interface UserDao {
 	public int userCounts();
 
 	public int insertUser(Signiner signin);
+	
+	public int modify(Signiner signin);
+	
+	public int delete(Signiner signin);
+	
+	public Signiner findUserById(int id);
 }

@@ -28,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailService;
+import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.web.pojo.RoleResource;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.pojo.UserRole;
@@ -116,6 +117,42 @@ public class RoleController {
 		}
 	}
 
+	/** Modify user. */
+	@RequiresPermissions("/system/user/modify")
+	@RequestMapping(value = "/user/modify/", method = RequestMethod.POST)
+	public String modifyUser(HttpSession session, HttpServletRequest request) {
+		String rtxno = request.getParameter("ke_rtxno_name_modify");
+		String username = request.getParameter("ke_user_name_modify");
+		String realname = request.getParameter("ke_real_name_modify");
+		String email = request.getParameter("ke_user_email_modify");
+		String id = request.getParameter("ke_user_id_modify");
+
+		Signiner signin = new Signiner();
+		signin.setId(Integer.parseInt(id));
+		signin.setEmail(email);
+		signin.setRealname(realname);
+		signin.setRtxno(Integer.parseInt(rtxno));
+		signin.setUsername(username);
+		if (accountService.modify(signin) > 0) {
+			return "redirect:/system/user";
+		} else {
+			return "redirect:/errors/500";
+		}
+	}
+
+	/** Delete user. */
+	@RequiresPermissions("/system/user/delete")
+	@RequestMapping(value = "/user/delete/{id}/", method = RequestMethod.GET)
+	public String deleteUser(@PathVariable("id") int id, HttpSession session, HttpServletRequest request) {
+		Signiner signin = new Signiner();
+		signin.setId(id);
+		if (accountService.delete(signin) > 0) {
+			return "redirect:/system/user";
+		} else {
+			return "redirect:/errors/500";
+		}
+	}
+
 	/** Get the roles that the user owns. */
 	@RequestMapping(value = "/user/role/table/ajax", method = RequestMethod.GET)
 	public void getUserRoleAjax(HttpServletResponse response, HttpServletRequest request) {
@@ -145,12 +182,20 @@ public class RoleController {
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : roles) {
 			JSONObject role = (JSONObject) object;
+			int id = role.getInteger("id");
 			JSONObject obj = new JSONObject();
 			obj.put("rtxno", role.getString("rtxno"));
 			obj.put("username", role.getString("username"));
 			obj.put("realname", role.getString("realname"));
 			obj.put("email", role.getString("email"));
-			obj.put("operate", "<a id='operater_modal' name='operater_modal' href='#" + role.getInteger("id") + "' class='btn btn-primary btn-xs'>分配角色</a>");
+			if (Constants.Role.ADMIN.equals(role.getString("username"))) {
+				obj.put("operate", "");
+			} else {
+				obj.put("operate",
+						"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a id='operater_modal' name='operater_modal' href='#"
+								+ id + "/'>Assign</a><li><a name='operater_modify_modal' href='#" + id + "'>Modify</a><li><a href='/ke/system/user/delete/" + id
+								+ "/'>Delete</a></ul></div>");
+			}
 			aaDatas.add(obj);
 		}
 
@@ -219,6 +264,17 @@ public class RoleController {
 	public void roleResourceAjax(@PathVariable("roleId") int roleId, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			byte[] output = roleService.getRoleTree(roleId).getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Find siginer through the user id. */
+	@RequestMapping(value = "/user/signin/{id}/ajax", method = RequestMethod.GET)
+	public void findUserByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			byte[] output = accountService.findUserById(id).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

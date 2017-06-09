@@ -38,6 +38,25 @@ $(document).ready(function() {
 		$('#ke_user_add_dialog').modal('show');
 	});
 
+	$(document).on('click', 'a[name=operater_modify_modal]', function() {
+		$('#ke_user_modify_dialog').modal('show');
+		var href = $(this).attr("href");
+		var id = href.split("#")[1];
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/system/user/signin/' + id + '/ajax',
+			success : function(datas) {
+				$("#ke_rtxno_name_modify").val(datas.rtxno);
+				$("#ke_real_name_modify").val(datas.realname);
+				$("#ke_user_name_modify").val(datas.username);
+				$("#ke_user_email_modify").val(datas.email);
+				$("#ke_user_id_modify").val(id);
+			}
+		});
+
+	});
+
 	var id = "";
 	$(document).on('click', 'a[name=operater_modal]', function() {
 		var href = $(this).attr("href");

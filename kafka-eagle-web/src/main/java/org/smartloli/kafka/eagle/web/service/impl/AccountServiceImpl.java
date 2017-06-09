@@ -27,6 +27,8 @@ import org.smartloli.kafka.eagle.web.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * Handling requests for login, reset password, logout, etc.
  * 
@@ -78,6 +80,27 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public int reset(Signiner signin) {
 		return userDao.reset(signin);
+	}
+
+	@Override
+	public int modify(Signiner signin) {
+		return userDao.modify(signin);
+	}
+
+	@Override
+	public int delete(Signiner signin) {
+		return userDao.delete(signin);
+	}
+
+	@Override
+	public String findUserById(int id) {
+		Signiner signer = userDao.findUserById(id);
+		JSONObject object = new JSONObject();
+		object.put("rtxno", signer.getRtxno());
+		object.put("username", signer.getUsername());
+		object.put("realname", signer.getRealname());
+		object.put("email", signer.getEmail());
+		return object.toJSONString();
 	}
 
 }
