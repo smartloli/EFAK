@@ -40,7 +40,7 @@
 								</div>
 							</fieldset>
 						</div>
-						<div id="remove_div" class="modal-footer">
+						<div class="modal-footer">
 							<button type="button" class="btn btn-default"
 								data-dismiss="modal">Cancle</button>
 							<button type="submit" class="btn btn-primary" id="create-btn">Submit

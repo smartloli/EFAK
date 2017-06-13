@@ -34,6 +34,12 @@ import org.smartloli.kafka.eagle.common.domain.offsets.KeyAndValueSchemasDomain;
 import org.smartloli.kafka.eagle.common.domain.offsets.MessageValueStructAndVersionDomain;
 import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.core.factory.KafkaService;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import kafka.common.OffsetAndMetadata;
 import kafka.common.OffsetMetadata;
@@ -61,6 +67,9 @@ public class KafkaOffsetGetter extends Thread {
 
 	/** Multi cluster information. */
 	public static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new ConcurrentHashMap<>();
+
+	/** Kafka brokers */
+	private KafkaService kafkaService = new KafkaFactory().create();
 
 	/** ============================ Start Filter ========================= */
 	private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));
@@ -199,11 +208,25 @@ public class KafkaOffsetGetter extends Thread {
 	public void run() {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
-			String zk = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
 			Properties props = new Properties();
 			props.put("group.id", "kafka.eagle.system.group");
-			props.put("zookeeper.connect", zk);
 			props.put("exclude.internal.topics", "false");
+			if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+				JSONArray bootstrapServers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+				String bootstrapServer = "";
+				for (Object object : bootstrapServers) {
+					JSONObject kafkaBroker = (JSONObject) object;
+					bootstrapServer += kafkaBroker.getString("host") + ":" + kafkaBroker.getInteger("port") + ",";
+				}
+				System.setProperty("java.security.auth.login.config", SystemConfigUtils.getProperty("kafka.eagle.sasl.client"));
+				props.put("security.protocol", "SASL_PLAINTEXT");
+				props.put("sasl.mechanism", "PLAIN");
+				//props.put("bootstrap.servers", bootstrapServer.substring(0, bootstrapServer.length() - 1));
+				props.put("bootstrap.servers", "dn1:9092");
+			} else {
+				String zk = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
+				props.put("zookeeper.connect", zk);
+			}
 			ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
 			startOffsetListener(clusterAlias, consumer);
 		}

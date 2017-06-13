@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.core.factory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -230,10 +231,17 @@ public class KafkaServiceImpl implements KafkaService {
 					BrokersDomain broker = new BrokersDomain();
 					broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
 					broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
-					String host = JSON.parseObject(tuple._1.get()).getString("host");
-					int port = JSON.parseObject(tuple._1.get()).getInteger("port");
-					broker.setHost(host);
-					broker.setPort(port);
+					if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+						String endpoints = JSON.parseObject(tuple._1.get()).getString("endpoints");
+						String tmp = endpoints.split(File.separator + File.separator)[1];
+						broker.setHost(tmp.substring(0, tmp.length() - 2).split(":")[0]);
+						broker.setPort(Integer.valueOf(tmp.substring(0, tmp.length() - 2).split(":")[1]));
+					} else {
+						String host = JSON.parseObject(tuple._1.get()).getString("host");
+						int port = JSON.parseObject(tuple._1.get()).getInteger("port");
+						broker.setHost(host);
+						broker.setPort(port);
+					}
 					broker.setId(++id);
 					targets.add(broker);
 				} catch (Exception ex) {
