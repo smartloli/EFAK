@@ -34,8 +34,11 @@ public class Constants {
 	/** Kafka parameter setting. */
 	public interface Kafka {
 		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
+		public final static String KAFKA_EAGLE_SYSTEM_GROUP = "kafka.eagle.system.group";
+		public final static String JAVA_SECURITY = "java.security.auth.login.config";
 		public final static int SINGLE_THREAD = 1;
 		public final static int ACTIVER_INTERVAL = 10000;
+		public final static int TIME_OUT = 100;
 	}
 
 	/** Mail args setting. */

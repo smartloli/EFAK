@@ -15,15 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.ipc;
+package org.smartloli.kafka.eagle.ipc;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.protocol.types.Schema;
@@ -40,6 +44,7 @@ import org.smartloli.kafka.eagle.core.factory.KafkaService;
 
 import kafka.common.OffsetAndMetadata;
 import kafka.common.OffsetMetadata;
+import kafka.common.Topic;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -55,9 +60,9 @@ import kafka.message.MessageAndMetadata;
  *
  *         Created by Jan 3, 2017
  */
-public class KafkaOffsetGetter extends Thread {
+public class TestKafkaOffsetGetter extends Thread {
 
-	private final static Logger LOG = LoggerFactory.getLogger(KafkaOffsetGetter.class);
+	private final static Logger LOG = LoggerFactory.getLogger(TestKafkaOffsetGetter.class);
 
 	/** Consumer offsets in kafka topic. */
 	private final static String CONSUMER_OFFSET_TOPIC = Constants.Kafka.CONSUMER_OFFSET_TOPIC;
@@ -135,6 +140,33 @@ public class KafkaOffsetGetter extends Thread {
 		}
 	}
 
+	private static synchronized void startOffsetSASLListener(String clusterAlias, KafkaConsumer<String, String> consumer) {
+		while (true) {
+			ConsumerRecords<String, String> records = consumer.poll(100);
+			for (ConsumerRecord<String, String> offsetMsg : records) {
+				if (ByteBuffer.wrap(offsetMsg.key().getBytes()).getShort() < 2) {
+					try {
+						GroupTopicPartition commitKey = readMessageKey(ByteBuffer.wrap(offsetMsg.key().getBytes()));
+						if (offsetMsg.value().getBytes() == null) {
+							continue;
+						}
+						OffsetAndMetadata commitValue = readMessageValue(ByteBuffer.wrap(offsetMsg.value().getBytes()));
+						if (multiKafkaConsumerOffsets.containsKey(clusterAlias)) {
+							multiKafkaConsumerOffsets.get(clusterAlias).put(commitKey, commitValue);
+						} else {
+							Map<GroupTopicPartition, OffsetAndMetadata> kafkaConsumerOffsets = new ConcurrentHashMap<>();
+							kafkaConsumerOffsets.put(commitKey, commitValue);
+							multiKafkaConsumerOffsets.put(clusterAlias, kafkaConsumerOffsets);
+						}
+						System.out.println(multiKafkaConsumerOffsets.toString());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+
 	/** Get instance K&V schema. */
 	private static KeyAndValueSchemasDomain schemaFor(int version) {
 		return OFFSET_SCHEMAS.get(version);
@@ -191,18 +223,18 @@ public class KafkaOffsetGetter extends Thread {
 
 	static {
 		LOG.info("Initialize KafkaOffsetGetter clazz.");
-		KafkaOffsetGetter kafka = new KafkaOffsetGetter();
-		kafka.start();
+//		TestKafkaOffsetGetter kafka = new TestKafkaOffsetGetter();
+//		kafka.start();
 	}
 
 	/** Instance KafkaOffsetGetter clazz. */
 	public static void getInstance() {
-		LOG.info(KafkaOffsetGetter.class.getName());
+		LOG.info(TestKafkaOffsetGetter.class.getName());
 	}
 
 	public static void main(String[] args) {
 		getInstance();
-		KafkaOffsetGetter kafka = new KafkaOffsetGetter();
+		TestKafkaOffsetGetter kafka = new TestKafkaOffsetGetter();
 		kafka.run();
 	}
 
@@ -219,8 +251,13 @@ public class KafkaOffsetGetter extends Thread {
 				props.put("enable.auto.commit", "true");
 				props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 				props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+				
 				props.put("security.protocol", "SASL_PLAINTEXT");
 				props.put("sasl.mechanism", "PLAIN");
+				
+				KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+				consumer.subscribe(Arrays.asList(Topic.GroupMetadataTopicName()));
+				startOffsetSASLListener(clusterAlias, consumer);
 			} else {
 				String zk = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
 				props.put("group.id", "kafka.eagle.system.group");

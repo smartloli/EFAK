@@ -91,6 +91,9 @@ public interface KafkaService {
 	/** Get kafka consumer information pages. */
 	public String getKafkaActiverSize(String clusterAlias, String group);
 
+	/** Get kafka broker bootstrap server. */
+	public String getKafkaBrokerServer(String clusterAlias);
+
 	/** Get kafka consumer groups. */
 	public int getKafkaConsumerGroups(String clusterAlias);
 

@@ -97,7 +97,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
-
+	
 	/**
 	 * Use Kafka low level consumer API to find leader.
 	 * 
@@ -667,6 +667,12 @@ public class KafkaServiceImpl implements KafkaService {
 		return sql;
 	}
 
+	private void sasl(Properties props, String bootstrapServers) {
+//		System.setProperty("java.security.auth.login.config", SystemConfigUtils.getProperty("kafka.eagle.sasl.client"));
+		props.put("security.protocol", "SASL_PLAINTEXT");
+		props.put("sasl.mechanism", "PLAIN");
+	}
+
 	private KafkaSqlDomain segments(String clusterAlias, String sql) {
 		KafkaSqlDomain kafkaSql = new KafkaSqlDomain();
 		kafkaSql.setMetaSql(sql);
@@ -727,6 +733,11 @@ public class KafkaServiceImpl implements KafkaService {
 		Properties prop = new Properties();
 		JSONArray consumerGroups = new JSONArray();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+			sasl(prop, getKafkaBrokerServer(clusterAlias));
+		}
+
 		try {
 			AdminClient adminClient = AdminClient.create(prop);
 			scala.collection.immutable.Map<Node, scala.collection.immutable.List<GroupOverview>> opts = adminClient.listAllConsumerGroups();
@@ -758,6 +769,11 @@ public class KafkaServiceImpl implements KafkaService {
 	private JSONArray getKafkaMetadata(String bootstrapServers, String group) {
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+
+		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+			sasl(prop, bootstrapServers);
+		}
+
 		JSONArray consumerGroups = new JSONArray();
 		try {
 			AdminClient adminClient = AdminClient.create(prop);
@@ -814,6 +830,11 @@ public class KafkaServiceImpl implements KafkaService {
 		Properties prop = new Properties();
 		int counter = 0;
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+			sasl(prop, parseBrokerServer(clusterAlias));
+		}
+
 		try {
 			AdminClient adminClient = AdminClient.create(prop);
 			scala.collection.immutable.Map<Node, scala.collection.immutable.List<GroupOverview>> opts = adminClient.listAllConsumerGroups();
@@ -871,6 +892,11 @@ public class KafkaServiceImpl implements KafkaService {
 			return targets.toJSONString();
 		}
 		return "";
+	}
+
+	/** Get kafka 0.10.x broker bootstrap server. */
+	public String getKafkaBrokerServer(String clusterAlias) {
+		return parseBrokerServer(clusterAlias);
 	}
 
 }
