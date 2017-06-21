@@ -24,16 +24,20 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.protocol.types.Schema;
 import org.apache.kafka.common.protocol.types.Struct;
 import org.apache.kafka.common.protocol.types.Type;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.domain.offsets.KeyAndValueSchemasDomain;
 import org.smartloli.kafka.eagle.common.domain.offsets.MessageValueStructAndVersionDomain;
 import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.Constants.Kafka;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -41,12 +45,12 @@ import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import kafka.common.OffsetAndMetadata;
 import kafka.common.OffsetMetadata;
 import kafka.consumer.Consumer;
-import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import kafka.coordinator.GroupTopicPartition;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
+import kafka.server.KafkaConfig;
 
 /**
  * New offset storage formats: kafka
@@ -213,20 +217,20 @@ public class KafkaOffsetGetter extends Thread {
 		for (String clusterAlias : clusterAliass) {
 			Properties props = new Properties();
 			if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-				props.put("group.id", "kafka.eagle.sasl.system.group");
-				props.put("exclude.internal.topics", "false");
+				props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+				props.put(ConsumerConfig.EXCLUDE_INTERNAL_TOPICS_CONFIG, "false");
 				props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(clusterAlias));
-				props.put("enable.auto.commit", "true");
-				props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-				props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-				props.put("security.protocol", "SASL_PLAINTEXT");
-				props.put("sasl.mechanism", "PLAIN");
+				props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
+				props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+				props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+				props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty("kafka.eagle.sasl.protocol"));
+				props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
 			} else {
 				String zk = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
-				props.put("group.id", "kafka.eagle.system.group");
-				props.put("exclude.internal.topics", "false");
-				props.put("zookeeper.connect", zk);
-				ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
+				props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+				props.put(ConsumerConfig.EXCLUDE_INTERNAL_TOPICS_CONFIG, "false");
+				props.put(KafkaConfig.ZkConnectProp(), zk);
+				ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new kafka.consumer.ConsumerConfig(props));
 				startOffsetListener(clusterAlias, consumer);
 			}
 		}
