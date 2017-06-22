@@ -102,5 +102,7 @@ public interface KafkaService {
 
 	/** Get kafka consumer group & topic. */
 	public String getKafkaConsumerGroupTopic(String clusterAlias, String group);
+	
+	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid);
 
 }

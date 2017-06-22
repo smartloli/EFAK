@@ -32,9 +32,13 @@ import java.util.regex.Pattern;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.security.JaasUtils;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +46,7 @@ import org.smartloli.kafka.eagle.common.domain.*;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
+import org.smartloli.kafka.eagle.common.util.Constants.Kafka;
 import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
 
 import com.alibaba.fastjson.JSON;
@@ -97,7 +102,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
-	
+
 	/**
 	 * Use Kafka low level consumer API to find leader.
 	 * 
@@ -580,10 +585,14 @@ public class KafkaServiceImpl implements KafkaService {
 	/**
 	 * Find leader through topic.
 	 * 
+	 * When we use kafka sasl, this method and not meet the requirements, from
+	 * the kafka eagle v1.1.5 began to repeal the use of this method.
+	 * 
 	 * @param topic
 	 * @return List
 	 * @see org.smartloli.kafka.eagle.domain.MetadataDomain
 	 */
+	@Deprecated
 	public List<MetadataDomain> findLeader(String clusterAlias, String topic) {
 		List<MetadataDomain> targets = new ArrayList<>();
 
@@ -668,9 +677,8 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	private void sasl(Properties props, String bootstrapServers) {
-//		System.setProperty("java.security.auth.login.config", SystemConfigUtils.getProperty("kafka.eagle.sasl.client"));
-		props.put("security.protocol", "SASL_PLAINTEXT");
-		props.put("sasl.mechanism", "PLAIN");
+		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty("kafka.eagle.sasl.protocol"));
+		props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
 	}
 
 	private KafkaSqlDomain segments(String clusterAlias, String sql) {
@@ -897,6 +905,25 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Get kafka 0.10.x broker bootstrap server. */
 	public String getKafkaBrokerServer(String clusterAlias) {
 		return parseBrokerServer(clusterAlias);
+	}
+
+	/** Get kafka 0.10.x sasl logsize. */
+	@Override
+	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid) {
+		Properties props = new Properties();
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty("kafka.eagle.sasl.protocol"));
+		props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
+
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		TopicPartition tp = new TopicPartition(topic, partitionid);
+		consumer.assign(Collections.singleton(tp));
+		java.util.Map<TopicPartition, Long> logsize = consumer.endOffsets(Collections.singleton(tp));
+		consumer.close();
+		return logsize.get(tp).longValue();
 	}
 
 }

@@ -181,7 +181,12 @@ public class OffsetsQuartz {
 					OffsetsLiteDomain offsetSQLite = new OffsetsLiteDomain();
 					for (String partitionStr : kafkaService.findTopicPartition(clusterAlias, topic)) {
 						int partition = Integer.parseInt(partitionStr);
-						long logSize = kafkaService.getLogSize(hosts, topic, partition);
+						long logSize = 0L;
+						if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+							logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partition);
+						} else {
+							logSize = kafkaService.getLogSize(hosts, topic, partition);
+						}
 						OffsetZkDomain offsetZk = null;
 						if ("kafka".equals(formatter)) {
 							String bootstrapServers = "";

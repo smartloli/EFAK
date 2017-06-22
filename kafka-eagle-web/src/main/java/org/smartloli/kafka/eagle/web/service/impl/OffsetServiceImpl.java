@@ -28,6 +28,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.domain.OffsetDomain;
 import org.smartloli.kafka.eagle.common.domain.OffsetZkDomain;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.ZkFactory;
@@ -75,7 +76,12 @@ public class OffsetServiceImpl implements OffsetService {
 			int partitionInt = Integer.parseInt(partition);
 			OffsetZkDomain offsetZk = getKafkaOffset(clusterAlias, topic, group, partitionInt);
 			OffsetDomain offset = new OffsetDomain();
-			long logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
+			long logSize = 0L;
+			if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+				logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partitionInt);
+			} else {
+				logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
+			}
 			offset.setPartition(partitionInt);
 			offset.setLogSize(logSize);
 			offset.setCreate(offsetZk.getCreate());
