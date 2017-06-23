@@ -79,6 +79,15 @@ public class TopicController {
 		return mav;
 	}
 
+	/** Topic mock viewer. */
+	@RequiresPermissions("/topic/mock")
+	@RequestMapping(value = "/topic/mock", method = RequestMethod.GET)
+	public ModelAndView topicMockView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/topic/mock");
+		return mav;
+	}
+
 	/** Topic list viewer. */
 	@RequestMapping(value = "/topic/list", method = RequestMethod.GET)
 	public ModelAndView topicListView(HttpSession session) {
@@ -163,6 +172,37 @@ public class TopicController {
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get topic datasets by ajax. */
+	@RequestMapping(value = "/topic/mock/list/ajax", method = RequestMethod.GET)
+	public void topicMockAjax(HttpServletResponse response, HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+			String name = request.getParameter("name");
+			JSONObject object = new JSONObject();
+			object.put("items", JSON.parseArray(topicService.mockTopics(clusterAlias, name)));
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/***/
+	@RequestMapping(value = "/topic/mock/send/message/{topic}/ajax", method = RequestMethod.GET)
+	public void topicMockSend(@PathVariable("topic") String topic, @RequestParam("message") String message, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+			JSONObject object = new JSONObject();
+			object.put("status", topicService.mockSendMsg(clusterAlias, topic, message));
+			byte[] output = object.toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

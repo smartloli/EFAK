@@ -40,6 +40,15 @@ public class KafkaSqlDomain {
 	private String topic;
 	private boolean status;
 	private List<HostsDomain> seeds = new ArrayList<>();
+	private String clusterAlias;
+
+	public String getClusterAlias() {
+		return clusterAlias;
+	}
+
+	public void setClusterAlias(String clusterAlias) {
+		this.clusterAlias = clusterAlias;
+	}
 
 	public String getTopic() {
 		return topic;

@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.core.factory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,11 +35,15 @@ import org.I0Itec.zkclient.ZkClient;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.security.JaasUtils;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +52,7 @@ import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.Constants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KafkaPartitioner;
 import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
 
 import com.alibaba.fastjson.JSON;
@@ -96,6 +102,7 @@ public class KafkaServiceImpl implements KafkaService {
 	private final String BROKER_IDS_PATH = "/brokers/ids";
 	private final String BROKER_TOPICS_PATH = "/brokers/topics";
 	private final String CONSUMERS_PATH = "/consumers";
+	private final String TOPIC_ISR = "/brokers/topics/%s/partitions/%s/state";
 	private final Logger LOG = LoggerFactory.getLogger(KafkaServiceImpl.class);
 	/** Instance Zookeeper client pool. */
 	private ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
@@ -476,7 +483,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 * @param partitionid
 	 * @return String.
 	 */
-	public String getReplicasIsr(String clusterAlias, String topic, int partitionid) {
+	private String getReplicasIsr(String clusterAlias, String topic, int partitionid) {
 		ZkClient zkc = zkPool.getZkClientSerializer(clusterAlias);
 		Seq<Object> repclicasAndPartition = ZkUtils.apply(zkc, false).getInSyncReplicasForPartition(topic, partitionid);
 		List<Object> targets = JavaConversions.seqAsJavaList(repclicasAndPartition);
@@ -908,7 +915,6 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get kafka 0.10.x sasl logsize. */
-	@Override
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid) {
 		Properties props = new Properties();
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
@@ -926,4 +932,57 @@ public class KafkaServiceImpl implements KafkaService {
 		return logsize.get(tp).longValue();
 	}
 
+	/** Get kafka 0.10.x sasl topic metadata. */
+	public List<MetadataDomain> findKafkaLeader(String clusterAlias, String topic) {
+		List<MetadataDomain> targets = new ArrayList<>();
+		ZkClient zkc = zkPool.getZkClientSerializer(clusterAlias);
+		if (ZkUtils.apply(zkc, false).pathExists(BROKER_TOPICS_PATH)) {
+			Seq<String> subBrokerTopicsPaths = ZkUtils.apply(zkc, false).getChildren(BROKER_TOPICS_PATH);
+			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+			if (topics.contains(topic)) {
+				Tuple2<Option<String>, Stat> tuple = ZkUtils.apply(zkc, false).readDataMaybeNull(BROKER_TOPICS_PATH + "/" + topic);
+				JSONObject partitionObject = JSON.parseObject(tuple._1.get()).getJSONObject("partitions");
+				for (String partition : partitionObject.keySet()) {
+					String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
+					Tuple2<Option<String>, Stat> tuple2 = ZkUtils.apply(zkc, false).readDataMaybeNull(path);
+					JSONObject topicMetadata = JSON.parseObject(tuple2._1.get());
+					MetadataDomain metadate = new MetadataDomain();
+					metadate.setIsr(topicMetadata.getString("isr"));
+					metadate.setLeader(topicMetadata.getInteger("leader"));
+					metadate.setPartitionId(Integer.valueOf(partition));
+					metadate.setReplicas(getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
+					targets.add(metadate);
+				}
+			}
+		}
+		if (zkc != null) {
+			zkPool.releaseZKSerializer(clusterAlias, zkc);
+			zkc = null;
+		}
+		return targets;
+	}
+
+	/** Send mock message to kafka topic . */
+	public boolean mockMessage(String clusterAlias, String topic, String message) {
+		Properties props = new Properties();
+		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
+		props.put(Kafka.KEY_SERIALIZER, StringSerializer.class.getCanonicalName());
+		props.put(Kafka.VALUE_SERIALIZER, StringSerializer.class.getCanonicalName());
+		props.put(Kafka.PARTITION_CLASS, KafkaPartitioner.class.getName());
+
+		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty("kafka.eagle.sasl.protocol"));
+			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
+		}
+
+		Producer<String, String> producer = new KafkaProducer<>(props);
+		JSONObject msg = new JSONObject();
+		msg.put("date", CalendarUtils.getDate());
+		msg.put("msg", message);
+
+		producer.send(new ProducerRecord<String, String>(topic, new Date().getTime() + "", msg.toJSONString()));
+		producer.close();
+
+		return true;
+	}
 }

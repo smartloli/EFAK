@@ -67,9 +67,6 @@ public interface KafkaService {
 	/** Get kafka 0.10.x offset from topic. */
 	public String getKafkaOffset(String clusterAlias);
 
-	/** According to topic and partition to obtain Replicas & Isr. */
-	public String getReplicasIsr(String clusterAlias, String topic, int partitionid);
-
 	/** Use kafka console comand to create topic. */
 	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic);
 
@@ -102,7 +99,14 @@ public interface KafkaService {
 
 	/** Get kafka consumer group & topic. */
 	public String getKafkaConsumerGroupTopic(String clusterAlias, String group);
-	
+
+	/** Get kafka sasl logsize . */
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid);
+
+	/** Get kafka sasl topic metadate. */
+	public List<MetadataDomain> findKafkaLeader(String clusterAlias, String topic);
+
+	/** Send mock message to kafka. */
+	public boolean mockMessage(String clusterAlias, String topic, String message);
 
 }

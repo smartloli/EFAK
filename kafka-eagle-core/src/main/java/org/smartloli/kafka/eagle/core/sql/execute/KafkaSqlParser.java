@@ -53,7 +53,8 @@ public class KafkaSqlParser {
 					status.put("msg", "ERROR - Topic[" + kafkaSql.getTableName() + "] not exist.");
 				} else {
 					long start = System.currentTimeMillis();
-					List<JSONArray> dataSets = SimpleKafkaConsumer.start(kafkaSql);
+					kafkaSql.setClusterAlias(clusterAlias);
+					List<JSONArray> dataSets = KafkaConsumerAdapter.executor(kafkaSql);
 					String results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
 					long end = System.currentTimeMillis();
 					status.put("error", false);
@@ -67,6 +68,7 @@ public class KafkaSqlParser {
 		} catch (Exception e) {
 			status.put("error", true);
 			status.put("msg", e.getMessage());
+			e.printStackTrace();
 			LOG.error("Execute sql to query kafka topic has error,msg is " + e.getMessage());
 		}
 		return status.toJSONString();

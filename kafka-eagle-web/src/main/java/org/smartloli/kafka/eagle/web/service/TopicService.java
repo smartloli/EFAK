@@ -40,4 +40,10 @@ public interface TopicService {
 	/** Execute kafka query sql. */
 	public String execute(String clusterAlias, String sql);
 
+	/** Get mock topics. */
+	public String mockTopics(String clusterAlias, String name);
+
+	/** Send mock message to topic. */
+	public boolean mockSendMsg(String clusterAlias, String topic, String message);
+
 }

@@ -21,6 +21,7 @@ isexit()
 }
 
 DIALUP_PID=$KE_HOME/bin/ke.pid
+
 start()
 {
     echo -n $"Starting $prog: "

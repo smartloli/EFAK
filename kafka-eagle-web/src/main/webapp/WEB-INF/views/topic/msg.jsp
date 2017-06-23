@@ -43,7 +43,7 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> Sample SQL query: <strong>SELECT "partition","offset","msg" FROM "KE_Test_Topic_NAME" WHERE "partition" IN (0,1,2) AND "offsets"=10001 limit 10</strong>
+						<i class="fa fa-info-circle"></i> Sample SQL query: <strong>SELECT "partition","offset","msg" FROM "KE_Test_Topic_NAME" WHERE "partition" IN (0,1,2) limit 10</strong> 
 					</div>
 				</div>
 			</div>

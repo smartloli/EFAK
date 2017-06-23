@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.web.service.TopicService;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
@@ -59,7 +60,11 @@ public class TopicServiceImpl implements TopicService {
 
 	/** Get metadata in topic. */
 	public String metadata(String clusterAlias, String topicName) {
-		return kafkaService.findLeader(clusterAlias, topicName).toString();
+		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+			return kafkaService.findKafkaLeader(clusterAlias, topicName).toString();
+		} else {
+			return kafkaService.findLeader(clusterAlias, topicName).toString();
+		}
 	}
 
 	/** List all the topic under Kafka in partition. */
@@ -70,6 +75,37 @@ public class TopicServiceImpl implements TopicService {
 	/** Execute kafka execute query sql and viewer topic message. */
 	public String execute(String clusterAlias, String sql) {
 		return KafkaSqlParser.execute(clusterAlias, sql);
+	}
+
+	/** Get kafka 0.10.x mock topics. */
+	public String mockTopics(String clusterAlias, String name) {
+		JSONArray allPartitions = JSON.parseArray(kafkaService.getAllPartitions(clusterAlias));
+		JSONArray topics = new JSONArray();
+		int offset = 0;
+		for (Object object : allPartitions) {
+			JSONObject allPartition = (JSONObject) object;
+			if (name != null) {
+				JSONObject topic = new JSONObject();
+				if (allPartition.getString("topic").contains(name)) {
+					topic.put("text", allPartition.getString("topic"));
+					topic.put("id", offset);
+				}
+				topics.add(topic);
+			} else {
+				JSONObject topic = new JSONObject();
+				topic.put("text", allPartition.getString("topic"));
+				topic.put("id", offset);
+				topics.add(topic);
+			}
+
+			offset++;
+		}
+		return topics.toJSONString();
+	}
+
+	/** Send mock message to kafka topic . */
+	public boolean mockSendMsg(String clusterAlias, String topic, String message) {
+		return kafkaService.mockMessage(clusterAlias, topic, message);
 	}
 
 }
