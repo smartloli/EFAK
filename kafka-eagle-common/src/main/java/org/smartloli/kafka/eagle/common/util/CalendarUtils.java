@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.common.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -28,6 +29,18 @@ import java.util.Date;
  *         Created by Nov 6, 2015
  */
 public class CalendarUtils {
+
+	/**
+	 * Convert date time to unix time,default is yyyy-MM-dd HH:mm:ss.
+	 * 
+	 * @param date
+	 * @return 1498443597
+	 * @throws ParseException
+	 */
+	public static long convertDate2UnixTime(String date) throws ParseException {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return df.parse(date).getTime();
+	}
 
 	/**
 	 * Convert time mill into ? day ? hour ? min ? sec.

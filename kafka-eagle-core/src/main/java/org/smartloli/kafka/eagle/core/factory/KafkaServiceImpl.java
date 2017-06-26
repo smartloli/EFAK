@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.core.factory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -297,6 +298,26 @@ public class KafkaServiceImpl implements KafkaService {
 			zkPool.releaseZKSerializer(clusterAlias, zkc);
 			zkc = null;
 		}
+		// Sort topic by create time.
+		Collections.sort(targets, new Comparator<PartitionsDomain>() {
+			public int compare(PartitionsDomain arg0, PartitionsDomain arg1) {
+				try {
+					long hits0 = CalendarUtils.convertDate2UnixTime(arg0.getCreated());
+					long hits1 = CalendarUtils.convertDate2UnixTime(arg1.getCreated());
+
+					if (hits1 > hits0) {
+						return 1;
+					} else if (hits1 == hits0) {
+						return 0;
+					} else {
+						return -1;
+					}
+				} catch (Exception e) {
+					LOG.error("Convert date to unix time has error,msg is " + e.getMessage());
+					return 0;
+				}
+			}
+		});
 		return targets.toString();
 	}
 
