@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.domain.HostsDomain;
 import org.smartloli.kafka.eagle.common.domain.KafkaSqlDomain;
+import org.smartloli.kafka.eagle.common.util.Constants.Kafka;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -58,7 +59,6 @@ public class SimpleKafkaConsumer {
 	private static int buff_size = 64 * 1024;
 	private static int fetch_size = 1000 * 1000 * 1000;
 	private static int timeout = 100000;
-	private static int maxSize = 5000;
 
 	public SimpleKafkaConsumer() {
 		m_replicaBrokers = new ArrayList<HostsDomain>();
@@ -109,10 +109,9 @@ public class SimpleKafkaConsumer {
 
 		SimpleConsumer consumer = new SimpleConsumer(leadBroker, a_port, timeout, buff_size, clientName);
 		long latestOffset = getLastOffset(consumer, a_topic, a_partition, kafka.api.OffsetRequest.LatestTime(), clientName);
-		long earliestOffset = getLastOffset(consumer, a_topic, a_partition, kafka.api.OffsetRequest.EarliestTime(), clientName);
 		long readOffset = 0L;
-		if ((latestOffset - maxSize) > 0) {
-			readOffset = (latestOffset - maxSize) > earliestOffset ? (latestOffset - maxSize) : earliestOffset;
+		if ((latestOffset - Kafka.POSITION) > 0) {
+			readOffset = latestOffset - Kafka.POSITION;
 		} else {
 			readOffset = getLastOffset(consumer, a_topic, a_partition, kafka.api.OffsetRequest.EarliestTime(), clientName);
 		}
