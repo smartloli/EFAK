@@ -79,7 +79,7 @@ public class OffsetsQuartz {
 	}
 
 	private void alert(String clusterAlias, List<OffsetsLiteDomain> offsetLites) {
-		boolean enableAlarm = SystemConfigUtils.getBooleanProperty("kafka.eagel.mail.enable");
+		boolean enableAlarm = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.enable");
 		if (enableAlarm) {
 			List<AlarmDomain> alarmers = alarmConfigure(clusterAlias);
 			for (AlarmDomain alarm : alarmers) {

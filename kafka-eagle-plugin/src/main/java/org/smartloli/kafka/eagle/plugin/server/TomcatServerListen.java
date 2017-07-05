@@ -35,7 +35,7 @@ public class TomcatServerListen {
 	public static void main(String[] args) {
 		try {
 			String xml = System.getProperty("user.dir") + "/kms/conf/server.xml";
-			String modifyPort = SystemConfigUtils.getProperty("kafka.eagel.webui.port");
+			String modifyPort = SystemConfigUtils.getProperty("kafka.eagle.webui.port");
 			DomUtils.getTomcatServerXML(xml, modifyPort);
 		} catch (Exception ex) {
 			ex.printStackTrace();

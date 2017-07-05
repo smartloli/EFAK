@@ -57,12 +57,12 @@ public class MailServiceImpl implements MailService {
 	@Override
 	public boolean send(String subject, String address, String content, String attachment) {
 		MailSenderDomain mailInfo = new MailSenderDomain();
-		mailInfo.setMailServerHost(SystemConfigUtils.getProperty("kafka.eagel.mail.server.host"));
-		mailInfo.setMailServerPort(SystemConfigUtils.getProperty("kafka.eagel.mail.server.port"));
+		mailInfo.setMailServerHost(SystemConfigUtils.getProperty("kafka.eagle.mail.server.host"));
+		mailInfo.setMailServerPort(SystemConfigUtils.getProperty("kafka.eagle.mail.server.port"));
 		mailInfo.setValidate(true);
-		mailInfo.setUserName(SystemConfigUtils.getProperty("kafka.eagel.mail.sa"));
-		mailInfo.setPassword(SystemConfigUtils.getProperty("kafka.eagel.mail.password"));
-		mailInfo.setFromAddress(SystemConfigUtils.getProperty("kafka.eagel.mail.username"));
+		mailInfo.setUserName(SystemConfigUtils.getProperty("kafka.eagle.mail.sa"));
+		mailInfo.setPassword(SystemConfigUtils.getProperty("kafka.eagle.mail.password"));
+		mailInfo.setFromAddress(SystemConfigUtils.getProperty("kafka.eagle.mail.username"));
 		mailInfo.setToAddress(address);
 		mailInfo.setSubject(subject);
 		mailInfo.setContent(content);
