@@ -18,7 +18,8 @@
 			<directory>src/main/resources/conf/</directory>
 			<outputDirectory>/conf</outputDirectory>
 			<includes>
-				<include>*</include>
+				<include>*.properties</include>
+				<include>*.conf</include>
 			</includes>
 		</fileSet>
 		<fileSet>

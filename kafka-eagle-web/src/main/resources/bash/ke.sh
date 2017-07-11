@@ -65,9 +65,7 @@ start()
 	echo "*******************************************************************"
 	sleep 3
 	rm -rf ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/*.properties
-	rm -rf ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/*.xml
 	cp ${KE_HOME}/conf/*.properties ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/
-	cp ${KE_HOME}/conf/*.xml ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/
 	sleep 3
 	rm -rf ${KE_HOME}/kms/logs/*
 	chmod +x ${KE_HOME}/kms/bin/*.sh

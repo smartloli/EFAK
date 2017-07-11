@@ -14,7 +14,7 @@
 	<!-- Introducing configuration files -->
 	<bean id="propertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="classpath:jdbc.properties" />
+		<property name="location" value="classpath:system-config.properties" />
 	</bean>
 
 	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
