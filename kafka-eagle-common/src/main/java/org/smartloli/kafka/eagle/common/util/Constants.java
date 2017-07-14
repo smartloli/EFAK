@@ -64,4 +64,16 @@ public class Constants {
 	public interface Role {
 		public static String ADMIN = "admin";
 	}
+
+	/** Kafka jmx mbean. */
+	public interface MBean {
+		public static String COUNT = "Count";
+		public static String EVENT_TYPE = "EventType";
+		public static String FIFTEEN_MINUTE_RATE = "FifteenMinuteRate";
+		public static String FIVE_MINUTE_RATE = "FiveMinuteRate";
+		public static String MEAN_RATE = "MeanRate";
+		public static String ONE_MINUTE_RATE = "OneMinuteRate";
+		public static String RATE_UNIT = "RateUnit";
+		public static String VALUE = "Value";
+	}
 }
