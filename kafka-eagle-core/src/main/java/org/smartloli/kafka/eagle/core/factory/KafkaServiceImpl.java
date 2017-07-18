@@ -254,7 +254,9 @@ public class KafkaServiceImpl implements KafkaService {
 						int port = JSON.parseObject(tuple._1.get()).getInteger("port");
 						broker.setHost(host);
 						broker.setPort(port);
+
 					}
+					broker.setJmxPort(JSON.parseObject(tuple._1.get()).getInteger("jmx_port"));
 					broker.setId(++id);
 					targets.add(broker);
 				} catch (Exception ex) {

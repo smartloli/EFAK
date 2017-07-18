@@ -19,6 +19,9 @@ $(document).ready(function() {
 	}else if (ret.indexOf("/system") > -1) {
 		$("#demo3").addClass('collapse in');
 		$("#demo3").attr("aria-expanded", true);
+	}else if (ret.indexOf("/metrics") > -1) {
+		$("#demo4").addClass('collapse in');
+		$("#demo4").attr("aria-expanded", true);
 	}
 	
 	$(document).on('click', 'a[name=ke_account_reset]', function() {

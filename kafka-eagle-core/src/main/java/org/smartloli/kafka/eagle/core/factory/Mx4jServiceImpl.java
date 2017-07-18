@@ -157,20 +157,14 @@ public class Mx4jServiceImpl implements Mx4jService {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, uri));
 			connector = JMXConnectorFactory.connect(jmxSeriverUrl);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			Object count = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.COUNT);
-			Object eventType = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.EVENT_TYPE);
 			Object fifteenMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIFTEEN_MINUTE_RATE);
 			Object fiveMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIVE_MINUTE_RATE);
 			Object meanRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.MEAN_RATE);
 			Object oneMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.ONE_MINUTE_RATE);
-			Object rateUnit = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.RATE_UNIT);
-			mbeanDomain.setCount(Long.valueOf(count.toString()));
-			mbeanDomain.setEventType(eventType.toString());
 			mbeanDomain.setFifteenMinute(fifteenMinuteRate.toString());
 			mbeanDomain.setFiveMinute(fiveMinuteRate.toString());
 			mbeanDomain.setMeanRate(meanRate.toString());
 			mbeanDomain.setOneMinute(oneMinuteRate.toString());
-			mbeanDomain.setRateUnit(rateUnit.toString());
 		} catch (Exception e) {
 			LOG.error("JMX service url[" + uri + "] create has error,msg is " + e.getMessage());
 		} finally {

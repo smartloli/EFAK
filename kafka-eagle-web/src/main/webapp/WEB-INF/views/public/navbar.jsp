@@ -57,7 +57,7 @@
 			data-toggle="dropdown"><i class="fa fa-sitemap"></i>
 				${clusterAlias} </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.1.5 </a></li>
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.1.6 </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
 			data-toggle="dropdown" aria-expanded="false"><i
 				class="fa fa-user"></i> ${LOGIN_USER_SESSION.realname} <b
@@ -99,6 +99,15 @@
 							class="fa fa-maxcdn fa-fw"></i> Multi-Clusters</a></li>
 					<li id="navbar_zk"><a href="/ke/cluster/zkcli"><i
 							class="fa fa-terminal fa-fw"></i> ZkCli</a></li>
+				</ul></li>
+			<li><a href="#" data-toggle="collapse" data-target="#demo4"><i
+					class="fa fa-fw fa-eye"></i> Metrics <i
+					class="fa fa-fw fa-caret-down"></i></a>
+				<ul id="demo4" class="collapse">
+					<li id="navbar_cli"><a href="/ke/metrics/brokers"><i
+							class="fa fa-sitemap fa-fw"></i> Brokers</a></li>
+					<li id="navbar_cli"><a href="/ke/metrics/trend"><i
+							class="fa fa-bar-chart-o fa-fw"></i> Trend</a></li>
 				</ul></li>
 			<li><a href="#" data-toggle="collapse" data-target="#demo1"><i
 					class="fa fa-fw fa-bell"></i> Alarm <i

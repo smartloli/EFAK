@@ -33,6 +33,15 @@ public class BrokersDomain {
 	private int port = 0;
 	private String created = "";
 	private String modify = "";
+	private int jmxPort = 0;
+
+	public int getJmxPort() {
+		return jmxPort;
+	}
+
+	public void setJmxPort(int jmxPort) {
+		this.jmxPort = jmxPort;
+	}
 
 	public int getId() {
 		return id;

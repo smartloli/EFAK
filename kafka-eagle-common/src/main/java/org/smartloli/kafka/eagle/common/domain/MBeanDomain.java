@@ -28,29 +28,10 @@ import com.google.gson.Gson;
  */
 public class MBeanDomain {
 
-	private long count;
-	private String eventType;
 	private String fifteenMinute;
 	private String fiveMinute;
 	private String meanRate;
 	private String oneMinute;
-	private String rateUnit;
-
-	public long getCount() {
-		return count;
-	}
-
-	public void setCount(long count) {
-		this.count = count;
-	}
-
-	public String getEventType() {
-		return eventType;
-	}
-
-	public void setEventType(String eventType) {
-		this.eventType = eventType;
-	}
 
 	public String getFifteenMinute() {
 		return fifteenMinute;
@@ -82,14 +63,6 @@ public class MBeanDomain {
 
 	public void setOneMinute(String oneMinute) {
 		this.oneMinute = oneMinute;
-	}
-
-	public String getRateUnit() {
-		return rateUnit;
-	}
-
-	public void setRateUnit(String rateUnit) {
-		this.rateUnit = rateUnit;
 	}
 
 	@Override

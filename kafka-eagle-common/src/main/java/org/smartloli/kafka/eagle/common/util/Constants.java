@@ -75,5 +75,18 @@ public class Constants {
 		public static String ONE_MINUTE_RATE = "OneMinuteRate";
 		public static String RATE_UNIT = "RateUnit";
 		public static String VALUE = "Value";
+
+		/** Messages in /sec. */
+		public static String MESSAGES_IN = "msg";
+		/** Bytes in /sec. */
+		public static String BYTES_IN = "in";
+		/** Bytes out /sec. */
+		public static String BYTES_OUT = "out";
+		/** Bytes rejected /sec. */
+		public static String BYTES_REJECTED = "rejected";
+		/** Failed fetch request /sec. */
+		public static String FAILED_FETCH_REQUEST = "fetch";
+		/** Failed produce request /sec. */
+		public static String FAILED_PRODUCE_REQUEST = "produce";
 	}
 }
