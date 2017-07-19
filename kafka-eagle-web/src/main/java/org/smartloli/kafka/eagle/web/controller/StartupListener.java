@@ -25,6 +25,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.ContextLoader;
 
 /**
  * Load kafka consumer internal thread to get offset.
@@ -38,10 +39,23 @@ public class StartupListener implements ApplicationContextAware {
 
 	private Logger LOG = LoggerFactory.getLogger(StartupListener.class);
 
+	private static ApplicationContext applicationContext;
+
 	@Override
 	public void setApplicationContext(ApplicationContext arg0) throws BeansException {
 		RunTask task = new RunTask();
 		task.start();
+	}
+
+	public static Object getBean(String beanName) {
+		if (applicationContext == null) {
+			applicationContext = ContextLoader.getCurrentWebApplicationContext();
+		}
+		return applicationContext.getBean(beanName);
+	}
+
+	public static <T> T getBean(String beanName, Class<T> clazz) {
+		return clazz.cast(getBean(beanName));
 	}
 
 	class RunTask extends Thread {

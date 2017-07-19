@@ -15,29 +15,59 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.web.service;
+package org.smartloli.kafka.eagle.common.domain;
 
-import java.util.List;
-import java.util.Map;
-
-import org.smartloli.kafka.eagle.common.domain.KpiDomain;
+import com.google.gson.Gson;
 
 /**
- * Define access to the kafka monitoring data interface via jmx.
+ * KpiDomain pojo.
  * 
  * @author smartloli.
  *
- *         Created by Jul 17, 2017
+ *         Created by Jul 19, 2017
  */
-public interface MetricsService {
+public class KpiDomain {
 
-	/** Gets summary monitoring data for all broker. */
-	public String getAllBrokersMBean(String clusterAlias);
+	private String cluster;
+	private String key;
+	private String value;
+	private String tm;
 
-	/** Collection statistics data from kafka jmx & insert into table. */
-	public int insert(List<KpiDomain> kpi);
+	public String getCluster() {
+		return cluster;
+	}
 
-	/** Get mbean data from table. */
-	public String query(Map<String, Object> param);
+	public void setCluster(String cluster) {
+		this.cluster = cluster;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public String getTm() {
+		return tm;
+	}
+
+	public void setTm(String tm) {
+		this.tm = tm;
+	}
+
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
+	}
 
 }

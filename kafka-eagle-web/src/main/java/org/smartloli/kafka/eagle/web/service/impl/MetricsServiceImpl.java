@@ -18,9 +18,11 @@
 package org.smartloli.kafka.eagle.web.service.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.smartloli.kafka.eagle.common.domain.KpiDomain;
 import org.smartloli.kafka.eagle.common.domain.MBeanDomain;
 import org.smartloli.kafka.eagle.common.util.Constants.MBean;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
@@ -28,7 +30,9 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
 import org.smartloli.kafka.eagle.core.factory.Mx4jService;
+import org.smartloli.kafka.eagle.web.dao.MBeanDao;
 import org.smartloli.kafka.eagle.web.service.MetricsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -45,6 +49,9 @@ import com.google.gson.Gson;
  */
 @Service
 public class MetricsServiceImpl implements MetricsService {
+
+	@Autowired
+	private MBeanDao mbeanDao;
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
@@ -158,6 +165,38 @@ public class MetricsServiceImpl implements MetricsService {
 			entry.getValue().setOneMinute(StrUtils.assembly(entry.getValue().getOneMinute()));
 		}
 		return new Gson().toJson(mbeans);
+	}
+
+	/** Collection statistics data from kafka jmx & insert into table. */
+	public int insert(List<KpiDomain> kpi) {
+		return mbeanDao.insert(kpi);
+	}
+
+	/** Get mbean data from table. */
+	public String query(Map<String, Object> param) {
+		JSONObject target = new JSONObject();
+
+		param.put("key", "ByteIn");
+		List<KpiDomain> bytesIn = mbeanDao.query(param);
+		target.put("bytesIn", bytesIn);
+
+		param.put("key", "ByteOut");
+		List<KpiDomain> bytesOut = mbeanDao.query(param);
+		target.put("bytesOut", bytesOut);
+
+		param.put("key", "FailedFetchRequest");
+		List<KpiDomain> failedFetchRequest = mbeanDao.query(param);
+		target.put("failedFetchRequest", failedFetchRequest);
+
+		param.put("key", "FailedProduceRequest");
+		List<KpiDomain> failedProduceRequest = mbeanDao.query(param);
+		target.put("failedProduceRequest", failedProduceRequest);
+
+		param.put("key", "MessageIn");
+		List<KpiDomain> messageIn = mbeanDao.query(param);
+		target.put("messageIn", messageIn);
+
+		return target.toJSONString();
 	}
 
 }

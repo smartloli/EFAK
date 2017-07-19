@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.web.service;
+package org.smartloli.kafka.eagle.web.dao;
 
 import java.util.List;
 import java.util.Map;
@@ -23,21 +23,18 @@ import java.util.Map;
 import org.smartloli.kafka.eagle.common.domain.KpiDomain;
 
 /**
- * Define access to the kafka monitoring data interface via jmx.
+ * MBeanDao interface definition
  * 
  * @author smartloli.
  *
- *         Created by Jul 17, 2017
+ *         Created by Jul 19, 2017
  */
-public interface MetricsService {
-
-	/** Gets summary monitoring data for all broker. */
-	public String getAllBrokersMBean(String clusterAlias);
+public interface MBeanDao {
 
 	/** Collection statistics data from kafka jmx & insert into table. */
 	public int insert(List<KpiDomain> kpi);
 
 	/** Get mbean data from table. */
-	public String query(Map<String, Object> param);
+	public List<KpiDomain> query(Map<String, Object> params);
 
 }

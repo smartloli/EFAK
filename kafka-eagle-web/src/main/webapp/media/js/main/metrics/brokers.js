@@ -17,7 +17,7 @@ $(document).ready(
 						msg += "<tr><td>Bytes out /sec</td><td><a class='btn btn-primary btn-xs'>" + datas.out.meanRate + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.out.oneMinute
 								+ "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.out.fiveMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.out.fifteenMinute + "</a></td></tr>";
 						msg += "<tr><td>Bytes rejected</td><td><a class='btn btn-primary btn-xs'>" + datas.rejected.meanRate + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.rejected.oneMinute
-								+ "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.rejected.fiveMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.rejected.fifteenMinute.split("B")[0] + "</a></td></tr>";
+								+ "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.rejected.fiveMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.rejected.fifteenMinute + "</a></td></tr>";
 						msg += "<tr><td>Failed fetch request /sec</td><td><a class='btn btn-primary btn-xs'>" + datas.fetch.meanRate.split("B")[0] + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.fetch.oneMinute.split("B")[0]
 						+ "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.fetch.fiveMinute.split("B")[0] + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.fetch.fifteenMinute.split("B")[0] + "</a></td></tr>";
 						msg += "<tr><td>Failed produce request /sec</td><td><a class='btn btn-primary btn-xs'>" + datas.produce.meanRate.split("B")[0] + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.produce.oneMinute.split("B")[0]
