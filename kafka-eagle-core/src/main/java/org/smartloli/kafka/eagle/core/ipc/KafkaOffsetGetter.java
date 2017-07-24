@@ -143,9 +143,6 @@ public class KafkaOffsetGetter extends Thread {
 					e.printStackTrace();
 				}
 			}
-			if (SystemConfigUtils.getBooleanProperty("kafka.eagle.offset.logger.enable")) {
-				LOG.info("[multiKafkaConsumerOffsets]::" + multiKafkaConsumerOffsets.toString());
-			}
 		}
 	}
 
@@ -153,9 +150,8 @@ public class KafkaOffsetGetter extends Thread {
 	private static synchronized void startOffsetSaslListener(String clusterAlias, KafkaConsumer<String, String> consumer) {
 		consumer.subscribe(Arrays.asList(Topic.GroupMetadataTopicName()));
 		boolean flag = true;
-		int poll = SystemConfigUtils.getIntProperty("kafka.eagle.offset.monitor.poll");
 		while (flag) {
-			ConsumerRecords<String, String> records = consumer.poll(poll);
+			ConsumerRecords<String, String> records = consumer.poll(1000);
 			for (ConsumerRecord<String, String> record : records) {
 				if (record != null && record.value() != null) {
 					Object offsetKey = GroupMetadataManager.readMessageKey(ByteBuffer.wrap(record.key().getBytes()));
@@ -177,9 +173,6 @@ public class KafkaOffsetGetter extends Thread {
 						LOG.info("Consumer group[" + offsetKey.toString() + "] thread has shutdown.");
 					}
 				}
-			}
-			if (SystemConfigUtils.getBooleanProperty("kafka.eagle.offset.logger.enable")) {
-				LOG.info("[multiKafkaConsumerOffsets]::" + multiKafkaConsumerOffsets.toString());
 			}
 		}
 	}

@@ -13,12 +13,6 @@
 		<property name="targetMethod" value="jobQuartz" />
 		<property name="concurrent" value="false" />
 	</bean>
-	<bean id="mbeanDetail"
-		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="mbeanSchedule" />
-		<property name="targetMethod" value="mbeanQuartz" />
-		<property name="concurrent" value="false" />
-	</bean>
 	<!-- Configure the trigger time for scheduling execution. -->
 	<bean id="offsetsTrigger"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -28,14 +22,6 @@
 			<value>0 0/5 * * * ?</value>
 		</property>
 	</bean>
-	<bean id="mbeanTrigger"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail" ref="mbeanDetail" />
-		<property name="cronExpression">
-			<!-- Perform task scheduling per 5min. -->
-			<value>0 0/1 * * * ?</value>
-		</property>
-	</bean>
 	<!-- Quartz scheduling factory scheduling plant can only have one, multiple 
 		scheduling tasks added in list. -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -43,7 +29,6 @@
 			<list>
 				<!-- All scheduling lists. -->
 				<ref local="offsetsTrigger" />
-				<ref local="mbeanTrigger" />
 			</list>
 		</property>
 	</bean>
