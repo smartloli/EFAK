@@ -30,8 +30,8 @@ import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
-import org.smartloli.kafka.eagle.common.domain.OffsetsLiteDomain;
+import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
+import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
@@ -201,9 +201,9 @@ public class ZkServiceImpl implements ZkService {
 	 * @param list
 	 *            New datasets.
 	 */
-	public void insert(String clusterAlias, List<OffsetsLiteDomain> list) {
+	public void insert(String clusterAlias, List<OffsetsLiteInfo> list) {
 		String hour = getZkHour();
-		for (OffsetsLiteDomain offset : list) {
+		for (OffsetsLiteInfo offset : list) {
 			JSONObject target = new JSONObject();
 			target.put("hour", hour);
 
@@ -239,7 +239,7 @@ public class ZkServiceImpl implements ZkService {
 	 *            New configure object.
 	 * @return Integer.
 	 */
-	public int insertAlarmConfigure(String clusterAlias, AlarmDomain alarm) {
+	public int insertAlarmConfigure(String clusterAlias, AlarmInfo alarm) {
 		JSONObject object = new JSONObject();
 		object.put("lag", alarm.getLag());
 		object.put("owner", alarm.getOwners());

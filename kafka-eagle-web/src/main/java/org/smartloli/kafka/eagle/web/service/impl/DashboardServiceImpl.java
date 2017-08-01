@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.smartloli.kafka.eagle.common.domain.DashboardDomain;
+import org.smartloli.kafka.eagle.common.protocol.DashboardInfo;
 import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -99,7 +99,7 @@ public class DashboardServiceImpl implements DashboardService {
 		int topicSize = JSON.parseArray(topciAndPartitions).size();
 		String kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);
 		int brokerSize = JSON.parseArray(kafkaBrokers).size();
-		DashboardDomain dashboard = new DashboardDomain();
+		DashboardInfo dashboard = new DashboardInfo();
 		dashboard.setBrokers(brokerSize);
 		dashboard.setTopics(topicSize);
 		dashboard.setZks(zks);

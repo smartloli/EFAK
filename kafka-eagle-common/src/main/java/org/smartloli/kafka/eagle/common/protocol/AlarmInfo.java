@@ -15,25 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Definition offset lite information.
+ * Definition alarmer information.
  * 
  * @author smartloli.
  *
- *         Created by Aug 18, 2016
+ *         Created by Sep 7, 2016
  */
-public class OffsetsLiteDomain {
+public class AlarmInfo extends BaseProtocol{
 
 	private String group = "";
-	private String topic = "";
-	private long logSize = 0L;
-	private long offsets = 0L;
+	private String topics = "";
 	private long lag = 0L;
-	private String created = "";
+	private String owners = "";
+	private String modifyDate = "";
 
 	public String getGroup() {
 		return group;
@@ -43,28 +40,20 @@ public class OffsetsLiteDomain {
 		this.group = group;
 	}
 
-	public String getTopic() {
-		return topic;
+	public String getTopics() {
+		return topics;
 	}
 
-	public void setTopic(String topic) {
-		this.topic = topic;
+	public void setTopics(String topics) {
+		this.topics = topics;
 	}
 
-	public long getLogSize() {
-		return logSize;
+	public String getOwners() {
+		return owners;
 	}
 
-	public void setLogSize(long logSize) {
-		this.logSize = logSize;
-	}
-
-	public long getOffsets() {
-		return offsets;
-	}
-
-	public void setOffsets(long offsets) {
-		this.offsets = offsets;
+	public void setOwners(String owners) {
+		this.owners = owners;
 	}
 
 	public long getLag() {
@@ -75,17 +64,12 @@ public class OffsetsLiteDomain {
 		this.lag = lag;
 	}
 
-	public String getCreated() {
-		return created;
+	public String getModifyDate() {
+		return modifyDate;
 	}
 
-	public void setCreated(String created) {
-		this.created = created;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setModifyDate(String modifyDate) {
+		this.modifyDate = modifyDate;
 	}
 
 }

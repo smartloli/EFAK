@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
+package org.smartloli.kafka.eagle.common.protocol;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
@@ -27,14 +27,14 @@ import javax.mail.PasswordAuthentication;
  * 
  *         Created by Aug 15, 2016
  */
-public class SaAuthenticatorDomain extends Authenticator {
+public class SaAuthenticatorInfo extends Authenticator {
 	String userName = null;
 	String password = null;
 
-	public SaAuthenticatorDomain() {
+	public SaAuthenticatorInfo() {
 	}
 
-	public SaAuthenticatorDomain(String username, String password) {
+	public SaAuthenticatorInfo(String username, String password) {
 		this.userName = username;
 		this.password = password;
 	}

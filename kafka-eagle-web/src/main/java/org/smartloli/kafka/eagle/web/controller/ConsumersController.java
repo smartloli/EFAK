@@ -32,7 +32,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import org.smartloli.kafka.eagle.common.domain.PageParamDomain;
+import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
@@ -96,7 +96,7 @@ public class ConsumersController {
 			}
 		}
 
-		PageParamDomain page = new PageParamDomain();
+		DisplayInfo page = new DisplayInfo();
 		page.setSearch(search);
 		page.setiDisplayLength(iDisplayLength);
 		page.setiDisplayStart(iDisplayStart);

@@ -26,7 +26,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
+import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.ZkFactory;
@@ -61,7 +61,7 @@ public class AlarmServiceImpl implements AlarmService {
 	 * 
 	 * @see org.smartloli.kafka.eagle.domain.AlarmDomain
 	 */
-	public Map<String, Object> add(String clusterAlias, AlarmDomain alarm) {
+	public Map<String, Object> add(String clusterAlias, AlarmInfo alarm) {
 		Map<String, Object> alarmStates = new HashMap<String, Object>();
 		int status = zkService.insertAlarmConfigure(clusterAlias, alarm);
 		if (status == -1) {

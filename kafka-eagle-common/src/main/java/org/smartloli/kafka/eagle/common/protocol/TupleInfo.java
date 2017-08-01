@@ -15,25 +15,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.util;
-
-import org.smartloli.kafka.eagle.common.protocol.offsets.TopicAndGroupInfo;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
-* Test Class.
-* 
-* @author smartloli.
-*
-* Created by Mar 23, 2017
-*/
-public class TestSystemConfigUtils {
-	
-	public static void main(String[] args) {
-		String storage = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		System.out.println(storage);
-		TopicAndGroupInfo tp = new TopicAndGroupInfo();
-		tp.setGroup("ss");
-		System.out.println(tp);
+ * Definition memory tuple information.
+ * 
+ * @author smartloli.
+ *
+ *         Created by May 5, 2016
+ */
+public class TupleInfo extends BaseProtocol{
+	private long timespan;
+	private String ret = "";
+	private boolean status;
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+
+	public long getTimespan() {
+		return timespan;
+	}
+
+	public void setTimespan(long timespan) {
+		this.timespan = timespan;
+	}
+
+	public String getRet() {
+		return ret;
+	}
+
+	public void setRet(String ret) {
+		this.ret = ret;
 	}
 
 }

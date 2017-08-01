@@ -17,7 +17,7 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
-import org.smartloli.kafka.eagle.common.domain.PageParamDomain;
+import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 
 /**
  * Kafka consumer data interface.
@@ -25,7 +25,7 @@ import org.smartloli.kafka.eagle.common.domain.PageParamDomain;
  * @author smartloli.
  *
  *         Created by Jan 17, 2017.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 public interface ConsumerService {
@@ -34,18 +34,18 @@ public interface ConsumerService {
 	public String getActiveGraph(String clusterAlias);
 
 	/** Storage offset in kafka or zookeeper interface. */
-	public String getActiveTopic(String clusterAlias,String formatter);
+	public String getActiveTopic(String clusterAlias, String formatter);
 
 	/**
 	 * Judge consumer detail information storage offset in kafka or zookeeper
 	 * interface.
 	 */
-	public String getConsumerDetail(String clusterAlias,String formatter, String group);
+	public String getConsumerDetail(String clusterAlias, String formatter, String group);
 
 	/** Judge consumers storage offset in kafka or zookeeper interface. */
-	public String getConsumer(String clusterAlias,String formatter, PageParamDomain page);
+	public String getConsumer(String clusterAlias, String formatter, DisplayInfo page);
 
 	/** Get consumer size from kafka topic interface. */
-	public int getConsumerCount(String clusterAlias,String formatter);
-	
+	public int getConsumerCount(String clusterAlias, String formatter);
+
 }

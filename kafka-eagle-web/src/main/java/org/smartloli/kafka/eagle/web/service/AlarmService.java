@@ -19,8 +19,7 @@ package org.smartloli.kafka.eagle.web.service;
 
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
-
+import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
 
 /**
  * Alarm service interface.
@@ -28,19 +27,19 @@ import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
  * @author smartloli.
  *
  *         Created by Jan 17, 2017.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 public interface AlarmService {
 
 	/** Add alarmer interface. */
-	public Map<String, Object> add(String clusterAlias,AlarmDomain alarm);
+	public Map<String, Object> add(String clusterAlias, AlarmInfo alarm);
 
 	/** Delete alarmer interface. */
-	public void delete(String clusterAlias,String group, String topic);
+	public void delete(String clusterAlias, String group, String topic);
 
 	/** Get alarmer interface. */
-	public String get(String clusterAlias,String formatter);
+	public String get(String clusterAlias, String formatter);
 
 	/** List alarmer information. */
 	public String list(String clusterAlias);

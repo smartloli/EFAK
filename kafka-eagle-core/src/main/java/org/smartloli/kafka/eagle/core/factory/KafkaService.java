@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.smartloli.kafka.eagle.common.domain.KafkaSqlDomain;
-import org.smartloli.kafka.eagle.common.domain.MetadataDomain;
-import org.smartloli.kafka.eagle.common.domain.OffsetZkDomain;
-import org.smartloli.kafka.eagle.common.domain.PageParamDomain;
+import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
+import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
+import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 
 /**
  * Kafka group,topic and partition interface.
@@ -56,13 +56,13 @@ public interface KafkaService {
 	public Map<String, List<String>> getConsumers(String clusterAlias);
 
 	/** Obtaining kafka consumer page information from zookeeper. */
-	public Map<String, List<String>> getConsumers(String clusterAlias, PageParamDomain page);
+	public Map<String, List<String>> getConsumers(String clusterAlias, DisplayInfo page);
 
 	/** Use Kafka low consumer API & get logsize size from zookeeper. */
 	public long getLogSize(List<String> hosts, String topic, int partition);
 
 	/** According to group, topic and partition to get offset from zookeeper. */
-	public OffsetZkDomain getOffset(String clusterAlias, String topic, String group, int partition);
+	public OffsetZkInfo getOffset(String clusterAlias, String topic, String group, int partition);
 
 	/** Get kafka 0.10.x offset from topic. */
 	public String getKafkaOffset(String clusterAlias);
@@ -74,10 +74,10 @@ public interface KafkaService {
 	public Map<String, Object> delete(String clusterAlias, String topicName);
 
 	/** Find leader through topic. */
-	public List<MetadataDomain> findLeader(String clusterAlias, String topic);
+	public List<MetadataInfo> findLeader(String clusterAlias, String topic);
 
 	/** Convert query kafka to topic in the sql message for standard sql. */
-	public KafkaSqlDomain parseSql(String clusterAlias, String sql);
+	public KafkaSqlInfo parseSql(String clusterAlias, String sql);
 
 	/** Get kafka 0.10.x active consumer group & topics. */
 	public Set<String> getKafkaActiverTopics(String clusterAlias, String group);
@@ -104,7 +104,7 @@ public interface KafkaService {
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid);
 
 	/** Get kafka sasl topic metadate. */
-	public List<MetadataDomain> findKafkaLeader(String clusterAlias, String topic);
+	public List<MetadataInfo> findKafkaLeader(String clusterAlias, String topic);
 
 	/** Send mock message to kafka. */
 	public boolean mockMessage(String clusterAlias, String topic, String message);

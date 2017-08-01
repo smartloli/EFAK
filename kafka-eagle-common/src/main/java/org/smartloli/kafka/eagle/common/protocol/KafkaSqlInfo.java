@@ -15,13 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
+package org.smartloli.kafka.eagle.common.protocol;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
 
 /**
  * TODO
@@ -30,7 +29,7 @@ import com.google.gson.Gson;
  *
  *         Created by Feb 28, 2017
  */
-public class KafkaSqlDomain {
+public class KafkaSqlInfo extends BaseProtocol{
 
 	private List<Integer> partition = new ArrayList<>();
 	private String sql;
@@ -39,7 +38,7 @@ public class KafkaSqlDomain {
 	private String tableName;
 	private String topic;
 	private boolean status;
-	private List<HostsDomain> seeds = new ArrayList<>();
+	private List<HostsInfo> seeds = new ArrayList<>();
 	private String clusterAlias;
 
 	public String getClusterAlias() {
@@ -66,11 +65,11 @@ public class KafkaSqlDomain {
 		this.metaSql = metaSql;
 	}
 
-	public List<HostsDomain> getSeeds() {
+	public List<HostsInfo> getSeeds() {
 		return seeds;
 	}
 
-	public void setSeeds(List<HostsDomain> seeds) {
+	public void setSeeds(List<HostsInfo> seeds) {
 		this.seeds = seeds;
 	}
 
@@ -112,11 +111,6 @@ public class KafkaSqlDomain {
 
 	public void setStatus(boolean status) {
 		this.status = status;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
 	}
 
 }

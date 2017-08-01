@@ -15,59 +15,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Definition Kafka offset in zookeeper information.
+ * Kpi pojo.
  * 
  * @author smartloli.
  *
- *         Created by Aug 16, 2016
+ *         Created by Jul 19, 2017
  */
-public class OffsetZkDomain {
+public class KpiInfo extends BaseProtocol{
 
-	private long offset = -1L;
-	private String create = "";
-	private String modify = "";
-	private String owners = "";
+	private String cluster;
+	private String key;
+	private String value;
+	private String tm;
 
-	public String getOwners() {
-		return owners;
+	public String getCluster() {
+		return cluster;
 	}
 
-	public void setOwners(String owners) {
-		this.owners = owners;
+	public void setCluster(String cluster) {
+		this.cluster = cluster;
 	}
 
-	public long getOffset() {
-		return offset;
+	public String getKey() {
+		return key;
 	}
 
-	public void setOffset(long offset) {
-		this.offset = offset;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
-	public String getCreate() {
-		return create;
+	public String getValue() {
+		return value;
 	}
 
-	public void setCreate(String create) {
-		this.create = create;
+	public void setValue(String value) {
+		this.value = value;
 	}
 
-	public String getModify() {
-		return modify;
+	public String getTm() {
+		return tm;
 	}
 
-	public void setModify(String modify) {
-		this.modify = modify;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setTm(String tm) {
+		this.tm = tm;
 	}
 
 }

@@ -15,41 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Definition Kafka offset information.
+ * Definition Kafka offset in zookeeper information.
  * 
  * @author smartloli.
  *
  *         Created by Aug 16, 2016
  */
-public class OffsetDomain {
+public class OffsetZkInfo extends BaseProtocol{
 
-	private int partition;
-	private long logSize;
-	private long offset;
-	private long lag;
-	private String owner;
-	private String create;
-	private String modify;
+	private long offset = -1L;
+	private String create = "";
+	private String modify = "";
+	private String owners = "";
 
-	public int getPartition() {
-		return partition;
+	public String getOwners() {
+		return owners;
 	}
 
-	public void setPartition(int partition) {
-		this.partition = partition;
-	}
-
-	public long getLogSize() {
-		return logSize;
-	}
-
-	public void setLogSize(long logSize) {
-		this.logSize = logSize;
+	public void setOwners(String owners) {
+		this.owners = owners;
 	}
 
 	public long getOffset() {
@@ -58,22 +45,6 @@ public class OffsetDomain {
 
 	public void setOffset(long offset) {
 		this.offset = offset;
-	}
-
-	public long getLag() {
-		return lag;
-	}
-
-	public void setLag(long lag) {
-		this.lag = lag;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
 	}
 
 	public String getCreate() {
@@ -90,11 +61,6 @@ public class OffsetDomain {
 
 	public void setModify(String modify) {
 		this.modify = modify;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
 	}
 
 }

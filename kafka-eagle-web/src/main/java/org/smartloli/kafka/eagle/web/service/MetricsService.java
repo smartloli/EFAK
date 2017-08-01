@@ -20,7 +20,7 @@ package org.smartloli.kafka.eagle.web.service;
 import java.util.List;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.domain.KpiDomain;
+import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 
 /**
  * Define access to the kafka monitoring data interface via jmx.
@@ -35,7 +35,7 @@ public interface MetricsService {
 	public String getAllBrokersMBean(String clusterAlias);
 
 	/** Collection statistics data from kafka jmx & insert into table. */
-	public int insert(List<KpiDomain> kpi);
+	public int insert(List<KpiInfo> kpi);
 
 	/** Get mbean data from table. */
 	public String query(Map<String, Object> param);

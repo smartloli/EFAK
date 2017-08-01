@@ -15,66 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
+package org.smartloli.kafka.eagle.common.protocol;
 
 import com.google.gson.Gson;
 
 /**
- * Definition alarmer information.
+ * Rewrite the toString method.
  * 
  * @author smartloli.
  *
- *         Created by Sep 7, 2016
+ *         Created by Aug 1, 2017
  */
-public class AlarmDomain {
+public class BaseProtocol {
 
-	private String group = "";
-	private String topics = "";
-	private long lag = 0L;
-	private String owners = "";
-	private String modifyDate = "";
-
-	public String getGroup() {
-		return group;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
-	}
-
-	public String getTopics() {
-		return topics;
-	}
-
-	public void setTopics(String topics) {
-		this.topics = topics;
-	}
-
-	public String getOwners() {
-		return owners;
-	}
-
-	public void setOwners(String owners) {
-		this.owners = owners;
-	}
-
-	public long getLag() {
-		return lag;
-	}
-
-	public void setLag(long lag) {
-		this.lag = lag;
-	}
-
-	public String getModifyDate() {
-		return modifyDate;
-	}
-
-	public void setModifyDate(String modifyDate) {
-		this.modifyDate = modifyDate;
-	}
-
-	@Override
 	public String toString() {
 		return new Gson().toJson(this);
 	}

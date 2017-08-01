@@ -22,7 +22,7 @@ package org.smartloli.kafka.eagle.core.factory;
 
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.domain.MBeanDomain;
+import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 
 /**
  * Mx4jService operate comand and get metadata from kafka jmx interface.
@@ -34,41 +34,41 @@ import org.smartloli.kafka.eagle.common.domain.MBeanDomain;
 public interface Mx4jService {
 
 	/** Get brokers all topics bytes in per sec. */
-	public MBeanDomain bytesInPerSec(String uri);
+	public MBeanInfo bytesInPerSec(String uri);
 
 	/** Get brokers bytes in per sec by topic. */
-	public MBeanDomain bytesInPerSec(String uri, String topic);
+	public MBeanInfo bytesInPerSec(String uri, String topic);
 
 	/** Get brokers all topics bytes out per sec. */
-	public MBeanDomain bytesOutPerSec(String uri);
+	public MBeanInfo bytesOutPerSec(String uri);
 
 	/** Get brokers bytes out per sec by topic. */
-	public MBeanDomain bytesOutPerSec(String uri, String topic);
+	public MBeanInfo bytesOutPerSec(String uri, String topic);
 
 	/** Get brokers all topics byte rejected per sec. */
-	public MBeanDomain bytesRejectedPerSec(String uri);
+	public MBeanInfo bytesRejectedPerSec(String uri);
 
 	/** Get brokers byte rejected per sec by topic. */
-	public MBeanDomain bytesRejectedPerSec(String uri, String topic);
+	public MBeanInfo bytesRejectedPerSec(String uri, String topic);
 
 	/** Get brokers all topic failed fetch request per sec. */
-	public MBeanDomain failedFetchRequestsPerSec(String uri);
+	public MBeanInfo failedFetchRequestsPerSec(String uri);
 
 	/** Get brokers failed fetch request per sec by topic. */
-	public MBeanDomain failedFetchRequestsPerSec(String uri, String topic);
+	public MBeanInfo failedFetchRequestsPerSec(String uri, String topic);
 
 	/** Get brokers all topics failed fetch produce request per sec. */
-	public MBeanDomain failedProduceRequestsPerSec(String uri);
+	public MBeanInfo failedProduceRequestsPerSec(String uri);
 
 	/** Get brokers failed fetch produce request per sec by topic. */
-	public MBeanDomain failedProduceRequestsPerSec(String uri, String topic);
+	public MBeanInfo failedProduceRequestsPerSec(String uri, String topic);
 
 	/** Get brokers topic all partitions log end offset. */
 	public Map<Integer, Long> logEndOffset(String uri, String topic);
 
 	/** Get brokers all topics message in per sec. */
-	public MBeanDomain messagesInPerSec(String uri);
+	public MBeanInfo messagesInPerSec(String uri);
 
 	/** Get brokers message in per sec by topic. */
-	public MBeanDomain messagesInPerSec(String uri, String topic);
+	public MBeanInfo messagesInPerSec(String uri, String topic);
 }

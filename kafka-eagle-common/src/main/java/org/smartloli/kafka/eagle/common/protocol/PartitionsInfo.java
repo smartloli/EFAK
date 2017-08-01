@@ -15,22 +15,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
+package org.smartloli.kafka.eagle.common.protocol;
 
-import com.google.gson.Gson;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Definition Kafka consumer detail information.
+ * Definition Kafka partition information.
  * 
  * @author smartloli.
  *
- *         Created by Aug 16, 2016
+ *         Created by Mar 30, 2016
  */
-public class TopicConsumerDomain {
+public class PartitionsInfo extends BaseProtocol{
 
-	private int id;
-	private String topic;
-	private boolean isConsumering;
+	private int id = 0;
+	private String topic = "";
+	private Set<String> partitions = new HashSet<String>();
+	private int partitionNumbers = 0;
+	private String created = "";
+	private String modify = "";
+
+	public String getCreated() {
+		return created;
+	}
+
+	public void setCreated(String created) {
+		this.created = created;
+	}
+
+	public String getModify() {
+		return modify;
+	}
+
+	public void setModify(String modify) {
+		this.modify = modify;
+	}
 
 	public int getId() {
 		return id;
@@ -38,6 +58,14 @@ public class TopicConsumerDomain {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getPartitionNumbers() {
+		return partitionNumbers;
+	}
+
+	public void setPartitionNumbers(int partitionNumbers) {
+		this.partitionNumbers = partitionNumbers;
 	}
 
 	public String getTopic() {
@@ -48,17 +76,12 @@ public class TopicConsumerDomain {
 		this.topic = topic;
 	}
 
-	public boolean isConsumering() {
-		return isConsumering;
+	public Set<String> getPartitions() {
+		return partitions;
 	}
 
-	public void setConsumering(boolean isConsumering) {
-		this.isConsumering = isConsumering;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setPartitions(Set<String> partitions) {
+		this.partitions = partitions;
 	}
 
 }

@@ -48,7 +48,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.domain.*;
+import org.smartloli.kafka.eagle.common.protocol.*;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
@@ -233,7 +233,7 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Get all broker list from zookeeper. */
 	public String getAllBrokersInfo(String clusterAlias) {
 		ZkClient zkc = zkPool.getZkClientSerializer(clusterAlias);
-		List<BrokersDomain> targets = new ArrayList<BrokersDomain>();
+		List<BrokersInfo> targets = new ArrayList<BrokersInfo>();
 		if (ZkUtils.apply(zkc, false).pathExists(BROKER_IDS_PATH)) {
 			Seq<String> subBrokerIdsPaths = ZkUtils.apply(zkc, false).getChildren(BROKER_IDS_PATH);
 			List<String> brokerIdss = JavaConversions.seqAsJavaList(subBrokerIdsPaths);
@@ -241,7 +241,7 @@ public class KafkaServiceImpl implements KafkaService {
 			for (String ids : brokerIdss) {
 				try {
 					Tuple2<Option<String>, Stat> tuple = ZkUtils.apply(zkc, false).readDataMaybeNull(BROKER_IDS_PATH + "/" + ids);
-					BrokersDomain broker = new BrokersDomain();
+					BrokersInfo broker = new BrokersInfo();
 					broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
 					broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
 					if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
@@ -274,7 +274,7 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Get all topic info from zookeeper. */
 	public String getAllPartitions(String clusterAlias) {
 		ZkClient zkc = zkPool.getZkClientSerializer(clusterAlias);
-		List<PartitionsDomain> targets = new ArrayList<PartitionsDomain>();
+		List<PartitionsInfo> targets = new ArrayList<PartitionsInfo>();
 		if (ZkUtils.apply(zkc, false).pathExists(BROKER_TOPICS_PATH)) {
 			Seq<String> subBrokerTopicsPaths = ZkUtils.apply(zkc, false).getChildren(BROKER_TOPICS_PATH);
 			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
@@ -282,7 +282,7 @@ public class KafkaServiceImpl implements KafkaService {
 			for (String topic : topics) {
 				try {
 					Tuple2<Option<String>, Stat> tuple = ZkUtils.apply(zkc, false).readDataMaybeNull(BROKER_TOPICS_PATH + "/" + topic);
-					PartitionsDomain partition = new PartitionsDomain();
+					PartitionsInfo partition = new PartitionsInfo();
 					partition.setId(++id);
 					partition.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
 					partition.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
@@ -301,8 +301,8 @@ public class KafkaServiceImpl implements KafkaService {
 			zkc = null;
 		}
 		// Sort topic by create time.
-		Collections.sort(targets, new Comparator<PartitionsDomain>() {
-			public int compare(PartitionsDomain arg0, PartitionsDomain arg1) {
+		Collections.sort(targets, new Comparator<PartitionsInfo>() {
+			public int compare(PartitionsInfo arg0, PartitionsInfo arg1) {
 				try {
 					long hits0 = CalendarUtils.convertDate2UnixTime(arg0.getCreated());
 					long hits1 = CalendarUtils.convertDate2UnixTime(arg1.getCreated());
@@ -352,7 +352,7 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Obtaining kafka consumer page information from zookeeper. */
-	public Map<String, List<String>> getConsumers(String clusterAlias, PageParamDomain page) {
+	public Map<String, List<String>> getConsumers(String clusterAlias, DisplayInfo page) {
 		ZkClient zkc = zkPool.getZkClient(clusterAlias);
 		Map<String, List<String>> consumers = new HashMap<String, List<String>>();
 		try {
@@ -453,13 +453,13 @@ public class KafkaServiceImpl implements KafkaService {
 	 *            Filter group.
 	 * @param partition
 	 *            Filter partition.
-	 * @return OffsetZkDomain.
+	 * @return OffsetZkInfo.
 	 * 
-	 * @see org.smartloli.kafka.eagle.domain.OffsetZkDomain
+	 * @see org.smartloli.kafka.eagle.domain.OffsetZkInfo
 	 */
-	public OffsetZkDomain getOffset(String clusterAlias, String topic, String group, int partition) {
+	public OffsetZkInfo getOffset(String clusterAlias, String topic, String group, int partition) {
 		ZkClient zkc = zkPool.getZkClientSerializer(clusterAlias);
-		OffsetZkDomain offsetZk = new OffsetZkDomain();
+		OffsetZkInfo offsetZk = new OffsetZkInfo();
 		String offsetPath = CONSUMERS_PATH + "/" + group + "/offsets/" + topic + "/" + partition;
 		String ownersPath = CONSUMERS_PATH + "/" + group + "/owners/" + topic + "/" + partition;
 		Tuple2<Option<String>, Stat> tuple = null;
@@ -620,14 +620,14 @@ public class KafkaServiceImpl implements KafkaService {
 	 * 
 	 * @param topic
 	 * @return List
-	 * @see org.smartloli.kafka.eagle.domain.MetadataDomain
+	 * @see org.smartloli.kafka.eagle.domain.MetadataInfo
 	 */
 	@Deprecated
-	public List<MetadataDomain> findLeader(String clusterAlias, String topic) {
-		List<MetadataDomain> targets = new ArrayList<>();
+	public List<MetadataInfo> findLeader(String clusterAlias, String topic) {
+		List<MetadataInfo> targets = new ArrayList<>();
 
 		SimpleConsumer consumer = null;
-		for (HostsDomain broker : getBrokers(clusterAlias)) {
+		for (HostsInfo broker : getBrokers(clusterAlias)) {
 			try {
 				consumer = new SimpleConsumer(broker.getHost(), broker.getPort(), 100000, 64 * 1024, "leaderLookup");
 				if (consumer != null) {
@@ -653,7 +653,7 @@ public class KafkaServiceImpl implements KafkaService {
 		List<TopicMetadata> topicsMeta = topicMetaRespn.topicsMetadata();
 		for (TopicMetadata item : topicsMeta) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
-				MetadataDomain metadata = new MetadataDomain();
+				MetadataInfo metadata = new MetadataInfo();
 				metadata.setIsr(getReplicasIsr(clusterAlias, topic, part.partitionId()));
 				metadata.setLeader(part.leader() == null ? -1 : part.leader().id());
 				metadata.setPartitionId(part.partitionId());
@@ -672,12 +672,12 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get kafka brokers from zookeeper. */
-	private List<HostsDomain> getBrokers(String clusterAlias) {
-		List<HostsDomain> targets = new ArrayList<HostsDomain>();
+	private List<HostsInfo> getBrokers(String clusterAlias) {
+		List<HostsInfo> targets = new ArrayList<HostsInfo>();
 		JSONArray brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias));
 		for (Object object : brokers) {
 			JSONObject broker = (JSONObject) object;
-			HostsDomain host = new HostsDomain();
+			HostsInfo host = new HostsInfo();
 			host.setHost(broker.getString("host"));
 			host.setPort(broker.getInteger("port"));
 			targets.add(host);
@@ -696,7 +696,7 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Convert query sql to object. */
-	public KafkaSqlDomain parseSql(String clusterAlias, String sql) {
+	public KafkaSqlInfo parseSql(String clusterAlias, String sql) {
 		return segments(clusterAlias, prepare(sql));
 	}
 
@@ -711,8 +711,8 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
 	}
 
-	private KafkaSqlDomain segments(String clusterAlias, String sql) {
-		KafkaSqlDomain kafkaSql = new KafkaSqlDomain();
+	private KafkaSqlInfo segments(String clusterAlias, String sql) {
+		KafkaSqlInfo kafkaSql = new KafkaSqlInfo();
 		kafkaSql.setMetaSql(sql);
 		sql = sql.toLowerCase();
 		kafkaSql.setSql(sql);
@@ -956,8 +956,8 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get kafka 0.10.x sasl topic metadata. */
-	public List<MetadataDomain> findKafkaLeader(String clusterAlias, String topic) {
-		List<MetadataDomain> targets = new ArrayList<>();
+	public List<MetadataInfo> findKafkaLeader(String clusterAlias, String topic) {
+		List<MetadataInfo> targets = new ArrayList<>();
 		ZkClient zkc = zkPool.getZkClientSerializer(clusterAlias);
 		if (ZkUtils.apply(zkc, false).pathExists(BROKER_TOPICS_PATH)) {
 			Seq<String> subBrokerTopicsPaths = ZkUtils.apply(zkc, false).getChildren(BROKER_TOPICS_PATH);
@@ -969,7 +969,7 @@ public class KafkaServiceImpl implements KafkaService {
 					String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
 					Tuple2<Option<String>, Stat> tuple2 = ZkUtils.apply(zkc, false).readDataMaybeNull(path);
 					JSONObject topicMetadata = JSON.parseObject(tuple2._1.get());
-					MetadataDomain metadate = new MetadataDomain();
+					MetadataInfo metadate = new MetadataInfo();
 					metadate.setIsr(topicMetadata.getString("isr"));
 					metadate.setLeader(topicMetadata.getInteger("leader"));
 					metadate.setPartitionId(Integer.valueOf(partition));

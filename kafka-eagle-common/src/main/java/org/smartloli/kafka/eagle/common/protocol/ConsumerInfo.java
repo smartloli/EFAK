@@ -15,43 +15,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain.offsets;
-
-import org.apache.kafka.common.protocol.types.Struct;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Topic __consumer_offsets consumer message include struct & version data.
+ * Definition Kafka consumer information.
  * 
  * @author smartloli.
  *
- *         Created by Jan 3, 2017
+ *         Created by Aug 16, 2016
  */
-public class MessageValueStructAndVersionDomain {
+public class ConsumerInfo extends BaseProtocol{
 
-	private Struct value;
-	private Short version;
+	private int id;
+	private String group;
+	private int topics;
+	private String node;
+	private int activeNumber;
 
-	public Struct getValue() {
-		return value;
+	public int getActiveNumber() {
+		return activeNumber;
 	}
 
-	public void setValue(Struct value) {
-		this.value = value;
+	public void setActiveNumber(int activeNumber) {
+		this.activeNumber = activeNumber;
 	}
 
-	public Short getVersion() {
-		return version;
+	public int getId() {
+		return id;
 	}
 
-	public void setVersion(Short version) {
-		this.version = version;
+	public void setId(int id) {
+		this.id = id;
 	}
 
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	public int getTopics() {
+		return topics;
+	}
+
+	public void setTopics(int topics) {
+		this.topics = topics;
+	}
+
+	public String getNode() {
+		return node;
+	}
+
+	public void setNode(String node) {
+		this.node = node;
 	}
 
 }

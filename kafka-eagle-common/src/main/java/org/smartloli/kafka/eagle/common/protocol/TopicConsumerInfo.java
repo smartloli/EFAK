@@ -15,32 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Definition Kafka consumer information.
+ * Definition Kafka consumer detail information.
  * 
  * @author smartloli.
  *
  *         Created by Aug 16, 2016
  */
-public class ConsumerDomain {
+public class TopicConsumerInfo extends BaseProtocol{
 
 	private int id;
-	private String group;
-	private int topics;
-	private String node;
-	private int activeNumber;
-
-	public int getActiveNumber() {
-		return activeNumber;
-	}
-
-	public void setActiveNumber(int activeNumber) {
-		this.activeNumber = activeNumber;
-	}
+	private String topic;
+	private boolean isConsumering;
 
 	public int getId() {
 		return id;
@@ -50,33 +38,20 @@ public class ConsumerDomain {
 		this.id = id;
 	}
 
-	public String getGroup() {
-		return group;
+	public String getTopic() {
+		return topic;
 	}
 
-	public void setGroup(String group) {
-		this.group = group;
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
-	public int getTopics() {
-		return topics;
+	public boolean isConsumering() {
+		return isConsumering;
 	}
 
-	public void setTopics(int topics) {
-		this.topics = topics;
-	}
-
-	public String getNode() {
-		return node;
-	}
-
-	public void setNode(String node) {
-		this.node = node;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setConsumering(boolean isConsumering) {
+		this.isConsumering = isConsumering;
 	}
 
 }

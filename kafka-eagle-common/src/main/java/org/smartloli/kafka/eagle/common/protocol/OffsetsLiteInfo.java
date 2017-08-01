@@ -15,21 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain.offsets;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Default topic & group tuple.
+ * Definition offset lite information.
  * 
  * @author smartloli.
  *
- *         Created by Jan 3, 2017
+ *         Created by Aug 18, 2016
  */
-public class TopicAndGroupDomain {
+public class OffsetsLiteInfo extends BaseProtocol{
 
-	private String group;
-	private String topic;
+	private String group = "";
+	private String topic = "";
+	private long logSize = 0L;
+	private long offsets = 0L;
+	private long lag = 0L;
+	private String created = "";
 
 	public String getGroup() {
 		return group;
@@ -47,9 +49,36 @@ public class TopicAndGroupDomain {
 		this.topic = topic;
 	}
 
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public long getLogSize() {
+		return logSize;
+	}
+
+	public void setLogSize(long logSize) {
+		this.logSize = logSize;
+	}
+
+	public long getOffsets() {
+		return offsets;
+	}
+
+	public void setOffsets(long offsets) {
+		this.offsets = offsets;
+	}
+
+	public long getLag() {
+		return lag;
+	}
+
+	public void setLag(long lag) {
+		this.lag = lag;
+	}
+
+	public String getCreated() {
+		return created;
+	}
+
+	public void setCreated(String created) {
+		this.created = created;
 	}
 
 }

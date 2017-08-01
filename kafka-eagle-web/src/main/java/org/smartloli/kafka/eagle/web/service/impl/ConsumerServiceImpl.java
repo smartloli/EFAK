@@ -27,9 +27,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import org.smartloli.kafka.eagle.common.domain.ConsumerDomain;
-import org.smartloli.kafka.eagle.common.domain.PageParamDomain;
-import org.smartloli.kafka.eagle.common.domain.TopicConsumerDomain;
+import org.smartloli.kafka.eagle.common.protocol.ConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
 import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -114,12 +114,12 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get consumers from zookeeper. */
-	private String getConsumer(String clusterAlias, PageParamDomain page) {
+	private String getConsumer(String clusterAlias, DisplayInfo page) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias, page);
-		List<ConsumerDomain> consumerPages = new ArrayList<ConsumerDomain>();
+		List<ConsumerInfo> consumerPages = new ArrayList<ConsumerInfo>();
 		int id = 0;
 		for (Entry<String, List<String>> entry : consumers.entrySet()) {
-			ConsumerDomain consumer = new ConsumerDomain();
+			ConsumerInfo consumer = new ConsumerInfo();
 			consumer.setGroup(entry.getKey());
 			consumer.setNode("");
 			consumer.setTopics(entry.getValue().size());
@@ -131,7 +131,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Judge consumers storage offset in kafka or zookeeper. */
-	public String getConsumer(String clusterAlias, String formatter, PageParamDomain page) {
+	public String getConsumer(String clusterAlias, String formatter, DisplayInfo page) {
 		if ("kafka".equals(formatter)) {
 			return getKafkaConsumer(page, clusterAlias);
 		} else {
@@ -152,10 +152,10 @@ public class ConsumerServiceImpl implements ConsumerService {
 	private String getConsumerDetail(String clusterAlias, String group) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
 		Map<String, List<String>> actvTopics = kafkaService.getActiveTopic(clusterAlias);
-		List<TopicConsumerDomain> kafkaConsumerDetails = new ArrayList<TopicConsumerDomain>();
+		List<TopicConsumerInfo> kafkaConsumerDetails = new ArrayList<TopicConsumerInfo>();
 		int id = 0;
 		for (String topic : consumers.get(group)) {
-			TopicConsumerDomain consumerDetail = new TopicConsumerDomain();
+			TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
 			if (actvTopics.containsKey(group + "_" + topic)) {
@@ -220,8 +220,8 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get kafka consumer & storage offset in kafka topic. */
-	private String getKafkaConsumer(PageParamDomain page, String clusterAlias) {
-		List<ConsumerDomain> kafkaConsumerPages = new ArrayList<ConsumerDomain>();
+	private String getKafkaConsumer(DisplayInfo page, String clusterAlias) {
+		List<ConsumerInfo> kafkaConsumerPages = new ArrayList<ConsumerInfo>();
 		JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
 		int offset = 0;
 		int id = 0;
@@ -229,7 +229,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 			JSONObject consumerGroup = (JSONObject) object;
 			String group = consumerGroup.getString("group");
 			if (page.getSearch().length() > 0 && page.getSearch().equals(group)) {
-				ConsumerDomain consumer = new ConsumerDomain();
+				ConsumerInfo consumer = new ConsumerInfo();
 				consumer.setGroup(group);
 				consumer.setId(++id);
 				consumer.setNode(consumerGroup.getString("node"));
@@ -239,7 +239,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 				break;
 			} else if (page.getSearch().length() == 0) {
 				if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
-					ConsumerDomain consumer = new ConsumerDomain();
+					ConsumerInfo consumer = new ConsumerInfo();
 					consumer.setGroup(group);
 					consumer.setId(++id);
 					consumer.setNode(consumerGroup.getString("node"));
@@ -257,10 +257,10 @@ public class ConsumerServiceImpl implements ConsumerService {
 	private String getKafkaConsumerDetail(String clusterAlias, String group) {
 		Set<String> consumerTopics = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
 		Set<String> activerTopics = kafkaService.getKafkaActiverTopics(clusterAlias, group);
-		List<TopicConsumerDomain> kafkaConsumerPages = new ArrayList<TopicConsumerDomain>();
+		List<TopicConsumerInfo> kafkaConsumerPages = new ArrayList<TopicConsumerInfo>();
 		int id = 0;
 		for (String topic : consumerTopics) {
-			TopicConsumerDomain consumerDetail = new TopicConsumerDomain();
+			TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
 			if (activerTopics.contains(topic)) {

@@ -25,8 +25,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import org.smartloli.kafka.eagle.common.domain.OffsetDomain;
-import org.smartloli.kafka.eagle.common.domain.OffsetZkDomain;
+import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
+import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -71,11 +71,11 @@ public class OffsetServiceImpl implements OffsetService {
 	private String getKafkaLogSize(String clusterAlias, String topic, String group) {
 		List<String> hosts = getBrokers(clusterAlias, topic, group);
 		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
-		List<OffsetDomain> targets = new ArrayList<OffsetDomain>();
+		List<OffsetInfo> targets = new ArrayList<OffsetInfo>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
-			OffsetZkDomain offsetZk = getKafkaOffset(clusterAlias, topic, group, partitionInt);
-			OffsetDomain offset = new OffsetDomain();
+			OffsetZkInfo offsetZk = getKafkaOffset(clusterAlias, topic, group, partitionInt);
+			OffsetInfo offset = new OffsetInfo();
 			long logSize = 0L;
 			if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
 				logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partitionInt);
@@ -95,9 +95,9 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get Kafka offset from Kafka topic. */
-	private OffsetZkDomain getKafkaOffset(String clusterAlias, String topic, String group, int partition) {
+	private OffsetZkInfo getKafkaOffset(String clusterAlias, String topic, String group, int partition) {
 		JSONArray kafkaOffsets = JSON.parseArray(kafkaService.getKafkaOffset(clusterAlias));
-		OffsetZkDomain targetOffset = new OffsetZkDomain();
+		OffsetZkInfo targetOffset = new OffsetZkInfo();
 		for (Object kafkaOffset : kafkaOffsets) {
 			JSONObject object = (JSONObject) kafkaOffset;
 			String _topic = object.getString("topic");
@@ -128,11 +128,11 @@ public class OffsetServiceImpl implements OffsetService {
 	private String getLogSize(String clusterAlias, String topic, String group) {
 		List<String> hosts = getBrokers(clusterAlias, topic, group);
 		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
-		List<OffsetDomain> targets = new ArrayList<OffsetDomain>();
+		List<OffsetInfo> targets = new ArrayList<OffsetInfo>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
-			OffsetZkDomain offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partitionInt);
-			OffsetDomain offset = new OffsetDomain();
+			OffsetZkInfo offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partitionInt);
+			OffsetInfo offset = new OffsetInfo();
 			long logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
 			offset.setPartition(partitionInt);
 			offset.setLogSize(logSize);

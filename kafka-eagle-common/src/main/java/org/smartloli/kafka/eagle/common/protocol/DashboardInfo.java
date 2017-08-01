@@ -15,59 +15,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * KpiDomain pojo.
+ * Definition dashboard information.
  * 
  * @author smartloli.
  *
- *         Created by Jul 19, 2017
+ *         Created by Aug 13, 2016
  */
-public class KpiDomain {
+public class DashboardInfo extends BaseProtocol{
 
-	private String cluster;
-	private String key;
-	private String value;
-	private String tm;
+	private int brokers = 0;
+	private int topics = 0;
+	private int zks = 0;
+	private int consumers = 0;
 
-	public String getCluster() {
-		return cluster;
+	public int getBrokers() {
+		return brokers;
 	}
 
-	public void setCluster(String cluster) {
-		this.cluster = cluster;
+	public void setBrokers(int brokers) {
+		this.brokers = brokers;
 	}
 
-	public String getKey() {
-		return key;
+	public int getTopics() {
+		return topics;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setTopics(int topics) {
+		this.topics = topics;
 	}
 
-	public String getValue() {
-		return value;
+	public int getZks() {
+		return zks;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setZks(int zks) {
+		this.zks = zks;
 	}
 
-	public String getTm() {
-		return tm;
+	public int getConsumers() {
+		return consumers;
 	}
 
-	public void setTm(String tm) {
-		this.tm = tm;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setConsumers(int consumers) {
+		this.consumers = consumers;
 	}
 
 }

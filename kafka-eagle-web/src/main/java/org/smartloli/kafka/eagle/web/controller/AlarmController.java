@@ -37,7 +37,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
+import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -121,7 +121,7 @@ public class AlarmController {
 		String ke_topic_email = request.getParameter("ke_topic_email");
 		JSONArray topics = JSON.parseArray(ke_topic_alarms);
 		JSONArray groups = JSON.parseArray(ke_group_alarms);
-		AlarmDomain alarm = new AlarmDomain();
+		AlarmInfo alarm = new AlarmInfo();
 		for (Object object : groups) {
 			JSONObject group = (JSONObject) object;
 			alarm.setGroup(group.getString("name"));

@@ -15,41 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
+package org.smartloli.kafka.eagle.common.protocol.offsets;
 
-import com.google.gson.Gson;
+import org.apache.kafka.common.protocol.types.Struct;
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * Definition Kafka broker information.
+ * Topic __consumer_offsets consumer message include struct & version data.
  * 
  * @author smartloli.
  *
- *         Created by Aug 15, 2016
+ *         Created by Jan 3, 2017
  */
-public class HostsDomain {
+public class MessageValueStructAndVersionInfo extends BaseProtocol{
 
-	private String host;
-	private int port;
+	private Struct value;
+	private Short version;
 
-	public String getHost() {
-		return host;
+	public Struct getValue() {
+		return value;
 	}
 
-	public void setHost(String host) {
-		this.host = host;
+	public void setValue(Struct value) {
+		this.value = value;
 	}
 
-	public int getPort() {
-		return port;
+	public Short getVersion() {
+		return version;
 	}
 
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setVersion(Short version) {
+		this.version = version;
 	}
 
 }

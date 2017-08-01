@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.smartloli.kafka.eagle.common.domain.KpiDomain;
-import org.smartloli.kafka.eagle.common.domain.MBeanDomain;
+import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.util.Constants.MBean;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -62,19 +62,19 @@ public class MetricsServiceImpl implements MetricsService {
 	/** Gets summary monitoring data for all broker. */
 	public String getAllBrokersMBean(String clusterAlias) {
 		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
-		Map<String, MBeanDomain> mbeans = new HashMap<>();
+		Map<String, MBeanInfo> mbeans = new HashMap<>();
 		for (Object object : brokers) {
 			JSONObject broker = (JSONObject) object;
 			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
-			MBeanDomain bytesIn = mx4jService.bytesInPerSec(uri);
-			MBeanDomain bytesOut = mx4jService.bytesOutPerSec(uri);
-			MBeanDomain bytesRejected = mx4jService.bytesRejectedPerSec(uri);
-			MBeanDomain failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri);
-			MBeanDomain failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri);
-			MBeanDomain messageIn = mx4jService.messagesInPerSec(uri);
+			MBeanInfo bytesIn = mx4jService.bytesInPerSec(uri);
+			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri);
+			MBeanInfo bytesRejected = mx4jService.bytesRejectedPerSec(uri);
+			MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri);
+			MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri);
+			MBeanInfo messageIn = mx4jService.messagesInPerSec(uri);
 
 			if (mbeans.containsKey(MBean.MESSAGES_IN)) {
-				MBeanDomain msgIn = mbeans.get(MBean.MESSAGES_IN);
+				MBeanInfo msgIn = mbeans.get(MBean.MESSAGES_IN);
 				long fifteenMinute = Math.round(StrUtils.numberic(msgIn.getFifteenMinute())) + Math.round(StrUtils.numberic(messageIn.getFifteenMinute()));
 				long fiveMinute = Math.round(StrUtils.numberic(msgIn.getFiveMinute())) + Math.round(StrUtils.numberic(messageIn.getFiveMinute()));
 				long meanRate = Math.round(StrUtils.numberic(msgIn.getMeanRate())) + Math.round(StrUtils.numberic(messageIn.getMeanRate()));
@@ -88,7 +88,7 @@ public class MetricsServiceImpl implements MetricsService {
 			}
 
 			if (mbeans.containsKey(MBean.BYTES_IN)) {
-				MBeanDomain byteIn = mbeans.get(MBean.BYTES_IN);
+				MBeanInfo byteIn = mbeans.get(MBean.BYTES_IN);
 				long fifteenMinute = Math.round(StrUtils.numberic(byteIn.getFifteenMinute())) + Math.round(StrUtils.numberic(bytesIn.getFifteenMinute()));
 				long fiveMinute = Math.round(StrUtils.numberic(byteIn.getFiveMinute())) + Math.round(StrUtils.numberic(bytesIn.getFiveMinute()));
 				long meanRate = Math.round(StrUtils.numberic(byteIn.getMeanRate())) + Math.round(StrUtils.numberic(bytesIn.getMeanRate()));
@@ -102,7 +102,7 @@ public class MetricsServiceImpl implements MetricsService {
 			}
 
 			if (mbeans.containsKey(MBean.BYTES_OUT)) {
-				MBeanDomain byteOut = mbeans.get(MBean.BYTES_OUT);
+				MBeanInfo byteOut = mbeans.get(MBean.BYTES_OUT);
 				long fifteenMinute = Math.round(StrUtils.numberic(byteOut.getFifteenMinute())) + Math.round(StrUtils.numberic(bytesOut.getFifteenMinute()));
 				long fiveMinute = Math.round(StrUtils.numberic(byteOut.getFiveMinute())) + Math.round(StrUtils.numberic(bytesOut.getFiveMinute()));
 				long meanRate = Math.round(StrUtils.numberic(byteOut.getMeanRate())) + Math.round(StrUtils.numberic(bytesOut.getMeanRate()));
@@ -116,7 +116,7 @@ public class MetricsServiceImpl implements MetricsService {
 			}
 
 			if (mbeans.containsKey(MBean.BYTES_REJECTED)) {
-				MBeanDomain byteRejected = mbeans.get(MBean.BYTES_REJECTED);
+				MBeanInfo byteRejected = mbeans.get(MBean.BYTES_REJECTED);
 				long fifteenMinute = Math.round(StrUtils.numberic(byteRejected.getFifteenMinute())) + Math.round(StrUtils.numberic(bytesRejected.getFifteenMinute()));
 				long fiveMinute = Math.round(StrUtils.numberic(byteRejected.getFiveMinute())) + Math.round(StrUtils.numberic(bytesRejected.getFiveMinute()));
 				long meanRate = Math.round(StrUtils.numberic(byteRejected.getMeanRate())) + Math.round(StrUtils.numberic(bytesRejected.getMeanRate()));
@@ -130,7 +130,7 @@ public class MetricsServiceImpl implements MetricsService {
 			}
 
 			if (mbeans.containsKey(MBean.FAILED_FETCH_REQUEST)) {
-				MBeanDomain failedFetch = mbeans.get(MBean.FAILED_FETCH_REQUEST);
+				MBeanInfo failedFetch = mbeans.get(MBean.FAILED_FETCH_REQUEST);
 				long fifteenMinute = Math.round(StrUtils.numberic(failedFetch.getFifteenMinute())) + Math.round(StrUtils.numberic(failedFetchRequest.getFifteenMinute()));
 				long fiveMinute = Math.round(StrUtils.numberic(failedFetch.getFiveMinute())) + Math.round(StrUtils.numberic(failedFetchRequest.getFiveMinute()));
 				long meanRate = Math.round(StrUtils.numberic(failedFetch.getMeanRate())) + Math.round(StrUtils.numberic(failedFetchRequest.getMeanRate()));
@@ -144,7 +144,7 @@ public class MetricsServiceImpl implements MetricsService {
 			}
 
 			if (mbeans.containsKey(MBean.FAILED_PRODUCE_REQUEST)) {
-				MBeanDomain failedProduce = mbeans.get(MBean.FAILED_PRODUCE_REQUEST);
+				MBeanInfo failedProduce = mbeans.get(MBean.FAILED_PRODUCE_REQUEST);
 				long fifteenMinute = Math.round(StrUtils.numberic(failedProduce.getFifteenMinute())) + Math.round(StrUtils.numberic(failedProduceRequest.getFifteenMinute()));
 				long fiveMinute = Math.round(StrUtils.numberic(failedProduce.getFiveMinute())) + Math.round(StrUtils.numberic(failedProduceRequest.getFiveMinute()));
 				long meanRate = Math.round(StrUtils.numberic(failedProduce.getMeanRate())) + Math.round(StrUtils.numberic(failedProduceRequest.getMeanRate()));
@@ -158,7 +158,7 @@ public class MetricsServiceImpl implements MetricsService {
 			}
 
 		}
-		for (Entry<String, MBeanDomain> entry : mbeans.entrySet()) {
+		for (Entry<String, MBeanInfo> entry : mbeans.entrySet()) {
 			entry.getValue().setFifteenMinute(StrUtils.assembly(entry.getValue().getFifteenMinute()));
 			entry.getValue().setFiveMinute(StrUtils.assembly(entry.getValue().getFiveMinute()));
 			entry.getValue().setMeanRate(StrUtils.assembly(entry.getValue().getMeanRate()));
@@ -168,7 +168,7 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	/** Collection statistics data from kafka jmx & insert into table. */
-	public int insert(List<KpiDomain> kpi) {
+	public int insert(List<KpiInfo> kpi) {
 		return mbeanDao.insert(kpi);
 	}
 
@@ -177,23 +177,23 @@ public class MetricsServiceImpl implements MetricsService {
 		JSONObject target = new JSONObject();
 
 		param.put("key", "ByteIn");
-		List<KpiDomain> bytesIn = mbeanDao.query(param);
+		List<KpiInfo> bytesIn = mbeanDao.query(param);
 		target.put("bytesIn", bytesIn);
 
 		param.put("key", "ByteOut");
-		List<KpiDomain> bytesOut = mbeanDao.query(param);
+		List<KpiInfo> bytesOut = mbeanDao.query(param);
 		target.put("bytesOut", bytesOut);
 
 		param.put("key", "FailedFetchRequest");
-		List<KpiDomain> failedFetchRequest = mbeanDao.query(param);
+		List<KpiInfo> failedFetchRequest = mbeanDao.query(param);
 		target.put("failedFetchRequest", failedFetchRequest);
 
 		param.put("key", "FailedProduceRequest");
-		List<KpiDomain> failedProduceRequest = mbeanDao.query(param);
+		List<KpiInfo> failedProduceRequest = mbeanDao.query(param);
 		target.put("failedProduceRequest", failedProduceRequest);
 
 		param.put("key", "MessageIn");
-		List<KpiDomain> messageIn = mbeanDao.query(param);
+		List<KpiInfo> messageIn = mbeanDao.query(param);
 		target.put("messageIn", messageIn);
 
 		return target.toJSONString();

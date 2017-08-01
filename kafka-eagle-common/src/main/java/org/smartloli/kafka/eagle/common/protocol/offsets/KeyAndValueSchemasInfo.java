@@ -15,49 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
+package org.smartloli.kafka.eagle.common.protocol.offsets;
 
-import com.google.gson.Gson;
+import org.apache.kafka.common.protocol.types.Schema;
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * Definition memory tuple information.
+ * K&V schema storage offset in Kafka topic.
  * 
  * @author smartloli.
  *
- *         Created by May 5, 2016
+ *         Created by Jan 3, 2017
  */
-public class TupleDomain {
-	private long timespan;
-	private String ret = "";
-	private boolean status;
+public class KeyAndValueSchemasInfo extends BaseProtocol{
 
-	public boolean isStatus() {
-		return status;
+	private Schema keySchema;
+	private Schema valueSchema;
+
+	public Schema getKeySchema() {
+		return keySchema;
 	}
 
-	public void setStatus(boolean status) {
-		this.status = status;
+	public void setKeySchema(Schema keySchema) {
+		this.keySchema = keySchema;
 	}
 
-	public long getTimespan() {
-		return timespan;
+	public Schema getValueSchema() {
+		return valueSchema;
 	}
 
-	public void setTimespan(long timespan) {
-		this.timespan = timespan;
-	}
-
-	public String getRet() {
-		return ret;
-	}
-
-	public void setRet(String ret) {
-		this.ret = ret;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setValueSchema(Schema valueSchema) {
+		this.valueSchema = valueSchema;
 	}
 
 }

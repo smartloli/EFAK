@@ -15,25 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.util;
-
-import org.smartloli.kafka.eagle.common.protocol.offsets.TopicAndGroupInfo;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
-* Test Class.
-* 
-* @author smartloli.
-*
-* Created by Mar 23, 2017
-*/
-public class TestSystemConfigUtils {
-	
-	public static void main(String[] args) {
-		String storage = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		System.out.println(storage);
-		TopicAndGroupInfo tp = new TopicAndGroupInfo();
-		tp.setGroup("ss");
-		System.out.println(tp);
+ * Definition Kafka broker information.
+ * 
+ * @author smartloli.
+ *
+ *         Created by Aug 15, 2016
+ */
+public class HostsInfo extends BaseProtocol{
+
+	private String host;
+	private int port;
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 }

@@ -20,8 +20,8 @@ package org.smartloli.kafka.eagle.web.quartz;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.smartloli.kafka.eagle.common.domain.KpiDomain;
-import org.smartloli.kafka.eagle.common.domain.MBeanDomain;
+import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -59,52 +59,52 @@ public class MBeanQuartz {
 
 	private void execute(String clusterAlias) {
 		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
-		List<KpiDomain> list = new ArrayList<>();
+		List<KpiInfo> list = new ArrayList<>();
 		for (Object object : brokers) {
 			JSONObject broker = (JSONObject) object;
 			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
-			MBeanDomain bytesIn = mx4jService.bytesInPerSec(uri);
-			KpiDomain kpiByteIn = new KpiDomain();
+			MBeanInfo bytesIn = mx4jService.bytesInPerSec(uri);
+			KpiInfo kpiByteIn = new KpiInfo();
 			kpiByteIn.setCluster(clusterAlias);
 			kpiByteIn.setKey("ByteIn");
 			kpiByteIn.setValue(bytesIn.getMeanRate());
 			kpiByteIn.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
 			list.add(kpiByteIn);
 
-			MBeanDomain bytesOut = mx4jService.bytesOutPerSec(uri);
-			KpiDomain kpiByteOut = new KpiDomain();
+			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri);
+			KpiInfo kpiByteOut = new KpiInfo();
 			kpiByteOut.setCluster(clusterAlias);
 			kpiByteOut.setKey("ByteOut");
 			kpiByteOut.setValue(bytesOut.getMeanRate());
 			kpiByteOut.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
 			list.add(kpiByteOut);
 
-			MBeanDomain bytesRejected = mx4jService.bytesRejectedPerSec(uri);
-			KpiDomain kpiByteRejected = new KpiDomain();
+			MBeanInfo bytesRejected = mx4jService.bytesRejectedPerSec(uri);
+			KpiInfo kpiByteRejected = new KpiInfo();
 			kpiByteRejected.setCluster(clusterAlias);
 			kpiByteRejected.setKey("ByteRejected");
 			kpiByteRejected.setValue(bytesRejected.getMeanRate());
 			kpiByteRejected.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
 			list.add(kpiByteRejected);
 
-			MBeanDomain failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri);
-			KpiDomain kpiFailedFetchRequest = new KpiDomain();
+			MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri);
+			KpiInfo kpiFailedFetchRequest = new KpiInfo();
 			kpiFailedFetchRequest.setCluster(clusterAlias);
 			kpiFailedFetchRequest.setKey("FailedFetchRequest");
 			kpiFailedFetchRequest.setValue(failedFetchRequest.getMeanRate());
 			kpiFailedFetchRequest.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
 			list.add(kpiFailedFetchRequest);
 
-			MBeanDomain failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri);
-			KpiDomain kpiFailedProduceRequest = new KpiDomain();
+			MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri);
+			KpiInfo kpiFailedProduceRequest = new KpiInfo();
 			kpiFailedProduceRequest.setCluster(clusterAlias);
 			kpiFailedProduceRequest.setKey("FailedProduceRequest");
 			kpiFailedProduceRequest.setValue(failedProduceRequest.getMeanRate());
 			kpiFailedProduceRequest.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
 			list.add(kpiFailedProduceRequest);
 
-			MBeanDomain messageIn = mx4jService.messagesInPerSec(uri);
-			KpiDomain kpiMessageIn = new KpiDomain();
+			MBeanInfo messageIn = mx4jService.messagesInPerSec(uri);
+			KpiInfo kpiMessageIn = new KpiInfo();
 			kpiMessageIn.setCluster(clusterAlias);
 			kpiMessageIn.setKey("MessageIn");
 			kpiMessageIn.setValue(messageIn.getMeanRate());

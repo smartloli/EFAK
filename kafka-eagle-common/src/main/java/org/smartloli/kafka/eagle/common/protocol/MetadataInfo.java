@@ -15,59 +15,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Definition dashboard information.
+ * Definition Kafka metadata information.
  * 
  * @author smartloli.
  *
- *         Created by Aug 13, 2016
+ *         Created by Aug 15, 2016
  */
-public class DashboardDomain {
+public class MetadataInfo extends BaseProtocol{
 
-	private int brokers = 0;
-	private int topics = 0;
-	private int zks = 0;
-	private int consumers = 0;
+	private int partitionId;
+	private int leader;
+	private String isr;
+	private String replicas;
 
-	public int getBrokers() {
-		return brokers;
+	public int getPartitionId() {
+		return partitionId;
 	}
 
-	public void setBrokers(int brokers) {
-		this.brokers = brokers;
+	public void setPartitionId(int partitionId) {
+		this.partitionId = partitionId;
 	}
 
-	public int getTopics() {
-		return topics;
+	public int getLeader() {
+		return leader;
 	}
 
-	public void setTopics(int topics) {
-		this.topics = topics;
+	public void setLeader(int leader) {
+		this.leader = leader;
 	}
 
-	public int getZks() {
-		return zks;
+	public String getIsr() {
+		return isr;
 	}
 
-	public void setZks(int zks) {
-		this.zks = zks;
+	public void setIsr(String isr) {
+		this.isr = isr;
 	}
 
-	public int getConsumers() {
-		return consumers;
+	public String getReplicas() {
+		return replicas;
 	}
 
-	public void setConsumers(int consumers) {
-		this.consumers = consumers;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setReplicas(String replicas) {
+		this.replicas = replicas;
 	}
 
 }

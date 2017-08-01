@@ -35,8 +35,8 @@ import org.apache.kafka.common.protocol.types.Struct;
 import org.apache.kafka.common.protocol.types.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.domain.offsets.KeyAndValueSchemasDomain;
-import org.smartloli.kafka.eagle.common.domain.offsets.MessageValueStructAndVersionDomain;
+import org.smartloli.kafka.eagle.common.protocol.offsets.KeyAndValueSchemasInfo;
+import org.smartloli.kafka.eagle.common.protocol.offsets.MessageValueStructAndVersionInfo;
 import org.smartloli.kafka.eagle.common.util.Constants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -96,14 +96,14 @@ public class TestKafkaOffsetGetter extends Thread {
 
 	/** Kafka offset memory in schema. */
 	@SuppressWarnings("serial")
-	private static Map<Integer, KeyAndValueSchemasDomain> OFFSET_SCHEMAS = new HashMap<Integer, KeyAndValueSchemasDomain>() {
+	private static Map<Integer, KeyAndValueSchemasInfo> OFFSET_SCHEMAS = new HashMap<Integer, KeyAndValueSchemasInfo>() {
 		{
-			KeyAndValueSchemasDomain ks0 = new KeyAndValueSchemasDomain();
+			KeyAndValueSchemasInfo ks0 = new KeyAndValueSchemasInfo();
 			ks0.setKeySchema(OFFSET_COMMIT_KEY_SCHEMA_V0);
 			ks0.setValueSchema(OFFSET_COMMIT_VALUE_SCHEMA_V0);
 			put(0, ks0);
 
-			KeyAndValueSchemasDomain ks1 = new KeyAndValueSchemasDomain();
+			KeyAndValueSchemasInfo ks1 = new KeyAndValueSchemasInfo();
 			ks1.setKeySchema(OFFSET_COMMIT_KEY_SCHEMA_V0);
 			ks1.setValueSchema(OFFSET_COMMIT_VALUE_SCHEMA_V1);
 			put(1, ks1);
@@ -168,7 +168,7 @@ public class TestKafkaOffsetGetter extends Thread {
 	}
 
 	/** Get instance K&V schema. */
-	private static KeyAndValueSchemasDomain schemaFor(int version) {
+	private static KeyAndValueSchemasInfo schemaFor(int version) {
 		return OFFSET_SCHEMAS.get(version);
 	}
 
@@ -185,7 +185,7 @@ public class TestKafkaOffsetGetter extends Thread {
 
 	/** Analysis of buffer data in metadata in Kafka. */
 	private static OffsetAndMetadata readMessageValue(ByteBuffer buffer) {
-		MessageValueStructAndVersionDomain structAndVersion = readMessageValueStruct(buffer);
+		MessageValueStructAndVersionInfo structAndVersion = readMessageValueStruct(buffer);
 		if (structAndVersion.getValue() == null) {
 			return null;
 		} else {
@@ -206,8 +206,8 @@ public class TestKafkaOffsetGetter extends Thread {
 	}
 
 	/** Analysis of struct data structure in metadata in Kafka. */
-	private static MessageValueStructAndVersionDomain readMessageValueStruct(ByteBuffer buffer) {
-		MessageValueStructAndVersionDomain mvs = new MessageValueStructAndVersionDomain();
+	private static MessageValueStructAndVersionInfo readMessageValueStruct(ByteBuffer buffer) {
+		MessageValueStructAndVersionInfo mvs = new MessageValueStructAndVersionInfo();
 		if (buffer == null) {
 			mvs.setValue(null);
 			mvs.setVersion(Short.valueOf("-1"));

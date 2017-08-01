@@ -15,64 +15,71 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Definition Kafka brokers information.
+ * Definition Kafka offset information.
  * 
  * @author smartloli.
  *
- *         Created by Aug 17, 2016
+ *         Created by Aug 16, 2016
  */
-public class BrokersDomain {
+public class OffsetInfo extends BaseProtocol{
 
-	private int id = 0;
-	private String host = "";
-	private int port = 0;
-	private String created = "";
-	private String modify = "";
-	private int jmxPort = 0;
+	private int partition;
+	private long logSize;
+	private long offset;
+	private long lag;
+	private String owner;
+	private String create;
+	private String modify;
 
-	public int getJmxPort() {
-		return jmxPort;
+	public int getPartition() {
+		return partition;
 	}
 
-	public void setJmxPort(int jmxPort) {
-		this.jmxPort = jmxPort;
+	public void setPartition(int partition) {
+		this.partition = partition;
 	}
 
-	public int getId() {
-		return id;
+	public long getLogSize() {
+		return logSize;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setLogSize(long logSize) {
+		this.logSize = logSize;
 	}
 
-	public String getHost() {
-		return host;
+	public long getOffset() {
+		return offset;
 	}
 
-	public void setHost(String host) {
-		this.host = host;
+	public void setOffset(long offset) {
+		this.offset = offset;
 	}
 
-	public int getPort() {
-		return port;
+	public long getLag() {
+		return lag;
 	}
 
-	public void setPort(int port) {
-		this.port = port;
+	public void setLag(long lag) {
+		this.lag = lag;
 	}
 
-	public String getCreated() {
-		return created;
+	public String getOwner() {
+		return owner;
 	}
 
-	public void setCreated(String created) {
-		this.created = created;
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	public String getCreate() {
+		return create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
 	}
 
 	public String getModify() {
@@ -81,11 +88,6 @@ public class BrokersDomain {
 
 	public void setModify(String modify) {
 		this.modify = modify;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
 	}
 
 }

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.smartloli.kafka.eagle.web.dao.MBeanDao">
 
-	<resultMap type="org.smartloli.kafka.eagle.common.domain.KpiDomain"
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.KpiInfo"
 		id="kpi">
 		<result property="cluster" column="cluster" />
 		<result property="key" column="key" />

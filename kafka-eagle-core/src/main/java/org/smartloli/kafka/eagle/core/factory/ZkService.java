@@ -19,8 +19,8 @@ package org.smartloli.kafka.eagle.core.factory;
 
 import java.util.List;
 
-import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
-import org.smartloli.kafka.eagle.common.domain.OffsetsLiteDomain;
+import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
+import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -48,10 +48,10 @@ public interface ZkService {
 	public String getOffsets(String clusterAlias,String group, String topic);
 
 	/** Insert new datasets. */
-	public void insert(String clusterAlias,List<OffsetsLiteDomain> list);
+	public void insert(String clusterAlias,List<OffsetsLiteInfo> list);
 
 	/** Insert new alarmer configure information. */
-	public int insertAlarmConfigure(String clusterAlias,AlarmDomain alarm);
+	public int insertAlarmConfigure(String clusterAlias,AlarmInfo alarm);
 
 	/** Zookeeper ls command. */
 	public String ls(String clusterAlias,String cmd);

@@ -15,59 +15,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Definition Kafka metadata information.
+ * Mapper kafka jmx data to MBeanDomain.
  * 
  * @author smartloli.
  *
- *         Created by Aug 15, 2016
+ *         Created by Jul 14, 2017
  */
-public class MetadataDomain {
+public class MBeanInfo extends BaseProtocol{
 
-	private int partitionId;
-	private int leader;
-	private String isr;
-	private String replicas;
+	private String fifteenMinute;
+	private String fiveMinute;
+	private String meanRate;
+	private String oneMinute;
 
-	public int getPartitionId() {
-		return partitionId;
+	public String getFifteenMinute() {
+		return fifteenMinute;
 	}
 
-	public void setPartitionId(int partitionId) {
-		this.partitionId = partitionId;
+	public void setFifteenMinute(String fifteenMinute) {
+		this.fifteenMinute = fifteenMinute;
 	}
 
-	public int getLeader() {
-		return leader;
+	public String getFiveMinute() {
+		return fiveMinute;
 	}
 
-	public void setLeader(int leader) {
-		this.leader = leader;
+	public void setFiveMinute(String fiveMinute) {
+		this.fiveMinute = fiveMinute;
 	}
 
-	public String getIsr() {
-		return isr;
+	public String getMeanRate() {
+		return meanRate;
 	}
 
-	public void setIsr(String isr) {
-		this.isr = isr;
+	public void setMeanRate(String meanRate) {
+		this.meanRate = meanRate;
 	}
 
-	public String getReplicas() {
-		return replicas;
+	public String getOneMinute() {
+		return oneMinute;
 	}
 
-	public void setReplicas(String replicas) {
-		this.replicas = replicas;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setOneMinute(String oneMinute) {
+		this.oneMinute = oneMinute;
 	}
 
 }

@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.domain.KafkaSqlDomain;
+import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
@@ -45,7 +45,7 @@ public class KafkaSqlParser {
 	public static String execute(String clusterAlias, String sql) {
 		JSONObject status = new JSONObject();
 		try {
-			KafkaSqlDomain kafkaSql = kafkaService.parseSql(clusterAlias, sql);
+			KafkaSqlInfo kafkaSql = kafkaService.parseSql(clusterAlias, sql);
 			LOG.info("KafkaSqlParser - SQL[" + kafkaSql.getSql() + "]");
 			if (kafkaSql.isStatus()) {
 				if (!hasTopic(clusterAlias, kafkaSql)) {
@@ -74,7 +74,7 @@ public class KafkaSqlParser {
 		return status.toJSONString();
 	}
 
-	private static boolean hasTopic(String clusterAlias, KafkaSqlDomain kafkaSql) {
+	private static boolean hasTopic(String clusterAlias, KafkaSqlInfo kafkaSql) {
 		String topics = kafkaService.getAllPartitions(clusterAlias);
 		JSONArray topicDataSets = JSON.parseArray(topics);
 		for (Object object : topicDataSets) {

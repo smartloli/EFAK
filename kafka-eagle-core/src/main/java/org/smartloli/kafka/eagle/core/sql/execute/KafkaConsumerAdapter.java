@@ -15,9 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * 
- */
 package org.smartloli.kafka.eagle.core.sql.execute;
 
 import java.util.ArrayList;
@@ -34,7 +31,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.smartloli.kafka.eagle.common.domain.KafkaSqlDomain;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -42,6 +38,7 @@ import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.util.Constants.Kafka;
 
 /**
@@ -56,7 +53,7 @@ public class KafkaConsumerAdapter {
 
 	private static KafkaService kafkaService = new KafkaFactory().create();
 
-	public static List<JSONArray> executor(KafkaSqlDomain kafkaSql) {
+	public static List<JSONArray> executor(KafkaSqlInfo kafkaSql) {
 		List<JSONArray> messages = new ArrayList<>();
 		Properties props = new Properties();
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);

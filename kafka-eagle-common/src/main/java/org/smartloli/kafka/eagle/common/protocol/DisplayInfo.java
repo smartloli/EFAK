@@ -15,9 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.protocol;
 
 /**
  * Definition consumer page information.
@@ -26,7 +24,7 @@ import com.google.gson.Gson;
  *
  *         Created by Jan 10, 2017
  */
-public class PageParamDomain {
+public class DisplayInfo extends BaseProtocol{
 
 	private String search;
 	private int iDisplayStart;
@@ -54,11 +52,6 @@ public class PageParamDomain {
 
 	public void setiDisplayLength(int iDisplayLength) {
 		this.iDisplayLength = iDisplayLength;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
 	}
 
 }

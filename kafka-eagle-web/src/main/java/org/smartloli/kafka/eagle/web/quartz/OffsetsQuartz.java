@@ -34,9 +34,9 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailProvider;
-import org.smartloli.kafka.eagle.common.domain.AlarmDomain;
-import org.smartloli.kafka.eagle.common.domain.OffsetZkDomain;
-import org.smartloli.kafka.eagle.common.domain.OffsetsLiteDomain;
+import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
+import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
+import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -62,12 +62,12 @@ public class OffsetsQuartz {
 	private ZkService zkService = new ZkFactory().create();
 
 	/** Get alarmer configure. */
-	private List<AlarmDomain> alarmConfigure(String clusterAlias) {
+	private List<AlarmInfo> alarmConfigure(String clusterAlias) {
 		String alarmer = zkService.getAlarm(clusterAlias);
-		List<AlarmDomain> targets = new ArrayList<>();
+		List<AlarmInfo> targets = new ArrayList<>();
 		JSONArray alarmers = JSON.parseArray(alarmer);
 		for (Object object : alarmers) {
-			AlarmDomain alarm = new AlarmDomain();
+			AlarmInfo alarm = new AlarmInfo();
 			JSONObject alarmSerialize = (JSONObject) object;
 			alarm.setGroup(alarmSerialize.getString("group"));
 			alarm.setTopics(alarmSerialize.getString("topic"));
@@ -78,12 +78,12 @@ public class OffsetsQuartz {
 		return targets;
 	}
 
-	private void alert(String clusterAlias, List<OffsetsLiteDomain> offsetLites) {
+	private void alert(String clusterAlias, List<OffsetsLiteInfo> offsetLites) {
 		boolean enableAlarm = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.enable");
 		if (enableAlarm) {
-			List<AlarmDomain> alarmers = alarmConfigure(clusterAlias);
-			for (AlarmDomain alarm : alarmers) {
-				for (OffsetsLiteDomain offset : offsetLites) {
+			List<AlarmInfo> alarmers = alarmConfigure(clusterAlias);
+			for (AlarmInfo alarm : alarmers) {
+				for (OffsetsLiteInfo offset : offsetLites) {
 					if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
 						try {
 							MailProvider provider = new MailFactory();
@@ -115,9 +115,9 @@ public class OffsetsQuartz {
 		return targets;
 	}
 
-	private OffsetZkDomain getKafkaOffset(String clusterAlias, String bootstrapServers, String topic, String group, int partition) {
+	private OffsetZkInfo getKafkaOffset(String clusterAlias, String bootstrapServers, String topic, String group, int partition) {
 		JSONArray kafkaOffsets = JSON.parseArray(kafkaService.getKafkaOffset(clusterAlias));
-		OffsetZkDomain targets = new OffsetZkDomain();
+		OffsetZkInfo targets = new OffsetZkInfo();
 		for (Object object : kafkaOffsets) {
 			JSONObject kafkaOffset = (JSONObject) object;
 			String _topic = kafkaOffset.getString("topic");
@@ -151,7 +151,7 @@ public class OffsetsQuartz {
 	private void execute(String clusterAlias) {
 		try {
 			List<String> hosts = getBrokers(clusterAlias);
-			List<OffsetsLiteDomain> offsetLites = new ArrayList<OffsetsLiteDomain>();
+			List<OffsetsLiteInfo> offsetLites = new ArrayList<OffsetsLiteInfo>();
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 			Map<String, List<String>> consumers = null;
 			if ("kafka".equals(formatter)) {
@@ -178,7 +178,7 @@ public class OffsetsQuartz {
 			for (Entry<String, List<String>> entry : consumers.entrySet()) {
 				String group = entry.getKey();
 				for (String topic : entry.getValue()) {
-					OffsetsLiteDomain offsetSQLite = new OffsetsLiteDomain();
+					OffsetsLiteInfo offsetSQLite = new OffsetsLiteInfo();
 					for (String partitionStr : kafkaService.findTopicPartition(clusterAlias, topic)) {
 						int partition = Integer.parseInt(partitionStr);
 						long logSize = 0L;
@@ -187,7 +187,7 @@ public class OffsetsQuartz {
 						} else {
 							logSize = kafkaService.getLogSize(hosts, topic, partition);
 						}
-						OffsetZkDomain offsetZk = null;
+						OffsetZkInfo offsetZk = null;
 						if ("kafka".equals(formatter)) {
 							String bootstrapServers = "";
 							for (String host : hosts) {

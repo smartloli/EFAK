@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.domain.HostsDomain;
+import org.smartloli.kafka.eagle.common.protocol.HostsInfo;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -53,14 +53,14 @@ import kafka.message.MessageAndOffset;
  */
 public class TestSimpleKafkaConsumer extends Thread {
 	private static Logger LOG = LoggerFactory.getLogger(TestSimpleKafkaConsumer.class);
-	private List<HostsDomain> m_replicaBrokers = new ArrayList<HostsDomain>();
+	private List<HostsInfo> m_replicaBrokers = new ArrayList<HostsInfo>();
 	private static int buff_size = 64 * 1024;
 	private static int fetch_size = 1000 * 1000 * 1000;
 	private static int timeout = 100000;
 	private static int maxSize = 5000;
 
 	public TestSimpleKafkaConsumer() {
-		m_replicaBrokers = new ArrayList<HostsDomain>();
+		m_replicaBrokers = new ArrayList<HostsInfo>();
 	}
 
 	public static void main(String[] args) {
@@ -69,12 +69,12 @@ public class TestSimpleKafkaConsumer extends Thread {
 
 	@Override
 	public void run() {
-		List<HostsDomain> seeds = new ArrayList<>();
-		HostsDomain host = new HostsDomain();
+		List<HostsInfo> seeds = new ArrayList<>();
+		HostsInfo host = new HostsInfo();
 		host.setHost("master");
 		host.setPort(9092);
 		seeds.add(host);
-		HostsDomain host1 = new HostsDomain();
+		HostsInfo host1 = new HostsInfo();
 		host1.setHost("slave01");
 		host1.setPort(9092);
 		seeds.add(host1);
@@ -83,7 +83,7 @@ public class TestSimpleKafkaConsumer extends Thread {
 		System.out.println(topics.size());
 	}
 
-	public static JSONArray consumer(int _partition, String _topic, List<HostsDomain> seeds) {
+	public static JSONArray consumer(int _partition, String _topic, List<HostsInfo> seeds) {
 		JSONArray msg = null;
 		TestSimpleKafkaConsumer example = new TestSimpleKafkaConsumer();
 		// Max read number
@@ -101,7 +101,7 @@ public class TestSimpleKafkaConsumer extends Thread {
 		return msg;
 	}
 
-	private JSONArray run(long a_maxReads, String a_topic, int a_partition, List<HostsDomain> a_seedBrokers) throws Exception {
+	private JSONArray run(long a_maxReads, String a_topic, int a_partition, List<HostsInfo> a_seedBrokers) throws Exception {
 		JSONArray topics = new JSONArray();
 		// Get point topic partition's meta
 		PartitionMetadata metadata = findLeader(a_seedBrokers, a_topic, a_partition);
@@ -243,9 +243,9 @@ public class TestSimpleKafkaConsumer extends Thread {
 		throw new Exception("Unable to find new leader after Broker failure. Exiting");
 	}
 
-	private PartitionMetadata findLeader(List<HostsDomain> a_seedBrokers, String a_topic, int a_partition) {
+	private PartitionMetadata findLeader(List<HostsInfo> a_seedBrokers, String a_topic, int a_partition) {
 		PartitionMetadata returnMetaData = null;
-		loop: for (HostsDomain seed : a_seedBrokers) {
+		loop: for (HostsInfo seed : a_seedBrokers) {
 			SimpleConsumer consumer = null;
 			try {
 				consumer = new SimpleConsumer(seed.getHost(), seed.getPort(), timeout, buff_size, "leaderLookup");
@@ -272,7 +272,7 @@ public class TestSimpleKafkaConsumer extends Thread {
 		if (returnMetaData != null) {
 			m_replicaBrokers.clear();
 			for (kafka.cluster.BrokerEndPoint replica : returnMetaData.replicas()) {
-				HostsDomain host = new HostsDomain();
+				HostsInfo host = new HostsInfo();
 				host.setHost(replica.host());
 				host.setPort(replica.port());
 				m_replicaBrokers.add(host);

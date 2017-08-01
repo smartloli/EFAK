@@ -38,8 +38,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang.StringUtils;
-import org.smartloli.kafka.eagle.common.domain.MailSenderDomain;
-import org.smartloli.kafka.eagle.common.domain.SaAuthenticatorDomain;
+import org.smartloli.kafka.eagle.common.protocol.MailSenderInfo;
+import org.smartloli.kafka.eagle.common.protocol.SaAuthenticatorInfo;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
 /**
@@ -56,7 +56,7 @@ public class MailServiceImpl implements MailService {
 	/** Send alert message by email. */
 	@Override
 	public boolean send(String subject, String address, String content, String attachment) {
-		MailSenderDomain mailInfo = new MailSenderDomain();
+		MailSenderInfo mailInfo = new MailSenderInfo();
 		mailInfo.setMailServerHost(SystemConfigUtils.getProperty("kafka.eagle.mail.server.host"));
 		mailInfo.setMailServerPort(SystemConfigUtils.getProperty("kafka.eagle.mail.server.port"));
 		mailInfo.setValidate(true);
@@ -83,11 +83,11 @@ public class MailServiceImpl implements MailService {
 	}
 
 	/** Send mail in HTML format */
-	private boolean sendHtmlMail(MailSenderDomain mailInfo) {
-		SaAuthenticatorDomain authenticator = null;
+	private boolean sendHtmlMail(MailSenderInfo mailInfo) {
+		SaAuthenticatorInfo authenticator = null;
 		Properties pro = mailInfo.getProperties();
 		if (mailInfo.isValidate()) {
-			authenticator = new SaAuthenticatorDomain(mailInfo.getUserName(), mailInfo.getPassword());
+			authenticator = new SaAuthenticatorInfo(mailInfo.getUserName(), mailInfo.getPassword());
 		}
 		Session sendMailSession = Session.getDefaultInstance(pro, authenticator);
 		try {

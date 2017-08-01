@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain;
+package org.smartloli.kafka.eagle.common.protocol;
 
 import java.io.File;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.Properties;
  * 
  *         Created by Aug 15, 2016
  */
-public class MailSenderDomain {
+public class MailSenderInfo {
 	private String mailServerHost;
 	private String mailServerPort = "25";
 	private String fromAddress;

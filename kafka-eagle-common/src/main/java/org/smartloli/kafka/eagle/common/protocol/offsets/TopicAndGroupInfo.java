@@ -15,43 +15,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.domain.offsets;
+package org.smartloli.kafka.eagle.common.protocol.offsets;
 
-import org.apache.kafka.common.protocol.types.Schema;
-
-import com.google.gson.Gson;
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * K&V schema storage offset in Kafka topic.
+ * Default topic & group tuple.
  * 
  * @author smartloli.
  *
  *         Created by Jan 3, 2017
  */
-public class KeyAndValueSchemasDomain {
+public class TopicAndGroupInfo extends BaseProtocol{
 
-	private Schema keySchema;
-	private Schema valueSchema;
+	private String group;
+	private String topic;
 
-	public Schema getKeySchema() {
-		return keySchema;
+	public String getGroup() {
+		return group;
 	}
 
-	public void setKeySchema(Schema keySchema) {
-		this.keySchema = keySchema;
+	public void setGroup(String group) {
+		this.group = group;
 	}
 
-	public Schema getValueSchema() {
-		return valueSchema;
+	public String getTopic() {
+		return topic;
 	}
 
-	public void setValueSchema(Schema valueSchema) {
-		this.valueSchema = valueSchema;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
 }
