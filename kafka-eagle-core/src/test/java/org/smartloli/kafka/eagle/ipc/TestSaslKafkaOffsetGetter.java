@@ -32,7 +32,7 @@ import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -63,7 +63,7 @@ public class TestSaslKafkaOffsetGetter extends Thread {
 	/** Listening offset thread method. */
 	private static synchronized void startOffsetListener(String clusterAlias, KafkaConsumer<String, String> consumer) {
 		while (true) {
-			ConsumerRecords<String, String> records = consumer.poll(Constants.Kafka.TIME_OUT);
+			ConsumerRecords<String, String> records = consumer.poll(KConstants.Kafka.TIME_OUT);
 			for (ConsumerRecord<String, String> record : records) {
 				try {
 					if (record.value() == null) {
@@ -105,7 +105,7 @@ public class TestSaslKafkaOffsetGetter extends Thread {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
 			Properties props = new Properties();
-			props.put(ConsumerConfig.GROUP_ID_CONFIG, Constants.Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+			props.put(ConsumerConfig.GROUP_ID_CONFIG, KConstants.Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
 			props.put(ConsumerConfig.EXCLUDE_INTERNAL_TOPICS_CONFIG, false);
 			props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(clusterAlias));
 			props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());

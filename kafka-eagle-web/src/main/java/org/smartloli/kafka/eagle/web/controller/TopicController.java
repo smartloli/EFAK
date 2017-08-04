@@ -36,7 +36,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -101,7 +101,7 @@ public class TopicController {
 	public ModelAndView topicMetaView(@PathVariable("tname") String tname, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		if (topicService.hasTopic(clusterAlias, tname)) {
 			mav.setViewName("/topic/topic_meta");
 		} else {
@@ -145,7 +145,7 @@ public class TopicController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String metadata = topicService.metadata(clusterAlias, tname);
 		JSONArray metadatas = JSON.parseArray(metadata);
@@ -183,7 +183,7 @@ public class TopicController {
 	public void topicMockAjax(HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			String name = request.getParameter("name");
 			JSONObject object = new JSONObject();
 			object.put("items", JSON.parseArray(topicService.mockTopics(clusterAlias, name)));
@@ -199,7 +199,7 @@ public class TopicController {
 	public void topicMockSend(@PathVariable("topic") String topic, @RequestParam("message") String message, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			JSONObject object = new JSONObject();
 			object.put("status", topicService.mockSendMsg(clusterAlias, topic, message));
 			byte[] output = object.toJSONString().getBytes();
@@ -230,7 +230,7 @@ public class TopicController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		JSONArray topics = JSON.parseArray(topicService.list(clusterAlias));
 		int offset = 0;
@@ -283,7 +283,7 @@ public class TopicController {
 		String ke_topic_name = request.getParameter("ke_topic_name");
 		String ke_topic_partition = request.getParameter("ke_topic_partition");
 		String ke_topic_repli = request.getParameter("ke_topic_repli");
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		Map<String, Object> respons = kafkaService.create(clusterAlias, ke_topic_name, ke_topic_partition, ke_topic_repli);
 		if ("success".equals(respons.get("status"))) {
 			session.removeAttribute("Submit_Status");
@@ -303,7 +303,7 @@ public class TopicController {
 			HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		if (SystemConfigUtils.getProperty("kafka.eagle.topic.token").equals(token)) {
-			String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			Map<String, Object> respons = kafkaService.delete(clusterAlias, topicName);
 			if ("success".equals(respons.get("status"))) {
 				mav.setViewName("redirect:/topic/list");
@@ -320,7 +320,7 @@ public class TopicController {
 	@RequestMapping(value = "/topic/logical/commit/", method = RequestMethod.GET)
 	public void topicSqlLogicalAjax(@RequestParam String sql, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		try {
-			String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			String target = topicService.execute(clusterAlias, sql);
 			JSONObject result = JSON.parseObject(target);
 
@@ -348,7 +348,7 @@ public class TopicController {
 			}
 		}
 
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String text = topicService.execute(clusterAlias, sql);
 		JSONObject result = JSON.parseObject(text);

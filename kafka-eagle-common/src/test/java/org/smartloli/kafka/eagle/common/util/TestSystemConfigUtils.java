@@ -17,8 +17,6 @@
  */
 package org.smartloli.kafka.eagle.common.util;
 
-import org.smartloli.kafka.eagle.common.protocol.offsets.TopicAndGroupInfo;
-
 /**
 * Test Class.
 * 
@@ -31,9 +29,7 @@ public class TestSystemConfigUtils {
 	public static void main(String[] args) {
 		String storage = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		System.out.println(storage);
-		TopicAndGroupInfo tp = new TopicAndGroupInfo();
-		tp.setGroup("ss");
-		System.out.println(tp);
+		System.out.println(CalendarUtils.getCustomDate("HH"));
 	}
 
 }

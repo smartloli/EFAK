@@ -39,7 +39,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
-import org.smartloli.kafka.eagle.common.util.Constants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 
 /**
  * Parse the sql statement, and execute the sql content, get the message record

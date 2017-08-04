@@ -39,7 +39,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.AlarmService;
 
@@ -100,7 +100,7 @@ public class AlarmController {
 	public void alarmTopicAjax(HttpServletResponse response, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		try {
@@ -138,7 +138,7 @@ public class AlarmController {
 		alarm.setModifyDate(CalendarUtils.getDate());
 		alarm.setOwners(ke_topic_email);
 
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		Map<String, Object> respons = alarmService.add(clusterAlias, alarm);
 		if ("success".equals(respons.get("status"))) {
 			session.removeAttribute("Alarm_Submit_Status");
@@ -173,7 +173,7 @@ public class AlarmController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		JSONArray alarms = JSON.parseArray(alarmService.list(clusterAlias));
 		int offset = 0;
@@ -223,7 +223,7 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/{group}/{topic}/del", method = RequestMethod.GET)
 	public ModelAndView alarmDelete(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		alarmService.delete(clusterAlias, group, topic);
 		return new ModelAndView("redirect:/alarm/modify");

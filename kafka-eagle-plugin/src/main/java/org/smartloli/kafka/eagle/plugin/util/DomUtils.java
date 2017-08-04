@@ -34,6 +34,7 @@ import org.dom4j.io.XMLWriter;
  *         Created by Nov 17, 2015
  */
 public class DomUtils {
+	
 	public static void getTomcatServerXML(String xml, String modifyPort) throws Exception {
 		SAXReader reader = new SAXReader();
 		Document document = reader.read(new File(xml));
@@ -53,10 +54,6 @@ public class DomUtils {
 		XMLWriter writer = new XMLWriter(new FileWriter(xml));
 		writer.write(document);
 		writer.close();
-	}
-
-	public static void main(String[] args) throws Exception {
-		getTomcatServerXML("/Users/dengjie/hadoop/workspace/cms/src/main/resources/server.xml", "9092");
 	}
 
 }

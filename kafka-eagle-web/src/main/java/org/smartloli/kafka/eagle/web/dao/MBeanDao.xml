@@ -7,6 +7,7 @@
 		<result property="cluster" column="cluster" />
 		<result property="key" column="key" />
 		<result property="value" column="value" />
+		<result property="hour" column="hour" />
 		<result property="tm" column="tm" />
 	</resultMap>
 
@@ -16,22 +17,38 @@
 			LAST_INSERT_ID()
 		</selectKey>
 		insert into
-		ke_trend(`cluster`,`key`,`value`,`tm`) values
+		ke_trend(`cluster`,`key`,`value`,`hour`,`tm`) values
 		<foreach collection="list" item="item" index="index"
 			separator=",">
-			(#{item.cluster},#{item.key},#{item.value},#{item.tm})
+			(#{item.cluster},#{item.key},#{item.value},#{item.hour},#{item.tm})
 		</foreach>
 	</insert>
 
-	<select id="query" parameterType="map" resultMap="kpi">
+	<select id="daily" parameterType="map" resultMap="kpi">
 		select
 		`key`,sum(`value`) as
-		value,tm
+		`value`,`hour`,tm
 		from ke_trend where
-		`key`=#{key} and
 		`cluster`=#{cluster} and tm
 		between #{stime} and
-		#{etime} group by tm
+		#{etime} group by
+		`key`,`hour`
 	</select>
+
+	<select id="day" parameterType="map" resultMap="kpi">
+		select
+		`key`,sum(`value`) as
+		`value`,tm
+		from ke_trend where
+		`cluster`=#{cluster} and tm
+		between #{stime} and
+		#{etime} group by
+		`key`,tm
+	</select>
+
+	<delete id="remove" parameterType="int">
+		delete from ke_trend where
+		tm=#{tm}
+	</delete>
 
 </mapper>

@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,10 @@ public interface MetricsService {
 	/** Collection statistics data from kafka jmx & insert into table. */
 	public int insert(List<KpiInfo> kpi);
 
-	/** Get mbean data from table. */
-	public String query(Map<String, Object> param);
+	/** Query MBean data in different dimensions. */
+	public String query(Map<String, Object> params) throws ParseException;
+
+	/** Crontab clean data. */
+	public void remove(int tm);
 
 }

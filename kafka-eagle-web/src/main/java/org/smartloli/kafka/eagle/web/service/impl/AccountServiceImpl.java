@@ -20,7 +20,7 @@ package org.smartloli.kafka.eagle.web.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.dao.UserDao;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.AccountService;
@@ -49,7 +49,7 @@ public class AccountServiceImpl implements AccountService {
 		signin.setPassword(password);
 
 		if (userDao.login(signin) == null) {
-			signin.setUsername(Constants.Login.UNKNOW_USER);
+			signin.setUsername(KConstants.Login.UNKNOW_USER);
 			signin.setPassword("");
 			return signin;
 		}

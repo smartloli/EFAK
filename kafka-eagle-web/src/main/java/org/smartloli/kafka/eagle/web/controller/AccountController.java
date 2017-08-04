@@ -23,7 +23,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.AccountService;
@@ -68,7 +68,7 @@ public class AccountController {
 			setKafkaAlias(subject);
 			return "redirect:" + refUrl.replaceAll("/ke", "");
 		} else {
-			subject.getSession().setAttribute(Constants.Login.ERROR_LOGIN, "<div class='alert alert-danger'>Account or password is error .</div>");
+			subject.getSession().setAttribute(KConstants.Login.ERROR_LOGIN, "<div class='alert alert-danger'>Account or password is error .</div>");
 		}
 		token.clear();
 		return "/account/signin";
@@ -76,11 +76,11 @@ public class AccountController {
 
 	/** If validation passes, set the kafka default cluster. */
 	private void setKafkaAlias(Subject subject) {
-		Object object = subject.getSession().getAttribute(Constants.SessionAlias.CLUSTER_ALIAS);
+		Object object = subject.getSession().getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS);
 		if (object == null) {
 			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 			String defaultClusterAlias = clusterAliass[0];
-			subject.getSession().setAttribute(Constants.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
+			subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class AccountController {
 	@RequestMapping(value = "/reset/", method = RequestMethod.POST)
 	public String reset(HttpSession session, HttpServletRequest request) {
 		String password = request.getParameter("ke_new_password_name");
-		Signiner signin = (Signiner) SecurityUtils.getSubject().getSession().getAttribute(Constants.Login.SESSION_USER);
+		Signiner signin = (Signiner) SecurityUtils.getSubject().getSession().getAttribute(KConstants.Login.SESSION_USER);
 		signin.setPassword(password);
 		int code = accountService.reset(signin);
 		if (code > 0) {
@@ -104,8 +104,8 @@ public class AccountController {
 	public String logout() {
 		Subject subject = SecurityUtils.getSubject();
 		if (subject.isAuthenticated()) {
-			subject.getSession().removeAttribute(Constants.Login.SESSION_USER);
-			subject.getSession().removeAttribute(Constants.Login.ERROR_LOGIN);
+			subject.getSession().removeAttribute(KConstants.Login.SESSION_USER);
+			subject.getSession().removeAttribute(KConstants.Login.ERROR_LOGIN);
 		}
 		return "redirect:/account/signin";
 	}

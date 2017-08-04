@@ -28,7 +28,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailService;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.pojo.RoleResource;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.pojo.UserRole;
@@ -188,7 +188,7 @@ public class RoleController {
 			obj.put("username", role.getString("username"));
 			obj.put("realname", role.getString("realname"));
 			obj.put("email", role.getString("email"));
-			if (Constants.Role.ADMIN.equals(role.getString("username"))) {
+			if (KConstants.Role.ADMIN.equals(role.getString("username"))) {
 				obj.put("operate", "");
 			} else {
 				obj.put("operate",

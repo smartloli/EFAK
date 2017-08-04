@@ -52,7 +52,7 @@ import org.smartloli.kafka.eagle.common.protocol.*;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
-import org.smartloli.kafka.eagle.common.util.Constants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaPartitioner;
 import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
 
@@ -730,22 +730,26 @@ public class KafkaServiceImpl implements KafkaService {
 			kafkaSql.setStatus(false);
 			return kafkaSql;
 		} else {
-			kafkaSql.setStatus(true);
-			Matcher matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(sql);
-			if (matcher.find()) {
-				kafkaSql.setTableName(matcher.group(1).trim().replaceAll("\"", ""));
-				if (matcher.group(2).trim().startsWith("\"partition\"")) {
-					String[] columns = matcher.group(2).trim().split("in")[1].replace("(", "").replace(")", "").trim().split(",");
-					for (String column : columns) {
-						try {
-							kafkaSql.getPartition().add(Integer.parseInt(column));
-						} catch (Exception e) {
-							LOG.error("Parse parition[" + column + "] has error,msg is " + e.getMessage());
+			Matcher tableName = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(kafkaSql.getMetaSql());
+			if (tableName.find()) {
+				kafkaSql.setStatus(true);
+				kafkaSql.setTableName(tableName.group(1).trim().replaceAll("\"", ""));
+			} else {
+				Matcher matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(sql);
+				if (matcher.find()) {
+					if (matcher.group(2).trim().startsWith("\"partition\"")) {
+						String[] columns = matcher.group(2).trim().split("in")[1].replace("(", "").replace(")", "").trim().split(",");
+						for (String column : columns) {
+							try {
+								kafkaSql.getPartition().add(Integer.parseInt(column));
+							} catch (Exception e) {
+								LOG.error("Parse parition[" + column + "] has error,msg is " + e.getMessage());
+							}
 						}
 					}
 				}
+				kafkaSql.setSeeds(getBrokers(clusterAlias));
 			}
-			kafkaSql.setSeeds(getBrokers(clusterAlias));
 		}
 		return kafkaSql;
 	}

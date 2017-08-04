@@ -26,7 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
 
 /**
@@ -57,7 +57,7 @@ public class DashboardController {
 	@RequestMapping(value = "/dash/kafka/ajax", method = RequestMethod.GET)
 	public void dashboardAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
 			byte[] output = dashboradService.getDashboard(clusterAlias).getBytes();

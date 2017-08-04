@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.AccountService;
 import org.smartloli.kafka.eagle.web.sso.pojo.SSOAuthenticationToken;
@@ -64,12 +64,12 @@ public class SSOFilter implements Filter {
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
 			Signiner signinerChk = accountService.login(username, password);
-			if (!signinerChk.getUsername().equals(Constants.Login.UNKNOW_USER)) {
+			if (!signinerChk.getUsername().equals(KConstants.Login.UNKNOW_USER)) {
 				SSOAuthenticationToken token = new SSOAuthenticationToken(signinerChk.getRtxno(), signinerChk.getRealname(), signinerChk.getUsername(), signinerChk.getEmail());
 				SecurityUtils.getSubject().login(token);
 			}
 		} else {
-			Signiner signiner = (Signiner) getSession().getAttribute(Constants.Login.SESSION_USER);
+			Signiner signiner = (Signiner) getSession().getAttribute(KConstants.Login.SESSION_USER);
 			if (signiner == null) {
 				if (req.getHeader("x-requested-with") != null && req.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {
 					resp.setHeader("sessionstatus", "timeout");

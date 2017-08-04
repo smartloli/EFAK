@@ -3,22 +3,36 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 	<!-- Add scheduling task bean configuration corresponding to class. -->
-	<bean id="offsetsSchedule" class="org.smartloli.kafka.eagle.web.quartz.OffsetsQuartz" />
+	<bean id="mbeanSchedule" class="org.smartloli.kafka.eagle.web.quartz.MBeanQuartz" />
 	<!-- Method for configuring scheduling specific execution. -->
 	<!-- task1 -->
-	<bean id="offsetsDetail"
+	<bean id="mbeanDetail"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="offsetsSchedule" />
-		<property name="targetMethod" value="jobQuartz" />
+		<property name="targetObject" ref="mbeanSchedule" />
+		<property name="targetMethod" value="mbeanQuartz" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="mbeanCleanDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="mbeanSchedule" />
+		<property name="targetMethod" value="clean" />
 		<property name="concurrent" value="false" />
 	</bean>
 	<!-- Configure the trigger time for scheduling execution. -->
-	<bean id="offsetsTrigger"
+	<bean id="mbeanTrigger"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail" ref="offsetsDetail" />
+		<property name="jobDetail" ref="mbeanDetail" />
 		<property name="cronExpression">
 			<!-- Perform task scheduling per 5min. -->
 			<value>0 0/5 * * * ?</value>
+		</property>
+	</bean>
+	<bean id="mbeanCleanTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="mbeanCleanDetail" />
+		<property name="cronExpression">
+			<!-- Perform task scheduling 1:00 daily. -->
+			<value>0 0 1 * * ?</value>
 		</property>
 	</bean>
 	<!-- Quartz scheduling factory scheduling plant can only have one, multiple 
@@ -27,7 +41,8 @@
 		<property name="triggers">
 			<list>
 				<!-- All scheduling lists. -->
-				<ref local="offsetsTrigger" />
+				<ref local="mbeanTrigger" />
+				<ref local="mbeanCleanTrigger" />
 			</list>
 		</property>
 	</bean>

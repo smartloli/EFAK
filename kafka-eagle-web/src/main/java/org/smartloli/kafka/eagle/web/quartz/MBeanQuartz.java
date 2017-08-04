@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.web.quartz;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
@@ -44,11 +46,18 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class MBeanQuartz {
 
+	private Logger LOG = LoggerFactory.getLogger(MBeanQuartz.class);
+
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
 	/** Mx4j service interface. */
 	private Mx4jService mx4jService = new Mx4jFactory().create();
+
+	public void clean() {
+		MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
+		metrics.remove(Integer.valueOf(CalendarUtils.getCustomLastDay(7)));
+	}
 
 	public void mbeanQuartz() {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
@@ -68,7 +77,8 @@ public class MBeanQuartz {
 			kpiByteIn.setCluster(clusterAlias);
 			kpiByteIn.setKey("ByteIn");
 			kpiByteIn.setValue(bytesIn.getMeanRate());
-			kpiByteIn.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
+			kpiByteIn.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+			kpiByteIn.setHour(CalendarUtils.getCustomDate("HH"));
 			list.add(kpiByteIn);
 
 			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri);
@@ -76,23 +86,17 @@ public class MBeanQuartz {
 			kpiByteOut.setCluster(clusterAlias);
 			kpiByteOut.setKey("ByteOut");
 			kpiByteOut.setValue(bytesOut.getMeanRate());
-			kpiByteOut.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
+			kpiByteOut.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+			kpiByteOut.setHour(CalendarUtils.getCustomDate("HH"));
 			list.add(kpiByteOut);
-
-			MBeanInfo bytesRejected = mx4jService.bytesRejectedPerSec(uri);
-			KpiInfo kpiByteRejected = new KpiInfo();
-			kpiByteRejected.setCluster(clusterAlias);
-			kpiByteRejected.setKey("ByteRejected");
-			kpiByteRejected.setValue(bytesRejected.getMeanRate());
-			kpiByteRejected.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
-			list.add(kpiByteRejected);
 
 			MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri);
 			KpiInfo kpiFailedFetchRequest = new KpiInfo();
 			kpiFailedFetchRequest.setCluster(clusterAlias);
 			kpiFailedFetchRequest.setKey("FailedFetchRequest");
 			kpiFailedFetchRequest.setValue(failedFetchRequest.getMeanRate());
-			kpiFailedFetchRequest.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
+			kpiFailedFetchRequest.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+			kpiFailedFetchRequest.setHour(CalendarUtils.getCustomDate("HH"));
 			list.add(kpiFailedFetchRequest);
 
 			MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri);
@@ -100,7 +104,8 @@ public class MBeanQuartz {
 			kpiFailedProduceRequest.setCluster(clusterAlias);
 			kpiFailedProduceRequest.setKey("FailedProduceRequest");
 			kpiFailedProduceRequest.setValue(failedProduceRequest.getMeanRate());
-			kpiFailedProduceRequest.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
+			kpiFailedProduceRequest.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+			kpiFailedProduceRequest.setHour(CalendarUtils.getCustomDate("HH"));
 			list.add(kpiFailedProduceRequest);
 
 			MBeanInfo messageIn = mx4jService.messagesInPerSec(uri);
@@ -108,12 +113,17 @@ public class MBeanQuartz {
 			kpiMessageIn.setCluster(clusterAlias);
 			kpiMessageIn.setKey("MessageIn");
 			kpiMessageIn.setValue(messageIn.getMeanRate());
-			kpiMessageIn.setTm(CalendarUtils.getCustomDate("yyyyMMddHH"));
+			kpiMessageIn.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+			kpiMessageIn.setHour(CalendarUtils.getCustomDate("HH"));
 			list.add(kpiMessageIn);
 		}
 
 		MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
-		metrics.insert(list);
+		try {
+			metrics.insert(list);
+		} catch (Exception e) {
+			LOG.error("Collector mbean data has error,msg is " + e.getMessage());
+		}
 	}
 
 }

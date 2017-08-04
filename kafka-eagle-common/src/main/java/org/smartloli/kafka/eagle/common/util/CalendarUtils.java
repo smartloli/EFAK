@@ -19,6 +19,7 @@ package org.smartloli.kafka.eagle.common.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -101,6 +102,23 @@ public class CalendarUtils {
 	public static String getCustomDate(String formatter) {
 		SimpleDateFormat df = new SimpleDateFormat(formatter);
 		return df.format(new Date());
+	}
+
+	/** Get custom day. */
+	public static String getCustomLastDay(int day) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+		Calendar calendar = Calendar.getInstance();
+		Date date = new Date();
+		calendar.setTime(date);
+		calendar.add(Calendar.DAY_OF_MONTH, -day);
+		return df.format(calendar.getTime());
+	}
+
+	/** Convert date to date. */
+	public static String convertDate2Date(String date) throws ParseException {
+		SimpleDateFormat newly = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat oldly = new SimpleDateFormat("yyyyMMdd");
+		return newly.format(oldly.parse(date));
 	}
 
 }

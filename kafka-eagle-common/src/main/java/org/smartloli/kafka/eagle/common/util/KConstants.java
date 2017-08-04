@@ -24,7 +24,7 @@ package org.smartloli.kafka.eagle.common.util;
  *
  *         Created by Jan 3, 2017
  */
-public class Constants {
+public class KConstants {
 
 	/** D3 data plugin size. */
 	public interface D3 {
@@ -55,38 +55,45 @@ public class Constants {
 
 	/** Login session. */
 	public interface Login {
-		public static String SESSION_USER = "LOGIN_USER_SESSION";
-		public static String UNKNOW_USER = "__unknow__";
-		public static String ERROR_LOGIN = "error_msg";
+		public final static String SESSION_USER = "LOGIN_USER_SESSION";
+		public final static String UNKNOW_USER = "__unknow__";
+		public final static String ERROR_LOGIN = "error_msg";
 	}
 
 	/** Role Administrator. */
 	public interface Role {
-		public static String ADMIN = "admin";
+		public final static String ADMIN = "admin";
 	}
 
 	/** Kafka jmx mbean. */
 	public interface MBean {
-		public static String COUNT = "Count";
-		public static String EVENT_TYPE = "EventType";
-		public static String FIFTEEN_MINUTE_RATE = "FifteenMinuteRate";
-		public static String FIVE_MINUTE_RATE = "FiveMinuteRate";
-		public static String MEAN_RATE = "MeanRate";
-		public static String ONE_MINUTE_RATE = "OneMinuteRate";
-		public static String RATE_UNIT = "RateUnit";
-		public static String VALUE = "Value";
+		public final static String COUNT = "Count";
+		public final static String EVENT_TYPE = "EventType";
+		public final static String FIFTEEN_MINUTE_RATE = "FifteenMinuteRate";
+		public final static String FIVE_MINUTE_RATE = "FiveMinuteRate";
+		public final static String MEAN_RATE = "MeanRate";
+		public final static String ONE_MINUTE_RATE = "OneMinuteRate";
+		public final static String RATE_UNIT = "RateUnit";
+		public final static String VALUE = "Value";
 
 		/** Messages in /sec. */
-		public static String MESSAGES_IN = "msg";
+		public final static String MESSAGES_IN = "msg";
 		/** Bytes in /sec. */
-		public static String BYTES_IN = "in";
+		public final static String BYTES_IN = "in";
 		/** Bytes out /sec. */
-		public static String BYTES_OUT = "out";
+		public final static String BYTES_OUT = "out";
 		/** Bytes rejected /sec. */
-		public static String BYTES_REJECTED = "rejected";
+		public final static String BYTES_REJECTED = "rejected";
 		/** Failed fetch request /sec. */
-		public static String FAILED_FETCH_REQUEST = "fetch";
+		public final static String FAILED_FETCH_REQUEST = "fetch";
 		/** Failed produce request /sec. */
-		public static String FAILED_PRODUCE_REQUEST = "produce";
+		public final static String FAILED_PRODUCE_REQUEST = "produce";
+
+		/** MBean keys. */
+		public final static String MESSAGEIN = "MessageIn";
+		public final static String BYTEIN = "ByteIn";
+		public final static String BYTEOUT = "ByteOut";
+		public final static String FAILEDFETCHREQUEST = "FailedFetchRequest";
+		public final static String FAILEDPRODUCEREQUEST = "FailedProduceRequest";
 	}
 }

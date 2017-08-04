@@ -33,7 +33,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
 
@@ -65,7 +65,7 @@ public class ConsumersController {
 	@RequestMapping(value = "/consumers/info/ajax", method = RequestMethod.GET)
 	public void consumersGraphAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		
 		try {
 			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
@@ -102,7 +102,7 @@ public class ConsumersController {
 		page.setiDisplayStart(iDisplayStart);
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		int count = consumerService.getConsumerCount(clusterAlias,formatter);
@@ -155,7 +155,7 @@ public class ConsumersController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		
 		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
 		JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(clusterAlias,formatter, group));

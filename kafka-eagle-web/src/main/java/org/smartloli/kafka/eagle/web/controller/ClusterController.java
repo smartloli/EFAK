@@ -33,7 +33,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.service.ClusterService;
 
 /**
@@ -97,7 +97,7 @@ public class ClusterController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		JSONObject deserializeClusters = JSON.parseObject(clusterService.get(clusterAlias, type));
 		JSONArray clusters = deserializeClusters.getJSONArray(type);
@@ -164,8 +164,8 @@ public class ClusterController {
 		if (!clusterService.hasClusterAlias(clusterAlias)) {
 			return new ModelAndView("redirect:/error/404");
 		} else {
-			session.removeAttribute(Constants.SessionAlias.CLUSTER_ALIAS);
-			session.setAttribute(Constants.SessionAlias.CLUSTER_ALIAS, clusterAlias);
+			session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS);
+			session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, clusterAlias);
 			return new ModelAndView("redirect:/");
 		}
 	}
@@ -232,7 +232,7 @@ public class ClusterController {
 	@RequestMapping(value = "/cluster/zk/islive/ajax", method = RequestMethod.GET)
 	public void zkCliLiveAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
 			byte[] output = clusterService.status(clusterAlias).toJSONString().getBytes();
@@ -249,7 +249,7 @@ public class ClusterController {
 		String type = request.getParameter("type");
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
 			byte[] output = clusterService.execute(clusterAlias, cmd, type).getBytes();

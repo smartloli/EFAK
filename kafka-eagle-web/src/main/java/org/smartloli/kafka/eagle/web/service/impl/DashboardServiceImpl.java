@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.DashboardInfo;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -76,7 +76,7 @@ public class DashboardServiceImpl implements DashboardService {
 		int count = 0;
 		for (Object object : targets1) {
 			JSONObject subTarget = (JSONObject) object;
-			if (count > Constants.D3.SIZE) {
+			if (count > KConstants.D3.SIZE) {
 				JSONObject subTarget2 = new JSONObject();
 				subTarget2.put("name", "...");
 				targets2.add(subTarget2);

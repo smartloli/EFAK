@@ -72,6 +72,18 @@ INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1
 COMMIT;
 
 -- ----------------------------
+--  Table structure for `ke_trend`
+-- ----------------------------
+DROP TABLE IF EXISTS `ke_trend`;
+CREATE TABLE `ke_trend` (
+  `cluster` varchar(64) NOT NULL,
+  `key` varchar(64) NOT NULL,
+  `value` varchar(64) NOT NULL,
+  `hour` varchar(2) NOT NULL,
+  `tm` varchar(16) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
 --  Table structure for `ke_user_role`
 -- ----------------------------
 DROP TABLE IF EXISTS `ke_user_role`;

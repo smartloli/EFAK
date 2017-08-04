@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.HostsInfo;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
-import org.smartloli.kafka.eagle.common.util.Constants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

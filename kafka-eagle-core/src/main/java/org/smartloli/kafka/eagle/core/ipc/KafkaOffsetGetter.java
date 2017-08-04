@@ -40,8 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.offsets.KeyAndValueSchemasInfo;
 import org.smartloli.kafka.eagle.common.protocol.offsets.MessageValueStructAndVersionInfo;
-import org.smartloli.kafka.eagle.common.util.Constants;
-import org.smartloli.kafka.eagle.common.util.Constants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -71,7 +71,7 @@ public class KafkaOffsetGetter extends Thread {
 	private final static Logger LOG = LoggerFactory.getLogger(KafkaOffsetGetter.class);
 
 	/** Consumer offsets in kafka topic. */
-	private final static String CONSUMER_OFFSET_TOPIC = Constants.Kafka.CONSUMER_OFFSET_TOPIC;
+	private final static String CONSUMER_OFFSET_TOPIC = KConstants.Kafka.CONSUMER_OFFSET_TOPIC;
 
 	/** Multi cluster information. */
 	public static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new ConcurrentHashMap<>();

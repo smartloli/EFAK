@@ -33,7 +33,7 @@ import javax.management.remote.JMXServiceURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
-import org.smartloli.kafka.eagle.common.util.Constants.MBean;
+import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 
 /**
  * Implements Mx4jService all method.

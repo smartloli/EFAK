@@ -17,6 +17,9 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -27,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.service.MetricsService;
 
 /**
@@ -50,7 +53,7 @@ public class MetricsController {
 		mav.setViewName("/metrics/brokers");
 		return mav;
 	}
-	
+
 	/** Trend viewer. */
 	@RequestMapping(value = "/metrics/trend", method = RequestMethod.GET)
 	public ModelAndView trendView(HttpSession session) {
@@ -63,9 +66,29 @@ public class MetricsController {
 	@RequestMapping(value = "/metrics/brokers/mbean/ajax", method = RequestMethod.GET)
 	public void clusterAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
 		try {
-			String clusterAlias = session.getAttribute(Constants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			String target = metricsService.getAllBrokersMBean(clusterAlias);
 
+			byte[] output = target.getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get trend data by ajax. */
+	@RequestMapping(value = "/metrics/trend/mbean/ajax", method = RequestMethod.GET)
+	public void trendAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+		try {
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+			Map<String, Object> param = new HashMap<>();
+			param.put("cluster", clusterAlias);
+			param.put("stime", request.getParameter("stime"));
+			param.put("etime", request.getParameter("etime"));
+			param.put("type", request.getParameter("type"));
+			
+			String target = metricsService.query(param) == null ? "" : metricsService.query(param);
 			byte[] output = target.getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {

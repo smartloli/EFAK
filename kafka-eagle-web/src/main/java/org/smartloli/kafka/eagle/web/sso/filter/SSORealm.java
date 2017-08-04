@@ -36,7 +36,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.AccountService;
 import org.smartloli.kafka.eagle.web.service.ResourceService;
@@ -64,7 +64,7 @@ public class SSORealm extends AuthorizingRealm {
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		Signiner signiner = (Signiner) getSession().getAttribute(Constants.Login.SESSION_USER);
+		Signiner signiner = (Signiner) getSession().getAttribute(KConstants.Login.SESSION_USER);
 		List<Resources> resources = resourcesService.getUserResources(signiner.getId());
 
 		List<String> permissions = new ArrayList<String>();
@@ -85,7 +85,7 @@ public class SSORealm extends AuthorizingRealm {
 		SSOAuthenticationToken token = (SSOAuthenticationToken) authcToken;
 		Integer rtxno = token.getCode();
 		Signiner signin = accountService.findUserByRtxNo(rtxno);
-		this.getSession().setAttribute(Constants.Login.SESSION_USER, signin);
+		this.getSession().setAttribute(KConstants.Login.SESSION_USER, signin);
 		return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), getName());
 	}
 

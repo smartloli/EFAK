@@ -30,7 +30,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.ConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
-import org.smartloli.kafka.eagle.common.util.Constants;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
@@ -68,7 +68,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 		for (Entry<String, List<String>> entry : activeTopics.entrySet()) {
 			JSONObject subTarget = new JSONObject();
 			JSONArray subTargets = new JSONArray();
-			if (count > Constants.D3.SIZE) {
+			if (count > KConstants.D3.SIZE) {
 				subTarget.put("name", "...");
 				JSONObject subInSubTarget = new JSONObject();
 				subInSubTarget.put("name", "...");
@@ -188,7 +188,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 			JSONObject consumerGroup = (JSONObject) object;
 			JSONObject subTarget = new JSONObject();
 			JSONArray subTargets = new JSONArray();
-			if (count > Constants.D3.SIZE) {
+			if (count > KConstants.D3.SIZE) {
 				subTarget.put("name", "...");
 				JSONObject subInSubTarget = new JSONObject();
 				subInSubTarget.put("name", "...");

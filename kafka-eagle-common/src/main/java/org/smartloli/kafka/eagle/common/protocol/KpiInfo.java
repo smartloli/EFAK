@@ -24,12 +24,21 @@ package org.smartloli.kafka.eagle.common.protocol;
  *
  *         Created by Jul 19, 2017
  */
-public class KpiInfo extends BaseProtocol{
+public class KpiInfo extends BaseProtocol {
 
 	private String cluster;
 	private String key;
 	private String value;
 	private String tm;
+	private String hour;
+
+	public String getHour() {
+		return hour;
+	}
+
+	public void setHour(String hour) {
+		this.hour = hour;
+	}
 
 	public String getCluster() {
 		return cluster;

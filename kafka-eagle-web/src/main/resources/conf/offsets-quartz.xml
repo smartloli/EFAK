@@ -4,7 +4,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 	<!-- Add scheduling task bean configuration corresponding to class. -->
 	<bean id="offsetsSchedule" class="org.smartloli.kafka.eagle.web.quartz.OffsetsQuartz" />
-	<bean id="mbeanSchedule" class="org.smartloli.kafka.eagle.web.quartz.MBeanQuartz" />
 	<!-- Method for configuring scheduling specific execution. -->
 	<!-- task1 -->
 	<bean id="offsetsDetail"
