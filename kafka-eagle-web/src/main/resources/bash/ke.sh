@@ -69,7 +69,13 @@ start()
 	sleep 3
 	rm -rf ${KE_HOME}/kms/logs/*
 	chmod +x ${KE_HOME}/kms/bin/*.sh
-	nohup ${KE_HOME}/kms/bin/startup.sh > ${LOG_DIR}/ke.out 2>&1
+	chmod +x ${KE_HOME}/bin/schema.sh
+	nohup ${KE_HOME}/bin/schema.sh >> ${LOG_DIR}/ke.out 2>&1
+	echo "*******************************************************************"
+    echo "* Schema has checked finished.	*"
+	echo "*******************************************************************"
+	sleep 2
+	nohup ${KE_HOME}/kms/bin/startup.sh >> ${LOG_DIR}/ke.out 2>&1
 	ret=$?
 	echo "Status Code["$ret"]"
 	isexit $ret

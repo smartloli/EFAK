@@ -119,7 +119,7 @@ CREATE TABLE `ke_users` (
 --  Records of `ke_users`
 -- ----------------------------
 BEGIN;
-INSERT INTO `ke_users` VALUES ('1', '1000', 'admin', '123456', 'admin@email.com', '系统管理员');
+INSERT INTO `ke_users` VALUES ('1', '1000', 'admin', '123456', 'admin@email.com', 'Administrator');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
