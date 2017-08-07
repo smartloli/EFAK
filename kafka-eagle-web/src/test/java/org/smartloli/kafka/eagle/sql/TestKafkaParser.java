@@ -30,7 +30,7 @@ public class TestKafkaParser {
 
 	public static void main(String[] args) {
 		//String sql = "Select \"partition\",\"offset\",\"msg\" from \"mf.ip_login\" where \"partition\" in (0) and \"offset\"=37445 limit 10";
-		String sql = "select * from \"A\" where \"partition\" in (0) limit 10";
+		String sql = "select * from \"ip_login\" where \"partition\" in (0) limit 10";
 		String result = KafkaSqlParser.execute("cluster1", sql);
 		System.out.println(result);
 	}

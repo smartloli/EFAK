@@ -734,17 +734,17 @@ public class KafkaServiceImpl implements KafkaService {
 			if (tableName.find()) {
 				kafkaSql.setStatus(true);
 				kafkaSql.setTableName(tableName.group(1).trim().replaceAll("\"", ""));
-			} else {
-				Matcher matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(sql);
-				if (matcher.find()) {
-					if (matcher.group(2).trim().startsWith("\"partition\"")) {
-						String[] columns = matcher.group(2).trim().split("in")[1].replace("(", "").replace(")", "").trim().split(",");
-						for (String column : columns) {
-							try {
-								kafkaSql.getPartition().add(Integer.parseInt(column));
-							} catch (Exception e) {
-								LOG.error("Parse parition[" + column + "] has error,msg is " + e.getMessage());
-							}
+			}
+
+			Matcher matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(sql);
+			if (matcher.find()) {
+				if (matcher.group(2).trim().startsWith("\"partition\"")) {
+					String[] columns = matcher.group(2).trim().split("in")[1].replace("(", "").replace(")", "").trim().split(",");
+					for (String column : columns) {
+						try {
+							kafkaSql.getPartition().add(Integer.parseInt(column));
+						} catch (Exception e) {
+							LOG.error("Parse parition[" + column + "] has error,msg is " + e.getMessage());
 						}
 					}
 				}

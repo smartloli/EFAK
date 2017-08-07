@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
+import org.smartloli.kafka.eagle.plugin.mysql.MySqlRecordSchema;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -43,6 +44,9 @@ public class StartupListener implements ApplicationContextAware {
 
 	@Override
 	public void setApplicationContext(ApplicationContext arg0) throws BeansException {
+		ContextSchema context = new ContextSchema();
+		context.start();
+
 		RunTask task = new RunTask();
 		task.start();
 	}
@@ -68,6 +72,12 @@ public class StartupListener implements ApplicationContextAware {
 					LOG.error("Initialize KafkaOffsetGetter thread has error,msg is " + ex.getMessage());
 				}
 			}
+		}
+	}
+
+	class ContextSchema extends Thread {
+		public void run() {
+			MySqlRecordSchema.schema();
 		}
 	}
 
