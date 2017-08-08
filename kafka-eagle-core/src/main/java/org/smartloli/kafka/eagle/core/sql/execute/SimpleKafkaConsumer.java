@@ -64,7 +64,7 @@ public class SimpleKafkaConsumer {
 		m_replicaBrokers = new ArrayList<HostsInfo>();
 	}
 
-	public static List<JSONArray> start(KafkaSqlInfo kafkaSql) {
+	public static List<JSONArray> executor(KafkaSqlInfo kafkaSql) {
 		List<JSONArray> messages = new ArrayList<>();
 		List<HostsInfo> seeds = kafkaSql.getSeeds();
 		for (int partition : kafkaSql.getPartition()) {
