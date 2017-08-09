@@ -11,6 +11,8 @@ When you install [Kafka Eagle](http://download.smartloli.org/), you can see the 
 
 The system shows the trend of consumer and producer trends on the same day, so you can see what happened that day.
 
+Supported on : ``` 0.8.2.x ```,``` 0.9.x ```,``` 0.10.x ``` . 
+
 Here are a few Kafka Eagle system screenshots:
 
 # List of Consumer Groups & Active Group Graph
