@@ -11,7 +11,8 @@ When you install [Kafka Eagle](http://download.smartloli.org/), you can see the 
 
 The system shows the trend of consumer and producer trends on the same day, so you can see what happened that day.
 
-Supported on : ``` 0.8.2.x ```,``` 0.9.x ```,``` 0.10.x ``` . 
+Supported on kafka version: ``` 0.8.2.x ```,``` 0.9.x ```,``` 0.10.x ``` .
+Supported platform: ```Mac OS X```,```Linux```,```Windows```  
 
 Here are a few Kafka Eagle system screenshots:
 
@@ -44,7 +45,7 @@ Please read [Kafka Eagle Install](https://ke.smartloli.org/2.Install/2.Installin
 
 The project is a maven project that uses the Maven command to pack the deployment as follows:
 ```bash
-mvn clean && mvn package
+mvn clean && mvn package -DskipTests
 ```
 # More Information
 

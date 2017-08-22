@@ -25,15 +25,17 @@ DIALUP_PID=$KE_HOME/bin/ke.pid
 start()
 {
     echo -n $"Starting $prog: "
-    echo "Ke service check ..."
+    echo "KE Service Check ..."
     
     if [ "$KE_HOME" = "" ]; then
-  		echo "Error: KE_HOME is not set."
+  		echo "Error: The KE_HOME environment variable is not defined correctly."
+		echo "Error: This environment variable is needed to run this program."
   		exit 1
 	fi
 	
 	if [ "$JAVA_HOME" = "" ]; then
-  		echo "Error: JAVA_HOME is not set."
+  		echo "Error: The JAVA_HOME environment variable is not defined correctly."
+		echo "Error: This environment variable is needed to run this program."
   		exit 1
 	fi
 
@@ -61,7 +63,7 @@ start()
 	CLASS=org.smartloli.kafka.eagle.plugin.server.TomcatServerListen
 	${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ke.out 2>&1
 	echo "*******************************************************************"
-    echo "* Listen port has successed! *"
+    echo "* Kafka Eagle system monitor port successful... *"
 	echo "*******************************************************************"
 	sleep 3
 	rm -rf ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/*.properties
@@ -80,7 +82,7 @@ start()
 	echo "Status Code["$ret"]"
 	isexit $ret
 	echo "*******************************************************************"
-    	echo "* KE service has started success! *"
+    	echo "* KE Service has started success! *"
     	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke' *"
     	echo "* Account:admin ,Password:123456                          *"
 	echo "*******************************************************************"
@@ -99,7 +101,7 @@ stop()
                          ${KE_HOME}/kms/bin/shutdown.sh
                          kill -9  $SPID
                          echo > $DIALUP_PID
-						 echo "stop success"
+						 echo "Stop Success."
 					  fi
 	 fi
 }
@@ -172,9 +174,9 @@ status()
 
 restart()
 {
-    echo "stoping ... "
+    echo "Stoping ... "
     stop
-    echo "staring ..."
+    echo "Starting ..."
     start
 }
 

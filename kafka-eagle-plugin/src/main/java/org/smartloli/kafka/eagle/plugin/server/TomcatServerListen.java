@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.plugin.util.DomUtils;
+import org.smartloli.kafka.eagle.plugin.util.JConstants;
 
 /**
  * Listen tomcat server port
@@ -34,7 +35,13 @@ public class TomcatServerListen {
 
 	public static void main(String[] args) {
 		try {
-			String xml = System.getProperty("user.dir") + "/kms/conf/server.xml";
+			String xml = "";
+			String osName = System.getProperties().getProperty("os.name");
+			if (osName.contains(JConstants.WIN)) {
+				xml = System.getProperty("user.dir") + "\\kms\\conf\\server.xml";
+			} else {
+				xml = System.getProperty("user.dir") + "/kms/conf/server.xml";
+			}
 			String modifyPort = SystemConfigUtils.getProperty("kafka.eagle.webui.port");
 			DomUtils.getTomcatServerXML(xml, modifyPort);
 		} catch (Exception ex) {

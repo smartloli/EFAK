@@ -86,4 +86,10 @@ public interface JConstants {
 
 	};
 
+	/** Mac system . */
+	public static final String MAC = "Mac";
+
+	/** Windows system. */
+	public static final String WIN = "Win";
+
 }
