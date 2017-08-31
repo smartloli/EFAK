@@ -12,8 +12,8 @@ $(document).ready(
 						var tbody = "<tbody>";
 						var msg = "<tr><td>Messages in /sec</td><td><a class='btn btn-primary btn-xs'>" + datas.msg.meanRate.split("B")[0] + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.msg.oneMinute.split("B")[0]
 								+ "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.msg.fiveMinute.split("B")[0] + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.msg.fifteenMinute.split("B")[0] + "</a></td></tr>";
-						msg += "<tr><td>Bytes in /sec</td><td><a class='btn btn-primary btn-xs'>" + datas.in.meanRate + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.in.oneMinute
-								+ "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.in.fiveMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.in.fifteenMinute + "</a></td></tr>";
+						msg += "<tr><td>Bytes in /sec</td><td><a class='btn btn-primary btn-xs'>" + datas.ins.meanRate + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.ins.oneMinute
+								+ "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.ins.fiveMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.ins.fifteenMinute + "</a></td></tr>";
 						msg += "<tr><td>Bytes out /sec</td><td><a class='btn btn-primary btn-xs'>" + datas.out.meanRate + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.out.oneMinute
 								+ "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.out.fiveMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.out.fifteenMinute + "</a></td></tr>";
 						msg += "<tr><td>Bytes rejected</td><td><a class='btn btn-primary btn-xs'>" + datas.rejected.meanRate + "</a></td><td><a class='btn btn-primary btn-xs'>" + datas.rejected.oneMinute

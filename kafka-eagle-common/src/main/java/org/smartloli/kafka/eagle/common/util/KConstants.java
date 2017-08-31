@@ -79,7 +79,7 @@ public class KConstants {
 		/** Messages in /sec. */
 		public final static String MESSAGES_IN = "msg";
 		/** Bytes in /sec. */
-		public final static String BYTES_IN = "in";
+		public final static String BYTES_IN = "ins";
 		/** Bytes out /sec. */
 		public final static String BYTES_OUT = "out";
 		/** Bytes rejected /sec. */
