@@ -29,8 +29,8 @@ import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
 public class TestKafkaParser {
 
 	public static void main(String[] args) {
-		//String sql = "Select \"partition\",\"offset\",\"msg\" from \"mf.ip_login\" where \"partition\" in (0) and \"offset\"=37445 limit 10";
-		String sql = "select * from \"test_ke\" where \"partition\" in (0) limit 10";
+		String sql = "SELECT \"partition\",\"offset\",\"msg\" from \"mf.ip_login\" where \"partition\" in (0) and \"offset\"=37445 limit 10";
+		//String sql = "select * from \"test_ke\" where \"partition\" in (0) limit 10";
 		String result = KafkaSqlParser.execute("cluster1", sql);
 		System.out.println(result);
 	}

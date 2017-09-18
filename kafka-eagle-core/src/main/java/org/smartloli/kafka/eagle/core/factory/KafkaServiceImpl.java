@@ -730,7 +730,7 @@ public class KafkaServiceImpl implements KafkaService {
 			kafkaSql.setStatus(false);
 			return kafkaSql;
 		} else {
-			Matcher tableName = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(kafkaSql.getMetaSql());
+			Matcher tableName = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(kafkaSql.getMetaSql().toLowerCase());
 			if (tableName.find()) {
 				kafkaSql.setStatus(true);
 				kafkaSql.setTableName(tableName.group(1).trim().replaceAll("\"", ""));
