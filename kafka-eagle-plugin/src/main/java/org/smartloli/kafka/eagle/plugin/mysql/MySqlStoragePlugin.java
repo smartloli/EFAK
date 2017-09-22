@@ -41,7 +41,7 @@ public class MySqlStoragePlugin {
 		try {
 			Class.forName(JConstants.MYSQL_DRIVER);
 		} catch (Exception e) {
-			LOG.error("Initialization Driver has error,msg is " + e.getMessage());
+			LOG.error("Initialization MySql Driver has error,msg is " + e.getMessage());
 		}
 	}
 
@@ -66,10 +66,6 @@ public class MySqlStoragePlugin {
 				LOG.error("Close connection has error,msg is " + e.getMessage());
 			}
 		}
-	}
-
-	public static void main(String[] args) {
-		System.out.println(getInstance("192.168.202.89:3306", "root", "123456"));
 	}
 
 }
