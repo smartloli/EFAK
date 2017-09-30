@@ -34,6 +34,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.sql.schema.TopicSchema;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -86,9 +87,9 @@ public class KafkaConsumerAdapter {
 			ConsumerRecords<String, String> records = consumer.poll(Kafka.TIME_OUT);
 			for (ConsumerRecord<String, String> record : records) {
 				JSONObject object = new JSONObject();
-				object.put("msg", record.value());
-				object.put("offset", record.offset());
-				object.put("partition", record.partition());
+				object.put(TopicSchema.MSG, record.value());
+				object.put(TopicSchema.OFFSET, record.offset());
+				object.put(TopicSchema.PARTITION, record.partition());
 				datasets.add(object);
 			}
 			if (records.isEmpty()) {

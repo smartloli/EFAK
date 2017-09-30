@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.HostsInfo;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.core.sql.schema.TopicSchema;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -59,6 +60,7 @@ public class SimpleKafkaConsumer {
 	private static int buff_size = 64 * 1024;
 	private static int fetch_size = 1000 * 1000 * 1000;
 	private static int timeout = 100000;
+	private static final String UTF_8 = "UTF-8";
 
 	public SimpleKafkaConsumer() {
 		m_replicaBrokers = new ArrayList<HostsInfo>();
@@ -157,9 +159,9 @@ public class SimpleKafkaConsumer {
 				byte[] bytes = new byte[payload.limit()];
 				payload.get(bytes);
 				JSONObject topic = new JSONObject();
-				topic.put("partition", a_partition);
-				topic.put("offset", messageAndOffset.offset());
-				topic.put("msg", new String(bytes, "UTF-8"));
+				topic.put(TopicSchema.PARTITION, a_partition);
+				topic.put(TopicSchema.OFFSET, messageAndOffset.offset());
+				topic.put(TopicSchema.MSG, new String(bytes, UTF_8));
 				topics.add(topic);
 
 				numRead++;
