@@ -46,7 +46,7 @@ Please read [Kafka Eagle Install](https://ke.smartloli.org/2.Install/2.Installin
 
 The project is a maven project that uses the Maven command to pack the deployment as follows:
 ```bash
-mvn clean && mvn package -DskipTests
+./build.sh
 ```
 # More Information
 
