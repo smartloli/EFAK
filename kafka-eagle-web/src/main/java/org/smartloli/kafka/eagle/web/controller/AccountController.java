@@ -106,6 +106,7 @@ public class AccountController {
 		if (subject.isAuthenticated()) {
 			subject.getSession().removeAttribute(KConstants.Login.SESSION_USER);
 			subject.getSession().removeAttribute(KConstants.Login.ERROR_LOGIN);
+			subject.getSession().removeAttribute(KConstants.Role.WHETHER_SYSTEM_ADMIN);
 		}
 		return "redirect:/account/signin";
 	}

@@ -45,7 +45,7 @@ public class KConstants {
 
 	/** Mail args setting. */
 	public interface Mail {
-		public final static String[] ARGS = new String[]{"toAddress", "subject", "content"};
+		public final static String[] ARGS = new String[] { "toAddress", "subject", "content" };
 	}
 
 	/** Zookeeper session. */
@@ -63,6 +63,9 @@ public class KConstants {
 	/** Role Administrator. */
 	public interface Role {
 		public final static String ADMIN = "admin";
+		public final static int ADMINISRATOR = 1;
+		public final static int ANONYMOUS = 0;
+		public final static String WHETHER_SYSTEM_ADMIN = "WHETHER_SYSTEM_ADMIN";
 	}
 
 	/** Kafka jmx mbean. */

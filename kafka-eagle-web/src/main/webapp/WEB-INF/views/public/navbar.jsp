@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!-- Navigation -->
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -118,19 +119,21 @@
 					<li id="navbar_modify"><a href="/ke/alarm/modify"><i
 							class="fa fa-edit fa-fw"></i> Modify</a></li>
 				</ul></li>
-			<li><a href="#" data-toggle="collapse" data-target="#demo3"><i
-					class="fa fa-fw fa-cog"></i> System <i
-					class="fa fa-fw fa-caret-down"></i></a>
-				<ul id="demo3" class="collapse">
-					<li><a href="/ke/system/user"><i class="fa fa-user fa-fw"></i>
-							User</a></li>
-					<li><a href="/ke/system/role"><i class="fa fa-key fa-fw"></i>
-							Role</a></li>
-					<li><a href="/ke/system/resource"><i
-							class="fa fa-folder-open fa-fw"></i> Resource</a></li>
-					<!-- <li><a href="/ke/system/notice"><i
+			<c:if test="${WHETHER_SYSTEM_ADMIN==1}">
+				<li><a href="#" data-toggle="collapse" data-target="#demo3"><i
+						class="fa fa-fw fa-cog"></i> System <i
+						class="fa fa-fw fa-caret-down"></i></a>
+					<ul id="demo3" class="collapse">
+						<li><a href="/ke/system/user"><i class="fa fa-user fa-fw"></i>
+								User</a></li>
+						<li><a href="/ke/system/role"><i class="fa fa-key fa-fw"></i>
+								Role</a></li>
+						<li><a href="/ke/system/resource"><i
+								class="fa fa-folder-open fa-fw"></i> Resource</a></li>
+						<!-- <li><a href="/ke/system/notice"><i
 							class="fa fa-bullhorn fa-fw"></i> Notice</a></li> -->
-				</ul></li>
+					</ul></li>
+			</c:if>
 		</ul>
 	</div>
 	<!-- /.navbar-collapse -->

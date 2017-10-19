@@ -37,6 +37,8 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Login;
+import org.smartloli.kafka.eagle.common.util.KConstants.Role;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.AccountService;
 import org.smartloli.kafka.eagle.web.service.ResourceService;
@@ -85,7 +87,11 @@ public class SSORealm extends AuthorizingRealm {
 		SSOAuthenticationToken token = (SSOAuthenticationToken) authcToken;
 		Integer rtxno = token.getCode();
 		Signiner signin = accountService.findUserByRtxNo(rtxno);
-		this.getSession().setAttribute(KConstants.Login.SESSION_USER, signin);
+		this.getSession().setAttribute(Login.SESSION_USER, signin);
+		List<Integer> roles = resourcesService.findRoleIdByUserId(signin.getId());
+		if (roles.contains(Role.ADMINISRATOR)) {
+			this.getSession().setAttribute(Role.WHETHER_SYSTEM_ADMIN, Role.ADMINISRATOR);
+		}
 		return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), getName());
 	}
 
