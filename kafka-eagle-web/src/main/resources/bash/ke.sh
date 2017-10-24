@@ -71,11 +71,6 @@ start()
 	sleep 3
 	rm -rf ${KE_HOME}/kms/logs/*
 	chmod +x ${KE_HOME}/kms/bin/*.sh
-	chmod +x ${KE_HOME}/bin/schema.sh
-	nohup ${KE_HOME}/bin/schema.sh >> ${LOG_DIR}/ke.out 2>&1
-	echo "*******************************************************************"
-    echo "* Schema has checked finished.	*"
-	echo "*******************************************************************"
 	sleep 2
 	nohup ${KE_HOME}/kms/bin/startup.sh >> ${LOG_DIR}/ke.out 2>&1
 	ret=$?
@@ -122,6 +117,15 @@ stats()
 	echo "===================== Connection Number Of Different States ==========="
 	netstat -an | awk '/^tcp/ {++y[$NF]} END {for(w in y) print w, y[w]}'
 	
+	echo "===================== End ============================================="
+}
+
+find()
+{
+	echo "===================== Find [$1] Path  ===================="
+	for f in $KE_HOME/kms/webapps/ke/WEB-INF/lib/*.jar; do
+    		${JAVA_HOME}/bin/jar vtf $f|grep $1 && echo $f;
+    done	
 	echo "===================== End ============================================="
 }
 
@@ -192,6 +196,9 @@ case "$1" in
         ;;
     stats)
          stats
+        ;;
+    find)
+         find $2
         ;;
     restart)
         restart

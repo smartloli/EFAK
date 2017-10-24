@@ -98,6 +98,22 @@ public class JSqlUtils {
 		return new Gson().toJson(ret);
 	}
 
+	/** Parse datasets to datatable. */
+	public static String toJSONObject(List<JSONArray> dataSets) {
+		List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
+		for (JSONArray dataSet : dataSets) {
+			for (Object obj : dataSet) {
+				JSONObject object = (JSONObject) obj;
+				Map<String, Object> map = new HashMap<String, Object>();
+				for (String key : object.keySet()) {
+					map.put(key, object.getString(key));
+				}
+				results.add(map);
+			}
+		}
+		return new Gson().toJson(results);
+	}
+
 	private static File createTempJson() throws IOException {
 		JSONObject object = new JSONObject();
 		object.put("version", "2.0");
