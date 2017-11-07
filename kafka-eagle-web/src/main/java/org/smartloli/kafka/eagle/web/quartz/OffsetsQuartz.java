@@ -87,10 +87,9 @@ public class OffsetsQuartz {
 					if (offset.getGroup().equals(alarm.getGroup()) && offset.getTopic().equals(alarm.getTopics()) && offset.getLag() > alarm.getLag()) {
 						try {
 							MailProvider provider = new MailFactory();
-							String subject = "Alarm Lag Alert";
+							String subject = "Kafka Eagle Consumer Alert";
 							String address = alarm.getOwners();
-							String content = "Lag exceeds a specified threshold,Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is ["
-									+ alarm.getLag() + "].";
+							String content = "Group is [" + alarm.getGroup() + "],Topic is [" + alarm.getTopics() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alarm.getLag() + "].";
 							provider.create().send(subject, address, content, "");
 						} catch (Exception ex) {
 							LOG.error("Topic[" + alarm.getTopics() + "] Send alarm mail has error,msg is " + ex.getMessage());
@@ -103,7 +102,7 @@ public class OffsetsQuartz {
 
 	/** Get kafka brokers. */
 	private List<String> getBrokers(String clusterAlias) {
-		String brokers = kafkaService.getAllBrokersInfo(clusterAlias);;
+		String brokers = kafkaService.getAllBrokersInfo(clusterAlias);
 		JSONArray kafkaBrokers = JSON.parseArray(brokers);
 		List<String> targets = new ArrayList<String>();
 		for (Object object : kafkaBrokers) {

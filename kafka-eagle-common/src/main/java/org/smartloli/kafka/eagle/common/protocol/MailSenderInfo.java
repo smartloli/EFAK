@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.common.protocol;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -135,6 +136,12 @@ public class MailSenderInfo {
 
 	public void setContent(String textContent) {
 		this.content = textContent;
+	}
+
+	@Override
+	public String toString() {
+		return "MailSenderInfo [mailServerHost=" + mailServerHost + ", mailServerPort=" + mailServerPort + ", fromAddress=" + fromAddress + ", toAddress=" + toAddress + ", userName=" + userName + ", password=" + password + ", validate="
+				+ validate + ", subject=" + subject + ", content=" + content + ", attachFileNames=" + Arrays.toString(attachFileNames) + ", fileList=" + fileList + "]";
 	}
 
 }
