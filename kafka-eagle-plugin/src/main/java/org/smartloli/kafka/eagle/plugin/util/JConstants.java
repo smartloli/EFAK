@@ -37,11 +37,20 @@ public interface JConstants {
 	/** Get tables. */
 	public static final String SHOW_TABLES = "SHOW TABLES";
 
+	/** Get tables from sqlite db. */
+	public static final String SQLITE_TABLES = "select name from sqlite_master;";
+
 	/** MySql type. */
 	public static final String MYSQL = "mysql";
 
 	/** MySql driver name. */
 	public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
+
+	/** Sqlite type. */
+	public static final String SQLITE = "sqlite";
+
+	/** Sqlite driver name. */
+	public static final String SQLITE_DRIVER = "org.sqlite.JDBC";
 
 	/** Create database script. */
 	public static String CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS %s";
@@ -57,7 +66,7 @@ public interface JConstants {
 	static String CREATE_TABLE_KE_ROLE_RESOURCE = "CREATE TABLE IF NOT EXISTS `ke_role_resource` (`id` int(11) NOT NULL AUTO_INCREMENT,`role_id` int(11) NOT NULL,`resource_id` int(11) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16')";
 
-	static String CREATE_TABLE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64) NOT NULL,`key` varchar(64) NOT NULL,`value` varchar(64) NOT NULL,`hour` varchar(2) NOT NULL,`tm` varchar(16) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64) NOT NULL,`key` varchar(64) ,`value` varchar(64),`hour` varchar(2),`tm` varchar(16) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` int(11) NOT NULL AUTO_INCREMENT,`user_id` int(11) NOT NULL,`role_id` tinyint(4) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1');";

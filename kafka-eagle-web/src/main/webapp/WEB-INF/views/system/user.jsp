@@ -100,7 +100,7 @@
 									<label for="path" class="col-sm-2 control-label">RealName</label>
 									<div class="col-sm-9">
 										<input id="ke_real_name" name="ke_real_name" type="text"
-											class="form-control" placeholder="萝莉">
+											class="form-control" placeholder="smartloli">
 									</div>
 								</div>
 								<div class="form-group">

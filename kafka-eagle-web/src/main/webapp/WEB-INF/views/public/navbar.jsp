@@ -6,12 +6,10 @@
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 	<!-- Brand and toggle get grouped for better mobile display -->
 	<div class="navbar-header">
-		<button type="button" class="navbar-toggle" data-toggle="collapse"
-			data-target=".navbar-ex1-collapse">
-			<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
-			<span class="icon-bar"></span> <span class="icon-bar"></span>
-		</button>
-		<a class="navbar-brand" href="/ke"> Kafka Eagle</a>
+		<img class="user-avatar"
+			style="border: 3px solid #fff; border-radius: 50%; margin-top: 6px; margin-left: 10px; float: left;"
+			src="/ke/media/img/ke_login.png" width="40px"> <a
+			class="navbar-brand" href="/ke"> Kafka Eagle</a>
 		<div class="modal fade" aria-labelledby="mfModalLabel"
 			aria-hidden="true" id="ke_account_reset_dialog" tabindex="-1"
 			role="dialog">
@@ -58,7 +56,7 @@
 			data-toggle="dropdown"><i class="fa fa-sitemap"></i>
 				${clusterAlias} </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.1.9 </a></li>
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.2.0 </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
 			data-toggle="dropdown" aria-expanded="false"><i
 				class="fa fa-user"></i> ${LOGIN_USER_SESSION.realname} <b
