@@ -26,6 +26,8 @@ import org.I0Itec.zkclient.ZkClient;
 import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.factory.ZkFactory;
+import org.smartloli.kafka.eagle.core.factory.ZkService;
 
 import kafka.utils.ZkUtils;
 import scala.collection.JavaConversions;
@@ -43,11 +45,15 @@ public class TestKafkaServiceImpl {
 	private ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
 
 	private final String BROKER_TOPICS_PATH = "/brokers/topics";
-	
+
 	private static KafkaService kafkaService = new KafkaFactory().create();
+
+	private static ZkService zkService = new ZkFactory().create();
 
 	public static void main(String[] args) {
 		System.out.println(kafkaService.getAllBrokersInfo("cluster1"));
+		String status = zkService.status("dn3", "2181");
+		System.out.println("status : " + status);
 	}
 
 	public List<String> findTopicPartition(String clusterAlias, String topic) {
