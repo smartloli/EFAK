@@ -76,12 +76,17 @@ start()
 	ret=$?
 	echo "Status Code["$ret"]"
 	isexit $ret
+	
+	CLASS=org.smartloli.kafka.eagle.plugin.font.KafkaEagleVersion
+	${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS 2>&1
+	
 	echo "*******************************************************************"
-    	echo "* KE Service has started success! *"
+    	echo "* Kafka Eagle Service has started success! *"
     	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke' *"
     	echo "* Account:admin ,Password:123456                          *"
 	echo "*******************************************************************"
     	echo "* <Usage> ke.sh [start|status|stop|restart|stats] </Usage> *"
+    	echo "* <Usage> http://ke.smartloli.org/ </Usage> *"
 	echo "*******************************************************************"
 	ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}' > $DIALUP_PID
 	rm -rf ${LOG_DIR}/ke_console.out

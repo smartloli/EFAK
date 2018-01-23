@@ -24,6 +24,13 @@
 			</includes>
 		</fileSet>
 		<fileSet>
+			<directory>src/main/resources/font/</directory>
+			<outputDirectory>/font</outputDirectory>
+			<includes>
+				<include>*.flf</include>
+			</includes>
+		</fileSet>
+		<fileSet>
 			<directory>src/main/resources/sql/</directory>
 			<outputDirectory>/sql</outputDirectory>
 			<includes>
