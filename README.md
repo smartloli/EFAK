@@ -26,6 +26,9 @@ Here are a few Kafka Eagle system screenshots:
 # Consumer & Producer Rate Chart
 ![Rate Chart](https://ke.smartloli.org/res/consumer_producer_rate@2x.png)
 
+# Start Kafka Eagle
+![KE Script](https://ke.smartloli.org/res/ke_script@2x.png)
+
 # Kafka Offset Types
 
 Kafka is designed to be flexible on how the offsets are managed. Consumer can choose arbitrary storage and format to persist kafka offsets. Kafka Eagle currently support following popular storage format:
