@@ -41,22 +41,20 @@ public class SqliteRecordSchema {
 
 	public static final Logger LOG = LoggerFactory.getLogger(SqliteRecordSchema.class);
 
+	public static void main(String[] args) {
+		schema();
+	}
+
 	/** Load database schema script. */
 	public static void schema() {
 		String url = SystemConfigUtils.getProperty("kafka.eagle.url");
-		// String username =
-		// SystemConfigUtils.getProperty("kafka.eagle.username");
-		// String password =
-		// SystemConfigUtils.getProperty("kafka.eagle.password");
-		// String host = url.split("//")[1].split("/")[0].split(":")[0];
-		// String port = url.split("//")[1].split("/")[0].split(":")[1];
-		// String db = url.split("//")[1].split("/")[1].split("\\?")[0];
-
-		tables(url);
+		String username = SystemConfigUtils.getProperty("kafka.eagle.username");
+		String password = SystemConfigUtils.getProperty("kafka.eagle.password");
+		tables(url, username, password);
 	}
 
-	private static void tables(String url) {
-		Connection connection = SqliteStoragePlugin.getInstance(url);
+	private static void tables(String url, String username, String password) {
+		Connection connection = SqliteStoragePlugin.getInstance(url, username, username);
 		ResultSet rs = null;
 		Statement stmt = null;
 		List<String> tbls = new ArrayList<>();
@@ -74,7 +72,7 @@ public class SqliteRecordSchema {
 				if (tbls.contains(tbl)) {
 					LOG.info("The [" + tbl + "] table already exists. Do not need to create it.");
 				} else {
-					String key = "CREATE_TABLE_" + tbl.toUpperCase();
+					String key = "CREATE_TABLE_SQLITE_" + tbl.toUpperCase();
 					stmt = connection.createStatement();
 					if (JConstants.KEYS.containsKey(key)) {
 						stmt.addBatch(JConstants.KEYS.get(key).toString());

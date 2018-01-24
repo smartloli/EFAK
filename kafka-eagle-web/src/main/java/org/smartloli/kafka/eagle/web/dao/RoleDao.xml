@@ -32,7 +32,7 @@
 
 	<insert id="insertRoleResource" parameterType="org.smartloli.kafka.eagle.web.pojo.RoleResource">
 		insert into
-		ke_role_resource(role_id,resource_id) value(#{roleId},#{resourceId})
+		ke_role_resource(role_id,resource_id) values(#{roleId},#{resourceId})
 	</insert>
 
 	<delete id="deleteRoleResource" parameterType="org.smartloli.kafka.eagle.web.pojo.RoleResource">
@@ -46,7 +46,7 @@
 
 	<insert id="insertUserRole" parameterType="org.smartloli.kafka.eagle.web.pojo.UserRole">
 		insert into
-		ke_user_role(user_id,role_id) value(#{userId},#{roleId})
+		ke_user_role(user_id,role_id) values(#{userId},#{roleId})
 	</insert>
 
 	<delete id="deleteUserRole" parameterType="org.smartloli.kafka.eagle.web.pojo.UserRole">

@@ -31,10 +31,10 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>src/main/resources/sql/</directory>
-			<outputDirectory>/sql</outputDirectory>
+			<directory>src/main/resources/db/</directory>
+			<outputDirectory>/db</outputDirectory>
 			<includes>
-				<include>ke.sql</include>
+				<include></include>
 			</includes>
 		</fileSet>
 		<fileSet>

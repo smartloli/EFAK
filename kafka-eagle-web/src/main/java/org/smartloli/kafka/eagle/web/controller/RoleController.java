@@ -106,13 +106,18 @@ public class RoleController {
 		signin.setRealname(realname);
 		signin.setRtxno(Integer.parseInt(rtxno));
 		signin.setUsername(username);
-		if (accountService.insertUser(signin) > 0) {
-			MailService mail = new MailFactory().create();
-			String content = "You can use account(" + signin.getUsername() + ") or rtxno(" + signin.getRtxno() + ") signin, and you password is : [" + signin.getPassword()
-					+ "], you can change the password in the system personal settings. Hope you have a nice day.";
-			mail.send("*** Password ***", signin.getEmail(), content, null);
-			return "redirect:/system/user";
-		} else {
+		try {
+			if (accountService.insertUser(signin) > 0) {
+				MailService mail = new MailFactory().create();
+				String content = "You can use account(" + signin.getUsername() + ") or rtxno(" + signin.getRtxno() + ") signin, and you password is : [" + signin.getPassword()
+						+ "], you can change the password in the system personal settings. Hope you have a nice day.";
+				mail.send("*** Password ***", signin.getEmail(), content, null);
+				return "redirect:/system/user";
+			} else {
+				return "redirect:/errors/500";
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 			return "redirect:/errors/500";
 		}
 	}
@@ -193,8 +198,7 @@ public class RoleController {
 			} else {
 				obj.put("operate",
 						"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a id='operater_modal' name='operater_modal' href='#"
-								+ id + "/'>Assign</a><li><a name='operater_modify_modal' href='#" + id + "'>Modify</a><li><a href='/ke/system/user/delete/" + id
-								+ "/'>Delete</a></ul></div>");
+								+ id + "/'>Assign</a><li><a name='operater_modify_modal' href='#" + id + "'>Modify</a><li><a href='/ke/system/user/delete/" + id + "/'>Delete</a></ul></div>");
 			}
 			aaDatas.add(obj);
 		}
@@ -283,8 +287,7 @@ public class RoleController {
 
 	/** Change the user's role. */
 	@RequestMapping(value = "/user/role/{action}/{userId}/{roleId}/ajax", method = RequestMethod.GET)
-	public void changeUserRoleAjax(@PathVariable("action") String action, @PathVariable("userId") int userId, @PathVariable("roleId") int roleId, HttpServletResponse response,
-			HttpServletRequest request) {
+	public void changeUserRoleAjax(@PathVariable("action") String action, @PathVariable("userId") int userId, @PathVariable("roleId") int roleId, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			UserRole userRole = new UserRole();
 			userRole.setUserId(userId);
@@ -330,8 +333,7 @@ public class RoleController {
 
 	/** Change the resources that you have by role id. */
 	@RequestMapping(value = "/role/{action}/{roleId}/{resourceId}/", method = RequestMethod.GET)
-	public void changeRoleResource(@PathVariable("action") String action, @PathVariable("roleId") int roleId, @PathVariable("resourceId") int resourceId,
-			HttpServletResponse response) {
+	public void changeRoleResource(@PathVariable("action") String action, @PathVariable("roleId") int roleId, @PathVariable("resourceId") int resourceId, HttpServletResponse response) {
 		try {
 			JSONObject object = new JSONObject();
 			RoleResource roleResource = new RoleResource();

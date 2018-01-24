@@ -32,7 +32,7 @@
 
 	<insert id="insertResource" parameterType="map">
 		insert into
-		ke_resources(name,url,parent_id) value(#{name},#{url},#{parentId})
+		ke_resources(name,url,parent_id) values(#{name},#{url},#{parentId})
 	</insert>
 
 	<select id="getResourceParent" resultMap="resources">

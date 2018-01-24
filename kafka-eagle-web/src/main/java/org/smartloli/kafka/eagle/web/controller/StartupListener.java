@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
 import org.smartloli.kafka.eagle.plugin.mysql.MySqlRecordSchema;
+import org.smartloli.kafka.eagle.plugin.sqlite.SqliteRecordSchema;
+import org.smartloli.kafka.eagle.plugin.util.JConstants;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -77,7 +79,12 @@ public class StartupListener implements ApplicationContextAware {
 
 	class ContextSchema extends Thread {
 		public void run() {
-			MySqlRecordSchema.schema();
+			String jdbc = SystemConfigUtils.getProperty("kafka.eagle.driver");
+			if (JConstants.MYSQL_DRIVER.equals(jdbc)) {
+				MySqlRecordSchema.schema();
+			} else if (JConstants.SQLITE_DRIVER.equals(jdbc)) {
+				SqliteRecordSchema.schema();
+			}
 		}
 	}
 

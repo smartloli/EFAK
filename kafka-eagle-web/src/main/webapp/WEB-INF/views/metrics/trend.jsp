@@ -71,7 +71,7 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>Kafka
-								Message In And Out</strong>
+								Byte In And Out</strong>
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->

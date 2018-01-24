@@ -11,11 +11,7 @@
 		<result property="tm" column="tm" />
 	</resultMap>
 
-	<insert id="insert" useGeneratedKeys="true" parameterType="java.util.List">
-		<selectKey resultType="long" keyProperty="id" order="AFTER">
-			SELECT
-			LAST_INSERT_ID()
-		</selectKey>
+	<insert id="insert" parameterType="java.util.List">
 		insert into
 		ke_trend(`cluster`,`key`,`value`,`hour`,`tm`) values
 		<foreach collection="list" item="item" index="index"
@@ -32,7 +28,7 @@
 		`cluster`=#{cluster} and tm
 		between #{stime} and
 		#{etime} group by
-		`key`,`hour`
+		`key`,`hour`,tm
 	</select>
 
 	<select id="day" parameterType="map" resultMap="kpi">

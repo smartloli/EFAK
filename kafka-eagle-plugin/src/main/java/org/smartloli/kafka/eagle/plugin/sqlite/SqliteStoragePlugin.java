@@ -46,10 +46,10 @@ public class SqliteStoragePlugin {
 	}
 
 	/** Get sqlite connection object. */
-	public static Connection getInstance(String address) {
+	public static Connection getInstance(String address, String username, String password) {
 		Connection connection = null;
 		try {
-			connection = (Connection) DriverManager.getConnection(address);
+			connection = (Connection) DriverManager.getConnection(address, username, password);
 		} catch (Exception e) {
 			LOG.error("Create sqlite connection has error address[" + address + "], msg is " + e.getMessage());
 		}
