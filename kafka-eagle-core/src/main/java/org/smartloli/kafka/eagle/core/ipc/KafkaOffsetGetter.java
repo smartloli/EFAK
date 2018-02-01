@@ -85,11 +85,10 @@ public class KafkaOffsetGetter extends Thread {
 	private static Field KEY_TOPIC_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("topic");
 	private static Field KEY_PARTITION_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("partition");
 
-	private static Schema OFFSET_COMMIT_VALUE_SCHEMA_V0 = new Schema(new Field("offset", Type.INT64), new Field("metadata", Type.STRING, "Associated metadata.", ""),
-			new Field("timestamp", Type.INT64));
+	private static Schema OFFSET_COMMIT_VALUE_SCHEMA_V0 = new Schema(new Field("offset", Type.INT64), new Field("metadata", Type.STRING, "Associated metadata.", ""), new Field("timestamp", Type.INT64));
 
-	private static Schema OFFSET_COMMIT_VALUE_SCHEMA_V1 = new Schema(new Field("offset", Type.INT64), new Field("metadata", Type.STRING, "Associated metadata.", ""),
-			new Field("commit_timestamp", Type.INT64), new Field("expire_timestamp", Type.INT64));
+	private static Schema OFFSET_COMMIT_VALUE_SCHEMA_V1 = new Schema(new Field("offset", Type.INT64), new Field("metadata", Type.STRING, "Associated metadata.", ""), new Field("commit_timestamp", Type.INT64),
+			new Field("expire_timestamp", Type.INT64));
 
 	private static Field VALUE_OFFSET_FIELD_V0 = OFFSET_COMMIT_VALUE_SCHEMA_V0.get("offset");
 	private static Field VALUE_METADATA_FIELD_V0 = OFFSET_COMMIT_VALUE_SCHEMA_V0.get("metadata");
@@ -151,28 +150,36 @@ public class KafkaOffsetGetter extends Thread {
 		consumer.subscribe(Arrays.asList(Topic.GroupMetadataTopicName()));
 		boolean flag = true;
 		while (flag) {
-			ConsumerRecords<String, String> records = consumer.poll(1000);
-			for (ConsumerRecord<String, String> record : records) {
-				if (record != null && record.value() != null) {
-					Object offsetKey = GroupMetadataManager.readMessageKey(ByteBuffer.wrap(record.key().getBytes()));
-					if (offsetKey instanceof OffsetKey) {
-						GroupTopicPartition commitKey = ((OffsetKey) offsetKey).key();
-						if (commitKey.topicPartition().topic().equals(Topic.GroupMetadataTopicName())) {
-							continue;
-						}
+			try {
+				ConsumerRecords<String, String> records = consumer.poll(1000);
+				for (ConsumerRecord<String, String> record : records) {
+					try {
+						if (record != null && record.value() != null) {
+							Object offsetKey = GroupMetadataManager.readMessageKey(ByteBuffer.wrap(record.key().getBytes()));
+							if (offsetKey instanceof OffsetKey) {
+								GroupTopicPartition commitKey = ((OffsetKey) offsetKey).key();
+								if (commitKey.topicPartition().topic().equals(Topic.GroupMetadataTopicName())) {
+									continue;
+								}
 
-						OffsetAndMetadata commitValue = GroupMetadataManager.readOffsetMessageValue(ByteBuffer.wrap(record.value().getBytes()));
-						if (multiKafkaConsumerOffsets.containsKey(clusterAlias)) {
-							multiKafkaConsumerOffsets.get(clusterAlias).put(commitKey, commitValue);
-						} else {
-							Map<GroupTopicPartition, OffsetAndMetadata> kafkaConsumerOffsets = new ConcurrentHashMap<>();
-							kafkaConsumerOffsets.put(commitKey, commitValue);
-							multiKafkaConsumerOffsets.put(clusterAlias, kafkaConsumerOffsets);
+								OffsetAndMetadata commitValue = GroupMetadataManager.readOffsetMessageValue(ByteBuffer.wrap(record.value().getBytes()));
+								if (multiKafkaConsumerOffsets.containsKey(clusterAlias)) {
+									multiKafkaConsumerOffsets.get(clusterAlias).put(commitKey, commitValue);
+								} else {
+									Map<GroupTopicPartition, OffsetAndMetadata> kafkaConsumerOffsets = new ConcurrentHashMap<>();
+									kafkaConsumerOffsets.put(commitKey, commitValue);
+									multiKafkaConsumerOffsets.put(clusterAlias, kafkaConsumerOffsets);
+								}
+							} else {
+								LOG.info("Consumer group[" + offsetKey.toString() + "] thread has shutdown.");
+							}
 						}
-					} else {
-						LOG.info("Consumer group[" + offsetKey.toString() + "] thread has shutdown.");
+					} catch (Exception e) {
+						LOG.error("Get consumer records has error, msg is " + e.getMessage());
 					}
 				}
+			} catch (Exception ex) {
+				LOG.error("Start kafka sasl listener has error, msg is " + ex.getMessage());
 			}
 		}
 	}
