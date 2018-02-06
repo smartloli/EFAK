@@ -99,4 +99,18 @@ public class KConstants {
 		public final static String FAILEDFETCHREQUEST = "FailedFetchRequest";
 		public final static String FAILEDPRODUCEREQUEST = "FailedProduceRequest";
 	}
+	
+	public interface Linux {
+		public static final String DEVICE = "sd";
+		public static final String LO = "lo";
+		public static final String CPU = "cpu";
+		public static final String IO = "io";
+		public static final String MemTotal = "MemTotal";
+		public static final String MemFree = "MemFree";
+		public static final String TCP = "Tcp";
+		public static final String CurrEstab = "CurrEstab";
+		public static final int SLEEP = 3000;
+	}
+	
+	
 }
