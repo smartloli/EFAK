@@ -92,8 +92,4 @@ public class ZKMetricsUtils {
 		return zk;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(zkClusterInfo("127.0.0.1", 2181));
-	}
-
 }

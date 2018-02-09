@@ -26,7 +26,7 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">
-						MBean Trend <small>details</small>
+						Zookeeper Monitor <small>details</small>
 					</h1>
 					<div id="reportrange"
 						style="position: absolute; top: 46px; left: 964px; width: 230px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc;">
@@ -42,56 +42,101 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Through JMX to
-							obtain data, monitor the Kafka client, the production side, the
-							number of messages, the number of requests, processing time and
-							other data to visualize performance .</strong>
+						<i class="fa fa-info-circle"></i> <strong>Monitor
+							Zookeeper transmission, receive packets, connection numbers, file
+							open number, respond to client request processing time and other
+							performance monitoring .</strong>
 					</div>
 				</div>
 			</div>
 
 			<!-- /.row -->
 			<div class="row">
-				<div class="col-lg-12">
+				<div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>Kafka
-								Message In (per/sec)</strong>
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>Zookeeper
+								Send Packets</strong>
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_msg_in"></div>
+							<div id="zk_send_packets"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
 				</div>
 				<!-- /.col-lg-4 -->
-				<div class="col-lg-12">
+				<div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>Kafka
-								Byte In And Out</strong>
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>Zookeeper
+								Received Packets</strong>
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_msg_in_out"></div>
+							<div id="zk_recevied_packets"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
 				</div>
 				<!-- /.col-lg-4 -->
-				<div class="col-lg-12">
+				<div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-								Fetch And Produce Fails (per/sec) </strong>
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
+								Zookeeper Avg Latency </strong>
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_fetch_produce"></div>
+							<div id="zk_avg_latency"></div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+				<div class="col-lg-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
+								Zookeeper Alive Connections </strong>
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div id="zk_alives_connections"></div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+				<div class="col-lg-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
+								Zookeeper Queue Requests </strong>
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div id="zk_queue_requests"></div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+				<div class="col-lg-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
+								Zookeeper OpenFile Counts </strong>
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div id="zk_openfile_counts"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -103,7 +148,7 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/metrics/trend.js" name="loader" />
+	<jsp:param value="main/metrics/zk.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/daterangepicker.js"
 		name="loader" />

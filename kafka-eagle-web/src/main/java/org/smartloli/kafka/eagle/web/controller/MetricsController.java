@@ -61,6 +61,14 @@ public class MetricsController {
 		mav.setViewName("/metrics/trend");
 		return mav;
 	}
+	
+	/** Trend viewer. */
+	@RequestMapping(value = "/metrics/zk", method = RequestMethod.GET)
+	public ModelAndView zkView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/metrics/zk");
+		return mav;
+	}
 
 	/** Get cluster data by ajax. */
 	@RequestMapping(value = "/metrics/brokers/mbean/ajax", method = RequestMethod.GET)

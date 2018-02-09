@@ -99,7 +99,7 @@ public class KConstants {
 		public final static String FAILEDFETCHREQUEST = "FailedFetchRequest";
 		public final static String FAILEDPRODUCEREQUEST = "FailedProduceRequest";
 	}
-	
+
 	public interface Linux {
 		public static final String DEVICE = "sd";
 		public static final String LO = "lo";
@@ -111,6 +111,15 @@ public class KConstants {
 		public static final String CurrEstab = "CurrEstab";
 		public static final int SLEEP = 3000;
 	}
-	
-	
+
+	public interface ZK {
+		public static final String ZK_SEND_PACKETS = "ZKSendPackets";
+		public static final String ZK_RECEIVEDPACKETS = "ZKReceivedPackets";
+		public static final String ZK_AVGLATENCY = "ZKAvgLatency";
+		public static final String ZK_NUM_ALIVECONNRCTIONS = "ZKNumAliveConnections";
+		public static final String ZK_OUTSTANDING_REQUESTS = "ZKOutstandingRequests";
+		public static final String ZK_OPENFILE_DESCRIPTOR_COUNT = "ZKOpenFileDescriptorCount";
+
+	}
+
 }

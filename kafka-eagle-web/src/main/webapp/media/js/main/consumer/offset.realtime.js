@@ -14,6 +14,7 @@ $(document).ready(function() {
 		lineColors : [ '#d43f3a', '#7cb47c', '#2577b5' ],
 		pointSize : 2,
 		hideHover : 'auto',
+		behaveLikeLine: true,
 		resize : true
 	});
 

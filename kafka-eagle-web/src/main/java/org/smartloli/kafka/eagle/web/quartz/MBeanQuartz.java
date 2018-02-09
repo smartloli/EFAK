@@ -24,8 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
+import org.smartloli.kafka.eagle.common.protocol.ZkClusterInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.common.util.ZKMetricsUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
@@ -64,6 +66,80 @@ public class MBeanQuartz {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
 			execute(clusterAlias);
+			zookeeper(clusterAlias);
+		}
+	}
+
+	private void zookeeper(String clusterAlias) {
+		List<KpiInfo> list = new ArrayList<>();
+		String zkList = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
+		String[] zks = zkList.split(",");
+		for (String zk : zks) {
+			String ip = zk.split(":")[0];
+			String port = zk.split(":")[1];
+			if (port.contains("/")) {
+				port = port.split("/")[0];
+			}
+			try {
+				ZkClusterInfo zkInfo = ZKMetricsUtils.zkClusterInfo(ip, Integer.parseInt(port));
+				KpiInfo kpiSend = new KpiInfo();
+				kpiSend.setCluster(clusterAlias);
+				kpiSend.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+				kpiSend.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiSend.setKey("ZKSendPackets");
+				kpiSend.setValue(zkInfo.getZkPacketsSent());
+				list.add(kpiSend);
+
+				KpiInfo kpiReceived = new KpiInfo();
+				kpiReceived.setCluster(clusterAlias);
+				kpiReceived.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+				kpiReceived.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiReceived.setKey("ZKReceivedPackets");
+				kpiReceived.setValue(zkInfo.getZkPacketsReceived());
+				list.add(kpiReceived);
+
+				KpiInfo kpiAvgLatency = new KpiInfo();
+				kpiAvgLatency.setCluster(clusterAlias);
+				kpiAvgLatency.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+				kpiAvgLatency.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiAvgLatency.setKey("ZKAvgLatency");
+				kpiAvgLatency.setValue(zkInfo.getZkAvgLatency());
+				list.add(kpiAvgLatency);
+
+				KpiInfo kpiNumAliveConnections = new KpiInfo();
+				kpiNumAliveConnections.setCluster(clusterAlias);
+				kpiNumAliveConnections.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+				kpiNumAliveConnections.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiNumAliveConnections.setKey("ZKNumAliveConnections");
+				kpiNumAliveConnections.setValue(zkInfo.getZkNumAliveConnections());
+				list.add(kpiNumAliveConnections);
+
+				KpiInfo kpiOutstandingRequests = new KpiInfo();
+				kpiOutstandingRequests.setCluster(clusterAlias);
+				kpiOutstandingRequests.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+				kpiOutstandingRequests.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiOutstandingRequests.setKey("ZKOutstandingRequests");
+				kpiOutstandingRequests.setValue(zkInfo.getZkOutstandingRequests());
+				list.add(kpiOutstandingRequests);
+
+				KpiInfo kpiOpenFileDescriptorCount = new KpiInfo();
+				kpiOpenFileDescriptorCount.setCluster(clusterAlias);
+				kpiOpenFileDescriptorCount.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+				kpiOpenFileDescriptorCount.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiOpenFileDescriptorCount.setKey("ZKOpenFileDescriptorCount");
+				kpiOpenFileDescriptorCount.setValue(zkInfo.getZkOpenFileDescriptorCount());
+				list.add(kpiOpenFileDescriptorCount);
+
+			} catch (Exception ex) {
+				LOG.error("Transcation string to int has error,msg is " + ex.getMessage());
+			}
+		}
+
+		MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
+		try {
+			metrics.insert(list);
+		} catch (Exception e) {
+			LOG.error("Collector zookeeper data has error,msg is " + e.getMessage());
 		}
 	}
 

@@ -27,6 +27,7 @@ import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
+import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -186,16 +187,16 @@ public class MetricsServiceImpl implements MetricsService {
 		JSONArray messageIns = new JSONArray();
 		JSONArray byteInOuts = new JSONArray();
 		JSONArray failedReqstProds = new JSONArray();
+
+		JSONArray zkSendPackets = new JSONArray();
+		JSONArray zkReceivedPackets = new JSONArray();
+		JSONArray zkAvgLatency = new JSONArray();
+		JSONArray zkNumAliveConnections = new JSONArray();
+		JSONArray zkOutstandingRequests = new JSONArray();
+		JSONArray zkOpenFileDescriptorCount = new JSONArray();
 		for (KpiInfo kpi : kpis) {
 			if (MBean.MESSAGEIN.equals(kpi.getKey())) {
-				JSONObject object = new JSONObject();
-				if ("daily".equals(type)) {
-					object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()) + " " + kpi.getHour() + ":00");
-				} else if ("day".equals(type)) {
-					object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()));
-				}
-				object.put(kpi.getKey(), StrUtils.numberic(kpi.getValue()));
-				messageIns.add(object);
+				assembly(type, messageIns, kpi);
 			}
 
 			if (MBean.BYTEIN.equals(kpi.getKey()) || MBean.BYTEOUT.equals(kpi.getKey())) {
@@ -219,14 +220,7 @@ public class MetricsServiceImpl implements MetricsService {
 				}
 
 				if (flag) {
-					JSONObject object = new JSONObject();
-					if ("daily".equals(type)) {
-						object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()) + " " + kpi.getHour() + ":00");
-					} else if ("day".equals(type)) {
-						object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()));
-					}
-					object.put(kpi.getKey(), StrUtils.numberic(kpi.getValue()));
-					byteInOuts.add(object);
+					assembly(type, byteInOuts, kpi);
 				}
 			}
 
@@ -250,15 +244,35 @@ public class MetricsServiceImpl implements MetricsService {
 				}
 
 				if (flag) {
-					JSONObject object = new JSONObject();
-					if ("daily".equals(type)) {
-						object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()) + " " + kpi.getHour() + ":00");
-					} else if ("day".equals(type)) {
-						object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()));
-					}
-					object.put(kpi.getKey(), StrUtils.numberic(kpi.getValue()));
-					failedReqstProds.add(object);
+					assembly(type, failedReqstProds, kpi);
 				}
+			}
+
+			// if (ZK.ZK_SEND_PACKETS.equals(kpi.getKey())) {
+			// assembly(type, zkSendPackets, kpi);
+			// }
+
+			switch (kpi.getKey()) {
+			case ZK.ZK_SEND_PACKETS:
+				assembly(type, zkSendPackets, kpi);
+				break;
+			case ZK.ZK_RECEIVEDPACKETS:
+				assembly(type, zkReceivedPackets, kpi);
+				break;
+			case ZK.ZK_AVGLATENCY:
+				assembly(type, zkAvgLatency, kpi);
+				break;
+			case ZK.ZK_OUTSTANDING_REQUESTS:
+				assembly(type, zkOutstandingRequests, kpi);
+				break;
+			case ZK.ZK_NUM_ALIVECONNRCTIONS:
+				assembly(type, zkNumAliveConnections, kpi);
+				break;
+			case ZK.ZK_OPENFILE_DESCRIPTOR_COUNT:
+				assembly(type, zkOpenFileDescriptorCount, kpi);
+				break;
+			default:
+				break;
 			}
 		}
 
@@ -266,7 +280,26 @@ public class MetricsServiceImpl implements MetricsService {
 		target.put("message", messageIns);
 		target.put("inout", byteInOuts);
 		target.put("failed", failedReqstProds);
+
+		target.put("send", zkSendPackets);
+		target.put("received", zkReceivedPackets);
+		target.put("queue", zkOutstandingRequests);
+		target.put("avg", zkAvgLatency);
+		target.put("openfile", zkOpenFileDescriptorCount);
+		target.put("alive", zkNumAliveConnections);
+
 		return target.toJSONString();
+	}
+
+	private void assembly(String type, JSONArray assemblys, KpiInfo kpi) throws ParseException {
+		JSONObject object = new JSONObject();
+		if ("daily".equals(type)) {
+			object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()) + " " + kpi.getHour() + ":00");
+		} else if ("day".equals(type)) {
+			object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()));
+		}
+		object.put(kpi.getKey(), StrUtils.numberic(kpi.getValue()));
+		assemblys.add(object);
 	}
 
 	/** Crontab clean data. */
