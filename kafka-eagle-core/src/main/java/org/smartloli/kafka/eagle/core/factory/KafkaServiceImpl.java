@@ -692,6 +692,9 @@ public class KafkaServiceImpl implements KafkaService {
 			JSONObject broker = (JSONObject) object;
 			brokerServer += broker.getString("host") + ":" + broker.getInteger("port") + ",";
 		}
+		if("".equals(brokerServer)){
+			return "";
+		}
 		return brokerServer.substring(0, brokerServer.length() - 1);
 	}
 
