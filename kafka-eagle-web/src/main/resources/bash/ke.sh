@@ -3,6 +3,8 @@
 # source function library
 #. /etc/rc.d/init.d/functions
 
+export MALLOC_ARENA_MAX=1
+
 COLOR_G="\x1b[0;32m"  # green
 COLOR_R="\x1b[1;31m"  # red
 RESET="\x1b[0m"
