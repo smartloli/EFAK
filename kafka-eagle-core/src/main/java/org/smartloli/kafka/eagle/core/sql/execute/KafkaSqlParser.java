@@ -61,8 +61,8 @@ public class KafkaSqlParser {
 					} else {
 						dataSets = SimpleKafkaConsumer.executor(kafkaSql);
 					}
-					//String results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
-					String results = JSqlUtils.toJSONObject(dataSets);
+					String results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
+//					String results = JSqlUtils.toJSONObject(dataSets);
 					long end = System.currentTimeMillis();
 					status.put("error", false);
 					status.put("msg", results);

@@ -121,5 +121,9 @@ public class KConstants {
 		public static final String ZK_OPENFILE_DESCRIPTOR_COUNT = "ZKOpenFileDescriptorCount";
 
 	}
+	
+	public interface TopicCache{
+		public static final String NAME="TopicCacheData";
+	}
 
 }
