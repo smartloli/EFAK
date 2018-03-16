@@ -55,7 +55,7 @@ public interface JConstants {
 	/** Create database script. */
 	public static String CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS %s";
 
-	public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_trend", "ke_user_role", "ke_users");
+	public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_trend", "ke_trends", "ke_user_role", "ke_users");
 
 	static String CREATE_TABLE_KE_P_ROLE = "CREATE TABLE IF NOT EXISTS `ke_p_role` (`id` tinyint(4) NOT NULL AUTO_INCREMENT,`name` varchar(64) CHARACTER SET utf8 NOT NULL COMMENT 'role name',`seq` tinyint(4) NOT NULL COMMENT 'rank',`description` varchar(128) CHARACTER SET utf8 NOT NULL COMMENT 'role describe',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_P_ROLE_INSERT = "INSERT INTO `ke_p_role` VALUES ('1', 'Administrator', '1', 'Have all permissions'), ('2', 'Devs', '2', 'Own add or delete'), ('3', 'Tourist', '3', 'Only viewer')";
@@ -66,7 +66,11 @@ public interface JConstants {
 	static String CREATE_TABLE_KE_ROLE_RESOURCE = "CREATE TABLE IF NOT EXISTS `ke_role_resource` (`id` int(11) NOT NULL AUTO_INCREMENT,`role_id` int(11) NOT NULL,`resource_id` int(11) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16')";
 
-	static String CREATE_TABLE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64) NOT NULL,`key` varchar(64) ,`value` varchar(64),`hour` varchar(2),`tm` varchar(16) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(64) DEFAULT NULL,`hour` varchar(2) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+	static String CREATE_TABLE_KE_TRENDS = "CREATE TABLE IF NOT EXISTS `ke_trends` (`cluster` varchar(64) DEFAULT NULL,`broker` varchar(64) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(64) DEFAULT NULL,`hour` varchar(2) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+	static String CREATE_TABLE_KE_BROKERS = "CREATE TABLE IF NOT EXISTS `ke_brokers` (`cluster` varchar(64) DEFAULT NULL,`broker` varchar(64) DEFAULT NULL,`alive` varchar(4) DEFAULT NULL,`enable` varchar(4) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` int(11) NOT NULL AUTO_INCREMENT,`user_id` int(11) NOT NULL,`role_id` tinyint(4) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1');";
@@ -84,7 +88,11 @@ public interface JConstants {
 	static String CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE = "CREATE TABLE IF NOT EXISTS `ke_role_resource` (`id` integer primary key autoincrement,`role_id` int(11),`resource_id` int(11))";
 	static String CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16')";
 
-	static String CREATE_TABLE_SQLITE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64) NOT NULL,`key` varchar(64) ,`value` varchar(64),`hour` varchar(2),`tm` varchar(16) NOT NULL)";
+	static String CREATE_TABLE_SQLITE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64),`key` varchar(64) ,`value` varchar(64),`hour` varchar(2),`tm` varchar(16))";
+
+	static String CREATE_TABLE_SQLITE_KE_TRENDS = "CREATE TABLE IF NOT EXISTS `ke_trends` (`cluster` varchar(64),`broker` varchar(64),`key` varchar(64),`value` varchar(64),`hour` varchar(2),`tm` varchar(16))";
+
+	static String CREATE_TABLE_SQLITE_KE_BROKERS = "CREATE TABLE IF NOT EXISTS `ke_brokers` (`cluster` varchar(64),`broker` varchar(64),`alive` varchar(4),`enable` varchar(4))";
 
 	static String CREATE_TABLE_SQLITE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` integer primary key autoincrement,`user_id` int(11),`role_id` tinyint(4))";
 	static String CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1')";
@@ -106,6 +114,8 @@ public interface JConstants {
 			put("CREATE_TABLE_KE_ROLE_RESOURCE", CREATE_TABLE_KE_ROLE_RESOURCE);
 			put("CREATE_TABLE_KE_ROLE_RESOURCE_INSERT", CREATE_TABLE_KE_ROLE_RESOURCE_INSERT);
 			put("CREATE_TABLE_KE_TREND", CREATE_TABLE_KE_TREND);
+			put("CREATE_TABLE_KE_TRENDS", CREATE_TABLE_KE_TRENDS);
+			put("CREATE_TABLE_KE_BROKERS", CREATE_TABLE_KE_BROKERS);
 			put("CREATE_TABLE_KE_USER_ROLE", CREATE_TABLE_KE_USER_ROLE);
 			put("CREATE_TABLE_KE_USER_ROLE_INSERT", CREATE_TABLE_KE_USER_ROLE_INSERT);
 			put("CREATE_TABLE_KE_USERS", CREATE_TABLE_KE_USERS);
@@ -118,6 +128,8 @@ public interface JConstants {
 			put("CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE", CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE);
 			put("CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT", CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT);
 			put("CREATE_TABLE_SQLITE_KE_TREND", CREATE_TABLE_SQLITE_KE_TREND);
+			put("CREATE_TABLE_SQLITE_KE_TRENDS", CREATE_TABLE_SQLITE_KE_TRENDS);
+			put("CREATE_TABLE_SQLITE_KE_BROKERS", CREATE_TABLE_SQLITE_KE_BROKERS);
 			put("CREATE_TABLE_SQLITE_KE_USER_ROLE", CREATE_TABLE_SQLITE_KE_USER_ROLE);
 			put("CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT", CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT);
 			put("CREATE_TABLE_SQLITE_KE_USERS", CREATE_TABLE_SQLITE_KE_USERS);

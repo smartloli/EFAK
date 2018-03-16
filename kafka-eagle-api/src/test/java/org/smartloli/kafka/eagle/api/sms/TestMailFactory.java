@@ -33,7 +33,7 @@ public class TestMailFactory {
 		MailProvider provider = new MailFactory();
 		String subject = "Kafka Eagle Consumer Alert";
 		String address = "smartloli.org@gmail.com";
-		String content = "Group is [Test],Topic is [ke_test],current lag is [150],expired lag is [100].";
+		String content = "Group Name is [Test],Topic is [ke_test2],current lag is [15000],expired lag is [10000].";
 		provider.create().send(subject, address, content, "");
 	}
 

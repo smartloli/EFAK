@@ -6,6 +6,7 @@
 		id="kpi">
 		<result property="cluster" column="cluster" />
 		<result property="key" column="key" />
+		<result property="broker" column="broker" />
 		<result property="value" column="value" />
 		<result property="hour" column="hour" />
 		<result property="tm" column="tm" />
@@ -13,7 +14,8 @@
 
 	<insert id="insert" parameterType="java.util.List">
 		insert into
-		ke_trend(`cluster`,`key`,`value`,`hour`,`tm`) values
+		ke_trend(`cluster`,`key`,`value`,`hour`,`tm`)
+		values
 		<foreach collection="list" item="item" index="index"
 			separator=",">
 			(#{item.cluster},#{item.key},#{item.value},#{item.hour},#{item.tm})
@@ -44,7 +46,7 @@
 
 	<delete id="remove" parameterType="int">
 		delete from ke_trend where
-		tm=#{tm}
+		tm&lt;=#{tm}
 	</delete>
 
 </mapper>

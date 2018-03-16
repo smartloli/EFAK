@@ -27,10 +27,19 @@ package org.smartloli.kafka.eagle.common.protocol;
 public class KpiInfo extends BaseProtocol {
 
 	private String cluster;
+	private String broker;
 	private String key;
 	private String value;
 	private String tm;
 	private String hour;
+
+	public String getBroker() {
+		return broker;
+	}
+
+	public void setBroker(String broker) {
+		this.broker = broker;
+	}
 
 	public String getHour() {
 		return hour;

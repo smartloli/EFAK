@@ -38,6 +38,7 @@ import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.NetWorkUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -218,8 +219,31 @@ public class OffsetsQuartz {
 			// Plan B: Storage single file.
 			// keService.write(clusterAlias, offsetLites.toString());
 			alert(clusterAlias, offsetLites);
+			alertBroker(clusterAlias);
 		} catch (Exception ex) {
 			LOG.error("Quartz statistics offset has error,msg is " + ex.getMessage());
+		}
+	}
+
+	private void alertBroker(String clusterAlias) {
+		String brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+		JSONArray kafkaBrokers = JSON.parseArray(brokers);
+		for (Object object : kafkaBrokers) {
+			JSONObject kafkaBroker = (JSONObject) object;
+			String host = kafkaBroker.getString("host");
+			int port = kafkaBroker.getInteger("port");
+			boolean status = NetWorkUtils.connect(host, port);
+			if (!status) {
+				String address = SystemConfigUtils.getProperty("kafka.eagle.alert.users");
+				try {
+					MailProvider provider = new MailFactory();
+					String subject = "Kafka Eagle On-Site Inspection Alert";
+					String content = "Thread Service [" + host + ":" + port + "] has crashed,please check it.";
+					provider.create().send(subject, address, content, "");
+				} catch (Exception ex) {
+					LOG.error("Alertor[" + address + "] Send alarm mail has error,msg is " + ex.getMessage());
+				}
+			}
 		}
 	}
 }

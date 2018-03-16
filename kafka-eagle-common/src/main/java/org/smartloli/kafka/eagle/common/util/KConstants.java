@@ -125,5 +125,10 @@ public class KConstants {
 	public interface TopicCache{
 		public static final String NAME="TopicCacheData";
 	}
+	
+	public interface ServerDevice{
+		public static final int TIME_OUT=3000;
+		public static final int BUFFER_SIZE=8049;
+	}
 
 }
