@@ -9,6 +9,11 @@
 body {
     margin-top: 100px;
     background-color: #222;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 @media(min-width:768px) {
@@ -19,12 +24,13 @@ body {
 
 #wrapper {
     padding-left: 0;
+    min-height: 100%;
+    background: #fff;
 }
 
 #page-wrapper {
     width: 100%;
     padding: 0;
-    background-color: #fff;
 }
 
 .huge {
@@ -38,7 +44,7 @@ body {
     }
 
     #page-wrapper {
-        padding: 10px;
+        padding: 15px;
     }
 }
 
@@ -224,4 +230,9 @@ ul.alert-dropdown {
 
 .panel-yellow > a:hover {
     color: #df8a13;
+}
+
+/* Wrapper Content */
+h1.page-header {
+    margin: 5px 0 20px;
 }
