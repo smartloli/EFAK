@@ -71,7 +71,7 @@ path.link {
 						<!-- /.panel-heading -->
 						<div class="panel-body">
 							<div id="kafka_cluster_info">
-								<table id="result" class="table table-bordered table-hover">
+								<table id="result" class="table table-bordered table-hover" width="100%">
 									<thead>
 										<tr>
 											<th>ID</th>
