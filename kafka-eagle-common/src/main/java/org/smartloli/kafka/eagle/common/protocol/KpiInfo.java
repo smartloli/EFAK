@@ -31,7 +31,15 @@ public class KpiInfo extends BaseProtocol {
 	private String key;
 	private String value;
 	private String tm;
-	private String hour;
+	private long timespan;
+	
+	public long getTimespan() {
+		return timespan;
+	}
+
+	public void setTimespan(long timespan) {
+		this.timespan = timespan;
+	}
 
 	public String getBroker() {
 		return broker;
@@ -39,14 +47,6 @@ public class KpiInfo extends BaseProtocol {
 
 	public void setBroker(String broker) {
 		this.broker = broker;
-	}
-
-	public String getHour() {
-		return hour;
-	}
-
-	public void setHour(String hour) {
-		this.hour = hour;
 	}
 
 	public String getCluster() {

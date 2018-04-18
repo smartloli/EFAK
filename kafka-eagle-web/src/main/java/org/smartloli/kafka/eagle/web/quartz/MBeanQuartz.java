@@ -65,12 +65,96 @@ public class MBeanQuartz {
 	public void mbeanQuartz() {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
-			execute(clusterAlias);
-			zookeeper(clusterAlias);
+			mbean(clusterAlias);
+			//zookeeper(clusterAlias);
+			zkCluster(clusterAlias);
 		}
 	}
+	
+	private void broker(){
+		
+	}
 
-	private void zookeeper(String clusterAlias) {
+//	private void zookeeper(String clusterAlias) {
+//		List<KpiInfo> list = new ArrayList<>();
+//		String zkList = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
+//		String[] zks = zkList.split(",");
+//		for (String zk : zks) {
+//			String ip = zk.split(":")[0];
+//			String port = zk.split(":")[1];
+//			if (port.contains("/")) {
+//				port = port.split("/")[0];
+//			}
+//			try {
+//				ZkClusterInfo zkInfo = ZKMetricsUtils.zkClusterInfo(ip, Integer.parseInt(port));
+//				KpiInfo kpiSend = new KpiInfo();
+//				kpiSend.setCluster(clusterAlias);
+//				kpiSend.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//				kpiSend.setHour(CalendarUtils.getCustomDate("HH"));
+//				kpiSend.setKey("ZKSendPackets");
+//				kpiSend.setValue(zkInfo.getZkPacketsSent());
+//				kpiSend.setBroker(ip);
+//				list.add(kpiSend);
+//
+//				KpiInfo kpiReceived = new KpiInfo();
+//				kpiReceived.setCluster(clusterAlias);
+//				kpiReceived.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//				kpiReceived.setHour(CalendarUtils.getCustomDate("HH"));
+//				kpiReceived.setKey("ZKReceivedPackets");
+//				kpiReceived.setValue(zkInfo.getZkPacketsReceived());
+//				kpiReceived.setBroker(ip);
+//				list.add(kpiReceived);
+//
+//				KpiInfo kpiAvgLatency = new KpiInfo();
+//				kpiAvgLatency.setCluster(clusterAlias);
+//				kpiAvgLatency.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//				kpiAvgLatency.setHour(CalendarUtils.getCustomDate("HH"));
+//				kpiAvgLatency.setKey("ZKAvgLatency");
+//				kpiAvgLatency.setValue(zkInfo.getZkAvgLatency());
+//				kpiAvgLatency.setBroker(ip);
+//				list.add(kpiAvgLatency);
+//
+//				KpiInfo kpiNumAliveConnections = new KpiInfo();
+//				kpiNumAliveConnections.setCluster(clusterAlias);
+//				kpiNumAliveConnections.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//				kpiNumAliveConnections.setHour(CalendarUtils.getCustomDate("HH"));
+//				kpiNumAliveConnections.setKey("ZKNumAliveConnections");
+//				kpiNumAliveConnections.setValue(zkInfo.getZkNumAliveConnections());
+//				kpiNumAliveConnections.setBroker(ip);
+//				list.add(kpiNumAliveConnections);
+//
+//				KpiInfo kpiOutstandingRequests = new KpiInfo();
+//				kpiOutstandingRequests.setCluster(clusterAlias);
+//				kpiOutstandingRequests.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//				kpiOutstandingRequests.setHour(CalendarUtils.getCustomDate("HH"));
+//				kpiOutstandingRequests.setKey("ZKOutstandingRequests");
+//				kpiOutstandingRequests.setValue(zkInfo.getZkOutstandingRequests());
+//				kpiOutstandingRequests.setBroker(ip);
+//				list.add(kpiOutstandingRequests);
+//
+//				KpiInfo kpiOpenFileDescriptorCount = new KpiInfo();
+//				kpiOpenFileDescriptorCount.setCluster(clusterAlias);
+//				kpiOpenFileDescriptorCount.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//				kpiOpenFileDescriptorCount.setHour(CalendarUtils.getCustomDate("HH"));
+//				kpiOpenFileDescriptorCount.setKey("ZKOpenFileDescriptorCount");
+//				kpiOpenFileDescriptorCount.setValue(zkInfo.getZkOpenFileDescriptorCount());
+//				kpiOpenFileDescriptorCount.setBroker(ip);
+//				list.add(kpiOpenFileDescriptorCount);
+//
+//			} catch (Exception ex) {
+//				LOG.error("Transcation string to int has error,msg is " + ex.getMessage());
+//			}
+//		}
+//
+//		MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
+//		try {
+//			metrics.insert(list);
+//		} catch (Exception e) {
+//			LOG.error("Collector zookeeper data has error,msg is " + e.getMessage());
+//		}
+//	}
+
+	private void zkCluster(String clusterAlias) {
 		List<KpiInfo> list = new ArrayList<>();
 		String zkList = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
 		String[] zks = zkList.split(",");
@@ -85,55 +169,55 @@ public class MBeanQuartz {
 				KpiInfo kpiSend = new KpiInfo();
 				kpiSend.setCluster(clusterAlias);
 				kpiSend.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-				kpiSend.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiSend.setTimespan(CalendarUtils.getTimeSpan());
 				kpiSend.setKey("ZKSendPackets");
 				kpiSend.setValue(zkInfo.getZkPacketsSent());
-				kpiSend.setBroker(ip);
+				kpiSend.setBroker(ip + ":" + port);
 				list.add(kpiSend);
 
 				KpiInfo kpiReceived = new KpiInfo();
 				kpiReceived.setCluster(clusterAlias);
 				kpiReceived.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-				kpiReceived.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiReceived.setTimespan(CalendarUtils.getTimeSpan());
 				kpiReceived.setKey("ZKReceivedPackets");
 				kpiReceived.setValue(zkInfo.getZkPacketsReceived());
-				kpiReceived.setBroker(ip);
+				kpiReceived.setBroker(ip + ":" + port);
 				list.add(kpiReceived);
 
 				KpiInfo kpiAvgLatency = new KpiInfo();
 				kpiAvgLatency.setCluster(clusterAlias);
 				kpiAvgLatency.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-				kpiAvgLatency.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiAvgLatency.setTimespan(CalendarUtils.getTimeSpan());
 				kpiAvgLatency.setKey("ZKAvgLatency");
 				kpiAvgLatency.setValue(zkInfo.getZkAvgLatency());
-				kpiAvgLatency.setBroker(ip);
+				kpiAvgLatency.setBroker(ip + ":" + port);
 				list.add(kpiAvgLatency);
 
 				KpiInfo kpiNumAliveConnections = new KpiInfo();
 				kpiNumAliveConnections.setCluster(clusterAlias);
 				kpiNumAliveConnections.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-				kpiNumAliveConnections.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiNumAliveConnections.setTimespan(CalendarUtils.getTimeSpan());
 				kpiNumAliveConnections.setKey("ZKNumAliveConnections");
 				kpiNumAliveConnections.setValue(zkInfo.getZkNumAliveConnections());
-				kpiNumAliveConnections.setBroker(ip);
+				kpiNumAliveConnections.setBroker(ip + ":" + port);
 				list.add(kpiNumAliveConnections);
 
 				KpiInfo kpiOutstandingRequests = new KpiInfo();
 				kpiOutstandingRequests.setCluster(clusterAlias);
 				kpiOutstandingRequests.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-				kpiOutstandingRequests.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiOutstandingRequests.setTimespan(CalendarUtils.getTimeSpan());
 				kpiOutstandingRequests.setKey("ZKOutstandingRequests");
 				kpiOutstandingRequests.setValue(zkInfo.getZkOutstandingRequests());
-				kpiOutstandingRequests.setBroker(ip);
+				kpiOutstandingRequests.setBroker(ip + ":" + port);
 				list.add(kpiOutstandingRequests);
 
 				KpiInfo kpiOpenFileDescriptorCount = new KpiInfo();
 				kpiOpenFileDescriptorCount.setCluster(clusterAlias);
 				kpiOpenFileDescriptorCount.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-				kpiOpenFileDescriptorCount.setHour(CalendarUtils.getCustomDate("HH"));
+				kpiOpenFileDescriptorCount.setTimespan(CalendarUtils.getTimeSpan());
 				kpiOpenFileDescriptorCount.setKey("ZKOpenFileDescriptorCount");
 				kpiOpenFileDescriptorCount.setValue(zkInfo.getZkOpenFileDescriptorCount());
-				kpiOpenFileDescriptorCount.setBroker(ip);
+				kpiOpenFileDescriptorCount.setBroker(ip + ":" + port);
 				list.add(kpiOpenFileDescriptorCount);
 
 			} catch (Exception ex) {
@@ -149,7 +233,7 @@ public class MBeanQuartz {
 		}
 	}
 
-	private void execute(String clusterAlias) {
+	private void mbean(String clusterAlias) {
 		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
 		List<KpiInfo> list = new ArrayList<>();
 		for (Object object : brokers) {
@@ -161,8 +245,8 @@ public class MBeanQuartz {
 			kpiByteIn.setKey("ByteIn");
 			kpiByteIn.setValue(bytesIn.getMeanRate());
 			kpiByteIn.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiByteIn.setHour(CalendarUtils.getCustomDate("HH"));
-			kpiByteIn.setBroker(broker.getString("host"));
+			kpiByteIn.setTimespan(CalendarUtils.getTimeSpan());
+			kpiByteIn.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
 			list.add(kpiByteIn);
 
 			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri);
@@ -171,8 +255,8 @@ public class MBeanQuartz {
 			kpiByteOut.setKey("ByteOut");
 			kpiByteOut.setValue(bytesOut.getMeanRate());
 			kpiByteOut.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiByteOut.setHour(CalendarUtils.getCustomDate("HH"));
-			kpiByteOut.setBroker(broker.getString("host"));
+			kpiByteOut.setTimespan(CalendarUtils.getTimeSpan());
+			kpiByteOut.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
 			list.add(kpiByteOut);
 
 			MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri);
@@ -181,8 +265,8 @@ public class MBeanQuartz {
 			kpiFailedFetchRequest.setKey("FailedFetchRequest");
 			kpiFailedFetchRequest.setValue(failedFetchRequest.getMeanRate());
 			kpiFailedFetchRequest.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiFailedFetchRequest.setHour(CalendarUtils.getCustomDate("HH"));
-			kpiFailedFetchRequest.setBroker(broker.getString("host"));
+			kpiFailedFetchRequest.setTimespan(CalendarUtils.getTimeSpan());
+			kpiFailedFetchRequest.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
 			list.add(kpiFailedFetchRequest);
 
 			MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri);
@@ -191,8 +275,8 @@ public class MBeanQuartz {
 			kpiFailedProduceRequest.setKey("FailedProduceRequest");
 			kpiFailedProduceRequest.setValue(failedProduceRequest.getMeanRate());
 			kpiFailedProduceRequest.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiFailedProduceRequest.setHour(CalendarUtils.getCustomDate("HH"));
-			kpiFailedProduceRequest.setBroker(broker.getString("host"));
+			kpiFailedProduceRequest.setTimespan(CalendarUtils.getTimeSpan());
+			kpiFailedProduceRequest.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
 			list.add(kpiFailedProduceRequest);
 
 			MBeanInfo messageIn = mx4jService.messagesInPerSec(uri);
@@ -201,8 +285,8 @@ public class MBeanQuartz {
 			kpiMessageIn.setKey("MessageIn");
 			kpiMessageIn.setValue(messageIn.getMeanRate());
 			kpiMessageIn.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiMessageIn.setHour(CalendarUtils.getCustomDate("HH"));
-			kpiMessageIn.setBroker(broker.getString("host"));
+			kpiMessageIn.setTimespan(CalendarUtils.getTimeSpan());
+			kpiMessageIn.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
 			list.add(kpiMessageIn);
 		}
 

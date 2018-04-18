@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.common.util;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -33,12 +34,12 @@ import org.smartloli.kafka.eagle.common.util.KConstants.ServerDevice;
  *
  *         Created by Mar 16, 2018
  */
-public class NetWorkUtils {
+public class NetUtils {
 
-	private static final Logger LOG = LoggerFactory.getLogger(NetWorkUtils.class);
+	private static final Logger LOG = LoggerFactory.getLogger(NetUtils.class);
 
 	/** Check server host & port whether normal. */
-	public static boolean connect(String host, int port) {
+	public static boolean telnet(String host, int port) {
 		Socket socket = new Socket();
 		try {
 			socket.setReceiveBufferSize(ServerDevice.BUFFER_SIZE);
@@ -51,7 +52,7 @@ public class NetWorkUtils {
 			socket.connect(address, ServerDevice.TIME_OUT);
 			return true;
 		} catch (IOException e) {
-			LOG.error("Thread Service [" + host + ":" + port + "] has crash,please check it.");
+			LOG.error("Telnet [" + host + ":" + port + "] has crash,please check it.");
 			return false;
 		} finally {
 			if (socket != null) {
@@ -61,6 +62,17 @@ public class NetWorkUtils {
 					LOG.error("Close socket [" + host + ":" + port + "] has error.");
 				}
 			}
+		}
+	}
+
+	/** Ping server whether alive. */
+	public static boolean ping(String host) {
+		try {
+			InetAddress address = InetAddress.getByName(host);
+			return address.isReachable(ServerDevice.TIME_OUT);
+		} catch (Exception e) {
+			LOG.error("Ping [" + host + "] server has crash or not exist.");
+			return false;
 		}
 	}
 

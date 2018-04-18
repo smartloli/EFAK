@@ -98,6 +98,11 @@ public class CalendarUtils {
 		return df.format(new Date());
 	}
 
+	/** Get unix time. */
+	public static long getTimeSpan() {
+		return new Date().getTime();
+	}
+
 	/** Get custom date,like yyyy/mm/dd etc. */
 	public static String getCustomDate(String formatter) {
 		SimpleDateFormat df = new SimpleDateFormat(formatter);

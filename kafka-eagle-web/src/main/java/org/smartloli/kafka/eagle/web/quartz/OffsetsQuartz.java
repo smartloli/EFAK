@@ -38,7 +38,7 @@ import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.NetWorkUtils;
+import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -232,7 +232,7 @@ public class OffsetsQuartz {
 			JSONObject kafkaBroker = (JSONObject) object;
 			String host = kafkaBroker.getString("host");
 			int port = kafkaBroker.getInteger("port");
-			boolean status = NetWorkUtils.connect(host, port);
+			boolean status = NetUtils.connect(host, port);
 			if (!status) {
 				String address = SystemConfigUtils.getProperty("kafka.eagle.alert.users");
 				try {
