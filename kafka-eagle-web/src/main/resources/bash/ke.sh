@@ -5,6 +5,8 @@
 
 export MALLOC_ARENA_MAX=1
 
+stime=`date "+%Y-%m-%d %H:%M:%S"`
+
 COLOR_G="\x1b[0;32m"  # green
 COLOR_R="\x1b[1;31m"  # red
 RESET="\x1b[0m"
@@ -15,9 +17,9 @@ MSG_OK=$COLOR_G$STR_OK$RESET
 isexit()
 {
 	if [[ $1 -eq 0 ]];then
-		echo -e $MSG_OK
+		echo -e [$stime] INFO: $MSG_OK
 	else
-		echo -e $MSG_ERR
+		echo -e [$stime] ERROR: $MSG_ERR
 		exit 1
 	fi
 }
@@ -26,18 +28,18 @@ DIALUP_PID=$KE_HOME/bin/ke.pid
 
 start()
 {
-    echo -n $"Starting $prog: "
-    echo "KE Service Check ..."
+    echo -n [$stime] INFO:  $"Starting $prog "
+    echo "kafka eagle environment check ..."
     
     if [ "$KE_HOME" = "" ]; then
-  		echo "Error: The KE_HOME environment variable is not defined correctly."
-		echo "Error: This environment variable is needed to run this program."
+  		echo "[$stime] Error: The KE_HOME environment variable is not defined correctly."
+		echo "[$stime] Error: This environment variable is needed to run this program."
   		exit 1
 	fi
 	
 	if [ "$JAVA_HOME" = "" ]; then
-  		echo "Error: The JAVA_HOME environment variable is not defined correctly."
-		echo "Error: This environment variable is needed to run this program."
+  		echo "[$stime] Error: The JAVA_HOME environment variable is not defined correctly."
+		echo "[$stime] Error: This environment variable is needed to run this program."
   		exit 1
 	fi
 
@@ -76,16 +78,18 @@ start()
 	sleep 2
 	nohup ${KE_HOME}/kms/bin/startup.sh >> ${LOG_DIR}/ke.out 2>&1
 	ret=$?
-	echo "Status Code["$ret"]"
+	echo "[$stime] INFO: Status Code["$ret"]"
 	isexit $ret
 	
 	CLASS=org.smartloli.kafka.eagle.plugin.font.KafkaEagleVersion
 	${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS 2>&1
 	
+	ADMIN="Account:admin ,Password:123456"
+	
 	echo "*******************************************************************"
-    	echo "* Kafka Eagle Service has started success!"
+    	echo "* Kafka Eagle Service has started success."
     	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'"
-    	echo "* Account:admin ,Password:123456"
+    	echo -e "* "$COLOR_G$ADMIN$RESET
 	echo "*******************************************************************"
     	echo "* <Usage> ke.sh [start|status|stop|restart|stats] </Usage>"
     	echo "* <Usage> http://ke.smartloli.org/ </Usage>"
@@ -103,7 +107,7 @@ stop()
                          ${KE_HOME}/kms/bin/shutdown.sh
                          kill -9  $SPID
                          echo > $DIALUP_PID
-						 echo "Stop Success."
+						 echo "[$stime] INFO: Stop Success."
 					  fi
 	 fi
 }
@@ -176,18 +180,18 @@ status()
   SPID=`cat $KE_HOME/bin/ke.pid`
   CheckProcessStata $SPID >/dev/null
   if [ $? != 0 ];then
-	echo "unixdialup:{$SPID}  Stopped ...."
+	echo "[$stime] INFO : Kafka Eagle has stopped, [$SPID] ."
   else
-	echo "unixdialup:{$SPID} Running Normal."
+	echo "[$stime] INFO : Kafka Eagle is running, [$SPID] ."
   fi
 
 }
 
 restart()
 {
-    echo "Stoping ... "
+    echo "[$stime] INFO : Kafka Eagle is stoping ... "
     stop
-    echo "Starting ..."
+    echo "[$stime] INFO : Kafka Eagle is starting ..."
     start
 }
 
