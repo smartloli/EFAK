@@ -27,6 +27,7 @@ import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.ZkClusterInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
+import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKMetricsUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -57,6 +58,8 @@ public class MBeanQuartz {
 	private static final String zk_outstanding_requests = "zk_outstanding_requests";
 	private static final String[] zk_kpis = new String[] { zk_packets_received, zk_packets_sent, zk_num_alive_connections, zk_outstanding_requests };
 
+	private static final String[] broker_kpis = new String[] { MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT };
+
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
@@ -72,13 +75,61 @@ public class MBeanQuartz {
 	public void mbeanQuartz() {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
-			// mbean(clusterAlias);
+			kafkaCluster(clusterAlias);
 			zkCluster(clusterAlias);
 		}
 	}
 
-	private void broker() {
+	private void kafkaCluster(String clusterAlias) {
+		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+		List<KpiInfo> list = new ArrayList<>();
 
+		for (String kpi : broker_kpis) {
+			KpiInfo kpiInfo = new KpiInfo();
+			kpiInfo.setCluster(clusterAlias);
+			kpiInfo.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+			kpiInfo.setTimespan(CalendarUtils.getTimeSpan());
+			kpiInfo.setKey(kpi);
+			String broker = "";
+			JSONObject value = new JSONObject();
+			value.put("y", CalendarUtils.getDate());
+			for (Object object : brokers) {
+				JSONObject kafka = (JSONObject) object;
+				broker += kafka.getString("host") + ",";
+				kafkaAssembly(mx4jService, kpi, value, kafka);
+			}
+			kpiInfo.setBroker(broker.length() == 0 ? "unkowns" : broker.substring(0, broker.length() - 1));
+			kpiInfo.setType(CollectorType.KAFKA);
+			kpiInfo.setValue(value.toJSONString());
+			list.add(kpiInfo);
+		}
+
+		MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
+		try {
+			metrics.insert(list);
+		} catch (Exception e) {
+			LOG.error("Collector mbean data has error,msg is " + e.getMessage());
+		}
+	}
+
+	private void kafkaAssembly(Mx4jService mx4jService, String type, JSONObject value, JSONObject kafka) {
+		String uri = kafka.getString("host") + ":" + kafka.getInteger("jmxPort");
+		switch (type) {
+		case MBean.MESSAGEIN:
+			MBeanInfo msg = mx4jService.messagesInPerSec(uri);
+			value.put(kafka.getString("host"), msg.getMeanRate());
+			break;
+		case MBean.BYTEIN:
+			MBeanInfo bin = mx4jService.bytesInPerSec(uri);
+			value.put(kafka.getString("host"), bin.getMeanRate());
+			break;
+		case MBean.BYTEOUT:
+			MBeanInfo bout = mx4jService.bytesOutPerSec(uri);
+			value.put(kafka.getString("host"), bout.getMeanRate());
+			break;
+		default:
+			break;
+		}
 	}
 
 	private void zkCluster(String clusterAlias) {
@@ -142,69 +193,71 @@ public class MBeanQuartz {
 		}
 	}
 
-	private void mbean(String clusterAlias) {
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
-		List<KpiInfo> list = new ArrayList<>();
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
-			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
-			MBeanInfo bytesIn = mx4jService.bytesInPerSec(uri);
-			KpiInfo kpiByteIn = new KpiInfo();
-			kpiByteIn.setCluster(clusterAlias);
-			kpiByteIn.setKey("ByteIn");
-			kpiByteIn.setValue(bytesIn.getMeanRate());
-			kpiByteIn.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiByteIn.setTimespan(CalendarUtils.getTimeSpan());
-			kpiByteIn.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
-			list.add(kpiByteIn);
-
-			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri);
-			KpiInfo kpiByteOut = new KpiInfo();
-			kpiByteOut.setCluster(clusterAlias);
-			kpiByteOut.setKey("ByteOut");
-			kpiByteOut.setValue(bytesOut.getMeanRate());
-			kpiByteOut.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiByteOut.setTimespan(CalendarUtils.getTimeSpan());
-			kpiByteOut.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
-			list.add(kpiByteOut);
-
-			MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri);
-			KpiInfo kpiFailedFetchRequest = new KpiInfo();
-			kpiFailedFetchRequest.setCluster(clusterAlias);
-			kpiFailedFetchRequest.setKey("FailedFetchRequest");
-			kpiFailedFetchRequest.setValue(failedFetchRequest.getMeanRate());
-			kpiFailedFetchRequest.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiFailedFetchRequest.setTimespan(CalendarUtils.getTimeSpan());
-			kpiFailedFetchRequest.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
-			list.add(kpiFailedFetchRequest);
-
-			MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri);
-			KpiInfo kpiFailedProduceRequest = new KpiInfo();
-			kpiFailedProduceRequest.setCluster(clusterAlias);
-			kpiFailedProduceRequest.setKey("FailedProduceRequest");
-			kpiFailedProduceRequest.setValue(failedProduceRequest.getMeanRate());
-			kpiFailedProduceRequest.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiFailedProduceRequest.setTimespan(CalendarUtils.getTimeSpan());
-			kpiFailedProduceRequest.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
-			list.add(kpiFailedProduceRequest);
-
-			MBeanInfo messageIn = mx4jService.messagesInPerSec(uri);
-			KpiInfo kpiMessageIn = new KpiInfo();
-			kpiMessageIn.setCluster(clusterAlias);
-			kpiMessageIn.setKey("MessageIn");
-			kpiMessageIn.setValue(messageIn.getMeanRate());
-			kpiMessageIn.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-			kpiMessageIn.setTimespan(CalendarUtils.getTimeSpan());
-			kpiMessageIn.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
-			list.add(kpiMessageIn);
-		}
-
-		MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
-		try {
-			metrics.insert(list);
-		} catch (Exception e) {
-			LOG.error("Collector mbean data has error,msg is " + e.getMessage());
-		}
-	}
+//	private void mbean(String clusterAlias) {
+//		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+//		List<KpiInfo> list = new ArrayList<>();
+//		for (Object object : brokers) {
+//			JSONObject broker = (JSONObject) object;
+//			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
+//			JSONObject values = new JSONObject();
+//
+//			MBeanInfo bytesIn = mx4jService.bytesInPerSec(uri);
+//			KpiInfo kpiByteIn = new KpiInfo();
+//			kpiByteIn.setCluster(clusterAlias);
+//			kpiByteIn.setKey("ByteIn");
+//			kpiByteIn.setValue(bytesIn.getMeanRate());
+//			kpiByteIn.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//			kpiByteIn.setTimespan(CalendarUtils.getTimeSpan());
+//			kpiByteIn.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
+//			list.add(kpiByteIn);
+//
+//			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri);
+//			KpiInfo kpiByteOut = new KpiInfo();
+//			kpiByteOut.setCluster(clusterAlias);
+//			kpiByteOut.setKey("ByteOut");
+//			kpiByteOut.setValue(bytesOut.getMeanRate());
+//			kpiByteOut.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//			kpiByteOut.setTimespan(CalendarUtils.getTimeSpan());
+//			kpiByteOut.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
+//			list.add(kpiByteOut);
+//
+//			MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri);
+//			KpiInfo kpiFailedFetchRequest = new KpiInfo();
+//			kpiFailedFetchRequest.setCluster(clusterAlias);
+//			kpiFailedFetchRequest.setKey("FailedFetchRequest");
+//			kpiFailedFetchRequest.setValue(failedFetchRequest.getMeanRate());
+//			kpiFailedFetchRequest.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//			kpiFailedFetchRequest.setTimespan(CalendarUtils.getTimeSpan());
+//			kpiFailedFetchRequest.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
+//			list.add(kpiFailedFetchRequest);
+//
+//			MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri);
+//			KpiInfo kpiFailedProduceRequest = new KpiInfo();
+//			kpiFailedProduceRequest.setCluster(clusterAlias);
+//			kpiFailedProduceRequest.setKey("FailedProduceRequest");
+//			kpiFailedProduceRequest.setValue(failedProduceRequest.getMeanRate());
+//			kpiFailedProduceRequest.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//			kpiFailedProduceRequest.setTimespan(CalendarUtils.getTimeSpan());
+//			kpiFailedProduceRequest.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
+//			list.add(kpiFailedProduceRequest);
+//
+//			MBeanInfo messageIn = mx4jService.messagesInPerSec(uri);
+//			KpiInfo kpiMessageIn = new KpiInfo();
+//			kpiMessageIn.setCluster(clusterAlias);
+//			kpiMessageIn.setKey("MessageIn");
+//			kpiMessageIn.setValue(messageIn.getMeanRate());
+//			kpiMessageIn.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+//			kpiMessageIn.setTimespan(CalendarUtils.getTimeSpan());
+//			kpiMessageIn.setBroker(broker.getString("host") + ":" + broker.getInteger("port"));
+//			list.add(kpiMessageIn);
+//		}
+//
+//		MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
+//		try {
+//			metrics.insert(list);
+//		} catch (Exception e) {
+//			LOG.error("Collector mbean data has error,msg is " + e.getMessage());
+//		}
+//	}
 
 }

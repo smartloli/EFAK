@@ -13,7 +13,7 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<title>Trend - KafkaEagle</title>
+<title>Kafka - KafkaEagle</title>
 <jsp:include page="../public/css.jsp">
 	<jsp:param value="plugins/datatimepicker/daterangepicker.css"
 		name="css" />
@@ -26,7 +26,7 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">
-						MBean Trend <small>details</small>
+						Kafka Performance <small>details</small>
 					</h1>
 					<div id="reportrange"
 						style="position: absolute; top: 46px; left: 964px; width: 230px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc;">
@@ -71,12 +71,12 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>Kafka
-								Byte In And Out</strong>
+								Topic Byte In (byte/sec)</strong>
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_msg_in_out"></div>
+							<div id="mbean_msg_byte_in"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -86,12 +86,12 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-								Fetch And Produce Fails (per/sec) </strong>
+								Topic Byte Out (byte/sec)</strong>
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_fetch_produce"></div>
+							<div id="mbean_msg_byte_out"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -103,7 +103,7 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/metrics/trend.js" name="loader" />
+	<jsp:param value="main/metrics/kafka.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/daterangepicker.js"
 		name="loader" />

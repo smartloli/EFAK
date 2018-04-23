@@ -93,11 +93,11 @@ public class KConstants {
 		public final static String FAILED_PRODUCE_REQUEST = "produce";
 
 		/** MBean keys. */
-		public final static String MESSAGEIN = "MessageIn";
-		public final static String BYTEIN = "ByteIn";
-		public final static String BYTEOUT = "ByteOut";
-		public final static String FAILEDFETCHREQUEST = "FailedFetchRequest";
-		public final static String FAILEDPRODUCEREQUEST = "FailedProduceRequest";
+		public final static String MESSAGEIN = "message_in";
+		public final static String BYTEIN = "byte_in";
+		public final static String BYTEOUT = "byte_out";
+		public final static String FAILEDFETCHREQUEST = "failed_fetch_request";
+		public final static String FAILEDPRODUCEREQUEST = "failed_produce_request";
 	}
 
 	public interface Linux {

@@ -55,10 +55,10 @@ public class MetricsController {
 	}
 
 	/** Trend viewer. */
-	@RequestMapping(value = "/metrics/trend", method = RequestMethod.GET)
+	@RequestMapping(value = "/metrics/kafka", method = RequestMethod.GET)
 	public ModelAndView trendView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/metrics/trend");
+		mav.setViewName("/metrics/kafka");
 		return mav;
 	}
 	

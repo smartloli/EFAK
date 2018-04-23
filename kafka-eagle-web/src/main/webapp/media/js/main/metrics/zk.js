@@ -30,12 +30,6 @@ $(document).ready(function() {
 		reportrange.on('apply.daterangepicker', function(ev, picker) {
 			stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 			etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
-			// if (picker.chosenLabel == "Today" || picker.chosenLabel ==
-			// "Yesterday") {
-			// type = "daily";
-			// } else {
-			// type = "day";
-			// }
 			zkRealtime(stime, etime, type);
 		});
 		console.log(stime + "," + etime);

@@ -23,28 +23,6 @@
 		</foreach>
 	</insert>
 
-	<select id="daily" parameterType="map" resultMap="kpi">
-		select
-		`key`,sum(`value`) as
-		`value`,`hour`,tm
-		from ke_trend where
-		`cluster`=#{cluster} and tm
-		between #{stime} and
-		#{etime} group by
-		`key`,`hour`,tm
-	</select>
-
-	<select id="day" parameterType="map" resultMap="kpi">
-		select
-		`key`,sum(`value`) as
-		`value`,tm
-		from ke_trend where
-		`cluster`=#{cluster} and tm
-		between #{stime} and
-		#{etime} group by
-		`key`,tm
-	</select>
-
 	<delete id="remove" parameterType="int">
 		delete from ke_trend where
 		tm&lt;=#{tm}

@@ -25,11 +25,9 @@ import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
@@ -181,9 +179,9 @@ public class MetricsServiceImpl implements MetricsService {
 
 		List<KpiInfo> kpis = mbeanDao.query(params);
 
-		// JSONArray messageIns = new JSONArray();
-		// JSONArray byteInOuts = new JSONArray();
-		// JSONArray failedReqstProds = new JSONArray();
+		JSONArray messageIns = new JSONArray();
+		JSONArray byteIns = new JSONArray();
+		JSONArray byteOuts = new JSONArray();
 
 		JSONArray zkSendPackets = new JSONArray();
 		JSONArray zkReceivedPackets = new JSONArray();
@@ -207,6 +205,15 @@ public class MetricsServiceImpl implements MetricsService {
 			case ZK.ZK_NUM_ALIVECONNRCTIONS:
 				assembly(zkNumAliveConnections, kpi);
 				break;
+			case MBean.MESSAGEIN:
+				assembly(messageIns, kpi);
+				break;
+			case MBean.BYTEIN:
+				assembly(byteIns, kpi);
+				break;
+			case MBean.BYTEOUT:
+				assembly(byteOuts, kpi);
+				break;
 			default:
 				break;
 			}
@@ -216,6 +223,10 @@ public class MetricsServiceImpl implements MetricsService {
 		target.put("received", zkReceivedPackets);
 		target.put("queue", zkOutstandingRequests);
 		target.put("alive", zkNumAliveConnections);
+		target.put("msg", messageIns);
+		target.put("ins", byteIns);
+		target.put("outs", byteOuts);
+		
 		target.put("zks", zks.split(","));
 
 		return target.toJSONString();

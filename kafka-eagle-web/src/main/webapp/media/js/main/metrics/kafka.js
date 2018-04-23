@@ -2,36 +2,39 @@ $(document).ready(function() {
 	var mbean_msg_in = Morris.Line({
 		element : 'mbean_msg_in',
 		data : [],
-		xkey : 'xkey',
-		ykeys : [ 'MessageIn' ],
-		labels : [ 'MessageIn' ],
-		lineColors : [ '#7cb47c' ],
+		xkey : 'y',
+		ykeys : [],
+		labels : [],
 		pointSize : 2,
 		hideHover : 'auto',
+		pointFillColors : [ '#ffffff' ],
+		pointStrokeColors : [ 'black' ],
 		resize : true
 	});
 
-	var mbean_msg_in_out = Morris.Line({
-		element : 'mbean_msg_in_out',
+	var mbean_msg_byte_in = Morris.Line({
+		element : 'mbean_msg_byte_in',
 		data : [],
-		xkey : 'xkey',
-		ykeys : [ 'ByteIn', 'ByteOut' ],
-		labels : [ 'ByteIn', 'ByteOut' ],
-		lineColors : [ '#d43f3a', '#7cb47c' ],
+		xkey : 'y',
+		ykeys : [],
+		labels : [],
 		pointSize : 2,
 		hideHover : 'auto',
+		pointFillColors : [ '#ffffff' ],
+		pointStrokeColors : [ 'black' ],
 		resize : true
 	});
 
-	var mbean_fetch_produce = Morris.Line({
-		element : 'mbean_fetch_produce',
+	var mbean_msg_byte_out = Morris.Line({
+		element : 'mbean_msg_byte_out',
 		data : [],
-		xkey : 'xkey',
-		ykeys : [ 'FailedFetchRequest', 'FailedProduceRequest' ],
-		labels : [ 'FailedFetchRequest', 'FailedProduceRequest' ],
-		lineColors : [ '#a7b3bc', '#2577b5' ],
+		xkey : 'y',
+		ykeys : [],
+		labels : [],
 		pointSize : 2,
 		hideHover : 'auto',
+		pointFillColors : [ '#ffffff' ],
+		pointStrokeColors : [ 'black' ],
 		resize : true
 	});
 
@@ -46,13 +49,42 @@ $(document).ready(function() {
 			},
 			success : function(datas) {
 				if (datas != null) {
-					mbean_msg_in.setData(datas.message);
-					mbean_msg_in_out.setData(datas.inout);
-					mbean_fetch_produce.setData(datas.failed);
+					console.log(datas);
+					mbean_msg_in.options.ykeys = datas.zks;
+					mbean_msg_in.options.labels = datas.zks;
+					mbean_msg_in.setData(filter(datas.msg, "message_in"));
+
+					mbean_msg_byte_in.options.ykeys = datas.zks;
+					mbean_msg_byte_in.options.labels = datas.zks;
+					mbean_msg_byte_in.setData(filter(datas.ins, "byte_in"));
+
+					mbean_msg_byte_out.options.ykeys = datas.zks;
+					mbean_msg_byte_out.options.labels = datas.zks;
+					mbean_msg_byte_out.setData(filter(datas.outs, "byte_out"));
 					datas = null;
 				}
 			}
 		});
+	}
+
+	function filter(datas, type) {
+		var data = new Array();
+		for (var i = 0; i < datas.length; i++) {
+			switch (type) {
+			case "message_in":
+				data.push(JSON.parse(datas[i].message_in));
+				break;
+			case "byte_in":
+				data.push(JSON.parse(datas[i].byte_in));
+				break;
+			case "byte_out":
+				data.push(JSON.parse(datas[i].byte_out));
+				break;
+			default:
+				break;
+			}
+		}
+		return data;
 	}
 
 	var start = moment();
@@ -76,7 +108,7 @@ $(document).ready(function() {
 	cb(start, end);
 	var stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 	var etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
-	var type = "daily";
+	var type = "kafka";
 
 	mbeanRealtime(stime, etime, type);
 	$(".ranges").find("li[data-range-key='Custom Range']").remove();
@@ -84,11 +116,6 @@ $(document).ready(function() {
 	reportrange.on('apply.daterangepicker', function(ev, picker) {
 		stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 		etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
-		if (picker.chosenLabel == "Today" || picker.chosenLabel == "Yesterday") {
-			type = "daily";
-		} else {
-			type = "day";
-		}
 		mbeanRealtime(stime, etime, type);
 	});
 	console.log(stime + "," + etime);

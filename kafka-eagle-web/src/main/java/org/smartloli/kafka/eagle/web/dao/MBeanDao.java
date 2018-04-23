@@ -34,12 +34,6 @@ public interface MBeanDao {
 	/** Collection statistics data from kafka jmx & insert into table. */
 	public int insert(List<KpiInfo> kpi);
 
-	/** Get daily data. */
-	public List<KpiInfo> daily(Map<String, Object> params);
-
-	/** Day or weekly query data. */
-	public List<KpiInfo> day(Map<String, Object> params);
-
 	/** Query collector data. */
 	public List<KpiInfo> query(Map<String, Object> params);
 
