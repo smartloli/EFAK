@@ -113,22 +113,25 @@ public class KConstants {
 	}
 
 	public interface ZK {
-		public static final String ZK_SEND_PACKETS = "ZKSendPackets";
-		public static final String ZK_RECEIVEDPACKETS = "ZKReceivedPackets";
-		public static final String ZK_AVGLATENCY = "ZKAvgLatency";
-		public static final String ZK_NUM_ALIVECONNRCTIONS = "ZKNumAliveConnections";
-		public static final String ZK_OUTSTANDING_REQUESTS = "ZKOutstandingRequests";
-		public static final String ZK_OPENFILE_DESCRIPTOR_COUNT = "ZKOpenFileDescriptorCount";
+		public static final String ZK_SEND_PACKETS = "zk_packets_sent";
+		public static final String ZK_RECEIVEDPACKETS = "zk_packets_received";
+		public static final String ZK_NUM_ALIVECONNRCTIONS = "zk_num_alive_connections";
+		public static final String ZK_OUTSTANDING_REQUESTS = "zk_outstanding_requests";
 
 	}
-	
-	public interface TopicCache{
-		public static final String NAME="TopicCacheData";
+
+	public interface TopicCache {
+		public static final String NAME = "TopicCacheData";
 	}
-	
-	public interface ServerDevice{
-		public static final int TIME_OUT=3000;
-		public static final int BUFFER_SIZE=8049;
+
+	public interface ServerDevice {
+		public static final int TIME_OUT = 3000;
+		public static final int BUFFER_SIZE = 8049;
+	}
+
+	public interface CollectorType {
+		public static final String ZK = "zookeeper";
+		public static final String KAFKA = "kafka";
 	}
 
 }

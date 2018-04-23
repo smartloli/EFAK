@@ -232,7 +232,7 @@ public class OffsetsQuartz {
 			JSONObject kafkaBroker = (JSONObject) object;
 			String host = kafkaBroker.getString("host");
 			int port = kafkaBroker.getInteger("port");
-			boolean status = NetUtils.connect(host, port);
+			boolean status = NetUtils.telnet(host, port);
 			if (!status) {
 				String address = SystemConfigUtils.getProperty("kafka.eagle.alert.users");
 				try {

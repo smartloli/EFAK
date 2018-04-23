@@ -22,7 +22,7 @@ $(document).ready(function() {
 		cb(start, end);
 		var stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 		var etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
-		var type = "daily";
+		var type = "zookeeper";
 
 		zkRealtime(stime, etime, type);
 		$(".ranges").find("li[data-range-key='Custom Range']").remove();
@@ -30,11 +30,12 @@ $(document).ready(function() {
 		reportrange.on('apply.daterangepicker', function(ev, picker) {
 			stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 			etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
-			if (picker.chosenLabel == "Today" || picker.chosenLabel == "Yesterday") {
-				type = "daily";
-			} else {
-				type = "day";
-			}
+			// if (picker.chosenLabel == "Today" || picker.chosenLabel ==
+			// "Yesterday") {
+			// type = "daily";
+			// } else {
+			// type = "day";
+			// }
 			zkRealtime(stime, etime, type);
 		});
 		console.log(stime + "," + etime);
@@ -48,34 +49,24 @@ $(document).ready(function() {
 	var zk_send_packets = Morris.Line({
 		element : 'zk_send_packets',
 		data : [],
-		xkey : 'xkey',
-		ykeys : [ 'ZKSendPackets' ],
-		labels : [ 'ZKSendPackets' ],
-		// lineColors : [ '#7cb47c' ],
+		xkey : 'y',
+		ykeys : [],
+		labels : [],
 		pointSize : 2,
 		hideHover : 'auto',
+		pointFillColors : [ '#ffffff' ],
+		pointStrokeColors : [ 'black' ],
 		resize : true
 	});
 
 	var zk_recevied_packets = Morris.Line({
 		element : 'zk_recevied_packets',
 		data : [],
-		xkey : 'xkey',
-		ykeys : [ 'ZKReceivedPackets' ],
-		labels : [ 'ZKReceivedPackets' ],
-		// lineColors : [ '#d43f3a' ],
-		pointSize : 2,
-		hideHover : 'auto',
-		resize : true
-	});
-
-	var zk_avg_latency = Morris.Line({
-		element : 'zk_avg_latency',
-		data : [],
-		xkey : 'xkey',
-		ykeys : [ 'ZKAvgLatency' ],
-		labels : [ 'ZKAvgLatency' ],
-		// lineColors : [ '#a7b3bc' ],
+		xkey : 'y',
+		ykeys : [],
+		labels : [],
+		pointFillColors : [ '#ffffff' ],
+		pointStrokeColors : [ 'black' ],
 		pointSize : 2,
 		hideHover : 'auto',
 		resize : true
@@ -84,10 +75,11 @@ $(document).ready(function() {
 	var zk_alives_connections = Morris.Line({
 		element : 'zk_alives_connections',
 		data : [],
-		xkey : 'xkey',
-		ykeys : [ 'ZKNumAliveConnections' ],
-		labels : [ 'ZKNumAliveConnections' ],
-		// lineColors : [ '#a7b3bc' ],
+		xkey : 'y',
+		ykeys : [],
+		labels : [],
+		pointFillColors : [ '#ffffff' ],
+		pointStrokeColors : [ 'black' ],
 		pointSize : 2,
 		hideHover : 'auto',
 		resize : true
@@ -96,22 +88,11 @@ $(document).ready(function() {
 	var zk_queue_requests = Morris.Line({
 		element : 'zk_queue_requests',
 		data : [],
-		xkey : 'xkey',
-		ykeys : [ 'ZKOutstandingRequests' ],
-		labels : [ 'ZKOutstandingRequests' ],
-		// lineColors : [ '#a7b3bc' ],
-		pointSize : 2,
-		hideHover : 'auto',
-		resize : true
-	});
-
-	var zk_openfile_counts = Morris.Line({
-		element : 'zk_openfile_counts',
-		data : [],
-		xkey : 'xkey',
-		ykeys : [ 'ZKOpenFileDescriptorCount' ],
-		labels : [ 'ZKOpenFileDescriptorCount' ],
-		// lineColors : [ '#a7b3bc' ],
+		xkey : 'y',
+		ykeys : [],
+		labels : [],
+		pointFillColors : [ '#ffffff' ],
+		pointStrokeColors : [ 'black' ],
 		pointSize : 2,
 		hideHover : 'auto',
 		resize : true
@@ -128,17 +109,48 @@ $(document).ready(function() {
 			},
 			success : function(datas) {
 				if (datas != null) {
-					console.log(datas);
-					zk_send_packets.setData(datas.send);
-					zk_recevied_packets.setData(datas.received);
-					zk_avg_latency.setData(datas.avg);
-					zk_alives_connections.setData(datas.alive);
-					zk_queue_requests.setData(datas.queue);
-					zk_openfile_counts.setData(datas.openfile);
+					zk_send_packets.options.ykeys = datas.zks;
+					zk_send_packets.options.labels = datas.zks;
+					zk_send_packets.setData(filter(datas.send, "zk_packets_sent"));
+
+					zk_recevied_packets.options.ykeys = datas.zks;
+					zk_recevied_packets.options.labels = datas.zks;
+					zk_recevied_packets.setData(filter(datas.received, "zk_packets_received"));
+
+					zk_alives_connections.options.ykeys = datas.zks;
+					zk_alives_connections.options.labels = datas.zks;
+					zk_alives_connections.setData(filter(datas.alive, "zk_num_alive_connections"));
+
+					zk_queue_requests.options.ykeys = datas.zks;
+					zk_queue_requests.options.labels = datas.zks;
+					zk_queue_requests.setData(filter(datas.queue, "zk_outstanding_requests"));
 					datas = null;
 				}
 			}
 		});
+	}
+
+	function filter(datas, type) {
+		var data = new Array();
+		for (var i = 0; i < datas.length; i++) {
+			switch (type) {
+			case "zk_packets_sent":
+				data.push(JSON.parse(datas[i].zk_packets_sent));
+				break;
+			case "zk_num_alive_connections":
+				data.push(JSON.parse(datas[i].zk_num_alive_connections));
+				break;
+			case "zk_outstanding_requests":
+				data.push(JSON.parse(datas[i].zk_outstanding_requests));
+				break;
+			case "zk_packets_received":
+				data.push(JSON.parse(datas[i].zk_packets_received));
+				break;
+			default:
+				break;
+			}
+		}
+		return data;
 	}
 
 });

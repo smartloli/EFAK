@@ -91,7 +91,7 @@ public class CalendarUtils {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return df.format(new Date(unixtime));
 	}
-
+	
 	/** Get the date of the day,accurate to seconds. */
 	public static String getDate() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

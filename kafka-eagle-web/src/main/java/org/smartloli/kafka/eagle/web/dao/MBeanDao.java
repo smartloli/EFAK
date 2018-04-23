@@ -40,6 +40,9 @@ public interface MBeanDao {
 	/** Day or weekly query data. */
 	public List<KpiInfo> day(Map<String, Object> params);
 
+	/** Query collector data. */
+	public List<KpiInfo> query(Map<String, Object> params);
+
 	/** Crontab clean data. */
 	public void remove(int tm);
 

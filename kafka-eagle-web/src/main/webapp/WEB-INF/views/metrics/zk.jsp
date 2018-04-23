@@ -52,7 +52,7 @@
 
 			<!-- /.row -->
 			<div class="row">
-				<div class="col-lg-6">
+				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>Zookeeper
@@ -67,7 +67,7 @@
 					</div>
 				</div>
 				<!-- /.col-lg-4 -->
-				<div class="col-lg-6">
+				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>Zookeeper
@@ -82,22 +82,22 @@
 					</div>
 				</div>
 				<!-- /.col-lg-4 -->
-				<div class="col-lg-6">
+				<!-- <div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
 								Zookeeper Avg Latency </strong>
 							<div class="pull-right"></div>
 						</div>
-						<!-- /.panel-heading -->
+						/.panel-heading
 						<div class="panel-body">
 							<div id="zk_avg_latency"></div>
 						</div>
-						<!-- /.panel-body -->
+						/.panel-body
 					</div>
-				</div>
+				</div> -->
 				<!-- /.col-lg-4 -->
-				<div class="col-lg-6">
+				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
@@ -112,7 +112,7 @@
 					</div>
 				</div>
 				<!-- /.col-lg-4 -->
-				<div class="col-lg-6">
+				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
@@ -127,20 +127,20 @@
 					</div>
 				</div>
 				<!-- /.col-lg-4 -->
-				<div class="col-lg-6">
+				<!-- <div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
 								Zookeeper OpenFile Counts </strong>
 							<div class="pull-right"></div>
 						</div>
-						<!-- /.panel-heading -->
+						/.panel-heading
 						<div class="panel-body">
 							<div id="zk_openfile_counts"></div>
 						</div>
-						<!-- /.panel-body -->
+						/.panel-body
 					</div>
-				</div>
+				</div> -->
 				<!-- /.col-lg-4 -->
 			</div>
 		</div>

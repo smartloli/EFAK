@@ -68,7 +68,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(64) DEFAULT NULL,`hour` varchar(2) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64) DEFAULT NULL,`broker` varchar(256) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(64) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64) DEFAULT NULL,`broker` varchar(256) DEFAULT NULL,`type` varchar(32) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(256) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_BROKERS = "CREATE TABLE IF NOT EXISTS `ke_brokers` (`cluster` varchar(64) DEFAULT NULL,`broker` varchar(64) DEFAULT NULL,`alive` varchar(4) DEFAULT NULL,`enable` varchar(4) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -90,7 +90,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_SQLITE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64),`key` varchar(64) ,`value` varchar(64),`hour` varchar(2),`tm` varchar(16))";
 
-	static String CREATE_TABLE_SQLITE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64),`broker` varchar(256),`key` varchar(64),`value` varchar(64),`timespan` bigint(20),`tm` varchar(16))";
+	static String CREATE_TABLE_SQLITE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64),`broker` varchar(256),`type` varchar(32),`key` varchar(64),`value` varchar(256),`timespan` bigint(20),`tm` varchar(16))";
 
 	static String CREATE_TABLE_SQLITE_KE_BROKERS = "CREATE TABLE IF NOT EXISTS `ke_brokers` (`cluster` varchar(64),`broker` varchar(64),`alive` varchar(4),`enable` varchar(4))";
 

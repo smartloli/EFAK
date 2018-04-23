@@ -29,6 +29,7 @@ import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
@@ -177,128 +178,52 @@ public class MetricsServiceImpl implements MetricsService {
 
 	/** Query MBean data in different dimensions. */
 	public String query(Map<String, Object> params) throws ParseException {
-		String type = params.get("type").toString();
-		List<KpiInfo> kpis = null;
-		if ("daily".equals(type)) {
-			kpis = mbeanDao.daily(params);
-		} else if ("day".equals(type)) {
-			kpis = mbeanDao.day(params);
-		}
-		JSONArray messageIns = new JSONArray();
-		JSONArray byteInOuts = new JSONArray();
-		JSONArray failedReqstProds = new JSONArray();
+
+		List<KpiInfo> kpis = mbeanDao.query(params);
+
+		// JSONArray messageIns = new JSONArray();
+		// JSONArray byteInOuts = new JSONArray();
+		// JSONArray failedReqstProds = new JSONArray();
 
 		JSONArray zkSendPackets = new JSONArray();
 		JSONArray zkReceivedPackets = new JSONArray();
-		JSONArray zkAvgLatency = new JSONArray();
 		JSONArray zkNumAliveConnections = new JSONArray();
 		JSONArray zkOutstandingRequests = new JSONArray();
-		JSONArray zkOpenFileDescriptorCount = new JSONArray();
+		String zks = "";
 		for (KpiInfo kpi : kpis) {
-			if (MBean.MESSAGEIN.equals(kpi.getKey())) {
-				assembly(type, messageIns, kpi);
+			if ("".equals(zks) || zks == null) {
+				zks = kpi.getBroker();
 			}
-
-			if (MBean.BYTEIN.equals(kpi.getKey()) || MBean.BYTEOUT.equals(kpi.getKey())) {
-				boolean flag = true;
-				for (Object object : byteInOuts) {
-					JSONObject byteInOut = (JSONObject) object;
-					if ("daily".equals(type)) {
-						if (byteInOut.getString("xkey").equals(CalendarUtils.convertDate2Date(kpi.getTm()) + " " + kpi.getHour() + ":00")) {
-							flag = false;
-							byteInOut.put(kpi.getKey(), StrUtils.numberic(kpi.getValue()));
-							break;
-						}
-					} else if ("day".equals(type)) {
-						if (byteInOut.getString("xkey").equals(CalendarUtils.convertDate2Date(kpi.getTm()))) {
-							flag = false;
-							byteInOut.put(kpi.getKey(), StrUtils.numberic(kpi.getValue()));
-							break;
-						}
-					}
-
-				}
-
-				if (flag) {
-					assembly(type, byteInOuts, kpi);
-				}
-			}
-
-			if (MBean.FAILEDFETCHREQUEST.equals(kpi.getKey()) || MBean.FAILEDPRODUCEREQUEST.equals(kpi.getKey())) {
-				boolean flag = true;
-				for (Object object : failedReqstProds) {
-					JSONObject failedReqstProd = (JSONObject) object;
-					if ("daily".equals(type)) {
-						if (failedReqstProd.getString("xkey").equals(CalendarUtils.convertDate2Date(kpi.getTm()) + " " + kpi.getHour() + ":00")) {
-							flag = false;
-							failedReqstProd.put(kpi.getKey(), StrUtils.numberic(kpi.getValue()));
-							break;
-						}
-					} else if ("day".equals(type)) {
-						if (failedReqstProd.getString("xkey").equals(CalendarUtils.convertDate2Date(kpi.getTm()))) {
-							flag = false;
-							failedReqstProd.put(kpi.getKey(), StrUtils.numberic(kpi.getValue()));
-							break;
-						}
-					}
-				}
-
-				if (flag) {
-					assembly(type, failedReqstProds, kpi);
-				}
-			}
-
-			// if (ZK.ZK_SEND_PACKETS.equals(kpi.getKey())) {
-			// assembly(type, zkSendPackets, kpi);
-			// }
-
 			switch (kpi.getKey()) {
 			case ZK.ZK_SEND_PACKETS:
-				assembly(type, zkSendPackets, kpi);
+				assembly(zkSendPackets, kpi);
 				break;
 			case ZK.ZK_RECEIVEDPACKETS:
-				assembly(type, zkReceivedPackets, kpi);
-				break;
-			case ZK.ZK_AVGLATENCY:
-				assembly(type, zkAvgLatency, kpi);
+				assembly(zkReceivedPackets, kpi);
 				break;
 			case ZK.ZK_OUTSTANDING_REQUESTS:
-				assembly(type, zkOutstandingRequests, kpi);
+				assembly(zkOutstandingRequests, kpi);
 				break;
 			case ZK.ZK_NUM_ALIVECONNRCTIONS:
-				assembly(type, zkNumAliveConnections, kpi);
-				break;
-			case ZK.ZK_OPENFILE_DESCRIPTOR_COUNT:
-				assembly(type, zkOpenFileDescriptorCount, kpi);
+				assembly(zkNumAliveConnections, kpi);
 				break;
 			default:
 				break;
 			}
 		}
-
 		JSONObject target = new JSONObject();
-		target.put("message", messageIns);
-		target.put("inout", byteInOuts);
-		target.put("failed", failedReqstProds);
-
 		target.put("send", zkSendPackets);
 		target.put("received", zkReceivedPackets);
 		target.put("queue", zkOutstandingRequests);
-		target.put("avg", zkAvgLatency);
-		target.put("openfile", zkOpenFileDescriptorCount);
 		target.put("alive", zkNumAliveConnections);
+		target.put("zks", zks.split(","));
 
 		return target.toJSONString();
 	}
 
-	private void assembly(String type, JSONArray assemblys, KpiInfo kpi) throws ParseException {
+	private void assembly(JSONArray assemblys, KpiInfo kpi) throws ParseException {
 		JSONObject object = new JSONObject();
-		if ("daily".equals(type)) {
-			object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()) + " " + kpi.getHour() + ":00");
-		} else if ("day".equals(type)) {
-			object.put("xkey", CalendarUtils.convertDate2Date(kpi.getTm()));
-		}
-		object.put(kpi.getKey(), StrUtils.numberic(kpi.getValue()));
+		object.put(kpi.getKey(), kpi.getValue());
 		assemblys.add(object);
 	}
 
