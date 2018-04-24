@@ -48,8 +48,8 @@ $(document).ready(function() {
 		labels : [],
 		pointSize : 2,
 		hideHover : 'auto',
-		pointFillColors : [ '#ffffff' ],
-		pointStrokeColors : [ 'black' ],
+		//pointFillColors : [ '#ffffff' ],
+		//pointStrokeColors : [ 'black' ],
 		resize : true
 	});
 
@@ -59,8 +59,8 @@ $(document).ready(function() {
 		xkey : 'y',
 		ykeys : [],
 		labels : [],
-		pointFillColors : [ '#ffffff' ],
-		pointStrokeColors : [ 'black' ],
+		//pointFillColors : [ '#ffffff' ],
+		//pointStrokeColors : [ 'black' ],
 		pointSize : 2,
 		hideHover : 'auto',
 		resize : true
@@ -72,8 +72,8 @@ $(document).ready(function() {
 		xkey : 'y',
 		ykeys : [],
 		labels : [],
-		pointFillColors : [ '#ffffff' ],
-		pointStrokeColors : [ 'black' ],
+		//pointFillColors : [ '#ffffff' ],
+		//pointStrokeColors : [ 'black' ],
 		pointSize : 2,
 		hideHover : 'auto',
 		resize : true
@@ -85,8 +85,8 @@ $(document).ready(function() {
 		xkey : 'y',
 		ykeys : [],
 		labels : [],
-		pointFillColors : [ '#ffffff' ],
-		pointStrokeColors : [ 'black' ],
+		//pointFillColors : [ '#ffffff' ],
+		//pointStrokeColors : [ 'black' ],
 		pointSize : 2,
 		hideHover : 'auto',
 		resize : true
