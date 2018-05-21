@@ -9,7 +9,7 @@
 	<artifactId>kafka-eagle-common</artifactId>
 
 	<properties>
-		<fasterxml.version>2.9.5</fasterxml.version>
+		<fasterxml.version>2.8.4</fasterxml.version>
 	</properties>
 
 	<repositories>
