@@ -42,6 +42,7 @@ import org.smartloli.kafka.eagle.common.protocol.offsets.KeyAndValueSchemasInfo;
 import org.smartloli.kafka.eagle.common.protocol.offsets.MessageValueStructAndVersionInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.common.util.LRUCacheUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -74,7 +75,10 @@ public class KafkaOffsetGetter extends Thread {
 	private final static String CONSUMER_OFFSET_TOPIC = KConstants.Kafka.CONSUMER_OFFSET_TOPIC;
 
 	/** Multi cluster information. */
-	public static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new ConcurrentHashMap<>();
+	// public static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>>
+	// multiKafkaConsumerOffsets = new ConcurrentHashMap<>();
+	/** Add LRCCache. */
+	public static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new LRUCacheUtils<>();
 
 	/** Kafka brokers */
 	private KafkaService kafkaService = new KafkaFactory().create();
