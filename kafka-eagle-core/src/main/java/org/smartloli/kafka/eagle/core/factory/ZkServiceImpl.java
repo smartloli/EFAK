@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants.Zookeeper;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
 
@@ -402,6 +403,20 @@ public class ZkServiceImpl implements ZkService {
 			zkc = null;
 		}
 		return target;
+	}
+
+	/** Find zookeeper leader node && reback. */
+	public String findZkLeader(String clusterAlias) {
+		String[] zks = SystemConfigUtils.getPropertyArray(clusterAlias + ".zk.list", ",");
+		String address = "";
+		for (String zk : zks) {
+			String status = status(zk.split(":")[0], zk.split(":")[1]);
+			if (Zookeeper.LEADER.equals(status)) {
+				address = zk;
+				break;
+			}
+		}
+		return address;
 	}
 
 }

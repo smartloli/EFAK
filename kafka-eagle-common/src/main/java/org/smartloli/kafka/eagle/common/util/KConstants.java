@@ -35,6 +35,9 @@ public class KConstants {
 	public interface Kafka {
 		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
 		public final static String KAFKA_EAGLE_SYSTEM_GROUP = "kafka.eagle.system.group";
+		public final static String AUTO_COMMIT = "true";
+		public final static String AUTO_COMMIT_MS = "1000";
+		public final static String EARLIEST = "earliest";
 		public final static String JAVA_SECURITY = "java.security.auth.login.config";
 		public final static int TIME_OUT = 100;
 		public final static long POSITION = 5000;// default 5000
@@ -132,6 +135,10 @@ public class KConstants {
 	public interface CollectorType {
 		public static final String ZK = "zookeeper";
 		public static final String KAFKA = "kafka";
+	}
+	
+	public interface Zookeeper{
+		public static final String LEADER="leader";
 	}
 
 }

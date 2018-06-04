@@ -15,27 +15,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.plugin.font;
+package org.smartloli.kafka.eagle.factory;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.Properties;
+
+import org.apache.kafka.common.security.JaasUtils;
+
+import kafka.admin.AdminUtils;
+import kafka.admin.RackAwareMode;
+import kafka.utils.ZkUtils;
 
 /**
- * Print kafka eagle system version.
+ * Test clazz.
  * 
  * @author smartloli.
  *
- *         Created by Jan 23, 2018
+ *         Created by Jun 1, 2018
  */
-public class KafkaEagleVersion {
-
-	public static void main(String[] args) throws IOException {
-		String name = System.getProperty("user.dir") + "/font/slant.flf";
-		File file = new File(name);
-		String asciiArt = FigletFont.convertOneLine(file, "KAfKA EAGLE");
-		System.out.println("Welcome to");
-		System.out.println(asciiArt);
-		System.out.println("Version 1.2.3");
+public class TestZkTopic {
+	public static void main(String[] args) {
+//		create();
+		delete();
 	}
 
+	public static void delete() {
+		ZkUtils zkUtils = ZkUtils.apply("localhost:2181", 30000, 30000, JaasUtils.isZkSecurityEnabled());
+		AdminUtils.deleteTopic(zkUtils, "tt1");
+		zkUtils.close();
+	}
+
+	public static void create() {
+		ZkUtils zkUtils = ZkUtils.apply("localhost:2181", 30000, 30000, JaasUtils.isZkSecurityEnabled());
+		AdminUtils.createTopic(zkUtils, "tt1", 1, 1, new Properties(), RackAwareMode.Enforced$.MODULE$);
+		zkUtils.close();
+	}
 }
