@@ -48,4 +48,6 @@ public interface UserDao {
 	public int delete(Signiner signin);
 	
 	public Signiner findUserById(int id);
+	
+	public Signiner findUserLimitOne();
 }

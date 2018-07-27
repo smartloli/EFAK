@@ -81,6 +81,8 @@
 							class="fa fa-edit fa-fw"></i> Create</a></li>
 					<li id="navbar_list"><a href="/ke/topic/list"><i
 							class="fa fa-table fa-fw"></i> List</a></li>
+					<%-- <li id="navbar_list"><a href="/ke/topic/export"><i
+							class="fa fa-download fa-fw"></i> Export</a></li> --%>
 					<li id="navbar_list"><a href="/ke/topic/message"><i
 							class="fa fa-file-text fa-fw"></i> Message</a></li>
 					<li id="navbar_list"><a href="/ke/topic/mock"><i

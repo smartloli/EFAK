@@ -103,4 +103,12 @@ public class AccountServiceImpl implements AccountService {
 		return object.toJSONString();
 	}
 
+	@Override
+	public String getAutoUserRtxNo() {
+		Signiner signer = userDao.findUserLimitOne();
+		JSONObject object = new JSONObject();
+		object.put("rtxno", signer.getRtxno()+1);
+		return object.toJSONString();
+	}
+
 }

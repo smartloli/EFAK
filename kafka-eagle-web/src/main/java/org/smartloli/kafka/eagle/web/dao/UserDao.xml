@@ -62,5 +62,9 @@
 		ke_users(rtxno,username,password,email,realname)
 		values(#{rtxno},#{username},#{password},#{email},#{realname})
 	</insert>
+	
+	<select id="findUserLimitOne" resultMap="signin">
+		select * from ke_users order by id desc limit 1
+	</select>
 
 </mapper>

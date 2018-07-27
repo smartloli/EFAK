@@ -126,7 +126,7 @@
 							<div id="remove_div" class="modal-footer">
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">Cancle</button>
-								<button type="submit" class="btn btn-primary" id="create-btn">Submit
+								<button type="submit" class="btn btn-primary" id="create-add">Submit
 								</button>
 							</div>
 						</form>
@@ -179,14 +179,14 @@
 										<input id="ke_user_id_modify" name="ke_user_id_modify"
 											type="hidden" class="form-control" placeholder="1000">
 										<input id="ke_rtxno_name_modify" name="ke_rtxno_name_modify" type="text"
-											class="form-control" placeholder="1000">
+											class="form-control" disabled placeholder="1000">
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">RealName</label>
 									<div class="col-sm-9">
 										<input id="ke_real_name_modify" name="ke_real_name_modify" type="text"
-											class="form-control" placeholder="萝莉">
+											class="form-control" placeholder="smartloli">
 									</div>
 								</div>
 								<div class="form-group">
@@ -212,7 +212,7 @@
 							<div id="remove_div" class="modal-footer">
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">Cancle</button>
-								<button type="submit" class="btn btn-primary" id="create-btn">Submit
+								<button type="submit" class="btn btn-primary" id="create-modify">Submit
 								</button>
 							</div>
 						</form>

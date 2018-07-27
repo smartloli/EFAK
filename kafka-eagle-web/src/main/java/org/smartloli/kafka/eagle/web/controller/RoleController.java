@@ -144,6 +144,17 @@ public class RoleController {
 			return "redirect:/errors/500";
 		}
 	}
+	
+	/** Get user rtxno. */
+	@RequestMapping(value = "/user/signin/rtxno/ajax/", method = RequestMethod.GET)
+	public void getUserRtxNo(HttpServletResponse response, HttpServletRequest request) {
+		try {
+			byte[] output = accountService.getAutoUserRtxNo().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
 	/** Delete user. */
 	@RequiresPermissions("/system/user/delete")

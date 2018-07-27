@@ -36,6 +36,15 @@ $(document).ready(function() {
 
 	$("#ke-add-user-btn").click(function() {
 		$('#ke_user_add_dialog').modal('show');
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/system/user/signin/rtxno/ajax/',
+			success : function(datas) {
+				$("#ke_rtxno_name").val(datas.rtxno);
+				$("#ke_rtxno_name").attr("readonly","readonly");
+			}
+		});
 	});
 
 	$(document).on('click', 'a[name=operater_modify_modal]', function() {

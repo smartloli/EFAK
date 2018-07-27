@@ -78,6 +78,15 @@ public class TopicController {
 		mav.setViewName("/topic/msg");
 		return mav;
 	}
+	
+	/** Topic message viewer. */
+	@RequiresPermissions("/topic/export")
+	@RequestMapping(value = "/topic/export", method = RequestMethod.GET)
+	public ModelAndView topicExportView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/topic/export");
+		return mav;
+	}
 
 	/** Topic mock viewer. */
 	@RequiresPermissions("/topic/mock")
