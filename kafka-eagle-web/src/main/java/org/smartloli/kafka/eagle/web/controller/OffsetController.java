@@ -58,7 +58,7 @@ public class OffsetController {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_consumers");
 		} else {
@@ -73,7 +73,7 @@ public class OffsetController {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_realtime");
 		} else {
@@ -102,7 +102,7 @@ public class OffsetController {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		JSONArray logSizes = JSON.parseArray(offsetService.getLogSize(clusterAlias, formatter, topic, group));
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();

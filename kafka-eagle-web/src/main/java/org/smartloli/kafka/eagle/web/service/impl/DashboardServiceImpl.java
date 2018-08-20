@@ -103,7 +103,7 @@ public class DashboardServiceImpl implements DashboardService {
 		dashboard.setBrokers(brokerSize);
 		dashboard.setTopics(topicSize);
 		dashboard.setZks(zks);
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		if ("kafka".equals(formatter)) {
 			dashboard.setConsumers(kafkaService.getKafkaConsumerGroups(clusterAlias));
 		} else {

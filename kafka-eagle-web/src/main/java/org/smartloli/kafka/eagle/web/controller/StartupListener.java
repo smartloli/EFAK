@@ -66,12 +66,15 @@ public class StartupListener implements ApplicationContextAware {
 
 	class RunTask extends Thread {
 		public void run() {
-			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-			if ("kafka".equals(formatter)) {
-				try {
-					KafkaOffsetGetter.getInstance();
-				} catch (Exception ex) {
-					LOG.error("Initialize KafkaOffsetGetter thread has error,msg is " + ex.getMessage());
+			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+			for (String clusterAlias : clusterAliass) {
+				String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+				if ("kafka".equals(formatter)) {
+					try {
+						KafkaOffsetGetter.getInstance();
+					} catch (Exception ex) {
+						LOG.error("Initialize KafkaOffsetGetter thread has error,msg is " + ex.getMessage());
+					}
 				}
 			}
 		}

@@ -102,7 +102,7 @@ public class AlarmController {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		try {
 			byte[] output = alarmService.get(clusterAlias, formatter).getBytes();
 			BaseController.response(output, response);

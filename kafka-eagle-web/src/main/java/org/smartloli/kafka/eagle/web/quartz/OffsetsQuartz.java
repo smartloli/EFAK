@@ -152,7 +152,7 @@ public class OffsetsQuartz {
 		try {
 			List<String> hosts = getBrokers(clusterAlias);
 			List<OffsetsLiteInfo> offsetLites = new ArrayList<OffsetsLiteInfo>();
-			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+			String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 			Map<String, List<String>> consumers = null;
 			if ("kafka".equals(formatter)) {
 				Map<String, List<String>> consumerGroupMap = new HashMap<String, List<String>>();

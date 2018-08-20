@@ -122,7 +122,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 */
 	private PartitionMetadata findLeader(List<String> a_seedBrokers, String a_topic, int a_partition) {
 		PartitionMetadata returnMetaData = null;
-		loop : for (String seed : a_seedBrokers) {
+		loop: for (String seed : a_seedBrokers) {
 			SimpleConsumer consumer = null;
 			try {
 				String ip = seed.split(":")[0];
@@ -571,7 +571,7 @@ public class KafkaServiceImpl implements KafkaService {
 			targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
 			return targets;
 		}
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		String zks = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
 		if ("kafka".equals(formatter)) {
 			ZkUtils zkUtils = ZkUtils.apply(zks, 30000, 30000, JaasUtils.isZkSecurityEnabled());
@@ -580,7 +580,7 @@ public class KafkaServiceImpl implements KafkaService {
 				zkUtils.close();
 			}
 		} else {
-			String[] options = new String[]{"--create", "--zookeeper", zks, "--partitions", partitions, "--topic", topicName, "--replication-factor", replic};
+			String[] options = new String[] { "--create", "--zookeeper", zks, "--partitions", partitions, "--topic", topicName, "--replication-factor", replic };
 			TopicCommand.main(options);
 		}
 		targets.put("status", "success");
@@ -592,7 +592,7 @@ public class KafkaServiceImpl implements KafkaService {
 	public Map<String, Object> delete(String clusterAlias, String topicName) {
 		Map<String, Object> targets = new HashMap<String, Object>();
 		ZkClient zkc = zkPool.getZkClient(clusterAlias);
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		String zks = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
 		if ("kafka".equals(formatter)) {
 			ZkUtils zkUtils = ZkUtils.apply(zks, 30000, 30000, JaasUtils.isZkSecurityEnabled());
@@ -601,7 +601,7 @@ public class KafkaServiceImpl implements KafkaService {
 				zkUtils.close();
 			}
 		} else {
-			String[] options = new String[]{"--delete", "--zookeeper", zks, "--topic", topicName};
+			String[] options = new String[] { "--delete", "--zookeeper", zks, "--topic", topicName };
 			TopicCommand.main(options);
 		}
 		targets.put("status", zkc.deleteRecursive(ZkUtils.getTopicPath(topicName)) == true ? "success" : "failed");
@@ -692,7 +692,7 @@ public class KafkaServiceImpl implements KafkaService {
 			JSONObject broker = (JSONObject) object;
 			brokerServer += broker.getString("host") + ":" + broker.getInteger("port") + ",";
 		}
-		if("".equals(brokerServer)){
+		if ("".equals(brokerServer)) {
 			return "";
 		}
 		return brokerServer.substring(0, brokerServer.length() - 1);
