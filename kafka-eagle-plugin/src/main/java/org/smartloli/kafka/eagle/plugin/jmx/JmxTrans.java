@@ -55,7 +55,7 @@ public class JmxTrans {
 			ex.printStackTrace();
 		}
 	}
-
+	
 	/** Get memory by address(ip:port), such as 127.0.0.1:9999 . */
 	public static long jvmMem(String address) {
 		long memSize = 0L;
