@@ -112,7 +112,7 @@
 					<li id="navbar_cli"><a href="/ke/metrics/zk"><i
 							class="fa fa-area-chart fa-fw"></i> Zookeeper</a></li>
 				</ul></li>
-			<li><a href="#" data-toggle="collapse" data-target="#demo1"><i
+			<!-- <li><a href="#" data-toggle="collapse" data-target="#demo1"><i
 					class="fa fa-fw fa-bell"></i> Alarm <i
 					class="fa fa-fw fa-caret-down"></i></a>
 				<ul id="demo1" class="collapse">
@@ -120,7 +120,37 @@
 							class="fa fa-info-circle fa-fw"></i> Add</a></li>
 					<li id="navbar_modify"><a href="/ke/alarm/modify"><i
 							class="fa fa-edit fa-fw"></i> Modify</a></li>
+				</ul></li> -->
+			<li><a href="#" data-toggle="collapse" data-target="#demo1"><i
+					class="fa fa-fw fa-bell"></i> Alarm <i
+					class="fa fa-fw fa-caret-down"></i></a>
+				<ul id="demo1" class="collapse">
+					<li><a href="#" data-toggle="collapse" data-target="#demo1_1"><i
+							class="fa fa-fw fa-users"></i> Consumer <i
+							class="fa fa-fw fa-caret-down"></i></a>
+						<ul id="demo1_1" class="collapse"
+							style="list-style: none; margin-left: -40px">
+							<li id="navbar_add"><a href="/ke/alarm/add"
+								style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;"><i
+									class="fa fa-info-circle fa-fw"></i> Add</a></li>
+							<li id="navbar_modify"><a href="/ke/alarm/modify"
+								style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;"><i
+									class="fa fa-edit fa-fw"></i> Modify</a></li>
+						</ul></li>
+					<li><a href="#" data-toggle="collapse" data-target="#demo1_2"><i
+							class="fa fa-fw fa-cloud"></i> Cluster <i
+							class="fa fa-fw fa-caret-down"></i></a>
+						<ul id="demo1_2" class="collapse"
+							style="list-style: none; margin-left: -40px">
+							<li id="navbar_create"><a href="/ke/alarm/create"
+								style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;"><i
+									class="fa fa-info-circle fa-fw"></i> Create</a></li>
+							<li id="navbar_history"><a href="/ke/alarm/history"
+								style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;"><i
+									class="fa fa-edit fa-fw"></i> History</a></li>
+						</ul></li>
 				</ul></li>
+
 			<c:if test="${WHETHER_SYSTEM_ADMIN==1}">
 				<li><a href="#" data-toggle="collapse" data-target="#demo3"><i
 						class="fa fa-fw fa-cog"></i> System <i

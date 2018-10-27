@@ -44,4 +44,7 @@ public interface MetricsDao {
 
 	/** Delete alert by id. */
 	public int deleteAlertById(int id);
+
+	/** Find alert info by id. */
+	public AlertInfo findAlertById(int id);
 }

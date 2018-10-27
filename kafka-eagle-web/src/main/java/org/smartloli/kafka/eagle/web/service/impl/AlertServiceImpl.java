@@ -55,12 +55,6 @@ public class AlertServiceImpl implements AlertService {
 		return metrics.insertAlert(alert);
 	}
 
-	@Override
-	public void delete(int id) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public String get(String clusterAlias, String formatter) {
 		if ("kafka".equals(formatter)) {
 			return getKafka(clusterAlias);
@@ -113,6 +107,15 @@ public class AlertServiceImpl implements AlertService {
 	@Override
 	public int deleteAlertById(int id) {
 		return metrics.deleteAlertById(id);
+	}
+
+	@Override
+	public String findAlertById(int id) {
+		AlertInfo alert = metrics.findAlertById(id);
+		JSONObject object = new JSONObject();
+		object.put("lag", alert.getLag());
+		object.put("owners", alert.getOwner());
+		return object.toJSONString();
 	}
 
 }

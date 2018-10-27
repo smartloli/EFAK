@@ -205,10 +205,10 @@ public class AlarmController {
 			obj.put("group", alertInfo.getGroup());
 			obj.put("topic", alertInfo.getTopic());
 			obj.put("lag", alertInfo.getLag());
-			obj.put("owner", alertInfo.getOwner());
+			obj.put("owner", alertInfo.getOwner().length() > 30 ? alertInfo.getOwner().substring(0, 30) + "..." : alertInfo.getOwner());
 			obj.put("created", alertInfo.getCreated());
 			obj.put("modify", alertInfo.getModify());
-			obj.put("operate", "<a name='remove' href='#" + alertInfo.getId() + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
+			obj.put("operate", "<a name='remove' href='#" + alertInfo.getId() + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp<a name='modify' href='#" + alertInfo.getId() + "' class='btn btn-warning btn-xs'>Modify</a>&nbsp");
 			aaDatas.add(obj);
 		}
 
@@ -233,6 +233,28 @@ public class AlarmController {
 			return new ModelAndView("redirect:/alarm/modify");
 		} else {
 			return new ModelAndView("redirect:/errors/500");
+		}
+	}
+
+	/** Modify alarmer. */
+	@RequestMapping(value = "/alarm/{id}/modify", method = RequestMethod.GET)
+	public ModelAndView alarmModify(@PathVariable("id") int id, HttpServletRequest request) {
+		int code = alertService.deleteAlertById(id);
+		if (code > 0) {
+			return new ModelAndView("redirect:/alarm/modify");
+		} else {
+			return new ModelAndView("redirect:/errors/500");
+		}
+	}
+
+	/** Get alert info. */
+	@RequestMapping(value = "/alarm/consumer/modify/{id}/ajax", method = RequestMethod.GET)
+	public void findUserByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			byte[] output = alertService.findAlertById(id).getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 }

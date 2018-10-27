@@ -16,18 +16,25 @@ $(document).ready(function() {
 	} else if (ret.indexOf("/alarm") > -1) {
 		$("#demo1").addClass('collapse in');
 		$("#demo1").attr("aria-expanded", true);
-	}else if (ret.indexOf("/system") > -1) {
+		if (ret.indexOf("/alarm/add") > -1 || ret.indexOf("/alarm/modify") > -1) {
+			$("#demo1_1").addClass('collapse in');
+			$("#demo1_1").attr("aria-expanded", true);
+		} else {
+			$("#demo1_2").addClass('collapse in');
+			$("#demo1_2").attr("aria-expanded", true);
+		}
+	} else if (ret.indexOf("/system") > -1) {
 		$("#demo3").addClass('collapse in');
 		$("#demo3").attr("aria-expanded", true);
-	}else if (ret.indexOf("/metrics") > -1) {
+	} else if (ret.indexOf("/metrics") > -1) {
 		$("#demo4").addClass('collapse in');
 		$("#demo4").attr("aria-expanded", true);
 	}
-	
+
 	$(document).on('click', 'a[name=ke_account_reset]', function() {
 		$('#ke_account_reset_dialog').modal('show');
 		$(".modal-backdrop").css({
-			"z-index": "999"
+			"z-index" : "999"
 		});
 	});
 });

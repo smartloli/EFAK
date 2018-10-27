@@ -89,6 +89,52 @@
 					</div>
 				</div>
 			</div>
+			<!-- modify -->
+			<div class="modal fade" aria-labelledby="keModalLabelModify"
+				aria-hidden="true" id="modfiy_info" tabindex="-1" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabelModify">Modify</h4>
+						</div>
+						<!-- /.row -->
+						<form role="form" action="/ke/alarm/consumer/modify/"
+							method="post"
+							onsubmit="return contextModifyFormValid();return false;">
+							<fieldset class="form-horizontal">
+								<div class="form-group">
+									<label for="path" class="col-sm-2 control-label">Lag</label>
+									<div class="col-sm-9">
+										<input id="ke_consumer_id_lag" name="ke_consumer_id_lag"
+											type="hidden" class="form-control" placeholder=""> <input
+											id="ke_consumer_name_lag" name="ke_consumer_name_lag"
+											type="text" class="form-control" placeholder="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="path" class="col-sm-2 control-label">Owners</label>
+									<div class="col-sm-9">
+										<textarea id="ke_owners_modify" name="ke_owners_modify"
+											class="form-control" rows="3"></textarea>
+									</div>
+								</div>
+								<div id="alert_message_modify" style="display: none"
+									class="alert alert-danger">
+									<label> Oops! Please make some changes .</label>
+								</div>
+							</fieldset>
+
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Cancle</button>
+								<button type="submit" class="btn btn-primary" id="create-modify">Submit
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
 		<!-- /#page-wrapper -->
 	</div>

@@ -25,7 +25,7 @@
 		<where>
 			`cluster`=#{cluster}
 			<if test="search!=null and search!=''">
-				`group`=#{search} or `topic`=#{search}
+				and (`group`=#{search} or `topic`=#{search})
 			</if>
 		</where>
 		order by `id` desc limit #{start},#{size}
@@ -47,5 +47,9 @@
 		ke_alarm
 		where `id`=#{id}
 	</delete>
+
+	<select id="findAlertById" parameterType="Integer" resultMap="alert">
+		select * from ke_alarm where `id`=#{id}
+	</select>
 
 </mapper>

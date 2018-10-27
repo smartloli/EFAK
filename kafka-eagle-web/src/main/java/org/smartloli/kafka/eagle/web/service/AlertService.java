@@ -36,9 +36,6 @@ public interface AlertService {
 	/** Add alerter interface. */
 	public int add(AlertInfo alert);
 
-	/** Delete alarmer interface. */
-	public void delete(int id);
-
 	/** Get alarmer interface. */
 	public String get(String clusterAlias, String formatter);
 
@@ -47,11 +44,14 @@ public interface AlertService {
 
 	/** Count alert size. */
 	public int alertCount();
-	
+
 	/** find alert by cluster_group_topic from table. */
 	public int findAlertByCGT(Map<String, Object> params);
-	
+
 	/** Delete alert by id. */
 	public int deleteAlertById(int id);
+
+	/** Find alert info by id. */
+	public String findAlertById(int id);
 
 }

@@ -54,4 +54,30 @@ $(document).ready(function() {
 			transform : 'translateX(-50%) translateY(-50%)'
 		});
 	});
+
+	$(document).on('click', 'a[name=modify]', function() {
+		var href = $(this).attr("href");
+		var id = href.split("#")[1].split("/")[0];
+		$('#modfiy_info').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+		$('#modfiy_info').modal('show').css({
+			position : 'fixed',
+			left : '50%',
+			top : '50%',
+			transform : 'translateX(-50%) translateY(-50%)'
+		});
+		console.log("id:" + id);
+		
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/alarm/consumer/modify/' + id + '/ajax',
+			success : function(datas) {
+				$("#ke_consumer_name_lag").val(datas.lag);
+				$("#ke_owners_modify").val(datas.owners);
+			}
+		});
+	});
 });
