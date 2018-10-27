@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.smartloli.kafka.eagle.web.dao.MetricsDao">
+
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.AlertInfo"
+		id="alert">
+		<result property="id" column="id" />
+		<result property="cluster" column="cluster" />
+		<result property="group" column="group" />
+		<result property="topic" column="topic" />
+		<result property="lag" column="lag" />
+		<result property="owner" column="owner" />
+		<result property="created" column="created" />
+		<result property="modify" column="modify" />
+	</resultMap>
+
+	<insert id="insertAlert" parameterType="org.smartloli.kafka.eagle.common.protocol.AlertInfo">
+		insert into
+		ke_alarm(`cluster`,`group`,`topic`,`lag`,`owner`,`created`,`modify`)
+		value(#{cluster},#{group},#{topic},#{lag},#{owner},#{created},#{modify})
+	</insert>
+
+	<select id="query" parameterType="map" resultMap="alert">
+		select * from ke_alarm
+		<where>
+			`cluster`=#{cluster}
+			<if test="search!=null and search!=''">
+				`group`=#{search} or `topic`=#{search}
+			</if>
+		</where>
+		order by `id` desc limit #{start},#{size}
+	</select>
+
+	<select id="alertCount" resultType="Integer">
+		select count(*) from ke_alarm
+	</select>
+
+	<select id="findAlertByCGT" parameterType="map" resultType="Integer">
+		select count(*) from ke_alarm
+		<where>
+			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
+		</where>
+	</select>
+
+	<delete id="deleteAlertById" parameterType="Integer">
+		delete from
+		ke_alarm
+		where `id`=#{id}
+	</delete>
+
+</mapper>

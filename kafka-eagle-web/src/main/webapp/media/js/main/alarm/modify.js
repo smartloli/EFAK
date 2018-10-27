@@ -18,7 +18,7 @@ $(document).ready(function() {
 			"mData" : 'created'
 		}, {
 			"mData" : 'modify'
-		},{
+		}, {
 			"mData" : 'operate'
 		} ]
 	});
@@ -40,10 +40,9 @@ $(document).ready(function() {
 
 	$(document).on('click', 'a[name=remove]', function() {
 		var href = $(this).attr("href");
-		var group = href.split("#")[1].split("/")[0];
-		var topic = href.split("#")[1].split("/")[1];
+		var id = href.split("#")[1].split("/")[0];
 		$("#remove_div").html("");
-		$("#remove_div").append("<a href='/ke/alarm/" + group + "/" + topic + "/del' class='btn btn-danger'>Remove</a>");
+		$("#remove_div").append("<a href='/ke/alarm/" + id + "/del' class='btn btn-danger'>Remove</a>");
 		$('#doc_info').modal({
 			backdrop : 'static',
 			keyboard : false

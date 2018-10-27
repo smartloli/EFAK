@@ -17,9 +17,10 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
+import java.util.List;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
+import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 
 /**
  * Alarm service interface.
@@ -30,18 +31,27 @@ import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
  * 
  *         Update by hexiang 20170216
  */
-public interface AlarmService {
+public interface AlertService {
 
-	/** Add alarmer interface. */
-	public Map<String, Object> add(String clusterAlias, AlarmInfo alarm);
+	/** Add alerter interface. */
+	public int add(AlertInfo alert);
 
 	/** Delete alarmer interface. */
-	public void delete(String clusterAlias, String group, String topic);
+	public void delete(int id);
 
 	/** Get alarmer interface. */
 	public String get(String clusterAlias, String formatter);
 
 	/** List alarmer information. */
-	public String list(String clusterAlias);
+	public List<AlertInfo> list(Map<String, Object> params);
+
+	/** Count alert size. */
+	public int alertCount();
+	
+	/** find alert by cluster_group_topic from table. */
+	public int findAlertByCGT(Map<String, Object> params);
+	
+	/** Delete alert by id. */
+	public int deleteAlertById(int id);
 
 }

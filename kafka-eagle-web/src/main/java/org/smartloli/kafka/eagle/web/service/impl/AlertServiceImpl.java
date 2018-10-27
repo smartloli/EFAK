@@ -17,71 +17,48 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
+import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.web.dao.MetricsDao;
+import org.smartloli.kafka.eagle.web.service.AlertService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
-import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
-import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.factory.ZkFactory;
-import org.smartloli.kafka.eagle.core.factory.ZkService;
-import org.smartloli.kafka.eagle.web.service.AlarmService;
-import org.springframework.stereotype.Service;
 
 /**
  * Alarm implements service to get configure info.
  *
  * @Author smartloli.
  *
- *         Created by Sep 6, 2016.
+ *         Created by Oct 27, 2018.
  * 
- *         Update by hexiang 20170216
  */
 @Service
-public class AlarmServiceImpl implements AlarmService {
+public class AlertServiceImpl implements AlertService {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
-	/** Zookeeper service interface. */
-	private ZkService zkService = new ZkFactory().create();
+	@Autowired
+	private MetricsDao metrics;
 
-	/**
-	 * Add alarmer information.
-	 * 
-	 * @param alarm
-	 *            AlarmDomain object
-	 * @return Map.
-	 * 
-	 * @see org.smartloli.kafka.eagle.domain.AlarmDomain
-	 */
-	public Map<String, Object> add(String clusterAlias, AlarmInfo alarm) {
-		Map<String, Object> alarmStates = new HashMap<String, Object>();
-		int status = zkService.insertAlarmConfigure(clusterAlias, alarm);
-		if (status == -1) {
-			alarmStates.put("status", "error");
-			alarmStates.put("info", "insert [" + alarm + "] has error!");
-		} else {
-			alarmStates.put("status", "success");
-			alarmStates.put("info", "insert success!");
-		}
-		return alarmStates;
+	@Override
+	public int add(AlertInfo alert) {
+		return metrics.insertAlert(alert);
 	}
 
-	/**
-	 * Group and topic as a condition to delete alarmer.
-	 * 
-	 * @param group
-	 * @param topic
-	 */
-	public void delete(String clusterAlias, String group, String topic) {
-		zkService.remove(clusterAlias, group, topic, "alarm");
+	@Override
+	public void delete(int id) {
+		// TODO Auto-generated method stub
+
 	}
 
 	public String get(String clusterAlias, String formatter) {
@@ -92,7 +69,7 @@ public class AlarmServiceImpl implements AlarmService {
 		}
 	}
 
-	/** Get alarmer topics. */
+	/** Get consumer topics to alert. */
 	private String get(String clusterAlias) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
 		JSONArray topics = new JSONArray();
@@ -118,9 +95,24 @@ public class AlarmServiceImpl implements AlarmService {
 		return topics.toJSONString();
 	}
 
-	/** List alarmer datasets. */
-	public String list(String clusterAlias) {
-		return zkService.getAlarm(clusterAlias);
+	@Override
+	public List<AlertInfo> list(Map<String, Object> params) {
+		return metrics.query(params);
+	}
+
+	@Override
+	public int alertCount() {
+		return metrics.alertCount();
+	}
+
+	@Override
+	public int findAlertByCGT(Map<String, Object> params) {
+		return metrics.findAlertByCGT(params);
+	}
+
+	@Override
+	public int deleteAlertById(int id) {
+		return metrics.deleteAlertById(id);
 	}
 
 }
