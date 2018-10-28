@@ -14,10 +14,21 @@
 		<result property="modify" column="modify" />
 	</resultMap>
 
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.ClustersInfo"
+		id="clustersInfo">
+		<result property="id" column="id" />
+		<result property="type" column="type" />
+		<result property="cluster" column="cluster" />
+		<result property="server" column="server" />
+		<result property="owner" column="owner" />
+		<result property="created" column="created" />
+		<result property="modify" column="modify" />
+	</resultMap>
+
 	<insert id="insertAlert" parameterType="org.smartloli.kafka.eagle.common.protocol.AlertInfo">
 		insert into
 		ke_alarm(`cluster`,`group`,`topic`,`lag`,`owner`,`created`,`modify`)
-		value(#{cluster},#{group},#{topic},#{lag},#{owner},#{created},#{modify})
+		values(#{cluster},#{group},#{topic},#{lag},#{owner},#{created},#{modify})
 	</insert>
 
 	<select id="query" parameterType="map" resultMap="alertInfo">
@@ -31,8 +42,9 @@
 		order by `id` desc limit #{start},#{size}
 	</select>
 
-	<select id="alertCount" resultType="Integer">
-		select count(*) from ke_alarm
+	<select id="alertCount" parameterType="map" resultType="Integer">
+		select
+		count(*) from ke_alarm where `cluster`=#{cluster}
 	</select>
 
 	<select id="isExistAlertByCGT" parameterType="map" resultType="Integer">
@@ -64,5 +76,50 @@
 		`lag`=#{lag},`owner`=#{owner},`modify`=#{modify} where
 		`id`=#{id}
 	</update>
+
+	<insert id="insertKafkaOrZK"
+		parameterType="org.smartloli.kafka.eagle.common.protocol.ClustersInfo">
+		insert into
+		ke_clusters(`type`,`cluster`,`server`,`owner`,`created`,`modify`)
+		values(#{type},#{cluster},#{server},#{owner},#{created},#{modify})
+	</insert>
+
+	<select id="history" parameterType="map" resultMap="clustersInfo">
+		select * from ke_clusters
+		<where>
+			`cluster`=#{cluster}
+			<if test="search!=null and search!=''">
+				and (`id`=#{search} or `type`=#{search})
+			</if>
+		</where>
+		order by `id` desc limit #{start},#{size}
+	</select>
+
+	<select id="alertHistoryCount" parameterType="map" resultType="Integer">
+		select
+		count(*) from ke_clusters where `cluster`=#{cluster}
+	</select>
+
+	<delete id="deleteClusterAlertById" parameterType="Integer">
+		delete from
+		ke_clusters
+		where `id`=#{id}
+	</delete>
+
+	<select id="findClusterAlertById" parameterType="Integer"
+		resultMap="clustersInfo">
+		select * from ke_clusters where `id`=#{id}
+	</select>
+
+	<update id="modifyClusterAlertById"
+		parameterType="org.smartloli.kafka.eagle.common.protocol.ClustersInfo">
+		update ke_clusters set
+		`server`=#{server},`owner`=#{owner} where
+		`id`=#{id}
+	</update>
+
+	<select id="historys" resultMap="clustersInfo">
+		select * from ke_clusters
+	</select>
 
 </mapper>

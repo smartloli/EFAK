@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
+import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 
 /**
  * Store kafka alert data & metrics data into database.
@@ -37,7 +38,7 @@ public interface AlertDao {
 	/** Query collector data. */
 	public List<AlertInfo> query(Map<String, Object> params);
 
-	public int alertCount();
+	public int alertCount(Map<String, Object> params);
 
 	/** Exist alert by cluster_group_topic from table. */
 	public int isExistAlertByCGT(Map<String, Object> params);
@@ -51,9 +52,27 @@ public interface AlertDao {
 	/** Find alert info by id. */
 	public AlertInfo findAlertById(int id);
 
-	/** Find alert info by id. */
+	/** Modify alert info by id. */
 	public int modifyAlertById(AlertInfo alert);
 
 	/** Insert alert data into db. */
-	public int insertKafkaOrZK();
+	public int insertKafkaOrZK(ClustersInfo clusterInfo);
+	
+	/** Query cluster collector data. */
+	public List<ClustersInfo> history(Map<String, Object> params);
+	
+	public int alertHistoryCount(Map<String, Object> params);
+	
+	/** Delete alert by id. */
+	public int deleteClusterAlertById(int id);
+	
+	/** Find alert info by id. */
+	public ClustersInfo findClusterAlertById(int id);
+	
+	/** Modify alert info by id. */
+	public int modifyClusterAlertById(ClustersInfo cluster);
+	
+	/** Query clusters collector data. */
+	public List<ClustersInfo> historys();
+	
 }

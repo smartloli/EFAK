@@ -24,6 +24,70 @@ package org.smartloli.kafka.eagle.common.protocol;
  *
  *         Created by Oct 28, 2018
  */
-public class ClustersInfo {
+public class ClustersInfo extends BaseProtocol {
+
+	private int id;
+	private String type;
+	private String cluster;// ClusterAlias
+	private String server;
+	private String owner;
+	private String created;
+	private String modify;
+
+	public String getCluster() {
+		return cluster;
+	}
+
+	public void setCluster(String cluster) {
+		this.cluster = cluster;
+	}
+
+	public String getServer() {
+		return server;
+	}
+
+	public void setServer(String server) {
+		this.server = server;
+	}
+
+	public String getCreated() {
+		return created;
+	}
+
+	public void setCreated(String created) {
+		this.created = created;
+	}
+
+	public String getModify() {
+		return modify;
+	}
+
+	public void setModify(String modify) {
+		this.modify = modify;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 }

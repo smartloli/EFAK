@@ -40,6 +40,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
+import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -72,6 +73,15 @@ public class AlarmController {
 		return mav;
 	}
 
+	/** Create cluster alarmer viewer. */
+	@RequiresPermissions("/alarm/create")
+	@RequestMapping(value = "/alarm/create", method = RequestMethod.GET)
+	public ModelAndView createView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/alarm/create");
+		return mav;
+	}
+
 	/** Modify alarmer viewer. */
 	@RequiresPermissions("/alarm/modify")
 	@RequestMapping(value = "/alarm/modify", method = RequestMethod.GET)
@@ -81,19 +91,44 @@ public class AlarmController {
 		return mav;
 	}
 
+	/** Modify alarmer viewer. */
+	@RequiresPermissions("/alarm/history")
+	@RequestMapping(value = "/alarm/history", method = RequestMethod.GET)
+	public ModelAndView historyView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/alarm/history");
+		return mav;
+	}
+
 	/** Create alarmer success viewer. */
-	@RequestMapping(value = "/alarm/create/success", method = RequestMethod.GET)
-	public ModelAndView successView(HttpSession session) {
+	@RequestMapping(value = "/alarm/add/success", method = RequestMethod.GET)
+	public ModelAndView addSuccessView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/alarm/add_success");
 		return mav;
 	}
 
 	/** Create alarmer failed viewer. */
-	@RequestMapping(value = "/alarm/create/failed", method = RequestMethod.GET)
-	public ModelAndView failedView(HttpSession session) {
+	@RequestMapping(value = "/alarm/add/failed", method = RequestMethod.GET)
+	public ModelAndView addFailedView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/alarm/add_failed");
+		return mav;
+	}
+
+	/** Create alarmer success viewer. */
+	@RequestMapping(value = "/alarm/create/success", method = RequestMethod.GET)
+	public ModelAndView createSuccessView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/alarm/create_success");
+		return mav;
+	}
+
+	/** Create alarmer failed viewer. */
+	@RequestMapping(value = "/alarm/create/failed", method = RequestMethod.GET)
+	public ModelAndView createFailedView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/alarm/create_failed");
 		return mav;
 	}
 
@@ -152,17 +187,17 @@ public class AlarmController {
 		if (findCode > 0) {
 			session.removeAttribute("Alarm_Submit_Status");
 			session.setAttribute("Alarm_Submit_Status", "Insert failed,msg is group[" + alert.getGroup() + "] and topic[" + alert.getTopic() + "] has exist.");
-			mav.setViewName("redirect:/alarm/create/failed");
+			mav.setViewName("redirect:/alarm/add/failed");
 		} else {
 			int code = alertService.add(alert);
 			if (code > 0) {
 				session.removeAttribute("Alarm_Submit_Status");
 				session.setAttribute("Alarm_Submit_Status", "Insert success.");
-				mav.setViewName("redirect:/alarm/create/success");
+				mav.setViewName("redirect:/alarm/add/success");
 			} else {
 				session.removeAttribute("Alarm_Submit_Status");
 				session.setAttribute("Alarm_Submit_Status", "Insert failed.");
-				mav.setViewName("redirect:/alarm/create/failed");
+				mav.setViewName("redirect:/alarm/add/failed");
 			}
 		}
 
@@ -214,8 +249,8 @@ public class AlarmController {
 
 		JSONObject target = new JSONObject();
 		target.put("sEcho", sEcho);
-		target.put("iTotalRecords", alertService.alertCount());
-		target.put("iTotalDisplayRecords", alertService.alertCount());
+		target.put("iTotalRecords", alertService.alertCount(map));
+		target.put("iTotalDisplayRecords", alertService.alertCount(map));
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
@@ -249,7 +284,7 @@ public class AlarmController {
 
 	/** Get alert info. */
 	@RequestMapping(value = "/alarm/consumer/modify/{id}/ajax", method = RequestMethod.GET)
-	public void findUserByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
+	public void findAlertByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			byte[] output = alertService.findAlertById(id).getBytes();
 			BaseController.response(output, response);
@@ -274,6 +309,140 @@ public class AlarmController {
 
 		if (alertService.modifyAlertById(alert) > 0) {
 			return "redirect:/alarm/modify";
+		} else {
+			return "redirect:/errors/500";
+		}
+	}
+
+	/** Create alarmer form. */
+	@RequestMapping(value = "/alarm/create/form", method = RequestMethod.POST)
+	public ModelAndView alarmCreateForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		String ke_type_alarm_id = request.getParameter("ke_type_alarm_id");
+		String ke_server_alarm = request.getParameter("ke_server_alarm");
+		String ke_cluster_email = request.getParameter("ke_cluster_email");
+		JSONArray types = JSON.parseArray(ke_type_alarm_id);
+		ClustersInfo clusterInfo = new ClustersInfo();
+		for (Object object : types) {
+			JSONObject type = (JSONObject) object;
+			clusterInfo.setType(type.getString("name"));
+		}
+
+		clusterInfo.setOwner(ke_cluster_email);
+		clusterInfo.setServer(ke_server_alarm);
+		clusterInfo.setCreated(CalendarUtils.getDate());
+		clusterInfo.setModify(CalendarUtils.getDate());
+
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		clusterInfo.setCluster(clusterAlias);
+		int code = alertService.create(clusterInfo);
+		if (code > 0) {
+			session.removeAttribute("Alarm_Submit_Status");
+			session.setAttribute("Alarm_Submit_Status", "Insert success.");
+			mav.setViewName("redirect:/alarm/create/success");
+		} else {
+			session.removeAttribute("Alarm_Submit_Status");
+			session.setAttribute("Alarm_Submit_Status", "Insert failed.");
+			mav.setViewName("redirect:/alarm/create/failed");
+		}
+
+		return mav;
+	}
+
+	/** Get alarmer cluster history datasets by ajax. */
+	@RequestMapping(value = "/alarm/history/table/ajax", method = RequestMethod.GET)
+	public void alarmClusterHistoryAjax(HttpServletResponse response, HttpServletRequest request) {
+		String aoData = request.getParameter("aoData");
+		JSONArray params = JSON.parseArray(aoData);
+		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+		String search = "";
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
+			} else if ("sSearch".equals(param.getString("name"))) {
+				search = param.getString("value");
+			}
+		}
+
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("cluster", clusterAlias);
+		map.put("search", search);
+		map.put("start", iDisplayStart);
+		map.put("size", iDisplayLength);
+
+		List<ClustersInfo> clusters = alertService.history(map);
+		JSONArray aaDatas = new JSONArray();
+		for (ClustersInfo clustersInfo : clusters) {
+			JSONObject obj = new JSONObject();
+			obj.put("id", clustersInfo.getId());
+			obj.put("type", clustersInfo.getType());
+			obj.put("cluster", clustersInfo.getCluster());
+			obj.put("server", clustersInfo.getServer().length() > 30 ? clustersInfo.getServer().substring(0, 30) + "..." : clustersInfo.getServer());
+			obj.put("owner", clustersInfo.getOwner().length() > 30 ? clustersInfo.getOwner().substring(0, 30) + "..." : clustersInfo.getOwner());
+			obj.put("created", clustersInfo.getCreated());
+			obj.put("modify", clustersInfo.getModify());
+			obj.put("operate", "<a name='remove' href='#" + clustersInfo.getId() + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp<a name='modify' href='#" + clustersInfo.getId() + "' class='btn btn-warning btn-xs'>Modify</a>&nbsp");
+			aaDatas.add(obj);
+		}
+
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", alertService.alertHistoryCount(map));
+		target.put("iTotalDisplayRecords", alertService.alertHistoryCount(map));
+		target.put("aaData", aaDatas);
+		try {
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Delete alarmer. */
+	@RequestMapping(value = "/alarm/history/{id}/del", method = RequestMethod.GET)
+	public ModelAndView alarmClusterDelete(@PathVariable("id") int id, HttpServletRequest request) {
+		int code = alertService.deleteClusterAlertById(id);
+		if (code > 0) {
+			return new ModelAndView("redirect:/alarm/history");
+		} else {
+			return new ModelAndView("redirect:/errors/500");
+		}
+	}
+
+	/** Get alert info. */
+	@RequestMapping(value = "/alarm/history/modify/{id}/ajax", method = RequestMethod.GET)
+	public void findClusterAlertByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			byte[] output = alertService.findClusterAlertById(id).getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Modify consumer topic alert info. */
+	@RequestMapping(value = "/alarm/history/modify/", method = RequestMethod.POST)
+	public String modifyClusterAlertInfo(HttpSession session, HttpServletRequest request) {
+		String id = request.getParameter("ke_history_id_lag");
+		String server = request.getParameter("ke_history_name_lag");
+		String owners = request.getParameter("ke_owners_modify");
+
+		ClustersInfo cluster = new ClustersInfo();
+		cluster.setId(Integer.parseInt(id));
+		cluster.setServer(server);
+		cluster.setOwner(owners);
+		cluster.setModify(CalendarUtils.getDate());
+
+		if (alertService.modifyClusterAlertById(cluster) > 0) {
+			return "redirect:/alarm/history";
 		} else {
 			return "redirect:/errors/500";
 		}

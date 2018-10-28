@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
+import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.dao.AlertDao;
@@ -95,8 +96,8 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public int alertCount() {
-		return alertDao.alertCount();
+	public int alertCount(Map<String, Object> params) {
+		return alertDao.alertCount(params);
 	}
 
 	@Override
@@ -126,6 +127,45 @@ public class AlertServiceImpl implements AlertService {
 	@Override
 	public AlertInfo findAlertByCGT(Map<String, Object> params) {
 		return alertDao.findAlertByCGT(params);
+	}
+
+	@Override
+	public int create(ClustersInfo clusterInfo) {
+		return alertDao.insertKafkaOrZK(clusterInfo);
+	}
+
+	@Override
+	public List<ClustersInfo> history(Map<String, Object> params) {
+		return alertDao.history(params);
+	}
+
+	@Override
+	public int alertHistoryCount(Map<String, Object> params) {
+		return alertDao.alertHistoryCount(params);
+	}
+
+	@Override
+	public int deleteClusterAlertById(int id) {
+		return alertDao.deleteClusterAlertById(id);
+	}
+
+	@Override
+	public String findClusterAlertById(int id) {
+		ClustersInfo cluster = alertDao.findClusterAlertById(id);
+		JSONObject object = new JSONObject();
+		object.put("server", cluster.getServer());
+		object.put("owners", cluster.getOwner());
+		return object.toJSONString();
+	}
+
+	@Override
+	public int modifyClusterAlertById(ClustersInfo cluster) {
+		return alertDao.modifyClusterAlertById(cluster);
+	}
+
+	@Override
+	public List<ClustersInfo> historys() {
+		return alertDao.historys();
 	}
 
 }

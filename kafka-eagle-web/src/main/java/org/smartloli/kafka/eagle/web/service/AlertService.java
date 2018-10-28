@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
+import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 
 /**
  * Alarm service interface.
@@ -43,11 +44,11 @@ public interface AlertService {
 	public List<AlertInfo> list(Map<String, Object> params);
 
 	/** Count alert size. */
-	public int alertCount();
+	public int alertCount(Map<String, Object> params);
 
 	/** Exist alert by cluster_group_topic from table. */
 	public int isExistAlertByCGT(Map<String, Object> params);
-	
+
 	/** Find alert by cluster_group_topic from table. */
 	public AlertInfo findAlertByCGT(Map<String, Object> params);
 
@@ -56,8 +57,28 @@ public interface AlertService {
 
 	/** Find alert info by id. */
 	public String findAlertById(int id);
-	
+
 	/** Find alert info by id. */
 	public int modifyAlertById(AlertInfo alert);
+
+	/** Insert alert data into db. */
+	public int create(ClustersInfo clusterInfo);
+
+	/** List cluster information from alert. */
+	public List<ClustersInfo> history(Map<String, Object> params);
+	
+	public int alertHistoryCount(Map<String, Object> params);
+	
+	/** Delete alert by id. */
+	public int deleteClusterAlertById(int id);
+	
+	/** Find alert info by id. */
+	public String findClusterAlertById(int id);
+	
+	/** Modify alert info by id. */
+	public int modifyClusterAlertById(ClustersInfo cluster);
+	
+	/** Query clusters collector data. */
+	public List<ClustersInfo> historys();
 
 }

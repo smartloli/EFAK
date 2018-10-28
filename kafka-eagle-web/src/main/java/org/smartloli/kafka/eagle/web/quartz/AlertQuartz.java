@@ -30,9 +30,11 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailProvider;
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
+import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -69,7 +71,10 @@ public class AlertQuartz {
 			Consumer consumer = new Consumer();
 			consumer.consumer(clusterAlias);
 
-			// TBD
+			// Run cluster job
+			Cluster cluster = new Cluster();
+			cluster.cluster();
+
 		}
 	}
 
@@ -144,7 +149,6 @@ public class AlertQuartz {
 				zkService.insert(clusterAlias, offsetLites);
 
 				alert(clusterAlias, offsetLites);
-				// alertBroker(clusterAlias);
 			} catch (Exception ex) {
 				LOG.error("Quartz statistics offset has error,msg is " + ex.getMessage());
 			}
@@ -161,11 +165,9 @@ public class AlertQuartz {
 
 					AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
 					AlertInfo alertInfo = alertService.findAlertByCGT(params);
-					LOG.info("Alert:" + alertInfo.getLag() + ",Offset:" + offset.getLag());
 
-					if (offset.getLag() < alertInfo.getLag()) {
+					if (offset.getLag() > alertInfo.getLag()) {
 						try {
-							LOG.info("Send Alert ...");
 							MailProvider provider = new MailFactory();
 							String subject = "Kafka Eagle Consumer Alert";
 							String address = alertInfo.getOwner();
@@ -220,11 +222,38 @@ public class AlertQuartz {
 	}
 
 	class Cluster {
-		public void kafka() {
 
-		}
+		public void cluster() {
+			boolean enableAlert = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.enable");
+			if (enableAlert) {
+				AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
+				for (ClustersInfo cluster : alertService.historys()) {
+					String[] servers = cluster.getServer().split(",");
+					for (String server : servers) {
+						String host = server.split(":")[0];
+						int port = 0;
+						try {
+							port = Integer.parseInt(server.split(":")[1]);
+							boolean status = NetUtils.telnet(host, port);
+							if (!status) {
+								String address = SystemConfigUtils.getProperty("kafka.eagle.alert.users");
+								try {
+									MailProvider provider = new MailFactory();
+									String subject = "Kafka Eagle On-Site Inspection Alert";
+									String content = "Thread Service [" + host + ":" + port + "] has crashed,please check it.";
+									provider.create().send(subject, address, content, "");
+								} catch (Exception ex) {
+									LOG.error("Alertor[" + address + "] Send alarm mail has error,msg is " + ex.getMessage());
+								}
+							}
 
-		public void zookeeper() {
+						} catch (Exception e) {
+							LOG.error("Parse port[" + server.split(":")[1] + "] has error, msg is " + e.getMessage());
+						}
+					}
+				}
+
+			}
 
 		}
 	}

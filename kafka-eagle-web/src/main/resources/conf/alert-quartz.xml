@@ -3,19 +3,19 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 	<!-- Add scheduling task bean configuration corresponding to class. -->
-	<bean id="offsetsSchedule" class="org.smartloli.kafka.eagle.web.quartz.OffsetsQuartz" />
+	<bean id="alertSchedule" class="org.smartloli.kafka.eagle.web.quartz.AlertQuartz" />
 	<!-- Method for configuring scheduling specific execution. -->
 	<!-- task1 -->
-	<bean id="offsetsDetail"
+	<bean id="alertDetail"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="offsetsSchedule" />
-		<property name="targetMethod" value="jobQuartz" />
+		<property name="targetObject" ref="alertSchedule" />
+		<property name="targetMethod" value="alertJobQuartz" />
 		<property name="concurrent" value="false" />
 	</bean>
 	<!-- Configure the trigger time for scheduling execution. -->
-	<bean id="offsetsTrigger"
+	<bean id="alertTrigger"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail" ref="offsetsDetail" />
+		<property name="jobDetail" ref="alertDetail" />
 		<property name="cronExpression">
 			<!-- Perform task scheduling per 5min. -->
 			<value>0 0/5 * * * ?</value>
@@ -27,7 +27,7 @@
 		<property name="triggers">
 			<list>
 				<!-- All scheduling lists. -->
-				<ref local="offsetsTrigger" />
+				<ref local="alertTrigger" />
 			</list>
 		</property>
 	</bean>
