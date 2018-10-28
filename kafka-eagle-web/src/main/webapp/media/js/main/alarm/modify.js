@@ -58,6 +58,7 @@ $(document).ready(function() {
 	$(document).on('click', 'a[name=modify]', function() {
 		var href = $(this).attr("href");
 		var id = href.split("#")[1].split("/")[0];
+		$("#ke_consumer_id_lag").val(id);
 		$('#modfiy_info').modal({
 			backdrop : 'static',
 			keyboard : false
@@ -68,7 +69,6 @@ $(document).ready(function() {
 			top : '50%',
 			transform : 'translateX(-50%) translateY(-50%)'
 		});
-		console.log("id:" + id);
 		
 		$.ajax({
 			type : 'get',

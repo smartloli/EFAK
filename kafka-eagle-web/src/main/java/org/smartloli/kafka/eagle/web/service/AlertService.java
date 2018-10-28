@@ -53,5 +53,8 @@ public interface AlertService {
 
 	/** Find alert info by id. */
 	public String findAlertById(int id);
+	
+	/** Find alert info by id. */
+	public int modifyAlertById(AlertInfo alert);
 
 }

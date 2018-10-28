@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.web.dao.MetricsDao;
+import org.smartloli.kafka.eagle.web.dao.AlertDao;
 import org.smartloli.kafka.eagle.web.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,11 +48,11 @@ public class AlertServiceImpl implements AlertService {
 	private KafkaService kafkaService = new KafkaFactory().create();
 
 	@Autowired
-	private MetricsDao metrics;
+	private AlertDao alertDao;
 
 	@Override
 	public int add(AlertInfo alert) {
-		return metrics.insertAlert(alert);
+		return alertDao.insertAlert(alert);
 	}
 
 	public String get(String clusterAlias, String formatter) {
@@ -91,31 +91,36 @@ public class AlertServiceImpl implements AlertService {
 
 	@Override
 	public List<AlertInfo> list(Map<String, Object> params) {
-		return metrics.query(params);
+		return alertDao.query(params);
 	}
 
 	@Override
 	public int alertCount() {
-		return metrics.alertCount();
+		return alertDao.alertCount();
 	}
 
 	@Override
 	public int findAlertByCGT(Map<String, Object> params) {
-		return metrics.findAlertByCGT(params);
+		return alertDao.findAlertByCGT(params);
 	}
 
 	@Override
 	public int deleteAlertById(int id) {
-		return metrics.deleteAlertById(id);
+		return alertDao.deleteAlertById(id);
 	}
 
 	@Override
 	public String findAlertById(int id) {
-		AlertInfo alert = metrics.findAlertById(id);
+		AlertInfo alert = alertDao.findAlertById(id);
 		JSONObject object = new JSONObject();
 		object.put("lag", alert.getLag());
 		object.put("owners", alert.getOwner());
 		return object.toJSONString();
+	}
+
+	@Override
+	public int modifyAlertById(AlertInfo alert) {
+		return alertDao.modifyAlertById(alert);
 	}
 
 }

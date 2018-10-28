@@ -143,4 +143,28 @@
 	<jsp:param value="main/alarm/modify.js" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
+<script type="text/javascript">
+	function contextModifyFormValid() {
+		var ke_consumer_name_lag = $("#ke_consumer_name_lag").val();
+		var ke_owners_modify = $("#ke_owners_modify").val();
+		
+		if (isNaN(ke_consumer_name_lag)) {
+			$("#alert_message_modify").show();
+			setTimeout(function() {
+				$("#alert_message_modify").hide()
+			}, 3000);
+			return false;
+		}
+		
+		if (ke_consumer_name_lag.length == 0 || ke_owners_modify.length == 0) {
+			$("#alert_message_modify").show();
+			setTimeout(function() {
+				$("#alert_message_modify").hide()
+			}, 3000);
+			return false;
+		}
+
+		return true;
+	}
+</script>
 </html>

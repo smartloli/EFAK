@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.smartloli.kafka.eagle.web.dao.MetricsDao">
+<mapper namespace="org.smartloli.kafka.eagle.web.dao.AlertDao">
 
 	<resultMap type="org.smartloli.kafka.eagle.common.protocol.AlertInfo"
-		id="alert">
+		id="alertInfo">
 		<result property="id" column="id" />
 		<result property="cluster" column="cluster" />
 		<result property="group" column="group" />
@@ -20,7 +20,7 @@
 		value(#{cluster},#{group},#{topic},#{lag},#{owner},#{created},#{modify})
 	</insert>
 
-	<select id="query" parameterType="map" resultMap="alert">
+	<select id="query" parameterType="map" resultMap="alertInfo">
 		select * from ke_alarm
 		<where>
 			`cluster`=#{cluster}
@@ -48,8 +48,14 @@
 		where `id`=#{id}
 	</delete>
 
-	<select id="findAlertById" parameterType="Integer" resultMap="alert">
+	<select id="findAlertById" parameterType="Integer" resultMap="alertInfo">
 		select * from ke_alarm where `id`=#{id}
 	</select>
+
+	<update id="modifyAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.AlertInfo"
+		resultType="Integer">
+		update ke_alarm set `lag`=#{lag},`owner`=#{owner} where
+		`id`=#{id}
+	</update>
 
 </mapper>

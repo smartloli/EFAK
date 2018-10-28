@@ -257,4 +257,24 @@ public class AlarmController {
 			ex.printStackTrace();
 		}
 	}
+
+	/** Modify consumer topic alert info. */
+	@RequestMapping(value = "/alarm/consumer/modify/", method = RequestMethod.POST)
+	public String modifyAlertInfo(HttpSession session, HttpServletRequest request) {
+		String id = request.getParameter("ke_consumer_id_lag");
+		String lag = request.getParameter("ke_consumer_name_lag");
+		String owners = request.getParameter("ke_owners_modify");
+
+		AlertInfo alert = new AlertInfo();
+		// JavaScript has already judged.
+		alert.setId(Integer.parseInt(id));
+		alert.setLag(Long.parseLong(lag));
+		alert.setOwner(owners);
+
+		if (alertService.modifyAlertById(alert) > 0) {
+			return "redirect:/alarm/modify";
+		} else {
+			return "redirect:/errors/500";
+		}
+	}
 }

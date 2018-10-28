@@ -29,7 +29,7 @@ import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
  *
  *         Created by Oct 27, 2018
  */
-public interface MetricsDao {
+public interface AlertDao {
 
 	/** Insert alert data into db. */
 	public int insertAlert(AlertInfo alert);
@@ -47,4 +47,7 @@ public interface MetricsDao {
 
 	/** Find alert info by id. */
 	public AlertInfo findAlertById(int id);
+	
+	/** Find alert info by id. */
+	public int modifyAlertById(AlertInfo alert);
 }
