@@ -35,8 +35,15 @@
 		select count(*) from ke_alarm
 	</select>
 
-	<select id="findAlertByCGT" parameterType="map" resultType="Integer">
+	<select id="isExistAlertByCGT" parameterType="map" resultType="Integer">
 		select count(*) from ke_alarm
+		<where>
+			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
+		</where>
+	</select>
+
+	<select id="findAlertByCGT" parameterType="map" resultMap="alertInfo">
+		select * from ke_alarm
 		<where>
 			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
 		</where>
@@ -52,9 +59,9 @@
 		select * from ke_alarm where `id`=#{id}
 	</select>
 
-	<update id="modifyAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.AlertInfo"
-		resultType="Integer">
-		update ke_alarm set `lag`=#{lag},`owner`=#{owner} where
+	<update id="modifyAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.AlertInfo">
+		update ke_alarm set
+		`lag`=#{lag},`owner`=#{owner},`modify`=#{modify} where
 		`id`=#{id}
 	</update>
 

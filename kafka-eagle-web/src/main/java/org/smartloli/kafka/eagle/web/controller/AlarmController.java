@@ -147,7 +147,7 @@ public class AlarmController {
 		map.put("cluster", clusterAlias);
 		map.put("group", alert.getGroup());
 		map.put("topic", alert.getTopic());
-		int findCode = alertService.findAlertByCGT(map);
+		int findCode = alertService.isExistAlertByCGT(map);
 
 		if (findCode > 0) {
 			session.removeAttribute("Alarm_Submit_Status");
@@ -270,6 +270,7 @@ public class AlarmController {
 		alert.setId(Integer.parseInt(id));
 		alert.setLag(Long.parseLong(lag));
 		alert.setOwner(owners);
+		alert.setModify(CalendarUtils.getDate());
 
 		if (alertService.modifyAlertById(alert) > 0) {
 			return "redirect:/alarm/modify";

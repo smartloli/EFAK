@@ -39,15 +39,21 @@ public interface AlertDao {
 
 	public int alertCount();
 
-	/** find alert by cluster_group_topic from table. */
-	public int findAlertByCGT(Map<String, Object> params);
+	/** Exist alert by cluster_group_topic from table. */
+	public int isExistAlertByCGT(Map<String, Object> params);
+
+	/** Find alert by cluster_group_topic from table. */
+	public AlertInfo findAlertByCGT(Map<String, Object> params);
 
 	/** Delete alert by id. */
 	public int deleteAlertById(int id);
 
 	/** Find alert info by id. */
 	public AlertInfo findAlertById(int id);
-	
+
 	/** Find alert info by id. */
 	public int modifyAlertById(AlertInfo alert);
+
+	/** Insert alert data into db. */
+	public int insertKafkaOrZK();
 }

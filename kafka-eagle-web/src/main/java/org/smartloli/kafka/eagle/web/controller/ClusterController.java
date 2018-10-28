@@ -189,7 +189,7 @@ public class ClusterController {
 				search = param.getString("value");
 			}
 		}
-	
+
 		JSONArray clusterAliass = clusterService.clusterAliass();
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
@@ -214,7 +214,7 @@ public class ClusterController {
 				offset++;
 			}
 		}
-	
+
 		JSONObject target = new JSONObject();
 		target.put("sEcho", sEcho);
 		target.put("iTotalRecords", clusterAliass.size());

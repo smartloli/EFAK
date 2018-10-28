@@ -136,9 +136,9 @@ public class KConstants {
 		public static final String ZK = "zookeeper";
 		public static final String KAFKA = "kafka";
 	}
-	
-	public interface Zookeeper{
-		public static final String LEADER="leader";
+
+	public interface Zookeeper {
+		public static final String LEADER = "leader";
 	}
 
 }

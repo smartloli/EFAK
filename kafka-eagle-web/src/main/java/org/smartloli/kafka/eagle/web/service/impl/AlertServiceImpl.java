@@ -100,8 +100,8 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public int findAlertByCGT(Map<String, Object> params) {
-		return alertDao.findAlertByCGT(params);
+	public int isExistAlertByCGT(Map<String, Object> params) {
+		return alertDao.isExistAlertByCGT(params);
 	}
 
 	@Override
@@ -121,6 +121,11 @@ public class AlertServiceImpl implements AlertService {
 	@Override
 	public int modifyAlertById(AlertInfo alert) {
 		return alertDao.modifyAlertById(alert);
+	}
+
+	@Override
+	public AlertInfo findAlertByCGT(Map<String, Object> params) {
+		return alertDao.findAlertByCGT(params);
 	}
 
 }
