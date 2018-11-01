@@ -44,4 +44,6 @@ public interface RoleService {
 	public int insertUserRole(UserRole userRole);
 	
 	public int deleteUserRole(UserRole userRole);
+	
+	public String getConsoleCache();
 }

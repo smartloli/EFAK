@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
 import org.smartloli.kafka.eagle.web.dao.ResourcesDao;
 import org.smartloli.kafka.eagle.web.dao.RoleDao;
 import org.smartloli.kafka.eagle.web.pojo.Role;
@@ -128,6 +130,15 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public int deleteUserRole(UserRole userRole) {
 		return roleDao.deleteUserRole(userRole);
+	}
+
+	@Override
+	public String getConsoleCache() {
+		JSONObject object = new JSONObject();
+		object.put("cache", KafkaOffsetGetter.multiKafkaConsumerOffsets);
+		object.put("date", CalendarUtils.getDate());
+		System.out.println(object.toJSONString());
+		return object.toJSONString();
 	}
 
 }

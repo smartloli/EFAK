@@ -133,6 +133,7 @@ public class TestKafkaOffsetGetter extends Thread {
 						kafkaConsumerOffsets.put(commitKey, commitValue);
 						multiKafkaConsumerOffsets.put(clusterAlias, kafkaConsumerOffsets);
 					}
+					System.out.println(multiKafkaConsumerOffsets.toString());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -101,6 +101,7 @@ public class AlertQuartz {
 						consumers = consumerGroupMap;
 					} catch (Exception e) {
 						LOG.error("Get consumer info from [kafkaService.getKafkaConsumer] has error,msg is " + e.getMessage());
+						e.printStackTrace();
 					}
 				} else {
 					consumers = kafkaService.getConsumers(clusterAlias);
@@ -151,6 +152,7 @@ public class AlertQuartz {
 				alert(clusterAlias, offsetLites);
 			} catch (Exception ex) {
 				LOG.error("Quartz statistics offset has error,msg is " + ex.getMessage());
+				ex.printStackTrace();
 			}
 		}
 

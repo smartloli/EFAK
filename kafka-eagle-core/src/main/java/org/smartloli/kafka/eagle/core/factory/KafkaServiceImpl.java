@@ -845,6 +845,7 @@ public class KafkaServiceImpl implements KafkaService {
 			adminClient.close();
 		} catch (Exception e) {
 			LOG.error("Get kafka consumer metadata has error, msg is " + e.getMessage());
+			e.printStackTrace();
 		}
 		return consumerGroups;
 	}

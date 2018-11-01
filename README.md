@@ -11,7 +11,7 @@ When you install [Kafka Eagle](http://download.smartloli.org/), you can see the 
 
 The system shows the trend of consumer and producer trends on the same day, so you can see what happened that day.
 
-Supported on kafka version: ``` 0.8.2.x ```,``` 0.9.x ```,``` 0.10.x ```,``` 1.x ``` .
+Supported on kafka version: ``` 0.8.2.x ```,``` 0.9.x ```,``` 0.10.x ```,``` 1.x ```,``` 2.x ``` .
 
 Supported platform: ```Mac OS X```,```Linux```,```Windows```.
 

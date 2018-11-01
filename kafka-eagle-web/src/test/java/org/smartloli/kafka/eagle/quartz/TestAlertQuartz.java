@@ -17,18 +17,18 @@
  */
 package org.smartloli.kafka.eagle.quartz;
 
-import org.smartloli.kafka.eagle.web.quartz.OffsetsQuartz;
+import org.smartloli.kafka.eagle.web.quartz.AlertQuartz;
 
 /**
- * Test OffsetsQuartz clazz.
+ * Test AlertQuartz clazz.
  * 
  * @author smartloli.
  *
- *         Created by Jan 16, 2017
+ *         Created by Oct 29, 2018
  */
-public class TestOffsetsQuartz {
+public class TestAlertQuartz {
 	public static void main(String[] args) {
-		OffsetsQuartz offsets = new OffsetsQuartz();
-		offsets.jobQuartz();
+		AlertQuartz offsets = new AlertQuartz();
+		offsets.alertJobQuartz();;
 	}
 }

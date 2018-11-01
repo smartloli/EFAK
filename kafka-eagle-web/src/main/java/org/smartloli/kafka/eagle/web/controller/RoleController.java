@@ -144,7 +144,7 @@ public class RoleController {
 			return "redirect:/errors/500";
 		}
 	}
-	
+
 	/** Get user rtxno. */
 	@RequestMapping(value = "/user/signin/rtxno/ajax/", method = RequestMethod.GET)
 	public void getUserRtxNo(HttpServletResponse response, HttpServletRequest request) {
@@ -370,6 +370,17 @@ public class RoleController {
 				}
 			}
 			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get alert info. */
+	@RequestMapping(value = "/console/cache/ajax", method = RequestMethod.GET)
+	public void getConsoleCacheAjax(HttpServletResponse response) {
+		try {
+			byte[] output = roleService.getConsoleCache().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
