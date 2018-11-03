@@ -17,12 +17,10 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
@@ -37,10 +35,11 @@ import org.smartloli.kafka.eagle.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Achieve access to the kafka monitoring data interface through jmx.
@@ -48,6 +47,7 @@ import com.google.gson.Gson;
  * @author smartloli.
  *
  *         Created by Jul 17, 2017
+ *         Update by No 3, 2018 by cocodroid
  */
 @Service
 public class MetricsServiceImpl implements MetricsService {
@@ -74,93 +74,39 @@ public class MetricsServiceImpl implements MetricsService {
 			MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri);
 			MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri);
 			MBeanInfo messageIn = mx4jService.messagesInPerSec(uri);
+			MBeanInfo produceMessageConversions = mx4jService.produceMessageConversionsPerSec(uri);
+			MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(uri);
+			MBeanInfo totalProduceRequests = mx4jService.totalProduceRequestsPerSec(uri);
+			MBeanInfo replicationBytesInPerSec = mx4jService.replicationBytesInPerSec(uri);
+			MBeanInfo replicationBytesOutPerSec = mx4jService.replicationBytesOutPerSec(uri);
 
-			if (mbeans.containsKey(MBean.MESSAGES_IN)) {
-				MBeanInfo msgIn = mbeans.get(MBean.MESSAGES_IN);
-				long fifteenMinute = Math.round(StrUtils.numberic(msgIn.getFifteenMinute())) + Math.round(StrUtils.numberic(messageIn.getFifteenMinute()));
-				long fiveMinute = Math.round(StrUtils.numberic(msgIn.getFiveMinute())) + Math.round(StrUtils.numberic(messageIn.getFiveMinute()));
-				long meanRate = Math.round(StrUtils.numberic(msgIn.getMeanRate())) + Math.round(StrUtils.numberic(messageIn.getMeanRate()));
-				long oneMinute = Math.round(StrUtils.numberic(msgIn.getOneMinute())) + Math.round(StrUtils.numberic(messageIn.getOneMinute()));
-				msgIn.setFifteenMinute(String.valueOf(fifteenMinute));
-				msgIn.setFiveMinute(String.valueOf(fiveMinute));
-				msgIn.setMeanRate(String.valueOf(meanRate));
-				msgIn.setOneMinute(String.valueOf(oneMinute));
-			} else {
-				mbeans.put(MBean.MESSAGES_IN, messageIn);
-			}
+            assembleMBeanInfo(mbeans, MBean.MESSAGES_IN, messageIn);
 
-			if (mbeans.containsKey(MBean.BYTES_IN)) {
-				MBeanInfo byteIn = mbeans.get(MBean.BYTES_IN);
-				long fifteenMinute = Math.round(StrUtils.numberic(byteIn.getFifteenMinute())) + Math.round(StrUtils.numberic(bytesIn.getFifteenMinute()));
-				long fiveMinute = Math.round(StrUtils.numberic(byteIn.getFiveMinute())) + Math.round(StrUtils.numberic(bytesIn.getFiveMinute()));
-				long meanRate = Math.round(StrUtils.numberic(byteIn.getMeanRate())) + Math.round(StrUtils.numberic(bytesIn.getMeanRate()));
-				long oneMinute = Math.round(StrUtils.numberic(byteIn.getOneMinute())) + Math.round(StrUtils.numberic(bytesIn.getOneMinute()));
-				byteIn.setFifteenMinute(String.valueOf(fifteenMinute));
-				byteIn.setFiveMinute(String.valueOf(fiveMinute));
-				byteIn.setMeanRate(String.valueOf(meanRate));
-				byteIn.setOneMinute(String.valueOf(oneMinute));
-			} else {
-				mbeans.put(MBean.BYTES_IN, bytesIn);
-			}
+            assembleMBeanInfo(mbeans, MBean.BYTES_IN, bytesIn);
 
-			if (mbeans.containsKey(MBean.BYTES_OUT)) {
-				MBeanInfo byteOut = mbeans.get(MBean.BYTES_OUT);
-				long fifteenMinute = Math.round(StrUtils.numberic(byteOut.getFifteenMinute())) + Math.round(StrUtils.numberic(bytesOut.getFifteenMinute()));
-				long fiveMinute = Math.round(StrUtils.numberic(byteOut.getFiveMinute())) + Math.round(StrUtils.numberic(bytesOut.getFiveMinute()));
-				long meanRate = Math.round(StrUtils.numberic(byteOut.getMeanRate())) + Math.round(StrUtils.numberic(bytesOut.getMeanRate()));
-				long oneMinute = Math.round(StrUtils.numberic(byteOut.getOneMinute())) + Math.round(StrUtils.numberic(bytesOut.getOneMinute()));
-				byteOut.setFifteenMinute(String.valueOf(fifteenMinute));
-				byteOut.setFiveMinute(String.valueOf(fiveMinute));
-				byteOut.setMeanRate(String.valueOf(meanRate));
-				byteOut.setOneMinute(String.valueOf(oneMinute));
-			} else {
-				mbeans.put(MBean.BYTES_OUT, bytesOut);
-			}
+            assembleMBeanInfo(mbeans, MBean.BYTES_OUT, bytesOut);
 
-			if (mbeans.containsKey(MBean.BYTES_REJECTED)) {
-				MBeanInfo byteRejected = mbeans.get(MBean.BYTES_REJECTED);
-				long fifteenMinute = Math.round(StrUtils.numberic(byteRejected.getFifteenMinute())) + Math.round(StrUtils.numberic(bytesRejected.getFifteenMinute()));
-				long fiveMinute = Math.round(StrUtils.numberic(byteRejected.getFiveMinute())) + Math.round(StrUtils.numberic(bytesRejected.getFiveMinute()));
-				long meanRate = Math.round(StrUtils.numberic(byteRejected.getMeanRate())) + Math.round(StrUtils.numberic(bytesRejected.getMeanRate()));
-				long oneMinute = Math.round(StrUtils.numberic(byteRejected.getOneMinute())) + Math.round(StrUtils.numberic(bytesRejected.getOneMinute()));
-				byteRejected.setFifteenMinute(String.valueOf(fifteenMinute));
-				byteRejected.setFiveMinute(String.valueOf(fiveMinute));
-				byteRejected.setMeanRate(String.valueOf(meanRate));
-				byteRejected.setOneMinute(String.valueOf(oneMinute));
-			} else {
-				mbeans.put(MBean.BYTES_REJECTED, bytesRejected);
-			}
+            assembleMBeanInfo(mbeans, MBean.BYTES_REJECTED, bytesRejected);
 
-			if (mbeans.containsKey(MBean.FAILED_FETCH_REQUEST)) {
-				MBeanInfo failedFetch = mbeans.get(MBean.FAILED_FETCH_REQUEST);
-				long fifteenMinute = Math.round(StrUtils.numberic(failedFetch.getFifteenMinute())) + Math.round(StrUtils.numberic(failedFetchRequest.getFifteenMinute()));
-				long fiveMinute = Math.round(StrUtils.numberic(failedFetch.getFiveMinute())) + Math.round(StrUtils.numberic(failedFetchRequest.getFiveMinute()));
-				long meanRate = Math.round(StrUtils.numberic(failedFetch.getMeanRate())) + Math.round(StrUtils.numberic(failedFetchRequest.getMeanRate()));
-				long oneMinute = Math.round(StrUtils.numberic(failedFetch.getOneMinute())) + Math.round(StrUtils.numberic(failedFetchRequest.getOneMinute()));
-				failedFetch.setFifteenMinute(String.valueOf(fifteenMinute));
-				failedFetch.setFiveMinute(String.valueOf(fiveMinute));
-				failedFetch.setMeanRate(String.valueOf(meanRate));
-				failedFetch.setOneMinute(String.valueOf(oneMinute));
-			} else {
-				mbeans.put(MBean.FAILED_FETCH_REQUEST, failedFetchRequest);
-			}
+            assembleMBeanInfo(mbeans, MBean.FAILED_FETCH_REQUEST, failedFetchRequest);
 
-			if (mbeans.containsKey(MBean.FAILED_PRODUCE_REQUEST)) {
-				MBeanInfo failedProduce = mbeans.get(MBean.FAILED_PRODUCE_REQUEST);
-				long fifteenMinute = Math.round(StrUtils.numberic(failedProduce.getFifteenMinute())) + Math.round(StrUtils.numberic(failedProduceRequest.getFifteenMinute()));
-				long fiveMinute = Math.round(StrUtils.numberic(failedProduce.getFiveMinute())) + Math.round(StrUtils.numberic(failedProduceRequest.getFiveMinute()));
-				long meanRate = Math.round(StrUtils.numberic(failedProduce.getMeanRate())) + Math.round(StrUtils.numberic(failedProduceRequest.getMeanRate()));
-				long oneMinute = Math.round(StrUtils.numberic(failedProduce.getOneMinute())) + Math.round(StrUtils.numberic(failedProduceRequest.getOneMinute()));
-				failedProduce.setFifteenMinute(String.valueOf(fifteenMinute));
-				failedProduce.setFiveMinute(String.valueOf(fiveMinute));
-				failedProduce.setMeanRate(String.valueOf(meanRate));
-				failedProduce.setOneMinute(String.valueOf(oneMinute));
-			} else {
-				mbeans.put(MBean.FAILED_PRODUCE_REQUEST, failedProduceRequest);
-			}
+            assembleMBeanInfo(mbeans, MBean.FAILED_PRODUCE_REQUEST, failedProduceRequest);
+
+            assembleMBeanInfo(mbeans, MBean.PRODUCEMESSAGECONVERSIONS, produceMessageConversions);
+
+            assembleMBeanInfo(mbeans, MBean.TOTALFETCHREQUESTSPERSEC, totalFetchRequests);
+
+            assembleMBeanInfo(mbeans, MBean.TOTALPRODUCEREQUESTSPERSEC, totalProduceRequests);
+
+            assembleMBeanInfo(mbeans, MBean.REPLICATIONBYTESINPERSEC, replicationBytesInPerSec);
+
+            assembleMBeanInfo(mbeans, MBean.REPLICATIONBYTESOUTPERSEC, replicationBytesOutPerSec);
 
 		}
 		for (Entry<String, MBeanInfo> entry : mbeans.entrySet()) {
+		    if (entry == null || entry.getValue() == null) {
+		        continue;
+            }
 			entry.getValue().setFifteenMinute(StrUtils.assembly(entry.getValue().getFifteenMinute()));
 			entry.getValue().setFiveMinute(StrUtils.assembly(entry.getValue().getFiveMinute()));
 			entry.getValue().setMeanRate(StrUtils.assembly(entry.getValue().getMeanRate()));
@@ -168,6 +114,22 @@ public class MetricsServiceImpl implements MetricsService {
 		}
 		return new Gson().toJson(mbeans);
 	}
+
+	private void assembleMBeanInfo(Map<String, MBeanInfo> mbeans, String mBeanInfoKey, MBeanInfo mBeanInfo) {
+        if (mbeans.containsKey(mBeanInfoKey)) {
+            MBeanInfo replicationBytesOut = mbeans.get(MBean.REPLICATIONBYTESOUTPERSEC);
+            long fifteenMinute = Math.round(StrUtils.numberic(replicationBytesOut.getFifteenMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFifteenMinute()));
+            long fiveMinute = Math.round(StrUtils.numberic(replicationBytesOut.getFiveMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFiveMinute()));
+            long meanRate = Math.round(StrUtils.numberic(replicationBytesOut.getMeanRate())) + Math.round(StrUtils.numberic(mBeanInfo.getMeanRate()));
+            long oneMinute = Math.round(StrUtils.numberic(replicationBytesOut.getOneMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getOneMinute()));
+            replicationBytesOut.setFifteenMinute(String.valueOf(fifteenMinute));
+            replicationBytesOut.setFiveMinute(String.valueOf(fiveMinute));
+            replicationBytesOut.setMeanRate(String.valueOf(meanRate));
+            replicationBytesOut.setOneMinute(String.valueOf(oneMinute));
+        } else {
+            mbeans.put(mBeanInfoKey, mBeanInfo);
+        }
+    }
 
 	/** Collection statistics data from kafka jmx & insert into table. */
 	public int insert(List<KpiInfo> kpi) {
