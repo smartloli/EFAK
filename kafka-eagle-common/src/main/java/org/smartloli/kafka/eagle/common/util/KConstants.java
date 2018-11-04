@@ -101,6 +101,11 @@ public class KConstants {
 		public final static String BYTEOUT = "byte_out";
 		public final static String FAILEDFETCHREQUEST = "failed_fetch_request";
 		public final static String FAILEDPRODUCEREQUEST = "failed_produce_request";
+		public final static String PRODUCEMESSAGECONVERSIONS = "produce_message_conversions";
+		public final static String TOTALFETCHREQUESTSPERSEC = "total_fetch_requests";
+		public final static String TOTALPRODUCEREQUESTSPERSEC = "total_produce_requests";
+		public final static String REPLICATIONBYTESINPERSEC = "replication_bytes_out";
+		public final static String REPLICATIONBYTESOUTPERSEC = "replication_bytes_in";
 	}
 
 	public interface Linux {
