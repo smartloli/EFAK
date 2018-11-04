@@ -29,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailProvider;
+import org.smartloli.kafka.eagle.api.email.module.ClusterContentModule;
+import org.smartloli.kafka.eagle.api.email.module.LagContentModule;
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
@@ -173,8 +175,21 @@ public class AlertQuartz {
 							MailProvider provider = new MailFactory();
 							String subject = "Kafka Eagle Consumer Alert";
 							String address = alertInfo.getOwner();
-							String content = "Group is [" + alertInfo.getGroup() + "],Topic is [" + alertInfo.getTopic() + "],current lag is [" + offset.getLag() + "],expired lag is [" + alertInfo.getLag() + "].";
-							provider.create().send(subject, address, content, "");
+							// String content = "Group is [" +
+							// alertInfo.getGroup() + "],Topic is [" +
+							// alertInfo.getTopic() + "],current lag is [" +
+							// offset.getLag() + "],expired lag is [" +
+							// alertInfo.getLag() + "].";
+							LagContentModule lcm = new LagContentModule();
+							lcm.setCluster(clusterAlias);
+							lcm.setConsumerLag(offset.getLag() + "");
+							lcm.setGroup(alertInfo.getGroup());
+							lcm.setLagThreshold(alertInfo.getLag() + "");
+							lcm.setTime(CalendarUtils.getDate());
+							lcm.setTopic(alertInfo.getTopic());
+							lcm.setType("Consumer");
+							lcm.setUser(alertInfo.getOwner());
+							provider.create().send(subject, address, lcm.toString(), "");
 						} catch (Exception ex) {
 							LOG.error("Topic[" + alertInfo.getTopic() + "] Send alarm mail has error,msg is " + ex.getMessage());
 						}
@@ -242,8 +257,16 @@ public class AlertQuartz {
 								try {
 									MailProvider provider = new MailFactory();
 									String subject = "Kafka Eagle On-Site Inspection Alert";
-									String content = "Thread Service [" + host + ":" + port + "] has crashed,please check it.";
-									provider.create().send(subject, address, content, "");
+									// String content = "Thread Service [" +
+									// host + ":" + port + "] has crashed,please
+									// check it.";
+									ClusterContentModule ccm = new ClusterContentModule();
+									ccm.setCluster(cluster.getCluster());
+									ccm.setServer(cluster.getServer());
+									ccm.setTime(CalendarUtils.getDate());
+									ccm.setType(cluster.getType());
+									ccm.setUser(cluster.getOwner());
+									provider.create().send(subject, cluster.getOwner(), ccm.toString(), "");
 								} catch (Exception ex) {
 									LOG.error("Alertor[" + address + "] Send alarm mail has error,msg is " + ex.getMessage());
 								}

@@ -20,7 +20,6 @@ package org.smartloli.kafka.eagle.api.sms;
 import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailProvider;
 import org.smartloli.kafka.eagle.api.email.module.ClusterContentModule;
-import org.smartloli.kafka.eagle.api.email.module.LagContentModule;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 
 /**
@@ -36,29 +35,40 @@ public class TestMailFactory {
 		MailProvider provider = new MailFactory();
 		String subject = "Kafka Eagle Consumer Alert";
 		String[] address = new String[] { "smartloli.org@gmail.com", "810371213@qq.com" };
-		for (String addr : address) {
-			// String content = "Hi " + addr.split("@")[0] + " , <br/>Group Name
-			// is
-			// [Test],Topic is [ke_test2],current lag is [15000],expired lag is
-			// [10000].";
-			// LagContentModule lag = new LagContentModule();
-			// lag.setUser(addr.split("@")[0]);
-			// lag.setCluster("cluseter2");
-			// lag.setGroup("ke_group");
-			// lag.setTopic("ke_topic");
-			// lag.setConsumerLag("3200");
-			// lag.setLagThreshold("2000");
-			// lag.setType("Consumer");
-			// lag.setTime(CalendarUtils.getDate());
-
-			ClusterContentModule cluster = new ClusterContentModule();
-			cluster.setUser(addr.split("@")[0]);
-			cluster.setCluster("cluster1");
-			cluster.setServer("127.0.0.1:9092");
-			cluster.setType("Kafka");
-			cluster.setTime(CalendarUtils.getDate());
-			provider.create().send(subject, addr, cluster.toString(), "");
-		}
+		
+		String addr = "smartloli.org@gmail.com,810371213@qq.com";
+		
+		ClusterContentModule cluster = new ClusterContentModule();
+		cluster.setUser(addr);
+		cluster.setCluster("cluster1");
+		cluster.setServer("127.0.0.1:9092");
+		cluster.setType("Kafka");
+		cluster.setTime(CalendarUtils.getDate());
+		provider.create().send(subject, addr, cluster.toString(), "");
+		
+//		for (String addr : address) {
+//			// String content = "Hi " + addr.split("@")[0] + " , <br/>Group Name
+//			// is
+//			// [Test],Topic is [ke_test2],current lag is [15000],expired lag is
+//			// [10000].";
+//			// LagContentModule lag = new LagContentModule();
+//			// lag.setUser(addr.split("@")[0]);
+//			// lag.setCluster("cluseter2");
+//			// lag.setGroup("ke_group");
+//			// lag.setTopic("ke_topic");
+//			// lag.setConsumerLag("3200");
+//			// lag.setLagThreshold("2000");
+//			// lag.setType("Consumer");
+//			// lag.setTime(CalendarUtils.getDate());
+//
+//			ClusterContentModule cluster = new ClusterContentModule();
+//			cluster.setUser(addr.split("@")[0]);
+//			cluster.setCluster("cluster1");
+//			cluster.setServer("127.0.0.1:9092");
+//			cluster.setType("Kafka");
+//			cluster.setTime(CalendarUtils.getDate());
+//			provider.create().send(subject, addr, cluster.toString(), "");
+//		}
 	}
 
 }
