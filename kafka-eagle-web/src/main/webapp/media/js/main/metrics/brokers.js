@@ -44,8 +44,6 @@ function brokerMetricData(field, data) {
 		return tr;
 	}
 
-	console.log(field.toUpperCase());
-	
 	if (field.toUpperCase().indexOf("BYTE") > -1) {
 		console.log("dsdsd");
 		tr += "<tr><td>" + field + "</td><td><a class='btn btn-primary btn-xs'>" + data.meanRate + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.oneMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.fiveMinute
