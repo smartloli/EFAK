@@ -72,23 +72,23 @@ public interface Mx4jService {
 	/** Get brokers message in per sec by topic. */
 	public MBeanInfo messagesInPerSec(String uri, String topic);
 
-	MBeanInfo produceMessageConversionsPerSec(String uri);
+	public MBeanInfo produceMessageConversionsPerSec(String uri);
 
-	MBeanInfo produceMessageConversionsPerSec(String uri, String topic);
+	public MBeanInfo produceMessageConversionsPerSec(String uri, String topic);
 
-	MBeanInfo totalFetchRequestsPerSec(String uri);
+	public MBeanInfo totalFetchRequestsPerSec(String uri);
 
-	MBeanInfo totalFetchRequestsPerSec(String uri, String topic);
+	public MBeanInfo totalFetchRequestsPerSec(String uri, String topic);
 
-	MBeanInfo totalProduceRequestsPerSec(String uri);
+	public MBeanInfo totalProduceRequestsPerSec(String uri);
 
-	MBeanInfo totalProduceRequestsPerSec(String uri, String topic);
+	public MBeanInfo totalProduceRequestsPerSec(String uri, String topic);
 
-	MBeanInfo replicationBytesInPerSec(String uri);
+	public MBeanInfo replicationBytesInPerSec(String uri);
 
-	MBeanInfo replicationBytesInPerSec(String uri, String topic);
+	public MBeanInfo replicationBytesInPerSec(String uri, String topic);
 
-	MBeanInfo replicationBytesOutPerSec(String uri);
+	public MBeanInfo replicationBytesOutPerSec(String uri);
 
 	MBeanInfo replicationBytesOutPerSec(String uri, String topic);
 }

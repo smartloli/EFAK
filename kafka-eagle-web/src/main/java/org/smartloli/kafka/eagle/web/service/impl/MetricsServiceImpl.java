@@ -46,8 +46,7 @@ import java.util.Map.Entry;
  * 
  * @author smartloli.
  *
- *         Created by Jul 17, 2017
- *         Update by No 3, 2018 by cocodroid
+ *         Created by Jul 17, 2017 Update by No 3, 2018 by cocodroid
  */
 @Service
 public class MetricsServiceImpl implements MetricsService {
@@ -80,33 +79,33 @@ public class MetricsServiceImpl implements MetricsService {
 			MBeanInfo replicationBytesInPerSec = mx4jService.replicationBytesInPerSec(uri);
 			MBeanInfo replicationBytesOutPerSec = mx4jService.replicationBytesOutPerSec(uri);
 
-            assembleMBeanInfo(mbeans, MBean.MESSAGES_IN, messageIn);
+			assembleMBeanInfo(mbeans, MBean.MESSAGES_IN, messageIn);
 
-            assembleMBeanInfo(mbeans, MBean.BYTES_IN, bytesIn);
+			assembleMBeanInfo(mbeans, MBean.BYTES_IN, bytesIn);
 
-            assembleMBeanInfo(mbeans, MBean.BYTES_OUT, bytesOut);
+			assembleMBeanInfo(mbeans, MBean.BYTES_OUT, bytesOut);
 
-            assembleMBeanInfo(mbeans, MBean.BYTES_REJECTED, bytesRejected);
+			assembleMBeanInfo(mbeans, MBean.BYTES_REJECTED, bytesRejected);
 
-            assembleMBeanInfo(mbeans, MBean.FAILED_FETCH_REQUEST, failedFetchRequest);
+			assembleMBeanInfo(mbeans, MBean.FAILED_FETCH_REQUEST, failedFetchRequest);
 
-            assembleMBeanInfo(mbeans, MBean.FAILED_PRODUCE_REQUEST, failedProduceRequest);
+			assembleMBeanInfo(mbeans, MBean.FAILED_PRODUCE_REQUEST, failedProduceRequest);
 
-            assembleMBeanInfo(mbeans, MBean.PRODUCEMESSAGECONVERSIONS, produceMessageConversions);
+			assembleMBeanInfo(mbeans, MBean.PRODUCEMESSAGECONVERSIONS, produceMessageConversions);
 
-            assembleMBeanInfo(mbeans, MBean.TOTALFETCHREQUESTSPERSEC, totalFetchRequests);
+			assembleMBeanInfo(mbeans, MBean.TOTALFETCHREQUESTSPERSEC, totalFetchRequests);
 
-            assembleMBeanInfo(mbeans, MBean.TOTALPRODUCEREQUESTSPERSEC, totalProduceRequests);
+			assembleMBeanInfo(mbeans, MBean.TOTALPRODUCEREQUESTSPERSEC, totalProduceRequests);
 
-            assembleMBeanInfo(mbeans, MBean.REPLICATIONBYTESINPERSEC, replicationBytesInPerSec);
+			assembleMBeanInfo(mbeans, MBean.REPLICATIONBYTESINPERSEC, replicationBytesInPerSec);
 
-            assembleMBeanInfo(mbeans, MBean.REPLICATIONBYTESOUTPERSEC, replicationBytesOutPerSec);
+			assembleMBeanInfo(mbeans, MBean.REPLICATIONBYTESOUTPERSEC, replicationBytesOutPerSec);
 
 		}
 		for (Entry<String, MBeanInfo> entry : mbeans.entrySet()) {
-		    if (entry == null || entry.getValue() == null) {
-		        continue;
-            }
+			if (entry == null || entry.getValue() == null) {
+				continue;
+			}
 			entry.getValue().setFifteenMinute(StrUtils.assembly(entry.getValue().getFifteenMinute()));
 			entry.getValue().setFiveMinute(StrUtils.assembly(entry.getValue().getFiveMinute()));
 			entry.getValue().setMeanRate(StrUtils.assembly(entry.getValue().getMeanRate()));
@@ -116,20 +115,22 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	private void assembleMBeanInfo(Map<String, MBeanInfo> mbeans, String mBeanInfoKey, MBeanInfo mBeanInfo) {
-        if (mbeans.containsKey(mBeanInfoKey)) {
-            MBeanInfo replicationBytesOut = mbeans.get(MBean.REPLICATIONBYTESOUTPERSEC);
-            long fifteenMinute = Math.round(StrUtils.numberic(replicationBytesOut.getFifteenMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFifteenMinute()));
-            long fiveMinute = Math.round(StrUtils.numberic(replicationBytesOut.getFiveMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFiveMinute()));
-            long meanRate = Math.round(StrUtils.numberic(replicationBytesOut.getMeanRate())) + Math.round(StrUtils.numberic(mBeanInfo.getMeanRate()));
-            long oneMinute = Math.round(StrUtils.numberic(replicationBytesOut.getOneMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getOneMinute()));
-            replicationBytesOut.setFifteenMinute(String.valueOf(fifteenMinute));
-            replicationBytesOut.setFiveMinute(String.valueOf(fiveMinute));
-            replicationBytesOut.setMeanRate(String.valueOf(meanRate));
-            replicationBytesOut.setOneMinute(String.valueOf(oneMinute));
-        } else {
-            mbeans.put(mBeanInfoKey, mBeanInfo);
-        }
-    }
+		if (mbeans.containsKey(mBeanInfoKey)) {
+			// MBeanInfo replicationBytesOut =
+			// mbeans.get(MBean.REPLICATIONBYTESOUTPERSEC);
+			MBeanInfo mbeanInfo = mbeans.get(mBeanInfoKey);
+			long fifteenMinute = Math.round(StrUtils.numberic(mbeanInfo.getFifteenMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFifteenMinute()));
+			long fiveMinute = Math.round(StrUtils.numberic(mbeanInfo.getFiveMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFiveMinute()));
+			long meanRate = Math.round(StrUtils.numberic(mbeanInfo.getMeanRate())) + Math.round(StrUtils.numberic(mBeanInfo.getMeanRate()));
+			long oneMinute = Math.round(StrUtils.numberic(mbeanInfo.getOneMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getOneMinute()));
+			mbeanInfo.setFifteenMinute(String.valueOf(fifteenMinute));
+			mbeanInfo.setFiveMinute(String.valueOf(fiveMinute));
+			mbeanInfo.setMeanRate(String.valueOf(meanRate));
+			mbeanInfo.setOneMinute(String.valueOf(oneMinute));
+		} else {
+			mbeans.put(mBeanInfoKey, mBeanInfo);
+		}
+	}
 
 	/** Collection statistics data from kafka jmx & insert into table. */
 	public int insert(List<KpiInfo> kpi) {
@@ -188,7 +189,7 @@ public class MetricsServiceImpl implements MetricsService {
 		target.put("msg", messageIns);
 		target.put("ins", byteIns);
 		target.put("outs", byteOuts);
-		
+
 		target.put("zks", zks.split(","));
 
 		return target.toJSONString();
