@@ -24,7 +24,7 @@
 	</insert>
 
 	<delete id="remove" parameterType="int">
-		delete from ke_trend where
+		delete from ke_metrics where
 		tm&lt;=#{tm}
 	</delete>
 
