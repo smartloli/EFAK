@@ -116,8 +116,6 @@ public class MetricsServiceImpl implements MetricsService {
 
 	private void assembleMBeanInfo(Map<String, MBeanInfo> mbeans, String mBeanInfoKey, MBeanInfo mBeanInfo) {
 		if (mbeans.containsKey(mBeanInfoKey)) {
-			// MBeanInfo replicationBytesOut =
-			// mbeans.get(MBean.REPLICATIONBYTESOUTPERSEC);
 			MBeanInfo mbeanInfo = mbeans.get(mBeanInfoKey);
 			long fifteenMinute = Math.round(StrUtils.numberic(mbeanInfo.getFifteenMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFifteenMinute()));
 			long fiveMinute = Math.round(StrUtils.numberic(mbeanInfo.getFiveMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFiveMinute()));
@@ -144,7 +142,15 @@ public class MetricsServiceImpl implements MetricsService {
 
 		JSONArray messageIns = new JSONArray();
 		JSONArray byteIns = new JSONArray();
-		JSONArray byteOuts = new JSONArray();
+        JSONArray byteOuts = new JSONArray();
+        JSONArray byteRejected = new JSONArray();
+        JSONArray failedFetchRequest = new JSONArray();
+		JSONArray failedProduceRequest = new JSONArray();
+		JSONArray produceMessageConversions = new JSONArray();
+		JSONArray totalFetchRequests = new JSONArray();
+		JSONArray totalProduceRequests = new JSONArray();
+		JSONArray replicationBytesOuts = new JSONArray();
+		JSONArray replicationBytesIns = new JSONArray();
 
 		JSONArray zkSendPackets = new JSONArray();
 		JSONArray zkReceivedPackets = new JSONArray();
@@ -177,6 +183,30 @@ public class MetricsServiceImpl implements MetricsService {
 			case MBean.BYTEOUT:
 				assembly(byteOuts, kpi);
 				break;
+			case MBean.BYTESREJECTED:
+				assembly(byteRejected, kpi);
+				break;
+			case MBean.FAILEDFETCHREQUEST:
+				assembly(failedFetchRequest, kpi);
+				break;
+			case MBean.FAILEDPRODUCEREQUEST:
+				assembly(failedProduceRequest, kpi);
+				break;
+			case MBean.PRODUCEMESSAGECONVERSIONS:
+				assembly(produceMessageConversions, kpi);
+				break;
+			case MBean.TOTALFETCHREQUESTSPERSEC:
+				assembly(totalFetchRequests, kpi);
+				break;
+			case MBean.TOTALPRODUCEREQUESTSPERSEC:
+				assembly(totalProduceRequests, kpi);
+				break;
+			case MBean.REPLICATIONBYTESINPERSEC:
+				assembly(replicationBytesOuts, kpi);
+				break;
+			case MBean.REPLICATIONBYTESOUTPERSEC:
+				assembly(replicationBytesIns, kpi);
+				break;
 			default:
 				break;
 			}
@@ -189,6 +219,14 @@ public class MetricsServiceImpl implements MetricsService {
 		target.put("msg", messageIns);
 		target.put("ins", byteIns);
 		target.put("outs", byteOuts);
+		target.put("byteRejected", byteRejected);
+		target.put("failedFetchRequest", failedFetchRequest);
+		target.put("failedProduceRequest", failedProduceRequest);
+		target.put("produceMessageConversions", produceMessageConversions);
+		target.put("totalFetchRequests", totalFetchRequests);
+		target.put("totalProduceRequests", totalProduceRequests);
+		target.put("replicationBytesIns", replicationBytesIns);
+		target.put("replicationBytesOuts", replicationBytesOuts);
 
 		target.put("zks", zks.split(","));
 
