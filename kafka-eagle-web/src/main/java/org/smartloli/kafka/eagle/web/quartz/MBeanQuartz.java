@@ -57,8 +57,8 @@ public class MBeanQuartz {
 	private static final String zk_outstanding_requests = "zk_outstanding_requests";
 	private static final String[] zk_kpis = new String[] { zk_packets_received, zk_packets_sent, zk_num_alive_connections, zk_outstanding_requests };
 
-	private static final String[] broker_kpis = new String[] { MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT,
-            MBean.PRODUCEMESSAGECONVERSIONS, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC
+	private static final String[] broker_kpis = new String[] { MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED,
+            MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC
             , MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS};
 
 	/** Kafka service interface. */
@@ -122,28 +122,69 @@ public class MBeanQuartz {
 		switch (type) {
 		case MBean.MESSAGEIN:
 			MBeanInfo msg = mx4jService.messagesInPerSec(uri);
-			value.put(kafka.getString("host"), msg.getMeanRate());
+            if (msg != null) {
+                value.put(kafka.getString("host"), msg.getMeanRate());
+            }
 			break;
 		case MBean.BYTEIN:
 			MBeanInfo bin = mx4jService.bytesInPerSec(uri);
-			value.put(kafka.getString("host"), bin.getMeanRate());
+            if (bin != null) {
+                value.put(kafka.getString("host"), bin.getMeanRate());
+            }
 			break;
 		case MBean.BYTEOUT:
 			MBeanInfo bout = mx4jService.bytesOutPerSec(uri);
-			value.put(kafka.getString("host"), bout.getMeanRate());
+            if (bout != null) {
+                value.put(kafka.getString("host"), bout.getMeanRate());
+            }
 			break;
-		case MBean.PRODUCEMESSAGECONVERSIONS:
-            MBeanInfo produceMessageConv= mx4jService.produceMessageConversionsPerSec(uri);
-            if (produceMessageConv != null)
-                value.put(kafka.getString("host"), produceMessageConv.getMeanRate());
-            break;
+		case MBean.BYTESREJECTED:
+			MBeanInfo bytesRejectedPerSec = mx4jService.bytesRejectedPerSec(uri);
+            if (bytesRejectedPerSec != null) {
+                value.put(kafka.getString("host"), bytesRejectedPerSec.getMeanRate());
+            }
+			break;
+		case MBean.FAILEDFETCHREQUEST:
+			MBeanInfo failedFetchRequestsPerSec = mx4jService.failedFetchRequestsPerSec(uri);
+            if (failedFetchRequestsPerSec != null) {
+                value.put(kafka.getString("host"), failedFetchRequestsPerSec.getMeanRate());
+            }
+			break;
+		case MBean.FAILEDPRODUCEREQUEST:
+			MBeanInfo failedProduceRequestsPerSec = mx4jService.failedProduceRequestsPerSec(uri);
+            if (failedProduceRequestsPerSec != null) {
+                value.put(kafka.getString("host"), failedProduceRequestsPerSec.getMeanRate());
+            }
+			break;
 		case MBean.TOTALFETCHREQUESTSPERSEC:
             MBeanInfo totalFetchRequests= mx4jService.totalFetchRequestsPerSec(uri);
-            value.put(kafka.getString("host"), totalFetchRequests.getMeanRate());
+            if (totalFetchRequests != null) {
+                value.put(kafka.getString("host"), totalFetchRequests.getMeanRate());
+            }
             break;
 		case MBean.TOTALPRODUCEREQUESTSPERSEC:
             MBeanInfo totalProduceRequestsPerSec= mx4jService.totalProduceRequestsPerSec(uri);
-            value.put(kafka.getString("host"), totalProduceRequestsPerSec.getMeanRate());
+            if (totalProduceRequestsPerSec != null) {
+                value.put(kafka.getString("host"), totalProduceRequestsPerSec.getMeanRate());
+            }
+            break;
+		case MBean.REPLICATIONBYTESINPERSEC:
+            MBeanInfo replicationBytesInPerSec= mx4jService.replicationBytesInPerSec(uri);
+            if (replicationBytesInPerSec != null) {
+                value.put(kafka.getString("host"), replicationBytesInPerSec.getMeanRate());
+            }
+            break;
+		case MBean.REPLICATIONBYTESOUTPERSEC:
+            MBeanInfo replicationBytesOutPerSec= mx4jService.replicationBytesOutPerSec(uri);
+            if (replicationBytesOutPerSec != null) {
+                value.put(kafka.getString("host"), replicationBytesOutPerSec.getMeanRate());
+            }
+            break;
+        case MBean.PRODUCEMESSAGECONVERSIONS:
+            MBeanInfo produceMessageConv= mx4jService.produceMessageConversionsPerSec(uri);
+            if (produceMessageConv != null) {
+                value.put(kafka.getString("host"), produceMessageConv.getMeanRate());
+            }
             break;
 		default:
 			break;

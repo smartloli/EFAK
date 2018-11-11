@@ -3,6 +3,7 @@
 <link href="/ke/media/css/public/sb-admin.css" rel="stylesheet"/>
 <link href="/ke/media/css/public/morris.css" rel="stylesheet"/>
 <link href="/ke/media/css/public/font-awesome.min.css" rel="stylesheet"/>
+<link href="/ke/media/css/public/awesome-bootstrap-checkbox.css" rel="stylesheet"/>
 <link href="/ke/media/css/public/magicsuggest.css" rel="stylesheet"/>
 <link href="/ke/media/css/public/codemirror.css" rel="stylesheet"/>
 <link href="/ke/media/css/public/show-hint.css" rel="stylesheet"/>

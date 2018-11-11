@@ -30,11 +30,11 @@
 						<div class="form-group">
 							<input class="form-control input-underline input-lg" id="usr"
 								ng-model="name" name="username" placeholder="Account"
-								autocomplete="off" type="text">
+								autocomplete="off" type="text" value="admin">
 						</div>
 						<div class="form-group">
 							<input class="form-control input-underline input-lg" id="pwd"
-								name="password" placeholder="Password" name="pwd" type="text">
+								name="password" placeholder="Password" name="pwd" type="text" value="123456">
 							<input type="hidden" id="ref_url" name="ref_url" type="text">
 						</div>
 						<div class="form-group">

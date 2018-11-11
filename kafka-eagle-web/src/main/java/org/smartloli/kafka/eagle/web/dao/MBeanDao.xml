@@ -24,19 +24,27 @@
 	</insert>
 
 	<delete id="remove" parameterType="int">
-		delete from ke_trend where
+		delete from ke_metrics where
 		tm&lt;=#{tm}
 	</delete>
 
 	<select id="query" parameterType="map" resultMap="kpi">
 		select
 		`broker`,`key`,`value`
-		from ke_metrics where
-		`cluster`=#{cluster} and
-		type=#{type} and tm
-		between
-		#{stime} and
-		#{etime}
+		from ke_metrics
+		where
+		`cluster` =#{cluster}
+		and `type` =#{type}
+		<if test="modules != '' and modules != null">
+            and `key` in (
+              <foreach collection="modules" item="item" index="index"
+                     separator=",">
+                  #{item}
+              </foreach>
+            )
+        </if>
+		and tm between
+		#{stime} and #{etime}
 	</select>
 
 	<select id="getHost" parameterType="map" resultMap="kpi">
