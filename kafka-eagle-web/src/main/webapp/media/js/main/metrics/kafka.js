@@ -98,7 +98,7 @@ $(document).ready(
         });
     }
 
-    // 模块显示
+    // module show or hide
     function module(id, display) {
         if (display) {
             $(id).css('display', 'block');
@@ -107,7 +107,7 @@ $(document).ready(
         }
     }
 
-    // 获得勾选模块
+    // choise module
     function getCheckedModules() {
         var modules = '';
         $('.checkbox').find('input[type="checkbox"]:checked').each(function () {
@@ -116,7 +116,7 @@ $(document).ready(
         return modules.substring(0, modules.length - 1);
     }
 
-    // 初始化模块显示并且绑定对应事件
+    // init module show or hide & bind change event
     function initModuleVisualAndBingding() {
         $('.checkbox').find('input[type="checkbox"]').each(function () {
             var that = this;
@@ -131,7 +131,6 @@ $(document).ready(
                     stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
                     etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
                     mbeanRealtime(stime, etime, type, getCheckedModules());
-                    // 规避问题：因为某些模块无数据加载，所以当动态加载时，对应的展示图宽度不能完全显示，因此，此次手动调整宽度。是否有更好的处理方法？
                     $('svg').css('width', '100%');
                     return;
                 }
@@ -140,14 +139,14 @@ $(document).ready(
         });
     }
 
-    // 设置趋势图数据
+    // set trend data
     function setTrendData(mbean, filed, zks, data) {
         mbean.options.ykeys = zks;
         mbean.options.labels = zks;
         mbean.setData(filter(data, filed));
     }
 
-    // 过滤数据
+    // filter data
     function filter(datas, type) {
         var data = new Array();
         for (var i = 0; i < datas.length; i++) {

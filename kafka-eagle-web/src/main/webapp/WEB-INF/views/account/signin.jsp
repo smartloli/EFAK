@@ -12,6 +12,25 @@
 <title>Login - KafkaEagle</title>
 <meta name="description" content="">
 <link rel="shortcut icon" href="/ke/media/img/favicon.ico" />
+<style type="text/css">
+/* input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill
+	{
+	box-shadow: 0 0 0px 1000px #222 inset !important;
+	color: white !important;
+} */
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill
+	{
+	-webkit-text-fill-color: #ededed !important;
+	-webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+	background-color: transparent;
+	background-image: none;
+	transition: background-color 50000s ease-in-out 0s;
+}
+
+input {
+	background-color: transparent;
+}
+</style>
 <link rel="stylesheet" href="/ke/media/css/public/account/main.css">
 </head>
 
@@ -30,12 +49,13 @@
 						<div class="form-group">
 							<input class="form-control input-underline input-lg" id="usr"
 								ng-model="name" name="username" placeholder="Account"
-								autocomplete="off" type="text" value="admin">
+								autocomplete="off" type="text">
 						</div>
 						<div class="form-group">
 							<input class="form-control input-underline input-lg" id="pwd"
-								name="password" placeholder="Password" name="pwd" type="text" value="123456">
-							<input type="hidden" id="ref_url" name="ref_url" type="text">
+								name="password" placeholder="Password" autocomplete="off"
+								name="pwd" type="text"> <input
+								type="hidden" id="ref_url" name="ref_url" type="text">
 						</div>
 						<div class="form-group">
 							<div id="alert_mssage" style="display: none"
