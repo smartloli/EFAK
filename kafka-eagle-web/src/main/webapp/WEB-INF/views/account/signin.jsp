@@ -13,11 +13,6 @@
 <meta name="description" content="">
 <link rel="shortcut icon" href="/ke/media/img/favicon.ico" />
 <style type="text/css">
-/* input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill
-	{
-	box-shadow: 0 0 0px 1000px #222 inset !important;
-	color: white !important;
-} */
 input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill
 	{
 	-webkit-text-fill-color: #ededed !important;
@@ -54,7 +49,7 @@ input {
 						<div class="form-group">
 							<input class="form-control input-underline input-lg" id="pwd"
 								name="password" placeholder="Password" autocomplete="off"
-								name="pwd" type="text"> <input
+								name="pwd" type="password"> <input
 								type="hidden" id="ref_url" name="ref_url" type="text">
 						</div>
 						<div class="form-group">
