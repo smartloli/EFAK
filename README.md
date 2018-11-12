@@ -35,7 +35,7 @@ Kafka is designed to be flexible on how the offsets are managed. Consumer can ch
   * Zookeeper. Old version of Kafka (0.8.2 before) default storage in Zookeeper.
   * Kafka. New version of Kafka (0.10.0 in the future) default recommend storage in Kafka Topic(__consumer_offsets).
   
-Kafka Eagle supports multiple offset storage paths. If you store them in Zookeeper and Kafka respectively, you can configure them like this.
+Kafka Eagle supports multiple offset storage paths. If you store them in Zookeeper and Kafka, you can configure them like this.
 ```
 # Set kafka cluster alias
 kafka.eagle.zk.cluster.alias=cluster1,cluster2
