@@ -13,6 +13,7 @@
 <meta name="description" content="">
 <link rel="shortcut icon" href="/ke/media/img/favicon.ico" />
 <style type="text/css">
+/** start: Add author by alisa. */
 input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill
 	{
 	-webkit-text-fill-color: #ededed !important;
@@ -25,6 +26,7 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill
 input {
 	background-color: transparent;
 }
+/** end*/
 </style>
 <link rel="stylesheet" href="/ke/media/css/public/account/main.css">
 </head>
@@ -49,8 +51,8 @@ input {
 						<div class="form-group">
 							<input class="form-control input-underline input-lg" id="pwd"
 								name="password" placeholder="Password" autocomplete="off"
-								name="pwd" type="password"> <input
-								type="hidden" id="ref_url" name="ref_url" type="text">
+								name="pwd" type="password"> <input type="hidden"
+								id="ref_url" name="ref_url" type="text">
 						</div>
 						<div class="form-group">
 							<div id="alert_mssage" style="display: none"
