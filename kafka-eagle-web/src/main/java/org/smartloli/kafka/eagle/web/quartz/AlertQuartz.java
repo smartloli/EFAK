@@ -170,7 +170,10 @@ public class AlertQuartz {
 					AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
 					AlertInfo alertInfo = alertService.findAlertByCGT(params);
 
-					if (offset.getLag() > alertInfo.getLag()) {
+					/*
+					 * the alertInfo maybe null, when the params not in database.
+					 */
+					if (alertInfo!=null && offset.getLag() > alertInfo.getLag()) {
 						try {
 							MailProvider provider = new MailFactory();
 							String subject = "Kafka Eagle Consumer Alert";
