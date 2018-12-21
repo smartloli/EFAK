@@ -175,11 +175,6 @@ public class AlertQuartz {
 							MailProvider provider = new MailFactory();
 							String subject = "Kafka Eagle Consumer Alert";
 							String address = alertInfo.getOwner();
-							// String content = "Group is [" +
-							// alertInfo.getGroup() + "],Topic is [" +
-							// alertInfo.getTopic() + "],current lag is [" +
-							// offset.getLag() + "],expired lag is [" +
-							// alertInfo.getLag() + "].";
 							LagContentModule lcm = new LagContentModule();
 							lcm.setCluster(clusterAlias);
 							lcm.setConsumerLag(offset.getLag() + "");
@@ -257,12 +252,9 @@ public class AlertQuartz {
 								try {
 									MailProvider provider = new MailFactory();
 									String subject = "Kafka Eagle On-Site Inspection Alert";
-									// String content = "Thread Service [" +
-									// host + ":" + port + "] has crashed,please
-									// check it.";
 									ClusterContentModule ccm = new ClusterContentModule();
 									ccm.setCluster(cluster.getCluster());
-									ccm.setServer(cluster.getServer());
+									ccm.setServer(host + ":" + port);
 									ccm.setTime(CalendarUtils.getDate());
 									ccm.setType(cluster.getType());
 									ccm.setUser(cluster.getOwner());
