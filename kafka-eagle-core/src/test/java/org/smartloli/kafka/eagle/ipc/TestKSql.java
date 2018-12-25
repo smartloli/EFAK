@@ -21,6 +21,7 @@ package org.smartloli.kafka.eagle.ipc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.core.sql.ignite.domain.TopicX;
 import org.smartloli.kafka.eagle.core.sql.ignite.factory.KafkaSqlFactory;
 import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
@@ -39,7 +40,8 @@ public class TestKSql {
 
 	public static void main(String[] args) throws Exception {
 //		ignite();
-		calcite();
+//		calcite();
+		System.out.println(KConstants.Kafka.POSITION);
 	}
 	
 	public static void ignite(){

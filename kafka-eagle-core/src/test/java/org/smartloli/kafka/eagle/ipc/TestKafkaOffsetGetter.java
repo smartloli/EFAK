@@ -18,7 +18,6 @@
 package org.smartloli.kafka.eagle.ipc;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,8 +33,6 @@ import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.protocol.types.Schema;
 import org.apache.kafka.common.protocol.types.Struct;
 import org.apache.kafka.common.protocol.types.Type;
-import org.apache.kafka.common.serialization.ByteBufferDeserializer;
-import org.apache.kafka.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.offsets.KeyAndValueSchemasInfo;
@@ -45,7 +42,6 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 
-import com.google.gson.Gson;
 
 import kafka.common.OffsetAndMetadata;
 import kafka.common.OffsetMetadata;
@@ -257,7 +253,6 @@ public class TestKafkaOffsetGetter extends Thread {
 			mvs.setVersion(Short.valueOf("-1"));
 		} else {
 			short version = buffer.getShort();
-			KeyAndValueSchemasInfo kk = schemaFor(version);
 			Schema valueSchema = schemaFor(version).getValueSchema();
 			Struct value = (Struct) valueSchema.read(buffer);
 			mvs.setValue(value);

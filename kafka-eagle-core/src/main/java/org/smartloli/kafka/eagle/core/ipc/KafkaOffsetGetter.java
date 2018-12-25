@@ -93,6 +93,12 @@ public class KafkaOffsetGetter extends Thread {
 
 	private static Schema OFFSET_COMMIT_VALUE_SCHEMA_V1 = new Schema(new Field("offset", Type.INT64), new Field("metadata", Type.STRING, "Associated metadata.", ""), new Field("commit_timestamp", Type.INT64),
 			new Field("expire_timestamp", Type.INT64));
+	
+	private static Schema OFFSET_COMMIT_VALUE_SCHEMA_V2 = new Schema(new Field("offset", Type.INT64), new Field("metadata", Type.STRING, "Associated metadata.", ""), new Field("commit_timestamp", Type.INT64));
+
+	/** GroupMetadataManager . */
+	private static Schema OFFSET_COMMIT_VALUE_SCHEMA_V3 = new Schema(new Field("offset", Type.INT64), new Field("leader_epoch", Type.INT32), new Field("metadata", Type.STRING, "Associated metadata.", ""),
+			new Field("commit_timestamp", Type.INT64));
 
 	private static Field VALUE_OFFSET_FIELD_V0 = OFFSET_COMMIT_VALUE_SCHEMA_V0.get("offset");
 	private static Field VALUE_METADATA_FIELD_V0 = OFFSET_COMMIT_VALUE_SCHEMA_V0.get("metadata");
@@ -101,6 +107,15 @@ public class KafkaOffsetGetter extends Thread {
 	private static Field VALUE_OFFSET_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("offset");
 	private static Field VALUE_METADATA_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("metadata");
 	private static Field VALUE_COMMIT_TIMESTAMP_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("commit_timestamp");
+	private static Field OFFSET_VALUE_EXPIRE_TIMESTAMP_FIELD_V1 = OFFSET_COMMIT_VALUE_SCHEMA_V1.get("expire_timestamp");
+	
+	private static Field VALUE_OFFSET_FIELD_V2 = OFFSET_COMMIT_VALUE_SCHEMA_V2.get("offset");
+	private static Field VALUE_METADATA_FIELD_V2 = OFFSET_COMMIT_VALUE_SCHEMA_V2.get("metadata");
+	private static Field VALUE_COMMIT_TIMESTAMP_FIELD_V2 = OFFSET_COMMIT_VALUE_SCHEMA_V2.get("commit_timestamp");
+
+	private static Field VALUE_OFFSET_FIELD_V3 = OFFSET_COMMIT_VALUE_SCHEMA_V3.get("offset");
+	private static Field VALUE_METADATA_FIELD_V3 = OFFSET_COMMIT_VALUE_SCHEMA_V3.get("metadata");
+	private static Field VALUE_COMMIT_TIMESTAMP_FIELD_V3 = OFFSET_COMMIT_VALUE_SCHEMA_V3.get("commit_timestamp");
 	/** ============================ End Filter ========================= */
 
 	/** Kafka offset memory in schema. */
@@ -116,6 +131,17 @@ public class KafkaOffsetGetter extends Thread {
 			ks1.setKeySchema(OFFSET_COMMIT_KEY_SCHEMA_V0);
 			ks1.setValueSchema(OFFSET_COMMIT_VALUE_SCHEMA_V1);
 			put(1, ks1);
+			
+			KeyAndValueSchemasInfo ks2 = new KeyAndValueSchemasInfo();
+			ks2.setKeySchema(OFFSET_COMMIT_KEY_SCHEMA_V0);
+			ks2.setValueSchema(OFFSET_COMMIT_VALUE_SCHEMA_V2);
+			put(2, ks2);
+
+			/** Fixed by kafka-2.1.0 version. */
+			KeyAndValueSchemasInfo ks3 = new KeyAndValueSchemasInfo();
+			ks3.setKeySchema(OFFSET_COMMIT_KEY_SCHEMA_V0);
+			ks3.setValueSchema(OFFSET_COMMIT_VALUE_SCHEMA_V3);
+			put(3, ks3);
 		}
 	};
 
@@ -219,8 +245,19 @@ public class KafkaOffsetGetter extends Thread {
 				long offset = structAndVersion.getValue().getLong(VALUE_OFFSET_FIELD_V1);
 				String metadata = structAndVersion.getValue().getString(VALUE_METADATA_FIELD_V1);
 				long commitTimestamp = structAndVersion.getValue().getLong(VALUE_COMMIT_TIMESTAMP_FIELD_V1);
+				long expireTimestamp = structAndVersion.getValue().getLong(OFFSET_VALUE_EXPIRE_TIMESTAMP_FIELD_V1);
+				return new OffsetAndMetadata(new OffsetMetadata(offset, metadata), commitTimestamp, expireTimestamp);
+			} else if (structAndVersion.getVersion() == 2) {
+				long offset = structAndVersion.getValue().getLong(VALUE_OFFSET_FIELD_V2);
+				String metadata = structAndVersion.getValue().getString(VALUE_METADATA_FIELD_V2);
+				long commitTimestamp = structAndVersion.getValue().getLong(VALUE_COMMIT_TIMESTAMP_FIELD_V2);
+				return new OffsetAndMetadata(new OffsetMetadata(offset, metadata), commitTimestamp,commitTimestamp);
+			} else if (structAndVersion.getVersion() == 3) {
+				long offset = structAndVersion.getValue().getLong(VALUE_OFFSET_FIELD_V3);
+				String metadata = structAndVersion.getValue().getString(VALUE_METADATA_FIELD_V3);
+				long commitTimestamp = structAndVersion.getValue().getLong(VALUE_COMMIT_TIMESTAMP_FIELD_V3);
 				return new OffsetAndMetadata(new OffsetMetadata(offset, metadata), commitTimestamp, commitTimestamp);
-			} else {
+			}else {
 				throw new IllegalStateException("Unknown offset message version: " + structAndVersion.getVersion());
 			}
 		}

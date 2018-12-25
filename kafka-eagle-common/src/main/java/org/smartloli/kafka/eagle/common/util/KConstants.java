@@ -40,7 +40,7 @@ public class KConstants {
 		public final static String EARLIEST = "earliest";
 		public final static String JAVA_SECURITY = "java.security.auth.login.config";
 		public final static int TIME_OUT = 100;
-		public final static long POSITION = 5000;// default 5000
+		public final static long POSITION = SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max") == 0 ? 5000 : SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max");
 		public final static String PARTITION_CLASS = "partitioner.class";
 		public final static String KEY_SERIALIZER = "key.serializer";
 		public final static String VALUE_SERIALIZER = "value.serializer";
