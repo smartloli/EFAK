@@ -98,6 +98,9 @@ public class OffsetServiceImpl implements OffsetService {
 	private OffsetZkInfo getKafkaOffset(String clusterAlias, String topic, String group, int partition) {
 		JSONArray kafkaOffsets = JSON.parseArray(kafkaService.getKafkaOffset(clusterAlias));
 		OffsetZkInfo targetOffset = new OffsetZkInfo();
+		if (kafkaOffsets == null) {
+			return targetOffset;
+		}
 		for (Object kafkaOffset : kafkaOffsets) {
 			JSONObject object = (JSONObject) kafkaOffset;
 			String _topic = object.getString("topic");
