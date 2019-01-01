@@ -15,17 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.api.email;
+package org.smartloli.kafka.eagle.api.im;
 
 /**
- * Mail provider MailService visitor enter.
+ * IM provider IMService visitor enter.
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
- * 
- * @see org.smartloli.kafka.eagle.api.email.MailService
+ *         Created by Jan 1, 2019
  */
-public interface MailProvider {
-	public MailService create();
+public interface IMService {
+
+	public void sendJsonMsgByDingDing(String data);
+	
+	public void sendJsonMsgByWeChat(String data);
+	
 }

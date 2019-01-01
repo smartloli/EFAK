@@ -102,12 +102,26 @@ public class LagContentModule {
 	@Override
 	public String toString() {
 		String head = "Hi " + user + ",<br/>";
-		String title = "If Kafka broker or Zookeeper is down, or [Consumer Lag] is greater than [Lag Threshold], the following alarm will occur.<br/>";
+		String title = "Kafka Broker [LagBlocked] is greater than [LagExpect], the following alarm will occur.<br/>";
 		String content = "</table>" + "	<table align='center' border='1'>  <tr><th  colspan='3' align='center'><label>Kafka Eagle Alert Data</label></th></tr>" + "        <tr><td>Type</td><td>" + type + "</td></tr>"
 				+ "        <tr><td>Cluster</td><td>" + cluster + "</td></tr>" + "        <tr><td>Group</td><td>" + group + "</td></tr>" + "        <tr><td>Topic</td><td>" + topic + "</td></tr>"
-				+ "        <tr><td>Lag Threshold</td><td bgcolor='green'>" + lagThreshold + "</td></tr>" + "        <tr><td>Consumer Lag</td><td bgcolor='red'>" + consumerLag + "</td></tr>" + "<tr><td>Time</td><td>" + time + "</td></tr>"
+				+ "        <tr><td>Lag Expect</td><td bgcolor='green'>" + lagThreshold + "</td></tr>" + "        <tr><td>Lag Blocked</td><td bgcolor='red'>" + consumerLag + "</td></tr>" + "<tr><td>Time</td><td>" + time + "</td></tr>"
 				+ "        <tr><td>Note</td><td>Please check in kafka cluster and applications.</td></tr>" + "	</table>";
 		return head + title + content;
 	}
 
+	public String toWeChatMarkDown() {
+		String content = "`### Kafka Eagle Alert`\n" + ">**Information** \n" + ">Type: <font color=\"info\">" + type + "</font> \n" + ">ClusterID: cluster1 \n" + ">Owners: @" + user + "\n" + ">Group: " + group + "\n" + ">Topic: " + topic + "\n"
+				+ ">LagExpect: <font color=\"info\">" + lagThreshold + "</font> \n" + ">LagBlocked: <font color=\"warning\">" + consumerLag + "</font> \n" + "> \n" + ">Time: <font color=\"info\">" + time + "</font> \n" + ">Describer:\n"
+				+ "><font color=\"warning\">Please check in kafka cluster and applications.</font>";
+		return content;
+	}
+
+	public String toDingDingMarkDown() {
+		String content = "<font color=\"#FF0000\"> ### [MINOR] Kafka Eagle Alert</font> \n\n" + "> #### Information \n" + "> #### Type: <font color=\"#008000\">" + type + "</font> \n" + "> #### ClusterID: cluster1 \n" + "> #### Owners: "
+				+ user + "\n" + "> #### Group: " + group + "\n" + "> #### Topic: " + topic + "\n" + "> #### LagExpect: <font color=\"#008000\">" + lagThreshold + "</font> \n" + "> #### LagBlocked: <font color=\"#FFA500\">" + consumerLag
+				+ "</font> \n" + "> \n" + "> #### Time: <font color=\"#008000\">" + time + "</font> \n" + "> #### Describer:\n" + "><font color=\"#FFA500\">Please check in kafka cluster and applications.</font>";
+
+		return content;
+	}
 }

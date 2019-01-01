@@ -96,10 +96,4 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 		return StrUtils.stringify(tpSize * jnis.size());
 	}
 
-	public static void main(String[] args) {
-		KafkaMetricsServiceImpl ki = new KafkaMetricsServiceImpl();
-		String res = ki.topicSize("cluster2", "kv3_topic");
-		System.out.println(res);
-	}
-
 }

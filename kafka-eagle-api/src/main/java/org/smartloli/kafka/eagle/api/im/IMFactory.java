@@ -15,17 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.api.email;
+package org.smartloli.kafka.eagle.api.im;
 
 /**
- * Mail provider MailService visitor enter.
+ * IM factory implements IMProvider service.
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
- * 
- * @see org.smartloli.kafka.eagle.api.email.MailService
+ *         Created by Jan 1, 2019
  */
-public interface MailProvider {
-	public MailService create();
+public class IMFactory implements IMProvider {
+
+	@Override
+	public IMService create() {
+		return new IMServiceImpl();
+	}
+
 }

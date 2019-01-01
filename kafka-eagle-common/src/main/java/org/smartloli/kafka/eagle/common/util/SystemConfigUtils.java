@@ -154,7 +154,7 @@ public final class SystemConfigUtils {
 	/** Retrieve a property as a long. */
 	public static Long getLongProperty(String name, Long defaultValue) {
 		String value = SystemConfigUtils.getProperty(name);
-		if (value == null) {
+		if (value == null || "".equals(value)) {
 			return defaultValue;
 		}
 		try {
@@ -182,7 +182,7 @@ public final class SystemConfigUtils {
 	public static String getProperty(String key, String defaultValue) {
 		LOG.debug("Fetching property [" + key + "=" + mConfig.getProperty(key) + "]");
 		String value = SystemConfigUtils.getProperty(key);
-		if (value == null) {
+		if (value == null || "".equals(value)) {
 			return defaultValue;
 		}
 		return value;

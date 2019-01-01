@@ -34,6 +34,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.web.service.ClusterService;
 
 /**
@@ -113,6 +114,12 @@ public class ClusterController {
 				if ("kafka".equals(type)) {
 					obj.put("created", cluster.getString("created"));
 					obj.put("modify", cluster.getString("modify"));
+					String version = cluster.getString("version") == "" ? Kafka.UNKOWN : cluster.getString("version");
+					if (Kafka.UNKOWN.equals(version)) {
+						obj.put("version", "<a class='btn btn-danger btn-xs'>" + version + "</a>");
+					} else {
+						obj.put("version", "<a class='btn btn-success btn-xs'>" + version + "</a>");
+					}
 				} else if ("zk".equals(type)) {
 					String mode = cluster.getString("mode");
 					if ("death".equals(mode)) {
@@ -131,6 +138,12 @@ public class ClusterController {
 					if ("kafka".equals(type)) {
 						obj.put("created", cluster.getString("created"));
 						obj.put("modify", cluster.getString("modify"));
+						String version = cluster.getString("version") == "" ? Kafka.UNKOWN : cluster.getString("version");
+						if (Kafka.UNKOWN.equals(version)) {
+							obj.put("version", "<a class='btn btn-danger btn-xs'>" + version + "</a>");
+						} else {
+							obj.put("version", "<a class='btn btn-success btn-xs'>" + version + "</a>");
+						}
 					} else if ("zk".equals(type)) {
 						String mode = cluster.getString("mode");
 						if ("death".equals(mode)) {

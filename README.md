@@ -17,6 +17,11 @@ Supported platform: ```Mac OS X```,```Linux```,```Windows```.
 
 Here are a few Kafka Eagle system screenshots:
 
+# Alert Support
+In addition to supporting ```email``` alerts, Kafka Eagle also supports im alerts, such as ```DingDing``` and ```WeChat```.
+![DingDing Alert](https://ke.smartloli.org/res/dingding_alert@2x.png)
+![WeChat Alert](https://ke.smartloli.org/res/wechat_alert@2x.png)
+
 # List of Consumer Groups & Active Group Graph
 ![Consumer & Active Graph](https://ke.smartloli.org/res/consumer@2x.png)
 

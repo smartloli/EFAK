@@ -66,6 +66,7 @@
 											<th>Port</th>
 											<th>Created</th>
 											<th>Modify</th>
+											<th>Version</th>
 										</tr>
 									</thead>
 								</table>

@@ -31,6 +31,8 @@ import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailProvider;
 import org.smartloli.kafka.eagle.api.email.module.ClusterContentModule;
 import org.smartloli.kafka.eagle.api.email.module.LagContentModule;
+import org.smartloli.kafka.eagle.api.im.IMFactory;
+import org.smartloli.kafka.eagle.api.im.IMProvider;
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
@@ -171,6 +173,7 @@ public class AlertQuartz {
 					AlertInfo alertInfo = alertService.findAlertByCGT(params);
 
 					if (alertInfo != null && offset.getLag() > alertInfo.getLag()) {
+						// Mail
 						try {
 							MailProvider provider = new MailFactory();
 							String subject = "Kafka Eagle Consumer Alert";
@@ -186,7 +189,27 @@ public class AlertQuartz {
 							lcm.setUser(alertInfo.getOwner());
 							provider.create().send(subject, address, lcm.toString(), "");
 						} catch (Exception ex) {
+							ex.printStackTrace();
 							LOG.error("Topic[" + alertInfo.getTopic() + "] Send alarm mail has error,msg is " + ex.getMessage());
+						}
+
+						// IM (WeChat & DingDing)
+						try {
+							IMProvider provider = new IMFactory();
+							LagContentModule lcm = new LagContentModule();
+							lcm.setCluster(clusterAlias);
+							lcm.setConsumerLag(offset.getLag() + "");
+							lcm.setGroup(alertInfo.getGroup());
+							lcm.setLagThreshold(alertInfo.getLag() + "");
+							lcm.setTime(CalendarUtils.getDate());
+							lcm.setTopic(alertInfo.getTopic());
+							lcm.setType("Consumer");
+							lcm.setUser(alertInfo.getOwner());
+							provider.create().sendJsonMsgByWeChat(lcm.toWeChatMarkDown());
+							provider.create().sendJsonMsgByDingDing(lcm.toDingDingMarkDown());
+						} catch (Exception ex) {
+							ex.printStackTrace();
+							LOG.error("Topic[" + alertInfo.getTopic() + "] Send alarm wechat or dingding has error,msg is " + ex.getMessage());
 						}
 					}
 				}
@@ -236,8 +259,10 @@ public class AlertQuartz {
 	class Cluster {
 
 		public void cluster() {
-			boolean enableAlert = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.enable");
-			if (enableAlert) {
+			boolean enableMailAlert = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.enable");
+			boolean enableIMDingDingAlert = SystemConfigUtils.getBooleanProperty("kafka.eagle.im.dingding.enable");
+			boolean enableWeChatAlert = SystemConfigUtils.getBooleanProperty("kafka.eagle.im.wechat.enable");
+			if (enableMailAlert || enableIMDingDingAlert || enableWeChatAlert) {
 				AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
 				for (ClustersInfo cluster : alertService.historys()) {
 					String[] servers = cluster.getServer().split(",");
@@ -248,10 +273,10 @@ public class AlertQuartz {
 							port = Integer.parseInt(server.split(":")[1]);
 							boolean status = NetUtils.telnet(host, port);
 							if (!status) {
-								String address = SystemConfigUtils.getProperty("kafka.eagle.alert.users");
+								// Mail
 								try {
 									MailProvider provider = new MailFactory();
-									String subject = "Kafka Eagle On-Site Inspection Alert";
+									String subject = "Kafka Eagle Alert";
 									ClusterContentModule ccm = new ClusterContentModule();
 									ccm.setCluster(cluster.getCluster());
 									ccm.setServer(host + ":" + port);
@@ -260,7 +285,24 @@ public class AlertQuartz {
 									ccm.setUser(cluster.getOwner());
 									provider.create().send(subject, cluster.getOwner(), ccm.toString(), "");
 								} catch (Exception ex) {
-									LOG.error("Alertor[" + address + "] Send alarm mail has error,msg is " + ex.getMessage());
+									ex.printStackTrace();
+									LOG.error("Alertor[" + cluster.getOwner() + "] Send alarm mail has error,msg is " + ex.getMessage());
+								}
+
+								// IM (WeChat & DingDing)
+								try {
+									IMProvider provider = new IMFactory();
+									ClusterContentModule ccm = new ClusterContentModule();
+									ccm.setCluster(cluster.getCluster());
+									ccm.setServer(host + ":" + port);
+									ccm.setTime(CalendarUtils.getDate());
+									ccm.setType(cluster.getType());
+									ccm.setUser(cluster.getOwner());
+									provider.create().sendJsonMsgByDingDing(ccm.toDingDingMarkDown());
+									provider.create().sendJsonMsgByWeChat(ccm.toWeChatMarkDown());
+								} catch (Exception ex) {
+									ex.printStackTrace();
+									LOG.error("Send alarm wechat or dingding has error,msg is " + ex.getMessage());
 								}
 							}
 

@@ -44,6 +44,7 @@ public class KConstants {
 		public final static String PARTITION_CLASS = "partitioner.class";
 		public final static String KEY_SERIALIZER = "key.serializer";
 		public final static String VALUE_SERIALIZER = "value.serializer";
+		public final static String UNKOWN = "Unknown";
 	}
 
 	/** Mail args setting. */
@@ -145,6 +146,17 @@ public class KConstants {
 
 	public interface Zookeeper {
 		public static final String LEADER = "leader";
+	}
+
+	public interface IM {
+		public static String TITLE = "Kafka Eagle Alert";
+	}
+
+	public interface WeChat {
+		public static String TOUSER = "@all";
+		public static String TOPARTY = "PartyID1|PartyID2";
+		public static String TOTAG = "TagID1 | TagID2";
+		public static long AGENTID = 1;
 	}
 
 }

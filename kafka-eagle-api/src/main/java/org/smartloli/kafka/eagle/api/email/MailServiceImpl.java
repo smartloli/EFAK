@@ -84,46 +84,49 @@ public class MailServiceImpl implements MailService {
 
 	/** Send mail in HTML format */
 	private boolean sendHtmlMail(MailSenderInfo mailInfo) {
-		SaAuthenticatorInfo authenticator = null;
-		Properties pro = mailInfo.getProperties();
-		if (mailInfo.isValidate()) {
-			authenticator = new SaAuthenticatorInfo(mailInfo.getUserName(), mailInfo.getPassword());
-		}
-		Session sendMailSession = Session.getDefaultInstance(pro, authenticator);
-		try {
-			Message mailMessage = new MimeMessage(sendMailSession);
-			Address from = new InternetAddress(mailInfo.getFromAddress());
-			mailMessage.setFrom(from);
-			Address[] to = new Address[mailInfo.getToAddress().split(",").length];
-			int i = 0;
-			for (String e : mailInfo.getToAddress().split(","))
-				to[i++] = new InternetAddress(e);
-			mailMessage.setRecipients(Message.RecipientType.TO, to);
-			mailMessage.setSubject(mailInfo.getSubject());
-			mailMessage.setSentDate(new Date());
-			Multipart mainPart = new MimeMultipart();
-			BodyPart html = new MimeBodyPart();
-			html.setContent(mailInfo.getContent(), "text/html; charset=UTF-8");
-			mainPart.addBodyPart(html);
+		boolean enableMailAlert = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.enable");
+		if (enableMailAlert) {
+			SaAuthenticatorInfo authenticator = null;
+			Properties pro = mailInfo.getProperties();
+			if (mailInfo.isValidate()) {
+				authenticator = new SaAuthenticatorInfo(mailInfo.getUserName(), mailInfo.getPassword());
+			}
+			Session sendMailSession = Session.getDefaultInstance(pro, authenticator);
+			try {
+				Message mailMessage = new MimeMessage(sendMailSession);
+				Address from = new InternetAddress(mailInfo.getFromAddress());
+				mailMessage.setFrom(from);
+				Address[] to = new Address[mailInfo.getToAddress().split(",").length];
+				int i = 0;
+				for (String e : mailInfo.getToAddress().split(","))
+					to[i++] = new InternetAddress(e);
+				mailMessage.setRecipients(Message.RecipientType.TO, to);
+				mailMessage.setSubject(mailInfo.getSubject());
+				mailMessage.setSentDate(new Date());
+				Multipart mainPart = new MimeMultipart();
+				BodyPart html = new MimeBodyPart();
+				html.setContent(mailInfo.getContent(), "text/html; charset=UTF-8");
+				mainPart.addBodyPart(html);
 
-			List<File> list = mailInfo.getFileList();
-			if (list != null && list.size() > 0) {
-				for (File f : list) {
-					MimeBodyPart mbp = new MimeBodyPart();
-					FileDataSource fds = new FileDataSource(f.getAbsolutePath());
-					mbp.setDataHandler(new DataHandler(fds));
-					mbp.setFileName(f.getName());
-					mainPart.addBodyPart(mbp);
+				List<File> list = mailInfo.getFileList();
+				if (list != null && list.size() > 0) {
+					for (File f : list) {
+						MimeBodyPart mbp = new MimeBodyPart();
+						FileDataSource fds = new FileDataSource(f.getAbsolutePath());
+						mbp.setDataHandler(new DataHandler(fds));
+						mbp.setFileName(f.getName());
+						mainPart.addBodyPart(mbp);
+					}
+
+					list.clear();
 				}
 
-				list.clear();
+				mailMessage.setContent(mainPart);
+				Transport.send(mailMessage);
+				return true;
+			} catch (MessagingException ex) {
+				ex.printStackTrace();
 			}
-
-			mailMessage.setContent(mainPart);
-			Transport.send(mailMessage);
-			return true;
-		} catch (MessagingException ex) {
-			ex.printStackTrace();
 		}
 		return false;
 	}

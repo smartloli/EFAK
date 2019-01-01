@@ -82,4 +82,26 @@ public class ClusterContentModule {
 		return head + title + content;
 	}
 
+	public String toWeChatMarkDown() {
+		String[] servers = server.split(",");
+		String describer = "";
+		for (String serve : servers) {
+			describer += "><font color=\"warning\">Telnet server[" + serve + "] is not available.</font>\n";
+		}
+		String content = "`### [CRITICAL] Kafka Eagle Alert` \n" + ">**Information** \n" + ">Type: <font color=\"info\">" + type + "</font> \n" + ">ClusterID: " + cluster + " \n" + ">Owners: @" + user + " \n" + ">Time: <font color=\"info\">" + time
+				+ "</font> \n" + ">Describer:\n" + describer;
+		return content;
+	}
+
+	public String toDingDingMarkDown() {
+		String[] servers = server.split(",");
+		String describer = "";
+		for (String serve : servers) {
+			describer += "> <font color=\"#FFA500\">Telnet server[" + serve + "] is not available.</font>\n";
+		}
+		String content = "<font color=\"#FF0000\">### [CRITICAL] Kafka Eagle Alert</font> \n\n" + "> #### Information \n" + "> #### Type: <font color=\"#008000\">" + type + "</font> \n" + "> #### ClusterID: " + cluster + " \n"
+				+ "> #### Owners: " + user + " \n" + "> #### Time: <font color=\"#008000\">" + time + "</font> \n" + "> #### Describer:\n" + describer;
+		return content;
+	}
+
 }

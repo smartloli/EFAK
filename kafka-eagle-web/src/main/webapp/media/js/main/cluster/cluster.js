@@ -17,6 +17,8 @@ $(document).ready(function() {
 			"mData" : 'created'
 		}, {
 			"mData" : 'modify'
+		}, {
+			"mData" : 'version'
 		} ]
 	});
 

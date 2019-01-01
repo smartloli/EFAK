@@ -21,6 +21,8 @@ import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailProvider;
 import org.smartloli.kafka.eagle.api.email.module.ClusterContentModule;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants.WeChat;
 
 /**
  * Test mail interface.
@@ -32,9 +34,15 @@ import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 public class TestMailFactory {
 
 	public static void main(String[] args) {
+		
+		System.out.println(SystemConfigUtils.getLongProperty("kafka.eagle.im.wechat.agentid",WeChat.AGENTID));
+		
+	}
+
+	public static void test() {
 		MailProvider provider = new MailFactory();
 		String subject = "Kafka Eagle Consumer Alert";
-		String[] address = new String[] { "smartloli.org@gmail.com", "810371213@qq.com" };
+		//String[] address = new String[] { "smartloli.org@gmail.com", "810371213@qq.com" };
 		
 		String addr = "smartloli.org@gmail.com,810371213@qq.com";
 		

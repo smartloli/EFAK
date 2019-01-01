@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.core.factory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +32,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.kafka.clients.CommonClientConfigs;
@@ -48,6 +55,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer;
 import org.smartloli.kafka.eagle.common.protocol.*;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -254,10 +262,10 @@ public class KafkaServiceImpl implements KafkaService {
 						int port = JSON.parseObject(tuple._1.get()).getInteger("port");
 						broker.setHost(host);
 						broker.setPort(port);
-
 					}
 					broker.setJmxPort(JSON.parseObject(tuple._1.get()).getInteger("jmx_port"));
 					broker.setId(++id);
+					broker.setVersion(getKafkaVersion(broker.getHost(), broker.getJmxPort()));
 					targets.add(broker);
 				} catch (Exception ex) {
 					LOG.error(ex.getMessage());
@@ -961,6 +969,30 @@ public class KafkaServiceImpl implements KafkaService {
 		java.util.Map<TopicPartition, Long> logsize = consumer.endOffsets(Collections.singleton(tp));
 		consumer.close();
 		return logsize.get(tp).longValue();
+	}
+
+	/** Get kafka version. */
+	private String getKafkaVersion(String host, int port) {
+		JMXConnector connector = null;
+		String version = "";
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		try {
+			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
+			connector = JMXConnectorFactory.connect(jmxSeriverUrl);
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			version = mbeanConnection.getAttribute(new ObjectName(KafkaServer.version), KafkaServer.value).toString();
+		} catch (Exception ex) {
+			LOG.error("Get kafka version from jmx has error, msg is " + ex.getMessage());
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					LOG.error("Close jmx connector has error, msg is " + e.getMessage());
+				}
+			}
+		}
+		return version;
 	}
 
 	/** Get kafka 0.10.x sasl topic metadata. */

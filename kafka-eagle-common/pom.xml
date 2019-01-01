@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.smartloli.kafka.eagle</groupId>
 		<artifactId>kafka-eagle</artifactId>
-		<version>1.2.7</version>
+		<version>1.2.8</version>
 	</parent>
 	<artifactId>kafka-eagle-common</artifactId>
 
@@ -98,25 +98,15 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.30</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${fasterxml.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${fasterxml.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>${fasterxml.version}</version>
-		</dependency> -->
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.21.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.6</version>
 		</dependency>
 	</dependencies>
 </project>

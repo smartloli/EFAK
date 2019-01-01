@@ -24,7 +24,7 @@ package org.smartloli.kafka.eagle.common.protocol;
  *
  *         Created by Aug 17, 2016
  */
-public class BrokersInfo extends BaseProtocol{
+public class BrokersInfo extends BaseProtocol {
 
 	private int id = 0;
 	private String host = "";
@@ -32,6 +32,15 @@ public class BrokersInfo extends BaseProtocol{
 	private String created = "";
 	private String modify = "";
 	private int jmxPort = 0;
+	private String version = "";
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
 	public int getJmxPort() {
 		return jmxPort;
