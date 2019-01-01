@@ -111,7 +111,7 @@ public class LagContentModule {
 	}
 
 	public String toWeChatMarkDown() {
-		String content = "`### Kafka Eagle Alert`\n" + ">**Information** \n" + ">Type: <font color=\"info\">" + type + "</font> \n" + ">ClusterID: cluster1 \n" + ">Owners: @" + user + "\n" + ">Group: " + group + "\n" + ">Topic: " + topic + "\n"
+		String content = "`### [MINOR] Kafka Eagle Alert`\n" + ">**Information** \n" + ">Type: <font color=\"info\">" + type + "</font> \n" + ">ClusterID: cluster1 \n" + ">Owners: " + user + "\n" + ">Group: " + group + "\n" + ">Topic: " + topic + "\n"
 				+ ">LagExpect: <font color=\"info\">" + lagThreshold + "</font> \n" + ">LagBlocked: <font color=\"warning\">" + consumerLag + "</font> \n" + "> \n" + ">Time: <font color=\"info\">" + time + "</font> \n" + ">Describer:\n"
 				+ "><font color=\"warning\">Please check in kafka cluster and applications.</font>";
 		return content;

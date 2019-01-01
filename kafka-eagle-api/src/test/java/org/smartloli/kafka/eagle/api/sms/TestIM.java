@@ -38,44 +38,46 @@ public class TestIM {
 	private static void testConsumerHeathyByWeChat() {
 		ClusterContentModule ccm = new ClusterContentModule();
 		ccm.setCluster("cluster2");
-		ccm.setServer("127.0.0.1:9093");
+		ccm.setServer("kafka-node-01:9093");
 		ccm.setTime(CalendarUtils.getDate());
-		ccm.setType("Zookeeper");
+		ccm.setType("Kafka");
 		ccm.setUser("smartloli.org@gmail.com");
 		
 		LagContentModule lcm = new LagContentModule();
 		lcm.setCluster("cluster2");
-		lcm.setConsumerLag("5000");
-		lcm.setGroup("ke_storm_group");
+		lcm.setConsumerLag("50000");
+		lcm.setGroup("ke-storm-group");
 		lcm.setLagThreshold("2000");
 		lcm.setTime(CalendarUtils.getDate());
-		lcm.setTopic("ke_t_storm_money");
+		lcm.setTopic("ke-t-storm-money");
 		lcm.setType("Consumer");
 		lcm.setUser("smartloli.org@gmail.com");
 		
 		IMServiceImpl im = new IMServiceImpl();
+		im.sendJsonMsgByWeChat(ccm.toWeChatMarkDown());
 		im.sendJsonMsgByWeChat(lcm.toWeChatMarkDown());
 	}
 
 	private static void testClusterHeathyByDingDing() {
 		ClusterContentModule ccm = new ClusterContentModule();
 		ccm.setCluster("cluster2");
-		ccm.setServer("127.0.0.1:9093");
+		ccm.setServer("zookeeper-node-01:2183");
 		ccm.setTime(CalendarUtils.getDate());
 		ccm.setType("Zookeeper");
 		ccm.setUser("smartloli.org@gmail.com");
 
 		LagContentModule lcm = new LagContentModule();
 		lcm.setCluster("cluster2");
-		lcm.setConsumerLag("5000");
-		lcm.setGroup("ke_storm_group");
+		lcm.setConsumerLag("50000");
+		lcm.setGroup("ke-storm-group");
 		lcm.setLagThreshold("2000");
 		lcm.setTime(CalendarUtils.getDate());
-		lcm.setTopic("ke_t_storm_money");
+		lcm.setTopic("ke-t-storm-money");
 		lcm.setType("Consumer");
 		lcm.setUser("smartloli.org@gmail.com");
 
 		IMServiceImpl im = new IMServiceImpl();
 		im.sendJsonMsgByDingDing(ccm.toDingDingMarkDown());
+		im.sendJsonMsgByDingDing(lcm.toDingDingMarkDown());
 	}
 }
