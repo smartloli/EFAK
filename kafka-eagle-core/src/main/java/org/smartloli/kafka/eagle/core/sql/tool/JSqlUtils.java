@@ -32,6 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlSchemaStatVisitor;
+import com.alibaba.druid.util.JdbcConstants;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData;
 
 import com.alibaba.fastjson.JSONArray;
@@ -46,7 +50,7 @@ import com.google.gson.Gson;
  *         Created by Mar 29, 2016
  */
 public class JSqlUtils {
-
+	private static String dbType = JdbcConstants.MYSQL;
 	/**
 	 * 
 	 * @param tabSchema
@@ -135,4 +139,19 @@ public class JSqlUtils {
 		return f;
 	}
 
+	public static String getSqlTableName(String sql) {
+		List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType);
+		String tableName = "null";
+		try {
+			if (stmtList.size() == 1 ){
+				SQLStatement stmt = stmtList.get(0);
+				MySqlSchemaStatVisitor visitor = new MySqlSchemaStatVisitor();
+				stmt.accept(visitor);
+				tableName = visitor.getCurrentTable().toString();
+			}
+		} catch (Exception e) {}
+		finally {
+			return sql.toLowerCase().replaceAll(tableName.toLowerCase(), tableName);
+		}
+	}
 }
