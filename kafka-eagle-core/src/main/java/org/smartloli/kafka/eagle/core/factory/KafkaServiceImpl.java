@@ -89,6 +89,7 @@ import kafka.javaapi.TopicMetadataRequest;
 import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.utils.ZkUtils;
+import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
 import scala.Option;
 import scala.Tuple2;
 import scala.collection.Iterator;
@@ -724,8 +725,8 @@ public class KafkaServiceImpl implements KafkaService {
 
 	private KafkaSqlInfo segments(String clusterAlias, String sql) {
 		KafkaSqlInfo kafkaSql = new KafkaSqlInfo();
+		sql = JSqlUtils.getSqlTableName(sql);
 		kafkaSql.setMetaSql(sql);
-		// sql = sql.toLowerCase();
 		kafkaSql.setSql(sql);
 		if (sql.contains("and")) {
 			sql = sql.split("and")[0];
