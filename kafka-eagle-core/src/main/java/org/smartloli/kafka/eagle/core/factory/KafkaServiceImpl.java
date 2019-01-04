@@ -725,7 +725,7 @@ public class KafkaServiceImpl implements KafkaService {
 	private KafkaSqlInfo segments(String clusterAlias, String sql) {
 		KafkaSqlInfo kafkaSql = new KafkaSqlInfo();
 		kafkaSql.setMetaSql(sql);
-		sql = sql.toLowerCase();
+		// sql = sql.toLowerCase();
 		kafkaSql.setSql(sql);
 		if (sql.contains("and")) {
 			sql = sql.split("and")[0];
