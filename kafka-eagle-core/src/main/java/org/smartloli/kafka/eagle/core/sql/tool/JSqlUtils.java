@@ -31,11 +31,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.alibaba.druid.sql.SQLUtils;
-import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlSchemaStatVisitor;
-import com.alibaba.druid.util.JdbcConstants;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData;
 
 import com.alibaba.fastjson.JSONArray;
@@ -50,7 +48,7 @@ import com.google.gson.Gson;
  *         Created by Mar 29, 2016
  */
 public class JSqlUtils {
-	private static String dbType = JdbcConstants.MYSQL;
+	public static final String dbType = "from\\s+(.*)\\s+where?";;
 	/**
 	 * 
 	 * @param tabSchema
@@ -138,16 +136,14 @@ public class JSqlUtils {
 		f.deleteOnExit();
 		return f;
 	}
-
+	
 	public static String getSqlTableName(String sql) {
-		List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType);
 		String tableName = "null";
 		try {
-			if (stmtList.size() == 1 ){
-				SQLStatement stmt = stmtList.get(0);
-				MySqlSchemaStatVisitor visitor = new MySqlSchemaStatVisitor();
-				stmt.accept(visitor);
-				tableName = visitor.getCurrentTable().toString();
+			Pattern p= Pattern.compile(dbType);
+			Matcher matcher=p.matcher(sql);
+			while (matcher.find()) {
+				tableName =matcher.group(1);
 			}
 		} catch (Exception e) {}
 		finally {
