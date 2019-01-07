@@ -48,7 +48,7 @@ import com.google.gson.Gson;
  *         Created by Mar 29, 2016
  */
 public class JSqlUtils {
-	public static final String dbType = "from\\s+(.*)\\s+where?";;
+	private static final String dbType = "select\\s.+from\\s(.+)where\\s(.+)";
 	/**
 	 * 
 	 * @param tabSchema
