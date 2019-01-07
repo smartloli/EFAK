@@ -140,7 +140,7 @@ public class JSqlUtils {
 	public static String getSqlTableName(String sql) {
 		String tableName = "null";
 		try {
-			Pattern p= Pattern.compile(dbType);
+			Pattern p= Pattern.compile(dbType,Pattern.CASE_INSENSITIVE);
 			Matcher matcher=p.matcher(sql);
 			while (matcher.find()) {
 				tableName =matcher.group(1);
