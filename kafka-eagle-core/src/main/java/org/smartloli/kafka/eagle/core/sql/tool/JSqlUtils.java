@@ -31,6 +31,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData;
 
@@ -46,7 +48,7 @@ import com.google.gson.Gson;
  *         Created by Mar 29, 2016
  */
 public class JSqlUtils {
-
+	private static final String dbType = "select\\s.+from\\s(.+)where\\s(.+)";
 	/**
 	 * 
 	 * @param tabSchema
@@ -134,5 +136,17 @@ public class JSqlUtils {
 		f.deleteOnExit();
 		return f;
 	}
-
+	public static String getSqlTableName(String sql) {
+		String tableName = "null";
+		try {
+			Pattern p= Pattern.compile(dbType,Pattern.CASE_INSENSITIVE);
+			Matcher matcher=p.matcher(sql);
+			while (matcher.find()) {
+				tableName =matcher.group(1);
+			}
+		} catch (Exception e) {}
+		finally {
+			return sql.toLowerCase().replaceAll(tableName.toLowerCase(), tableName);
+		}
+	}
 }
