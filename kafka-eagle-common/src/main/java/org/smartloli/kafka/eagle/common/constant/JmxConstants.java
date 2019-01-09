@@ -67,8 +67,8 @@ public class JmxConstants {
 			public static String zooKeeperRequestLatencyMs = "kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs";
 		}
 
-		public static final String version = "kafka.server:type=app-info";
-		public static final String value = "version";
+		public static final String version = "kafka.server:type=app-info,id=%s";
+		public static final String value = "Version";
 	}
 
 	public interface Hosts {

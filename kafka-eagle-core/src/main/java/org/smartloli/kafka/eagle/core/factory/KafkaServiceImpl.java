@@ -265,7 +265,7 @@ public class KafkaServiceImpl implements KafkaService {
 					}
 					broker.setJmxPort(JSON.parseObject(tuple._1.get()).getInteger("jmx_port"));
 					broker.setId(++id);
-					broker.setVersion(getKafkaVersion(broker.getHost(), broker.getJmxPort()));
+					broker.setVersion(getKafkaVersion(broker.getHost(), broker.getJmxPort(), ids));
 					targets.add(broker);
 				} catch (Exception ex) {
 					LOG.error(ex.getMessage());
@@ -972,7 +972,7 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get kafka version. */
-	private String getKafkaVersion(String host, int port) {
+	private String getKafkaVersion(String host, int port, String ids) {
 		JMXConnector connector = null;
 		String version = "";
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
@@ -980,7 +980,7 @@ public class KafkaServiceImpl implements KafkaService {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
 			connector = JMXConnectorFactory.connect(jmxSeriverUrl);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			version = mbeanConnection.getAttribute(new ObjectName(KafkaServer.version), KafkaServer.value).toString();
+			version = mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer.version, ids)), KafkaServer.value).toString();
 		} catch (Exception ex) {
 			LOG.error("Get kafka version from jmx has error, msg is " + ex.getMessage());
 		} finally {

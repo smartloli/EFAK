@@ -115,7 +115,7 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	private void assembleMBeanInfo(Map<String, MBeanInfo> mbeans, String mBeanInfoKey, MBeanInfo mBeanInfo) {
-		if (mbeans.containsKey(mBeanInfoKey)) {
+		if (mbeans.containsKey(mBeanInfoKey) && mBeanInfo != null) {
 			MBeanInfo mbeanInfo = mbeans.get(mBeanInfoKey);
 			long fifteenMinute = Math.round(StrUtils.numberic(mbeanInfo.getFifteenMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFifteenMinute()));
 			long fiveMinute = Math.round(StrUtils.numberic(mbeanInfo.getFiveMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFiveMinute()));
@@ -142,9 +142,9 @@ public class MetricsServiceImpl implements MetricsService {
 
 		JSONArray messageIns = new JSONArray();
 		JSONArray byteIns = new JSONArray();
-        JSONArray byteOuts = new JSONArray();
-        JSONArray byteRejected = new JSONArray();
-        JSONArray failedFetchRequest = new JSONArray();
+		JSONArray byteOuts = new JSONArray();
+		JSONArray byteRejected = new JSONArray();
+		JSONArray failedFetchRequest = new JSONArray();
 		JSONArray failedProduceRequest = new JSONArray();
 		JSONArray produceMessageConversions = new JSONArray();
 		JSONArray totalFetchRequests = new JSONArray();
