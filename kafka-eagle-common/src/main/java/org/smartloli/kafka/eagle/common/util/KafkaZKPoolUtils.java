@@ -116,6 +116,7 @@ public final class KafkaZKPoolUtils {
 			}
 		} catch (Exception e) {
 			LOG.error("ZK init has error,msg is " + e.getMessage());
+			LOG.error("Kafka cluster[" + clusterAlias + ".zk.list] address has null.");
 		}
 		return zkc;
 	}
@@ -123,14 +124,14 @@ public final class KafkaZKPoolUtils {
 	/** Release ZkClient object. */
 	public synchronized void release(String clusterAlias, KafkaZkClient zkc) {
 		Vector<KafkaZkClient> zkCliPool = zkCliPools.get(clusterAlias);
-		if (zkCliPool.size() < zkCliPoolSize) {
+		if (zkCliPool != null && zkCliPool.size() < zkCliPoolSize) {
 			zkCliPool.add(zkc);
 		}
 		String osName = System.getProperties().getProperty("os.name");
 		if (osName.contains("Linux")) {
-			LOG.debug("Release pool,and available size [" + zkCliPool.size() + "]");
+			LOG.debug("Release pool,and available size [" + (zkCliPool == null ? 0 : zkCliPool.size()) + "]");
 		} else {
-			LOG.info("Release pool,and available size [" + zkCliPool.size() + "]");
+			LOG.info("Release pool,and available size [" + (zkCliPool == null ? 0 : zkCliPool.size()) + "]");
 		}
 	}
 

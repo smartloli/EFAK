@@ -71,7 +71,7 @@ public class StartupListener implements ApplicationContextAware {
 				String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 				if ("kafka".equals(formatter)) {
 					try {
-						KafkaOffsetGetter.getInstance();
+						//KafkaOffsetGetter.getInstance();
 					} catch (Exception ex) {
 						LOG.error("Initialize KafkaOffsetGetter thread has error,msg is " + ex.getMessage());
 					}

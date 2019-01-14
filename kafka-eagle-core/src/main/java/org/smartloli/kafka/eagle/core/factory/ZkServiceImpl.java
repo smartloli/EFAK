@@ -26,28 +26,21 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Zookeeper;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import kafka.utils.ZkUtils;
 import kafka.zk.KafkaZkClient;
 import scala.Option;
 import scala.Tuple2;
-import scala.collection.JavaConversions;
-import scala.collection.Seq;
 
 /**
  * Implements ZkService all method.
@@ -66,9 +59,8 @@ public class ZkServiceImpl implements ZkService {
 
 	private final String KE_ROOT_PATH = "/kafka_eagle";
 	private final String STORE_OFFSETS = "offsets";
-	private final String STORE_ALARM = "alarm";
 	/** Request memory space. */
-	private ZkClient zkc = null;
+	private KafkaZkClient zkc = null;
 	/** Instance Kafka Zookeeper client pool. */
 	private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance(); 
 
@@ -78,14 +70,14 @@ public class ZkServiceImpl implements ZkService {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		boolean status = zkc.pathExists(cmd);
 		if (status) {
-			if (zkc.delete(cmd)) {
+			if (zkc.deleteRecursive(cmd)) {
 				ret = "[" + cmd + "] has delete success";
 			} else {
 				ret = "[" + cmd + "] has delete failed";
 			}
 		}
 		if (zkc != null) {
-			zkPool.release(clusterAlias, zkc);
+			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
 		return ret;
@@ -94,11 +86,10 @@ public class ZkServiceImpl implements ZkService {
 	/** Zookeeper get command. */
 	public String get(String clusterAlias, String cmd) {
 		String ret = "";
-		ZkClient zkc = zkPool.getZkClientSerializer(clusterAlias);
-		boolean status = ZkUtils.apply(zkc, false).pathExists(cmd);
-		if (status) {
-			Tuple2<Option<String>, Stat> tuple2 = ZkUtils.apply(zkc, false).readDataMaybeNull(cmd);
-			ret += tuple2._1.get() + "\n";
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		if (zkc.pathExists(cmd)) {
+			Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(cmd);
+			ret += tuple2._1.get().toString() + "\n";
 			ret += "cZxid = " + tuple2._2.getCzxid() + "\n";
 			ret += "ctime = " + tuple2._2.getCtime() + "\n";
 			ret += "mZxid = " + tuple2._2.getMzxid() + "\n";
@@ -112,49 +103,10 @@ public class ZkServiceImpl implements ZkService {
 			ret += "numChildren = " + tuple2._2.getNumChildren() + "\n";
 		}
 		if (zkc != null) {
-			zkPool.releaseZKSerializer(clusterAlias, zkc);
+			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
 		return ret;
-	}
-
-	/** Get alarmer information. */
-	public String getAlarm(String clusterAlias) {
-		JSONArray targets = new JSONArray();
-		if (zkc == null) {
-			zkc = zkPool.getZkClient(clusterAlias);
-		}
-		String path = KE_ROOT_PATH + "/" + STORE_ALARM;
-		if (ZkUtils.apply(zkc, false).pathExists(path)) {
-			Seq<String> alarmPaths = ZkUtils.apply(zkc, false).getChildren(path);
-			List<String> groups = JavaConversions.seqAsJavaList(alarmPaths);
-			for (String group : groups) {
-				Seq<String> subGroups = ZkUtils.apply(zkc, false).getChildren(path + "/" + group);
-				List<String> topics = JavaConversions.seqAsJavaList(subGroups);
-				for (String topic : topics) {
-					try {
-						JSONObject object = new JSONObject();
-						object.put("group", group);
-						object.put("topic", topic);
-						Tuple2<Option<String>, Stat> tuple = ZkUtils.apply(zkc, false).readDataMaybeNull(path + "/" + group + "/" + topic);
-						object.put("created", CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
-						object.put("modify", CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
-						long lag = JSON.parseObject(tuple._1.get()).getLong("lag");
-						String owner = JSON.parseObject(tuple._1.get()).getString("owner");
-						object.put("lag", lag);
-						object.put("owner", owner);
-						targets.add(object);
-					} catch (Exception ex) {
-						LOG.error("[ZK.getAlarm] has error,msg is " + ex.getMessage());
-					}
-				}
-			}
-		}
-		if (zkc != null) {
-			zkPool.release(clusterAlias, zkc);
-			zkc = null;
-		}
-		return targets.toJSONString();
 	}
 
 	/**
@@ -169,13 +121,13 @@ public class ZkServiceImpl implements ZkService {
 	public String getOffsets(String clusterAlias, String group, String topic) {
 		String target = "";
 		if (zkc == null) {
-			zkc = zkPool.getZkClient(clusterAlias);
+			zkc = kafkaZKPool.getZkClient(clusterAlias);
 		}
 		String path = KE_ROOT_PATH + "/" + STORE_OFFSETS + "/" + group + "/" + topic;
-		if (ZkUtils.apply(zkc, false).pathExists(path)) {
+		if (zkc.pathExists(path)) {
 			try {
-				Tuple2<Option<String>, Stat> tuple = ZkUtils.apply(zkc, false).readDataMaybeNull(path);
-				JSONObject object = JSON.parseObject(tuple._1.get());
+				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(path);
+				JSONObject object = JSON.parseObject(tuple._1.get().toString());
 				if (getZkHour().equals(object.getString("hour"))) {
 					target = object.toJSONString();
 				}
@@ -184,7 +136,7 @@ public class ZkServiceImpl implements ZkService {
 			}
 		}
 		if (zkc != null) {
-			zkPool.release(clusterAlias, zkc);
+			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
 		return target;
@@ -235,36 +187,16 @@ public class ZkServiceImpl implements ZkService {
 		}
 	}
 
-	/**
-	 * Insert new alarmer configure information.
-	 * 
-	 * @param alarm
-	 *            New configure object.
-	 * @return Integer.
-	 */
-	public int insertAlarmConfigure(String clusterAlias, AlarmInfo alarm) {
-		JSONObject object = new JSONObject();
-		object.put("lag", alarm.getLag());
-		object.put("owner", alarm.getOwners());
-		try {
-			update(clusterAlias, object.toJSONString(), STORE_ALARM + "/" + alarm.getGroup() + "/" + alarm.getTopics());
-		} catch (Exception ex) {
-			LOG.error("Insert alarmer configure object has error,msg is " + ex.getMessage());
-			return -1;
-		}
-		return 0;
-	}
-
 	/** Zookeeper ls command. */
 	public String ls(String clusterAlias, String cmd) {
 		String target = "";
-		ZkClient zkc = zkPool.getZkClient(clusterAlias);
-		boolean status = ZkUtils.apply(zkc, false).pathExists(cmd);
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		boolean status = zkc.pathExists(cmd);
 		if (status) {
 			target = zkc.getChildren(cmd).toString();
 		}
 		if (zkc != null) {
-			zkPool.release(clusterAlias, zkc);
+			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
 		return target;
@@ -283,14 +215,14 @@ public class ZkServiceImpl implements ZkService {
 	 */
 	public void remove(String clusterAlias, String group, String topic, String theme) {
 		if (zkc == null) {
-			zkc = zkPool.getZkClient(clusterAlias);
+			zkc = kafkaZKPool.getZkClient(clusterAlias);
 		}
 		String path = theme + "/" + group + "/" + topic;
-		if (ZkUtils.apply(zkc, false).pathExists(KE_ROOT_PATH + "/" + path)) {
-			ZkUtils.apply(zkc, false).deletePath(KE_ROOT_PATH + "/" + path);
+		if (zkc.pathExists(KE_ROOT_PATH + "/" + path)) {
+			zkc.deletePath(KE_ROOT_PATH + "/" + path);
 		}
 		if (zkc != null) {
-			zkPool.release(clusterAlias, zkc);
+			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
 	}
@@ -359,16 +291,16 @@ public class ZkServiceImpl implements ZkService {
 	 */
 	private void update(String clusterAlias, String data, String path) {
 		if (zkc == null) {
-			zkc = zkPool.getZkClient(clusterAlias);
+			zkc = kafkaZKPool.getZkClient(clusterAlias);
 		}
-		if (!ZkUtils.apply(zkc, false).pathExists(KE_ROOT_PATH + "/" + path)) {
-			ZkUtils.apply(zkc, false).createPersistentPath(KE_ROOT_PATH + "/" + path, "", ZkUtils.apply(zkc, false).DefaultAcls());
+		if (!zkc.pathExists(KE_ROOT_PATH + "/" + path)) {
+			zkc.createRecursive(path, data.getBytes(), false);
 		}
-		if (ZkUtils.apply(zkc, false).pathExists(KE_ROOT_PATH + "/" + path)) {
-			ZkUtils.apply(zkc, false).updatePersistentPath(KE_ROOT_PATH + "/" + path, data, ZkUtils.apply(zkc, false).DefaultAcls());
+		if (zkc.pathExists(KE_ROOT_PATH + "/" + path)) {
+			zkc.createRecursive(path, data.getBytes(), false);
 		}
 		if (zkc != null) {
-			zkPool.release(clusterAlias, zkc);
+			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
 	}
@@ -392,7 +324,7 @@ public class ZkServiceImpl implements ZkService {
 	/** Judge whether the zkcli is active. */
 	public JSONObject zkCliStatus(String clusterAlias) {
 		JSONObject target = new JSONObject();
-		ZkClient zkc = zkPool.getZkClient(clusterAlias);
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		if (zkc != null) {
 			target.put("live", true);
 			target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
@@ -401,7 +333,7 @@ public class ZkServiceImpl implements ZkService {
 			target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
 		}
 		if (zkc != null) {
-			zkPool.release(clusterAlias, zkc);
+			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
 		return target;

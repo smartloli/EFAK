@@ -22,7 +22,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
@@ -55,12 +54,12 @@ public class KafkaSqlParser {
 				} else {
 					long start = System.currentTimeMillis();
 					kafkaSql.setClusterAlias(clusterAlias);
-					List<JSONArray> dataSets = null;
-					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-						dataSets = KafkaConsumerAdapter.executor(kafkaSql);
-					} else {
-						dataSets = SimpleKafkaConsumer.executor(kafkaSql);
-					}
+					List<JSONArray> dataSets = KafkaConsumerAdapter.executor(kafkaSql);
+//					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+//						dataSets = KafkaConsumerAdapter.executor(kafkaSql);
+//					} else {
+//						dataSets = SimpleKafkaConsumer.executor(kafkaSql);
+//					}
 					String results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
 					// String results = JSqlUtils.toJSONObject(dataSets);
 					long end = System.currentTimeMillis();

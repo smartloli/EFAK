@@ -45,10 +45,12 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
+import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
 import org.apache.kafka.clients.admin.MemberDescription;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -75,7 +77,6 @@ import com.alibaba.fastjson.JSONObject;
 
 import kafka.admin.RackAwareMode;
 import kafka.admin.TopicCommand;
-import kafka.common.OffsetAndMetadata;
 import kafka.coordinator.group.GroupTopicPartition;
 import kafka.zk.AdminZkClient;
 import kafka.zk.KafkaZkClient;
@@ -202,18 +203,19 @@ public class KafkaServiceImpl implements KafkaService {
 					BrokersInfo broker = new BrokersInfo();
 					broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
 					broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
+					String tupleString = new String(tuple._1.get());
 					if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-						String endpoints = JSON.parseObject(tuple._1.get().toString()).getString("endpoints");
+						String endpoints = JSON.parseObject(tupleString).getString("endpoints");
 						String tmp = endpoints.split(File.separator + File.separator)[1];
 						broker.setHost(tmp.substring(0, tmp.length() - 2).split(":")[0]);
 						broker.setPort(Integer.valueOf(tmp.substring(0, tmp.length() - 2).split(":")[1]));
 					} else {
-						String host = JSON.parseObject(tuple._1.get().toString()).getString("host");
-						int port = JSON.parseObject(tuple._1.get().toString()).getInteger("port");
+						String host = JSON.parseObject(tupleString).getString("host");
+						int port = JSON.parseObject(tupleString).getInteger("port");
 						broker.setHost(host);
 						broker.setPort(port);
 					}
-					broker.setJmxPort(JSON.parseObject(tuple._1.get().toString()).getInteger("jmx_port"));
+					broker.setJmxPort(JSON.parseObject(tupleString).getInteger("jmx_port"));
 					broker.setId(++id);
 					broker.setVersion(getKafkaVersion(broker.getHost(), broker.getJmxPort(), ids));
 					targets.add(broker);
@@ -245,7 +247,8 @@ public class KafkaServiceImpl implements KafkaService {
 					partition.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
 					partition.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
 					partition.setTopic(topic);
-					JSONObject partitionObject = JSON.parseObject(tuple._1.get().toString()).getJSONObject("partitions");
+					String tupleString = new String(tuple._1.get());
+					JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 					partition.setPartitionNumbers(partitionObject.size());
 					partition.setPartitions(partitionObject.keySet());
 					targets.add(partition);
@@ -390,10 +393,12 @@ public class KafkaServiceImpl implements KafkaService {
 			}
 			return offsetZk;
 		}
-		long offsetSize = Long.parseLong(tuple._1.get().toString());
+		String tupleString = new String(tuple._1.get());
+		long offsetSize = Long.parseLong(tupleString);
 		if (zkc.pathExists(ownersPath)) {
 			Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(ownersPath);
-			offsetZk.setOwners(tuple2._1.get().toString() == null ? "" : tuple2._1.get().toString());
+			String tupleString2 = new String(tuple2._1.get());
+			offsetZk.setOwners(tupleString2 == null ? "" : tupleString2);
 		} else {
 			offsetZk.setOwners("");
 		}
@@ -615,9 +620,12 @@ public class KafkaServiceImpl implements KafkaService {
 			JSONObject consumerGroup = (JSONObject) object;
 			for (Object topicObject : consumerGroup.getJSONArray("topicSub")) {
 				JSONObject topic = (JSONObject) topicObject;
-				if (consumerGroup.getString("owner") != "" || consumerGroup.getString("owner") != null) {
-					topics.add(topic.getString("topic"));
-				}
+				topics.add(topic.getString("topic"));
+				
+				// flink has no consumerid
+//				if (consumerGroup.getString("owner") != "" || consumerGroup.getString("owner") != null) {
+//					topics.add(topic.getString("topic"));
+//				}
 			}
 		}
 		return topics;
@@ -767,22 +775,40 @@ public class KafkaServiceImpl implements KafkaService {
 		return getKafkaMetadata(parseBrokerServer(clusterAlias), group).toJSONString();
 	}
 
-	/** Get kafka 0.10.x offset from topic. */
+	/** Get kafka 0.10.x, 1.x, 2.x offset from topic. */
 	public String getKafkaOffset(String clusterAlias) {
-		if (KafkaOffsetGetter.multiKafkaConsumerOffsets.containsKey(clusterAlias)) {
-			JSONArray targets = new JSONArray();
-			for (Entry<GroupTopicPartition, OffsetAndMetadata> entry : KafkaOffsetGetter.multiKafkaConsumerOffsets.get(clusterAlias).entrySet()) {
-				JSONObject object = new JSONObject();
-				object.put("group", entry.getKey().group());
-				object.put("topic", entry.getKey().topicPartition().topic());
-				object.put("partition", entry.getKey().topicPartition().partition());
-				object.put("offset", entry.getValue().offset());
-				object.put("timestamp", entry.getValue().commitTimestamp());
-				targets.add(object);
-			}
-			return targets.toJSONString();
+		Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+			sasl(prop, parseBrokerServer(clusterAlias));
 		}
-		return "";
+		JSONArray targets = new JSONArray();
+		try {
+			AdminClient adminClient = AdminClient.create(prop);
+			ListConsumerGroupsResult consumerGroups = adminClient.listConsumerGroups();
+			java.util.Iterator<ConsumerGroupListing> groups = consumerGroups.all().get().iterator();
+			while (groups.hasNext()) {
+				String groupId = groups.next().groupId();
+				if (!groupId.contains("kafka.eagle")) {
+					ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(groupId);
+					for(Entry<TopicPartition, OffsetAndMetadata> entry:offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
+					JSONObject object = new JSONObject();
+					object.put("group", groupId);
+					object.put("topic", entry.getKey().topic());
+					object.put("partition", entry.getKey().partition());
+					object.put("offset", entry.getValue().offset());
+					object.put("timestamp", CalendarUtils.getDate());
+					targets.add(object);
+					}
+				}
+			}
+			adminClient.close();
+		} catch (Exception e) {
+			LOG.error("Get consumer offset has error, msg is "+e.getMessage());
+			e.printStackTrace();
+		}
+		return targets.toJSONString();
 	}
 
 	/** Get kafka 0.10.x broker bootstrap server. */
@@ -842,11 +868,13 @@ public class KafkaServiceImpl implements KafkaService {
 			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
 			if (topics.contains(topic)) {
 				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
-				JSONObject partitionObject = JSON.parseObject(tuple._1.get().toString()).getJSONObject("partitions");
+				String tupleString = new String(tuple._1.get());
+				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 				for (String partition : partitionObject.keySet()) {
 					String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
 					Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
-					JSONObject topicMetadata = JSON.parseObject(tuple2._1.get().toString());
+					String tupleString2 = new String(tuple2._1.get());
+					JSONObject topicMetadata = JSON.parseObject(tupleString2);
 					MetadataInfo metadate = new MetadataInfo();
 					metadate.setIsr(topicMetadata.getString("isr"));
 					metadate.setLeader(topicMetadata.getInteger("leader"));

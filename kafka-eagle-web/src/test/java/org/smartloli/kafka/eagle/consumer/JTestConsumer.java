@@ -15,23 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.util;
-
-import kafka.zk.KafkaZkClient;
+package org.smartloli.kafka.eagle.consumer;
 
 /**
 * TODO
 * 
 * @author smartloli.
 *
-* Created by Oct 28, 2018
+* Created by Jan 15, 2019
 */
-public class TestZKUtils {
+public class JTestConsumer {
 
-	public static void main(String[] args) {
-		KafkaZkClient zkCli = KafkaZKPoolUtils.getInstance().getZkClient("cluster2");
-		KafkaZKPoolUtils.getInstance().release("cluster2", zkCli);
-		System.out.println(zkCli);
-	}
-	
 }

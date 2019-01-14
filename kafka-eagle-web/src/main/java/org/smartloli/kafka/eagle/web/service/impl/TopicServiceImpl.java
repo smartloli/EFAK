@@ -60,11 +60,12 @@ public class TopicServiceImpl implements TopicService {
 
 	/** Get metadata in topic. */
 	public String metadata(String clusterAlias, String topicName) {
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			return kafkaService.findKafkaLeader(clusterAlias, topicName).toString();
-		} else {
-			return kafkaService.findLeader(clusterAlias, topicName).toString();
-		}
+		return kafkaService.findKafkaLeader(clusterAlias, topicName).toString();
+//		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+//			return kafkaService.findKafkaLeader(clusterAlias, topicName).toString();
+//		} else {
+//			return kafkaService.findLeader(clusterAlias, topicName).toString();
+//		}
 	}
 
 	/** List all the topic under Kafka in partition. */
