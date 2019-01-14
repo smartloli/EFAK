@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Zookeeper;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
@@ -42,6 +43,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import kafka.utils.ZkUtils;
+import kafka.zk.KafkaZkClient;
 import scala.Option;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
@@ -67,14 +69,14 @@ public class ZkServiceImpl implements ZkService {
 	private final String STORE_ALARM = "alarm";
 	/** Request memory space. */
 	private ZkClient zkc = null;
-	/** Instance zookeeper client pool. */
-	private ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
+	/** Instance Kafka Zookeeper client pool. */
+	private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance(); 
 
 	/** Zookeeper delete command. */
 	public String delete(String clusterAlias, String cmd) {
 		String ret = "";
-		ZkClient zkc = zkPool.getZkClient(clusterAlias);
-		boolean status = ZkUtils.apply(zkc, false).pathExists(cmd);
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		boolean status = zkc.pathExists(cmd);
 		if (status) {
 			if (zkc.delete(cmd)) {
 				ret = "[" + cmd + "] has delete success";

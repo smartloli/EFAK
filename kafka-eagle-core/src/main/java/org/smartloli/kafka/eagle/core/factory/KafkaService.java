@@ -58,9 +58,6 @@ public interface KafkaService {
 	/** Obtaining kafka consumer page information from zookeeper. */
 	public Map<String, List<String>> getConsumers(String clusterAlias, DisplayInfo page);
 
-	/** Use Kafka low consumer API & get logsize size from zookeeper. */
-	public long getLogSize(List<String> hosts, String topic, int partition);
-
 	/** According to group, topic and partition to get offset from zookeeper. */
 	public OffsetZkInfo getOffset(String clusterAlias, String topic, String group, int partition);
 
@@ -72,9 +69,6 @@ public interface KafkaService {
 
 	/** Use kafka console command to delete topic. */
 	public Map<String, Object> delete(String clusterAlias, String topicName);
-
-	/** Find leader through topic. */
-	public List<MetadataInfo> findLeader(String clusterAlias, String topic);
 
 	/** Convert query kafka to topic in the sql message for standard sql. */
 	public KafkaSqlInfo parseSql(String clusterAlias, String sql);

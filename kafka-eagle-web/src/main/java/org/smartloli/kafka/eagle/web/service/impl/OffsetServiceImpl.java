@@ -28,7 +28,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.ZkFactory;
@@ -54,22 +53,8 @@ public class OffsetServiceImpl implements OffsetService {
 	/** Zookeeper service interface. */
 	private ZkService zkService = new ZkFactory().create();
 
-	/** Get Kafka brokers. */
-	private List<String> getBrokers(String clusterAlias, String topic, String group) {
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
-		List<String> targets = new ArrayList<String>();
-		for (Object object : brokers) {
-			JSONObject target = (JSONObject) object;
-			String host = target.getString("host");
-			int port = target.getInteger("port");
-			targets.add(host + ":" + port);
-		}
-		return targets;
-	}
-
 	/** Get Kafka logsize from Kafka topic. */
 	private String getKafkaLogSize(String clusterAlias, String topic, String group) {
-		List<String> hosts = getBrokers(clusterAlias, topic, group);
 		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
 		List<OffsetInfo> targets = new ArrayList<OffsetInfo>();
 		for (String partition : partitions) {
@@ -77,11 +62,7 @@ public class OffsetServiceImpl implements OffsetService {
 			OffsetZkInfo offsetZk = getKafkaOffset(clusterAlias, topic, group, partitionInt);
 			OffsetInfo offset = new OffsetInfo();
 			long logSize = 0L;
-			if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-				logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partitionInt);
-			} else {
-				logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
-			}
+			logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partitionInt);
 			offset.setPartition(partitionInt);
 			offset.setLogSize(logSize);
 			offset.setCreate(offsetZk.getCreate());
@@ -129,14 +110,13 @@ public class OffsetServiceImpl implements OffsetService {
 
 	/** Get logsize from zookeeper. */
 	private String getLogSize(String clusterAlias, String topic, String group) {
-		List<String> hosts = getBrokers(clusterAlias, topic, group);
 		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
 		List<OffsetInfo> targets = new ArrayList<OffsetInfo>();
 		for (String partition : partitions) {
 			int partitionInt = Integer.parseInt(partition);
 			OffsetZkInfo offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partitionInt);
 			OffsetInfo offset = new OffsetInfo();
-			long logSize = kafkaService.getLogSize(hosts, topic, partitionInt);
+			long logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partitionInt);
 			offset.setPartition(partitionInt);
 			offset.setLogSize(logSize);
 			offset.setCreate(offsetZk.getCreate());
