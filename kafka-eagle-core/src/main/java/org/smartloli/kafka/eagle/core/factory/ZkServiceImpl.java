@@ -153,9 +153,12 @@ public class ZkServiceImpl implements ZkService {
 	/**
 	 * Insert new datasets.
 	 * 
+	 * @deprecated it will be removed in a future release, since = "1.3.0"
+	 * 
 	 * @param list
 	 *            New datasets.
 	 */
+	@Deprecated
 	public void insert(String clusterAlias, List<OffsetsLiteInfo> list) {
 		String hour = getZkHour();
 		for (OffsetsLiteInfo offset : list) {

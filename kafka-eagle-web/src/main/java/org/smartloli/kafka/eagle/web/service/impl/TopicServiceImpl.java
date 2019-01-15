@@ -22,7 +22,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.web.service.TopicService;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
@@ -61,11 +60,6 @@ public class TopicServiceImpl implements TopicService {
 	/** Get metadata in topic. */
 	public String metadata(String clusterAlias, String topicName) {
 		return kafkaService.findKafkaLeader(clusterAlias, topicName).toString();
-//		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-//			return kafkaService.findKafkaLeader(clusterAlias, topicName).toString();
-//		} else {
-//			return kafkaService.findLeader(clusterAlias, topicName).toString();
-//		}
 	}
 
 	/** List all the topic under Kafka in partition. */

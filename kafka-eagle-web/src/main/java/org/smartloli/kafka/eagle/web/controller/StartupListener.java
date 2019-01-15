@@ -20,7 +20,6 @@ package org.smartloli.kafka.eagle.web.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
 import org.smartloli.kafka.eagle.plugin.mysql.MySqlRecordSchema;
 import org.smartloli.kafka.eagle.plugin.sqlite.SqliteRecordSchema;
 import org.smartloli.kafka.eagle.plugin.util.JConstants;

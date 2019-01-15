@@ -69,7 +69,6 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaPartitioner;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
-import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -77,7 +76,6 @@ import com.alibaba.fastjson.JSONObject;
 
 import kafka.admin.RackAwareMode;
 import kafka.admin.TopicCommand;
-import kafka.coordinator.group.GroupTopicPartition;
 import kafka.zk.AdminZkClient;
 import kafka.zk.KafkaZkClient;
 import scala.Option;
@@ -620,12 +618,9 @@ public class KafkaServiceImpl implements KafkaService {
 			JSONObject consumerGroup = (JSONObject) object;
 			for (Object topicObject : consumerGroup.getJSONArray("topicSub")) {
 				JSONObject topic = (JSONObject) topicObject;
-				topics.add(topic.getString("topic"));
-				
-				// flink has no consumerid
-//				if (consumerGroup.getString("owner") != "" || consumerGroup.getString("owner") != null) {
-//					topics.add(topic.getString("topic"));
-//				}
+				if (consumerGroup.getString("owner") != "" || consumerGroup.getString("owner") != null) {
+					topics.add(topic.getString("topic"));
+				}
 			}
 		}
 		return topics;
@@ -686,19 +681,35 @@ public class KafkaServiceImpl implements KafkaService {
 			AdminClient adminClient = AdminClient.create(prop);
 			DescribeConsumerGroupsResult descConsumerGroup = adminClient.describeConsumerGroups(Arrays.asList(group));
 			Collection<MemberDescription> consumerMetaInfos = descConsumerGroup.describedGroups().get(group).get().members();
-			for (MemberDescription consumerMetaInfo : consumerMetaInfos) {
+			if (consumerMetaInfos.size() == 0) {
+				ListConsumerGroupOffsetsResult noActiveTopic = adminClient.listConsumerGroupOffsets(group);
 				JSONObject topicSub = new JSONObject();
 				JSONArray topicSubs = new JSONArray();
-				for (TopicPartition topic : consumerMetaInfo.assignment().topicPartitions()) {
+				for (Entry<TopicPartition, OffsetAndMetadata> entry : noActiveTopic.partitionsToOffsetAndMetadata().get().entrySet()) {
 					JSONObject object = new JSONObject();
-					object.put("topic", topic.topic());
-					object.put("partition", topic.partition());
+					object.put("topic", entry.getKey().topic());
+					object.put("partition", entry.getKey().partition());
 					topicSubs.add(object);
 				}
-				topicSub.put("owner", consumerMetaInfo.consumerId());
-				topicSub.put("node", consumerMetaInfo.host().replaceAll("/", ""));
+				topicSub.put("owner", "-");
+				topicSub.put("node", "-");
 				topicSub.put("topicSub", topicSubs);
 				consumerGroups.add(topicSub);
+			} else {
+				for (MemberDescription consumerMetaInfo : consumerMetaInfos) {
+					JSONObject topicSub = new JSONObject();
+					JSONArray topicSubs = new JSONArray();
+					for (TopicPartition topic : consumerMetaInfo.assignment().topicPartitions()) {
+						JSONObject object = new JSONObject();
+						object.put("topic", topic.topic());
+						object.put("partition", topic.partition());
+						topicSubs.add(object);
+					}
+					topicSub.put("owner", consumerMetaInfo.consumerId());
+					topicSub.put("node", consumerMetaInfo.host().replaceAll("/", ""));
+					topicSub.put("topicSub", topicSubs);
+					consumerGroups.add(topicSub);
+				}
 			}
 			adminClient.close();
 		} catch (Exception e) {
@@ -792,20 +803,20 @@ public class KafkaServiceImpl implements KafkaService {
 				String groupId = groups.next().groupId();
 				if (!groupId.contains("kafka.eagle")) {
 					ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(groupId);
-					for(Entry<TopicPartition, OffsetAndMetadata> entry:offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
-					JSONObject object = new JSONObject();
-					object.put("group", groupId);
-					object.put("topic", entry.getKey().topic());
-					object.put("partition", entry.getKey().partition());
-					object.put("offset", entry.getValue().offset());
-					object.put("timestamp", CalendarUtils.getDate());
-					targets.add(object);
+					for (Entry<TopicPartition, OffsetAndMetadata> entry : offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
+						JSONObject object = new JSONObject();
+						object.put("group", groupId);
+						object.put("topic", entry.getKey().topic());
+						object.put("partition", entry.getKey().partition());
+						object.put("offset", entry.getValue().offset());
+						object.put("timestamp", CalendarUtils.getDate());
+						targets.add(object);
 					}
 				}
 			}
 			adminClient.close();
 		} catch (Exception e) {
-			LOG.error("Get consumer offset has error, msg is "+e.getMessage());
+			LOG.error("Get consumer offset has error, msg is " + e.getMessage());
 			e.printStackTrace();
 		}
 		return targets.toJSONString();

@@ -26,7 +26,10 @@ package org.smartloli.kafka.eagle.core.metrics;
  */
 public interface KafkaMetricsService {
 
-	/** Get topic size. */
+	/** Get topic size by jmx. */
 	public String topicSize(String clusterAlias, String topic);
+
+	/** Get topic size by kafka api. */
+	public String kafkaTopicSize(String clusterAlias, String topic);
 
 }

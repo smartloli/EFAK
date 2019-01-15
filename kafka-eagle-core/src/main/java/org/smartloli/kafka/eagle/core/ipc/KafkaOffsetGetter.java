@@ -57,10 +57,13 @@ import kafka.coordinator.group.OffsetKey;
 /**
  * New offset storage formats: kafka
  * 
+ * @deprecated "This class is deprecated in favour of {@link org.smartloli.kafka.eagle.core.factory.KafkaServiceImpl} and it will be removed in " +"a future release.", since = "1.3.0"
+ * 
  * @author smartloli.
  *
  *         Created by Jan 3, 2017
  */
+@Deprecated
 public class KafkaOffsetGetter extends Thread {
 
 	private final static Logger LOG = LoggerFactory.getLogger(KafkaOffsetGetter.class);

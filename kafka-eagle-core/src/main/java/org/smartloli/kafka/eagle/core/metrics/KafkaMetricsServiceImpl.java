@@ -96,4 +96,12 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 		return StrUtils.stringify(tpSize * jnis.size());
 	}
 
+	/**
+	 * Get kafka topic size from kafka consumer api, since="1.2.9" in the future.
+	 */
+	@Override
+	public String kafkaTopicSize(String clusterAlias, String topic) {
+		return null;
+	}
+
 }

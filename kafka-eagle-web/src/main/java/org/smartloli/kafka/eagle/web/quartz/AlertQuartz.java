@@ -152,7 +152,7 @@ public class AlertQuartz {
 				}
 
 				// Monitor consumer topic rate min/per
-				zkService.insert(clusterAlias, offsetLites);
+				// zkService.insert(clusterAlias, offsetLites);
 
 				alert(clusterAlias, offsetLites);
 			} catch (Exception ex) {

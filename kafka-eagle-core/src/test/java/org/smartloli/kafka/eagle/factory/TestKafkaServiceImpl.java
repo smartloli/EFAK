@@ -51,8 +51,8 @@ public class TestKafkaServiceImpl {
 
 	public static void main(String[] args) {
 		System.out.println(kafkaService.getAllBrokersInfo("cluster1"));
-//		String status = zkService.status("dn3", "2181");
-//		System.out.println("status : " + status);
+		String status = zkService.status("dn3", "2181");
+		System.out.println("status : " + status);
 	}
 
 	public List<String> findTopicPartition(String clusterAlias, String topic) {
