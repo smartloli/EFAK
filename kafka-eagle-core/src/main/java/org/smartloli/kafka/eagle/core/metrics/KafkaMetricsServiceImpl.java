@@ -53,7 +53,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
-
+	
 	@Override
 	public String topicSize(String clusterAlias, String topic) {
 		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
@@ -94,14 +94,6 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 		}
 
 		return StrUtils.stringify(tpSize * jnis.size());
-	}
-
-	/**
-	 * Get kafka topic size from kafka consumer api, since="1.2.9" in the future.
-	 */
-	@Override
-	public String kafkaTopicSize(String clusterAlias, String topic) {
-		return null;
 	}
 
 }

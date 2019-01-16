@@ -42,8 +42,6 @@ import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.factory.ZkFactory;
-import org.smartloli.kafka.eagle.core.factory.ZkService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.AlertServiceImpl;
 
@@ -64,9 +62,6 @@ public class AlertQuartz {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
-
-	/** Zookeeper service interface. */
-	private ZkService zkService = new ZkFactory().create();
 
 	public void alertJobQuartz() {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");

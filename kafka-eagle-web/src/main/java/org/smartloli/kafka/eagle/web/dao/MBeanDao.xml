@@ -13,6 +13,17 @@
 		<result property="tm" column="tm" />
 	</resultMap>
 
+	<resultMap
+		type="org.smartloli.kafka.eagle.common.protocol.topic.TopicLagInfo"
+		id="lag">
+		<result property="cluster" column="cluster" />
+		<result property="group" column="group" />
+		<result property="topic" column="topic" />
+		<result property="lag" column="lag" />
+		<result property="timespan" column="timespan" />
+		<result property="tm" column="tm" />
+	</resultMap>
+
 	<insert id="insert" parameterType="java.util.List">
 		insert into
 		ke_metrics(`cluster`,`broker`,`type`,`key`,`value`,`timespan`,`tm`)
@@ -36,13 +47,13 @@
 		`cluster` =#{cluster}
 		and `type` =#{type}
 		<if test="modules != '' and modules != null">
-            and `key` in (
-              <foreach collection="modules" item="item" index="index"
-                     separator=",">
-                  #{item}
-              </foreach>
-            )
-        </if>
+			and `key` in (
+			<foreach collection="modules" item="item" index="index"
+				separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
 		and tm between
 		#{stime} and #{etime}
 	</select>
@@ -54,6 +65,29 @@
 		`cluster`=#{cluster} and tm
 		between #{stime} and
 		#{etime}
+	</select>
+
+	<insert id="setConsumerLag" parameterType="java.util.List">
+		insert into
+		ke_lag(`cluster`,`group`,`topic`,`lag`,`timespan`,`tm`)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.cluster},#{item.group},#{item.topic},#{item.lag},#{item.timespan},#{item.tm})
+		</foreach>
+	</insert>
+
+	<select id="getConsumerLag" parameterType="map" resultMap="lag">
+		select
+		`lag`,`timespan`
+		from ke_lag
+		where
+		`cluster` =#{cluster}
+		and `group`
+		=#{group}
+		and `topic` =#{topic}
+		and tm between
+		#{stime} and #{etime}
 	</select>
 
 </mapper>

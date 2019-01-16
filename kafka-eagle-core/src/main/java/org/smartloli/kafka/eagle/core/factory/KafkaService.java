@@ -103,4 +103,7 @@ public interface KafkaService {
 	/** Send mock message to kafka. */
 	public boolean mockMessage(String clusterAlias, String topic, String message);
 
+	/** Get consumer group all topics lag. */
+	public String getLag(String clusterAlias, String group);
+
 }

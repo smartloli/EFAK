@@ -639,7 +639,6 @@ public class KafkaServiceImpl implements KafkaService {
 		try {
 			AdminClient adminClient = AdminClient.create(prop);
 			ListConsumerGroupsResult cgrs = adminClient.listConsumerGroups();
-
 			java.util.Iterator<ConsumerGroupListing> itor = cgrs.all().get().iterator();
 			while (itor.hasNext()) {
 				ConsumerGroupListing gs = itor.next();
@@ -924,5 +923,36 @@ public class KafkaServiceImpl implements KafkaService {
 		producer.close();
 
 		return true;
+	}
+
+	/** Get group consumer all topics lags. */
+	public String getLag(String clusterAlias, String group) {
+		Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+			sasl(prop, parseBrokerServer(clusterAlias));
+		}
+		JSONObject object = new JSONObject();
+		try {
+			AdminClient adminClient = AdminClient.create(prop);
+			ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(group);
+			for (Entry<TopicPartition, OffsetAndMetadata> entry : offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
+				String topic = object.getString("topic");
+				if (topic != null && topic.equals(entry.getKey().topic())) {
+					long lag = object.getLong("lag");
+					long logSize = getKafkaLogSize(clusterAlias, entry.getKey().topic(), entry.getKey().partition());
+					object.put("lag", lag + (logSize - entry.getValue().offset()));
+				} else {
+					object.put("topic", entry.getKey().topic());
+					long logSize = getKafkaLogSize(clusterAlias, entry.getKey().topic(), entry.getKey().partition());
+					object.put("lag", logSize - entry.getValue().offset());
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Get cluster[" + clusterAlias + "] group[" + group + "] consumer lag has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		}
+		return object.toJSONString();
 	}
 }
