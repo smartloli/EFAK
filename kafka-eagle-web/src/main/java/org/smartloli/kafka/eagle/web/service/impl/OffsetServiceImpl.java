@@ -19,20 +19,26 @@ package org.smartloli.kafka.eagle.web.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLagInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.factory.ZkFactory;
-import org.smartloli.kafka.eagle.core.factory.ZkService;
+import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
+import org.smartloli.kafka.eagle.core.factory.Mx4jService;
+import org.smartloli.kafka.eagle.web.dao.MBeanDao;
 import org.smartloli.kafka.eagle.web.service.OffsetService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,11 +53,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class OffsetServiceImpl implements OffsetService {
 
+	@Autowired
+	private MBeanDao mbeanDao;
+
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
-	/** Zookeeper service interface. */
-	private ZkService zkService = new ZkFactory().create();
+	/** Mx4j service interface. */
+	private Mx4jService mx4jService = new Mx4jFactory().create();
 
 	/** Get Kafka logsize from Kafka topic. */
 	private String getKafkaLogSize(String clusterAlias, String topic, String group) {
@@ -139,12 +148,19 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get Kafka offset graph data from Zookeeper. */
-	public String getOffsetsGraph(String clusterAlias, String group, String topic) {
-		String target = zkService.getOffsets(clusterAlias, group, topic);
-		if (target.length() > 0) {
-			target = JSON.parseObject(target).getString("data");
+	public String getOffsetsGraph(Map<String, Object> params) {
+		JSONArray target = new JSONArray();
+		List<TopicLagInfo> topicLags = mbeanDao.getConsumerLag(params);
+		if (topicLags.size() > 0) {
+			for (TopicLagInfo topicLag : topicLags) {
+				JSONObject object = new JSONObject();
+				object.put("lag", topicLag.getLag());
+				target.add(object);
+			}
 		}
-		return target;
+		JSONObject value = new JSONObject();
+		value.put("graph", target);
+		return value.toJSONString();
 	}
 
 	/** Judge group & topic from Zookeeper has exist. */
@@ -169,6 +185,27 @@ public class OffsetServiceImpl implements OffsetService {
 			status = true;
 		}
 		return status;
+	}
+
+	/** Get topic consumer & producer rate by bytes per sec. */
+	public String getOffsetRate(String clusterAlias, String topic) {
+		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+		double byteInTopic = 0.0;
+		double byteOutTopic = 0.0;
+		for (Object object : brokers) {
+			JSONObject broker = (JSONObject) object;
+			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
+			MBeanInfo bytesInTopic = mx4jService.bytesInPerSec(uri, topic);
+			MBeanInfo bytesOutTopic = mx4jService.bytesOutPerSec(uri, topic);
+			byteInTopic += StrUtils.numberic(bytesInTopic.getOneMinute());
+			byteOutTopic += StrUtils.numberic(bytesOutTopic.getOneMinute());
+		}
+
+		JSONObject target = new JSONObject();
+		target.put("ins", StrUtils.assembly(byteInTopic + ""));
+		target.put("outs", StrUtils.assembly(byteOutTopic + ""));
+
+		return target.toJSONString();
 	}
 
 }

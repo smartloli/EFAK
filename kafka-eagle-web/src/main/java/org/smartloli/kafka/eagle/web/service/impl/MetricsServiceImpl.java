@@ -255,4 +255,9 @@ public class MetricsServiceImpl implements MetricsService {
 		return mbeanDao.getConsumerLag(params);
 	}
 
+	@Override
+	public void cleanLagData(int tm) {
+		mbeanDao.cleanLagData(tm);
+	}
+
 }

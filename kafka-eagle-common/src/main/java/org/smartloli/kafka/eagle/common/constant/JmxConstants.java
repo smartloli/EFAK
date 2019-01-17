@@ -49,6 +49,11 @@ public class JmxConstants {
 			public static String totalFetchRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec";
 			public static String totalProduceRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=TotalProduceRequestsPerSec";
 		}
+		
+		class Topic{
+			public static String bytesInPerSecTopic = "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic=%s";
+			public static String bytesOutPerSecTopic = "kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=%s";
+		}
 
 		class ClusterBusyMetrics {
 			// if value < 0.3, we need alert
@@ -81,10 +86,6 @@ public class JmxConstants {
 		public static String tcp = "tcp";
 		public static String openfile = "openfile";
 		public static String inode = "inode";
-	}
-
-	public static void main(String[] args) {
-		System.out.println(KafkaServer.version);
 	}
 
 }

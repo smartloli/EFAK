@@ -50,5 +50,8 @@ public interface MetricsService {
 	
 	/** Get consumer topic lag metrics. */
 	public List<TopicLagInfo> getConsumerLag(Map<String, Object> params);
+	
+	/** Clean lag data. */
+	public void cleanLagData(int tm);
 
 }

@@ -74,7 +74,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_KE_CLUSTERS = "CREATE TABLE IF NOT EXISTS `ke_clusters` (`id` int(11) NOT NULL AUTO_INCREMENT,`type` varchar(32) DEFAULT NULL,`cluster` varchar(256) DEFAULT NULL,`server` text DEFAULT NULL,`owner` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_LAG = "CREATE TABLE IF NOT EXISTS `ke_lag` (`cluster` varchar(256) DEFAULT NULL,`group` varchar(256) DEFAULT NULL,`topic` varchar(256) DEFAULT NULL,`lag` bigint DEFAULT NULL,`timespan` bigint DEFAULT NULL,`tm` varchar(16)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_LAG = "CREATE TABLE IF NOT EXISTS `ke_lag` (`cluster` varchar(256) DEFAULT NULL,`group` varchar(256) DEFAULT NULL,`topic` varchar(256) DEFAULT NULL,`lag` varchar(256) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` int(11) NOT NULL AUTO_INCREMENT,`user_id` int(11) NOT NULL,`role_id` tinyint(4) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1');";
@@ -100,7 +100,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_SQLITE_KE_CLUSTERS = "CREATE TABLE IF NOT EXISTS `ke_clusters` (`id` integer primary key autoincrement,`type` varchar(32),`cluster` varchar(256),`server` text,`owner` text,`created` varchar(32),`modify` varchar(32))";
 
-	static String CREATE_TABLE_SQLITE_KE_LAG = "CREATE TABLE IF NOT EXISTS `ke_lag` (`cluster` varchar(256),`group` varchar(256),`topic` varchar(256),`lag` bigint(20),`timespan` bigint(20),`tm` varchar(16))";
+	static String CREATE_TABLE_SQLITE_KE_LAG = "CREATE TABLE IF NOT EXISTS `ke_lag` (`cluster` varchar(256),`group` varchar(256),`topic` varchar(256),`lag` varchar(256),`timespan` bigint(20),`tm` varchar(16))";
 
 	static String CREATE_TABLE_SQLITE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` integer primary key autoincrement,`user_id` int(11),`role_id` tinyint(4))";
 	static String CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1')";

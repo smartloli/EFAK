@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.web.quartz;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLagInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -41,6 +43,8 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class MetricsQuartz {
 
+	private final Logger LOG = LoggerFactory.getLogger(MetricsQuartz.class);
+
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
@@ -57,13 +61,21 @@ public class MetricsQuartz {
 				topicLag.setGroup(group);
 				JSONObject objectTopicLag = JSON.parseObject(kafkaService.getLag(clusterAlias, group));
 				topicLag.setTopic(objectTopicLag.getString("topic"));
-				topicLag.setLag(objectTopicLag.getLong("lag"));
+				JSONObject value = new JSONObject();
+				value.put("y", CalendarUtils.getDate());
+				value.put("lag", objectTopicLag.getLong("lag"));
+				topicLag.setLag(value.toJSONString());
 				topicLag.setTimespan(CalendarUtils.getTimeSpan());
 				topicLag.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
 				topicLags.add(topicLag);
 			}
 		}
-		MetricsServiceImpl metricsServiceImpl = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
-		metricsServiceImpl.setConsumerLag(topicLags);
+		try {
+			MetricsServiceImpl metricsServiceImpl = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
+			metricsServiceImpl.setConsumerLag(topicLags);
+		} catch (Exception e) {
+			LOG.error("Collector consumer lag data has error,msg is " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 }

@@ -31,7 +31,7 @@ public class TopicLagInfo {
 	private String cluster;
 	private String group;
 	private String topic;
-	private long lag;
+	private String lag;
 	private long timespan;
 	private String tm;
 
@@ -59,11 +59,11 @@ public class TopicLagInfo {
 		this.topic = topic;
 	}
 
-	public long getLag() {
+	public String getLag() {
 		return lag;
 	}
 
-	public void setLag(long lag) {
+	public void setLag(String lag) {
 		this.lag = lag;
 	}
 

@@ -38,6 +38,11 @@
 		delete from ke_metrics where
 		tm&lt;=#{tm}
 	</delete>
+	
+	<delete id="cleanLagData" parameterType="int">
+		delete from ke_lag where
+		tm&lt;=#{tm}
+	</delete>
 
 	<select id="query" parameterType="map" resultMap="kpi">
 		select
