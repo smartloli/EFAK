@@ -13,6 +13,32 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
+<style>
+.box{
+	border-bottom:1px solid #eee;
+	margin-bottom:20px;
+	margin-top:30px;
+	overflow:hidden;
+}
+.box .left{
+	font-size: 36px;
+	float:left
+}
+.box .left small{
+	font-size: 24px;
+	color:#777
+}
+.box  .right{
+	float:right;
+	width: 230px;
+	margin-top:20px; 
+	background: #fff; 
+	cursor: pointer; 
+	padding: 5px 10px; 
+	border: 1px solid #ccc;
+}
+</style>
+
 <title>Trend - KafkaEagle</title>
 <jsp:include page="../public/css.jsp">
 	<jsp:param value="plugins/datatimepicker/daterangepicker.css"
@@ -25,13 +51,15 @@
 		<div id="page-wrapper">
 			<div class="row">
 				<div class="col-lg-12">
-					<h1 class="page-header">
-						Zookeeper Monitor <small>details</small>
-					</h1>
-					<div id="reportrange"
-						style="position: absolute; top: 46px; left: 964px; width: 230px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc;">
-						<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
-						<span></span> <b class="caret"></b>
+					<div class="box">
+					  <p   class="left">
+							Zookeeper Monitor <small>details</small>
+						</p>
+						<div id="reportrange"
+						class="right">
+							<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+							<span></span> <b class="caret"></b>
+						</div>
 					</div>
 				</div>
 				<!-- /.col-lg-12 -->
