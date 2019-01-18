@@ -35,6 +35,11 @@ public class JmxConstants {
 		// TODO
 	}
 
+	public interface KafkaServer8{
+		public static final String version = "kafka.common:type=AppInfo,name=Version";
+		public static final String value = "Value";
+	}
+	
 	public interface KafkaServer {
 		class BrokerTopicMetrics {
 			public static String bytesInPerSec = "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec";

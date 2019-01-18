@@ -41,6 +41,8 @@ import com.alibaba.fastjson.JSONObject;
 import kafka.zk.KafkaZkClient;
 import scala.Option;
 import scala.Tuple2;
+import scala.collection.JavaConversions;
+import scala.collection.Seq;
 
 /**
  * Implements ZkService all method.
@@ -62,7 +64,7 @@ public class ZkServiceImpl implements ZkService {
 	/** Request memory space. */
 	private KafkaZkClient zkc = null;
 	/** Instance Kafka Zookeeper client pool. */
-	private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance(); 
+	private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
 
 	/** Zookeeper delete command. */
 	public String delete(String clusterAlias, String cmd) {
@@ -196,7 +198,8 @@ public class ZkServiceImpl implements ZkService {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		boolean status = zkc.pathExists(cmd);
 		if (status) {
-			target = zkc.getChildren(cmd).toString();
+			Seq<String> seq = zkc.getChildren(cmd);
+			target = JavaConversions.seqAsJavaList(seq).toString();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
