@@ -25,7 +25,7 @@ $(document).ready(function() {
 		var type = "zookeeper";
 
 		zkRealtime(stime, etime, type);
-		$(".ranges").find("li[data-range-key='Custom Range']").remove();
+		// $(".ranges").find("li[data-range-key='Custom Range']").remove();
 
 		reportrange.on('apply.daterangepicker', function(ev, picker) {
 			stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();

@@ -69,14 +69,13 @@ $(document).ready(function() {
 	var type = "kafka";
 
 	mbeanRealtime(stime, etime, type, getCheckedModules());
-	$(".ranges").find("li[data-range-key='Custom Range']").remove();
+	// $(".ranges").find("li[data-range-key='Custom Range']").remove();
 
 	reportrange.on('apply.daterangepicker', function(ev, picker) {
 		stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 		etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
 		mbeanRealtime(stime, etime, type, getCheckedModules());
 	});
-	console.log(stime + "," + etime);
 	setInterval(function() {
 		mbeanRealtime(stime, etime, type, getCheckedModules())
 	}, 1000 * 60 * 5);

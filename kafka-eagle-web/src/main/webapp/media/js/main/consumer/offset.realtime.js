@@ -40,7 +40,7 @@ $(document).ready(function() {
 	var stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 	var etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
 
-	function offserRealtime() {
+	function offserRealtime(stime, etime) {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
@@ -79,8 +79,16 @@ $(document).ready(function() {
 		return data;
 	}
 
-	offserRealtime();
+	reportrange.on('apply.daterangepicker', function(ev, picker) {
+		stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
+		etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
+		offserRealtime(stime, etime);
+	});
+
+	offserRealtime(stime, etime);
 	offserRateRealtime();
-	setInterval(offserRealtime, 1000 * 60 * 1);
+	setInterval(function() {
+		offserRealtime(stime, etime)
+	}, 1000 * 60 * 1);
 	setInterval(offserRateRealtime, 1000 * 60 * 1);
 });

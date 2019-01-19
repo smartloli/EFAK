@@ -638,7 +638,7 @@ public class KafkaServiceImpl implements KafkaService {
 			JSONObject consumerGroup = (JSONObject) object;
 			for (Object topicObject : consumerGroup.getJSONArray("topicSub")) {
 				JSONObject topic = (JSONObject) topicObject;
-				if (consumerGroup.getString("owner") != "" || consumerGroup.getString("owner") != null) {
+				if (!"".equals(consumerGroup.getString("owner")) && consumerGroup.getString("owner") != null) {
 					topics.add(topic.getString("topic"));
 				}
 			}
@@ -710,7 +710,7 @@ public class KafkaServiceImpl implements KafkaService {
 					object.put("partition", entry.getKey().partition());
 					topicSubs.add(object);
 				}
-				topicSub.put("owner", "-");
+				topicSub.put("owner", "");
 				topicSub.put("node", "-");
 				topicSub.put("topicSub", topicSubs);
 				consumerGroups.add(topicSub);
@@ -745,7 +745,7 @@ public class KafkaServiceImpl implements KafkaService {
 		Set<String> topics = new HashSet<>();
 		for (Object object : consumerGroups) {
 			JSONObject consumerGroup = (JSONObject) object;
-			if (consumerGroup.getString("owner") != "" || consumerGroup.getString("owner") != null) {
+			if (!"".equals(consumerGroup.getString("owner")) && consumerGroup.getString("owner") != null) {
 				activerCounter++;
 			}
 			for (Object topicObject : consumerGroup.getJSONArray("topicSub")) {
