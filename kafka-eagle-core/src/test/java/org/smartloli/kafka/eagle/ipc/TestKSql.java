@@ -39,12 +39,20 @@ import com.alibaba.fastjson.JSONObject;
 public class TestKSql {
 
 	public static void main(String[] args) throws Exception {
-//		ignite();
-//		calcite();
+		// ignite();
+		// calcite();
 		System.out.println(KConstants.Kafka.POSITION);
+		JSONObject object = new JSONObject();
+		object.put("owner", "");
+		System.out.println();
+		int i = 0;
+		if (!"".equals(object.getString("owner"))&&object.getString("owner")!=null) {
+			i++;
+		}
+		System.out.println(i);
 	}
-	
-	public static void ignite(){
+
+	public static void ignite() {
 		List<TopicX> collectors = new ArrayList<>();
 		int count = 0;
 		for (int i = 0; i < 10; i++) {
@@ -65,8 +73,8 @@ public class TestKSql {
 		KafkaSqlFactory.sql(sql, collectors);
 		System.out.println("Cost time [" + (System.currentTimeMillis() - stime) / 1000.0 + "]ms");
 	}
-	
-	public static void calcite() throws Exception{
+
+	public static void calcite() throws Exception {
 		JSONObject tabSchema = new JSONObject();
 		tabSchema.put("id", "integer");
 		tabSchema.put("name", "varchar");

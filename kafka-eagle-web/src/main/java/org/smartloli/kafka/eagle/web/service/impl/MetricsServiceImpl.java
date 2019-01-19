@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLagInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
@@ -242,6 +243,21 @@ public class MetricsServiceImpl implements MetricsService {
 	/** Crontab clean data. */
 	public void remove(int tm) {
 		mbeanDao.remove(tm);
+	}
+
+	@Override
+	public int setConsumerLag(List<TopicLagInfo> topicLag) {
+		return mbeanDao.setConsumerLag(topicLag);
+	}
+
+	@Override
+	public List<TopicLagInfo> getConsumerLag(Map<String, Object> params) {
+		return mbeanDao.getConsumerLag(params);
+	}
+
+	@Override
+	public void cleanLagData(int tm) {
+		mbeanDao.cleanLagData(tm);
 	}
 
 }

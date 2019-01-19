@@ -35,6 +35,12 @@ public class JmxConstants {
 		// TODO
 	}
 
+	public interface KafkaServer8 {
+		public static final String version = "kafka.common:type=AppInfo,name=Version";
+		public static final String value = "Value";
+		public static final String logSize = "kafka.log:type=Log,name=LogEndOffset,topic=%s,partition=%s";
+	}
+
 	public interface KafkaServer {
 		class BrokerTopicMetrics {
 			public static String bytesInPerSec = "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec";
@@ -48,6 +54,11 @@ public class JmxConstants {
 			public static String replicationBytesOutPerSec = "kafka.server:type=BrokerTopicMetrics,name=ReplicationBytesOutPerSec";
 			public static String totalFetchRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec";
 			public static String totalProduceRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=TotalProduceRequestsPerSec";
+		}
+
+		class Topic {
+			public static String bytesInPerSecTopic = "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic=%s";
+			public static String bytesOutPerSecTopic = "kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=%s";
 		}
 
 		class ClusterBusyMetrics {
@@ -81,10 +92,6 @@ public class JmxConstants {
 		public static String tcp = "tcp";
 		public static String openfile = "openfile";
 		public static String inode = "inode";
-	}
-
-	public static void main(String[] args) {
-		System.out.println(KafkaServer.version);
 	}
 
 }

@@ -42,8 +42,6 @@ import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.factory.ZkFactory;
-import org.smartloli.kafka.eagle.core.factory.ZkService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.AlertServiceImpl;
 
@@ -64,9 +62,6 @@ public class AlertQuartz {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
-
-	/** Zookeeper service interface. */
-	private ZkService zkService = new ZkFactory().create();
 
 	public void alertJobQuartz() {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
@@ -118,11 +113,16 @@ public class AlertQuartz {
 						for (String partitionStr : kafkaService.findTopicPartition(clusterAlias, topic)) {
 							int partition = Integer.parseInt(partitionStr);
 							long logSize = 0L;
-							if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+							if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
 								logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partition);
 							} else {
-								logSize = kafkaService.getLogSize(hosts, topic, partition);
+								logSize = kafkaService.getLogSize(clusterAlias, topic, partition);
 							}
+//							if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+//								logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partition);
+//							} else {
+//								logSize = kafkaService.getLogSize(hosts, topic, partition);
+//							}
 							OffsetZkInfo offsetZk = null;
 							if ("kafka".equals(formatter)) {
 								String bootstrapServers = "";
@@ -151,7 +151,7 @@ public class AlertQuartz {
 				}
 
 				// Monitor consumer topic rate min/per
-				zkService.insert(clusterAlias, offsetLites);
+				// zkService.insert(clusterAlias, offsetLites);
 
 				alert(clusterAlias, offsetLites);
 			} catch (Exception ex) {

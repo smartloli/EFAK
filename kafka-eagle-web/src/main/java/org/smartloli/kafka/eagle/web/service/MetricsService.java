@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLagInfo;
 
 /**
  * Define access to the kafka monitoring data interface via jmx.
@@ -43,5 +44,14 @@ public interface MetricsService {
 
 	/** Crontab clean data. */
 	public void remove(int tm);
+	
+	/** Set consumer topic lag metrics. */
+	public int setConsumerLag(List<TopicLagInfo> topicLag);
+	
+	/** Get consumer topic lag metrics. */
+	public List<TopicLagInfo> getConsumerLag(Map<String, Object> params);
+	
+	/** Clean lag data. */
+	public void cleanLagData(int tm);
 
 }

@@ -15,28 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.ipc;
-
-import java.util.Properties;
-
-import org.apache.kafka.clients.CommonClientConfigs;
-
-import kafka.admin.AdminClient;
+package org.smartloli.kafka.eagle.consumer;
 
 /**
- * Test Kafka new feature.
- * 
- * @author smartloli.
- *
- *         Created by Feb 11, 2018
- */
-public class TestKafkaFeature {
-
-	public static void main(String[] args) {
-		Properties prop = new Properties();
-		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
-		AdminClient adminClient = AdminClient.create(prop);
-		System.out.println(adminClient.listAllConsumerGroups());
-	}
+* TODO
+* 
+* @author smartloli.
+*
+* Created by Jan 15, 2019
+*/
+public class JTestConsumer {
 
 }

@@ -17,6 +17,9 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -151,7 +154,28 @@ public class OffsetController {
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
-			byte[] output = offsetService.getOffsetsGraph(clusterAlias, group, topic).getBytes();
+			Map<String, Object> param = new HashMap<>();
+			param.put("cluster", clusterAlias);
+			param.put("group", group);
+			param.put("topic", topic);
+			param.put("stime", request.getParameter("stime"));
+			param.put("etime", request.getParameter("etime"));
+			
+			byte[] output = offsetService.getOffsetsGraph(param).getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	/** Get real-time offset graph data from Kafka by ajax. */
+	@RequestMapping(value = "/consumer/offset/rate/{topic}/realtime/ajax", method = RequestMethod.GET)
+	public void offsetRateGraphAjax(@PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+		try {
+			byte[] output = offsetService.getOffsetRate(clusterAlias, topic).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

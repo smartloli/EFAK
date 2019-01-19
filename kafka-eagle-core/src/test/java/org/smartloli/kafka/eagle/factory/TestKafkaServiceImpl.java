@@ -22,14 +22,13 @@ package org.smartloli.kafka.eagle.factory;
 
 import java.util.List;
 
-import org.I0Itec.zkclient.ZkClient;
-import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
+import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.ZkFactory;
 import org.smartloli.kafka.eagle.core.factory.ZkService;
 
-import kafka.utils.ZkUtils;
+import kafka.zk.KafkaZkClient;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 
@@ -42,7 +41,7 @@ import scala.collection.Seq;
  */
 public class TestKafkaServiceImpl {
 
-	private ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
+	private KafkaZKPoolUtils zkPool = KafkaZKPoolUtils.getInstance();
 
 	private final String BROKER_TOPICS_PATH = "/brokers/topics";
 
@@ -57,8 +56,8 @@ public class TestKafkaServiceImpl {
 	}
 
 	public List<String> findTopicPartition(String clusterAlias, String topic) {
-		ZkClient zkc = zkPool.getZkClient(clusterAlias);
-		Seq<String> brokerTopicsPaths = ZkUtils.apply(zkc, false).getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
+		KafkaZkClient zkc = zkPool.getZkClient(clusterAlias);
+		Seq<String> brokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
 		List<String> topicAndPartitions = JavaConversions.seqAsJavaList(brokerTopicsPaths);
 		if (zkc != null) {
 			zkPool.release(clusterAlias, zkc);

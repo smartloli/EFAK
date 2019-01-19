@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.core.sql.execute;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -87,7 +88,7 @@ public class KafkaConsumerAdapter {
 		JSONArray datasets = new JSONArray();
 		boolean flag = true;
 		while (flag) {
-			ConsumerRecords<String, String> records = consumer.poll(Kafka.TIME_OUT);
+			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Kafka.TIME_OUT));
 			for (ConsumerRecord<String, String> record : records) {
 				JSONObject object = new JSONObject();
 				object.put(TopicSchema.MSG, record.value());

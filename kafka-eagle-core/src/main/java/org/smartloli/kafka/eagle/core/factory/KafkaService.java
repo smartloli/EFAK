@@ -46,6 +46,9 @@ public interface KafkaService {
 	/** Get kafka active consumer topic. */
 	public Map<String, List<String>> getActiveTopic(String clusterAlias);
 
+	/** Get kafka active consumer topic. */
+	public Set<String> getActiveTopic(String clusterAlias, String group);
+
 	/** Get all broker list from zookeeper. */
 	public String getAllBrokersInfo(String clusterAlias);
 
@@ -58,9 +61,6 @@ public interface KafkaService {
 	/** Obtaining kafka consumer page information from zookeeper. */
 	public Map<String, List<String>> getConsumers(String clusterAlias, DisplayInfo page);
 
-	/** Use Kafka low consumer API & get logsize size from zookeeper. */
-	public long getLogSize(List<String> hosts, String topic, int partition);
-
 	/** According to group, topic and partition to get offset from zookeeper. */
 	public OffsetZkInfo getOffset(String clusterAlias, String topic, String group, int partition);
 
@@ -72,9 +72,6 @@ public interface KafkaService {
 
 	/** Use kafka console command to delete topic. */
 	public Map<String, Object> delete(String clusterAlias, String topicName);
-
-	/** Find leader through topic. */
-	public List<MetadataInfo> findLeader(String clusterAlias, String topic);
 
 	/** Convert query kafka to topic in the sql message for standard sql. */
 	public KafkaSqlInfo parseSql(String clusterAlias, String sql);
@@ -108,5 +105,14 @@ public interface KafkaService {
 
 	/** Send mock message to kafka. */
 	public boolean mockMessage(String clusterAlias, String topic, String message);
+
+	/** Get kafka consumer group all topics lag. */
+	public long getKafkaLag(String clusterAlias, String group,String topic);
+	
+	/** Get consumer group all topics lag. */
+	public long getLag(String clusterAlias, String group,String topic);
+
+	/** Get kafka logsize by old version. */
+	public long getLogSize(String clusterAlias, String topic, int partitionid);
 
 }
