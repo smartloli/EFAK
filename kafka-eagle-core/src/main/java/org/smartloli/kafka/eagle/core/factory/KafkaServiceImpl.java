@@ -101,6 +101,7 @@ public class KafkaServiceImpl implements KafkaService {
 	private final String BROKER_TOPICS_PATH = "/brokers/topics";
 	private final String DELETE_TOPICS_PATH = "/admin/delete_topics";
 	private final String CONSUMERS_PATH = "/consumers";
+	private final String OWNERS = "/owners";
 	private final String TOPIC_ISR = "/brokers/topics/%s/partitions/%s/state";
 	private final Logger LOG = LoggerFactory.getLogger(KafkaServiceImpl.class);
 
@@ -158,12 +159,15 @@ public class KafkaServiceImpl implements KafkaService {
 			List<String> groups = JavaConversions.seqAsJavaList(subConsumerPaths);
 			JSONArray groupsAndTopics = new JSONArray();
 			for (String group : groups) {
-				Seq<String> topics = zkc.getChildren(CONSUMERS_PATH + "/" + group);
+				Seq<String> topics = zkc.getChildren(CONSUMERS_PATH + "/" + group + OWNERS);
 				for (String topic : JavaConversions.seqAsJavaList(topics)) {
-					JSONObject groupAndTopic = new JSONObject();
-					groupAndTopic.put("topic", topic);
-					groupAndTopic.put("group", group);
-					groupsAndTopics.add(groupAndTopic);
+					Seq<String> partitionIds = zkc.getChildren(CONSUMERS_PATH + "/" + group + OWNERS + "/" + topic);
+					if (JavaConversions.seqAsJavaList(partitionIds).size() > 0) {
+						JSONObject groupAndTopic = new JSONObject();
+						groupAndTopic.put("topic", topic);
+						groupAndTopic.put("group", group);
+						groupsAndTopics.add(groupAndTopic);
+					}
 				}
 			}
 			for (Object object : groupsAndTopics) {
@@ -187,6 +191,27 @@ public class KafkaServiceImpl implements KafkaService {
 			}
 		}
 		return actvTopics;
+	}
+
+	/** Get kafka active consumer topic. */
+	public Set<String> getActiveTopic(String clusterAlias, String group) {
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		Set<String> activeTopics = new HashSet<>();
+		try {
+			Seq<String> topics = zkc.getChildren(CONSUMERS_PATH + "/" + group + OWNERS);
+			for (String topic : JavaConversions.seqAsJavaList(topics)) {
+				activeTopics.add(topic);
+			}
+		} catch (Exception ex) {
+			LOG.error("Get kafka active topic has error, msg is " + ex.getMessage());
+			LOG.error(ex.getMessage());
+		} finally {
+			if (zkc != null) {
+				kafkaZKPool.release(clusterAlias, zkc);
+				zkc = null;
+			}
+		}
+		return activeTopics;
 	}
 
 	/** Get all broker list from zookeeper. */
@@ -925,33 +950,84 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get group consumer all topics lags. */
-	public String getLag(String clusterAlias, String group) {
+	public long getLag(String clusterAlias, String group, String topic) {
+		long lag = 0L;
+		try {
+			List<String> partitions = findTopicPartition(clusterAlias, topic);
+			for (String partition : partitions) {
+				int partitionInt = Integer.parseInt(partition);
+				OffsetZkInfo offsetZk = getOffset(clusterAlias, topic, group, partitionInt);
+				long logSize = getLogSize(clusterAlias, topic, partitionInt);
+				lag += logSize - offsetZk.getOffset();
+			}
+		} catch (Exception e) {
+			LOG.error("Get cluser[" + clusterAlias + "] active group[" + group + "] topic[" + topic + "] lag has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		}
+		return lag;
+	}
+
+	/** Get kafka group consumer all topics lags. */
+	public long getKafkaLag(String clusterAlias, String group, String ketopic) {
+		long lag = 0L;
+
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
 		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
 			sasl(prop, parseBrokerServer(clusterAlias));
 		}
-		JSONObject object = new JSONObject();
 		try {
 			AdminClient adminClient = AdminClient.create(prop);
 			ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(group);
 			for (Entry<TopicPartition, OffsetAndMetadata> entry : offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
-				String topic = object.getString("topic");
-				if (topic != null && topic.equals(entry.getKey().topic())) {
-					long lag = object.getLong("lag");
+				if (ketopic.equals(entry.getKey().topic())) {
 					long logSize = getKafkaLogSize(clusterAlias, entry.getKey().topic(), entry.getKey().partition());
-					object.put("lag", lag + (logSize - entry.getValue().offset()));
-				} else {
-					object.put("topic", entry.getKey().topic());
-					long logSize = getKafkaLogSize(clusterAlias, entry.getKey().topic(), entry.getKey().partition());
-					object.put("lag", logSize - entry.getValue().offset());
+					lag += logSize - entry.getValue().offset();
 				}
 			}
 		} catch (Exception e) {
-			LOG.error("Get cluster[" + clusterAlias + "] group[" + group + "] consumer lag has error, msg is " + e.getMessage());
+			LOG.error("Get cluster[" + clusterAlias + "] group[" + group + "] topic[" + ketopic + "] consumer lag has error, msg is " + e.getMessage());
 			e.printStackTrace();
 		}
-		return object.toJSONString();
+		return lag;
+	}
+
+	/** Get kafka old version log size. */
+	public long getLogSize(String clusterAlias, String topic, int partitionid) {
+		JMXConnector connector = null;
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		JSONArray brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias));
+		for (Object object : brokers) {
+			JSONObject broker = (JSONObject) object;
+			try {
+				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getString("host") + ":" + broker.getInteger("jmxPort")));
+				connector = JMXConnectorFactory.connect(jmxSeriverUrl);
+				if (connector != null) {
+					break;
+				}
+			} catch (Exception e) {
+				LOG.error("Get kafka old version logsize has error, msg is " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		long logSize = 0L;
+		try {
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			logSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.logSize, topic, partitionid)), KafkaServer8.value).toString());
+		} catch (Exception ex) {
+			LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
+			ex.printStackTrace();
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					LOG.error("Close jmx connector has error, msg is " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+		return logSize;
 	}
 }

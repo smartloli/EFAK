@@ -19,6 +19,8 @@ package org.smartloli.kafka.eagle.web.quartz;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,22 +54,43 @@ public class MetricsQuartz {
 		List<TopicLagInfo> topicLags = new ArrayList<>();
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
-			JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
-			for (Object object : consumerGroups) {
-				TopicLagInfo topicLag = new TopicLagInfo();
-				topicLag.setCluster(clusterAlias);
-				JSONObject consumerGroup = (JSONObject) object;
-				String group = consumerGroup.getString("group");
-				topicLag.setGroup(group);
-				JSONObject objectTopicLag = JSON.parseObject(kafkaService.getLag(clusterAlias, group));
-				topicLag.setTopic(objectTopicLag.getString("topic"));
-				JSONObject value = new JSONObject();
-				value.put("y", CalendarUtils.getDate());
-				value.put("lag", objectTopicLag.getLong("lag"));
-				topicLag.setLag(value.toJSONString());
-				topicLag.setTimespan(CalendarUtils.getTimeSpan());
-				topicLag.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-				topicLags.add(topicLag);
+			if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+				JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+				for (Object object : consumerGroups) {
+					JSONObject consumerGroup = (JSONObject) object;
+					String group = consumerGroup.getString("group");
+					for (String topic : kafkaService.getKafkaActiverTopics(clusterAlias, group)) {
+						TopicLagInfo topicLag = new TopicLagInfo();
+						topicLag.setCluster(clusterAlias);
+						topicLag.setGroup(group);
+						topicLag.setTopic(topic);
+						JSONObject value = new JSONObject();
+						value.put("y", CalendarUtils.getDate());
+						value.put("lag", kafkaService.getKafkaLag(clusterAlias, group, topic));
+						topicLag.setLag(value.toJSONString());
+						topicLag.setTimespan(CalendarUtils.getTimeSpan());
+						topicLag.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+						topicLags.add(topicLag);
+					}
+				}
+			} else {
+				Map<String, List<String>> consumerGroups = kafkaService.getConsumers(clusterAlias);
+				for (Entry<String, List<String>> entry : consumerGroups.entrySet()) {
+					String group = entry.getKey();
+					for (String topic : kafkaService.getActiveTopic(clusterAlias, group)) {
+						TopicLagInfo topicLag = new TopicLagInfo();
+						topicLag.setCluster(clusterAlias);
+						topicLag.setGroup(group);
+						topicLag.setTopic(topic);
+						JSONObject value = new JSONObject();
+						value.put("y", CalendarUtils.getDate());
+						value.put("lag", kafkaService.getLag(clusterAlias, group, topic));
+						topicLag.setLag(value.toJSONString());
+						topicLag.setTimespan(CalendarUtils.getTimeSpan());
+						topicLag.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+						topicLags.add(topicLag);
+					}
+				}
 			}
 		}
 		try {

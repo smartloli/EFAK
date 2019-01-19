@@ -32,6 +32,7 @@ import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLagInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
@@ -125,7 +126,12 @@ public class OffsetServiceImpl implements OffsetService {
 			int partitionInt = Integer.parseInt(partition);
 			OffsetZkInfo offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partitionInt);
 			OffsetInfo offset = new OffsetInfo();
-			long logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partitionInt);
+			long logSize = 0L;
+			if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+				logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partitionInt);
+			} else {
+				logSize = kafkaService.getLogSize(clusterAlias, topic, partitionInt);
+			}
 			offset.setPartition(partitionInt);
 			offset.setLogSize(logSize);
 			offset.setCreate(offsetZk.getCreate());

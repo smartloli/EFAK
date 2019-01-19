@@ -113,7 +113,11 @@ public class AlertQuartz {
 						for (String partitionStr : kafkaService.findTopicPartition(clusterAlias, topic)) {
 							int partition = Integer.parseInt(partitionStr);
 							long logSize = 0L;
-							logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partition);
+							if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+								logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partition);
+							} else {
+								logSize = kafkaService.getLogSize(clusterAlias, topic, partition);
+							}
 //							if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
 //								logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partition);
 //							} else {
