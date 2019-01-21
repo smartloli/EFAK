@@ -95,10 +95,13 @@ public class MetricsQuartz {
 		}
 		try {
 			MetricsServiceImpl metricsServiceImpl = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
-			metricsServiceImpl.setConsumerLag(topicLags);
+			if (topicLags.size() > 0) {
+				metricsServiceImpl.setConsumerLag(topicLags);
+			}
 		} catch (Exception e) {
 			LOG.error("Collector consumer lag data has error,msg is " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
+
 }
