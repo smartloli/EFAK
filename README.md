@@ -15,6 +15,8 @@ Supported on kafka version: ``` 0.8.2.x ```,``` 0.9.x ```,``` 0.10.x ```,``` 1.x
 
 Supported platform: ```Mac OS X```,```Linux```,```Windows```.
 
+Supported JDK: ```JDK8+```
+
 Here are a few Kafka Eagle system screenshots:
 
 # Alert Support
