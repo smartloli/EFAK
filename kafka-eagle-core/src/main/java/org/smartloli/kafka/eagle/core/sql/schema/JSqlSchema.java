@@ -22,14 +22,19 @@ import java.util.Map;
 
 import org.apache.calcite.linq4j.tree.Expression;
 import org.apache.calcite.schema.Function;
+import org.apache.calcite.schema.ScalarFunction;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.SchemaPlus;
 import org.apache.calcite.schema.Table;
 import org.apache.calcite.schema.impl.AbstractSchema;
+import org.apache.calcite.schema.impl.ScalarFunctionImpl;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlTable;
+import org.smartloli.kafka.eagle.core.sql.function.JSONFunction;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData.Database;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
 /**
@@ -64,7 +69,14 @@ public class JSqlSchema extends AbstractSchema {
 
 	@Override
 	protected Multimap<String, Function> getFunctionMultimap() {
-		return super.getFunctionMultimap();
+		ImmutableMultimap<String, ScalarFunction> funcs = ScalarFunctionImpl.createAll(JSONFunction.class);
+		Multimap<String, Function> functions = HashMultimap.create();
+		for (String key : funcs.keySet()) {
+			for (ScalarFunction func : funcs.get(key)) {
+				functions.put(key, func);
+			}
+		}
+		return functions;
 	}
 
 	@Override
@@ -81,7 +93,7 @@ public class JSqlSchema extends AbstractSchema {
 		for (JSqlMapData.Table table : database.tables) {
 			tables.put(table.tableName, new JSqlTable(table));
 		}
-	
+
 		return tables;
 	}
 
