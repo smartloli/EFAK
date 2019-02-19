@@ -150,7 +150,7 @@ public class IMServiceImpl implements IMService {
 		hashMap.put("touser", strB.toString());
 		hashMap.put("totag", "TagID1");
 		hashMap.put("msgtype", "text");
-		hashMap.put("agentid", SystemConfigUtils.getIntProperty("kafka.eagle.im.qyapi.agentid"));
+		hashMap.put("agentid", SystemConfigUtils.getIntProperty("kafka.eagle.im.qyapi.agentid",0));
 		HashMap<String, String> messageHM = new HashMap<>();
 		messageHM.put("content", message);
 		hashMap.put("text", messageHM);
