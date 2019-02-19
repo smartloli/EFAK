@@ -209,6 +209,23 @@ public class AlertQuartz {
 						ex.printStackTrace();
 						LOG.error("Topic[" + alertInfo.getTopic() + "] Send alarm wechat or dingding has error,msg is " + ex.getMessage());
 					}
+					// 企业微信
+					try {
+						IMProvider provider = new IMFactory();
+						LagContentModule lcm = new LagContentModule();
+						lcm.setCluster(clusterAlias);
+						lcm.setConsumerLag(offset.getLag() + "");
+						lcm.setGroup(alertInfo.getGroup());
+						lcm.setLagThreshold(alertInfo.getLag() + "");
+						lcm.setTime(CalendarUtils.getDate());
+						lcm.setTopic(alertInfo.getTopic());
+						lcm.setType("Consumer");
+						lcm.setUser(alertInfo.getOwner());
+						provider.create().sendJsonMsgByQyapi(lcm.toWeChatMarkDown(),alertInfo.getOwner());
+					} catch (Exception ex) {
+						ex.printStackTrace();
+						LOG.error("Topic[" + alertInfo.getTopic() + "] Send alarm wechat or dingding has error,msg is " + ex.getMessage());
+					}
 				}
 			}
 		}
@@ -297,10 +314,25 @@ public class AlertQuartz {
 								ex.printStackTrace();
 								LOG.error("Send alarm wechat or dingding has error,msg is " + ex.getMessage());
 							}
+							// 企业微信
+							try {
+								IMProvider provider = new IMFactory();
+								ClusterContentModule ccm = new ClusterContentModule();
+								ccm.setCluster(cluster.getCluster());
+								ccm.setServer(host + ":" + port);
+								ccm.setTime(CalendarUtils.getDate());
+								ccm.setType(cluster.getType());
+								ccm.setUser(cluster.getOwner());
+								provider.create().sendJsonMsgByQyapi(ccm.toWeChatMarkDown(),cluster.getOwner());
+							} catch (Exception ex) {
+								ex.printStackTrace();
+								LOG.error(" Send alarm wechat or dingding has error,msg is " + ex.getMessage());
+							}
 						}
 					} catch (Exception e) {
 						LOG.error("Parse port[" + server.split(":")[1] + "] has error, msg is " + e.getMessage());
 					}
+
 				}
 			}
 		}

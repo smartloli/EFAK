@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.api.im;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
@@ -39,6 +40,7 @@ import com.alibaba.fastjson.JSONObject;
 public class IMServiceImpl implements IMService {
 
 	private final Logger LOG = LoggerFactory.getLogger(IMServiceImpl.class);
+	String tokenID ="";
 
 	/** Send Json msg by dingding. */
 	@Override
@@ -98,5 +100,61 @@ public class IMServiceImpl implements IMService {
 
 		return map;
 	}
+	private   String sendMessage(String alarmText) {
+		String url = SystemConfigUtils.getProperty("kafka.eagle.im.qyapi.emessageUrl") + tokenID;
+		String retV = HttpClientUtils.doPostJson(url, alarmText);
+		if (StringUtils.isNotEmpty(retV)) {
+			JSONObject firstJSON = JSONObject.parseObject(retV);
+			Integer errcode = firstJSON.getInteger("errcode");
+			if (errcode != null && errcode.intValue() != 0) {
+				String newTokenId = genNewToken();
+				if (StringUtils.isNotEmpty(newTokenId)) {
+					tokenID = newTokenId;
+				}
+				url =  SystemConfigUtils.getProperty("kafka.eagle.im.qyapi.emessageUrl")  + tokenID;
+				retV=	HttpClientUtils.doPostJson(url, alarmText);
+			}
+		}
+		return retV;
+	}
+	/**
+	 * Send Json msg by 企业微信.
+	 */
+	@Override
+	public void sendJsonMsgByQyapi(String data ,String adress) {
+		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.im.qyapi.enable")) {
+			String message =corpWeixinEntity(data,adress);
+			LOG.info("IM[Qyapi] response: " + sendMessage(message));
+		}
+	}
 
+	private String genNewToken() {
+		String value = HttpClientUtils.doPostJson(SystemConfigUtils.getProperty("kafka.eagle.im.qyapi.tokenUrl"),"");
+		if (StringUtils.isNotEmpty(value)) {
+			JSONObject firstO = JSONObject.parseObject(value);
+			return firstO.getString("access_token");
+		}
+		return null;
+	}
+
+	private String corpWeixinEntity(String message, String alarms) {
+		String [] alarmMans=alarms.split(",");
+		HashMap<String, Object> hashMap = new HashMap<>();
+		StringBuilder strB = new StringBuilder();
+		for (int i = 0; i < alarmMans.length; i++) {
+			strB.append(alarmMans[i].split("@")[0]);
+			if (i != alarmMans.length - 1) {
+				strB.append("|");
+			}
+		}
+		hashMap.put("touser", strB.toString());
+		hashMap.put("totag", "TagID1");
+		hashMap.put("msgtype", "text");
+		hashMap.put("agentid", 1000014);
+		HashMap<String, String> messageHM = new HashMap<>();
+		messageHM.put("content", message);
+		hashMap.put("text", messageHM);
+		hashMap.put("safe", 0);
+		return JSONObject.toJSONString(hashMap);
+	}
 }
