@@ -29,5 +29,7 @@ public interface IMService {
 	public void sendJsonMsgByDingDing(String data);
 	
 	public void sendJsonMsgByWeChat(String data);
+
+	public void sendJsonMsgByQyapi (String data,String user);
 	
 }
