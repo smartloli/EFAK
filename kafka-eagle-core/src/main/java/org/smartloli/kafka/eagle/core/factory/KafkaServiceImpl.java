@@ -986,6 +986,7 @@ public class KafkaServiceImpl implements KafkaService {
 					lag += logSize - entry.getValue().offset();
 				}
 			}
+			adminClient.close();
 		} catch (Exception e) {
 			LOG.error("Get cluster[" + clusterAlias + "] group[" + group + "] topic[" + ketopic + "] consumer lag has error, msg is " + e.getMessage());
 			e.printStackTrace();
