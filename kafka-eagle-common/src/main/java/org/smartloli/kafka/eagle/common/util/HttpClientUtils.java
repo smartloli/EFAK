@@ -151,18 +151,4 @@ public class HttpClientUtils {
 		return result;
 	}
 
-	public static void main(String[] args) {
-		testDingDing();
-
-	}
-
-	private static void testDingDing() {
-		String uri = SystemConfigUtils.getProperty("kafka.eagle.im.dingding.url");
-		String data = "{\"markdown\":\"{\\\"text\\\":\\\"<font color=\\\\\\\"#FF0000\\\\\\\"Kafka Eagle Alert</font>\n"
-				+ "> **Information** \n "
-				+ "> **Type:** <font color=\\\\\\\"#008000\\\\\\\">Zookeeper</font> \\\\n > **ClusterID:** cluster2 \\\\n>**Owners:** @example1@email.com> \\\\n>**Time:** <font color=\\\\\\\"#008000\\\\\\\">2019-01-01 15:45:02</font> \\\\n>Describer:\\\\n><font color=\\\\\\\"#FFA500\\\\\\\">Telnet server[127.0.0.1:2188] is not available.</font>\\\\n\\\",\\\"title\\\":\\\"Kafka Eagle Alert\\\"}\",\"msgtype\":\"markdown\"}";
-		String res = doPostJson(uri, data);
-		System.out.println(res);
-	}
-
 }

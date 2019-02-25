@@ -35,7 +35,7 @@ public class KafkaEagleVersion {
 		String asciiArt = FigletFont.convertOneLine(file, "KAfKA EAGLE");
 		System.out.println("Welcome to");
 		System.out.println(asciiArt);
-		System.out.println("Version 1.2.9");
+		System.out.println("Version 1.3.0");
 	}
 
 }

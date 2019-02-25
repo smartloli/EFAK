@@ -20,16 +20,17 @@ package org.smartloli.kafka.eagle.core.metrics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaLog;
+import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -53,7 +54,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
-	
+
 	@Override
 	public String topicSize(String clusterAlias, String topic) {
 		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
@@ -74,7 +75,8 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 		long tpSize = 0L;
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
-			connector = JMXConnectorFactory.connect(jmxSeriverUrl);
+			// connector = JMXConnectorFactory.connect(jmxSeriverUrl);
+			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
 			for (String partition : partitions) {
 				String objectName = String.format(KafkaLog.size, topic, partition);
