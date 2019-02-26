@@ -42,6 +42,13 @@ start()
 		echo "[$stime] Error: This environment variable is needed to run this program."
   		exit 1
 	fi
+	
+	PID=`ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}'`
+        
+    if [ -n "$PID" ]; then
+        echo "[$stime] Error: The Kafka Eagle[$PID] has started."
+        exit 1
+    fi
 
 	bin=`dirname "$0"`
 	export KE_HOME=`cd $bin/../; pwd`
