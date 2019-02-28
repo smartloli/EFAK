@@ -55,11 +55,6 @@ public class KafkaSqlParser {
 					long start = System.currentTimeMillis();
 					kafkaSql.setClusterAlias(clusterAlias);
 					List<JSONArray> dataSets = KafkaConsumerAdapter.executor(kafkaSql);
-//					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-//						dataSets = KafkaConsumerAdapter.executor(kafkaSql);
-//					} else {
-//						dataSets = SimpleKafkaConsumer.executor(kafkaSql);
-//					}
 					String results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
 					// String results = JSqlUtils.toJSONObject(dataSets);
 					long end = System.currentTimeMillis();

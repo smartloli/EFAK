@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
 import org.smartloli.kafka.eagle.core.sql.ignite.domain.TopicX;
 import org.smartloli.kafka.eagle.core.sql.ignite.factory.KafkaSqlFactory;
 import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
@@ -41,15 +42,9 @@ public class TestKSql {
 	public static void main(String[] args) throws Exception {
 		// ignite();
 		// calcite();
-		System.out.println(KConstants.Kafka.POSITION);
-		JSONObject object = new JSONObject();
-		object.put("owner", "");
-		System.out.println();
-		int i = 0;
-		if (!"".equals(object.getString("owner"))&&object.getString("owner")!=null) {
-			i++;
-		}
-		System.out.println(i);
+		String sql = "select * from \"KV_T\" where \"partition\" in (0)";
+		String result = KafkaSqlParser.execute("cluster1", sql);
+		System.out.println("result: " + result);
 	}
 
 	public static void ignite() {
