@@ -230,7 +230,7 @@ public class KafkaServiceImpl implements KafkaService {
 					broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
 					broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
 					String tupleString = new String(tuple._1.get());
-					if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
+					if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 						String endpoints = JSON.parseObject(tupleString).getString("endpoints");
 						String tmp = endpoints.split(File.separator + File.separator)[1];
 						broker.setHost(tmp.substring(0, tmp.length() - 2).split(":")[0]);
@@ -583,9 +583,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return sql;
 	}
 
-	private void sasl(Properties props, String bootstrapServers) {
-		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty("kafka.eagle.sasl.protocol"));
-		props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
+	private void sasl(Properties props, String bootstrapServers, String clusterAlias) {
+		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
+		props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
 	}
 
 	private KafkaSqlInfo segments(String clusterAlias, String sql) {
@@ -633,7 +633,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/** Get kafka 0.10.x activer topics. */
 	public Set<String> getKafkaActiverTopics(String clusterAlias, String group) {
-		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group);
+		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
 		Set<String> topics = new HashSet<>();
 		for (Object object : consumerGroups) {
 			JSONObject consumerGroup = (JSONObject) object;
@@ -653,8 +653,8 @@ public class KafkaServiceImpl implements KafkaService {
 		JSONArray consumerGroups = new JSONArray();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			sasl(prop, getKafkaBrokerServer(clusterAlias));
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, getKafkaBrokerServer(clusterAlias), clusterAlias);
 		}
 
 		try {
@@ -675,7 +675,7 @@ public class KafkaServiceImpl implements KafkaService {
 						LOG.error("Get coordinator node has error, msg is " + e.getMessage());
 						e.printStackTrace();
 					}
-					consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId));
+					consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId, clusterAlias));
 					consumerGroups.add(consumerGroup);
 				}
 			}
@@ -688,12 +688,12 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get kafka 0.10.x consumer metadata. */
-	private JSONArray getKafkaMetadata(String bootstrapServers, String group) {
+	private JSONArray getKafkaMetadata(String bootstrapServers, String group, String clusterAlias) {
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			sasl(prop, bootstrapServers);
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, bootstrapServers, clusterAlias);
 		}
 
 		JSONArray consumerGroups = new JSONArray();
@@ -741,7 +741,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/** Get kafka 0.10.x consumer pages. */
 	public String getKafkaActiverSize(String clusterAlias, String group) {
-		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group);
+		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
 		int activerCounter = 0;
 		Set<String> topics = new HashSet<>();
 		for (Object object : consumerGroups) {
@@ -766,8 +766,8 @@ public class KafkaServiceImpl implements KafkaService {
 		int counter = 0;
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			sasl(prop, parseBrokerServer(clusterAlias));
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, parseBrokerServer(clusterAlias), clusterAlias);
 		}
 
 		try {
@@ -789,7 +789,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/** Get kafka 0.10.x, 1.x, 2.x consumer topic information. */
 	public Set<String> getKafkaConsumerTopic(String clusterAlias, String group) {
-		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group);
+		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
 		Set<String> topics = new HashSet<>();
 		for (Object object : consumerGroups) {
 			JSONObject consumerGroup = (JSONObject) object;
@@ -803,7 +803,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/** Get kafka 0.10.x consumer group and topic. */
 	public String getKafkaConsumerGroupTopic(String clusterAlias, String group) {
-		return getKafkaMetadata(parseBrokerServer(clusterAlias), group).toJSONString();
+		return getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias).toJSONString();
 	}
 
 	/** Get kafka 0.10.x, 1.x, 2.x offset from topic. */
@@ -811,8 +811,8 @@ public class KafkaServiceImpl implements KafkaService {
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			sasl(prop, parseBrokerServer(clusterAlias));
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, parseBrokerServer(clusterAlias), clusterAlias);
 		}
 		JSONArray targets = new JSONArray();
 		try {
@@ -854,9 +854,9 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
 		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty("kafka.eagle.sasl.protocol"));
-			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
+			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
 		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		TopicPartition tp = new TopicPartition(topic, partitionid);
@@ -873,7 +873,7 @@ public class KafkaServiceImpl implements KafkaService {
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
-//			connector = JMXConnectorFactory.connect(jmxSeriverUrl);
+			// connector = JMXConnectorFactory.connect(jmxSeriverUrl);
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
 			if (CollectorType.KAFKA.equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
@@ -935,9 +935,9 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(Kafka.VALUE_SERIALIZER, StringSerializer.class.getCanonicalName());
 		props.put(Kafka.PARTITION_CLASS, KafkaPartitioner.class.getName());
 
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty("kafka.eagle.sasl.protocol"));
-			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
+			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
 		}
 
 		Producer<String, String> producer = new KafkaProducer<>(props);
@@ -976,8 +976,8 @@ public class KafkaServiceImpl implements KafkaService {
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			sasl(prop, parseBrokerServer(clusterAlias));
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, parseBrokerServer(clusterAlias), clusterAlias);
 		}
 		try {
 			AdminClient adminClient = AdminClient.create(prop);
@@ -1005,7 +1005,7 @@ public class KafkaServiceImpl implements KafkaService {
 			JSONObject broker = (JSONObject) object;
 			try {
 				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getString("host") + ":" + broker.getInteger("jmxPort")));
-//				connector = JMXConnectorFactory.connect(jmxSeriverUrl);
+				// connector = JMXConnectorFactory.connect(jmxSeriverUrl);
 				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 				if (connector != null) {
 					break;

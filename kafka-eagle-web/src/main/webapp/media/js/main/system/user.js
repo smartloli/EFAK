@@ -15,6 +15,8 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'email'
 		}, {
+			"mData" : 'password'
+		}, {
 			"mData" : 'operate'
 		} ]
 	});
@@ -77,7 +79,6 @@ $(document).ready(function() {
 			url : '/ke/system/user/role/' + id + '/ajax',
 			success : function(datas) {
 				$("#ke_role_list").html("");
-				console.log(datas);
 				var chk = "";
 				for (var i = 0; i < datas.role.length; i++) {
 					chk += "<input class='actionRole' type='checkbox' value='" + datas.role[i].id + "'>" + datas.role[i].roleName + "&nbsp;&nbsp;";

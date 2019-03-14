@@ -27,6 +27,7 @@ import org.smartloli.kafka.eagle.common.util.KConstants.IM;
 import org.smartloli.kafka.eagle.common.util.KConstants.WeChat;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -77,9 +78,12 @@ public class IMServiceImpl implements IMService {
 	@Override
 	public void sendJsonMsgByWeChat(String data) {
 		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.im.wechat.enable")) {
+			String token = SystemConfigUtils.getProperty("kafka.eagle.im.wechat.token");
 			String uri = SystemConfigUtils.getProperty("kafka.eagle.im.wechat.url");
+			String getToken = HttpClientUtils.doGet(token);
+			String accessToken = JSON.parseObject(getToken).getString("access_token");
 			Map<String, Object> wechatMarkdownMessage = getWeChatMarkdownMessage(data);
-			LOG.info("IM[WeChat] response: " + HttpClientUtils.doPostJson(uri, JSONObject.toJSONString(wechatMarkdownMessage)));
+			LOG.info("IM[WeChat] response: " + HttpClientUtils.doPostJson(uri + accessToken, JSONObject.toJSONString(wechatMarkdownMessage)));
 		}
 	}
 
