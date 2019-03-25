@@ -63,7 +63,6 @@
 										<th>UserName</th>
 										<th>RealName</th>
 										<th>Email</th>
-										<th>Password</th>
 										<th>Operate</th>
 									</tr>
 								</thead>
@@ -82,7 +81,9 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keModalLabel">Add User</h4>
+							<h4 class="modal-title" id="keModalLabel">
+								Add User
+							</h4>
 						</div>
 						<!-- /.row -->
 						<form role="form" action="/ke/system/user/add/" method="post"
@@ -116,9 +117,9 @@
 											class="form-control" placeholder="smartloli@email.com">
 									</div>
 								</div>
-								<div id="alert_mssage_add" style="display: none"
+								<div id="alert_mssage" style="display: none"
 									class="alert alert-danger">
-									<label id="alert_mssage_add_label"></label>
+									<label> Oops! Please make some changes .</label>
 								</div>
 							</fieldset>
 
@@ -140,7 +141,9 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keModalLabel">User Setting</h4>
+							<h4 class="modal-title" id="keModalLabel">
+								User Setting
+							</h4>
 							<div id="alert_mssage_info"></div>
 						</div>
 						<!-- /.row -->
@@ -162,7 +165,9 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keModalLabel">Modify User</h4>
+							<h4 class="modal-title" id="keModalLabel">
+								Modify User
+							</h4>
 						</div>
 						<!-- /.row -->
 						<form role="form" action="/ke/system/user/modify/" method="post"
@@ -173,35 +178,34 @@
 									<div class="col-sm-9">
 										<input id="ke_user_id_modify" name="ke_user_id_modify"
 											type="hidden" class="form-control" placeholder="1000">
-										<input id="ke_rtxno_name_modify" name="ke_rtxno_name_modify"
-											type="text" class="form-control" disabled placeholder="1000">
+										<input id="ke_rtxno_name_modify" name="ke_rtxno_name_modify" type="text"
+											class="form-control" disabled placeholder="1000">
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">RealName</label>
 									<div class="col-sm-9">
-										<input id="ke_real_name_modify" name="ke_real_name_modify"
-											type="text" class="form-control" placeholder="smartloli">
+										<input id="ke_real_name_modify" name="ke_real_name_modify" type="text"
+											class="form-control" placeholder="smartloli">
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">UserName</label>
 									<div class="col-sm-9">
-										<input id="ke_user_name_modify" name="ke_user_name_modify"
-											type="text" class="form-control" placeholder="smartloli">
+										<input id="ke_user_name_modify" name="ke_user_name_modify" type="text"
+											class="form-control" placeholder="smartloli">
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">Email</label>
 									<div class="col-sm-9">
-										<input id="ke_user_email_modify" name="ke_user_email_modify"
-											type="text" class="form-control"
-											placeholder="smartloli@email.com">
+										<input id="ke_user_email_modify" name="ke_user_email_modify" type="text"
+											class="form-control" placeholder="smartloli@email.com">
 									</div>
 								</div>
 								<div id="alert_mssage_modify" style="display: none"
 									class="alert alert-danger">
-									<label id="alert_mssage_modify_label"></label>
+									<label> Oops! Please make some changes .</label>
 								</div>
 							</fieldset>
 
@@ -229,44 +233,24 @@
 		var ke_real_name = $("#ke_real_name").val();
 		var ke_user_name = $("#ke_user_name").val();
 		var ke_user_email = $("#ke_user_email").val();
-		if (ke_real_name == "Administrator" || ke_user_name == "admin") {
-			$("#alert_mssage_add").show();
-			$("#alert_mssage_add_label").text("Oops! Administrator or admin is not available.");
-			setTimeout(function() {
-				$("#alert_mssage_add").hide()
-			}, 3000);
-			return false;
-		}
 		if (ke_rtxno_name.length == 0 || ke_real_name.length == 0 || ke_user_name.length == 0 || ke_user_email.length == 0) {
-			$("#alert_mssage_add").show();
-			$("#alert_mssage_add_label").text("Oops! Please enter the complete information.");
+			$("#alert_mssage").show();
 			setTimeout(function() {
-				$("#alert_mssage_add").hide()
+				$("#alert_mssage").hide()
 			}, 3000);
 			return false;
 		}
 
 		return true;
 	}
-
+	
 	function contextModifyFormValid() {
 		var ke_rtxno_name_modify = $("#ke_rtxno_name_modify").val();
 		var ke_real_name_modify = $("#ke_real_name_modify").val();
 		var ke_user_name_modify = $("#ke_user_name_modify").val();
 		var ke_user_email_modify = $("#ke_user_email_modify").val();
-
-		if (ke_real_name_modify == "Administrator" || ke_user_name_modify == "admin") {
-			$("#alert_mssage_modify").show();
-			$("#alert_mssage_modify_label").text("Oops! Administrator or admin is not available.");
-			setTimeout(function() {
-				$("#alert_mssage_modify").hide()
-			}, 3000);
-			return false;
-		}
-
 		if (ke_rtxno_name_modify.length == 0 || ke_real_name_modify.length == 0 || ke_user_name_modify.length == 0 || ke_user_email_modify.length == 0) {
 			$("#alert_mssage_modify").show();
-			$("#alert_mssage_modify_label").text("Oops! Please enter the complete information.");
 			setTimeout(function() {
 				$("#alert_mssage_modify").hide()
 			}, 3000);

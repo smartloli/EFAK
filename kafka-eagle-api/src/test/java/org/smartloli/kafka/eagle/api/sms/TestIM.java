@@ -34,7 +34,7 @@ public class TestIM {
 		testClusterHeathyByDingDing();
 		testConsumerHeathyByWeChat();
 	}
-	
+
 	private static void testConsumerHeathyByWeChat() {
 		ClusterContentModule ccm = new ClusterContentModule();
 		ccm.setCluster("cluster2");
