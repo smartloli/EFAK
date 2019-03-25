@@ -27,5 +27,5 @@ package org.smartloli.kafka.eagle.api.email;
  * @see org.smartloli.kafka.eagle.api.email.MailService
  */
 public interface MailProvider {
-	MailService create();
+	public MailService create();
 }

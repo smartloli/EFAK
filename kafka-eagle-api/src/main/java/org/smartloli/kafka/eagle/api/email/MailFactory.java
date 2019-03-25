@@ -24,7 +24,7 @@ package org.smartloli.kafka.eagle.api.email;
  *
  *         Created by Jan 17, 2017
  * 
- * @see org.smartloli.kafka.eagle.api.email.MailProvider
+ * @see org.smartloli.kafka.eagle.factory.MailProvider
  */
 public class MailFactory implements MailProvider {
 

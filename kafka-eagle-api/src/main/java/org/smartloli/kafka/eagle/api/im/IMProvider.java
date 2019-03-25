@@ -27,5 +27,5 @@ package org.smartloli.kafka.eagle.api.im;
  * @see org.smartloli.kafka.eagle.api.im.IMService
  */
 public interface IMProvider {
-	IMService create();
+	public IMService create();
 }
