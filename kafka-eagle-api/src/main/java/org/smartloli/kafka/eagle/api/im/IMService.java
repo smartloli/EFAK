@@ -26,8 +26,8 @@ package org.smartloli.kafka.eagle.api.im;
  */
 public interface IMService {
 
-	public void sendJsonMsgByDingDing(String data);
+	void sendJsonMsgByDingDing(String data);
 	
-	public void sendJsonMsgByWeChat(String data);
+	void sendJsonMsgByWeChat(String data);
 	
 }

@@ -17,30 +17,24 @@
  */
 package org.smartloli.kafka.eagle.api.email;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
-import javax.mail.Address;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
 import org.apache.commons.lang.StringUtils;
 import org.smartloli.kafka.eagle.common.protocol.MailSenderInfo;
 import org.smartloli.kafka.eagle.common.protocol.SaAuthenticatorInfo;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import java.io.File;
+import java.security.Security;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Implements MailService all method.
@@ -49,7 +43,7 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
  *
  *         Created by Jan 17, 2017
  * 
- * @see org.smartloli.kafka.eagle.factory.MailService
+ * @see org.smartloli.kafka.eagle.api.email.MailService
  */
 public class MailServiceImpl implements MailService {
 
@@ -85,13 +79,32 @@ public class MailServiceImpl implements MailService {
 	/** Send mail in HTML format */
 	private boolean sendHtmlMail(MailSenderInfo mailInfo) {
 		boolean enableMailAlert = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.enable");
+		boolean enableSSLMail = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.ssl.enable");
+
 		if (enableMailAlert) {
-			SaAuthenticatorInfo authenticator = null;
+			final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+			Session sendMailSession = null;
 			Properties pro = mailInfo.getProperties();
+
 			if (mailInfo.isValidate()) {
-				authenticator = new SaAuthenticatorInfo(mailInfo.getUserName(), mailInfo.getPassword());
+				if(!enableSSLMail) {
+					SaAuthenticatorInfo authenticator = new SaAuthenticatorInfo(mailInfo.getUserName(), mailInfo.getPassword());
+					sendMailSession = Session.getDefaultInstance(pro, authenticator);
+				} else {
+					pro.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY);
+					pro.setProperty("mail.smtp.socketFactory.fallback", "false");
+					pro.setProperty("mail.smtp.socketFactory.port", mailInfo.getMailServerPort());
+					Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+					final String username = mailInfo.getUserName();
+					final String password = mailInfo.getPassword();
+					sendMailSession = Session.getDefaultInstance(pro, new Authenticator() {
+						protected PasswordAuthentication getPasswordAuthentication() {
+							return new PasswordAuthentication(username, password);
+						}
+					});
+				}
 			}
-			Session sendMailSession = Session.getDefaultInstance(pro, authenticator);
+
 			try {
 				Message mailMessage = new MimeMessage(sendMailSession);
 				Address from = new InternetAddress(mailInfo.getFromAddress());
