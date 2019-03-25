@@ -35,8 +35,8 @@ public class TestMailFactory {
 
 	public static void main(String[] args) {
 		
-		System.out.println(SystemConfigUtils.getLongProperty("kafka.eagle.im.wechat.agentid",WeChat.AGENTID));
-		
+		// System.out.println(SystemConfigUtils.getLongProperty("kafka.eagle.im.wechat.agentid",WeChat.AGENTID));
+		test();
 	}
 
 	public static void test() {
