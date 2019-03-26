@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -36,6 +37,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.lang.StringUtils;
 import org.smartloli.kafka.eagle.common.protocol.MailSenderInfo;
@@ -108,6 +110,23 @@ public class MailServiceImpl implements MailService {
 				html.setContent(mailInfo.getContent(), "text/html; charset=UTF-8");
 				mainPart.addBodyPart(html);
 
+				if (mailInfo.getImagesMap() != null && !mailInfo.getImagesMap().isEmpty()) {
+					for (Entry<String, String> entry : mailInfo.getImagesMap().entrySet()) {
+						MimeBodyPart mbp = new MimeBodyPart();
+						File file = new File(entry.getValue());
+						FileDataSource fds = new FileDataSource(file);
+						mbp.setDataHandler(new DataHandler(fds));
+						try {
+							mbp.setFileName(MimeUtility.encodeWord(entry.getKey(), "UTF-8", null));
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						mbp.setContentID(entry.getKey());
+						mbp.setHeader("Content-ID", "<image>");
+						mainPart.addBodyPart(mbp);
+					}
+				}
+
 				List<File> list = mailInfo.getFileList();
 				if (list != null && list.size() > 0) {
 					for (File f : list) {
@@ -122,6 +141,7 @@ public class MailServiceImpl implements MailService {
 				}
 
 				mailMessage.setContent(mainPart);
+				// mailMessage.saveChanges();
 				Transport.send(mailMessage);
 				return true;
 			} catch (MessagingException ex) {
