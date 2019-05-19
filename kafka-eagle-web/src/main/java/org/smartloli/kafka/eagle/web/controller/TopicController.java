@@ -346,7 +346,7 @@ public class TopicController {
 		}
 	}
 
-	/** Get topic message by ajax. */
+	/** Get topic page message from kafka. */
 	@RequestMapping(value = "/topic/physics/commit/", method = RequestMethod.GET)
 	public void topicSqlPhysicsAjax(@RequestParam String sql, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		String aoData = request.getParameter("aoData");

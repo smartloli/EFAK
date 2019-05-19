@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.smartloli.kafka.eagle.common.constant.JConstants;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData;
 
 import com.alibaba.fastjson.JSONArray;
@@ -78,7 +79,7 @@ public class JSqlUtils {
 		}
 		JSqlMapData.loadSchema(tabSchema, tableName, list);
 
-		Class.forName("org.apache.calcite.jdbc.Driver");
+		Class.forName(JConstants.KAFKA_DRIVER);
 		Properties info = new Properties();
 
 		Connection connection = DriverManager.getConnection("jdbc:calcite:model=" + file.getAbsolutePath(), info);

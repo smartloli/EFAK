@@ -64,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer8;
+import org.smartloli.kafka.eagle.common.constant.OdpsSqlParser;
 import org.smartloli.kafka.eagle.common.protocol.*;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
@@ -590,29 +591,28 @@ public class KafkaServiceImpl implements KafkaService {
 
 	private KafkaSqlInfo segments(String clusterAlias, String sql) {
 		KafkaSqlInfo kafkaSql = new KafkaSqlInfo();
-		kafkaSql.setMetaSql(sql);
-		// sql = sql.toLowerCase();
 		kafkaSql.setSql(sql);
-		if (sql.contains("and")) {
-			sql = sql.split("and")[0];
-		} else if (sql.contains("group by")) {
-			sql = sql.split("group")[0];
-		} else if (sql.contains("limit")) {
-			sql = sql.split("limit")[0];
-		}
 		kafkaSql.getSchema().put("partition", "integer");
 		kafkaSql.getSchema().put("offset", "bigint");
 		kafkaSql.getSchema().put("msg", "varchar");
-		if (!sql.startsWith("select")) {
+		if (!sql.startsWith("select") && !sql.startsWith("SELECT")) {
 			kafkaSql.setStatus(false);
 			return kafkaSql;
 		} else {
-			Matcher tableName = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(kafkaSql.getMetaSql());
-			if (tableName.find()) {
+			String tableName = OdpsSqlParser.parserTopic(sql);
+			if (!"".equals(tableName)) {
 				kafkaSql.setStatus(true);
-				kafkaSql.setTableName(tableName.group(1).trim().replaceAll("\"", ""));
+				kafkaSql.setTableName(tableName);
 			}
-
+			sql = sql.toLowerCase();
+			if (sql.contains("and")) {
+				sql = sql.split("and")[0];
+			} else if (sql.contains("group by")) {
+				sql = sql.split("group")[0];
+			} else if (sql.contains("limit")) {
+				sql = sql.split("limit")[0];
+			}
+			
 			Matcher matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(sql);
 			if (matcher.find()) {
 				if (matcher.group(2).trim().startsWith("\"partition\"")) {
@@ -631,7 +631,7 @@ public class KafkaServiceImpl implements KafkaService {
 		return kafkaSql;
 	}
 
-	/** Get kafka 0.10.x activer topics. */
+	/** Get kafka 0.10.x after activer topics. */
 	public Set<String> getKafkaActiverTopics(String clusterAlias, String group) {
 		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
 		Set<String> topics = new HashSet<>();

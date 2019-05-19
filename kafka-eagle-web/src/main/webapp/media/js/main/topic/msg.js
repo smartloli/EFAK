@@ -15,6 +15,13 @@ $(document).ready(function() {
 			"Alt-/" : "autocomplete"
 		}
 	});
+	
+//	sqlEditor.on("cursorActivity", function () {
+//        var words = sqlEditor.getValue() + "";
+//        words = words.replace(/[a-z]+[\-|\']+[a-z]+/ig, '').match(/([a-z]+)/ig);
+//        CodeMirror.ukeys = words;
+//        sqlEditor.showHint();
+//    });
 
 	var logEditor = CodeMirror.fromTextArea(document.getElementById('job_info'), {
 		mode : mime,
@@ -51,6 +58,7 @@ $(document).ready(function() {
 		$("#result_children" + offset).dataTable({
 			"searching" : false,
 			"bSort" : false,
+			"retrieve" : true,
 			"bLengthChange" : false,
 			"bProcessing" : true,
 			"bServerSide" : true,
