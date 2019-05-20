@@ -17,7 +17,10 @@
  */
 package org.smartloli.kafka.eagle.core.sql.execute;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,7 @@ import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 
 /**
  * Pre processing the SQL submitted by the client.
@@ -55,8 +59,16 @@ public class KafkaSqlParser {
 					long start = System.currentTimeMillis();
 					kafkaSql.setClusterAlias(clusterAlias);
 					List<JSONArray> dataSets = KafkaConsumerAdapter.executor(kafkaSql);
-					String results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
-					// String results = JSqlUtils.toJSONObject(dataSets);
+					String results = "";
+					if (dataSets.size() > 0 && !dataSets.get(dataSets.size() - 1).isEmpty()) {
+						results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
+					} else {
+						List<Map<String, Object>> schemas = new ArrayList<Map<String, Object>>();
+						Map<String, Object> map = new HashMap<>();
+						map.put("NULL", "");
+						schemas.add(map);
+						results = new Gson().toJson(schemas);
+					}
 					long end = System.currentTimeMillis();
 					status.put("error", false);
 					status.put("msg", results);
@@ -80,7 +92,7 @@ public class KafkaSqlParser {
 		JSONArray topicDataSets = JSON.parseArray(topics);
 		for (Object object : topicDataSets) {
 			JSONObject topicDataSet = (JSONObject) object;
-			if (kafkaSql.getMetaSql().contains(topicDataSet.getString("topic"))) {
+			if (topicDataSet.getString("topic").equals(kafkaSql.getTableName())) {
 				kafkaSql.setTopic(topicDataSet.getString("topic"));
 				return true;
 			}

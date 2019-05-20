@@ -99,21 +99,21 @@
 									<label for="path" class="col-sm-2 control-label">RealName</label>
 									<div class="col-sm-9">
 										<input id="ke_real_name" name="ke_real_name" type="text"
-											class="form-control" placeholder="smartloli">
+											class="form-control" placeholder="kafka-eagle">
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">UserName</label>
 									<div class="col-sm-9">
 										<input id="ke_user_name" name="ke_user_name" type="text"
-											class="form-control" placeholder="smartloli">
+											class="form-control" placeholder="kafka-eagle">
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">Email</label>
 									<div class="col-sm-9">
 										<input id="ke_user_email" name="ke_user_email" type="text"
-											class="form-control" placeholder="smartloli@email.com">
+											class="form-control" placeholder="kafka-eagle@email.com">
 									</div>
 								</div>
 								<div id="alert_mssage_add" style="display: none"
@@ -181,14 +181,14 @@
 									<label for="path" class="col-sm-2 control-label">RealName</label>
 									<div class="col-sm-9">
 										<input id="ke_real_name_modify" name="ke_real_name_modify"
-											type="text" class="form-control" placeholder="smartloli">
+											type="text" class="form-control" placeholder="kafka-eagle">
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">UserName</label>
 									<div class="col-sm-9">
 										<input id="ke_user_name_modify" name="ke_user_name_modify"
-											type="text" class="form-control" placeholder="smartloli">
+											type="text" class="form-control" placeholder="kafka-eagle">
 									</div>
 								</div>
 								<div class="form-group">
@@ -196,7 +196,7 @@
 									<div class="col-sm-9">
 										<input id="ke_user_email_modify" name="ke_user_email_modify"
 											type="text" class="form-control"
-											placeholder="smartloli@email.com">
+											placeholder="kafka-eagle@email.com">
 									</div>
 								</div>
 								<div id="alert_mssage_modify" style="display: none"
