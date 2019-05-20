@@ -99,7 +99,7 @@ start()
     	echo -e "* "$COLOR_G$ADMIN$RESET
 	echo "*******************************************************************"
     	echo "* <Usage> ke.sh [start|status|stop|restart|stats] </Usage>"
-    	echo "* <Usage> http://ke.smartloli.org/ </Usage>"
+    	echo "* <Usage> https://www.kafka-eagle.org/ </Usage>"
 	echo "*******************************************************************"
 	ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}' > $DIALUP_PID
 	rm -rf ${LOG_DIR}/ke_console.out

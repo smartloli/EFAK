@@ -55,6 +55,9 @@ public interface KafkaService {
 	/** Get all topic info from zookeeper. */
 	public String getAllPartitions(String clusterAlias);
 
+	/** Get broker host info from ids. */
+	public String getBrokerJMXFromIds(String clusterAlias, int ids);
+
 	/** Obtaining kafka consumer information from zookeeper. */
 	public Map<String, List<String>> getConsumers(String clusterAlias);
 
@@ -107,10 +110,10 @@ public interface KafkaService {
 	public boolean mockMessage(String clusterAlias, String topic, String message);
 
 	/** Get kafka consumer group all topics lag. */
-	public long getKafkaLag(String clusterAlias, String group,String topic);
-	
+	public long getKafkaLag(String clusterAlias, String group, String topic);
+
 	/** Get consumer group all topics lag. */
-	public long getLag(String clusterAlias, String group,String topic);
+	public long getLag(String clusterAlias, String group, String topic);
 
 	/** Get kafka logsize by old version. */
 	public long getLogSize(String clusterAlias, String topic, int partitionid);

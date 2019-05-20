@@ -18,7 +18,6 @@
 package org.smartloli.kafka.eagle.core.metrics;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -30,15 +29,12 @@ import javax.management.remote.JMXServiceURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaLog;
+import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jServiceImpl;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * Implements KafkaMetricsService all methods.
@@ -57,45 +53,35 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
 	@Override
 	public String topicSize(String clusterAlias, String topic) {
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
-		List<String> jnis = new ArrayList<>();
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
-			String jni = broker.getString("host") + ":" + broker.getInteger("jmxPort");
-			jnis.add(jni);
-		}
 		String jmx = "";
-		if (jnis.size() > 0) {
-			jmx = String.format(JMX, jnis.get(0));
-		}
-
-		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
-
 		JMXConnector connector = null;
+		List<MetadataInfo> leaders = kafkaService.findKafkaLeader(clusterAlias, topic);
 		long tpSize = 0L;
-		try {
-			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
-			// connector = JMXConnectorFactory.connect(jmxSeriverUrl);
-			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
-			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			for (String partition : partitions) {
-				String objectName = String.format(KafkaLog.size, topic, partition);
+		for (MetadataInfo leader : leaders) {
+			String jni = kafkaService.getBrokerJMXFromIds(clusterAlias, leader.getLeader());
+			jmx = String.format(JMX, jni);
+			try {
+				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
+				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+				MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+				String objectName = String.format(KafkaLog.size, topic, leader.getPartitionId());
 				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.value);
 				tpSize += Long.parseLong(size.toString());
-			}
-		} catch (Exception ex) {
-			LOG.error("Get topic size from jmx has error, msg is " + ex.getMessage());
-		} finally {
-			if (connector != null) {
-				try {
-					connector.close();
-				} catch (IOException e) {
-					LOG.error("Close jmx connector has error, msg is " + e.getMessage());
+			} catch (Exception ex) {
+				LOG.error("Get topic size from jmx has error, msg is " + ex.getMessage());
+				ex.printStackTrace();
+			} finally {
+				if (connector != null) {
+					try {
+						connector.close();
+					} catch (IOException e) {
+						LOG.error("Close jmx connector has error, msg is " + e.getMessage());
+					}
 				}
 			}
 		}
 
-		return StrUtils.stringify(tpSize * jnis.size());
+		return StrUtils.stringify(tpSize);
 	}
 
 }

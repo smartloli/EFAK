@@ -612,7 +612,7 @@ public class KafkaServiceImpl implements KafkaService {
 			} else if (sql.contains("limit")) {
 				sql = sql.split("limit")[0];
 			}
-			
+
 			Matcher matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(sql);
 			if (matcher.find()) {
 				if (matcher.group(2).trim().startsWith("\"partition\"")) {
@@ -869,7 +869,7 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Get kafka version. */
 	private String getKafkaVersion(String host, int port, String ids, String clusterAlias) {
 		JMXConnector connector = null;
-		String version = "";
+		String version = "-";
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
@@ -1033,5 +1033,35 @@ public class KafkaServiceImpl implements KafkaService {
 			}
 		}
 		return logSize;
+	}
+
+	/** Get broker host and jmx_port info from ids. */
+	public String getBrokerJMXFromIds(String clusterAlias, int ids) {
+		String jni = "";
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		if (zkc.pathExists(BROKER_IDS_PATH)) {
+			try {
+				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
+				String tupleString = new String(tuple._1.get());
+				String host = "";
+				if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+					String endpoints = JSON.parseObject(tupleString).getString("endpoints");
+					String tmp = endpoints.split(File.separator + File.separator)[1];
+					host = tmp.substring(0, tmp.length() - 2).split(":")[0];
+				} else {
+					host = JSON.parseObject(tupleString).getString("host");
+				}
+				int jmxPort = JSON.parseObject(tupleString).getInteger("jmx_port");
+				jni = host + ":" + jmxPort;
+			} catch (Exception ex) {
+				LOG.error("Get broker from ids has error, msg is " + ex.getMessage());
+				ex.printStackTrace();
+			}
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return jni;
 	}
 }
