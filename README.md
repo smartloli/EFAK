@@ -34,7 +34,7 @@ In addition to supporting ```email``` alerts, Kafka Eagle also supports im alert
 ![Rate Chart](https://docs.kafka-eagle.org/res/consumer_producer_rate@2x.png)
 
 # Start Kafka Eagle
-![KE Script](https://docs.kafka-eagle.org/res/ke_script@2x.png)
+![KE Script](https://docs.kafka-eagle.org/res/ke_script@2x.png?q=20190530)
 
 # Kafka Offset Types
 
