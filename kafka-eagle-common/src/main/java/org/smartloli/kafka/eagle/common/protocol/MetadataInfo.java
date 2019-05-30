@@ -24,12 +24,21 @@ package org.smartloli.kafka.eagle.common.protocol;
  *
  *         Created by Aug 15, 2016
  */
-public class MetadataInfo extends BaseProtocol{
+public class MetadataInfo extends BaseProtocol {
 
 	private int partitionId;
+	private long logSize;
 	private int leader;
 	private String isr;
 	private String replicas;
+
+	public long getLogSize() {
+		return logSize;
+	}
+
+	public void setLogSize(long logSize) {
+		this.logSize = logSize;
+	}
 
 	public int getPartitionId() {
 		return partitionId;

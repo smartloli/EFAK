@@ -58,6 +58,7 @@
 									<tr>
 										<th>Topic</th>
 										<th>Partition</th>
+										<th>LogSize</th>
 										<th>Leader</th>
 										<th>Replicas</th>
 										<th>Isr</th>

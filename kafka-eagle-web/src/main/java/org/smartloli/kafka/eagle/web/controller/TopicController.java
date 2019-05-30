@@ -171,6 +171,7 @@ public class TopicController {
 				JSONObject obj = new JSONObject();
 				obj.put("topic", tname);
 				obj.put("partition", meta.getInteger("partitionId"));
+				obj.put("logsize", meta.getInteger("logSize"));
 				obj.put("leader", meta.getInteger("leader"));
 				obj.put("replicas", meta.getString("replicas"));
 				obj.put("isr", meta.getString("isr"));

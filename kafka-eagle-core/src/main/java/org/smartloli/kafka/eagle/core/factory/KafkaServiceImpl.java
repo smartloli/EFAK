@@ -916,6 +916,13 @@ public class KafkaServiceImpl implements KafkaService {
 					metadate.setLeader(topicMetadata.getInteger("leader"));
 					metadate.setPartitionId(Integer.valueOf(partition));
 					metadate.setReplicas(getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
+					long logSize =0L;
+					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+						 logSize = getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
+					} else {
+						logSize = getLogSize(clusterAlias, topic, Integer.valueOf(partition));
+					}
+					metadate.setLogSize(logSize);
 					targets.add(metadate);
 				}
 			}
