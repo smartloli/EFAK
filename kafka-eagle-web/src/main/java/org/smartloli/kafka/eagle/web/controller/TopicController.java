@@ -37,6 +37,8 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -256,24 +258,32 @@ public class TopicController {
 				JSONObject obj = new JSONObject();
 				obj.put("id", topic.getInteger("id"));
 				obj.put("topic", "<a href='/ke/topic/meta/" + topic.getString("topic") + "/' target='_blank'>" + topic.getString("topic") + "</a>");
-				obj.put("partitions", topic.getString("partitions").length() > 50 ? topic.getString("partitions").substring(0, 50) + "..." : topic.getString("partitions"));
+				obj.put("partitions", topic.getString("partitions").length() > Topic.PARTITION_LENGTH ? topic.getString("partitions").substring(0, Topic.PARTITION_LENGTH) + "..." : topic.getString("partitions"));
 				obj.put("partitionNumbers", topic.getInteger("partitionNumbers"));
 				obj.put("topicSize", "<a class='btn btn-primary btn-xs'>" + kafkaMetricsService.topicSize(clusterAlias, topic.getString("topic")) + "</a>&nbsp");
 				obj.put("created", topic.getString("created"));
 				obj.put("modify", topic.getString("modify"));
-				obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
+				if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic.getString("topic"))) {
+					obj.put("operate", "");
+				} else {
+					obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>R</a>&nbsp<a name='edit' href='#" + topic.getString("topic") + "' class='btn btn-warning btn-xs'>E</a>&nbsp<a name='desc' href='#" + topic.getString("topic") + "' class='btn btn-primary btn-xs'>D</a>");
+				}
 				aaDatas.add(obj);
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
 					JSONObject obj = new JSONObject();
 					obj.put("id", topic.getInteger("id"));
 					obj.put("topic", "<a href='/ke/topic/meta/" + topic.getString("topic") + "/' target='_blank'>" + topic.getString("topic") + "</a>");
-					obj.put("partitions", topic.getString("partitions").length() > 50 ? topic.getString("partitions").substring(0, 50) + "..." : topic.getString("partitions"));
+					obj.put("partitions", topic.getString("partitions").length() > Topic.PARTITION_LENGTH ? topic.getString("partitions").substring(0, Topic.PARTITION_LENGTH) + "..." : topic.getString("partitions"));
 					obj.put("partitionNumbers", topic.getInteger("partitionNumbers"));
 					obj.put("topicSize", "<a class='btn btn-primary btn-xs'>" + kafkaMetricsService.topicSize(clusterAlias, topic.getString("topic")) + "</a>&nbsp");
 					obj.put("created", topic.getString("created"));
 					obj.put("modify", topic.getString("modify"));
-					obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp");
+					if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic.getString("topic"))) {
+						obj.put("operate", "");
+					} else {
+						obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>R</a>&nbsp<a name='edit' href='#" + topic.getString("topic") + "' class='btn btn-warning btn-xs'>E</a>&nbsp<a name='desc' href='#" + topic.getString("topic") + "' class='btn btn-primary btn-xs'>D</a>");
+					}
 					aaDatas.add(obj);
 				}
 				offset++;

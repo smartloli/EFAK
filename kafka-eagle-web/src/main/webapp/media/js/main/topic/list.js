@@ -66,7 +66,7 @@ $(document).ready(function() {
 			$("#ke_del_topic").attr("href", "/ke/topic/" + topic + "/" + token + "/delete");
 		}
 	});
-
+	
 	$("#ke_admin_token").on('input', function(e) {
 		var token = $("#ke_admin_token").val();
 		if (token.length == 0) {
@@ -76,5 +76,37 @@ $(document).ready(function() {
 			$("#ke_del_topic").attr("disabled", false);
 			$("#ke_del_topic").attr("href", "/ke/topic/" + topic + "/" + token + "/delete");
 		}
+	});
+	
+	$(document).on('click', 'a[name=edit]', function() {
+		var href = $(this).attr("href");
+		topic = href.split("#")[1];
+		$("#edit_div").html("");
+		$("#edit_div").append("<a id='ke_submit_topic' href='#' class='btn btn-primary'>Getter</a>&nbsp<a id='ke_submit_topic' href='#' class='btn btn-warning'>Setter</a>");
+		$('#edit_topic').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+		$('#edit_topic').modal('show').css({
+			position : 'fixed',
+			left : '50%',
+			top : '50%',
+			transform : 'translateX(-50%) translateY(-50%)'
+		});
+	});
+	
+	$(document).on('click', 'a[name=desc]', function() {
+		var href = $(this).attr("href");
+		topic = href.split("#")[1];
+		$('#desc_topic').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+		$('#desc_topic').modal('show').css({
+			position : 'fixed',
+			left : '50%',
+			top : '50%',
+			transform : 'translateX(-50%) translateY(-50%)'
+		});
 	});
 });

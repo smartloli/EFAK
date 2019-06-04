@@ -112,6 +112,7 @@ public class ClusterController {
 				obj.put("port", cluster.getInteger("port"));
 				obj.put("ip", cluster.getString("host"));
 				if ("kafka".equals(type)) {
+					obj.put("jmxPort", cluster.getInteger("jmxPort"));
 					obj.put("created", cluster.getString("created"));
 					obj.put("modify", cluster.getString("modify"));
 					String version = cluster.getString("version") == "" ? Kafka.UNKOWN : cluster.getString("version");
@@ -136,6 +137,7 @@ public class ClusterController {
 					obj.put("port", cluster.getInteger("port"));
 					obj.put("ip", cluster.getString("host"));
 					if ("kafka".equals(type)) {
+						obj.put("jmxPort", cluster.getInteger("jmxPort"));
 						obj.put("created", cluster.getString("created"));
 						obj.put("modify", cluster.getString("modify"));
 						String version = cluster.getString("version") == "" ? Kafka.UNKOWN : cluster.getString("version");

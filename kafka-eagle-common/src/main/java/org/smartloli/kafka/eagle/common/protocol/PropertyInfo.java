@@ -15,29 +15,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.metrics;
+package org.smartloli.kafka.eagle.common.protocol;
 
-import org.smartloli.kafka.eagle.common.protocol.PropertyInfo;
+import com.google.gson.Gson;
 
 /**
- * KafkaMetricsService to collect kafka performance kpi.
+ * Set key and value.
  * 
  * @author smartloli.
  *
- *         Created by Oct 26, 2018
+ *         Created by Jun 1, 2019
  */
-public interface KafkaMetricsService {
+public class PropertyInfo {
 
-	/** Get topic size by jmx. */
-	public String topicSize(String clusterAlias, String topic);
+	private String key;
+	private String value;
 
-	/** Change topic config property. */
-	public String changeTopicConfig(String clusterAlias, String topic, PropertyInfo property);
+	public String getKey() {
+		return key;
+	}
 
-	/** Get topic config property. */
-	public String getTopicConfig(String clusterAlias, String topic);
+	public void setKey(String key) {
+		this.key = key;
+	}
 
-	/** Get topic config property by specified. */
-	public String getTopicConfig(String clusterAlias, String topic, PropertyInfo property);
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
+	}
 
 }

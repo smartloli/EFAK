@@ -19,6 +19,7 @@ package org.smartloli.kafka.eagle.core.metrics;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanServerConnection;
@@ -26,15 +27,29 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
 
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaLog;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
+import org.smartloli.kafka.eagle.common.protocol.PropertyInfo;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
+import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jServiceImpl;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import kafka.admin.AdminUtils;
+import kafka.server.ConfigType;
+import kafka.zk.KafkaZkClient;
 
 /**
  * Implements KafkaMetricsService all methods.
@@ -50,6 +65,9 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
+	
+	/** Instance Kafka Zookeeper client pool. */
+	private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
 
 	@Override
 	public String topicSize(String clusterAlias, String topic) {
@@ -84,4 +102,54 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 		return StrUtils.stringify(tpSize);
 	}
 
+	@Override
+	public String changeTopicConfig(String clusterAlias, String topic, PropertyInfo property) {
+		Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, getKafkaBrokerServer(clusterAlias), clusterAlias);
+		}
+		try {
+			AdminClient adminClient = AdminClient.create(prop);
+			//adminClient.alterConfigs(configs)
+//			AdminUtils.fetchEntityConfig(adminClient., ConfigType.Topic(), topic);
+			KafkaZkClient kafkaZkCli = kafkaZKPool.getZkClient(clusterAlias);
+		}catch (Exception e) {
+		}
+		return null;
+	}
+
+	@Override
+	public String getTopicConfig(String clusterAlias, String topic) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getTopicConfig(String clusterAlias, String topic, PropertyInfo property) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private String parseBrokerServer(String clusterAlias) {
+		String brokerServer = "";
+		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+		for (Object object : brokers) {
+			JSONObject broker = (JSONObject) object;
+			brokerServer += broker.getString("host") + ":" + broker.getInteger("port") + ",";
+		}
+		if ("".equals(brokerServer)) {
+			return "";
+		}
+		return brokerServer.substring(0, brokerServer.length() - 1);
+	}
+	
+	private void sasl(Properties props, String bootstrapServers, String clusterAlias) {
+		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
+		props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
+	}
+
+	public String getKafkaBrokerServer(String clusterAlias) {
+		return parseBrokerServer(clusterAlias);
+	}
 }

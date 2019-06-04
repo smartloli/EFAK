@@ -15,29 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.metrics;
+package org.smartloli.kafka.eagle.common.util;
 
-import org.smartloli.kafka.eagle.common.protocol.PropertyInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * KafkaMetricsService to collect kafka performance kpi.
- * 
- * @author smartloli.
- *
- *         Created by Oct 26, 2018
- */
-public interface KafkaMetricsService {
+* Zookeeper utils.
+* 
+* @author smartloli.
+*
+* Created by Jun 1, 2019
+*/
+public class ZkUtils {
 
-	/** Get topic size by jmx. */
-	public String topicSize(String clusterAlias, String topic);
-
-	/** Change topic config property. */
-	public String changeTopicConfig(String clusterAlias, String topic, PropertyInfo property);
-
-	/** Get topic config property. */
-	public String getTopicConfig(String clusterAlias, String topic);
-
-	/** Get topic config property by specified. */
-	public String getTopicConfig(String clusterAlias, String topic, PropertyInfo property);
-
+	private final static Logger LOG = LoggerFactory.getLogger(KafkaZKPoolUtils.class);
+	
+	public static final int ZK_CONNECTION_TIMEOUT_MS = 30_000;
+	public static final int ZK_SESSION_TIMEOUT_MS = 30_000;
+	
+	
 }

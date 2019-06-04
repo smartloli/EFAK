@@ -159,4 +159,8 @@ public class KConstants {
 		public static long AGENTID = 1;
 	}
 
+	public interface Topic {
+		public static int PARTITION_LENGTH = 10;
+	}
+
 }
