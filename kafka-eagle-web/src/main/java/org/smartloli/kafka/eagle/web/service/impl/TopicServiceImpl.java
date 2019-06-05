@@ -22,6 +22,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.web.service.TopicService;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
@@ -81,15 +83,17 @@ public class TopicServiceImpl implements TopicService {
 			JSONObject allPartition = (JSONObject) object;
 			if (name != null) {
 				JSONObject topic = new JSONObject();
-				if (allPartition.getString("topic").contains(name)) {
+				if (allPartition.getString("topic").contains(name) && !allPartition.getString("topic").equals(Kafka.CONSUMER_OFFSET_TOPIC)) {
 					topic.put("text", allPartition.getString("topic"));
 					topic.put("id", offset);
 				}
 				topics.add(topic);
 			} else {
 				JSONObject topic = new JSONObject();
-				topic.put("text", allPartition.getString("topic"));
-				topic.put("id", offset);
+				if (!allPartition.getString("topic").equals(Kafka.CONSUMER_OFFSET_TOPIC)) {
+					topic.put("text", allPartition.getString("topic"));
+					topic.put("id", offset);
+				}
 				topics.add(topic);
 			}
 
@@ -101,6 +105,29 @@ public class TopicServiceImpl implements TopicService {
 	/** Send mock message to kafka topic . */
 	public boolean mockSendMsg(String clusterAlias, String topic, String message) {
 		return kafkaService.mockMessage(clusterAlias, topic, message);
+	}
+
+	/** Get topic property keys */
+	public String managerTopicKeys(String clusterAlias, String name) {
+		JSONArray topics = new JSONArray();
+		int offset = 0;
+		for (String key : Topic.KEYS) {
+			if (name != null) {
+				JSONObject topic = new JSONObject();
+				if (key.contains(name)) {
+					topic.put("text", key);
+					topic.put("id", offset);
+				}
+				topics.add(topic);
+			} else {
+				JSONObject topic = new JSONObject();
+				topic.put("text", key);
+				topic.put("id", offset);
+				topics.add(topic);
+			}
+			offset++;
+		}
+		return topics.toJSONString();
 	}
 
 }

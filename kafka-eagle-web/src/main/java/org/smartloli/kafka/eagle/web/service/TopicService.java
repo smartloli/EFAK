@@ -42,6 +42,9 @@ public interface TopicService {
 
 	/** Get mock topics. */
 	public String mockTopics(String clusterAlias, String name);
+	
+	/** Get manager topic property keys. */
+	public String managerTopicKeys(String clusterAlias, String name);
 
 	/** Send mock message to topic. */
 	public boolean mockSendMsg(String clusterAlias, String topic, String message);

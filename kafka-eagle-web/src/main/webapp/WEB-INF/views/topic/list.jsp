@@ -37,9 +37,7 @@
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
 						<i class="fa fa-info-circle"></i> <strong>List all topic
-							information.</strong> <br /> R: Remove Topic<br /> E: Edit Topic, Such
-						as set <strong>log.retention.ms</strong> or <strong>cleanup.policy</strong>
-						etc.<br /> D: Describe Topic Property
+							information.</strong>
 					</div>
 				</div>
 			</div>
@@ -93,75 +91,6 @@
 							<p>
 						</div>
 						<div id="remove_div" class="modal-footer"></div>
-					</div>
-				</div>
-			</div>
-			<!-- edit -->
-			<div class="modal fade" aria-labelledby="keEditModalLabel"
-				aria-hidden="true" id="edit_topic" tabindex="-1" role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keEditModalLabel">Configure
-								Property</h4>
-						</div>
-						<!-- /.row -->
-						<div class="modal-body">
-							<fieldset class="form-horizontal">
-								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">Key</label>
-									<div class="col-sm-9">
-										<input id="ke_topic_property_key" name="ke_topic_property_key"
-											type="text" class="form-control"
-											placeholder="log.retention.bytes">
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">Value</label>
-									<div class="col-sm-9">
-										<input id="ke_topic_property_value"
-											name="ke_topic_property_value" type="text"
-											class="form-control" placeholder="-1">
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">Result</label>
-									<div class="col-sm-9">
-										<textarea id="ke_topic_setter_result"
-											name="ke_topic_setter_result" class="form-control"
-											placeholder="" rows="3" style="resize:none" readonly></textarea>
-									</div>
-								</div>
-							</fieldset>
-						</div>
-						<div id="edit_div" class="modal-footer"></div>
-					</div>
-				</div>
-			</div>
-			<!-- describe -->
-			<div class="modal fade" aria-labelledby="keDescModalLabel"
-				aria-hidden="true" id="desc_topic" tabindex="-1" role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keDescModalLabel">Describe Topic
-								Property</h4>
-						</div>
-						<!-- /.row -->
-						<div class="modal-body">
-							<fieldset class="form-horizontal">
-								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">Describe</label>
-									<div class="col-sm-9">
-										<textarea id="ke_topic_property_docs"
-											name="ke_topic_property_docs" class="form-control"
-											placeholder="" rows="10" style="resize:none" readonly></textarea>
-									</div>
-								</div>
-							</fieldset>
-						</div>
 					</div>
 				</div>
 			</div>

@@ -86,12 +86,12 @@ public class TopicController {
 		return mav;
 	}
 
-	/** Topic message viewer. */
-	@RequiresPermissions("/topic/export")
-	@RequestMapping(value = "/topic/export", method = RequestMethod.GET)
-	public ModelAndView topicExportView(HttpSession session) {
+	/** Topic message manager. */
+	@RequiresPermissions("/topic/manager")
+	@RequestMapping(value = "/topic/manager", method = RequestMethod.GET)
+	public ModelAndView topicManagerView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/topic/export");
+		mav.setViewName("/topic/manager");
 		return mav;
 	}
 
@@ -210,6 +210,22 @@ public class TopicController {
 			ex.printStackTrace();
 		}
 	}
+	
+	/** Get topic datasets by ajax. */
+	@RequestMapping(value = "/topic/manager/keys/ajax", method = RequestMethod.GET)
+	public void topicManagerKeysAjax(HttpServletResponse response, HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String name = request.getParameter("name");
+			JSONObject object = new JSONObject();
+			object.put("items", JSON.parseArray(topicService.managerTopicKeys(clusterAlias, name)));
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
 	/***/
 	@RequestMapping(value = "/topic/mock/send/message/{topic}/ajax", method = RequestMethod.GET)
@@ -266,7 +282,7 @@ public class TopicController {
 				if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic.getString("topic"))) {
 					obj.put("operate", "");
 				} else {
-					obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>R</a>&nbsp<a name='edit' href='#" + topic.getString("topic") + "' class='btn btn-warning btn-xs'>E</a>&nbsp<a name='desc' href='#" + topic.getString("topic") + "' class='btn btn-primary btn-xs'>D</a>");
+					obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>");
 				}
 				aaDatas.add(obj);
 			} else if (search.length() == 0) {
@@ -282,7 +298,7 @@ public class TopicController {
 					if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic.getString("topic"))) {
 						obj.put("operate", "");
 					} else {
-						obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>R</a>&nbsp<a name='edit' href='#" + topic.getString("topic") + "' class='btn btn-warning btn-xs'>E</a>&nbsp<a name='desc' href='#" + topic.getString("topic") + "' class='btn btn-primary btn-xs'>D</a>");
+						obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>");
 					}
 					aaDatas.add(obj);
 				}
