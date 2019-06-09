@@ -202,6 +202,17 @@ restart()
     start
 }
 
+gc()
+{	
+	if [ -f $KE_HOME/bin/ke.pid ];then
+		SPID=`cat $KE_HOME/bin/ke.pid`
+		if [ "$SPID" != "" ];then
+			echo "[$stime] INFO : Kafka Eagle Process[$SPID] GC."
+        		jstat -gcutil $SPID 1000
+		fi
+	fi
+}
+
 case "$1" in
     start)
         start
@@ -221,8 +232,11 @@ case "$1" in
     restart)
         restart
         ;;
+    gc)
+        gc
+        ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|status|stats}"
+        echo $"Usage: $0 {start|stop|restart|status|stats|find|gc}"
         RETVAL=1
 esac
 exit $RETVAL
