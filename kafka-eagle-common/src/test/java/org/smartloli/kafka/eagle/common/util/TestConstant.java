@@ -15,41 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.protocol;
-
-import com.google.gson.Gson;
+package org.smartloli.kafka.eagle.common.util;
 
 /**
- * Set key and value.
+ * Test constant topic type.
  * 
  * @author smartloli.
  *
- *         Created by Jun 1, 2019
+ *         Created by Jun 9, 2019
  */
-public class PropertyInfo {
+public class TestConstant {
 
-	private String key;
-	private String value;
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
+	public static void main(String[] args) {
 	}
 
 }

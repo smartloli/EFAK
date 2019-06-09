@@ -35,7 +35,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
@@ -210,16 +212,45 @@ public class TopicController {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/** Get topic datasets by ajax. */
 	@RequestMapping(value = "/topic/manager/keys/ajax", method = RequestMethod.GET)
-	public void topicManagerKeysAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void listTopicKeysAjax(HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			String name = request.getParameter("name");
 			JSONObject object = new JSONObject();
-			object.put("items", JSON.parseArray(topicService.managerTopicKeys(clusterAlias, name)));
+			object.put("items", JSON.parseArray(topicService.listTopicKeys(clusterAlias, name)));
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get topic datasets by ajax. */
+	@RequestMapping(value = "/topic/manager/{type}/ajax", method = RequestMethod.GET)
+	public void alterTopicConfigAjax(@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String topic = request.getParameter("topic");
+			TopicConfig topicConfig = new TopicConfig();
+			topicConfig.setName(topic);
+			topicConfig.setType(type.toUpperCase());
+			if (KConstants.Topic.ADD.equals(topicConfig.getType())) {
+				String key = request.getParameter("key");
+				String value = request.getParameter("value");
+				ConfigEntry configEntry = new ConfigEntry(key, value);
+				topicConfig.setConfigEntry(configEntry);
+			} else if (KConstants.Topic.DELETE.equals(topicConfig.getType())) {
+				String key = request.getParameter("key");
+				ConfigEntry configEntry = new ConfigEntry(key, "");
+				topicConfig.setConfigEntry(configEntry);
+			}
+			JSONObject object = new JSONObject();
+			object.put("result", topicService.changeTopicConfig(clusterAlias, topicConfig));
 			byte[] output = object.toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {

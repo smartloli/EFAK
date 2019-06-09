@@ -76,49 +76,70 @@ $(document).ready(function() {
 
 	$(document).on("click", "#btn_send", function() {
 		var topic = $("#ke_topic_name").val();
-		var message = $("#ke_mock_content").val();
-		if (topic.length == 0 || message.length == 0) {
-			$("#alert_mssage_mock").show();
-			setTimeout(function() {
-				$("#alert_mssage_mock").hide()
-			}, 3000);
-		} else {
-			$.ajax({
-				type : 'get',
-				dataType : 'json',
-				url : '/ke/topic/mock/send/message/' + topic + '/ajax?message=' + message,
-				success : function(datas) {
-					if (datas != null) {
-						console.log(datas)
-						if (datas.status) {
-							$("#success_mssage_mock").show();
-							setTimeout(function() {
-								$("#success_mssage_mock").hide()
-							}, 3000);
-						}
-					}
-				}
-			});
+		var type = $('input[name="ke_topic_alter"]:checked').val();
+		console.log(topic + "," + type);
+		if (type == "add_config") {
+			var key = $("#ke_topic_key").val();
+			var value = $("#ke_topic_value").val();
+			if (topic.length == 0 || key.length == 0 || value.length == 0) {
+				$("#alert_message_alter").show();
+				setTimeout(function() {
+					$("#alert_message_alter").hide()
+				}, 3000);
+			} else {
+				alterTopicConfig('add', topic, key, value);
+			}
+		} else if (type == "del_config") {
+			var key = $("#ke_topic_key").val();
+			if (topic.length == 0 || key.length == 0) {
+				$("#alert_message_alter").show();
+				setTimeout(function() {
+					$("#alert_message_alter").hide()
+				}, 3000);
+			} else {
+				alterTopicConfig('delete', topic, key, '');
+			}
+		} else if (type == "desc_config") {
+			if (topic.length == 0) {
+				$("#alert_message_alter").show();
+				setTimeout(function() {
+					$("#alert_message_alter").hide()
+				}, 3000);
+			} else {
+				alterTopicConfig('describe', topic, '', '');
+			}
 		}
 	});
+
+	function alterTopicConfig(type, topic, key, value) {
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/topic/manager/' + type + '/ajax?topic=' + topic + '&key=' + key + '&value=' + value,
+			success : function(datas) {
+				if (datas != null) {
+					$("#ke_topic_config_content").text(datas.result);
+				}
+			}
+		});
+	}
 
 	$(":radio").click(function() {
 		if ($(this).val() == "add_config") {
 			$("#div_topic_keys").show();
 			$("#div_topic_value").show();
 			$("#div_topic_msg").show();
+			$("#ke_topic_config_content").text("");
 		} else if ($(this).val() == "del_config") {
 			$("#div_topic_keys").show();
 			$("#div_topic_value").hide();
 			$("#div_topic_msg").show();
+			$("#ke_topic_config_content").text("");
 		} else if ($(this).val() == "desc_config") {
 			$("#div_topic_keys").hide();
 			$("#div_topic_value").hide();
 			$("#div_topic_msg").show();
-		} else if ($(this).val() == "clean_data") {
-			$("#div_topic_keys").hide();
-			$("#div_topic_value").hide();
-			$("#div_topic_msg").hide();
+			$("#ke_topic_config_content").text("");
 		}
 	});
 

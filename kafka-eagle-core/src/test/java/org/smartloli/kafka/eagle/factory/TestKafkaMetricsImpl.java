@@ -15,24 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.util;
+package org.smartloli.kafka.eagle.factory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.kafka.clients.admin.ConfigEntry;
+import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
+import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 
 /**
-* Zookeeper utils.
-* 
-* @author smartloli.
-*
-* Created by Jun 1, 2019
-*/
-public class ZkUtils {
+ * TODO
+ * 
+ * @author smartloli.
+ *
+ *         Created by Jun 9, 2019
+ */
+public class TestKafkaMetricsImpl {
 
-	private final static Logger LOG = LoggerFactory.getLogger(KafkaZKPoolUtils.class);
-	
-	public static final int ZK_CONNECTION_TIMEOUT_MS = 30_000;
-	public static final int ZK_SESSION_TIMEOUT_MS = 30_000;
-	
-	
+	private static KafkaMetricsService kafkaMetric = new KafkaMetricsFactory().create();
+
+	public static void main(String[] args) {
+		ConfigEntry configEntry = new ConfigEntry("cleanup.policy", "122ss");
+		String target = kafkaMetric.changeTopicConfig("cluster1", "kv-test2019", "ADD", configEntry);
+		System.out.println("target: " + target);
+	}
 }

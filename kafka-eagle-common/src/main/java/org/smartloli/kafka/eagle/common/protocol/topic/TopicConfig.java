@@ -15,23 +15,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.metrics;
+package org.smartloli.kafka.eagle.common.protocol.topic;
 
 import org.apache.kafka.clients.admin.ConfigEntry;
 
+import com.google.gson.Gson;
+
 /**
- * KafkaMetricsService to collect kafka performance kpi.
+ * Set topic information.
  * 
  * @author smartloli.
  *
- *         Created by Oct 26, 2018
+ *         Created by Jun 9, 2019
  */
-public interface KafkaMetricsService {
+public class TopicConfig {
 
-	/** Get topic size by jmx. */
-	public String topicSize(String clusterAlias, String topic);
+	private String name = "";
+	private String type = "";
+	private ConfigEntry configEntry;
 
-	/** Change topic config property. */
-	public String changeTopicConfig(String clusterAlias, String topic,String type, ConfigEntry configEntry);
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public ConfigEntry getConfigEntry() {
+		return configEntry;
+	}
+
+	public void setConfigEntry(ConfigEntry configEntry) {
+		this.configEntry = configEntry;
+	}
+
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
+	}
 
 }

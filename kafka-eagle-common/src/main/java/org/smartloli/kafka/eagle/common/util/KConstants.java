@@ -161,33 +161,16 @@ public class KConstants {
 
 	public interface Topic {
 		public static int PARTITION_LENGTH = 10;
-		public final static String[] KEYS = new String[] { 
-				"cleanup.policy",
-             	"compression.type",
-             	"delete.retention.ms",
-             	"file.delete.delay.ms",
-             	"flush.messages",
-             	"flush.ms",
-             	"follower.replication.throttled",
-             	"index.interval.bytes",
-             	"leader.replication.throttled.replicas",
-             	"max.message.bytes",
-             	"message.downconversion.enable",
-             	"message.format.version",
-             	"message.timestamp.difference.max.ms",
-             	"message.timestamp.type",
-             	"min.cleanable.dirty.ratio",
-             	"min.compaction.lag.ms",
-             	"min.insync.replicas",
-             	"preallocate",
-             	"retention.bytes",
-             	"retention.ms",
-             	"segment.bytes",
-             	"segment.index.bytes",
-             	"segment.jitter.ms",
-             	"segment.ms",
-             	"unclean.leader.election.enable"
-        };
+		public final static String[] KEYS = new String[] { "cleanup.policy", "compression.type", "delete.retention.ms", "file.delete.delay.ms", "flush.messages", "flush.ms", "follower.replication.throttled", "index.interval.bytes",
+				"leader.replication.throttled.replicas", "max.message.bytes", "message.downconversion.enable", "message.format.version", "message.timestamp.difference.max.ms", "message.timestamp.type", "min.cleanable.dirty.ratio",
+				"min.compaction.lag.ms", "min.insync.replicas", "preallocate", "retention.bytes", "retention.ms", "segment.bytes", "segment.index.bytes", "segment.jitter.ms", "segment.ms", "unclean.leader.election.enable" };
+
+		public final static String ADD = "ADD";
+		public final static String DELETE = "DELETE";
+		public final static String DESCRIBE = "DESCRIBE";
+
+		public final static String SUCCESS = "SUCCESS";
+		public final static String FAILED = "FAILED";
 	}
 
 }

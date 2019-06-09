@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
+
 /**
  * Kafka topic service interface.
  * 
@@ -42,9 +44,12 @@ public interface TopicService {
 
 	/** Get mock topics. */
 	public String mockTopics(String clusterAlias, String name);
-	
+
 	/** Get manager topic property keys. */
-	public String managerTopicKeys(String clusterAlias, String name);
+	public String listTopicKeys(String clusterAlias, String name);
+
+	/** Alter topic config. */
+	public String changeTopicConfig(String clusterAlias, TopicConfig topicConfig);
 
 	/** Send mock message to topic. */
 	public boolean mockSendMsg(String clusterAlias, String topic, String message);

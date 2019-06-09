@@ -22,10 +22,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.web.service.TopicService;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
+import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +46,9 @@ public class TopicServiceImpl implements TopicService {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
+
+	/** Kafka topic config service interface. */
+	private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
 
 	/** Find topic name in all topics. */
 	public boolean hasTopic(String clusterAlias, String topicName) {
@@ -108,7 +114,7 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	/** Get topic property keys */
-	public String managerTopicKeys(String clusterAlias, String name) {
+	public String listTopicKeys(String clusterAlias, String name) {
 		JSONArray topics = new JSONArray();
 		int offset = 0;
 		for (String key : Topic.KEYS) {
@@ -128,6 +134,11 @@ public class TopicServiceImpl implements TopicService {
 			offset++;
 		}
 		return topics.toJSONString();
+	}
+
+	/** Alter topic config. */
+	public String changeTopicConfig(String clusterAlias, TopicConfig topicConfig) {
+		return kafkaMetricsService.changeTopicConfig(clusterAlias, topicConfig.getName(), topicConfig.getType(), topicConfig.getConfigEntry());
 	}
 
 }

@@ -55,19 +55,22 @@
 						<!-- /.panel-heading -->
 						<div class="panel-body">
 							<div class="form-group">
-								<label>Type (*)</label><br/><label class="radio-inline"> <input
-									type="radio" name="ke_topic_alter" id="ke_topic_alter"
+								<label>Type (*)</label><br /> <label class="radio-inline">
+									<input type="radio" name="ke_topic_alter" id="ke_topic_alter"
 									value="add_config" checked="">Add Config
 								</label> <label class="radio-inline"> <input type="radio"
 									name="ke_topic_alter" id="ke_topic_delete" value="del_config">Delete
 									Config
 								</label> <label class="radio-inline"> <input type="radio"
-									name="ke_topic_alter" id="ke_topic_describe" value="desc_config">Describe
-									Config
-								</label> <!-- <label class="radio-inline"> <input type="radio"
+									name="ke_topic_alter" id="ke_topic_describe"
+									value="desc_config">Describe Config
+								</label>
+								<!-- <label class="radio-inline"> <input type="radio"
 									name="ke_topic_alter" id="ke_topic_clean" value="clean_data">Clean
 									Data
-								</label> --> <br/><label for="inputError" class="control-label text-danger"><i
+								</label> -->
+								<br /> <label for="inputError"
+									class="control-label text-danger"><i
 									class="fa fa-info-circle"></i> Select operate type when you
 									getter/setter topic .</label>
 							</div>
@@ -98,23 +101,19 @@
 							</div>
 							<div id="div_topic_msg" class="form-group">
 								<label>Message (*)</label>
-								<textarea id="ke_mock_content" name="ke_mock_content"
-									class="form-control" placeholder="" rows="5" readonly
-									maxlength="120"></textarea>
+								<textarea id="ke_topic_config_content"
+									name="ke_topic_config_content" class="form-control"
+									placeholder="" rows="5" readonly maxlength="120"></textarea>
 								<label for="inputSuccess" class="control-label text-danger"><i
 									class="fa fa-info-circle"></i> Get result from server when you
 									getter/setter topic .</label>
 							</div>
 							<button type="button" class="btn btn-primary" id="btn_send">Submit
 							</button>
-							<div id="alert_mssage_mock" style="display: none"
+							<div id="alert_message_alter" style="display: none"
 								class="alert alert-danger">
 								<label>Oops! Please make some changes . (*) is required
 									.</label>
-							</div>
-							<div id="success_mssage_mock" style="display: none"
-								class="alert alert-success">
-								<label>Message sent success .</label>
 							</div>
 						</div>
 					</div>
