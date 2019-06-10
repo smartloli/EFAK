@@ -94,8 +94,10 @@ start()
 	ADMIN="Account:admin ,Password:123456"
 	
 	echo "*******************************************************************"
-    	echo "* Kafka Eagle Service has started success."
-    	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'"
+	CLASS_STARTUP=org.smartloli.kafka.eagle.plugin.net.KafkaEagleNet 
+	${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS_STARTUP 2>&1  
+    	#echo "* Kafka Eagle Service has started success."
+    #echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'"
     	echo -e "* "$COLOR_G$ADMIN$RESET
 	echo "*******************************************************************"
     	echo "* <Usage> ke.sh [start|status|stop|restart|stats] </Usage>"

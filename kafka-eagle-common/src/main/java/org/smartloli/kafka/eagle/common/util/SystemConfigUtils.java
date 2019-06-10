@@ -55,7 +55,7 @@ public final class SystemConfigUtils {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			LOG.info("Successfully loaded default properties.");
+			LOG.debug("Successfully loaded default properties.");
 
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("SystemConfig looks like this ...");
