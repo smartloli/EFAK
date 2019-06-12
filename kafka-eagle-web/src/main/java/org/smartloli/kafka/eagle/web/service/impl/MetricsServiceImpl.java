@@ -118,10 +118,18 @@ public class MetricsServiceImpl implements MetricsService {
 	private void assembleMBeanInfo(Map<String, MBeanInfo> mbeans, String mBeanInfoKey, MBeanInfo mBeanInfo) {
 		if (mbeans.containsKey(mBeanInfoKey) && mBeanInfo != null) {
 			MBeanInfo mbeanInfo = mbeans.get(mBeanInfoKey);
-			long fifteenMinute = Math.round(StrUtils.numberic(mbeanInfo.getFifteenMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFifteenMinute()));
-			long fiveMinute = Math.round(StrUtils.numberic(mbeanInfo.getFiveMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFiveMinute()));
-			long meanRate = Math.round(StrUtils.numberic(mbeanInfo.getMeanRate())) + Math.round(StrUtils.numberic(mBeanInfo.getMeanRate()));
-			long oneMinute = Math.round(StrUtils.numberic(mbeanInfo.getOneMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getOneMinute()));
+			String fifteenMinuteOld = mbeanInfo.getFifteenMinute() == null ? "0.0" : mbeanInfo.getFifteenMinute();
+			String fifteenMinuteLastest = mBeanInfo.getFifteenMinute() == null ? "0.0" : mBeanInfo.getFifteenMinute();
+			String fiveMinuteOld = mbeanInfo.getFiveMinute() == null ? "0.0" : mbeanInfo.getFiveMinute();
+			String fiveMinuteLastest = mBeanInfo.getFiveMinute() == null ? "0.0" : mBeanInfo.getFiveMinute();
+			String meanRateOld = mbeanInfo.getMeanRate() == null ? "0.0" : mbeanInfo.getMeanRate();
+			String meanRateLastest = mBeanInfo.getMeanRate() == null ? "0.0" : mBeanInfo.getMeanRate();
+			String oneMinuteOld = mbeanInfo.getOneMinute() == null ? "0.0" : mbeanInfo.getOneMinute();
+			String oneMinuteLastest = mBeanInfo.getOneMinute() == null ? "0.0" : mBeanInfo.getOneMinute();
+			long fifteenMinute = Math.round(StrUtils.numberic(fifteenMinuteOld)) + Math.round(StrUtils.numberic(fifteenMinuteLastest));
+			long fiveMinute = Math.round(StrUtils.numberic(fiveMinuteOld)) + Math.round(StrUtils.numberic(fiveMinuteLastest));
+			long meanRate = Math.round(StrUtils.numberic(meanRateOld)) + Math.round(StrUtils.numberic(meanRateLastest));
+			long oneMinute = Math.round(StrUtils.numberic(oneMinuteOld)) + Math.round(StrUtils.numberic(oneMinuteLastest));
 			mbeanInfo.setFifteenMinute(String.valueOf(fifteenMinute));
 			mbeanInfo.setFiveMinute(String.valueOf(fiveMinute));
 			mbeanInfo.setMeanRate(String.valueOf(meanRate));

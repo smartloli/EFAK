@@ -15,27 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.plugin.font;
+package org.smartloli.kafka.eagle.plugin.net;
 
-import java.io.File;
-import java.io.IOException;
+import org.smartloli.kafka.eagle.common.util.NetUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
 /**
- * Print kafka eagle system version.
+ * Print kafka eagle system startup url.
  * 
  * @author smartloli.
  *
- *         Created by Jan 23, 2018
+ *         Created by Jun 10, 2019
  */
-public class KafkaEagleVersion {
-
-	public static void main(String[] args) throws IOException {
-		String name = System.getProperty("user.dir") + "/font/slant.flf";
-		File file = new File(name);
-		String asciiArt = FigletFont.convertOneLine(file, "KAfKA EAGLE");
-		System.out.println("Welcome to");
-		System.out.println(asciiArt);
-		System.out.println("Version 1.3.4");
+public class KafkaEagleNet {
+	public static void main(String[] args) {
+		System.out.println("* Kafka Eagle Service has started success.");
+		System.out.println("* Welcome, Now you can visit 'http://"+NetUtils.ip()+":"+SystemConfigUtils.getIntProperty("kafka.eagle.webui.port")+"/ke'");
 	}
-
 }

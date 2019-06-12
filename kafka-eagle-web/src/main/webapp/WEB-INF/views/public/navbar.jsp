@@ -56,7 +56,7 @@
 			data-toggle="dropdown"><i class="fa fa-sitemap"></i>
 				${clusterAlias} </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.3.2 </a></li>
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.3.4 </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
 			data-toggle="dropdown" aria-expanded="false"><i
 				class="fa fa-user"></i> ${LOGIN_USER_SESSION.realname} <b
@@ -81,12 +81,12 @@
 							class="fa fa-edit fa-fw"></i> Create</a></li>
 					<li id="navbar_list"><a href="/ke/topic/list"><i
 							class="fa fa-table fa-fw"></i> List</a></li>
-					<%-- <li id="navbar_list"><a href="/ke/topic/export"><i
-							class="fa fa-download fa-fw"></i> Export</a></li> --%>
 					<li id="navbar_list"><a href="/ke/topic/message"><i
 							class="fa fa-file-text fa-fw"></i> Message</a></li>
 					<li id="navbar_list"><a href="/ke/topic/mock"><i
 							class="fa fa-maxcdn fa-fw"></i> Mock</a></li>
+					<li id="navbar_list"><a href="/ke/topic/manager"><i
+							class="fa fa-tasks fa-fw"></i> Manager</a></li>
 				</ul></li>
 			<li id="navbar_consumers"><a href="/ke/consumers"><i
 					class="fa fa-fw fa-users"></i> Consumers</a></li>

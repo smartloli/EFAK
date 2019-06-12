@@ -66,7 +66,7 @@ $(document).ready(function() {
 			$("#ke_del_topic").attr("href", "/ke/topic/" + topic + "/" + token + "/delete");
 		}
 	});
-
+	
 	$("#ke_admin_token").on('input', function(e) {
 		var token = $("#ke_admin_token").val();
 		if (token.length == 0) {
@@ -77,4 +77,5 @@ $(document).ready(function() {
 			$("#ke_del_topic").attr("href", "/ke/topic/" + topic + "/" + token + "/delete");
 		}
 	});
+	
 });

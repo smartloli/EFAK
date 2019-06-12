@@ -94,12 +94,14 @@ start()
 	ADMIN="Account:admin ,Password:123456"
 	
 	echo "*******************************************************************"
-    	echo "* Kafka Eagle Service has started success."
-    	echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'"
+	CLASS_STARTUP=org.smartloli.kafka.eagle.plugin.net.KafkaEagleNet 
+	${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS_STARTUP 2>&1  
+    	#echo "* Kafka Eagle Service has started success."
+    #echo "* Welcome, Now you can visit 'http://<your_host_or_ip>:port/ke'"
     	echo -e "* "$COLOR_G$ADMIN$RESET
 	echo "*******************************************************************"
     	echo "* <Usage> ke.sh [start|status|stop|restart|stats] </Usage>"
-    	echo "* <Usage> http://ke.smartloli.org/ </Usage>"
+    	echo "* <Usage> https://www.kafka-eagle.org/ </Usage>"
 	echo "*******************************************************************"
 	ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}' > $DIALUP_PID
 	rm -rf ${LOG_DIR}/ke_console.out
@@ -202,6 +204,17 @@ restart()
     start
 }
 
+gc()
+{	
+	if [ -f $KE_HOME/bin/ke.pid ];then
+		SPID=`cat $KE_HOME/bin/ke.pid`
+		if [ "$SPID" != "" ];then
+			echo "[$stime] INFO : Kafka Eagle Process[$SPID] GC."
+        		jstat -gcutil $SPID 1000
+		fi
+	fi
+}
+
 case "$1" in
     start)
         start
@@ -221,8 +234,11 @@ case "$1" in
     restart)
         restart
         ;;
+    gc)
+        gc
+        ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|status|stats}"
+        echo $"Usage: $0 {start|stop|restart|status|stats|find|gc}"
         RETVAL=1
 esac
 exit $RETVAL

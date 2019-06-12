@@ -15,27 +15,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.plugin.font;
+package org.smartloli.kafka.eagle.common.protocol.topic;
 
-import java.io.File;
-import java.io.IOException;
+import org.apache.kafka.clients.admin.ConfigEntry;
+
+import com.google.gson.Gson;
 
 /**
- * Print kafka eagle system version.
+ * Set topic information.
  * 
  * @author smartloli.
  *
- *         Created by Jan 23, 2018
+ *         Created by Jun 9, 2019
  */
-public class KafkaEagleVersion {
+public class TopicConfig {
 
-	public static void main(String[] args) throws IOException {
-		String name = System.getProperty("user.dir") + "/font/slant.flf";
-		File file = new File(name);
-		String asciiArt = FigletFont.convertOneLine(file, "KAfKA EAGLE");
-		System.out.println("Welcome to");
-		System.out.println(asciiArt);
-		System.out.println("Version 1.3.4");
+	private String name = "";
+	private String type = "";
+	private ConfigEntry configEntry;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public ConfigEntry getConfigEntry() {
+		return configEntry;
+	}
+
+	public void setConfigEntry(ConfigEntry configEntry) {
+		this.configEntry = configEntry;
+	}
+
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
 	}
 
 }

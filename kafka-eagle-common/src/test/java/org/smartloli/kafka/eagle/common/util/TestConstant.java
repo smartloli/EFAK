@@ -15,27 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.plugin.font;
-
-import java.io.File;
-import java.io.IOException;
+package org.smartloli.kafka.eagle.common.util;
 
 /**
- * Print kafka eagle system version.
+ * Test constant topic type.
  * 
  * @author smartloli.
  *
- *         Created by Jan 23, 2018
+ *         Created by Jun 9, 2019
  */
-public class KafkaEagleVersion {
+public class TestConstant {
 
-	public static void main(String[] args) throws IOException {
-		String name = System.getProperty("user.dir") + "/font/slant.flf";
-		File file = new File(name);
-		String asciiArt = FigletFont.convertOneLine(file, "KAfKA EAGLE");
-		System.out.println("Welcome to");
-		System.out.println(asciiArt);
-		System.out.println("Version 1.3.4");
+	public static void main(String[] args) {
 	}
 
 }

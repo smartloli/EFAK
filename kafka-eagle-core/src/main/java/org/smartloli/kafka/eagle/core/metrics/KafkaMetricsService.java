@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.core.metrics;
 
+import org.apache.kafka.clients.admin.ConfigEntry;
+
 /**
  * KafkaMetricsService to collect kafka performance kpi.
  * 
@@ -28,5 +30,8 @@ public interface KafkaMetricsService {
 
 	/** Get topic size by jmx. */
 	public String topicSize(String clusterAlias, String topic);
+
+	/** Change topic config property. */
+	public String changeTopicConfig(String clusterAlias, String topic,String type, ConfigEntry configEntry);
 
 }

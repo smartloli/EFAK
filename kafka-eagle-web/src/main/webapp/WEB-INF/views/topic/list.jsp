@@ -83,7 +83,11 @@
 						</div>
 						<!-- /.row -->
 						<div class="modal-body">
-							<p>Are you sure you want to delete it? Admin Token : <input id="ke_admin_token" name="ke_admin_token" style="width: 100px;float: right;margin-right:150px;margin-top:-5px" class="form-control" placeholder="Enter Token" />
+							<p>
+								Are you sure you want to delete it? Admin Token : <input
+									id="ke_admin_token" name="ke_admin_token"
+									style="width: 100px; float: right; margin-right: 150px; margin-top: -5px"
+									class="form-control" placeholder="Enter Token" />
 							<p>
 						</div>
 						<div id="remove_div" class="modal-footer"></div>

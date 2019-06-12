@@ -15,6 +15,8 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'partition'
 		}, {
+			"mData" : 'logsize'
+		}, {
 			"mData" : 'leader'
 		}, {
 			"mData" : 'replicas'
