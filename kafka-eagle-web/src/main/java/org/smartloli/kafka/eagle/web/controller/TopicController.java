@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +39,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
@@ -44,6 +47,8 @@ import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.web.service.TopicService;
@@ -69,6 +74,9 @@ public class TopicController {
 
 	/** Kafka metrics interface. */
 	private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
+
+	/** Broker topic service interface. */
+	private static BrokerService brokerService = new BrokerFactory().create();
 
 	/** Topic create viewer. */
 	@RequiresPermissions("/topic/create")
@@ -215,7 +223,7 @@ public class TopicController {
 
 	/** Get topic datasets by ajax. */
 	@RequestMapping(value = "/topic/manager/keys/ajax", method = RequestMethod.GET)
-	public void listTopicKeysAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void managerTopicKeysAjax(HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
@@ -296,51 +304,34 @@ public class TopicController {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
-		JSONArray topics = JSON.parseArray(topicService.list(clusterAlias));
-		int offset = 0;
+		Map<String, Object> map = new HashMap<>();
+		map.put("search", search);
+		map.put("start", iDisplayStart);
+		map.put("length", iDisplayLength);
+		long count = brokerService.topicNumbers(clusterAlias);
+		List<PartitionsInfo> topics = brokerService.topicRecords(clusterAlias, map);
 		JSONArray aaDatas = new JSONArray();
-		for (Object object : topics) {
-			JSONObject topic = (JSONObject) object;
-			if (search.length() > 0 && topic.getString("topic").contains(search)) {
-				JSONObject obj = new JSONObject();
-				obj.put("id", topic.getInteger("id"));
-				obj.put("topic", "<a href='/ke/topic/meta/" + topic.getString("topic") + "/' target='_blank'>" + topic.getString("topic") + "</a>");
-				obj.put("partitions", topic.getString("partitions").length() > Topic.PARTITION_LENGTH ? topic.getString("partitions").substring(0, Topic.PARTITION_LENGTH) + "..." : topic.getString("partitions"));
-				obj.put("partitionNumbers", topic.getInteger("partitionNumbers"));
-				obj.put("topicSize", "<a class='btn btn-primary btn-xs'>" + kafkaMetricsService.topicSize(clusterAlias, topic.getString("topic")) + "</a>&nbsp");
-				obj.put("created", topic.getString("created"));
-				obj.put("modify", topic.getString("modify"));
-				if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic.getString("topic"))) {
-					obj.put("operate", "");
-				} else {
-					obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>");
-				}
-				aaDatas.add(obj);
-			} else if (search.length() == 0) {
-				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
-					JSONObject obj = new JSONObject();
-					obj.put("id", topic.getInteger("id"));
-					obj.put("topic", "<a href='/ke/topic/meta/" + topic.getString("topic") + "/' target='_blank'>" + topic.getString("topic") + "</a>");
-					obj.put("partitions", topic.getString("partitions").length() > Topic.PARTITION_LENGTH ? topic.getString("partitions").substring(0, Topic.PARTITION_LENGTH) + "..." : topic.getString("partitions"));
-					obj.put("partitionNumbers", topic.getInteger("partitionNumbers"));
-					obj.put("topicSize", "<a class='btn btn-primary btn-xs'>" + kafkaMetricsService.topicSize(clusterAlias, topic.getString("topic")) + "</a>&nbsp");
-					obj.put("created", topic.getString("created"));
-					obj.put("modify", topic.getString("modify"));
-					if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic.getString("topic"))) {
-						obj.put("operate", "");
-					} else {
-						obj.put("operate", "<a name='remove' href='#" + topic.getString("topic") + "' class='btn btn-danger btn-xs'>Remove</a>");
-					}
-					aaDatas.add(obj);
-				}
-				offset++;
+		for (PartitionsInfo partition : topics) {
+			JSONObject object = new JSONObject();
+			object.put("id", partition.getId());
+			object.put("topic", "<a href='/ke/topic/meta/" + partition.getTopic() + "/' target='_blank'>" + partition.getTopic() + "</a>");
+			object.put("partitions", partition.getPartitions().size() > Topic.PARTITION_LENGTH ? partition.getPartitions().toString().substring(0, Topic.PARTITION_LENGTH) + "..." : partition.getPartitions().toString());
+			object.put("partitionNumbers", partition.getPartitionNumbers());
+			object.put("topicSize", "<a class='btn btn-primary btn-xs'>" + kafkaMetricsService.topicSize(clusterAlias, partition.getTopic()) + "</a>&nbsp");
+			object.put("created", partition.getCreated());
+			object.put("modify", partition.getModify());
+			if (Kafka.CONSUMER_OFFSET_TOPIC.equals(partition.getTopic())) {
+				object.put("operate", "");
+			} else {
+				object.put("operate", "<a name='remove' href='#" + partition.getTopic() + "' class='btn btn-danger btn-xs'>Remove</a>");
 			}
+			aaDatas.add(object);
 		}
 
 		JSONObject target = new JSONObject();
 		target.put("sEcho", sEcho);
-		target.put("iTotalRecords", topics.size());
-		target.put("iTotalDisplayRecords", topics.size());
+		target.put("iTotalRecords", count);
+		target.put("iTotalDisplayRecords", count);
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();

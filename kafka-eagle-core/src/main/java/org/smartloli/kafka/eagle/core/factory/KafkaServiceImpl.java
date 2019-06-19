@@ -258,7 +258,11 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets.toString();
 	}
 
-	/** Get all topic info from zookeeper. */
+	/**
+	 * Get all topic info from zookeeper, Deprecated this method in the v1.3.4
+	 * and replace {@link BrokerService.scanTopicPage} method.
+	 */
+	@Deprecated
 	public String getAllPartitions(String clusterAlias) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		List<PartitionsInfo> targets = new ArrayList<PartitionsInfo>();
@@ -916,9 +920,9 @@ public class KafkaServiceImpl implements KafkaService {
 					metadate.setLeader(topicMetadata.getInteger("leader"));
 					metadate.setPartitionId(Integer.valueOf(partition));
 					metadate.setReplicas(getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
-					long logSize =0L;
+					long logSize = 0L;
 					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-						 logSize = getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
+						logSize = getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
 					} else {
 						logSize = getLogSize(clusterAlias, topic, Integer.valueOf(partition));
 					}
