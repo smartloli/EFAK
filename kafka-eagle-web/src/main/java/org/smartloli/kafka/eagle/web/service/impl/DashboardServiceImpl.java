@@ -30,6 +30,8 @@ import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +50,9 @@ public class DashboardServiceImpl implements DashboardService {
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
+	/** Broker service interface. */
+	private static BrokerService brokerService = new BrokerFactory().create();
+	
 	/** Get consumer number from zookeeper. */
 	private int getConsumerNumbers(String clusterAlias) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
@@ -95,13 +100,9 @@ public class DashboardServiceImpl implements DashboardService {
 	/** Get dashboard data. */
 	private String panel(String clusterAlias) {
 		int zks = SystemConfigUtils.getPropertyArray(clusterAlias + ".zk.list", ",").length;
-		String topciAndPartitions = kafkaService.getAllPartitions(clusterAlias);
-		int topicSize = JSON.parseArray(topciAndPartitions).size();
-		String kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);
-		int brokerSize = JSON.parseArray(kafkaBrokers).size();
 		DashboardInfo dashboard = new DashboardInfo();
-		dashboard.setBrokers(brokerSize);
-		dashboard.setTopics(topicSize);
+		dashboard.setBrokers(brokerService.brokerNumbers(clusterAlias));
+		dashboard.setTopics(brokerService.topicNumbers(clusterAlias));
 		dashboard.setZks(zks);
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		if ("kafka".equals(formatter)) {

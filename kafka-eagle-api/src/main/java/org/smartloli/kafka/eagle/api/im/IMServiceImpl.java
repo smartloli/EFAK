@@ -103,4 +103,10 @@ public class IMServiceImpl implements IMService {
 		return map;
 	}
 
+	@Override
+	public void sendJsonMsgByWebhook(String data, String maillist) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

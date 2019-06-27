@@ -260,7 +260,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/**
 	 * Get all topic info from zookeeper, Deprecated this method in the v1.3.4
-	 * and replace {@link BrokerService.scanTopicPage} method.
+	 * and replace {@link BrokerService.topicRecords} method.
 	 */
 	@Deprecated
 	public String getAllPartitions(String clusterAlias) {

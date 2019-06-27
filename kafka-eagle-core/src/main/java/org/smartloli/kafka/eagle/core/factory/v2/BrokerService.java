@@ -23,13 +23,23 @@ import java.util.Map;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 
 /**
- * Consumer group, topic and topic page or partition interface.
+ * Consumer group, topic and topic page or partition interface.Kafka api 2.x
+ * version.
  * 
  * @author smartloli.
  *
  *         Created by Jun 13, 2019
  */
 public interface BrokerService {
+
+	/** Check topic from zookeeper metadata. */
+	public boolean findKafkaTopic(String clusterAlias, String topic);
+
+	/**Get topic list.*/
+	public List<String> topicList(String clusterAlias);
+
+	/** Get kafka broker numbers. */
+	public long brokerNumbers(String clusterAlias);
 
 	/** Get topic number from zookeeper. */
 	public long topicNumbers(String clusterAlias);
@@ -42,11 +52,11 @@ public interface BrokerService {
 
 	/** Scan partition page display. */
 	public String partitionRecords(String clusterAlias, String topic, Map<String, Object> params);
-	
+
 	/** Get consumer topic under partition numbers. */
-	public String consumerTPNumbers(String clusterAlias,String group,String topic);
-	
+	public String consumerTPNumbers(String clusterAlias, String group, String topic);
+
 	/** Scan consumer topic under partition page display. */
-	public String consumerTPRecords(String clusterAlias,String group,String topic, Map<String, Object> params);
+	public String consumerTPRecords(String clusterAlias, String group, String topic, Map<String, Object> params);
 
 }

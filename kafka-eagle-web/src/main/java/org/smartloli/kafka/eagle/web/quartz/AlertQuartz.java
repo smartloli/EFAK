@@ -73,7 +73,6 @@ public class AlertQuartz {
 			// Run cluster job
 			Cluster cluster = new Cluster();
 			cluster.cluster();
-
 		}
 	}
 
@@ -118,11 +117,6 @@ public class AlertQuartz {
 							} else {
 								logSize = kafkaService.getLogSize(clusterAlias, topic, partition);
 							}
-//							if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-//								logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partition);
-//							} else {
-//								logSize = kafkaService.getLogSize(hosts, topic, partition);
-//							}
 							OffsetZkInfo offsetZk = null;
 							if ("kafka".equals(formatter)) {
 								String bootstrapServers = "";
@@ -149,9 +143,6 @@ public class AlertQuartz {
 						offsetLites.add(offsetSQLite);
 					}
 				}
-
-				// Monitor consumer topic rate min/per
-				// zkService.insert(clusterAlias, offsetLites);
 
 				alert(clusterAlias, offsetLites);
 			} catch (Exception ex) {

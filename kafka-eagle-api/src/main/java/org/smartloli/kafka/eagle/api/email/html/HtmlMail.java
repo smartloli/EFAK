@@ -71,7 +71,7 @@ public class HtmlMail {
 				"	height: 0;\n" + 
 				"}\n" + 
 				"body {\n" + 
-				"	background: url(https://ke.smartloli.org/res/mail/body-bg.png) repeat #232323;\n" + 
+				"	background: url(https://www.kafka-eagle.org/res/mail/body-bg.png) repeat #232323;\n" + 
 				"	font-family: \"HelveticaNeue\", \"Helvetica Neue\", Helvetica, Arial, serif;\n" + 
 				"	font-size: 14px;\n" + 
 				"	color: #000000;\n" + 
@@ -102,7 +102,7 @@ public class HtmlMail {
 				"	font-style: italic;\n" + 
 				"}\n" + 
 				"h4 {\n" + 
-				"	background: url(https://ke.smartloli.org/res/mail/wrapper-bg.png) repeat;\n" + 
+				"	background: url(https://www.kafka-eagle.org/res/mail/wrapper-bg.png) repeat;\n" + 
 				"	font-size: 16px;\n" + 
 				"	font-style: italic;\n" + 
 				"	font-weight: 400;\n" + 
@@ -128,7 +128,7 @@ public class HtmlMail {
 				"}\n" + 
 				".copyrights{text-indent:-9999px;height:0;line-height:0;font-size:0;overflow:hidden;}\n" + 
 				".divider {\n" + 
-				"	background: url(https://ke.smartloli.org/res/mail/divider.png) no-repeat center top;\n" + 
+				"	background: url(https://www.kafka-eagle.org/res/mail/divider.png) no-repeat center top;\n" + 
 				"	width: 620px;\n" + 
 				"	height: 3px;\n" + 
 				"	margin: 40px auto;\n" + 
@@ -137,7 +137,7 @@ public class HtmlMail {
 				"	position: relative;\n" + 
 				"}\n" + 
 				".divider_small {\n" + 
-				"	background: url(https://ke.smartloli.org/res/mail/divider-small.png) no-repeat center top;\n" + 
+				"	background: url(https://www.kafka-eagle.org/res/mail/divider-small.png) no-repeat center top;\n" + 
 				"	width: 100%;\n" + 
 				"	height: 2px;\n" + 
 				"	margin: 20px auto;\n" + 
@@ -176,7 +176,7 @@ public class HtmlMail {
 				"	color: #ffffff;\n" + 
 				"}\n" + 
 				"#content {\n" + 
-				"	background: url(https://ke.smartloli.org/res/mail/wrapper-bg.png) repeat #ffffff;\n" + 
+				"	background: url(https://www.kafka-eagle.org/res/mail/wrapper-bg.png) repeat #ffffff;\n" + 
 				"	width: 620px;\n" + 
 				"	padding: 40px 160px;\n" + 
 				"	float: left;\n" + 
@@ -186,13 +186,13 @@ public class HtmlMail {
 				"	text-align: center;\n" + 
 				"}\n" + 
 				".launch {\n" + 
-				"	background: url(https://ke.smartloli.org/res/mail/kafka-eagle.png) no-repeat;\n" + 
+				"	background: url(https://www.kafka-eagle.org/res/mail/kafka-eagle.png) no-repeat;\n" + 
 				"	width: 402px;\n" + 
 				"	height: 108px;\n" + 
 				"	margin: 0 auto;\n" + 
 				"}\n" + 
 				".countdown_bg {\n" + 
-				"	background: url(https://ke.smartloli.org/res/mail/countdown-bg.png) no-repeat;\n" + 
+				"	background: url(https://www.kafka-eagle.org/res/mail/countdown-bg.png) no-repeat;\n" + 
 				"	width: 560px;\n" + 
 				"	height: 60px;\n" + 
 				"	margin: 0 auto 20px auto;\n" + 
@@ -228,13 +228,13 @@ public class HtmlMail {
 				"}\n" + 
 				"\n" + 
 				"a.vimeo {\n" + 
-				"	background: url(https://ke.smartloli.org/res/mail/github.png) no-repeat 0 0;\n" + 
+				"	background: url(https://www.kafka-eagle.org/res/mail/github.png) no-repeat 0 0;\n" + 
 				"	width: 32px;\n" + 
 				"	height: 32px;\n" + 
 				"	display: block;\n" + 
 				"}\n" + 
 				"a.vimeo:hover {\n" + 
-				"	background: url(https://ke.smartloli.org/res/mail/github.png) no-repeat 0 -32px;\n" + 
+				"	background: url(https://www.kafka-eagle.org/res/mail/github.png) no-repeat 0 -32px;\n" + 
 				"}\n" + 
 				"</style>\n" + 
 				"</head>\n" + 
@@ -273,7 +273,7 @@ public class HtmlMail {
 				"    <h1> Kafka Eagle monitor cluster <span>health</span></h1>\n" + 
 				"    If the Kafka cluster or the Zookeeper cluster fails, you will receive the email. Please pay attention and check the availability of the Kafka and Zookeeper clusters.\n" + 
 				"    <div class=\"divider\"></div>\n" + 
-				"    <p> <a href=\"https://ke.smartloli.org/\" target=\"_blank\" class=\"textstyle2\">https://ke.smartloli.org</a> </p>\n" + 
+				"    <p> <a href=\"https://www.kafka-eagle.org/\" target=\"_blank\" class=\"textstyle2\">https://www.kafka-eagle.org</a> </p>\n" + 
 				"    <p class=\"textstyle2\">Kafka Eagle By Github </p>\n" + 
 				"    <div class=\"divider\"></div>\n" + 
 				"    <ul class=\"social\">\n" + 

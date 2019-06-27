@@ -52,7 +52,11 @@ public interface KafkaService {
 	/** Get all broker list from zookeeper. */
 	public String getAllBrokersInfo(String clusterAlias);
 
-	/** Get all topic info from zookeeper. */
+	/**
+	 * Get all topic info from zookeeper. Deprecated this method in the v1.3.4
+	 * and replace {@link BrokerService.topicRecords} method.
+	 */
+	@Deprecated
 	public String getAllPartitions(String clusterAlias);
 
 	/** Get broker host info from ids. */

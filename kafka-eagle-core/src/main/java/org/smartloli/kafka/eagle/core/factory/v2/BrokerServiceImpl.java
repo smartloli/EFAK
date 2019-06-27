@@ -18,8 +18,6 @@
 package org.smartloli.kafka.eagle.core.factory.v2;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,15 +48,16 @@ public class BrokerServiceImpl implements BrokerService {
 
 	private final String BROKER_IDS_PATH = "/brokers/ids";
 	private final String BROKER_TOPICS_PATH = "/brokers/topics";
-	private final String CONSUMERS_PATH = "/consumers";
-	private final String OWNERS = "/owners";
-	private final String TOPIC_ISR = "/brokers/topics/%s/partitions/%s/state";
+	// private final String CONSUMERS_PATH = "/consumers";
+	// private final String OWNERS = "/owners";
+	// private final String TOPIC_ISR =
+	// "/brokers/topics/%s/partitions/%s/state";
 	private final Logger LOG = LoggerFactory.getLogger(BrokerServiceImpl.class);
 
 	/** Instance Kafka Zookeeper client pool. */
 	private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
 
-	@Override
+	/** Statistics topic total used as page. */
 	public long topicNumbers(String clusterAlias) {
 		long count = 0L;
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
@@ -73,7 +72,7 @@ public class BrokerServiceImpl implements BrokerService {
 		return count;
 	}
 
-	@Override
+	/** Statistics topic partitions total used as page. */
 	public long partitionNumbers(String clusterAlias, String topic) {
 		long count = 0L;
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
@@ -88,7 +87,7 @@ public class BrokerServiceImpl implements BrokerService {
 		return count;
 	}
 
-	@Override
+	/** Get the number of page records for topic. */
 	public List<PartitionsInfo> topicRecords(String clusterAlias, Map<String, Object> params) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		List<PartitionsInfo> targets = new ArrayList<PartitionsInfo>();
@@ -172,6 +171,48 @@ public class BrokerServiceImpl implements BrokerService {
 	public String consumerTPRecords(String clusterAlias, String group, String topic, Map<String, Object> params) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/** Check topic from zookeeper metadata. */
+	public boolean findKafkaTopic(String clusterAlias, String topic) {
+		boolean status = false;
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		status = zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic);
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return status;
+	}
+
+	/** Get kafka broker numbers from zookeeper. */
+	public long brokerNumbers(String clusterAlias) {
+		long count = 0;
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		if (zkc.pathExists(BROKER_IDS_PATH)) {
+			Seq<String> subBrokerIdsPaths = zkc.getChildren(BROKER_IDS_PATH);
+			count = JavaConversions.seqAsJavaList(subBrokerIdsPaths).size();
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return count;
+	}
+
+	/** Get topic list from zookeeper. */
+	public List<String> topicList(String clusterAlias) {
+		List<String> topics = new ArrayList<>();
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+			topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return topics;
 	}
 
 }

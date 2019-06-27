@@ -27,9 +27,10 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
@@ -45,6 +46,7 @@ public class KafkaSqlParser {
 
 	private final static Logger LOG = LoggerFactory.getLogger(KafkaSqlParser.class);
 	private static KafkaService kafkaService = new KafkaFactory().create();
+	private static BrokerService brokerService = new BrokerFactory().create();
 
 	public static String execute(String clusterAlias, String sql) {
 		JSONObject status = new JSONObject();
@@ -87,17 +89,25 @@ public class KafkaSqlParser {
 		return status.toJSONString();
 	}
 
-	private static boolean hasTopic(String clusterAlias, KafkaSqlInfo kafkaSql) {
-		String topics = kafkaService.getAllPartitions(clusterAlias);
-		JSONArray topicDataSets = JSON.parseArray(topics);
-		for (Object object : topicDataSets) {
-			JSONObject topicDataSet = (JSONObject) object;
-			if (topicDataSet.getString("topic").equals(kafkaSql.getTableName())) {
-				kafkaSql.setTopic(topicDataSet.getString("topic"));
-				return true;
-			}
-		}
-		return false;
-	}
+	// private static boolean hasTopic(String clusterAlias, KafkaSqlInfo
+	// kafkaSql) {
+	// String topics = kafkaService.getAllPartitions(clusterAlias);
+	// JSONArray topicDataSets = JSON.parseArray(topics);
+	// for (Object object : topicDataSets) {
+	// JSONObject topicDataSet = (JSONObject) object;
+	// if (topicDataSet.getString("topic").equals(kafkaSql.getTableName())) {
+	// kafkaSql.setTopic(topicDataSet.getString("topic"));
+	// return true;
+	// }
+	// }
+	// return false;
+	// }
 
+	private static boolean hasTopic(String clusterAlias, KafkaSqlInfo kafkaSql) {
+		boolean status = brokerService.findKafkaTopic(clusterAlias, kafkaSql.getTableName());
+		if (status) {
+			kafkaSql.setTopic(kafkaSql.getTableName());
+		}
+		return status;
+	}
 }

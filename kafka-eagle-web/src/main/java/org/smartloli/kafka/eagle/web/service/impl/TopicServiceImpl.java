@@ -17,16 +17,20 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.smartloli.kafka.eagle.web.service.TopicService;
+
+import java.util.List;
+
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
@@ -50,29 +54,17 @@ public class TopicServiceImpl implements TopicService {
 	/** Kafka topic config service interface. */
 	private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
 
+	/** Broker service interface. */
+	private static BrokerService brokerService = new BrokerFactory().create();
+
 	/** Find topic name in all topics. */
 	public boolean hasTopic(String clusterAlias, String topicName) {
-		boolean target = false;
-		JSONArray topicAndPartitions = JSON.parseArray(kafkaService.getAllPartitions(clusterAlias));
-		for (Object topicAndPartition : topicAndPartitions) {
-			JSONObject object = (JSONObject) topicAndPartition;
-			String topic = object.getString("topic");
-			if (topicName.equals(topic)) {
-				target = true;
-				break;
-			}
-		}
-		return target;
+		return brokerService.findKafkaTopic(clusterAlias, topicName);
 	}
 
 	/** Get metadata in topic. */
 	public String metadata(String clusterAlias, String topicName) {
 		return kafkaService.findKafkaLeader(clusterAlias, topicName).toString();
-	}
-
-	/** List all the topic under Kafka in partition. */
-	public String list(String clusterAlias) {
-		return kafkaService.getAllPartitions(clusterAlias);
 	}
 
 	/** Execute kafka execute query sql and viewer topic message. */
@@ -82,22 +74,21 @@ public class TopicServiceImpl implements TopicService {
 
 	/** Get kafka 0.10.x mock topics. */
 	public String mockTopics(String clusterAlias, String name) {
-		JSONArray allPartitions = JSON.parseArray(kafkaService.getAllPartitions(clusterAlias));
-		JSONArray topics = new JSONArray();
+		List<String> topicList = brokerService.topicList(clusterAlias);
 		int offset = 0;
-		for (Object object : allPartitions) {
-			JSONObject allPartition = (JSONObject) object;
+		JSONArray topics = new JSONArray();
+		for (String topicName : topicList) {
 			if (name != null) {
 				JSONObject topic = new JSONObject();
-				if (allPartition.getString("topic").contains(name) && !allPartition.getString("topic").equals(Kafka.CONSUMER_OFFSET_TOPIC)) {
-					topic.put("text", allPartition.getString("topic"));
+				if (name.contains(topicName) && !topicName.equals(Kafka.CONSUMER_OFFSET_TOPIC)) {
+					topic.put("text", topicName);
 					topic.put("id", offset);
 				}
 				topics.add(topic);
 			} else {
 				JSONObject topic = new JSONObject();
-				if (!allPartition.getString("topic").equals(Kafka.CONSUMER_OFFSET_TOPIC)) {
-					topic.put("text", allPartition.getString("topic"));
+				if (!topicName.equals(Kafka.CONSUMER_OFFSET_TOPIC)) {
+					topic.put("text", topicName);
 					topic.put("id", offset);
 				}
 				topics.add(topic);

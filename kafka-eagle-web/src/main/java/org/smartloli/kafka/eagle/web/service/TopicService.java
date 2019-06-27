@@ -36,9 +36,6 @@ public interface TopicService {
 	/** Get metadata in topic. */
 	public String metadata(String clusterAlias, String topicName);
 
-	/** List all the topic under Kafka in partition. */
-	public String list(String clusterAlias);
-
 	/** Execute kafka query sql. */
 	public String execute(String clusterAlias, String sql);
 
