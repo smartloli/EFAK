@@ -23,7 +23,10 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.web.service.TopicService;
 
 import java.util.List;
+import java.util.Map;
 
+import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
+import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
@@ -63,8 +66,8 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	/** Get metadata in topic. */
-	public String metadata(String clusterAlias, String topicName) {
-		return kafkaService.findKafkaLeader(clusterAlias, topicName).toString();
+	public List<MetadataInfo> metadata(String clusterAlias, String topicName,Map<String, Object> params) {
+		return brokerService.topicMetadataRecords(clusterAlias, topicName, params);
 	}
 
 	/** Execute kafka execute query sql and viewer topic message. */
@@ -132,4 +135,19 @@ public class TopicServiceImpl implements TopicService {
 		return kafkaMetricsService.changeTopicConfig(clusterAlias, topicConfig.getName(), topicConfig.getType(), topicConfig.getConfigEntry());
 	}
 
+	/** Get topic numbers. */
+	public long getTopicNumbers(String clusterAlias) {
+		return brokerService.topicNumbers(clusterAlias);
+	}
+
+	/** Get topic list. */
+	public List<PartitionsInfo> list(String clusterAlias, Map<String, Object> params) {
+		return brokerService.topicRecords(clusterAlias, params);
+	}
+
+	/** Get topic partition numbers. */
+	public long getPartitionNumbers(String clusterAlias, String topic) {
+		return brokerService.partitionNumbers(clusterAlias, topic);
+	}
+	
 }

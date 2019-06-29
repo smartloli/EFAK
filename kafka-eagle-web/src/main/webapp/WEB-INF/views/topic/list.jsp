@@ -58,6 +58,7 @@
 										<th>ID</th>
 										<th>Topic Name</th>
 										<th>Partition Indexes</th>
+										<th>LogSize(All)</th>
 										<th>Partition Numbers</th>
 										<th>Size(All-Brokers)</th>
 										<th>Created</th>

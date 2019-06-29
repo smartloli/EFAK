@@ -102,8 +102,7 @@
 
 # JAVA_OPTS
 JAAS_CONF_PATH=$KE_HOME/conf/kafka_client_jaas.conf
-# JAVA_OPTS="-server -Xms1000M -Xmx1000M -Xss512k -XX:+AggressiveOpts -XX:+UseBiasedLocking -XX:PermSize=64M -XX:MaxPermSize=300M -XX:+DisableExplicitGC -XX:MaxTenuringThreshold=15 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -Djava.awt.headless=true -Djava.security.auth.login.config=${JAAS_CONF_PATH}"
-JAVA_OPTS="-server -Xms1000M -Xmx1000M -Xss512k -Xmn512M -XX:SurvivorRatio=1 -XX:+AggressiveOpts -XX:+UseBiasedLocking -XX:PermSize=64M -XX:MaxPermSize=300M -XX:+DisableExplicitGC -XX:MaxTenuringThreshold=15 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSFullGCsBeforeCompaction=1 -XX:ParallelCMSThreads=4 -XX:CMSInitiatingOccupancyFraction=56 -XX:+ExplicitGCInvokesConcurrent -XX:+CMSPermGenSweepingEnabled -XX:+CMSClassUnloadingEnabled -Djava.awt.headless=true -Djava.security.auth.login.config=${JAAS_CONF_PATH}"
+JAVA_OPTS="-server -Xms1000M -Xmx1000M -Xss512k -XX:+AggressiveOpts -XX:+UseBiasedLocking -XX:PermSize=64M -XX:MaxPermSize=300M -XX:+DisableExplicitGC -XX:MaxTenuringThreshold=15 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -Djava.awt.headless=true -Djava.security.auth.login.config=${JAAS_CONF_PATH}"
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false

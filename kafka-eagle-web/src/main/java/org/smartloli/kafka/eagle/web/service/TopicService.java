@@ -17,6 +17,11 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
+import java.util.List;
+import java.util.Map;
+
+import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
+import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 
 /**
@@ -34,7 +39,16 @@ public interface TopicService {
 	public boolean hasTopic(String clusterAlias, String topicName);
 
 	/** Get metadata in topic. */
-	public String metadata(String clusterAlias, String topicName);
+	public List<MetadataInfo> metadata(String clusterAlias, String topicName, Map<String, Object> params);
+
+	/** Get topic numbers. */
+	public long getTopicNumbers(String clusterAlias);
+	
+	/** Get topic partition numbers. */
+	public long getPartitionNumbers(String clusterAlias,String topic);
+
+	/** Get topic list. */
+	public List<PartitionsInfo> list(String clusterAlias, Map<String, Object> params);
 
 	/** Execute kafka query sql. */
 	public String execute(String clusterAlias, String sql);

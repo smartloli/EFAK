@@ -122,4 +122,7 @@ public interface KafkaService {
 	/** Get kafka logsize by old version. */
 	public long getLogSize(String clusterAlias, String topic, int partitionid);
 
+	/** Get topic metadata. */
+	public String getReplicasIsr(String clusterAlias, String topic, int partitionid);
+
 }

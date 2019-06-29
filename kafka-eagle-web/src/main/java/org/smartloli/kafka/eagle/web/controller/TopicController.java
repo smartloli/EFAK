@@ -39,6 +39,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.util.KConstants;
@@ -47,8 +48,6 @@ import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
-import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.web.service.TopicService;
@@ -74,9 +73,6 @@ public class TopicController {
 
 	/** Kafka metrics interface. */
 	private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
-
-	/** Broker topic service interface. */
-	private static BrokerService brokerService = new BrokerFactory().create();
 
 	/** Topic create viewer. */
 	@RequiresPermissions("/topic/create")
@@ -173,29 +169,27 @@ public class TopicController {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
-		String metadata = topicService.metadata(clusterAlias, tname);
-		JSONArray metadatas = JSON.parseArray(metadata);
-		int offset = 0;
+		Map<String, Object> map = new HashMap<>();
+		map.put("start", iDisplayStart);
+		map.put("length", iDisplayLength);
+		long count = topicService.getPartitionNumbers(clusterAlias, tname);
+		List<MetadataInfo> metadatas = topicService.metadata(clusterAlias, tname, map);
 		JSONArray aaDatas = new JSONArray();
-		for (Object object : metadatas) {
-			JSONObject meta = (JSONObject) object;
-			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
-				JSONObject obj = new JSONObject();
-				obj.put("topic", tname);
-				obj.put("partition", meta.getInteger("partitionId"));
-				obj.put("logsize", meta.getInteger("logSize"));
-				obj.put("leader", meta.getInteger("leader"));
-				obj.put("replicas", meta.getString("replicas"));
-				obj.put("isr", meta.getString("isr"));
-				aaDatas.add(obj);
-			}
-			offset++;
+		for (MetadataInfo metadata : metadatas) {
+			JSONObject object = new JSONObject();
+			object.put("topic", tname);
+			object.put("partition", metadata.getPartitionId());
+			object.put("logsize", metadata.getLogSize());
+			object.put("leader", metadata.getLeader());
+			object.put("replicas", metadata.getReplicas());
+			object.put("isr", metadata.getIsr());
+			aaDatas.add(object);
 		}
 
 		JSONObject target = new JSONObject();
 		target.put("sEcho", sEcho);
-		target.put("iTotalRecords", metadatas.size());
-		target.put("iTotalDisplayRecords", metadatas.size());
+		target.put("iTotalRecords", count);
+		target.put("iTotalDisplayRecords", count);
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
@@ -308,14 +302,15 @@ public class TopicController {
 		map.put("search", search);
 		map.put("start", iDisplayStart);
 		map.put("length", iDisplayLength);
-		long count = brokerService.topicNumbers(clusterAlias);
-		List<PartitionsInfo> topics = brokerService.topicRecords(clusterAlias, map);
+		long count = topicService.getTopicNumbers(clusterAlias);
+		List<PartitionsInfo> topics = topicService.list(clusterAlias, map);
 		JSONArray aaDatas = new JSONArray();
 		for (PartitionsInfo partition : topics) {
 			JSONObject object = new JSONObject();
 			object.put("id", partition.getId());
 			object.put("topic", "<a href='/ke/topic/meta/" + partition.getTopic() + "/' target='_blank'>" + partition.getTopic() + "</a>");
 			object.put("partitions", partition.getPartitions().size() > Topic.PARTITION_LENGTH ? partition.getPartitions().toString().substring(0, Topic.PARTITION_LENGTH) + "..." : partition.getPartitions().toString());
+			object.put("logsize", partition.getLogSize());
 			object.put("partitionNumbers", partition.getPartitionNumbers());
 			object.put("topicSize", "<a class='btn btn-primary btn-xs'>" + kafkaMetricsService.topicSize(clusterAlias, partition.getTopic()) + "</a>&nbsp");
 			object.put("created", partition.getCreated());
@@ -366,7 +361,7 @@ public class TopicController {
 	@RequestMapping(value = "/topic/{topicName}/{token}/delete", method = RequestMethod.GET)
 	public ModelAndView topicDelete(@PathVariable("topicName") String topicName, @PathVariable("token") String token, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
-		if (SystemConfigUtils.getProperty("kafka.eagle.topic.token").equals(token)) {
+		if (SystemConfigUtils.getProperty("kafka.eagle.topic.token").equals(token) && !Kafka.CONSUMER_OFFSET_TOPIC.equals(topicName)) {
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			Map<String, Object> respons = kafkaService.delete(clusterAlias, topicName);
 			if ("success".equals(respons.get("status"))) {

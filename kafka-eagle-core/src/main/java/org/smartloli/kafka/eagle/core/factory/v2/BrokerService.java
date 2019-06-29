@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.core.factory.v2;
 import java.util.List;
 import java.util.Map;
 
+import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 
 /**
@@ -35,7 +36,7 @@ public interface BrokerService {
 	/** Check topic from zookeeper metadata. */
 	public boolean findKafkaTopic(String clusterAlias, String topic);
 
-	/**Get topic list.*/
+	/** Get topic list. */
 	public List<String> topicList(String clusterAlias);
 
 	/** Get kafka broker numbers. */
@@ -58,5 +59,12 @@ public interface BrokerService {
 
 	/** Scan consumer topic under partition page display. */
 	public String consumerTPRecords(String clusterAlias, String group, String topic, Map<String, Object> params);
+
+	/** Scan topic meta page display. */
+	public List<MetadataInfo> topicMetadataRecords(String clusterAlias, String topic, Map<String, Object> params);
+
+	/** Get topic producer logsize total. */
+	public long getTopicLogSizeTotal(String clusterAlias, String topic);
+	
 
 }

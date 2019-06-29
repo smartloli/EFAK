@@ -443,14 +443,8 @@ public class KafkaServiceImpl implements KafkaService {
 		return offsetZk;
 	}
 
-	/**
-	 * According to topic and partition to obtain Replicas & Isr.
-	 * 
-	 * @param topic
-	 * @param partitionid
-	 * @return String.
-	 */
-	private String getReplicasIsr(String clusterAlias, String topic, int partitionid) {
+	/** According to topic and partition to obtain Replicas & Isr. */
+	public String getReplicasIsr(String clusterAlias, String topic, int partitionid) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		TopicPartition tp = new TopicPartition(topic, partitionid);
 		Option<Seq<Object>> repclicasAndPartition = zkc.getInSyncReplicasForPartition(tp);
@@ -877,7 +871,6 @@ public class KafkaServiceImpl implements KafkaService {
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
-			// connector = JMXConnectorFactory.connect(jmxSeriverUrl);
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
 			if (CollectorType.KAFKA.equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
@@ -1016,7 +1009,6 @@ public class KafkaServiceImpl implements KafkaService {
 			JSONObject broker = (JSONObject) object;
 			try {
 				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getString("host") + ":" + broker.getInteger("jmxPort")));
-				// connector = JMXConnectorFactory.connect(jmxSeriverUrl);
 				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 				if (connector != null) {
 					break;
