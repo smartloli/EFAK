@@ -173,4 +173,10 @@ public class KConstants {
 		public final static String FAILED = "FAILED";
 	}
 
+	public interface Component {
+		/** Flink app consumer don't commit consumer info into kafka. */
+		public static String UNKNOW = "unknow-host";
+
+	}
+
 }

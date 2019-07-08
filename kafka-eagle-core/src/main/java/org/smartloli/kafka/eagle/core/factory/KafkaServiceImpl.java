@@ -70,6 +70,7 @@ import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
+import org.smartloli.kafka.eagle.common.util.KConstants.Component;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaPartitioner;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
@@ -655,8 +656,9 @@ public class KafkaServiceImpl implements KafkaService {
 			sasl(prop, getKafkaBrokerServer(clusterAlias), clusterAlias);
 		}
 
+		AdminClient adminClient = null;
 		try {
-			AdminClient adminClient = AdminClient.create(prop);
+			adminClient = AdminClient.create(prop);
 			ListConsumerGroupsResult cgrs = adminClient.listConsumerGroups();
 			java.util.Iterator<ConsumerGroupListing> itor = cgrs.all().get().iterator();
 			while (itor.hasNext()) {
@@ -677,10 +679,11 @@ public class KafkaServiceImpl implements KafkaService {
 					consumerGroups.add(consumerGroup);
 				}
 			}
-			adminClient.close();
 		} catch (Exception e) {
 			LOG.error("Get kafka consumer has error,msg is " + e.getMessage());
 			e.printStackTrace();
+		} finally {
+			adminClient.close();
 		}
 		return consumerGroups.toJSONString();
 	}
@@ -695,8 +698,9 @@ public class KafkaServiceImpl implements KafkaService {
 		}
 
 		JSONArray consumerGroups = new JSONArray();
+		AdminClient adminClient = null;
 		try {
-			AdminClient adminClient = AdminClient.create(prop);
+			adminClient = AdminClient.create(prop);
 			DescribeConsumerGroupsResult descConsumerGroup = adminClient.describeConsumerGroups(Arrays.asList(group));
 			Collection<MemberDescription> consumerMetaInfos = descConsumerGroup.describedGroups().get(group).get().members();
 			if (consumerMetaInfos.size() == 0) {
@@ -709,8 +713,8 @@ public class KafkaServiceImpl implements KafkaService {
 					object.put("partition", entry.getKey().partition());
 					topicSubs.add(object);
 				}
-				topicSub.put("owner", "");
-				topicSub.put("node", "-");
+				topicSub.put("owner", Component.UNKNOW);
+				topicSub.put("node",Component.UNKNOW);
 				topicSub.put("topicSub", topicSubs);
 				consumerGroups.add(topicSub);
 			} else {
@@ -729,10 +733,11 @@ public class KafkaServiceImpl implements KafkaService {
 					consumerGroups.add(topicSub);
 				}
 			}
-			adminClient.close();
 		} catch (Exception e) {
 			LOG.error("Get kafka consumer metadata has error, msg is " + e.getMessage());
 			e.printStackTrace();
+		} finally {
+			adminClient.close();
 		}
 		return consumerGroups;
 	}
@@ -768,8 +773,9 @@ public class KafkaServiceImpl implements KafkaService {
 			sasl(prop, parseBrokerServer(clusterAlias), clusterAlias);
 		}
 
+		AdminClient adminClient = null;
 		try {
-			AdminClient adminClient = AdminClient.create(prop);
+			adminClient = AdminClient.create(prop);
 			ListConsumerGroupsResult consumerGroups = adminClient.listConsumerGroups();
 			java.util.Iterator<ConsumerGroupListing> groups = consumerGroups.all().get().iterator();
 			while (groups.hasNext()) {
@@ -778,9 +784,11 @@ public class KafkaServiceImpl implements KafkaService {
 					counter++;
 				}
 			}
-			adminClient.close();
 		} catch (Exception e) {
+			LOG.info("Get kafka consumer group has error, msg is " + e.getMessage());
 			e.printStackTrace();
+		} finally {
+			adminClient.close();
 		}
 		return counter;
 	}
@@ -813,8 +821,9 @@ public class KafkaServiceImpl implements KafkaService {
 			sasl(prop, parseBrokerServer(clusterAlias), clusterAlias);
 		}
 		JSONArray targets = new JSONArray();
+		AdminClient adminClient = null;
 		try {
-			AdminClient adminClient = AdminClient.create(prop);
+			adminClient = AdminClient.create(prop);
 			ListConsumerGroupsResult consumerGroups = adminClient.listConsumerGroups();
 			java.util.Iterator<ConsumerGroupListing> groups = consumerGroups.all().get().iterator();
 			while (groups.hasNext()) {
@@ -832,10 +841,11 @@ public class KafkaServiceImpl implements KafkaService {
 					}
 				}
 			}
-			adminClient.close();
 		} catch (Exception e) {
 			LOG.error("Get consumer offset has error, msg is " + e.getMessage());
 			e.printStackTrace();
+		} finally {
+			adminClient.close();
 		}
 		return targets.toJSONString();
 	}
@@ -983,8 +993,9 @@ public class KafkaServiceImpl implements KafkaService {
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, parseBrokerServer(clusterAlias), clusterAlias);
 		}
+		AdminClient adminClient = null;
 		try {
-			AdminClient adminClient = AdminClient.create(prop);
+			adminClient = AdminClient.create(prop);
 			ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(group);
 			for (Entry<TopicPartition, OffsetAndMetadata> entry : offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
 				if (ketopic.equals(entry.getKey().topic())) {
@@ -992,10 +1003,11 @@ public class KafkaServiceImpl implements KafkaService {
 					lag += logSize - entry.getValue().offset();
 				}
 			}
-			adminClient.close();
 		} catch (Exception e) {
 			LOG.error("Get cluster[" + clusterAlias + "] group[" + group + "] topic[" + ketopic + "] consumer lag has error, msg is " + e.getMessage());
 			e.printStackTrace();
+		} finally {
+			adminClient.close();
 		}
 		return lag;
 	}
