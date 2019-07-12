@@ -280,7 +280,6 @@ public class BrokerServiceImpl implements BrokerService {
 				String tupleString = new String(tuple._1.get());
 				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 				for (String partition : partitionObject.keySet()) {
-
 					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
 						logSize += kafkaService.getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
 					} else {

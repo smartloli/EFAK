@@ -22,14 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
-import org.smartloli.kafka.eagle.common.protocol.topic.TopicLagInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -41,6 +37,10 @@ import org.smartloli.kafka.eagle.web.dao.MBeanDao;
 import org.smartloli.kafka.eagle.web.service.OffsetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Offsets consumer data.
@@ -156,11 +156,11 @@ public class OffsetServiceImpl implements OffsetService {
 	/** Get Kafka offset graph data from Zookeeper. */
 	public String getOffsetsGraph(Map<String, Object> params) {
 		JSONArray target = new JSONArray();
-		List<TopicLagInfo> topicLags = mbeanDao.getConsumerLag(params);
-		if (topicLags.size() > 0) {
-			for (TopicLagInfo topicLag : topicLags) {
+		List<TopicOffsetsInfo> topicOffsets = mbeanDao.getConsumerTopic(params);
+		if (topicOffsets.size() > 0) {
+			for (TopicOffsetsInfo topicOffset : topicOffsets) {
 				JSONObject object = new JSONObject();
-				object.put("lag", topicLag.getLag());
+				object.put("lag", topicOffset.getLag());
 				target.add(object);
 			}
 		}

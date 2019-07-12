@@ -379,15 +379,4 @@ public class RoleController {
 		}
 	}
 
-	/** Get alert info. */
-	@RequestMapping(value = "/console/cache/ajax", method = RequestMethod.GET)
-	public void getConsoleCacheAjax(HttpServletResponse response) {
-		try {
-			byte[] output = roleService.getConsoleCache().getBytes();
-			BaseController.response(output, response);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
 }

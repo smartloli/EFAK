@@ -71,6 +71,25 @@
 				</div>
 				<!-- /.col-lg-4 -->
 			</div>
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<i class="fa fa-tasks fa-fw"></i> Topic MBean
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div>
+								<table id="topic_metrics_tab" class="table table-bordered table-hover">
+								</table>
+							</div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+			</div>
 			<!-- /.row -->
 		</div>
 		<!-- /#page-wrapper -->

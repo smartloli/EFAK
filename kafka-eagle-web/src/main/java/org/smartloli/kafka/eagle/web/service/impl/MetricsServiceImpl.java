@@ -17,13 +17,15 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
-import org.smartloli.kafka.eagle.common.protocol.topic.TopicLagInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
@@ -36,11 +38,10 @@ import org.smartloli.kafka.eagle.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 
 /**
  * Achieve access to the kafka monitoring data interface through jmx.
@@ -254,18 +255,18 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	@Override
-	public int setConsumerLag(List<TopicLagInfo> topicLag) {
-		return mbeanDao.setConsumerLag(topicLag);
+	public int setConsumerTopic(List<TopicOffsetsInfo> topicOffsets) {
+		return mbeanDao.setConsumerTopic(topicOffsets);
 	}
 
 	@Override
-	public List<TopicLagInfo> getConsumerLag(Map<String, Object> params) {
-		return mbeanDao.getConsumerLag(params);
+	public List<TopicOffsetsInfo> getConsumerTopic(Map<String, Object> params) {
+		return mbeanDao.getConsumerTopic(params);
 	}
 
 	@Override
-	public void cleanLagData(int tm) {
-		mbeanDao.cleanLagData(tm);
+	public void cleanConsumerTopic(int tm) {
+		mbeanDao.cleanConsumerTopic(tm);
 	}
 
 }

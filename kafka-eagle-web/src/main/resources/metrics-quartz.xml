@@ -9,7 +9,7 @@
 	<bean id="metricsDetail"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject" ref="metricsSchedule" />
-		<property name="targetMethod" value="metricsJobQuartz" />
+		<property name="targetMethod" value="metricsConsumerTopicQuartz" />
 		<property name="concurrent" value="false" />
 	</bean>
 	
@@ -18,8 +18,8 @@
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="metricsDetail" />
 		<property name="cronExpression">
-			<!-- Perform task scheduling per 5min. -->
-			<value>0 0/5 * * * ?</value>
+			<!-- Perform task scheduling per 1min. -->
+			<value>0 0/1 * * * ?</value>
 		</property>
 	</bean>
 	<!-- Quartz scheduling factory scheduling plant can only have one, multiple 

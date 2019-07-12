@@ -121,7 +121,6 @@ public class Mx4jServiceImpl implements Mx4jService {
 		Map<Integer, Long> endOffsets = new HashMap<>();
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, uri));
-			// connector = JMXConnectorFactory.connect(jmxSeriverUrl);
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
 			Set<ObjectName> objectNames = mbeanConnection.queryNames(new ObjectName(mbean), null);
@@ -214,25 +213,32 @@ public class Mx4jServiceImpl implements Mx4jService {
 		return common(uri, mbean);
 	}
 
+	/**
+	 * Before Kafka 0.11.x, some exceptions are thrown, such as
+	 * {@link ReplicationBytesOutPerSec} Exception.
+	 */
 	private MBeanInfo common(String uri, String mbean) {
 		JMXConnector connector = null;
-		MBeanInfo MBeanInfo = new MBeanInfo();
+		MBeanInfo mbeanInfo = new MBeanInfo();
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, uri));
-			// connector = JMXConnectorFactory.connect(jmxSeriverUrl);
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
 			Object fifteenMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIFTEEN_MINUTE_RATE);
 			Object fiveMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIVE_MINUTE_RATE);
 			Object meanRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.MEAN_RATE);
 			Object oneMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.ONE_MINUTE_RATE);
-			MBeanInfo.setFifteenMinute(fifteenMinuteRate.toString());
-			MBeanInfo.setFiveMinute(fiveMinuteRate.toString());
-			MBeanInfo.setMeanRate(meanRate.toString());
-			MBeanInfo.setOneMinute(oneMinuteRate.toString());
+			mbeanInfo.setFifteenMinute(fifteenMinuteRate.toString());
+			mbeanInfo.setFiveMinute(fiveMinuteRate.toString());
+			mbeanInfo.setMeanRate(meanRate.toString());
+			mbeanInfo.setOneMinute(oneMinuteRate.toString());
 		} catch (Exception e) {
 			LOG.error("JMX service url[" + uri + "] create has error,msg is " + e.getMessage());
 			e.printStackTrace();
+			mbeanInfo.setFifteenMinute("0.0");
+			mbeanInfo.setFiveMinute("0.0");
+			mbeanInfo.setMeanRate("0.0");
+			mbeanInfo.setOneMinute("0.0");
 		} finally {
 			if (connector != null) {
 				try {
@@ -243,7 +249,7 @@ public class Mx4jServiceImpl implements Mx4jService {
 				}
 			}
 		}
-		return MBeanInfo;
+		return mbeanInfo;
 	}
 
 }

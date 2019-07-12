@@ -25,6 +25,7 @@ import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 
 /**
  * Kafka group,topic and partition interface.
@@ -85,6 +86,9 @@ public interface KafkaService {
 
 	/** Get kafka 0.10.x active consumer group & topics. */
 	public Set<String> getKafkaActiverTopics(String clusterAlias, String group);
+
+	/** Get kafka 0.10.x consumer topic, maybe consumer topic owner is null. */
+	public Set<String> getKafkaConsumerTopics(String clusterAlias, String group);
 
 	/** Get kafka 0.10.x consumer group & topic information. */
 	public String getKafkaConsumer(String clusterAlias);

@@ -14,11 +14,13 @@
 	</resultMap>
 
 	<resultMap
-		type="org.smartloli.kafka.eagle.common.protocol.topic.TopicLagInfo"
-		id="lag">
+		type="org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo"
+		id="topicOffsets">
 		<result property="cluster" column="cluster" />
 		<result property="group" column="group" />
 		<result property="topic" column="topic" />
+		<result property="logsize" column="logsize" />
+		<result property="offsets" column="offsets" />
 		<result property="lag" column="lag" />
 		<result property="timespan" column="timespan" />
 		<result property="tm" column="tm" />
@@ -38,9 +40,10 @@
 		delete from ke_metrics where
 		tm&lt;=#{tm}
 	</delete>
-	
-	<delete id="cleanLagData" parameterType="int">
-		delete from ke_lag where
+
+	<delete id="cleanConsumerTopic" parameterType="int">
+		delete from
+		ke_consumer where
 		tm&lt;=#{tm}
 	</delete>
 
@@ -72,26 +75,27 @@
 		#{etime}
 	</select>
 
-	<insert id="setConsumerLag" parameterType="java.util.List">
+	<insert id="setConsumerTopic" parameterType="java.util.List">
 		insert into
-		ke_lag(`cluster`,`group`,`topic`,`lag`,`timespan`,`tm`)
+		ke_consumer(`cluster`,`group`,`topic`,`logsize`,`offsets`,`lag`,`timespan`,`tm`)
 		values
 		<foreach collection="list" item="item" index="index"
 			separator=",">
-			(#{item.cluster},#{item.group},#{item.topic},#{item.lag},#{item.timespan},#{item.tm})
+			(#{item.cluster},#{item.group},#{item.topic},#{item.logsize},#{item.offsets},#{item.lag},#{item.timespan},#{item.tm})
 		</foreach>
 	</insert>
 
-	<select id="getConsumerLag" parameterType="map" resultMap="lag">
+	<select id="getConsumerTopic" parameterType="map" resultMap="topicOffsets">
 		select
-		`lag`,`timespan`
-		from ke_lag
+		`logsize`,`offsets`,`lag`,`timespan`
+		from ke_consumer
 		where
 		`cluster` =#{cluster}
 		and `group`
 		=#{group}
 		and `topic` =#{topic}
-		and tm between
+		and tm
+		between
 		#{stime} and #{etime}
 	</select>
 

@@ -17,9 +17,9 @@
  */
 package org.smartloli.kafka.eagle.web.quartz;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
@@ -37,8 +37,9 @@ import org.smartloli.kafka.eagle.core.factory.Mx4jService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.MetricsServiceImpl;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Per 5 mins to stats mbean from kafka jmx.
@@ -72,7 +73,7 @@ public class MBeanQuartz {
 			MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
 			int retain = SystemConfigUtils.getIntProperty("kafka.eagle.metrics.retain");
 			metrics.remove(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
-			metrics.cleanLagData(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
+			metrics.cleanConsumerTopic(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
 		}
 	}
 

@@ -43,11 +43,13 @@ public class ZKMetricsUtils {
 	private static final String zk_open_file_descriptor_count = "zk_open_file_descriptor_count";
 	private static final String zk_max_file_descriptor_count = "zk_max_file_descriptor_count";
 
+	/** Get zookeeper metrics. */
 	public static ZkClusterInfo zkClusterInfo(String ip, int port) {
 		Process pro = null;
 		Runtime rt = Runtime.getRuntime();
 		ZkClusterInfo zk = new ZkClusterInfo();
 		try {
+			// Linux server must be install nc tools.
 			String[] command = { "/bin/sh", "-c", "echo mntr | nc " + ip + " " + port };
 			pro = rt.exec(command);
 			BufferedReader buffer = new BufferedReader(new InputStreamReader(pro.getInputStream()));

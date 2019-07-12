@@ -17,20 +17,22 @@
  */
 package org.smartloli.kafka.eagle.common.protocol.topic;
 
-import com.google.gson.Gson;
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * Topic lag information.
+ * Consumer topic logsize, offset, lag metrics.
  * 
  * @author smartloli.
  *
- *         Created by Jan 16, 2019
+ *         Created by Jul 13, 2019
  */
-public class TopicLagInfo {
+public class TopicOffsetsInfo extends BaseProtocol {
 
 	private String cluster;
 	private String group;
 	private String topic;
+	private String logsize;
+	private String offsets;
 	private String lag;
 	private long timespan;
 	private String tm;
@@ -59,6 +61,22 @@ public class TopicLagInfo {
 		this.topic = topic;
 	}
 
+	public String getLogsize() {
+		return logsize;
+	}
+
+	public void setLogsize(String logsize) {
+		this.logsize = logsize;
+	}
+
+	public String getOffsets() {
+		return offsets;
+	}
+
+	public void setOffsets(String offsets) {
+		this.offsets = offsets;
+	}
+
 	public String getLag() {
 		return lag;
 	}
@@ -81,11 +99,6 @@ public class TopicLagInfo {
 
 	public void setTm(String tm) {
 		this.tm = tm;
-	}
-
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
 	}
 
 }

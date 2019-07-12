@@ -17,21 +17,30 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 
 import org.smartloli.kafka.eagle.web.service.TopicService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
+import org.smartloli.kafka.eagle.core.factory.Mx4jService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
@@ -60,13 +69,16 @@ public class TopicServiceImpl implements TopicService {
 	/** Broker service interface. */
 	private static BrokerService brokerService = new BrokerFactory().create();
 
+	/** Mx4j service interface. */
+	private Mx4jService mx4jService = new Mx4jFactory().create();
+
 	/** Find topic name in all topics. */
 	public boolean hasTopic(String clusterAlias, String topicName) {
 		return brokerService.findKafkaTopic(clusterAlias, topicName);
 	}
 
 	/** Get metadata in topic. */
-	public List<MetadataInfo> metadata(String clusterAlias, String topicName,Map<String, Object> params) {
+	public List<MetadataInfo> metadata(String clusterAlias, String topicName, Map<String, Object> params) {
 		return brokerService.topicMetadataRecords(clusterAlias, topicName, params);
 	}
 
@@ -149,5 +161,68 @@ public class TopicServiceImpl implements TopicService {
 	public long getPartitionNumbers(String clusterAlias, String topic) {
 		return brokerService.partitionNumbers(clusterAlias, topic);
 	}
-	
+
+	@Override
+	public String getTopicMBean(String clusterAlias, String topic) {
+		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+		Map<String, MBeanInfo> mbeans = new HashMap<>();
+		for (Object object : brokers) {
+			JSONObject broker = (JSONObject) object;
+			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
+			MBeanInfo bytesIn = mx4jService.bytesInPerSec(uri, topic);
+			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri, topic);
+			MBeanInfo bytesRejected = mx4jService.bytesRejectedPerSec(uri, topic);
+			MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri, topic);
+			MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri, topic);
+			MBeanInfo messageIn = mx4jService.messagesInPerSec(uri, topic);
+			MBeanInfo produceMessageConversions = mx4jService.produceMessageConversionsPerSec(uri, topic);
+			MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(uri, topic);
+			MBeanInfo totalProduceRequests = mx4jService.totalProduceRequestsPerSec(uri, topic);
+
+			assembleMBeanInfo(mbeans, MBean.MESSAGES_IN, messageIn);
+			assembleMBeanInfo(mbeans, MBean.BYTES_IN, bytesIn);
+			assembleMBeanInfo(mbeans, MBean.BYTES_OUT, bytesOut);
+			assembleMBeanInfo(mbeans, MBean.BYTES_REJECTED, bytesRejected);
+			assembleMBeanInfo(mbeans, MBean.FAILED_FETCH_REQUEST, failedFetchRequest);
+			assembleMBeanInfo(mbeans, MBean.FAILED_PRODUCE_REQUEST, failedProduceRequest);
+			assembleMBeanInfo(mbeans, MBean.PRODUCEMESSAGECONVERSIONS, produceMessageConversions);
+			assembleMBeanInfo(mbeans, MBean.TOTALFETCHREQUESTSPERSEC, totalFetchRequests);
+			assembleMBeanInfo(mbeans, MBean.TOTALPRODUCEREQUESTSPERSEC, totalProduceRequests);
+		}
+		for (Entry<String, MBeanInfo> entry : mbeans.entrySet()) {
+			if (entry == null || entry.getValue() == null) {
+				continue;
+			}
+			entry.getValue().setFifteenMinute(StrUtils.assembly(entry.getValue().getFifteenMinute()));
+			entry.getValue().setFiveMinute(StrUtils.assembly(entry.getValue().getFiveMinute()));
+			entry.getValue().setMeanRate(StrUtils.assembly(entry.getValue().getMeanRate()));
+			entry.getValue().setOneMinute(StrUtils.assembly(entry.getValue().getOneMinute()));
+		}
+		return new Gson().toJson(mbeans);
+	}
+
+	private void assembleMBeanInfo(Map<String, MBeanInfo> mbeans, String mBeanInfoKey, MBeanInfo mBeanInfo) {
+		if (mbeans.containsKey(mBeanInfoKey) && mBeanInfo != null) {
+			MBeanInfo mbeanInfo = mbeans.get(mBeanInfoKey);
+			String fifteenMinuteOld = mbeanInfo.getFifteenMinute() == null ? "0.0" : mbeanInfo.getFifteenMinute();
+			String fifteenMinuteLastest = mBeanInfo.getFifteenMinute() == null ? "0.0" : mBeanInfo.getFifteenMinute();
+			String fiveMinuteOld = mbeanInfo.getFiveMinute() == null ? "0.0" : mbeanInfo.getFiveMinute();
+			String fiveMinuteLastest = mBeanInfo.getFiveMinute() == null ? "0.0" : mBeanInfo.getFiveMinute();
+			String meanRateOld = mbeanInfo.getMeanRate() == null ? "0.0" : mbeanInfo.getMeanRate();
+			String meanRateLastest = mBeanInfo.getMeanRate() == null ? "0.0" : mBeanInfo.getMeanRate();
+			String oneMinuteOld = mbeanInfo.getOneMinute() == null ? "0.0" : mbeanInfo.getOneMinute();
+			String oneMinuteLastest = mBeanInfo.getOneMinute() == null ? "0.0" : mBeanInfo.getOneMinute();
+			long fifteenMinute = Math.round(StrUtils.numberic(fifteenMinuteOld)) + Math.round(StrUtils.numberic(fifteenMinuteLastest));
+			long fiveMinute = Math.round(StrUtils.numberic(fiveMinuteOld)) + Math.round(StrUtils.numberic(fiveMinuteLastest));
+			long meanRate = Math.round(StrUtils.numberic(meanRateOld)) + Math.round(StrUtils.numberic(meanRateLastest));
+			long oneMinute = Math.round(StrUtils.numberic(oneMinuteOld)) + Math.round(StrUtils.numberic(oneMinuteLastest));
+			mbeanInfo.setFifteenMinute(String.valueOf(fifteenMinute));
+			mbeanInfo.setFiveMinute(String.valueOf(fiveMinute));
+			mbeanInfo.setMeanRate(String.valueOf(meanRate));
+			mbeanInfo.setOneMinute(String.valueOf(oneMinute));
+		} else {
+			mbeans.put(mBeanInfoKey, mBeanInfo);
+		}
+	}
+
 }

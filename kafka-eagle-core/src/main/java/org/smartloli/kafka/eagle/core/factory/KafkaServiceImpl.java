@@ -65,15 +65,21 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer8;
 import org.smartloli.kafka.eagle.common.constant.OdpsSqlParser;
-import org.smartloli.kafka.eagle.common.protocol.*;
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
+import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import org.smartloli.kafka.eagle.common.protocol.HostsInfo;
+import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
+import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
+import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
+import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
-import org.smartloli.kafka.eagle.common.util.KConstants.Component;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaPartitioner;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -646,6 +652,19 @@ public class KafkaServiceImpl implements KafkaService {
 		return topics;
 	}
 
+	public Set<String> getKafkaConsumerTopics(String clusterAlias, String group) {
+		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
+		Set<String> topics = new HashSet<>();
+		for (Object object : consumerGroups) {
+			JSONObject consumerGroup = (JSONObject) object;
+			for (Object topicObject : consumerGroup.getJSONArray("topicSub")) {
+				JSONObject topic = (JSONObject) topicObject;
+				topics.add(topic.getString("topic"));
+			}
+		}
+		return topics;
+	}
+
 	/** Get kafka 0.10.x, 1.x, 2.x consumer metadata. */
 	public String getKafkaConsumer(String clusterAlias) {
 		Properties prop = new Properties();
@@ -713,8 +732,8 @@ public class KafkaServiceImpl implements KafkaService {
 					object.put("partition", entry.getKey().partition());
 					topicSubs.add(object);
 				}
-				topicSub.put("owner", Component.UNKNOW);
-				topicSub.put("node",Component.UNKNOW);
+				topicSub.put("owner", "");
+				topicSub.put("node", "-");
 				topicSub.put("topicSub", topicSubs);
 				consumerGroups.add(topicSub);
 			} else {
