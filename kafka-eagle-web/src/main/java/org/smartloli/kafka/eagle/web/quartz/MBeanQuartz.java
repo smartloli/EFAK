@@ -28,6 +28,7 @@ import org.smartloli.kafka.eagle.common.protocol.ZkClusterInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.ZKMetricsUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -42,7 +43,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * Per 5 mins to stats mbean from kafka jmx.
+ * Per mins to stats mbean from kafka jmx.
  * 
  * @author smartloli.
  *
@@ -58,9 +59,8 @@ public class MBeanQuartz {
 	private static final String zk_outstanding_requests = "zk_outstanding_requests";
 	private static final String[] zk_kpis = new String[] { zk_packets_received, zk_packets_sent, zk_num_alive_connections, zk_outstanding_requests };
 
-	private static final String[] broker_kpis = new String[] { MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED,
-            MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC
-            , MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS};
+	private static final String[] broker_kpis = new String[] { MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC,
+			MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS };
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
@@ -98,16 +98,13 @@ public class MBeanQuartz {
 			kpiInfo.setTimespan(CalendarUtils.getTimeSpan());
 			kpiInfo.setKey(kpi);
 			String broker = "";
-			JSONObject value = new JSONObject();
-			value.put("y", CalendarUtils.getDate());
 			for (Object object : brokers) {
 				JSONObject kafka = (JSONObject) object;
 				broker += kafka.getString("host") + ",";
-				kafkaAssembly(mx4jService, kpi, value, kafka);
+				kafkaAssembly(mx4jService, kpi, kpiInfo, kafka);
 			}
 			kpiInfo.setBroker(broker.length() == 0 ? "unkowns" : broker.substring(0, broker.length() - 1));
 			kpiInfo.setType(CollectorType.KAFKA);
-			kpiInfo.setValue(value.toJSONString());
 			list.add(kpiInfo);
 		}
 
@@ -119,75 +116,75 @@ public class MBeanQuartz {
 		}
 	}
 
-	private void kafkaAssembly(Mx4jService mx4jService, String type, JSONObject value, JSONObject kafka) {
+	private void kafkaAssembly(Mx4jService mx4jService, String type, KpiInfo kpiInfo, JSONObject kafka) {
 		String uri = kafka.getString("host") + ":" + kafka.getInteger("jmxPort");
 		switch (type) {
 		case MBean.MESSAGEIN:
 			MBeanInfo msg = mx4jService.messagesInPerSec(uri);
-            if (msg != null) {
-                value.put(kafka.getString("host"), msg.getMeanRate());
-            }
+			if (msg != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(msg.getMeanRate()) + "");
+			}
 			break;
 		case MBean.BYTEIN:
 			MBeanInfo bin = mx4jService.bytesInPerSec(uri);
-            if (bin != null) {
-                value.put(kafka.getString("host"), bin.getMeanRate());
-            }
+			if (bin != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bin.getMeanRate()) + "");
+			}
 			break;
 		case MBean.BYTEOUT:
 			MBeanInfo bout = mx4jService.bytesOutPerSec(uri);
-            if (bout != null) {
-                value.put(kafka.getString("host"), bout.getMeanRate());
-            }
+			if (bout != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bout.getMeanRate()) + "");
+			}
 			break;
 		case MBean.BYTESREJECTED:
 			MBeanInfo bytesRejectedPerSec = mx4jService.bytesRejectedPerSec(uri);
-            if (bytesRejectedPerSec != null) {
-                value.put(kafka.getString("host"), bytesRejectedPerSec.getMeanRate());
-            }
+			if (bytesRejectedPerSec != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bytesRejectedPerSec.getMeanRate()) + "");
+			}
 			break;
 		case MBean.FAILEDFETCHREQUEST:
 			MBeanInfo failedFetchRequestsPerSec = mx4jService.failedFetchRequestsPerSec(uri);
-            if (failedFetchRequestsPerSec != null) {
-                value.put(kafka.getString("host"), failedFetchRequestsPerSec.getMeanRate());
-            }
+			if (failedFetchRequestsPerSec != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(failedFetchRequestsPerSec.getMeanRate()) + "");
+			}
 			break;
 		case MBean.FAILEDPRODUCEREQUEST:
 			MBeanInfo failedProduceRequestsPerSec = mx4jService.failedProduceRequestsPerSec(uri);
-            if (failedProduceRequestsPerSec != null) {
-                value.put(kafka.getString("host"), failedProduceRequestsPerSec.getMeanRate());
-            }
+			if (failedProduceRequestsPerSec != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(failedProduceRequestsPerSec.getMeanRate()) + "");
+			}
 			break;
 		case MBean.TOTALFETCHREQUESTSPERSEC:
-            MBeanInfo totalFetchRequests= mx4jService.totalFetchRequestsPerSec(uri);
-            if (totalFetchRequests != null) {
-                value.put(kafka.getString("host"), totalFetchRequests.getMeanRate());
-            }
-            break;
+			MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(uri);
+			if (totalFetchRequests != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(totalFetchRequests.getMeanRate()) + "");
+			}
+			break;
 		case MBean.TOTALPRODUCEREQUESTSPERSEC:
-            MBeanInfo totalProduceRequestsPerSec= mx4jService.totalProduceRequestsPerSec(uri);
-            if (totalProduceRequestsPerSec != null) {
-                value.put(kafka.getString("host"), totalProduceRequestsPerSec.getMeanRate());
-            }
-            break;
+			MBeanInfo totalProduceRequestsPerSec = mx4jService.totalProduceRequestsPerSec(uri);
+			if (totalProduceRequestsPerSec != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(totalProduceRequestsPerSec.getMeanRate()) + "");
+			}
+			break;
 		case MBean.REPLICATIONBYTESINPERSEC:
-            MBeanInfo replicationBytesInPerSec= mx4jService.replicationBytesInPerSec(uri);
-            if (replicationBytesInPerSec != null) {
-                value.put(kafka.getString("host"), replicationBytesInPerSec.getMeanRate());
-            }
-            break;
+			MBeanInfo replicationBytesInPerSec = mx4jService.replicationBytesInPerSec(uri);
+			if (replicationBytesInPerSec != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(replicationBytesInPerSec.getMeanRate()) + "");
+			}
+			break;
 		case MBean.REPLICATIONBYTESOUTPERSEC:
-            MBeanInfo replicationBytesOutPerSec= mx4jService.replicationBytesOutPerSec(uri);
-            if (replicationBytesOutPerSec != null) {
-                value.put(kafka.getString("host"), replicationBytesOutPerSec.getMeanRate());
-            }
-            break;
-        case MBean.PRODUCEMESSAGECONVERSIONS:
-            MBeanInfo produceMessageConv= mx4jService.produceMessageConversionsPerSec(uri);
-            if (produceMessageConv != null) {
-                value.put(kafka.getString("host"), produceMessageConv.getMeanRate());
-            }
-            break;
+			MBeanInfo replicationBytesOutPerSec = mx4jService.replicationBytesOutPerSec(uri);
+			if (replicationBytesOutPerSec != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(replicationBytesOutPerSec.getMeanRate()) + "");
+			}
+			break;
+		case MBean.PRODUCEMESSAGECONVERSIONS:
+			MBeanInfo produceMessageConv = mx4jService.produceMessageConversionsPerSec(uri);
+			if (produceMessageConv != null) {
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(produceMessageConv.getMeanRate()) + "");
+			}
+			break;
 		default:
 			break;
 		}
@@ -204,8 +201,6 @@ public class MBeanQuartz {
 			kpiInfo.setTimespan(CalendarUtils.getTimeSpan());
 			kpiInfo.setKey(kpi);
 			String broker = "";
-			JSONObject object = new JSONObject();
-			object.put("y", CalendarUtils.getDate());
 			for (String zk : zks) {
 				String ip = zk.split(":")[0];
 				String port = zk.split(":")[1];
@@ -215,15 +210,14 @@ public class MBeanQuartz {
 				broker += ip + ",";
 				try {
 					ZkClusterInfo zkInfo = ZKMetricsUtils.zkClusterInfo(ip, Integer.parseInt(port));
-					assembly(zkInfo, kpi, object, ip);
-
+					zkAssembly(zkInfo, kpi, kpiInfo);
 				} catch (Exception ex) {
+					ex.printStackTrace();
 					LOG.error("Transcation string to int has error,msg is " + ex.getMessage());
 				}
 			}
 			kpiInfo.setBroker(broker.length() == 0 ? "unkowns" : broker.substring(0, broker.length() - 1));
 			kpiInfo.setType(CollectorType.ZK);
-			kpiInfo.setValue(object.toJSONString());
 			list.add(kpiInfo);
 		}
 
@@ -235,19 +229,19 @@ public class MBeanQuartz {
 		}
 	}
 
-	private static void assembly(ZkClusterInfo zkInfo, String type, JSONObject object, String ip) {
+	private static void zkAssembly(ZkClusterInfo zkInfo, String type, KpiInfo kpiInfo) {
 		switch (type) {
 		case zk_packets_received:
-			object.put(ip, zkInfo.getZkPacketsReceived());
+			kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + Long.parseLong(zkInfo.getZkPacketsReceived()) + "");
 			break;
 		case zk_packets_sent:
-			object.put(ip, zkInfo.getZkPacketsSent());
+			kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + Long.parseLong(zkInfo.getZkPacketsSent()) + "");
 			break;
 		case zk_num_alive_connections:
-			object.put(ip, zkInfo.getZkNumAliveConnections());
+			kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + Long.parseLong(zkInfo.getZkNumAliveConnections()) + "");
 			break;
 		case zk_outstanding_requests:
-			object.put(ip, zkInfo.getZkOutstandingRequests());
+			kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + Long.parseLong(zkInfo.getZkOutstandingRequests()) + "");
 			break;
 		default:
 			break;

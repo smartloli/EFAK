@@ -36,6 +36,10 @@
 	padding: 5px 10px; 
 	border: 1px solid #ccc;
 }
+.chartkafkadiv {
+	width: 100%;
+	height: 300px;
+}
 </style>
 
 <title>Kafka - KafkaEagle</title>
@@ -95,35 +99,35 @@
                                 <label for="iBO">Topic Byte Out</label>
                             </div>
                             <div class="col-sm-3 checkbox checkbox-primary">
-                                <input type="checkbox" id="iBR"  name="byte_rejected">
+                                <input type="checkbox" id="iBR"  name="byte_rejected" checked>
                                 <label for="iBR">Topic Byte Rejected</label>
                             </div>
                             <div class="col-sm-3 checkbox checkbox-primary">
-                                <input type="checkbox" id="iFFR"  name="failed_fetch_request">
+                                <input type="checkbox" id="iFFR"  name="failed_fetch_request" checked>
                                 <label for="iFFR">Failed Fetch Request</label>
                             </div>
                             <div class="col-sm-3 checkbox checkbox-primary">
-                                <input type="checkbox" id="iFPR"  name="failed_produce_request">
+                                <input type="checkbox" id="iFPR"  name="failed_produce_request" checked>
                                 <label for="iFPR">Failed Produce Request</label>
                             </div>
                             <div class="col-sm-3 checkbox checkbox-primary">
-                                <input type="checkbox" id="iPMC"  name="produce_message_conversions">
+                                <input type="checkbox" id="iPMC"  name="produce_message_conversions" checked>
                                 <label for="iPMC">Produce Message Conversions</label>
                             </div>
                             <div class="col-sm-3 checkbox checkbox-primary">
-                                <input type="checkbox" id="iTFR"  name="total_fetch_requests">
+                                <input type="checkbox" id="iTFR"  name="total_fetch_requests" checked>
                                 <label for="iTFR">Total Fetch Requests</label>
                             </div>
                             <div class="col-sm-3 checkbox checkbox-primary">
-                                <input type="checkbox" id="iTPR"  name="total_produce_requests">
+                                <input type="checkbox" id="iTPR"  name="total_produce_requests" checked>
                                 <label for="iTPR">Total Produce Requests</label>
                             </div>
                             <div class="col-sm-3 checkbox checkbox-primary">
-                                <input type="checkbox" id="iRBO"  name="replication_bytes_out">
+                                <input type="checkbox" id="iRBO"  name="replication_bytes_out" checked>
                                 <label for="iRBO">Replication Bytes Out</label>
                             </div>
                             <div class="col-sm-3 checkbox checkbox-primary">
-                                <input type="checkbox" id="iRBI"  name="replication_bytes_in">
+                                <input type="checkbox" id="iRBI"  name="replication_bytes_in" checked>
                                 <label for="iRBI">Replication Bytes In</label>
                             </div>
                         </div>
@@ -142,7 +146,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_msg_in"></div>
+							<div id="mbean_msg_in" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -157,7 +161,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_msg_byte_in"></div>
+							<div id="mbean_msg_byte_in" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -172,7 +176,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_msg_byte_out"></div>
+							<div id="mbean_msg_byte_out" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -188,7 +192,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_byte_rejected"></div>
+							<div id="mbean_byte_rejected" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -204,7 +208,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_failed_fetch_request"></div>
+							<div id="mbean_failed_fetch_request" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -220,7 +224,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_failed_produce_request"></div>
+							<div id="mbean_failed_produce_request" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -236,7 +240,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_produce_message_conversions"></div>
+							<div id="mbean_produce_message_conversions" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -252,7 +256,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_total_fetch_requests"></div>
+							<div id="mbean_total_fetch_requests" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -268,7 +272,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_total_produce_requests"></div>
+							<div id="mbean_total_produce_requests" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -284,7 +288,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_replication_bytes_out"></div>
+							<div id="mbean_replication_bytes_out" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -300,7 +304,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="mbean_replication_bytes_in"></div>
+							<div id="mbean_replication_bytes_in" class="chartkafkadiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -313,6 +317,8 @@
 </body>
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="main/metrics/kafka.js" name="loader" />
+	<jsp:param value="plugins/echart/echarts.min.js" name="loader" />
+	<jsp:param value="plugins/echart/macarons.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/daterangepicker.js"
 		name="loader" />

@@ -24,6 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.web.service.OffsetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,10 +37,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.web.service.OffsetService;
 
 /**
  * Kafka offset controller to viewer data.
@@ -169,13 +168,18 @@ public class OffsetController {
 	}
 	
 	/** Get real-time offset graph data from Kafka by ajax. */
-	@RequestMapping(value = "/consumer/offset/rate/{topic}/realtime/ajax", method = RequestMethod.GET)
-	public void offsetRateGraphAjax(@PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
+	@RequestMapping(value = "/consumer/offset/rate/{group}/{topic}/realtime/ajax", method = RequestMethod.GET)
+	public void offsetRateGraphAjax(@PathVariable("group") String group,@PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
+		Map<String, Object> params = new HashMap<>();
+		params.put("cluster", clusterAlias);
+		params.put("group", group);
+		params.put("topic", topic);
+		
 		try {
-			byte[] output = offsetService.getOffsetRate(clusterAlias, topic).getBytes();
+			byte[] output = offsetService.getOffsetRate(params).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

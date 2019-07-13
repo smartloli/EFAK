@@ -1,4 +1,48 @@
 $(document).ready(function() {
+
+	chartCommonOption = {
+		backgroundColor : "#fff",
+		tooltip : {
+			trigger : 'axis',
+			axisPointer : {
+				type : 'cross',
+				label : {
+					backgroundColor : '#6a7985'
+				}
+			}
+		},
+		legend : {
+			data : []
+		},
+		xAxis : {
+			type : 'category',
+			boundaryGap : false,
+			data : []
+		},
+		dataZoom : {
+			show : true,
+			start : 30
+		},
+		grid : {
+			bottom : "70px",
+			left : "40px",
+			right : "40px"
+		},
+		yAxis : {
+			type : 'value'
+		},
+		series : {
+			type : 'line',
+			symbol : "none",
+			// name : "",
+			smooth : true,
+			areaStyle : {
+				opacity : 0.1
+			},
+			data : []
+		}
+	};
+
 	try {
 
 		var start = moment();
@@ -25,72 +69,29 @@ $(document).ready(function() {
 		var type = "zookeeper";
 
 		zkRealtime(stime, etime, type);
-		// $(".ranges").find("li[data-range-key='Custom Range']").remove();
 
 		reportrange.on('apply.daterangepicker', function(ev, picker) {
 			stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 			etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
 			zkRealtime(stime, etime, type);
 		});
-		console.log(stime + "," + etime);
 		setInterval(function() {
 			zkRealtime(stime, etime, type)
-		}, 1000 * 60 * 5);
+		}, 1000 * 60 * 1);
 	} catch (e) {
 		console.log(e.message);
 	}
 
-	var zk_send_packets = Morris.Line({
-		element : 'zk_send_packets',
-		data : [],
-		xkey : 'y',
-		ykeys : [],
-		labels : [],
-		pointSize : 2,
-		hideHover : 'auto',
-		//pointFillColors : [ '#ffffff' ],
-		//pointStrokeColors : [ 'black' ],
-		resize : true
-	});
+	function morrisLineInit(elment) {
+		lagChart = echarts.init(document.getElementById(elment), 'macarons');
+		lagChart.setOption(chartCommonOption);
+		return lagChart;
+	}
 
-	var zk_recevied_packets = Morris.Line({
-		element : 'zk_recevied_packets',
-		data : [],
-		xkey : 'y',
-		ykeys : [],
-		labels : [],
-		//pointFillColors : [ '#ffffff' ],
-		//pointStrokeColors : [ 'black' ],
-		pointSize : 2,
-		hideHover : 'auto',
-		resize : true
-	});
-
-	var zk_alives_connections = Morris.Line({
-		element : 'zk_alives_connections',
-		data : [],
-		xkey : 'y',
-		ykeys : [],
-		labels : [],
-		//pointFillColors : [ '#ffffff' ],
-		//pointStrokeColors : [ 'black' ],
-		pointSize : 2,
-		hideHover : 'auto',
-		resize : true
-	});
-
-	var zk_queue_requests = Morris.Line({
-		element : 'zk_queue_requests',
-		data : [],
-		xkey : 'y',
-		ykeys : [],
-		labels : [],
-		//pointFillColors : [ '#ffffff' ],
-		//pointStrokeColors : [ 'black' ],
-		pointSize : 2,
-		hideHover : 'auto',
-		resize : true
-	});
+	var zk_packets_sent = morrisLineInit('zk_send_packets');
+	var zk_packets_received = morrisLineInit('zk_recevied_packets');
+	var zk_num_alive_connections = morrisLineInit('zk_alives_connections');
+	var zk_outstanding_requests = morrisLineInit('zk_queue_requests');
 
 	function zkRealtime(stime, etime, type) {
 		$.ajax({
@@ -103,48 +104,58 @@ $(document).ready(function() {
 			},
 			success : function(datas) {
 				if (datas != null) {
-					zk_send_packets.options.ykeys = datas.zks;
-					zk_send_packets.options.labels = datas.zks;
-					zk_send_packets.setData(filter(datas.send, "zk_packets_sent"));
-
-					zk_recevied_packets.options.ykeys = datas.zks;
-					zk_recevied_packets.options.labels = datas.zks;
-					zk_recevied_packets.setData(filter(datas.received, "zk_packets_received"));
-
-					zk_alives_connections.options.ykeys = datas.zks;
-					zk_alives_connections.options.labels = datas.zks;
-					zk_alives_connections.setData(filter(datas.alive, "zk_num_alive_connections"));
-
-					zk_queue_requests.options.ykeys = datas.zks;
-					zk_queue_requests.options.labels = datas.zks;
-					zk_queue_requests.setData(filter(datas.queue, "zk_outstanding_requests"));
+					setTrendData(zk_packets_sent, 'zk_packets_sent', datas);
+					setTrendData(zk_packets_received, 'zk_packets_received', datas);
+					setTrendData(zk_num_alive_connections, 'zk_num_alive_connections', datas);
+					setTrendData(zk_outstanding_requests, 'zk_outstanding_requests', datas);
 					datas = null;
 				}
 			}
 		});
 	}
 
-	function filter(datas, type) {
-		var data = new Array();
-		for (var i = 0; i < datas.length; i++) {
-			switch (type) {
-			case "zk_packets_sent":
-				data.push(JSON.parse(datas[i].zk_packets_sent));
-				break;
-			case "zk_num_alive_connections":
-				data.push(JSON.parse(datas[i].zk_num_alive_connections));
-				break;
-			case "zk_outstanding_requests":
-				data.push(JSON.parse(datas[i].zk_outstanding_requests));
-				break;
-			case "zk_packets_received":
-				data.push(JSON.parse(datas[i].zk_packets_received));
-				break;
-			default:
-				break;
-			}
-		}
-		return data;
+	// set trend data
+	function setTrendData(mbean, filed, data) {
+		chartCommonOption.xAxis.data = filter(data, filed).x;
+		chartCommonOption.series.data = filter(data, filed).y;
+		mbean.setOption(chartCommonOption);
 	}
 
+	// filter data
+	function filter(datas, type) {
+		var data = new Object();
+		var datax = new Array();
+		var datay = new Array();
+		switch (type) {
+		case "zk_packets_sent":
+			for (var i = 0; i < datas.send.length; i++) {
+				datax.push(datas.send[i].x);
+				datay.push(datas.send[i].y);
+			}
+			break;
+		case "zk_num_alive_connections":
+			for (var i = 0; i < datas.alive.length; i++) {
+				datax.push(datas.alive[i].x);
+				datay.push(datas.alive[i].y);
+			}
+			break;
+		case "zk_outstanding_requests":
+			for (var i = 0; i < datas.queue.length; i++) {
+				datax.push(datas.queue[i].x);
+				datay.push(datas.queue[i].y);
+			}
+			break;
+		case "zk_packets_received":
+			for (var i = 0; i < datas.received.length; i++) {
+				datax.push(datas.received[i].x);
+				datay.push(datas.received[i].y);
+			}
+			break;
+		default:
+			break;
+		}
+		data.x = datax;
+		data.y = datay;
+		return data;
+	}
 });

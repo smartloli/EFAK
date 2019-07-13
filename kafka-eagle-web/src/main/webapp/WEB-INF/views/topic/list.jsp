@@ -37,7 +37,7 @@
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
 						<i class="fa fa-info-circle"></i> <strong>List all topic
-							information.</strong>
+							information.</strong> The topic size actually needs to be multiplied by the number of copies of the topic.
 					</div>
 				</div>
 			</div>

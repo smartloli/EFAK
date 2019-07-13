@@ -25,7 +25,7 @@
 		<property name="jobDetail" ref="mbeanDetail" />
 		<property name="cronExpression">
 			<!-- Perform task scheduling per 5min. -->
-			<value>0 0/5 * * * ?</value>
+			<value>0 0/1 * * * ?</value>
 		</property>
 	</bean>
 	<bean id="mbeanCleanTrigger"

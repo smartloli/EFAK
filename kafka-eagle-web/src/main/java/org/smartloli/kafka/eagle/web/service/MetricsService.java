@@ -48,9 +48,6 @@ public interface MetricsService {
 	/** Set consumer topic metrics. */
 	public int setConsumerTopic(List<TopicOffsetsInfo> topicLag);
 
-	/** Get consumer topic metrics. */
-	public List<TopicOffsetsInfo> getConsumerTopic(Map<String, Object> params);
-
 	/** Clean consumer topic data. */
 	public void cleanConsumerTopic(int tm);
 

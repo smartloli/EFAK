@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
@@ -166,11 +167,7 @@ public class MetricsServiceImpl implements MetricsService {
 		JSONArray zkReceivedPackets = new JSONArray();
 		JSONArray zkNumAliveConnections = new JSONArray();
 		JSONArray zkOutstandingRequests = new JSONArray();
-		String zks = "";
 		for (KpiInfo kpi : kpis) {
-			if ("".equals(zks) || zks == null) {
-				zks = kpi.getBroker();
-			}
 			switch (kpi.getKey()) {
 			case ZK.ZK_SEND_PACKETS:
 				assembly(zkSendPackets, kpi);
@@ -226,9 +223,9 @@ public class MetricsServiceImpl implements MetricsService {
 		target.put("received", zkReceivedPackets);
 		target.put("queue", zkOutstandingRequests);
 		target.put("alive", zkNumAliveConnections);
-		target.put("msg", messageIns);
-		target.put("ins", byteIns);
-		target.put("outs", byteOuts);
+		target.put("messageIns", messageIns);
+		target.put("byteIns", byteIns);
+		target.put("byteOuts", byteOuts);
 		target.put("byteRejected", byteRejected);
 		target.put("failedFetchRequest", failedFetchRequest);
 		target.put("failedProduceRequest", failedProduceRequest);
@@ -238,14 +235,13 @@ public class MetricsServiceImpl implements MetricsService {
 		target.put("replicationBytesIns", replicationBytesIns);
 		target.put("replicationBytesOuts", replicationBytesOuts);
 
-		target.put("zks", zks.split(","));
-
 		return target.toJSONString();
 	}
 
 	private void assembly(JSONArray assemblys, KpiInfo kpi) throws ParseException {
 		JSONObject object = new JSONObject();
-		object.put(kpi.getKey(), kpi.getValue());
+		object.put("x", CalendarUtils.convertUnixTime(kpi.getTimespan(), "yyyy-MM-dd HH:mm"));
+		object.put("y", kpi.getValue());
 		assemblys.add(object);
 	}
 
@@ -257,11 +253,6 @@ public class MetricsServiceImpl implements MetricsService {
 	@Override
 	public int setConsumerTopic(List<TopicOffsetsInfo> topicOffsets) {
 		return mbeanDao.setConsumerTopic(topicOffsets);
-	}
-
-	@Override
-	public List<TopicOffsetsInfo> getConsumerTopic(Map<String, Object> params) {
-		return mbeanDao.getConsumerTopic(params);
 	}
 
 	@Override

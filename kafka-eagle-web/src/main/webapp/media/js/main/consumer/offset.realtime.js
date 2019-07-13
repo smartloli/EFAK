@@ -3,20 +3,53 @@ $(document).ready(function() {
 	var tmp = url.split("offset/")[1];
 	var group = tmp.split("/")[0];
 	var topic = tmp.split("/")[1];
-	$("#topic_name_header").find("strong").text(topic);
+	$("#topic_name_header").find("strong").text("Consumer Blocking Metrics (" + topic + ")");
 
-	var graph = Morris.Area({
-		element : 'morris-area-chart',
-		data : [],
-		xkey : 'y',
-		ykeys : [ 'lag' ],
-		labels : [ 'lag' ],
-		// lineColors : [ '#d43f3a', '#7cb47c', '#2577b5' ],
-		pointSize : 1,
-		hideHover : 'auto',
-		behaveLikeLine : true,
-		resize : true
-	});
+	lagOption = {
+		backgroundColor : "#fff",
+		tooltip : {
+			trigger : 'axis',
+			axisPointer : {
+				type : 'cross',
+				label : {
+					backgroundColor : '#6a7985'
+				}
+			}
+		},
+		legend : {
+			data : [ 'Lag' ]
+		},
+		xAxis : {
+			type : 'category',
+			boundaryGap : false,
+			data : []
+		},
+		dataZoom : {
+			show : true,
+			start : 30
+		},
+		grid : {
+			bottom : "70px",
+			left : "40px",
+			right : "40px"
+		},
+		yAxis : {
+			type : 'value'
+		},
+		series : {
+			type : 'line',
+			symbol : "none",
+			name : "Lag",
+			smooth : true,
+			areaStyle : {
+				opacity : 0.1
+			},
+			data : []
+		}
+	};
+
+	var lagChart = echarts.init(document.getElementById('lag_chart'), 'macarons');
+	lagChart.setOption(lagOption);
 
 	var start = moment();
 	var end = moment();
@@ -48,7 +81,9 @@ $(document).ready(function() {
 			success : function(datas) {
 				if (datas != null) {
 					// Area Chart
-					graph.setData(filter(datas.graph));
+					lagOption.xAxis.data = datas.x;
+					lagOption.series.data = datas.y;
+					lagChart.setOption(lagOption);
 					datas = [];
 				}
 			}
@@ -59,7 +94,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/consumer/offset/rate/' + topic + '/realtime/ajax',
+			url : '/ke/consumer/offset/rate/' + group + '/' + topic + '/realtime/ajax',
 			success : function(datas) {
 				if (datas != null) {
 					// Consumer & Producer Rate
@@ -69,14 +104,6 @@ $(document).ready(function() {
 				}
 			}
 		});
-	}
-
-	function filter(datas) {
-		var data = new Array();
-		for (var i = 0; i < datas.length; i++) {
-			data.push(JSON.parse(datas[i].lag));
-		}
-		return data;
 	}
 
 	reportrange.on('apply.daterangepicker', function(ev, picker) {

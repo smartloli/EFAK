@@ -20,21 +20,22 @@
  */
 package org.smartloli.kafka.eagle.core.factory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXServiceURL;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
-
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXServiceURL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Implements Mx4jService all method.
@@ -224,14 +225,21 @@ public class Mx4jServiceImpl implements Mx4jService {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, uri));
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			Object fifteenMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIFTEEN_MINUTE_RATE);
-			Object fiveMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIVE_MINUTE_RATE);
-			Object meanRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.MEAN_RATE);
-			Object oneMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.ONE_MINUTE_RATE);
-			mbeanInfo.setFifteenMinute(fifteenMinuteRate.toString());
-			mbeanInfo.setFiveMinute(fiveMinuteRate.toString());
-			mbeanInfo.setMeanRate(meanRate.toString());
-			mbeanInfo.setOneMinute(oneMinuteRate.toString());
+			if (mbeanConnection.isRegistered(new ObjectName(mbean))) {
+				Object fifteenMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIFTEEN_MINUTE_RATE);
+				Object fiveMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIVE_MINUTE_RATE);
+				Object meanRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.MEAN_RATE);
+				Object oneMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.ONE_MINUTE_RATE);
+				mbeanInfo.setFifteenMinute(fifteenMinuteRate.toString());
+				mbeanInfo.setFiveMinute(fiveMinuteRate.toString());
+				mbeanInfo.setMeanRate(meanRate.toString());
+				mbeanInfo.setOneMinute(oneMinuteRate.toString());
+			} else {
+				mbeanInfo.setFifteenMinute("0.0");
+				mbeanInfo.setFiveMinute("0.0");
+				mbeanInfo.setMeanRate("0.0");
+				mbeanInfo.setOneMinute("0.0");
+			}
 		} catch (Exception e) {
 			LOG.error("JMX service url[" + uri + "] create has error,msg is " + e.getMessage());
 			e.printStackTrace();

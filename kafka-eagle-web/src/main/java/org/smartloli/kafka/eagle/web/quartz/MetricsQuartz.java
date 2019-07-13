@@ -69,23 +69,11 @@ public class MetricsQuartz {
 						topicOffset.setCluster(clusterAlias);
 						topicOffset.setGroup(group);
 						topicOffset.setTopic(topic);
-						JSONObject logsizeObject = new JSONObject();
-						logsizeObject.put("y", CalendarUtils.getDate());
 						long logsize = brokerService.getTopicLogSizeTotal(clusterAlias, topic);
-						logsizeObject.put("logsize", logsize);
-						topicOffset.setLogsize(logsizeObject.toJSONString());
-
-						JSONObject lagObject = new JSONObject();
-						lagObject.put("y", CalendarUtils.getDate());
+						topicOffset.setLogsize(String.valueOf(logsize));
 						long lag = kafkaService.getKafkaLag(clusterAlias, group, topic);
-						lagObject.put("lag", lag);
-						topicOffset.setLag(lagObject.toJSONString());
-
-						JSONObject offsetsObject = new JSONObject();
-						offsetsObject.put("y", CalendarUtils.getDate());
-						offsetsObject.put("offsets", logsize - lag);
-						topicOffset.setOffsets(offsetsObject.toJSONString());
-
+						topicOffset.setLag(String.valueOf(lag));
+						topicOffset.setOffsets(String.valueOf(logsize - lag));
 						topicOffset.setTimespan(CalendarUtils.getTimeSpan());
 						topicOffset.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
 						topicOffsets.add(topicOffset);
@@ -100,23 +88,11 @@ public class MetricsQuartz {
 						topicOffset.setCluster(clusterAlias);
 						topicOffset.setGroup(group);
 						topicOffset.setTopic(topic);
-						JSONObject logsizeObject = new JSONObject();
-						logsizeObject.put("y", CalendarUtils.getDate());
 						long logsize = brokerService.getTopicLogSizeTotal(clusterAlias, topic);
-						logsizeObject.put("logsize", logsize);
-						topicOffset.setLogsize(logsizeObject.toJSONString());
-
-						JSONObject lagObject = new JSONObject();
-						lagObject.put("y", CalendarUtils.getDate());
+						topicOffset.setLogsize(String.valueOf(logsize));
 						long lag = kafkaService.getLag(clusterAlias, group, topic);
-						lagObject.put("lag", lag);
-						topicOffset.setLag(lagObject.toJSONString());
-
-						JSONObject offsetsObject = new JSONObject();
-						offsetsObject.put("y", CalendarUtils.getDate());
-						offsetsObject.put("offsets", logsize - lag);
-						topicOffset.setOffsets(offsetsObject.toJSONString());
-
+						topicOffset.setLag(String.valueOf(lag));
+						topicOffset.setOffsets(String.valueOf(logsize - lag));
 						topicOffset.setTimespan(CalendarUtils.getTimeSpan());
 						topicOffset.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
 						topicOffsets.add(topicOffset);

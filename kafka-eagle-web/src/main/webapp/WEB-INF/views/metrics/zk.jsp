@@ -37,6 +37,10 @@
 	padding: 5px 10px; 
 	border: 1px solid #ccc;
 }
+.chartzkdiv {
+	width: 100%;
+	height: 300px;
+}
 </style>
 
 <title>Trend - KafkaEagle</title>
@@ -89,7 +93,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="zk_send_packets"></div>
+							<div id="zk_send_packets" class="chartzkdiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -104,26 +108,11 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="zk_recevied_packets"></div>
+							<div id="zk_recevied_packets" class="chartzkdiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
 				</div>
-				<!-- /.col-lg-4 -->
-				<!-- <div class="col-lg-6">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
-								Zookeeper Avg Latency </strong>
-							<div class="pull-right"></div>
-						</div>
-						/.panel-heading
-						<div class="panel-body">
-							<div id="zk_avg_latency"></div>
-						</div>
-						/.panel-body
-					</div>
-				</div> -->
 				<!-- /.col-lg-4 -->
 				<div class="col-lg-12">
 					<div class="panel panel-default">
@@ -134,7 +123,7 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="zk_alives_connections"></div>
+							<div id="zk_alives_connections" class="chartzkdiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -149,26 +138,11 @@
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div id="zk_queue_requests"></div>
+							<div id="zk_queue_requests" class="chartzkdiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
 				</div>
-				<!-- /.col-lg-4 -->
-				<!-- <div class="col-lg-6">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
-								Zookeeper OpenFile Counts </strong>
-							<div class="pull-right"></div>
-						</div>
-						/.panel-heading
-						<div class="panel-body">
-							<div id="zk_openfile_counts"></div>
-						</div>
-						/.panel-body
-					</div>
-				</div> -->
 				<!-- /.col-lg-4 -->
 			</div>
 		</div>
@@ -177,6 +151,8 @@
 </body>
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="main/metrics/zk.js" name="loader" />
+	<jsp:param value="plugins/echart/echarts.min.js" name="loader" />
+	<jsp:param value="plugins/echart/macarons.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/daterangepicker.js"
 		name="loader" />

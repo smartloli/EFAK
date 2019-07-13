@@ -39,6 +39,11 @@
 	padding: 5px 10px;
 	border: 1px solid #ccc;
 }
+
+.chartdiv {
+	width: 100%;
+	height: 500px;
+}
 </style>
 
 <title>Offsets - KafkaEagle</title>
@@ -73,7 +78,8 @@
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
 						<i class="fa fa-info-circle"></i> <strong>List the
-							current consumers's application realtime offsets of topic. Observe whether there is blocking by the trend of lag value.</strong>
+							current consumers's application realtime offsets of topic.
+							Observe whether there is blocking by the trend of lag value.</strong>
 					</div>
 				</div>
 			</div>
@@ -89,7 +95,7 @@
 								</div>
 								<div class="col-xs-9 text-right">
 									<div id="producer_rate" class="huge">0</div>
-									<div>bytes / s</div>
+									<div>msg / min</div>
 								</div>
 							</div>
 						</div>
@@ -112,7 +118,7 @@
 								</div>
 								<div class="col-xs-9 text-right">
 									<div id="consumer_rate" class="huge">0</div>
-									<div>bytes / s</div>
+									<div>msg / min</div>
 								</div>
 							</div>
 						</div>
@@ -135,8 +141,8 @@
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
-						<div id="offset_topic_realtime" class="panel-body">
-							<div id="morris-area-chart"></div>
+						<div class="panel-body">
+							<div id="lag_chart" class="chartdiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
@@ -149,6 +155,8 @@
 </body>
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="main/consumer/offset.realtime.js" name="loader" />
+	<jsp:param value="plugins/echart/echarts.min.js" name="loader" />
+	<jsp:param value="plugins/echart/macarons.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/daterangepicker.js"
 		name="loader" />

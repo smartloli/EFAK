@@ -40,6 +40,6 @@ public interface OffsetService {
 	public boolean hasGroupTopic(String clusterAlias, String formatter, String group, String topic);
 
 	/** Get topic consumer & producer rate. */
-	public String getOffsetRate(String clusterAlias, String topic);
+	public String getOffsetRate(Map<String, Object> param);
 
 }

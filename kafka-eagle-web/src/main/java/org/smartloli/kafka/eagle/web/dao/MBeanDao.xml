@@ -49,7 +49,7 @@
 
 	<select id="query" parameterType="map" resultMap="kpi">
 		select
-		`broker`,`key`,`value`
+		`broker`,`key`,`value`,`timespan`
 		from ke_metrics
 		where
 		`cluster` =#{cluster}
@@ -97,6 +97,31 @@
 		and tm
 		between
 		#{stime} and #{etime}
+	</select>
+
+	<select id="getConsumerRateTopic" parameterType="map" resultMap="topicOffsets">
+		select logsize,offsets,timespan from ke_consumer
+		where `cluster`
+		=#{cluster}
+		and `group`
+		=#{group}
+		and `topic` =#{topic} order by
+		`timespan` desc limit 2
+	</select>
+
+	<select id="getConsumerLagTopic" parameterType="map" resultMap="topicOffsets">
+		select `lag`,`timespan`
+		from ke_consumer
+		where
+		`cluster`=#{cluster}
+		and
+		`group`
+		=#{group}
+		and `topic`=#{topic}
+		and tm
+		between
+		#{stime} and
+		#{etime}
 	</select>
 
 </mapper>

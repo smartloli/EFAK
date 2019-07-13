@@ -22,17 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
-import org.smartloli.kafka.eagle.core.factory.Mx4jService;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
 import org.smartloli.kafka.eagle.web.service.OffsetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +55,6 @@ public class OffsetServiceImpl implements OffsetService {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
-
-	/** Mx4j service interface. */
-	private Mx4jService mx4jService = new Mx4jFactory().create();
 
 	/** Get Kafka logsize from Kafka topic. */
 	private String getKafkaLogSize(String clusterAlias, String topic, String group) {
@@ -153,19 +146,20 @@ public class OffsetServiceImpl implements OffsetService {
 		}
 	}
 
-	/** Get Kafka offset graph data from Zookeeper. */
+	/** Get kafka offset graph data. */
 	public String getOffsetsGraph(Map<String, Object> params) {
-		JSONArray target = new JSONArray();
-		List<TopicOffsetsInfo> topicOffsets = mbeanDao.getConsumerTopic(params);
+		List<String> x = new ArrayList<>();
+		List<String> y = new ArrayList<>();
+		List<TopicOffsetsInfo> topicOffsets = mbeanDao.getConsumerLagTopic(params);
 		if (topicOffsets.size() > 0) {
 			for (TopicOffsetsInfo topicOffset : topicOffsets) {
-				JSONObject object = new JSONObject();
-				object.put("lag", topicOffset.getLag());
-				target.add(object);
+				x.add(CalendarUtils.convertUnixTime(topicOffset.getTimespan(), "yyyy-MM-dd HH:mm"));
+				y.add(topicOffset.getLag());
 			}
 		}
 		JSONObject value = new JSONObject();
-		value.put("graph", target);
+		value.put("x", x);
+		value.put("y", y);
 		return value.toJSONString();
 	}
 
@@ -194,22 +188,30 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get topic consumer & producer rate by bytes per sec. */
-	public String getOffsetRate(String clusterAlias, String topic) {
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
-		double byteInTopic = 0.0;
-		double byteOutTopic = 0.0;
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
-			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
-			MBeanInfo bytesInTopic = mx4jService.bytesInPerSec(uri, topic);
-			MBeanInfo bytesOutTopic = mx4jService.bytesOutPerSec(uri, topic);
-			byteInTopic += StrUtils.numberic(bytesInTopic.getOneMinute());
-			byteOutTopic += StrUtils.numberic(bytesOutTopic.getOneMinute());
+	public String getOffsetRate(Map<String, Object> params) {
+		// sort by desc.
+		List<TopicOffsetsInfo> topicOffsets = mbeanDao.getConsumerRateTopic(params);
+		String ins = "0";
+		String outs = "0";
+		if (topicOffsets.size() == 1) {
+			ins = topicOffsets.get(0).getLogsize();
+			outs = topicOffsets.get(0).getOffsets();
+		} else if (topicOffsets.size() == 2) {
+			try {
+				ins = String.valueOf(Math.abs(Long.parseLong(topicOffsets.get(0).getLogsize()) - Long.parseLong(topicOffsets.get(1).getLogsize())));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				outs = String.valueOf(Math.abs(Long.parseLong(topicOffsets.get(0).getOffsets()) - Long.parseLong(topicOffsets.get(1).getOffsets())));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		JSONObject target = new JSONObject();
-		target.put("ins", StrUtils.assembly(byteInTopic + ""));
-		target.put("outs", StrUtils.assembly(byteOutTopic + ""));
+		target.put("ins", ins);
+		target.put("outs", outs);
 
 		return target.toJSONString();
 	}

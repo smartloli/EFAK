@@ -41,8 +41,14 @@ public interface MBeanDao {
 	/** Crontab clean data. */
 	public void remove(int tm);
 
-	/** Get consumer topic metrics. */
+	/** @deprecated Get consumer topic metrics. */
 	public List<TopicOffsetsInfo> getConsumerTopic(Map<String, Object> params);
+
+	/** Get consumer lag topic metrics. */
+	public List<TopicOffsetsInfo> getConsumerLagTopic(Map<String, Object> params);
+	
+	/** Get consumer rate topic metrics. */
+	public List<TopicOffsetsInfo> getConsumerRateTopic(Map<String, Object> params);
 
 	/** Set consumer topic metrics. */
 	public int setConsumerTopic(List<TopicOffsetsInfo> consumerTopic);
