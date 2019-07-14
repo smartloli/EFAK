@@ -84,6 +84,12 @@ The Kafka Eagle is released under the Apache License and we welcome any contribu
 
 Since this is an open source tool, please comply with the relevant laws and regulations, the use of civilization.
 
+# PPT & PDF
+
+[Kafka Eagle Architecture PPT](https://docs.kafka-eagle.org/res/ppt/Kafka_Eagle_Architecture.pptx)
+
+[Kafka Eagle Architecture PDF](https://docs.kafka-eagle.org/res/ppt/Kafka_Eagle_Architecture.pdf)
+
 # Committers
 
 Thanks to the following members for maintaining the project.
