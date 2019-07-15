@@ -25,8 +25,8 @@ $(document).ready(function() {
 		},
 		grid : {
 			bottom : "70px",
-			left : "40px",
-			right : "40px"
+			left : "90px",
+			right : "90px"
 		},
 		yAxis : {
 			type : 'value'
@@ -34,7 +34,7 @@ $(document).ready(function() {
 		series : {
 			type : 'line',
 			symbol : "none",
-			// name : "",
+			name : "",
 			smooth : true,
 			areaStyle : {
 				opacity : 0.1
@@ -73,7 +73,7 @@ $(document).ready(function() {
 					setTrendData(mbean_msg_in, 'message_in', datas);
 					setTrendData(mbean_msg_byte_in, 'byte_in', datas);
 					setTrendData(mbean_msg_byte_out, 'byte_out', datas);
-					setTrendData(mbean_byte_rejected, 'byteRejected', datas);
+					setTrendData(mbean_byte_rejected, 'byte_rejected', datas);
 					setTrendData(mbean_failed_fetch_request, 'failed_fetch_request', datas);
 					setTrendData(mbean_failed_produce_request, 'failed_produce_request', datas);
 					setTrendData(mbean_produce_message_conversions, 'produce_message_conversions', datas);
@@ -171,6 +171,8 @@ $(document).ready(function() {
 	function setTrendData(mbean, filed, data) {
 		chartCommonOption.xAxis.data = filter(data, filed).x;
 		chartCommonOption.series.data = filter(data, filed).y;
+		chartCommonOption.series.name = filter(data, filed).name;
+		chartCommonOption.legend.data = [ filter(data, filed).name ];
 		mbean.setOption(chartCommonOption);
 	}
 
@@ -185,66 +187,92 @@ $(document).ready(function() {
 				datax.push(datas.messageIns[i].x);
 				datay.push(datas.messageIns[i].y);
 			}
+			data.name = "MessagesInPerSec";
 			break;
 		case "byte_in":
+			var cunit = "";
 			for (var i = 0; i < datas.byteIns.length; i++) {
 				datax.push(datas.byteIns[i].x);
-				datay.push(datas.byteIns[i].y);
+				var value = stringify(datas.byteIns[i].y).value;
+				cunit = stringify(datas.byteIns[i].y).type;
+				datay.push(value);
 			}
+			data.name = "BytesInPerSec" + cunit;
 			break;
 		case "byte_out":
+			var cunit = "";
 			for (var i = 0; i < datas.byteOuts.length; i++) {
 				datax.push(datas.byteOuts[i].x);
-				datay.push(datas.byteOuts[i].y);
+				var value = stringify(datas.byteOuts[i].y).value;
+				cunit = stringify(datas.byteOuts[i].y).type;
+				datay.push(value);
 			}
+			data.name = "BytesOutPerSec" + cunit;
 			break;
 		case "byte_rejected":
+			var cunit = "";
 			for (var i = 0; i < datas.byteRejected.length; i++) {
 				datax.push(datas.byteRejected[i].x);
-				datay.push(datas.byteRejected[i].y);
+				var value = stringify(datas.byteRejected[i].y).value;
+				cunit = stringify(datas.byteRejected[i].y).type;
+				datay.push(value);
 			}
+			data.name = "BytesRejectedPerSec" + cunit;
 			break;
 		case "failed_fetch_request":
 			for (var i = 0; i < datas.failedFetchRequest.length; i++) {
 				datax.push(datas.failedFetchRequest[i].x);
 				datay.push(datas.failedFetchRequest[i].y);
 			}
+			data.name = "FailedFetchRequestsPerSec";
 			break;
 		case "failed_produce_request":
 			for (var i = 0; i < datas.failedProduceRequest.length; i++) {
 				datax.push(datas.failedProduceRequest[i].x);
 				datay.push(datas.failedProduceRequest[i].y);
 			}
+			data.name = "FailedProduceRequestsPerSec";
 			break;
 		case "produce_message_conversions":
 			for (var i = 0; i < datas.produceMessageConversions.length; i++) {
 				datax.push(datas.produceMessageConversions[i].x);
 				datay.push(datas.produceMessageConversions[i].y);
 			}
+			data.name = "ProduceMessageConversionsPerSec";
 			break;
 		case "total_fetch_requests":
 			for (var i = 0; i < datas.totalFetchRequests.length; i++) {
 				datax.push(datas.totalFetchRequests[i].x);
 				datay.push(datas.totalFetchRequests[i].y);
 			}
+			data.name = "TotalFetchRequestsPerSec";
 			break;
 		case "total_produce_requests":
 			for (var i = 0; i < datas.totalProduceRequests.length; i++) {
 				datax.push(datas.totalProduceRequests[i].x);
 				datay.push(datas.totalProduceRequests[i].y);
 			}
+			data.name = "TotalProduceRequestsPerSec";
 			break;
 		case "replication_bytes_out":
+			var cunit = "";
 			for (var i = 0; i < datas.replicationBytesOuts.length; i++) {
 				datax.push(datas.replicationBytesOuts[i].x);
-				datay.push(datas.replicationBytesOuts[i].y);
+				var value = stringify(datas.replicationBytesOuts[i].y).value;
+				cunit = stringify(datas.replicationBytesOuts[i].y).type;
+				datay.push(value);
 			}
+			data.name = "ReplicationBytesOutPerSec" + cunit;
 			break;
 		case "replication_bytes_in":
+			var cunit = "";
 			for (var i = 0; i < datas.replicationBytesIns.length; i++) {
 				datax.push(datas.replicationBytesIns[i].x);
-				datay.push(datas.replicationBytesIns[i].y);
+				var value = stringify(datas.replicationBytesIns[i].y).value;
+				cunit = stringify(datas.replicationBytesIns[i].y).type;
+				datay.push(value);
 			}
+			data.name = "ReplicationBytesInPerSec" + cunit;
 			break;
 		default:
 			break;
@@ -252,5 +280,37 @@ $(document).ready(function() {
 		data.x = datax;
 		data.y = datay;
 		return data;
+	}
+
+	// defined byte size
+	var KB_IN_BYTES = 1024;
+	var MB_IN_BYTES = 1024 * KB_IN_BYTES;
+	var GB_IN_BYTES = 1024 * MB_IN_BYTES;
+	var TB_IN_BYTES = 1024 * GB_IN_BYTES;
+
+	// formatter byte to kb,mb or gb etc.
+	function stringify(byteNumber) {
+		var object = new Object();
+		if (byteNumber / TB_IN_BYTES > 1) {
+			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.type = " (TB/min)";
+			return object;
+		} else if (byteNumber / GB_IN_BYTES > 1) {
+			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.type = " (GB/min)";
+			return object;
+		} else if (byteNumber / MB_IN_BYTES > 1) {
+			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.type = " (MB/min)";
+			return object;
+		} else if (byteNumber / KB_IN_BYTES > 1) {
+			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.type = " (KB/min)";
+			return object;
+		} else {
+			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.type = " (B/min)";
+			return object;
+		}
 	}
 });

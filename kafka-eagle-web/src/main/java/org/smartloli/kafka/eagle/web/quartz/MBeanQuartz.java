@@ -122,67 +122,67 @@ public class MBeanQuartz {
 		case MBean.MESSAGEIN:
 			MBeanInfo msg = mx4jService.messagesInPerSec(uri);
 			if (msg != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(msg.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(msg.getOneMinute()) + "");
 			}
 			break;
 		case MBean.BYTEIN:
 			MBeanInfo bin = mx4jService.bytesInPerSec(uri);
 			if (bin != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bin.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bin.getOneMinute()) + "");
 			}
 			break;
 		case MBean.BYTEOUT:
 			MBeanInfo bout = mx4jService.bytesOutPerSec(uri);
 			if (bout != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bout.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bout.getOneMinute()) + "");
 			}
 			break;
 		case MBean.BYTESREJECTED:
 			MBeanInfo bytesRejectedPerSec = mx4jService.bytesRejectedPerSec(uri);
 			if (bytesRejectedPerSec != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bytesRejectedPerSec.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bytesRejectedPerSec.getOneMinute()) + "");
 			}
 			break;
 		case MBean.FAILEDFETCHREQUEST:
 			MBeanInfo failedFetchRequestsPerSec = mx4jService.failedFetchRequestsPerSec(uri);
 			if (failedFetchRequestsPerSec != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(failedFetchRequestsPerSec.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(failedFetchRequestsPerSec.getOneMinute()) + "");
 			}
 			break;
 		case MBean.FAILEDPRODUCEREQUEST:
 			MBeanInfo failedProduceRequestsPerSec = mx4jService.failedProduceRequestsPerSec(uri);
 			if (failedProduceRequestsPerSec != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(failedProduceRequestsPerSec.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(failedProduceRequestsPerSec.getOneMinute()) + "");
 			}
 			break;
 		case MBean.TOTALFETCHREQUESTSPERSEC:
 			MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(uri);
 			if (totalFetchRequests != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(totalFetchRequests.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(totalFetchRequests.getOneMinute()) + "");
 			}
 			break;
 		case MBean.TOTALPRODUCEREQUESTSPERSEC:
 			MBeanInfo totalProduceRequestsPerSec = mx4jService.totalProduceRequestsPerSec(uri);
 			if (totalProduceRequestsPerSec != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(totalProduceRequestsPerSec.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(totalProduceRequestsPerSec.getOneMinute()) + "");
 			}
 			break;
 		case MBean.REPLICATIONBYTESINPERSEC:
 			MBeanInfo replicationBytesInPerSec = mx4jService.replicationBytesInPerSec(uri);
 			if (replicationBytesInPerSec != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(replicationBytesInPerSec.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(replicationBytesInPerSec.getOneMinute()) + "");
 			}
 			break;
 		case MBean.REPLICATIONBYTESOUTPERSEC:
 			MBeanInfo replicationBytesOutPerSec = mx4jService.replicationBytesOutPerSec(uri);
 			if (replicationBytesOutPerSec != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(replicationBytesOutPerSec.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(replicationBytesOutPerSec.getOneMinute()) + "");
 			}
 			break;
 		case MBean.PRODUCEMESSAGECONVERSIONS:
 			MBeanInfo produceMessageConv = mx4jService.produceMessageConversionsPerSec(uri);
 			if (produceMessageConv != null) {
-				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(produceMessageConv.getMeanRate()) + "");
+				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(produceMessageConv.getOneMinute()) + "");
 			}
 			break;
 		default:

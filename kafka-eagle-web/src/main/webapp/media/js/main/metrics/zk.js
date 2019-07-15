@@ -25,8 +25,8 @@ $(document).ready(function() {
 		},
 		grid : {
 			bottom : "70px",
-			left : "40px",
-			right : "40px"
+			left : "90px",
+			right : "90px"
 		},
 		yAxis : {
 			type : 'value'
