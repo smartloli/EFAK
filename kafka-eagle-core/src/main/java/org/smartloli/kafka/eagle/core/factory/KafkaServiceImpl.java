@@ -874,7 +874,13 @@ public class KafkaServiceImpl implements KafkaService {
 		return parseBrokerServer(clusterAlias);
 	}
 
-	/** Get kafka 0.10.x sasl logsize. */
+	/**
+	 * Get kafka 0.10.x sasl logsize. @Deprecated This class is deprecated in
+	 * favour of
+	 * {@link org.smartloli.kafka.eagle.core.factory.KafkaService.getKafkaLogSize()}
+	 * and it will be removed in a future release.", since = "1.3.4"
+	 */
+	@Deprecated
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid) {
 		Properties props = new Properties();
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
@@ -942,12 +948,7 @@ public class KafkaServiceImpl implements KafkaService {
 					metadate.setLeader(topicMetadata.getInteger("leader"));
 					metadate.setPartitionId(Integer.valueOf(partition));
 					metadate.setReplicas(getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
-					long logSize = 0L;
-					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-						logSize = getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
-					} else {
-						logSize = getLogSize(clusterAlias, topic, Integer.valueOf(partition));
-					}
+					long logSize = getLogSize(clusterAlias, topic, Integer.valueOf(partition));
 					metadate.setLogSize(logSize);
 					targets.add(metadate);
 				}
@@ -1018,7 +1019,7 @@ public class KafkaServiceImpl implements KafkaService {
 			ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(group);
 			for (Entry<TopicPartition, OffsetAndMetadata> entry : offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
 				if (ketopic.equals(entry.getKey().topic())) {
-					long logSize = getKafkaLogSize(clusterAlias, entry.getKey().topic(), entry.getKey().partition());
+					long logSize = getLogSize(clusterAlias, entry.getKey().topic(), entry.getKey().partition());
 					lag += logSize - entry.getValue().offset();
 				}
 			}

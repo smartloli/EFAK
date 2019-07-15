@@ -28,7 +28,6 @@ import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 
@@ -248,13 +247,7 @@ public class BrokerServiceImpl implements BrokerService {
 						metadate.setLeader(topicMetadata.getInteger("leader"));
 						metadate.setPartitionId(Integer.valueOf(partition));
 						metadate.setReplicas(kafkaService.getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
-						long logSize = 0L;
-						if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-							logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
-						} else {
-							logSize = kafkaService.getLogSize(clusterAlias, topic, Integer.valueOf(partition));
-						}
-						metadate.setLogSize(logSize);
+						metadate.setLogSize(kafkaService.getLogSize(clusterAlias, topic, Integer.valueOf(partition)));
 						targets.add(metadate);
 					}
 					offset++;
@@ -280,11 +273,12 @@ public class BrokerServiceImpl implements BrokerService {
 				String tupleString = new String(tuple._1.get());
 				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 				for (String partition : partitionObject.keySet()) {
-					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-						logSize += kafkaService.getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
-					} else {
-						logSize += kafkaService.getLogSize(clusterAlias, topic, Integer.valueOf(partition));
-					}
+//					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+//						logSize += kafkaService.getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
+//					} else {
+//						logSize += kafkaService.getLogSize(clusterAlias, topic, Integer.valueOf(partition));
+//					}
+					logSize += kafkaService.getLogSize(clusterAlias, topic, Integer.valueOf(partition));
 				}
 			}
 		}

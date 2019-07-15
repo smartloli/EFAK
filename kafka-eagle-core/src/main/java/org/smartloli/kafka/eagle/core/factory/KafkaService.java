@@ -109,6 +109,7 @@ public interface KafkaService {
 	public String getKafkaConsumerGroupTopic(String clusterAlias, String group);
 
 	/** Get kafka sasl logsize . */
+	@Deprecated
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid);
 
 	/** Get kafka sasl topic metadate. */

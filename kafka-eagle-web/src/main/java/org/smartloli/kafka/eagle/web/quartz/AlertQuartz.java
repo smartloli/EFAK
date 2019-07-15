@@ -111,12 +111,7 @@ public class AlertQuartz {
 						OffsetsLiteInfo offsetSQLite = new OffsetsLiteInfo();
 						for (String partitionStr : kafkaService.findTopicPartition(clusterAlias, topic)) {
 							int partition = Integer.parseInt(partitionStr);
-							long logSize = 0L;
-							if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-								logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partition);
-							} else {
-								logSize = kafkaService.getLogSize(clusterAlias, topic, partition);
-							}
+							long logSize = kafkaService.getLogSize(clusterAlias, topic, partition);
 							OffsetZkInfo offsetZk = null;
 							if ("kafka".equals(formatter)) {
 								String bootstrapServers = "";
