@@ -185,9 +185,9 @@ $(document).ready(function() {
 		case "message_in":
 			for (var i = 0; i < datas.messageIns.length; i++) {
 				datax.push(datas.messageIns[i].x);
-				datay.push(datas.messageIns[i].y);
+				datay.push(datas.messageIns[i].y * 60);
 			}
-			data.name = "MessagesInPerSec";
+			data.name = "MessagesInPerSec (msg/min)";
 			break;
 		case "byte_in":
 			var cunit = "";
@@ -222,37 +222,37 @@ $(document).ready(function() {
 		case "failed_fetch_request":
 			for (var i = 0; i < datas.failedFetchRequest.length; i++) {
 				datax.push(datas.failedFetchRequest[i].x);
-				datay.push(datas.failedFetchRequest[i].y);
+				datay.push(datas.failedFetchRequest[i].y * 60);
 			}
-			data.name = "FailedFetchRequestsPerSec";
+			data.name = "FailedFetchRequestsPerSec (msg/min)";
 			break;
 		case "failed_produce_request":
 			for (var i = 0; i < datas.failedProduceRequest.length; i++) {
 				datax.push(datas.failedProduceRequest[i].x);
-				datay.push(datas.failedProduceRequest[i].y);
+				datay.push(datas.failedProduceRequest[i].y * 60);
 			}
-			data.name = "FailedProduceRequestsPerSec";
+			data.name = "FailedProduceRequestsPerSec (msg/min)";
 			break;
 		case "produce_message_conversions":
 			for (var i = 0; i < datas.produceMessageConversions.length; i++) {
 				datax.push(datas.produceMessageConversions[i].x);
-				datay.push(datas.produceMessageConversions[i].y);
+				datay.push(datas.produceMessageConversions[i].y * 60);
 			}
-			data.name = "ProduceMessageConversionsPerSec";
+			data.name = "ProduceMessageConversionsPerSec (msg/min)";
 			break;
 		case "total_fetch_requests":
 			for (var i = 0; i < datas.totalFetchRequests.length; i++) {
 				datax.push(datas.totalFetchRequests[i].x);
-				datay.push(datas.totalFetchRequests[i].y);
+				datay.push(datas.totalFetchRequests[i].y * 60);
 			}
-			data.name = "TotalFetchRequestsPerSec";
+			data.name = "TotalFetchRequestsPerSec (msg/min)";
 			break;
 		case "total_produce_requests":
 			for (var i = 0; i < datas.totalProduceRequests.length; i++) {
 				datax.push(datas.totalProduceRequests[i].x);
-				datay.push(datas.totalProduceRequests[i].y);
+				datay.push(datas.totalProduceRequests[i].y * 60);
 			}
-			data.name = "TotalProduceRequestsPerSec";
+			data.name = "TotalProduceRequestsPerSec (msg/min)";
 			break;
 		case "replication_bytes_out":
 			var cunit = "";
@@ -296,19 +296,19 @@ $(document).ready(function() {
 			object.type = " (TB/min)";
 			return object;
 		} else if (byteNumber / GB_IN_BYTES > 1) {
-			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.value = (byteNumber / GB_IN_BYTES).toFixed(2);
 			object.type = " (GB/min)";
 			return object;
 		} else if (byteNumber / MB_IN_BYTES > 1) {
-			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.value = (byteNumber / MB_IN_BYTES).toFixed(2);
 			object.type = " (MB/min)";
 			return object;
 		} else if (byteNumber / KB_IN_BYTES > 1) {
-			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.value = (byteNumber / KB_IN_BYTES).toFixed(2);
 			object.type = " (KB/min)";
 			return object;
 		} else {
-			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.value = (byteNumber / 1).toFixed(2);
 			object.type = " (B/min)";
 			return object;
 		}
