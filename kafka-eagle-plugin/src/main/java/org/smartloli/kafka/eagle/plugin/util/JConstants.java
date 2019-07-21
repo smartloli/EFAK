@@ -55,6 +55,7 @@ public interface JConstants {
 	/** Create database script. */
 	public static String CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS %s";
 
+	/** Automatically create databases and tables. */
 	public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_trend", "ke_metrics", "ke_alarm", "ke_consumer", "ke_clusters", "ke_user_role", "ke_users");
 
 	static String CREATE_TABLE_KE_P_ROLE = "CREATE TABLE IF NOT EXISTS `ke_p_role` (`id` tinyint(4) NOT NULL AUTO_INCREMENT,`name` varchar(64) CHARACTER SET utf8 NOT NULL COMMENT 'role name',`seq` tinyint(4) NOT NULL COMMENT 'rank',`description` varchar(128) CHARACTER SET utf8 NOT NULL COMMENT 'role describe',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4";
