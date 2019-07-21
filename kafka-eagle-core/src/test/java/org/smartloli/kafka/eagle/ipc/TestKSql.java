@@ -21,10 +21,7 @@ package org.smartloli.kafka.eagle.ipc;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
-import org.smartloli.kafka.eagle.core.sql.ignite.domain.TopicX;
-import org.smartloli.kafka.eagle.core.sql.ignite.factory.KafkaSqlFactory;
 import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -45,28 +42,6 @@ public class TestKSql {
 		String sql = "select * from \"KV_T\" where \"partition\" in (0)";
 		String result = KafkaSqlParser.execute("cluster1", sql);
 		System.out.println("result: " + result);
-	}
-
-	public static void ignite() {
-		List<TopicX> collectors = new ArrayList<>();
-		int count = 0;
-		for (int i = 0; i < 10; i++) {
-			TopicX td = new TopicX();
-			if (count > 3) {
-				count = 0;
-			}
-			td.setPartitionId(count);
-			td.setOffsets(i);
-			td.setMessage("hello_" + i);
-			td.setTopicName("test");
-			collectors.add(td);
-			count++;
-		}
-
-		String sql = "select offsets,message from TopicX where offsets>6 and partitionId in (0,1) limit 1";
-		long stime = System.currentTimeMillis();
-		KafkaSqlFactory.sql(sql, collectors);
-		System.out.println("Cost time [" + (System.currentTimeMillis() - stime) / 1000.0 + "]ms");
 	}
 
 	public static void calcite() throws Exception {
