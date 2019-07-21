@@ -26,10 +26,13 @@ package org.smartloli.kafka.eagle.api.im;
  */
 public interface IMService {
 
+	/** Send alert message by dingding. */
 	public void sendJsonMsgByDingDing(String data);
 
+	/** Send alert message by wechat. */
 	public void sendJsonMsgByWeChat(String data);
 
+	/** Send alert message by webhook. */
 	public void sendJsonMsgByWebhook(String data, String maillist);
 
 }
