@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
@@ -51,8 +52,8 @@ public interface KafkaService {
 	public Set<String> getActiveTopic(String clusterAlias, String group);
 
 	/** Get all broker list from zookeeper. */
-	public String getAllBrokersInfo(String clusterAlias);
-
+	public List<BrokersInfo> getAllBrokersInfo(String clusterAlias);
+	
 	/**
 	 * Get all topic info from zookeeper. Deprecated this method in the v1.3.4
 	 * and replace {@link BrokerService.topicRecords} method.
@@ -128,5 +129,8 @@ public interface KafkaService {
 
 	/** Get topic metadata. */
 	public String getReplicasIsr(String clusterAlias, String topic, int partitionid);
+
+	/** Get kafka version. */
+	public String getKafkaVersion(String host, int port, String ids, String clusterAlias);
 
 }

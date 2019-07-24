@@ -17,14 +17,11 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DashboardInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -34,6 +31,9 @@ import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
 import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Kafka Eagle dashboard data generator.
@@ -73,27 +73,25 @@ public class DashboardServiceImpl implements DashboardService {
 
 	/** Get kafka data. */
 	private String kafkaBrokersGraph(String clusterAlias) {
-		String kafka = kafkaService.getAllBrokersInfo(clusterAlias);
+		List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
 		JSONObject target = new JSONObject();
 		target.put("name", "Kafka Brokers");
-		JSONArray targets1 = JSON.parseArray(kafka);
-		JSONArray targets2 = new JSONArray();
+		JSONArray targets = new JSONArray();
 		int count = 0;
-		for (Object object : targets1) {
-			JSONObject subTarget = (JSONObject) object;
+		for (BrokersInfo broker : brokers) {
 			if (count > KConstants.D3.SIZE) {
-				JSONObject subTarget2 = new JSONObject();
-				subTarget2.put("name", "...");
-				targets2.add(subTarget2);
+				JSONObject subTarget = new JSONObject();
+				subTarget.put("name", "...");
+				targets.add(subTarget);
 				break;
 			} else {
-				JSONObject subTarget2 = new JSONObject();
-				subTarget2.put("name", subTarget.getString("host") + ":" + subTarget.getInteger("port"));
-				targets2.add(subTarget2);
+				JSONObject subTarget = new JSONObject();
+				subTarget.put("name", broker.getHost() + ":" + broker.getPort());
+				targets.add(subTarget);
 			}
 			count++;
 		}
-		target.put("children", targets2);
+		target.put("children", targets);
 		return target.toJSONString();
 	}
 

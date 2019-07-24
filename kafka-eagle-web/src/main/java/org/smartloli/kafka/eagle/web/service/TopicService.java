@@ -44,6 +44,9 @@ public interface TopicService {
 	/** Get topic numbers. */
 	public long getTopicNumbers(String clusterAlias);
 
+	/** Get topic numbers with match name. */
+	public long getTopicNumbers(String clusterAlias, String topic);
+
 	/** Get topic partition numbers. */
 	public long getPartitionNumbers(String clusterAlias, String topic);
 
@@ -65,7 +68,10 @@ public interface TopicService {
 	/** Send mock message to topic. */
 	public boolean mockSendMsg(String clusterAlias, String topic, String message);
 
-	/** Gets topic metrics from brokers. */
-	public String getTopicMBean(String clusterAlias,String topic);
+	/** Get topic metrics from brokers. */
+	public String getTopicMBean(String clusterAlias, String topic);
+
+	/** Get topic logsize, topicsize from jmx data. */
+	public String getTopicMsgByJMX(String clusterAlias, String topic);
 
 }

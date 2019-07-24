@@ -52,8 +52,6 @@ public class BrokerServiceImpl implements BrokerService {
 
 	private final String BROKER_IDS_PATH = "/brokers/ids";
 	private final String BROKER_TOPICS_PATH = "/brokers/topics";
-	// private final String CONSUMERS_PATH = "/consumers";
-	// private final String OWNERS = "/owners";
 	private final String TOPIC_ISR = "/brokers/topics/%s/partitions/%s/state";
 	private final Logger LOG = LoggerFactory.getLogger(BrokerServiceImpl.class);
 
@@ -70,6 +68,26 @@ public class BrokerServiceImpl implements BrokerService {
 		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
 			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
 			count = JavaConversions.seqAsJavaList(subBrokerTopicsPaths).size();
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return count;
+	}
+
+	@Override
+	public long topicNumbers(String clusterAlias, String topic) {
+		long count = 0L;
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+			for (String name : topics) {
+				if (topic != null && name.contains(topic)) {
+					count++;
+				}
+			}
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
@@ -97,30 +115,36 @@ public class BrokerServiceImpl implements BrokerService {
 	public List<PartitionsInfo> topicRecords(String clusterAlias, Map<String, Object> params) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		List<PartitionsInfo> targets = new ArrayList<PartitionsInfo>();
+		int start = Integer.parseInt(params.get("start").toString());
+		int length = Integer.parseInt(params.get("length").toString());
 		if (params.containsKey("search") && params.get("search").toString().length() > 0) {
 			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
 				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
 				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
 				String search = params.get("search").toString();
+				int offset = 0;
+				int id = 1;
 				for (String topic : topics) {
-					if (search.equals(topic)) {
-						try {
-							Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
-							PartitionsInfo partition = new PartitionsInfo();
-							partition.setId(1);
-							partition.setLogSize(getTopicLogSizeTotal(clusterAlias, topic));
-							partition.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
-							partition.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
-							partition.setTopic(topic);
-							String tupleString = new String(tuple._1.get());
-							JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
-							partition.setPartitionNumbers(partitionObject.size());
-							partition.setPartitions(partitionObject.keySet());
-							targets.add(partition);
-						} catch (Exception ex) {
-							ex.printStackTrace();
-							LOG.error("Scan topic search from zookeeper has error, msg is " + ex.getMessage());
+					if (search != null && topic.contains(search)) {
+						if (offset < (start + length) && offset >= start) {
+							try {
+								Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+								PartitionsInfo partition = new PartitionsInfo();
+								partition.setId(id++);
+								partition.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
+								partition.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
+								partition.setTopic(topic);
+								String tupleString = new String(tuple._1.get());
+								JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+								partition.setPartitionNumbers(partitionObject.size());
+								partition.setPartitions(partitionObject.keySet());
+								targets.add(partition);
+							} catch (Exception ex) {
+								ex.printStackTrace();
+								LOG.error("Scan topic search from zookeeper has error, msg is " + ex.getMessage());
+							}
 						}
+						offset++;
 					}
 				}
 			}
@@ -128,8 +152,6 @@ public class BrokerServiceImpl implements BrokerService {
 			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
 				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
 				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-				int start = Integer.parseInt(params.get("start").toString());
-				int length = Integer.parseInt(params.get("length").toString());
 				int offset = 0;
 				int id = 1;
 				for (String topic : topics) {
@@ -138,7 +160,6 @@ public class BrokerServiceImpl implements BrokerService {
 							Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
 							PartitionsInfo partition = new PartitionsInfo();
 							partition.setId(id++);
-							partition.setLogSize(getTopicLogSizeTotal(clusterAlias, topic));
 							partition.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
 							partition.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
 							partition.setTopic(topic);

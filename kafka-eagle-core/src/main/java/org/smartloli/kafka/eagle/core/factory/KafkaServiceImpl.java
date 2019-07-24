@@ -224,7 +224,7 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get all broker list from zookeeper. */
-	public String getAllBrokersInfo(String clusterAlias) {
+	public List<BrokersInfo> getAllBrokersInfo(String clusterAlias) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		List<BrokersInfo> targets = new ArrayList<BrokersInfo>();
 		if (zkc.pathExists(BROKER_IDS_PATH)) {
@@ -251,7 +251,7 @@ public class KafkaServiceImpl implements KafkaService {
 					}
 					broker.setJmxPort(JSON.parseObject(tupleString).getInteger("jmx_port"));
 					broker.setId(++id);
-					broker.setVersion(getKafkaVersion(broker.getHost(), broker.getJmxPort(), ids, clusterAlias));
+					broker.setIds(ids);
 					targets.add(broker);
 				} catch (Exception ex) {
 					LOG.error(ex.getMessage());
@@ -262,7 +262,7 @@ public class KafkaServiceImpl implements KafkaService {
 			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
-		return targets.toString();
+		return targets;
 	}
 
 	/**
@@ -511,7 +511,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 */
 	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic) {
 		Map<String, Object> targets = new HashMap<String, Object>();
-		int brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias)).size();
+		int brokers = getAllBrokersInfo(clusterAlias).size();
 		if (Integer.parseInt(replic) > brokers) {
 			targets.put("status", "error");
 			targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
@@ -554,12 +554,11 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Get kafka brokers from zookeeper. */
 	private List<HostsInfo> getBrokers(String clusterAlias) {
 		List<HostsInfo> targets = new ArrayList<HostsInfo>();
-		JSONArray brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias));
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
+		List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+		for (BrokersInfo broker : brokers) {
 			HostsInfo host = new HostsInfo();
-			host.setHost(broker.getString("host"));
-			host.setPort(broker.getInteger("port"));
+			host.setHost(broker.getHost());
+			host.setPort(broker.getPort());
 			targets.add(host);
 		}
 		return targets;
@@ -567,10 +566,9 @@ public class KafkaServiceImpl implements KafkaService {
 
 	private String parseBrokerServer(String clusterAlias) {
 		String brokerServer = "";
-		JSONArray brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias));
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
-			brokerServer += broker.getString("host") + ":" + broker.getInteger("port") + ",";
+		List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+		for (BrokersInfo broker : brokers) {
+			brokerServer += broker.getHost() + ":" + broker.getPort() + ",";
 		}
 		if ("".equals(brokerServer)) {
 			return "";
@@ -894,7 +892,7 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get kafka version. */
-	private String getKafkaVersion(String host, int port, String ids, String clusterAlias) {
+	public String getKafkaVersion(String host, int port, String ids, String clusterAlias) {
 		JMXConnector connector = null;
 		String version = "-";
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
@@ -974,11 +972,7 @@ public class KafkaServiceImpl implements KafkaService {
 		}
 
 		Producer<String, String> producer = new KafkaProducer<>(props);
-		JSONObject msg = new JSONObject();
-		msg.put("date", CalendarUtils.getDate());
-		msg.put("msg", message);
-
-		producer.send(new ProducerRecord<String, String>(topic, new Date().getTime() + "", msg.toJSONString()));
+		producer.send(new ProducerRecord<String, String>(topic, new Date().getTime() + "", message));
 		producer.close();
 
 		return true;
@@ -1035,11 +1029,10 @@ public class KafkaServiceImpl implements KafkaService {
 	public long getLogSize(String clusterAlias, String topic, int partitionid) {
 		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
-		JSONArray brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias));
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
+		List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+		for (BrokersInfo broker : brokers) {
 			try {
-				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getString("host") + ":" + broker.getInteger("jmxPort")));
+				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
 				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 				if (connector != null) {
 					break;

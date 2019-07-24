@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.ZkClusterInfo;
@@ -37,10 +38,6 @@ import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
 import org.smartloli.kafka.eagle.core.factory.Mx4jService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.MetricsServiceImpl;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * Per mins to stats mbean from kafka jmx.
@@ -88,7 +85,7 @@ public class MBeanQuartz {
 	}
 
 	private void kafkaCluster(String clusterAlias) {
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+		List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
 		List<KpiInfo> list = new ArrayList<>();
 
 		for (String kpi : broker_kpis) {
@@ -98,9 +95,8 @@ public class MBeanQuartz {
 			kpiInfo.setTimespan(CalendarUtils.getTimeSpan());
 			kpiInfo.setKey(kpi);
 			String broker = "";
-			for (Object object : brokers) {
-				JSONObject kafka = (JSONObject) object;
-				broker += kafka.getString("host") + ",";
+			for (BrokersInfo kafka : brokers) {
+				broker += kafka.getHost() + ",";
 				kafkaAssembly(mx4jService, kpi, kpiInfo, kafka);
 			}
 			kpiInfo.setBroker(broker.length() == 0 ? "unkowns" : broker.substring(0, broker.length() - 1));
@@ -116,8 +112,8 @@ public class MBeanQuartz {
 		}
 	}
 
-	private void kafkaAssembly(Mx4jService mx4jService, String type, KpiInfo kpiInfo, JSONObject kafka) {
-		String uri = kafka.getString("host") + ":" + kafka.getInteger("jmxPort");
+	private void kafkaAssembly(Mx4jService mx4jService, String type, KpiInfo kpiInfo, BrokersInfo kafka) {
+		String uri = kafka.getHost() + ":" + kafka.getJmxPort();
 		switch (type) {
 		case MBean.MESSAGEIN:
 			MBeanInfo msg = mx4jService.messagesInPerSec(uri);

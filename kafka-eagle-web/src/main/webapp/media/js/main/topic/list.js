@@ -14,11 +14,7 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'partitions'
 		}, {
-			"mData" : 'logsize'
-		}, {
 			"mData" : 'partitionNumbers'
-		}, {
-			"mData" : 'topicSize'
 		}, {
 			"mData" : 'created'
 		}, {

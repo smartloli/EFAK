@@ -45,6 +45,9 @@ public interface BrokerService {
 	/** Get topic number from zookeeper. */
 	public long topicNumbers(String clusterAlias);
 
+	/** Get topic number with match name from zookeeper. */
+	public long topicNumbers(String clusterAlias, String topic);
+
 	/** Get partition number from zookeeper. */
 	public long partitionNumbers(String clusterAlias, String topic);
 
@@ -65,6 +68,5 @@ public interface BrokerService {
 
 	/** Get topic producer logsize total. */
 	public long getTopicLogSizeTotal(String clusterAlias, String topic);
-	
 
 }

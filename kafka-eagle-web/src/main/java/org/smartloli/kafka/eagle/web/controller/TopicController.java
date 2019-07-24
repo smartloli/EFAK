@@ -25,18 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
@@ -48,9 +36,18 @@ import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
-import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.web.service.TopicService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Kafka topic controller to viewer data.
@@ -70,9 +67,6 @@ public class TopicController {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
-
-	/** Kafka metrics interface. */
-	private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
 
 	/** Topic create viewer. */
 	@RequiresPermissions("/topic/create")
@@ -212,6 +206,20 @@ public class TopicController {
 			ex.printStackTrace();
 		}
 	}
+	
+	/** Get cluster data by ajax. */
+	@RequestMapping(value = "/topic/meta/jmx/{tname}/ajax", method = RequestMethod.GET)
+	public void topicMsgByJmxAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+		try {
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String target = topicService.getTopicMsgByJMX(clusterAlias, tname);
+
+			byte[] output = target.getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
 	/** Get topic datasets by ajax. */
 	@RequestMapping(value = "/topic/mock/list/ajax", method = RequestMethod.GET)
@@ -316,7 +324,12 @@ public class TopicController {
 		map.put("search", search);
 		map.put("start", iDisplayStart);
 		map.put("length", iDisplayLength);
-		long count = topicService.getTopicNumbers(clusterAlias);
+		long count = 0L;
+		if (search != null && !"".equals(search)) {
+			count = topicService.getTopicNumbers(clusterAlias, search);
+		} else {
+			count = topicService.getTopicNumbers(clusterAlias);
+		}
 		List<PartitionsInfo> topics = topicService.list(clusterAlias, map);
 		JSONArray aaDatas = new JSONArray();
 		for (PartitionsInfo partition : topics) {
@@ -324,9 +337,7 @@ public class TopicController {
 			object.put("id", partition.getId());
 			object.put("topic", "<a href='/ke/topic/meta/" + partition.getTopic() + "/' target='_blank'>" + partition.getTopic() + "</a>");
 			object.put("partitions", partition.getPartitions().size() > Topic.PARTITION_LENGTH ? partition.getPartitions().toString().substring(0, Topic.PARTITION_LENGTH) + "..." : partition.getPartitions().toString());
-			object.put("logsize", partition.getLogSize());
 			object.put("partitionNumbers", partition.getPartitionNumbers());
-			object.put("topicSize", "<a class='btn btn-primary btn-xs'>" + kafkaMetricsService.topicSize(clusterAlias, partition.getTopic()) + "</a>&nbsp");
 			object.put("created", partition.getCreated());
 			object.put("modify", partition.getModify());
 			if (Kafka.CONSUMER_OFFSET_TOPIC.equals(partition.getTopic())) {
