@@ -161,8 +161,8 @@ find()
 {
   echo "===================== Find [$1] Path  ===================="
   for f in $KE_HOME/kms/webapps/ke/WEB-INF/lib/*.jar; do
-   	${JAVA_HOME}/bin/jar vtf $f|grep $1 && echo $f;
-   done	
+   ${JAVA_HOME}/bin/jar vtf $f|grep $1 && echo $f;
+  done	
   echo "===================== End ============================================="
 }
 
