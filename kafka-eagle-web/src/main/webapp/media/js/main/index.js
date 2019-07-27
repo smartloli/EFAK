@@ -163,4 +163,52 @@ $(document).ready(function() {
 		loadLiquidFillGauge(id, datas, config);
 	}
 
+	$.ajax({
+		type : 'get',
+		dataType : 'json',
+		url : '/ke/dash/logsize/table/ajax',
+		success : function(datas) {
+			if (datas != null) {
+				$("#topic_logsize").html("")
+				var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>LogSize</th></tr></thead>";
+				$("#topic_logsize").append(thead);
+				var tbody = "<tbody>";
+				var tr = '';
+				for (var i = 0; i < datas.length; i++) {
+					var id = datas[i].id;
+					var topic = datas[i].topic;
+					var logsize = datas[i].logsize;
+					tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + logsize + "</td></tr>"
+				}
+				tbody += tr + "</tbody>"
+				$("#topic_logsize").append(tbody);
+			}
+		}
+	});
+
+	$.ajax({
+		type : 'get',
+		dataType : 'json',
+		url : '/ke/dash/capacity/table/ajax',
+		success : function(datas) {
+			if (datas != null) {
+				$("#topic_capacity").html("")
+				var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>Capacity</th></tr></thead>";
+				$("#topic_capacity").append(thead);
+				var tbody = "<tbody>";
+				var tr = '';
+				for (var i = 0; i < datas.length; i++) {
+					var id = datas[i].id;
+					var topic = datas[i].topic;
+					var capacity = datas[i].capacity;
+					tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + capacity + "</td></tr>"
+				}
+				tbody += tr + "</tbody>"
+				$("#topic_capacity").append(tbody);
+			}
+		}
+	});
+	
+	
+
 });

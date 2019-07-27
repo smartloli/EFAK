@@ -17,13 +17,20 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
+import java.util.List;
+import java.util.Map;
+
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
+
+import com.alibaba.fastjson.JSONArray;
+
 /**
  * Kafka Eagle dashboard data generator interface.
  * 
  * @author smartloli.
  *
  *         Created by Jan 17, 2017.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 public interface DashboardService {
@@ -31,4 +38,9 @@ public interface DashboardService {
 	/** Get kafka & dashboard dataset interface. */
 	public String getDashboard(String clusterAlias);
 
+	/** Get topic logsize & capacity. */
+	public JSONArray getTopicRank(Map<String, Object> params);
+	
+	/** Write statistics topic rank data from kafka jmx & insert into table. */
+	public int writeTopicRank(List<TopicRank> topicRanks);
 }

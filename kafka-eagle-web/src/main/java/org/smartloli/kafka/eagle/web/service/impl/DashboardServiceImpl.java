@@ -23,13 +23,18 @@ import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DashboardInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
+import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
@@ -52,7 +57,10 @@ public class DashboardServiceImpl implements DashboardService {
 
 	/** Broker service interface. */
 	private static BrokerService brokerService = new BrokerFactory().create();
-	
+
+	@Autowired
+	private TopicDao topicDao;
+
 	/** Get consumer number from zookeeper. */
 	private int getConsumerNumbers(String clusterAlias) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
@@ -109,6 +117,51 @@ public class DashboardServiceImpl implements DashboardService {
 			dashboard.setConsumers(getConsumerNumbers(clusterAlias));
 		}
 		return dashboard.toString();
+	}
+
+	/** Get topic rank data,such as logsize and topic capacity. */
+	public JSONArray getTopicRank(Map<String, Object> params) {
+		List<TopicRank> topicRank = topicDao.readTopicRank(params);
+		JSONArray array = new JSONArray();
+		if (Topic.LOGSIZE.equals(params.get("tkey"))) {
+			int index = 1;
+			for (int i = 0; i < 10; i++) {
+				JSONObject object = new JSONObject();
+				if (i < topicRank.size()) {
+					object.put("id", index);
+					object.put("topic", "<a href='/ke/topic/meta/" + topicRank.get(i).getTopic() + "/'>" + topicRank.get(i).getTopic() + "</a>");
+					object.put("logsize", topicRank.get(i).getTvalue());
+				} else {
+					object.put("id", index);
+					object.put("topic", "");
+					object.put("logsize", "");
+				}
+				index++;
+				array.add(object);
+			}
+		} else if (Topic.CAPACITY.equals(params.get("tkey"))) {
+			int index = 1;
+			for (int i = 0; i < 10; i++) {
+				JSONObject object = new JSONObject();
+				if (i < topicRank.size()) {
+					object.put("id", index);
+					object.put("topic", "<a href='/ke/topic/meta/" + topicRank.get(i).getTopic() + "/'>" + topicRank.get(i).getTopic() + "</a>");
+					object.put("capacity", StrUtils.stringify(topicRank.get(i).getTvalue()));
+				} else {
+					object.put("id", index);
+					object.put("topic", "");
+					object.put("capacity", "");
+				}
+				index++;
+				array.add(object);
+			}
+		}
+		return array;
+	}
+
+	/** Write statistics topic rank data from kafka jmx & insert into table. */
+	public int writeTopicRank(List<TopicRank> topicRanks) {
+		return topicDao.writeTopicRank(topicRanks);
 	}
 
 }

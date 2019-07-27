@@ -32,7 +32,7 @@
 		`cluster` =#{cluster}
 		and `tkey`
 		=#{tkey}
-		group by `tvalue` desc limit 10
+		order by `tvalue` desc limit 10
 	</select>
 
 	<insert id="writeTopicRank" parameterType="java.util.List">
@@ -50,7 +50,7 @@
 		select
 		`ksql`,`status`,`timespan`
 		from ke_sql_history where
-		`cluster`=#{cluster} and `username`=#{username}
+		`cluster`=#{cluster} and `username`=#{username} limit #{start},#{size}
 	</select>
 
 	<insert id="writeTopicSqlHistory" parameterType="java.util.List">

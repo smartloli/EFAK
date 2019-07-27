@@ -243,4 +243,37 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 	public String getKafkaBrokerServer(String clusterAlias) {
 		return parseBrokerServer(clusterAlias);
 	}
+
+	/** Get kafka topic capacity size . */
+	public long topicCapacity(String clusterAlias, String topic) {
+		String jmx = "";
+		JMXConnector connector = null;
+		List<MetadataInfo> leaders = kafkaService.findKafkaLeader(clusterAlias, topic);
+		long tpSize = 0L;
+		for (MetadataInfo leader : leaders) {
+			String jni = kafkaService.getBrokerJMXFromIds(clusterAlias, leader.getLeader());
+			jmx = String.format(JMX, jni);
+			try {
+				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
+				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+				MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+				String objectName = String.format(KafkaLog.size, topic, leader.getPartitionId());
+				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.value);
+				tpSize += Long.parseLong(size.toString());
+			} catch (Exception ex) {
+				LOG.error("Get topic size from jmx has error, msg is " + ex.getMessage());
+				ex.printStackTrace();
+			} finally {
+				if (connector != null) {
+					try {
+						connector.close();
+					} catch (IOException e) {
+						LOG.error("Close jmx connector has error, msg is " + e.getMessage());
+					}
+				}
+			}
+		}
+
+		return tpSize;
+	}
 }

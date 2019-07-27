@@ -171,6 +171,12 @@ public class KConstants {
 
 		public final static String SUCCESS = "SUCCESS";
 		public final static String FAILED = "FAILED";
+
+		public final static String LOGSIZE = "logsize";
+		public final static String CAPACITY = "capacity";
+
+		public final static int BATCH_SIZE = 500;
+
 	}
 
 	public interface Component {

@@ -88,7 +88,7 @@ Since this is an open source tool, please comply with the relevant laws and regu
 
 [Kafka Eagle Architecture PDF](http://pdf.kafka-eagle.org/)
 
-# Committers
+# Contributors
 
 Thanks to the following members for maintaining the project.
 

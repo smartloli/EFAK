@@ -32,8 +32,6 @@ public class TopicRank extends BaseProtocol {
 	private String topic = "";
 	private String tkey = "";
 	private long tvalue = 0L;
-	private long timespan = 0L;
-	private String tm = "";
 
 	public String getCluster() {
 		return cluster;
@@ -65,22 +63,6 @@ public class TopicRank extends BaseProtocol {
 
 	public void setTvalue(long tvalue) {
 		this.tvalue = tvalue;
-	}
-
-	public long getTimespan() {
-		return timespan;
-	}
-
-	public void setTimespan(long timespan) {
-		this.timespan = timespan;
-	}
-
-	public String getTm() {
-		return tm;
-	}
-
-	public void setTm(String tm) {
-		this.tm = tm;
 	}
 
 }

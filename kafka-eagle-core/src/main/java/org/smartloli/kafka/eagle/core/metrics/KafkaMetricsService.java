@@ -30,10 +30,13 @@ import com.alibaba.fastjson.JSONObject;
  */
 public interface KafkaMetricsService {
 
-	/** Get topic size by jmx. */
+	/** Get topic size by jmx and convert unit, such TB, GB ,MB etc. */
 	public JSONObject topicSize(String clusterAlias, String topic);
 
+	/** Get topic size by jmx no convert . */
+	public long topicCapacity(String clusterAlias, String topic);
+
 	/** Change topic config property. */
-	public String changeTopicConfig(String clusterAlias, String topic,String type, ConfigEntry configEntry);
+	public String changeTopicConfig(String clusterAlias, String topic, String type, ConfigEntry configEntry);
 
 }
