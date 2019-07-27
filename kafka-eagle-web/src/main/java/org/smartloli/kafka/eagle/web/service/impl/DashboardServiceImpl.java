@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DashboardInfo;
+import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
@@ -32,6 +33,7 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
+import org.smartloli.kafka.eagle.web.dao.MBeanDao;
 import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +62,9 @@ public class DashboardServiceImpl implements DashboardService {
 
 	@Autowired
 	private TopicDao topicDao;
+
+	@Autowired
+	private MBeanDao mbeanDao;
 
 	/** Get consumer number from zookeeper. */
 	private int getConsumerNumbers(String clusterAlias) {
@@ -162,6 +167,24 @@ public class DashboardServiceImpl implements DashboardService {
 	/** Write statistics topic rank data from kafka jmx & insert into table. */
 	public int writeTopicRank(List<TopicRank> topicRanks) {
 		return topicDao.writeTopicRank(topicRanks);
+	}
+
+	/** Get os memory data. */
+	public String getOSMem(Map<String, Object> params) {
+		List<KpiInfo> kpis = mbeanDao.getOsMem(params);
+		JSONObject object = new JSONObject();
+		if (kpis.size() == 2) {
+			long valueFirst = Long.parseLong(kpis.get(0).getValue());
+			long valueSecond = Long.parseLong(kpis.get(1).getValue());
+			if (valueFirst >= valueSecond) {
+				object.put("mem", 100 * StrUtils.numberic(((valueFirst - valueSecond) * 1.0 / valueFirst) + "", "###.###"));
+			} else {
+				object.put("mem", 100 * StrUtils.numberic(((valueSecond - valueFirst) * 1.0 / valueSecond) + "", "###.###"));
+			}
+		} else {
+			object.put("mem", "0.0");
+		}
+		return object.toJSONString();
 	}
 
 }

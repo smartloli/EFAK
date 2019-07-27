@@ -294,7 +294,6 @@
 					</div>
 				</div>
 				<!-- /.col-lg-4 -->
-				<!-- /.col-lg-4 -->
 				<div class="col-lg-12" id="replication_bytes_in" >
 					<div class="panel panel-default">
 						<div class="panel-heading">

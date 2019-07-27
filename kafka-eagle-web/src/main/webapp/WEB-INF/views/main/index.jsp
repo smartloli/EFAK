@@ -165,16 +165,12 @@ path.link {
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h3 class="panel-title">
-								<i class="fa fa-hdd-o fa-fw"></i> Kafka Memory
+								<i class="fa fa-hdd-o fa-fw"></i> Kafka OS Used Memory (%)
 							</h3>
 						</div>
 						<div class="panel-body">
 							<div>
-								<svg id="fillgauge_kafka_memory" width="97%" height="424"></svg>
-							</div>
-							<div class="text-right">
-								<a href="/ke/metrics/kafka">View Details <i
-									class="fa fa-arrow-circle-right"></i></a>
+								<svg id="fillgauge_kafka_memory" width="97%" height="444"></svg>
 							</div>
 						</div>
 					</div>

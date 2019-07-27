@@ -52,7 +52,8 @@
 		`broker`,`key`,`value`,`timespan`
 		from ke_metrics
 		where
-		`cluster` =#{cluster}
+		`cluster`
+		=#{cluster}
 		and `type` =#{type}
 		<if test="modules != '' and modules != null">
 			and `key` in (
@@ -64,6 +65,16 @@
 		</if>
 		and tm between
 		#{stime} and #{etime}
+	</select>
+
+	<select id="getOsMem" parameterType="map" resultMap="kpi">
+		select
+		`value`
+		from ke_metrics
+		where
+		`cluster`=#{cluster}
+		and `key` like #{key}
+		order by `timespan` desc limit 2
 	</select>
 
 	<select id="getHost" parameterType="map" resultMap="kpi">

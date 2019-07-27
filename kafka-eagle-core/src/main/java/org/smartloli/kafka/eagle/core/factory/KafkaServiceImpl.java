@@ -1091,4 +1091,29 @@ public class KafkaServiceImpl implements KafkaService {
 		}
 		return jni;
 	}
+
+	/** Get kafka os memory. */
+	public long getOSMemory(String host, int port, String property) {
+		JMXConnector connector = null;
+		long memory = 0L;
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		try {
+			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
+			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			String memorySize = mbeanConnection.getAttribute(new ObjectName(KafkaServer.OS.type), property).toString();
+			memory = Long.parseLong(memorySize);
+		} catch (Exception ex) {
+			LOG.error("Get kafka os memory from jmx has error, msg is " + ex.getMessage());
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					LOG.error("Close kafka os memory jmx connector has error, msg is " + e.getMessage());
+				}
+			}
+		}
+		return memory;
+	}
 }

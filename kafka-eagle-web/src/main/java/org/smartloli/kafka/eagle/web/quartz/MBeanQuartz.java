@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
@@ -57,7 +58,7 @@ public class MBeanQuartz {
 	private static final String[] zk_kpis = new String[] { zk_packets_received, zk_packets_sent, zk_num_alive_connections, zk_outstanding_requests };
 
 	private static final String[] broker_kpis = new String[] { MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC,
-			MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS };
+			MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS, MBean.OSTOTALMEMORY, MBean.OSFREEMEMORY };
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
@@ -180,6 +181,14 @@ public class MBeanQuartz {
 			if (produceMessageConv != null) {
 				kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(produceMessageConv.getOneMinute()) + "");
 			}
+			break;
+		case MBean.OSTOTALMEMORY:
+			long totalMemory = kafkaService.getOSMemory(kafka.getHost(), kafka.getJmxPort(), KafkaServer.OS.totalPhysicalMemorySize);
+			kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + totalMemory + "");
+			break;
+		case MBean.OSFREEMEMORY:
+			long freeMemory = kafkaService.getOSMemory(kafka.getHost(), kafka.getJmxPort(), KafkaServer.OS.freePhysicalMemorySize);
+			kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + freeMemory + "");
 			break;
 		default:
 			break;

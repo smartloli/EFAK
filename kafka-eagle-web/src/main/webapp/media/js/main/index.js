@@ -139,8 +139,6 @@ $(document).ready(function() {
 		}
 	}
 
-	fillgaugeGrahpPie(0.0, "fillgauge_kafka_memory");
-
 	function fillgaugeGrahpPie(datas, id) {
 		var config = liquidFillGaugeDefaultSettings();
 		config.circleThickness = 0.1;
@@ -161,6 +159,21 @@ $(document).ready(function() {
 			config.waveColor = "#FFDDDD";
 		}
 		loadLiquidFillGauge(id, datas, config);
+	}
+
+	try {
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/dash/os/mem/ajax',
+			success : function(datas) {
+				if (datas != null) {
+					fillgaugeGrahpPie(datas.mem, "fillgauge_kafka_memory");
+				}
+			}
+		});
+	} catch (e) {
+		console.log(e);
 	}
 
 	$.ajax({
@@ -208,7 +221,5 @@ $(document).ready(function() {
 			}
 		}
 	});
-	
-	
 
 });

@@ -97,6 +97,12 @@ public class StrUtils {
 		DecimalFormat formatter = new DecimalFormat("###.##");
 		return Double.valueOf(formatter.format(Double.valueOf(number)));
 	}
+	
+	/** Formmatter number. */
+	public static double numberic(String number,String format) {
+		DecimalFormat formatter = new DecimalFormat(format);
+		return Double.valueOf(formatter.format(Double.valueOf(number)));
+	}
 
 	/** Convert string number to double. */
 	public static long integer(double number) {

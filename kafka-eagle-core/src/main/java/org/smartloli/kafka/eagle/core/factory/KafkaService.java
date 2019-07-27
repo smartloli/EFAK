@@ -53,7 +53,7 @@ public interface KafkaService {
 
 	/** Get all broker list from zookeeper. */
 	public List<BrokersInfo> getAllBrokersInfo(String clusterAlias);
-	
+
 	/**
 	 * Get all topic info from zookeeper. Deprecated this method in the v1.3.4
 	 * and replace {@link BrokerService.topicRecords} method.
@@ -132,5 +132,8 @@ public interface KafkaService {
 
 	/** Get kafka version. */
 	public String getKafkaVersion(String host, int port, String ids, String clusterAlias);
+
+	/** Get kafka os memory. */
+	public long getOSMemory(String host, int port, String property);
 
 }

@@ -40,7 +40,10 @@ public interface DashboardService {
 
 	/** Get topic logsize & capacity. */
 	public JSONArray getTopicRank(Map<String, Object> params);
-	
+
 	/** Write statistics topic rank data from kafka jmx & insert into table. */
 	public int writeTopicRank(List<TopicRank> topicRanks);
+
+	/** Get os memory data. */
+	public String getOSMem(Map<String, Object> params);
 }

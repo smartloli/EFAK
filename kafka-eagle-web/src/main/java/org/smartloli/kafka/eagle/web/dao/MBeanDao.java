@@ -55,5 +55,8 @@ public interface MBeanDao {
 
 	/** Clean consumer topic data. */
 	public void cleanConsumerTopic(int tm);
+	
+	/** Query os memory data. */
+	public List<KpiInfo> getOsMem(Map<String, Object> params);
 
 }
