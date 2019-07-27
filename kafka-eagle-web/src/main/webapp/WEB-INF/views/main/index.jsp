@@ -33,6 +33,11 @@ path.link {
 	stroke: #ccc;
 	stroke-width: 1.5px;
 }
+
+.liquidFillGaugeText {
+	font-family: Helvetica;
+	font-weight: bold;
+}
 </style>
 <body>
 	<jsp:include page="../public/navbar.jsp"></jsp:include>
@@ -156,10 +161,182 @@ path.link {
 			</div>
 			<!-- /.row -->
 			<div class="row">
+				<div class="col-lg-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<i class="fa fa-hdd-o fa-fw"></i> Kafka Memory
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div>
+								<svg id="fillgauge_kafka_memory" width="97%" height="424"></svg>
+							</div>
+							<div class="text-right">
+								<a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<i class="fa fa-file-text-o fa-fw"></i> Topic LogSize Top10
+							</h3>
+						</div>
+						<div class="panel-body">
+							<table class="table table-bordered table-hover table-striped">
+								<thead>
+									<tr>
+										<th>RankID</th>
+										<th>Topic Name</th>
+										<th>LogSize</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>aaa</td>
+										<td>12345</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="text-right">
+								<a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<i class="fa fa-database fa-fw"></i> Topic Size Top10
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div class="table-responsive">
+								<table class="table table-bordered table-hover table-striped">
+									<thead>
+										<tr>
+											<th>RankID</th>
+											<th>Topic Name</th>
+											<th>Size</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>12GB</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>6GB</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>129MB</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>110MB</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>12MB</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>229KB</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>200KB</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>109KB</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>100B</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>aaa</td>
+											<td>10B</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="text-right">
+								<a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.row -->
+			<div class="row">
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-tasks fa-fw"></i> Kafka Brokers
+							<i class="fa fa-tasks fa-fw"></i> Kafka Active Brokers
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
@@ -177,8 +354,8 @@ path.link {
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="plugins/d3/d3.js" name="loader" />
-	<jsp:param value="plugins/d3/d3.layout.js" name="loader" />
+	<jsp:param value="plugins/d3/d3.v3.min.js" name="loader" />
+	<jsp:param value="plugins/d3/liquidFillGauge.js" name="loader" />
 	<jsp:param value="main/index.js" name="loader" />
 </jsp:include>
 </html>

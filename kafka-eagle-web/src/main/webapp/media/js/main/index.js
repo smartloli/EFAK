@@ -19,7 +19,7 @@ $(document).ready(function() {
 		$("#topics_count").text(dashboard.topics);
 		$("#zks_count").text(dashboard.zks);
 		$("#consumers_count").text(dashboard.consumers);
-		
+
 		function toggleAll(d) {
 			if (d.children) {
 				d.children.forEach(toggleAll);
@@ -137,6 +137,30 @@ $(document).ready(function() {
 			d.children = d._children;
 			d._children = null;
 		}
+	}
+
+	fillgaugeGrahpPie(0.0, "fillgauge_kafka_memory");
+
+	function fillgaugeGrahpPie(datas, id) {
+		var config = liquidFillGaugeDefaultSettings();
+		config.circleThickness = 0.1;
+		config.circleFillGap = 0.2;
+		config.textVertPosition = 0.8;
+		config.waveAnimateTime = 2000;
+		config.waveHeight = 0.3;
+		config.waveCount = 1;
+		if (datas > 65 && datas < 80) {
+			config.circleColor = "#D4AB6A";
+			config.textColor = "#553300";
+			config.waveTextColor = "#805615";
+			config.waveColor = "#AA7D39";
+		} else if (datas >= 80) {
+			config.circleColor = "#d9534f";
+			config.textColor = "#d9534f";
+			config.waveTextColor = "#d9534f";
+			config.waveColor = "#FFDDDD";
+		}
+		loadLiquidFillGauge(id, datas, config);
 	}
 
 });
