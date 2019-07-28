@@ -170,7 +170,11 @@ path.link {
 						</div>
 						<div class="panel-body">
 							<div>
-								<svg id="fillgauge_kafka_memory" width="97%" height="444"></svg>
+								<svg id="fillgauge_kafka_memory" width="97%" height="424"></svg>
+							</div>
+							<div class="text-right">
+								<a href="/ke/metrics/kafka">View Details <i
+									class="fa fa-arrow-circle-right"></i></a>
 							</div>
 						</div>
 					</div>

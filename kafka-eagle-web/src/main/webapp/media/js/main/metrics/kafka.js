@@ -58,6 +58,7 @@ $(document).ready(function() {
 	var mbean_total_produce_requests = morrisLineInit('mbean_total_produce_requests');
 	var mbean_replication_bytes_out = morrisLineInit('mbean_replication_bytes_out');
 	var mbean_replication_bytes_in = morrisLineInit('mbean_replication_bytes_in');
+	var mbean_os_free_memory = morrisLineInit('mbean_os_free_memory');
 
 	function mbeanRealtime(stime, etime, type, modules) {
 		$.ajax({
@@ -81,6 +82,7 @@ $(document).ready(function() {
 					setTrendData(mbean_total_produce_requests, 'total_produce_requests', datas);
 					setTrendData(mbean_replication_bytes_out, 'replication_bytes_out', datas);
 					setTrendData(mbean_replication_bytes_in, 'replication_bytes_in', datas);
+					setTrendData(mbean_os_free_memory, 'os_free_memory', datas);
 					datas = null;
 				}
 			}
@@ -273,6 +275,16 @@ $(document).ready(function() {
 				datay.push(value);
 			}
 			data.name = "ReplicationBytesInPerSec" + cunit;
+			break;
+		case "os_free_memory":
+			var cunit = "";
+			for (var i = 0; i < datas.osFreeMems.length; i++) {
+				datax.push(datas.osFreeMems[i].x);
+				var value = stringify(datas.osFreeMems[i].y).value;
+				cunit = stringify(datas.osFreeMems[i].y).type;
+				datay.push(value);
+			}
+			data.name = "OSFreeMemory" + cunit;
 			break;
 		default:
 			break;
