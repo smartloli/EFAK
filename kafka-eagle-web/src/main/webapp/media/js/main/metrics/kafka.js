@@ -1,5 +1,11 @@
 $(document).ready(function() {
 
+	// defined byte size
+	var KB_IN_BYTES = 1024;
+	var MB_IN_BYTES = 1024 * KB_IN_BYTES;
+	var GB_IN_BYTES = 1024 * MB_IN_BYTES;
+	var TB_IN_BYTES = 1024 * GB_IN_BYTES;
+
 	chartCommonOption = {
 		backgroundColor : "#fff",
 		tooltip : {
@@ -277,14 +283,12 @@ $(document).ready(function() {
 			data.name = "ReplicationBytesInPerSec" + cunit;
 			break;
 		case "os_free_memory":
-			var cunit = "";
 			for (var i = 0; i < datas.osFreeMems.length; i++) {
 				datax.push(datas.osFreeMems[i].x);
-				var value = stringify(datas.osFreeMems[i].y).value;
-				cunit = stringify(datas.osFreeMems[i].y).type;
+				var value = (datas.osFreeMems[i].y * 1.0 / GB_IN_BYTES).toFixed(2);
 				datay.push(value);
 			}
-			data.name = "OSFreeMemory" + cunit;
+			data.name = "OSFreeMemory (GB/min)";
 			break;
 		default:
 			break;
@@ -293,12 +297,6 @@ $(document).ready(function() {
 		data.y = datay;
 		return data;
 	}
-
-	// defined byte size
-	var KB_IN_BYTES = 1024;
-	var MB_IN_BYTES = 1024 * KB_IN_BYTES;
-	var GB_IN_BYTES = 1024 * MB_IN_BYTES;
-	var TB_IN_BYTES = 1024 * GB_IN_BYTES;
 
 	// formatter byte to kb,mb or gb etc.
 	function stringify(byteNumber) {
