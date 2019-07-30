@@ -109,8 +109,11 @@ public interface KafkaService {
 	/** Get kafka consumer group & topic. */
 	public String getKafkaConsumerGroupTopic(String clusterAlias, String group);
 
-	/** Get kafka sasl logsize . */
+	/** Get kafka topic history logsize . */
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid);
+
+	/** Get kafka topic real logsize. */
+	public long getKafkaRealLogSize(String clusterAlias, String topic, int partitionid);
 
 	/** Get kafka sasl topic metadate. */
 	public List<MetadataInfo> findKafkaLeader(String clusterAlias, String topic);
@@ -124,8 +127,11 @@ public interface KafkaService {
 	/** Get consumer group all topics lag. */
 	public long getLag(String clusterAlias, String group, String topic);
 
-	/** Get kafka logsize by old version. */
+	/** Get kafka history logsize by old version. */
 	public long getLogSize(String clusterAlias, String topic, int partitionid);
+
+	/** Get kafka real logsize by old version. */
+	public long getRealLogSize(String clusterAlias, String topic, int partitionid);
 
 	/** Get topic metadata. */
 	public String getReplicasIsr(String clusterAlias, String topic, int partitionid);

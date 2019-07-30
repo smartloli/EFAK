@@ -69,4 +69,7 @@ public interface BrokerService {
 	/** Get topic producer logsize total. */
 	public long getTopicLogSizeTotal(String clusterAlias, String topic);
 
+	/** Get topic real logsize records. */
+	public long getTopicRealLogSize(String clusterAlias, String topic);
+
 }

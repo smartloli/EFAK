@@ -872,8 +872,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return parseBrokerServer(clusterAlias);
 	}
 
-	/** Get kafka 0.10.x sasl logsize. */
+	/** Get kafka 0.10.x topic history logsize. */
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid) {
+		long histyLogSize = 0L;
 		Properties props = new Properties();
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
 		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
@@ -887,8 +888,47 @@ public class KafkaServiceImpl implements KafkaService {
 		TopicPartition tp = new TopicPartition(topic, partitionid);
 		consumer.assign(Collections.singleton(tp));
 		java.util.Map<TopicPartition, Long> logsize = consumer.endOffsets(Collections.singleton(tp));
-		consumer.close();
-		return logsize.get(tp).longValue();
+		try {
+			histyLogSize = logsize.get(tp).longValue();
+		} catch (Exception e) {
+			LOG.error("Get history topic logsize has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (consumer != null) {
+				consumer.close();
+			}
+		}
+		return histyLogSize;
+	}
+
+	/** Get kafka 0.10.x topic real logsize. */
+	public long getKafkaRealLogSize(String clusterAlias, String topic, int partitionid) {
+		long realLogSize = 0L;
+		Properties props = new Properties();
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
+			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
+		}
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		TopicPartition tp = new TopicPartition(topic, partitionid);
+		consumer.assign(Collections.singleton(tp));
+		java.util.Map<TopicPartition, Long> endLogSize = consumer.endOffsets(Collections.singleton(tp));
+		java.util.Map<TopicPartition, Long> startLogSize = consumer.beginningOffsets(Collections.singleton(tp));
+		try {
+			realLogSize = endLogSize.get(tp).longValue() - startLogSize.get(tp).longValue();
+		} catch (Exception e) {
+			LOG.error("Get real topic logsize has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (consumer != null) {
+				consumer.close();
+			}
+		}
+		return realLogSize;
 	}
 
 	/** Get kafka version. */
@@ -1025,7 +1065,7 @@ public class KafkaServiceImpl implements KafkaService {
 		return lag;
 	}
 
-	/** Get kafka old version log size. */
+	/** Get kafka old version topic history logsize. */
 	public long getLogSize(String clusterAlias, String topic, int partitionid) {
 		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
@@ -1045,7 +1085,46 @@ public class KafkaServiceImpl implements KafkaService {
 		long logSize = 0L;
 		try {
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			logSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.logSize, topic, partitionid)), KafkaServer8.value).toString());
+			logSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.endLogSize, topic, partitionid)), KafkaServer8.value).toString());
+		} catch (Exception ex) {
+			LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
+			ex.printStackTrace();
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					LOG.error("Close jmx connector has error, msg is " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+		return logSize;
+	}
+
+	/** Get kafka old version real topic logsize. */
+	public long getRealLogSize(String clusterAlias, String topic, int partitionid) {
+		JMXConnector connector = null;
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+		for (BrokersInfo broker : brokers) {
+			try {
+				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
+				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+				if (connector != null) {
+					break;
+				}
+			} catch (Exception e) {
+				LOG.error("Get kafka old version logsize has error, msg is " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		long logSize = 0L;
+		try {
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			long endLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.endLogSize, topic, partitionid)), KafkaServer8.value).toString());
+			long startLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.startLogSize, topic, partitionid)), KafkaServer8.value).toString());
+			logSize = endLogSize - startLogSize;
 		} catch (Exception ex) {
 			LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
 			ex.printStackTrace();

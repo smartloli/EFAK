@@ -123,7 +123,7 @@ public class TopicRankQuartz {
 		for (String clusterAlias : clusterAliass) {
 			List<String> topics = brokerService.topicList(clusterAlias);
 			for (String topic : topics) {
-				long logsize = brokerService.getTopicLogSizeTotal(clusterAlias, topic);
+				long logsize = brokerService.getTopicRealLogSize(clusterAlias, topic);
 				TopicRank topicRank = new TopicRank();
 				topicRank.setCluster(clusterAlias);
 				topicRank.setTopic(topic);

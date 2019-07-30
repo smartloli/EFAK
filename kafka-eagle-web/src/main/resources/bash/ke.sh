@@ -231,14 +231,12 @@ gc()
 }
 jdk()
 {
-  echo "========================== Kafka Eagle Check OS JDK Encoding  ============"
   for f in $KE_HOME/kms/webapps/ke/WEB-INF/lib/*.jar; do
    CLASSPATH=${CLASSPATH}:$f;
   done
   
   CLASS_JDK_ENV=org.smartloli.kafka.eagle.plugin.net.KafkaEagleJDK
   ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS_JDK_ENV 2>&1
-  echo "========================== End  =========================================="
 }
 
 case "$1" in

@@ -30,14 +30,14 @@ import java.nio.charset.Charset;
  */
 public class KafkaEagleJDK {
 	public static void main(String[] args) {
-		System.out.println("===================== Check OS JDK Encoding  ====================");
+		System.out.println("===================== Kafka Eagle Check OS JDK Encoding  ====================");
 		System.out.println("* Default Charset=" + Charset.defaultCharset());
 		System.out.println("* file.encoding=" + System.getProperty("file.encoding"));
 		System.out.println("* Default Charset=" + Charset.defaultCharset());
 		System.out.println("* Default Charset in Use=" + getDefaultCharSet());
 		System.out.println("*******************************************************************");
 		System.out.println("* If the charset is not 'UTF-8',\n* Please set it in the environment variable\n* export JAVA_TOOL_OPTIONS=\"-Dfile.encoding=UTF-8\" into ~/.bash_profile file.");
-		System.out.println("===================== End  ====================");
+		System.out.println("===================== End  ==================================================");
 	}
 
 	/** Get default charset. */

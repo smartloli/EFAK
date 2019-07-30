@@ -271,9 +271,9 @@ public class BrokerServiceImpl implements BrokerService {
 						metadate.setReplicas(kafkaService.getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
 						long logSize = 0L;
 						if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-							logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
+							logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
 						} else {
-							logSize = kafkaService.getLogSize(clusterAlias, topic, Integer.valueOf(partition));
+							logSize = kafkaService.getRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
 						}
 						metadate.setLogSize(logSize);
 						targets.add(metadate);
@@ -303,6 +303,33 @@ public class BrokerServiceImpl implements BrokerService {
 				for (String partition : partitionObject.keySet()) {
 					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
 						logSize += kafkaService.getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
+					} else {
+						logSize += kafkaService.getLogSize(clusterAlias, topic, Integer.valueOf(partition));
+					}
+				}
+			}
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return logSize;
+	}
+
+	/** Get topic real logsize records. */
+	public long getTopicRealLogSize(String clusterAlias, String topic) {
+		long logSize = 0L;
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+			if (topics.contains(topic)) {
+				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+				String tupleString = new String(tuple._1.get());
+				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+				for (String partition : partitionObject.keySet()) {
+					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+						logSize += kafkaService.getKafkaRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
 					} else {
 						logSize += kafkaService.getLogSize(clusterAlias, topic, Integer.valueOf(partition));
 					}

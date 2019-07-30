@@ -231,7 +231,7 @@ public class TopicServiceImpl implements TopicService {
 	/** Get topic logsize, topicsize from jmx data. */
 	public String getTopicMsgByJMX(String clusterAlias, String topic) {
 		JSONObject object = new JSONObject();
-		long logSize = brokerService.getTopicLogSizeTotal(clusterAlias, topic);
+		long logSize = brokerService.getTopicRealLogSize(clusterAlias, topic);
 		JSONObject topicSize = kafkaMetricsService.topicSize(clusterAlias, topic);
 		object.put("logsize", logSize);
 		object.put("topicsize", topicSize.getString("size"));

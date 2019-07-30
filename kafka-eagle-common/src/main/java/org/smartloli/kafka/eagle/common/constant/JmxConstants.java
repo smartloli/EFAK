@@ -38,7 +38,8 @@ public class JmxConstants {
 	public interface KafkaServer8 {
 		public static final String version = "kafka.common:type=AppInfo,name=Version";
 		public static final String value = "Value";
-		public static final String logSize = "kafka.log:type=Log,name=LogEndOffset,topic=%s,partition=%s";
+		public static final String endLogSize = "kafka.log:type=Log,name=LogEndOffset,topic=%s,partition=%s";
+		public static final String startLogSize = "kafka.log:type=Log,name=LogStartOffset,topic=%s,partition=%s";
 	}
 
 	public interface KafkaServer {
