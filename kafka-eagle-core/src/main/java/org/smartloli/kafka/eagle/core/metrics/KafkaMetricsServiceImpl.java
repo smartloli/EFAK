@@ -37,11 +37,12 @@ import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.ConfigResource.Type;
-import org.apache.zookeeper.data.Stat;
 import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaLog;
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
@@ -54,7 +55,6 @@ import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jServiceImpl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import kafka.zk.KafkaZkClient;
@@ -83,7 +83,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 	private final String CONFIG_TOPIC_PATH = "/config/topics/";
 
 	/** Get topic size from kafka jmx. */
-	public String topicSize(String clusterAlias, String topic) {
+	public JSONObject topicSize(String clusterAlias, String topic) {
 		String jmx = "";
 		JMXConnector connector = null;
 		List<MetadataInfo> leaders = kafkaService.findKafkaLeader(clusterAlias, topic);
@@ -112,7 +112,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 			}
 		}
 
-		return StrUtils.stringify(tpSize);
+		return StrUtils.stringifyByObject(tpSize);
 	}
 
 	/** Alter topic config. */
@@ -225,10 +225,9 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
 	private String parseBrokerServer(String clusterAlias) {
 		String brokerServer = "";
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
-			brokerServer += broker.getString("host") + ":" + broker.getInteger("port") + ",";
+		List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+		for (BrokersInfo broker : brokers) {
+			brokerServer += broker.getHost() + ":" + broker.getPort() + ",";
 		}
 		if ("".equals(brokerServer)) {
 			return "";
@@ -243,5 +242,38 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
 	public String getKafkaBrokerServer(String clusterAlias) {
 		return parseBrokerServer(clusterAlias);
+	}
+
+	/** Get kafka topic capacity size . */
+	public long topicCapacity(String clusterAlias, String topic) {
+		String jmx = "";
+		JMXConnector connector = null;
+		List<MetadataInfo> leaders = kafkaService.findKafkaLeader(clusterAlias, topic);
+		long tpSize = 0L;
+		for (MetadataInfo leader : leaders) {
+			String jni = kafkaService.getBrokerJMXFromIds(clusterAlias, leader.getLeader());
+			jmx = String.format(JMX, jni);
+			try {
+				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
+				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+				MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+				String objectName = String.format(KafkaLog.size, topic, leader.getPartitionId());
+				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.value);
+				tpSize += Long.parseLong(size.toString());
+			} catch (Exception ex) {
+				LOG.error("Get topic size from jmx has error, msg is " + ex.getMessage());
+				ex.printStackTrace();
+			} finally {
+				if (connector != null) {
+					try {
+						connector.close();
+					} catch (IOException e) {
+						LOG.error("Close jmx connector has error, msg is " + e.getMessage());
+					}
+				}
+			}
+		}
+
+		return tpSize;
 	}
 }

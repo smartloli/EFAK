@@ -20,9 +20,9 @@
  */
 package org.smartloli.kafka.eagle.core.factory;
 
-import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
-
 import java.util.Map;
+
+import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 
 /**
  * Mx4jService operate comand and get metadata from kafka jmx interface.
@@ -90,5 +90,5 @@ public interface Mx4jService {
 
 	public MBeanInfo replicationBytesOutPerSec(String uri);
 
-	MBeanInfo replicationBytesOutPerSec(String uri, String topic);
+	public MBeanInfo replicationBytesOutPerSec(String uri, String topic);
 }

@@ -33,6 +33,15 @@ public class BrokersInfo extends BaseProtocol {
 	private String modify = "";
 	private int jmxPort = 0;
 	private String version = "";
+	private String ids = "";
+
+	public String getIds() {
+		return ids;
+	}
+
+	public void setIds(String ids) {
+		this.ids = ids;
+	}
 
 	public String getVersion() {
 		return version;

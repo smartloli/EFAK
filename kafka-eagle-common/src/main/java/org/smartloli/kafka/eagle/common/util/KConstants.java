@@ -108,6 +108,8 @@ public class KConstants {
 		public final static String TOTALPRODUCEREQUESTSPERSEC = "total_produce_requests";
 		public final static String REPLICATIONBYTESINPERSEC = "replication_bytes_out";
 		public final static String REPLICATIONBYTESOUTPERSEC = "replication_bytes_in";
+		public final static String OSTOTALMEMORY = "os_total_memory";
+		public final static String OSFREEMEMORY = "os_free_memory";
 	}
 
 	public interface Linux {
@@ -171,6 +173,12 @@ public class KConstants {
 
 		public final static String SUCCESS = "SUCCESS";
 		public final static String FAILED = "FAILED";
+
+		public final static String LOGSIZE = "logsize";
+		public final static String CAPACITY = "capacity";
+
+		public final static int BATCH_SIZE = 500;
+
 	}
 
 	public interface Component {

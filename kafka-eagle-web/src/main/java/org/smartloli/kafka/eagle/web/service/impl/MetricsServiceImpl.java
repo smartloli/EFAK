@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
@@ -39,7 +40,6 @@ import org.smartloli.kafka.eagle.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
@@ -65,11 +65,10 @@ public class MetricsServiceImpl implements MetricsService {
 
 	/** Gets summary monitoring data for all broker. */
 	public String getAllBrokersMBean(String clusterAlias) {
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+		List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
 		Map<String, MBeanInfo> mbeans = new HashMap<>();
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
-			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
+		for (BrokersInfo broker : brokers) {
+			String uri = broker.getHost() + ":" + broker.getJmxPort();
 			MBeanInfo bytesIn = mx4jService.bytesInPerSec(uri);
 			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri);
 			MBeanInfo bytesRejected = mx4jService.bytesRejectedPerSec(uri);
@@ -163,6 +162,8 @@ public class MetricsServiceImpl implements MetricsService {
 		JSONArray replicationBytesOuts = new JSONArray();
 		JSONArray replicationBytesIns = new JSONArray();
 
+		JSONArray osFreeMems = new JSONArray();
+
 		JSONArray zkSendPackets = new JSONArray();
 		JSONArray zkReceivedPackets = new JSONArray();
 		JSONArray zkNumAliveConnections = new JSONArray();
@@ -214,6 +215,9 @@ public class MetricsServiceImpl implements MetricsService {
 			case MBean.REPLICATIONBYTESOUTPERSEC:
 				assembly(replicationBytesIns, kpi);
 				break;
+			case MBean.OSFREEMEMORY:
+				assembly(osFreeMems, kpi);
+				break;
 			default:
 				break;
 			}
@@ -234,6 +238,7 @@ public class MetricsServiceImpl implements MetricsService {
 		target.put("totalProduceRequests", totalProduceRequests);
 		target.put("replicationBytesIns", replicationBytesIns);
 		target.put("replicationBytesOuts", replicationBytesOuts);
+		target.put("osFreeMems", osFreeMems);
 
 		return target.toJSONString();
 	}

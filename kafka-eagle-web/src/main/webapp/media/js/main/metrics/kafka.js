@@ -1,5 +1,11 @@
 $(document).ready(function() {
 
+	// defined byte size
+	var KB_IN_BYTES = 1024;
+	var MB_IN_BYTES = 1024 * KB_IN_BYTES;
+	var GB_IN_BYTES = 1024 * MB_IN_BYTES;
+	var TB_IN_BYTES = 1024 * GB_IN_BYTES;
+
 	chartCommonOption = {
 		backgroundColor : "#fff",
 		tooltip : {
@@ -58,6 +64,7 @@ $(document).ready(function() {
 	var mbean_total_produce_requests = morrisLineInit('mbean_total_produce_requests');
 	var mbean_replication_bytes_out = morrisLineInit('mbean_replication_bytes_out');
 	var mbean_replication_bytes_in = morrisLineInit('mbean_replication_bytes_in');
+	var mbean_os_free_memory = morrisLineInit('mbean_os_free_memory');
 
 	function mbeanRealtime(stime, etime, type, modules) {
 		$.ajax({
@@ -81,6 +88,7 @@ $(document).ready(function() {
 					setTrendData(mbean_total_produce_requests, 'total_produce_requests', datas);
 					setTrendData(mbean_replication_bytes_out, 'replication_bytes_out', datas);
 					setTrendData(mbean_replication_bytes_in, 'replication_bytes_in', datas);
+					setTrendData(mbean_os_free_memory, 'os_free_memory', datas);
 					datas = null;
 				}
 			}
@@ -185,7 +193,7 @@ $(document).ready(function() {
 		case "message_in":
 			for (var i = 0; i < datas.messageIns.length; i++) {
 				datax.push(datas.messageIns[i].x);
-				datay.push(datas.messageIns[i].y * 60);
+				datay.push((datas.messageIns[i].y * 60).toFixed(2));
 			}
 			data.name = "MessagesInPerSec (msg/min)";
 			break;
@@ -222,35 +230,35 @@ $(document).ready(function() {
 		case "failed_fetch_request":
 			for (var i = 0; i < datas.failedFetchRequest.length; i++) {
 				datax.push(datas.failedFetchRequest[i].x);
-				datay.push(datas.failedFetchRequest[i].y * 60);
+				datay.push((datas.failedFetchRequest[i].y * 60).toFixed(2));
 			}
 			data.name = "FailedFetchRequestsPerSec (msg/min)";
 			break;
 		case "failed_produce_request":
 			for (var i = 0; i < datas.failedProduceRequest.length; i++) {
 				datax.push(datas.failedProduceRequest[i].x);
-				datay.push(datas.failedProduceRequest[i].y * 60);
+				datay.push((datas.failedProduceRequest[i].y * 60).toFixed(2));
 			}
 			data.name = "FailedProduceRequestsPerSec (msg/min)";
 			break;
 		case "produce_message_conversions":
 			for (var i = 0; i < datas.produceMessageConversions.length; i++) {
 				datax.push(datas.produceMessageConversions[i].x);
-				datay.push(datas.produceMessageConversions[i].y * 60);
+				datay.push((datas.produceMessageConversions[i].y * 60).toFixed(2));
 			}
 			data.name = "ProduceMessageConversionsPerSec (msg/min)";
 			break;
 		case "total_fetch_requests":
 			for (var i = 0; i < datas.totalFetchRequests.length; i++) {
 				datax.push(datas.totalFetchRequests[i].x);
-				datay.push(datas.totalFetchRequests[i].y * 60);
+				datay.push((datas.totalFetchRequests[i].y * 60).toFixed(2));
 			}
 			data.name = "TotalFetchRequestsPerSec (msg/min)";
 			break;
 		case "total_produce_requests":
 			for (var i = 0; i < datas.totalProduceRequests.length; i++) {
 				datax.push(datas.totalProduceRequests[i].x);
-				datay.push(datas.totalProduceRequests[i].y * 60);
+				datay.push((datas.totalProduceRequests[i].y * 60).toFixed(2));
 			}
 			data.name = "TotalProduceRequestsPerSec (msg/min)";
 			break;
@@ -274,6 +282,14 @@ $(document).ready(function() {
 			}
 			data.name = "ReplicationBytesInPerSec" + cunit;
 			break;
+		case "os_free_memory":
+			for (var i = 0; i < datas.osFreeMems.length; i++) {
+				datax.push(datas.osFreeMems[i].x);
+				var value = (datas.osFreeMems[i].y * 1.0 / GB_IN_BYTES).toFixed(2);
+				datay.push(value);
+			}
+			data.name = "OSFreeMemory (GB/min)";
+			break;
 		default:
 			break;
 		}
@@ -281,12 +297,6 @@ $(document).ready(function() {
 		data.y = datay;
 		return data;
 	}
-
-	// defined byte size
-	var KB_IN_BYTES = 1024;
-	var MB_IN_BYTES = 1024 * KB_IN_BYTES;
-	var GB_IN_BYTES = 1024 * MB_IN_BYTES;
-	var TB_IN_BYTES = 1024 * GB_IN_BYTES;
 
 	// formatter byte to kb,mb or gb etc.
 	function stringify(byteNumber) {

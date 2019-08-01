@@ -84,4 +84,18 @@ $(document).ready(
 
 				return tr;
 			}
+			
+			$.ajax({
+				type : 'get',
+				dataType : 'json',
+				url : '/ke/topic/meta/jmx/' + topicName + '/ajax',
+				success : function(datas) {
+					if (datas != null) {
+						$("#producer_logsize").text(datas.logsize);
+						$("#producer_topicsize").text(datas.topicsize);
+						$("#producer_topicsize_type").text(datas.sizetype);
+					}
+				}
+			});
+			
 		});

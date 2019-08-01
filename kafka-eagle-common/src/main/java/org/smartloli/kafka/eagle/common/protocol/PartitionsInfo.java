@@ -35,15 +35,15 @@ public class PartitionsInfo extends BaseProtocol {
 	private int partitionNumbers = 0;
 	private String created = "";
 	private String modify = "";
-	private long logSize = 0L;
-
-	public long getLogSize() {
-		return logSize;
-	}
-
-	public void setLogSize(long logSize) {
-		this.logSize = logSize;
-	}
+//	private long logSize = 0L;
+//
+//	public long getLogSize() {
+//		return logSize;
+//	}
+//
+//	public void setLogSize(long logSize) {
+//		this.logSize = logSize;
+//	}
 
 	public String getCreated() {
 		return created;

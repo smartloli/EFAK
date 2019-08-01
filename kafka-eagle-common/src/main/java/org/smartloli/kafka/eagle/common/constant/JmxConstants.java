@@ -38,7 +38,8 @@ public class JmxConstants {
 	public interface KafkaServer8 {
 		public static final String version = "kafka.common:type=AppInfo,name=Version";
 		public static final String value = "Value";
-		public static final String logSize = "kafka.log:type=Log,name=LogEndOffset,topic=%s,partition=%s";
+		public static final String endLogSize = "kafka.log:type=Log,name=LogEndOffset,topic=%s,partition=%s";
+		public static final String startLogSize = "kafka.log:type=Log,name=LogStartOffset,topic=%s,partition=%s";
 	}
 
 	public interface KafkaServer {
@@ -76,6 +77,13 @@ public class JmxConstants {
 
 		class ZookeeperClientMetrics {
 			public static String zooKeeperRequestLatencyMs = "kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs";
+		}
+
+		
+		class OS{
+			public static String type = "java.lang:type=OperatingSystem";
+			public static String totalPhysicalMemorySize = "TotalPhysicalMemorySize";
+			public static String freePhysicalMemorySize = "FreePhysicalMemorySize";
 		}
 
 		public static final String version = "kafka.server:type=app-info,id=%s";

@@ -102,8 +102,7 @@
 
 # JAVA_OPTS
 JAAS_CONF_PATH=$KE_HOME/conf/kafka_client_jaas.conf
-#JAVA_OPTS="-server -Xms1000M -Xmx1000M -Xss512k -XX:+AggressiveOpts -XX:+UseBiasedLocking -XX:PermSize=64M -XX:MaxPermSize=300M -XX:+DisableExplicitGC -XX:MaxTenuringThreshold=15 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -Djava.awt.headless=true -Djava.security.auth.login.config=${JAAS_CONF_PATH}"
-JAVA_OPTS="-server -Xms1000M -Xmx1800M -Xmn800M -Xss512k -XX:+AggressiveOpts -XX:SurvivorRatio=8 -XX:MetaspaceSize=200M -XX:+UseBiasedLocking -XX:PermSize=64M -XX:CMSInitiatingOccupancyFraction=75 -XX:MaxPermSize=300M -XX:+DisableExplicitGC -XX:MaxTenuringThreshold=15 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -Djava.awt.headless=true -Djava.security.auth.login.config=${JAAS_CONF_PATH}"
+JAVA_OPTS="-server -Xms2048M -Xmx2048M -Xmn1024M -Xss512k -XX:+AggressiveOpts -XX:SurvivorRatio=8 -XX:MetaspaceSize=96M -XX:+UseBiasedLocking -XX:CMSInitiatingOccupancyFraction=75 -XX:+DisableExplicitGC -XX:MaxTenuringThreshold=15 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -Djava.awt.headless=true -Djava.security.auth.login.config=${JAAS_CONF_PATH}"
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false

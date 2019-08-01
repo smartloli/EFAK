@@ -17,26 +17,20 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
-
-import org.smartloli.kafka.eagle.web.service.TopicService;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
-import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
@@ -46,7 +40,12 @@ import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
+import org.smartloli.kafka.eagle.web.service.TopicService;
 import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 
 /**
  * Kafka topic implements service interface.
@@ -95,7 +94,7 @@ public class TopicServiceImpl implements TopicService {
 		for (String topicName : topicList) {
 			if (name != null) {
 				JSONObject topic = new JSONObject();
-				if (name.contains(topicName) && !topicName.equals(Kafka.CONSUMER_OFFSET_TOPIC)) {
+				if (topicName.contains(name) && !topicName.equals(Kafka.CONSUMER_OFFSET_TOPIC)) {
 					topic.put("text", topicName);
 					topic.put("id", offset);
 				}
@@ -152,6 +151,11 @@ public class TopicServiceImpl implements TopicService {
 		return brokerService.topicNumbers(clusterAlias);
 	}
 
+	@Override
+	public long getTopicNumbers(String clusterAlias, String topic) {
+		return brokerService.topicNumbers(clusterAlias, topic);
+	}
+
 	/** Get topic list. */
 	public List<PartitionsInfo> list(String clusterAlias, Map<String, Object> params) {
 		return brokerService.topicRecords(clusterAlias, params);
@@ -164,11 +168,10 @@ public class TopicServiceImpl implements TopicService {
 
 	@Override
 	public String getTopicMBean(String clusterAlias, String topic) {
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+		List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
 		Map<String, MBeanInfo> mbeans = new HashMap<>();
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
-			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
+		for (BrokersInfo broker : brokers) {
+			String uri = broker.getHost() + ":" + broker.getJmxPort();
 			MBeanInfo bytesIn = mx4jService.bytesInPerSec(uri, topic);
 			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri, topic);
 			MBeanInfo bytesRejected = mx4jService.bytesRejectedPerSec(uri, topic);
@@ -223,6 +226,17 @@ public class TopicServiceImpl implements TopicService {
 		} else {
 			mbeans.put(mBeanInfoKey, mBeanInfo);
 		}
+	}
+
+	/** Get topic logsize, topicsize from jmx data. */
+	public String getTopicMsgByJMX(String clusterAlias, String topic) {
+		JSONObject object = new JSONObject();
+		long logSize = brokerService.getTopicRealLogSize(clusterAlias, topic);
+		JSONObject topicSize = kafkaMetricsService.topicSize(clusterAlias, topic);
+		object.put("logsize", logSize);
+		object.put("topicsize", topicSize.getString("size"));
+		object.put("sizetype", topicSize.getString("type"));
+		return object.toJSONString();
 	}
 
 }

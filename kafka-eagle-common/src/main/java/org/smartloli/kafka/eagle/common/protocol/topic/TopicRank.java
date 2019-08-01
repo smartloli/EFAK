@@ -15,28 +15,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.metrics;
+package org.smartloli.kafka.eagle.common.protocol.topic;
 
-import org.apache.kafka.clients.admin.ConfigEntry;
-
-import com.alibaba.fastjson.JSONObject;
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * KafkaMetricsService to collect kafka performance kpi.
+ * Rank topic records logsize & capacity size.
  * 
  * @author smartloli.
  *
- *         Created by Oct 26, 2018
+ *         Created by Jul 27, 2019
  */
-public interface KafkaMetricsService {
+public class TopicRank extends BaseProtocol {
 
-	/** Get topic size by jmx and convert unit, such TB, GB ,MB etc. */
-	public JSONObject topicSize(String clusterAlias, String topic);
+	private String cluster = "";
+	private String topic = "";
+	private String tkey = "";
+	private long tvalue = 0L;
 
-	/** Get topic size by jmx no convert . */
-	public long topicCapacity(String clusterAlias, String topic);
+	public String getCluster() {
+		return cluster;
+	}
 
-	/** Change topic config property. */
-	public String changeTopicConfig(String clusterAlias, String topic, String type, ConfigEntry configEntry);
+	public void setCluster(String cluster) {
+		this.cluster = cluster;
+	}
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	public String getTkey() {
+		return tkey;
+	}
+
+	public void setTkey(String tkey) {
+		this.tkey = tkey;
+	}
+
+	public long getTvalue() {
+		return tvalue;
+	}
+
+	public void setTvalue(long tvalue) {
+		this.tvalue = tvalue;
+	}
 
 }

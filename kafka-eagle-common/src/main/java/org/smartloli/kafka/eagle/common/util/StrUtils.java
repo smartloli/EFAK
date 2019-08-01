@@ -19,6 +19,8 @@ package org.smartloli.kafka.eagle.common.util;
 
 import java.text.DecimalFormat;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * String conversion tool.
  * 
@@ -64,9 +66,41 @@ public class StrUtils {
 		}
 	}
 
+	/** Formatter byte to kb,mb or gb etc. */
+	public static JSONObject stringifyByObject(long byteNumber) {
+		JSONObject object = new JSONObject();
+		if (byteNumber / TB_IN_BYTES > 0) {
+			object.put("size", df.format((double) byteNumber / (double) TB_IN_BYTES));
+			object.put("type", "TB");
+			return object;
+		} else if (byteNumber / GB_IN_BYTES > 0) {
+			object.put("size", df.format((double) byteNumber / (double) GB_IN_BYTES));
+			object.put("type", "GB");
+			return object;
+		} else if (byteNumber / MB_IN_BYTES > 0) {
+			object.put("size", df.format((double) byteNumber / (double) MB_IN_BYTES));
+			object.put("type", "MB");
+			return object;
+		} else if (byteNumber / KB_IN_BYTES > 0) {
+			object.put("size", df.format((double) byteNumber / (double) KB_IN_BYTES));
+			object.put("type", "KB");
+			return object;
+		} else {
+			object.put("size", String.valueOf(byteNumber));
+			object.put("type", "B");
+			return object;
+		}
+	}
+
 	/** Formmatter number. */
 	public static double numberic(String number) {
 		DecimalFormat formatter = new DecimalFormat("###.##");
+		return Double.valueOf(formatter.format(Double.valueOf(number)));
+	}
+	
+	/** Formmatter number. */
+	public static double numberic(String number,String format) {
+		DecimalFormat formatter = new DecimalFormat(format);
 		return Double.valueOf(formatter.format(Double.valueOf(number)));
 	}
 

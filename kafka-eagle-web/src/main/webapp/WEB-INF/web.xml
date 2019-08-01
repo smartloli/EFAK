@@ -5,7 +5,7 @@
 	id="WebApp_ID" version="3.0">
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:spring-mybatis.xml,classpath:spring-shiro.xml,classpath:alert-quartz.xml,classpath:mbean-quartz.xml,classpath:metrics-quartz.xml</param-value>
+		<param-value>classpath:spring-mybatis.xml,classpath:spring-shiro.xml,classpath:alert-quartz.xml,classpath:mbean-quartz.xml,classpath:metrics-quartz.xml,classpath:topic-quartz.xml</param-value>
 	</context-param>
 	<filter>
 		<filter-name>encodingFilter</filter-name>

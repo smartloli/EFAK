@@ -15,35 +15,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.web.service;
+package org.smartloli.kafka.eagle.web.dao;
 
 import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
-
-import com.alibaba.fastjson.JSONArray;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 
 /**
- * Kafka Eagle dashboard data generator interface.
+ * TopicDao interface definition
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017.
- * 
- *         Update by hexiang 20170216
+ *         Created by Jul 27, 2019
  */
-public interface DashboardService {
-
-	/** Get kafka & dashboard dataset interface. */
-	public String getDashboard(String clusterAlias);
-
-	/** Get topic logsize & capacity. */
-	public JSONArray getTopicRank(Map<String, Object> params);
+public interface TopicDao {
 
 	/** Write statistics topic rank data from kafka jmx & insert into table. */
 	public int writeTopicRank(List<TopicRank> topicRanks);
 
-	/** Get os memory data. */
-	public String getOSMem(Map<String, Object> params);
+	/** Read topic rank data. */
+	public List<TopicRank> readTopicRank(Map<String, Object> params);
+
+	/** Write topic sql history data into table. */
+	public int writeTopicSqlHistory(List<TopicSqlHistory> topicSqlHistorys);
+
+	/** Read topic sql history data. */
+	public List<TopicSqlHistory> readTopicSqlHistory(Map<String, Object> params);
+	
+	/** Count topic sql history.*/
+	
+	public long countTopicSqlHistory();
+
+	/** Crontab clean topic sql history data. */
+	public void cleanTopicSqlHistory(int tm);
+
 }

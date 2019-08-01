@@ -37,7 +37,7 @@
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
 						<i class="fa fa-info-circle"></i> <strong>List all topic
-							information.</strong> The topic size actually needs to be multiplied by the number of copies of the topic.
+							information.</strong>
 					</div>
 				</div>
 			</div>
@@ -58,9 +58,7 @@
 										<th>ID</th>
 										<th>Topic Name</th>
 										<th>Partition Indexes</th>
-										<th>LogSize(All)</th>
 										<th>Partition Numbers</th>
-										<th>Size(All-Brokers)</th>
 										<th>Created</th>
 										<th>Modify</th>
 										<th>Operate</th>

@@ -224,7 +224,7 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Get all broker list from zookeeper. */
-	public String getAllBrokersInfo(String clusterAlias) {
+	public List<BrokersInfo> getAllBrokersInfo(String clusterAlias) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		List<BrokersInfo> targets = new ArrayList<BrokersInfo>();
 		if (zkc.pathExists(BROKER_IDS_PATH)) {
@@ -251,7 +251,7 @@ public class KafkaServiceImpl implements KafkaService {
 					}
 					broker.setJmxPort(JSON.parseObject(tupleString).getInteger("jmx_port"));
 					broker.setId(++id);
-					broker.setVersion(getKafkaVersion(broker.getHost(), broker.getJmxPort(), ids, clusterAlias));
+					broker.setIds(ids);
 					targets.add(broker);
 				} catch (Exception ex) {
 					LOG.error(ex.getMessage());
@@ -262,7 +262,7 @@ public class KafkaServiceImpl implements KafkaService {
 			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
 		}
-		return targets.toString();
+		return targets;
 	}
 
 	/**
@@ -511,7 +511,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 */
 	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic) {
 		Map<String, Object> targets = new HashMap<String, Object>();
-		int brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias)).size();
+		int brokers = getAllBrokersInfo(clusterAlias).size();
 		if (Integer.parseInt(replic) > brokers) {
 			targets.put("status", "error");
 			targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
@@ -554,12 +554,11 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Get kafka brokers from zookeeper. */
 	private List<HostsInfo> getBrokers(String clusterAlias) {
 		List<HostsInfo> targets = new ArrayList<HostsInfo>();
-		JSONArray brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias));
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
+		List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+		for (BrokersInfo broker : brokers) {
 			HostsInfo host = new HostsInfo();
-			host.setHost(broker.getString("host"));
-			host.setPort(broker.getInteger("port"));
+			host.setHost(broker.getHost());
+			host.setPort(broker.getPort());
 			targets.add(host);
 		}
 		return targets;
@@ -567,10 +566,9 @@ public class KafkaServiceImpl implements KafkaService {
 
 	private String parseBrokerServer(String clusterAlias) {
 		String brokerServer = "";
-		JSONArray brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias));
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
-			brokerServer += broker.getString("host") + ":" + broker.getInteger("port") + ",";
+		List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+		for (BrokersInfo broker : brokers) {
+			brokerServer += broker.getHost() + ":" + broker.getPort() + ",";
 		}
 		if ("".equals(brokerServer)) {
 			return "";
@@ -874,8 +872,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return parseBrokerServer(clusterAlias);
 	}
 
-	/** Get kafka 0.10.x sasl logsize. */
+	/** Get kafka 0.10.x topic history logsize. */
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid) {
+		long histyLogSize = 0L;
 		Properties props = new Properties();
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
 		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
@@ -889,12 +888,51 @@ public class KafkaServiceImpl implements KafkaService {
 		TopicPartition tp = new TopicPartition(topic, partitionid);
 		consumer.assign(Collections.singleton(tp));
 		java.util.Map<TopicPartition, Long> logsize = consumer.endOffsets(Collections.singleton(tp));
-		consumer.close();
-		return logsize.get(tp).longValue();
+		try {
+			histyLogSize = logsize.get(tp).longValue();
+		} catch (Exception e) {
+			LOG.error("Get history topic logsize has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (consumer != null) {
+				consumer.close();
+			}
+		}
+		return histyLogSize;
+	}
+
+	/** Get kafka 0.10.x topic real logsize. */
+	public long getKafkaRealLogSize(String clusterAlias, String topic, int partitionid) {
+		long realLogSize = 0L;
+		Properties props = new Properties();
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
+			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
+		}
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		TopicPartition tp = new TopicPartition(topic, partitionid);
+		consumer.assign(Collections.singleton(tp));
+		java.util.Map<TopicPartition, Long> endLogSize = consumer.endOffsets(Collections.singleton(tp));
+		java.util.Map<TopicPartition, Long> startLogSize = consumer.beginningOffsets(Collections.singleton(tp));
+		try {
+			realLogSize = endLogSize.get(tp).longValue() - startLogSize.get(tp).longValue();
+		} catch (Exception e) {
+			LOG.error("Get real topic logsize has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (consumer != null) {
+				consumer.close();
+			}
+		}
+		return realLogSize;
 	}
 
 	/** Get kafka version. */
-	private String getKafkaVersion(String host, int port, String ids, String clusterAlias) {
+	public String getKafkaVersion(String host, int port, String ids, String clusterAlias) {
 		JMXConnector connector = null;
 		String version = "-";
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
@@ -974,11 +1012,7 @@ public class KafkaServiceImpl implements KafkaService {
 		}
 
 		Producer<String, String> producer = new KafkaProducer<>(props);
-		JSONObject msg = new JSONObject();
-		msg.put("date", CalendarUtils.getDate());
-		msg.put("msg", message);
-
-		producer.send(new ProducerRecord<String, String>(topic, new Date().getTime() + "", msg.toJSONString()));
+		producer.send(new ProducerRecord<String, String>(topic, new Date().getTime() + "", message));
 		producer.close();
 
 		return true;
@@ -1031,15 +1065,14 @@ public class KafkaServiceImpl implements KafkaService {
 		return lag;
 	}
 
-	/** Get kafka old version log size. */
+	/** Get kafka old version topic history logsize. */
 	public long getLogSize(String clusterAlias, String topic, int partitionid) {
 		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
-		JSONArray brokers = JSON.parseArray(getAllBrokersInfo(clusterAlias));
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
+		List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+		for (BrokersInfo broker : brokers) {
 			try {
-				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getString("host") + ":" + broker.getInteger("jmxPort")));
+				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
 				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 				if (connector != null) {
 					break;
@@ -1052,7 +1085,46 @@ public class KafkaServiceImpl implements KafkaService {
 		long logSize = 0L;
 		try {
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			logSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.logSize, topic, partitionid)), KafkaServer8.value).toString());
+			logSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.endLogSize, topic, partitionid)), KafkaServer8.value).toString());
+		} catch (Exception ex) {
+			LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
+			ex.printStackTrace();
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					LOG.error("Close jmx connector has error, msg is " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+		return logSize;
+	}
+
+	/** Get kafka old version real topic logsize. */
+	public long getRealLogSize(String clusterAlias, String topic, int partitionid) {
+		JMXConnector connector = null;
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+		for (BrokersInfo broker : brokers) {
+			try {
+				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
+				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+				if (connector != null) {
+					break;
+				}
+			} catch (Exception e) {
+				LOG.error("Get kafka old version logsize has error, msg is " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		long logSize = 0L;
+		try {
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			long endLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.endLogSize, topic, partitionid)), KafkaServer8.value).toString());
+			long startLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.startLogSize, topic, partitionid)), KafkaServer8.value).toString());
+			logSize = endLogSize - startLogSize;
 		} catch (Exception ex) {
 			LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
 			ex.printStackTrace();
@@ -1097,5 +1169,30 @@ public class KafkaServiceImpl implements KafkaService {
 			zkc = null;
 		}
 		return jni;
+	}
+
+	/** Get kafka os memory. */
+	public long getOSMemory(String host, int port, String property) {
+		JMXConnector connector = null;
+		long memory = 0L;
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		try {
+			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
+			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			String memorySize = mbeanConnection.getAttribute(new ObjectName(KafkaServer.OS.type), property).toString();
+			memory = Long.parseLong(memorySize);
+		} catch (Exception ex) {
+			LOG.error("Get kafka os memory from jmx has error, msg is " + ex.getMessage());
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					LOG.error("Close kafka os memory jmx connector has error, msg is " + e.getMessage());
+				}
+			}
+		}
+		return memory;
 	}
 }
