@@ -3,6 +3,7 @@ jdk:
   - oraclejdk11
 before_install:  
   - "echo skipped"  
-install: mvn install
+install: 
+  - "echo skipped"
 script:  
   - "echo skipped"
