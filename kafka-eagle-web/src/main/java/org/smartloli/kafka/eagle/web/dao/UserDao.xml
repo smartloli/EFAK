@@ -2,8 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.smartloli.kafka.eagle.web.dao.UserDao">
 
-	<resultMap type="org.smartloli.kafka.eagle.web.pojo.Signiner"
-		id="signin">
+	<resultMap type="org.smartloli.kafka.eagle.web.pojo.Signiner" id="signin">
 		<result property="id" column="id" />
 		<result property="rtxno" column="rtxno" />
 		<result property="username" column="username" />
@@ -12,26 +11,20 @@
 		<result property="email" column="email" />
 	</resultMap>
 
-	<select id="login" parameterType="org.smartloli.kafka.eagle.web.pojo.Signiner"
-		resultMap="signin">
-		select * from ke_users where (rtxno=#{username} or
-		username=#{username}) and
-		password=#{password}
+	<select id="login" parameterType="org.smartloli.kafka.eagle.web.pojo.Signiner" resultMap="signin">
+		select * from ke_users where (rtxno=#{username} or username=#{username}) and password=#{password}
 	</select>
 
 	<update id="modify" parameterType="org.smartloli.kafka.eagle.web.pojo.Signiner">
-		update ke_users set
-		username=#{username},realname=#{realname},email=#{email} where id=#{id}
+		update ke_users set username=#{username},realname=#{realname},email=#{email} where id=#{id}
 	</update>
 
 	<delete id="delete" parameterType="org.smartloli.kafka.eagle.web.pojo.Signiner">
-		delete from ke_users where
-		id=#{id}
+		delete from ke_users where id=#{id}
 	</delete>
 
 	<update id="reset" parameterType="org.smartloli.kafka.eagle.web.pojo.Signiner">
-		update ke_users set
-		password=#{password} where rtxno=#{rtxno}
+		update ke_users set password=#{password} where rtxno=#{rtxno}
 	</update>
 
 	<select id="findUserByRtxNo" parameterType="Integer" resultMap="signin">
@@ -62,7 +55,7 @@
 		ke_users(rtxno,username,password,email,realname)
 		values(#{rtxno},#{username},#{password},#{email},#{realname})
 	</insert>
-	
+
 	<select id="findUserLimitOne" resultMap="signin">
 		select * from ke_users order by id desc limit 1
 	</select>

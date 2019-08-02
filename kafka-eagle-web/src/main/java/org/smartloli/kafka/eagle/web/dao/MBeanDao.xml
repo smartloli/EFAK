@@ -2,8 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.smartloli.kafka.eagle.web.dao.MBeanDao">
 
-	<resultMap type="org.smartloli.kafka.eagle.common.protocol.KpiInfo"
-		id="kpi">
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.KpiInfo" id="kpi">
 		<result property="cluster" column="cluster" />
 		<result property="broker" column="broker" />
 		<result property="type" column="type" />
@@ -13,9 +12,7 @@
 		<result property="tm" column="tm" />
 	</resultMap>
 
-	<resultMap
-		type="org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo"
-		id="topicOffsets">
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo" id="topicOffsets">
 		<result property="cluster" column="cluster" />
 		<result property="group" column="group" />
 		<result property="topic" column="topic" />
@@ -30,109 +27,62 @@
 		insert into
 		ke_metrics(`cluster`,`broker`,`type`,`key`,`value`,`timespan`,`tm`)
 		values
-		<foreach collection="list" item="item" index="index"
-			separator=",">
+		<foreach collection="list" item="item" index="index" separator=",">
 			(#{item.cluster},#{item.broker},#{item.type},#{item.key},#{item.value},#{item.timespan},#{item.tm})
 		</foreach>
 	</insert>
 
 	<delete id="remove" parameterType="int">
-		delete from ke_metrics where
-		tm&lt;=#{tm}
+		delete from ke_metrics where tm&lt;=#{tm}
 	</delete>
 
 	<delete id="cleanConsumerTopic" parameterType="int">
-		delete from
-		ke_consumer where
-		tm&lt;=#{tm}
+		delete from ke_consumer where tm&lt;=#{tm}
 	</delete>
 
 	<select id="query" parameterType="map" resultMap="kpi">
-		select
-		`broker`,`key`,`value`,`timespan`
-		from ke_metrics
-		where
-		`cluster`
-		=#{cluster}
-		and `type` =#{type}
+		select `broker`,`key`,`value`,`timespan` from ke_metrics
+		where `cluster`=#{cluster} and `type` =#{type}
 		<if test="modules != '' and modules != null">
 			and `key` in (
-			<foreach collection="modules" item="item" index="index"
-				separator=",">
+			<foreach collection="modules" item="item" index="index" separator=",">
 				#{item}
 			</foreach>
 			)
 		</if>
-		and tm between
-		#{stime} and #{etime}
+		and tm between #{stime} and #{etime}
 	</select>
 
 	<select id="getOsMem" parameterType="map" resultMap="kpi">
-		select
-		`value`
-		from ke_metrics
-		where
-		`cluster`=#{cluster}
-		and `key` like #{key}
-		order by `timespan` desc limit 2
-	</select>
-
-	<select id="getHost" parameterType="map" resultMap="kpi">
-		select
-		`broker`,`key`,`value`,`timespan`
-		from ke_metrics where
-		`cluster`=#{cluster} and tm
-		between #{stime} and
-		#{etime}
+		select `value` from ke_metrics where `cluster`=#{cluster} and `key` like #{key} order by `timespan` desc limit 2
 	</select>
 
 	<insert id="setConsumerTopic" parameterType="java.util.List">
 		insert into
 		ke_consumer(`cluster`,`group`,`topic`,`logsize`,`offsets`,`lag`,`timespan`,`tm`)
 		values
-		<foreach collection="list" item="item" index="index"
-			separator=",">
+		<foreach collection="list" item="item" index="index" separator=",">
 			(#{item.cluster},#{item.group},#{item.topic},#{item.logsize},#{item.offsets},#{item.lag},#{item.timespan},#{item.tm})
 		</foreach>
 	</insert>
 
 	<select id="getConsumerTopic" parameterType="map" resultMap="topicOffsets">
-		select
-		`logsize`,`offsets`,`lag`,`timespan`
-		from ke_consumer
-		where
-		`cluster` =#{cluster}
-		and `group`
-		=#{group}
-		and `topic` =#{topic}
-		and tm
-		between
-		#{stime} and #{etime}
+		select `logsize`,`offsets`,`lag`,`timespan` from ke_consumer
+		where `cluster` =#{cluster} and `group`=#{group} and `topic` =#{topic}
+		and tm between #{stime} and #{etime}
 	</select>
 
 	<select id="getConsumerRateTopic" parameterType="map" resultMap="topicOffsets">
 		select logsize,offsets,timespan from ke_consumer
-		where `cluster`
-		=#{cluster}
-		and `group`
-		=#{group}
-		and `topic` =#{topic} order by
-		`timespan` desc limit 2
+		where `cluster`=#{cluster} and `group`=#{group}
+		and `topic`=#{topic} order by `timespan` desc limit 2
 	</select>
 
 	<select id="getConsumerLagTopic" parameterType="map" resultMap="topicOffsets">
 		select `lag`,`timespan`
 		from ke_consumer
-		where
-		`cluster`=#{cluster}
-		and
-		`group`
-		=#{group}
-		and `topic`=#{topic}
-		and tm
-		between
-		#{stime} and
-		#{etime}
+		where `cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
+		and tm between #{stime} and #{etime}
 	</select>
 
 </mapper>

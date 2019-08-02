@@ -2,8 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.smartloli.kafka.eagle.web.dao.AlertDao">
 
-	<resultMap type="org.smartloli.kafka.eagle.common.protocol.AlertInfo"
-		id="alertInfo">
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.AlertInfo" id="alertInfo">
 		<result property="id" column="id" />
 		<result property="cluster" column="cluster" />
 		<result property="group" column="group" />
@@ -14,8 +13,7 @@
 		<result property="modify" column="modify" />
 	</resultMap>
 
-	<resultMap type="org.smartloli.kafka.eagle.common.protocol.ClustersInfo"
-		id="clustersInfo">
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.ClustersInfo" id="clustersInfo">
 		<result property="id" column="id" />
 		<result property="type" column="type" />
 		<result property="cluster" column="cluster" />
@@ -43,8 +41,7 @@
 	</select>
 
 	<select id="alertCount" parameterType="map" resultType="Integer">
-		select
-		count(*) from ke_alarm where `cluster`=#{cluster}
+		select count(*) from ke_alarm where `cluster`=#{cluster}
 	</select>
 
 	<select id="isExistAlertByCGT" parameterType="map" resultType="Integer">
@@ -62,9 +59,7 @@
 	</select>
 
 	<delete id="deleteAlertById" parameterType="Integer">
-		delete from
-		ke_alarm
-		where `id`=#{id}
+		delete from ke_alarm where `id`=#{id}
 	</delete>
 
 	<select id="findAlertById" parameterType="Integer" resultMap="alertInfo">
@@ -72,16 +67,11 @@
 	</select>
 
 	<update id="modifyAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.AlertInfo">
-		update ke_alarm set
-		`lag`=#{lag},`owner`=#{owner},`modify`=#{modify} where
-		`id`=#{id}
+		update ke_alarm set `lag`=#{lag},`owner`=#{owner},`modify`=#{modify} where `id`=#{id}
 	</update>
 
-	<insert id="insertKafkaOrZK"
-		parameterType="org.smartloli.kafka.eagle.common.protocol.ClustersInfo">
-		insert into
-		ke_clusters(`type`,`cluster`,`server`,`owner`,`created`,`modify`)
-		values(#{type},#{cluster},#{server},#{owner},#{created},#{modify})
+	<insert id="insertKafkaOrZK" parameterType="org.smartloli.kafka.eagle.common.protocol.ClustersInfo">
+		insert into ke_clusters(`type`,`cluster`,`server`,`owner`,`created`,`modify`) values(#{type},#{cluster},#{server},#{owner},#{created},#{modify})
 	</insert>
 
 	<select id="history" parameterType="map" resultMap="clustersInfo">
@@ -96,26 +86,19 @@
 	</select>
 
 	<select id="alertHistoryCount" parameterType="map" resultType="Integer">
-		select
-		count(*) from ke_clusters where `cluster`=#{cluster}
+		select count(*) from ke_clusters where `cluster`=#{cluster}
 	</select>
 
 	<delete id="deleteClusterAlertById" parameterType="Integer">
-		delete from
-		ke_clusters
-		where `id`=#{id}
+		delete from ke_clusters where `id`=#{id}
 	</delete>
 
-	<select id="findClusterAlertById" parameterType="Integer"
-		resultMap="clustersInfo">
+	<select id="findClusterAlertById" parameterType="Integer" resultMap="clustersInfo">
 		select * from ke_clusters where `id`=#{id}
 	</select>
 
-	<update id="modifyClusterAlertById"
-		parameterType="org.smartloli.kafka.eagle.common.protocol.ClustersInfo">
-		update ke_clusters set
-		`server`=#{server},`owner`=#{owner} where
-		`id`=#{id}
+	<update id="modifyClusterAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.ClustersInfo">
+		update ke_clusters set `server`=#{server},`owner`=#{owner} where `id`=#{id}
 	</update>
 
 	<select id="historys" resultMap="clustersInfo">

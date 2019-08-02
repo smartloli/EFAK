@@ -2,9 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.smartloli.kafka.eagle.web.dao.TopicDao">
 
-	<resultMap
-		type="org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory"
-		id="tsql">
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory" id="tsql">
 		<result property="cluster" column="cluster" />
 		<result property="username" column="username" />
 		<result property="ksql" column="ksql" />
@@ -13,25 +11,17 @@
 		<result property="tm" column="tm" />
 	</resultMap>
 
-	<resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicRank"
-		id="trank">
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicRank" id="trank">
 		<result property="cluster" column="cluster" />
 		<result property="topic" column="topic" />
 		<result property="tkey" column="tkey" />
 		<result property="tvalue" column="tvalue" />
-		<result property="timespan" column="timespan" />
-		<result property="tm" column="tm" />
 	</resultMap>
 
 	<!-- TopicRank -->
 	<select id="readTopicRank" parameterType="map" resultMap="trank">
-		select
-		`topic`,`tvalue`
-		from ke_topic_rank
-		where
-		`cluster` =#{cluster}
-		and `tkey`
-		=#{tkey}
+		select `topic`,`tvalue` from ke_topic_rank
+		where `cluster` =#{cluster} and `tkey`=#{tkey}
 		order by `tvalue` desc limit 10
 	</select>
 
@@ -39,39 +29,32 @@
 		replace into
 		ke_topic_rank(`cluster`,`topic`,`tkey`,`tvalue`)
 		values
-		<foreach collection="list" item="item" index="index"
-			separator=",">
+		<foreach collection="list" item="item" index="index" separator=",">
 			(#{item.cluster},#{item.topic},#{item.tkey},#{item.tvalue})
 		</foreach>
 	</insert>
 
 	<!-- TopicSqlHistory -->
 	<select id="readTopicSqlHistory" parameterType="map" resultMap="tsql">
-		select
-		`ksql`,`status`,`timespan`
-		from ke_sql_history where
-		`cluster`=#{cluster} and `username`=#{username} limit #{start},#{size}
+		select `ksql`,`status`,`timespan` from ke_sql_history
+		where `cluster`=#{cluster} and `username`=#{username} limit #{start},#{size}
 	</select>
 
 	<insert id="writeTopicSqlHistory" parameterType="java.util.List">
 		insert into
 		ke_sql_history(`cluster`,`username`,`ksql`,`status`,`timespan`,`tm`)
 		values
-		<foreach collection="list" item="item" index="index"
-			separator=",">
+		<foreach collection="list" item="item" index="index" separator=",">
 			(#{item.cluster},#{item.username},#{item.ksql},#{item.status},#{item.timespan},#{item.tm})
 		</foreach>
 	</insert>
 
 	<select id="countTopicSqlHistory" resultType="int">
-		select count(*)
-		from ke_sql_history
+		select count(*) from ke_sql_history
 	</select>
 
 	<delete id="cleanTopicSqlHistory" parameterType="int">
-		delete from
-		ke_sql_history where
-		tm&lt;=#{tm}
+		delete from ke_sql_history where tm&lt;=#{tm}
 	</delete>
 
 </mapper>

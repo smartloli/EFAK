@@ -48,4 +48,7 @@ public interface ConsumerService {
 	/** Get consumer size from kafka topic interface. */
 	public int getConsumerCount(String clusterAlias, String formatter);
 
+	/** Check if the application is consuming. */
+	public boolean isConsumering(String clusterAlias, String group, String topic);
+
 }

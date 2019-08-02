@@ -46,7 +46,7 @@ public interface MBeanDao {
 
 	/** Get consumer lag topic metrics. */
 	public List<TopicOffsetsInfo> getConsumerLagTopic(Map<String, Object> params);
-	
+
 	/** Get consumer rate topic metrics. */
 	public List<TopicOffsetsInfo> getConsumerRateTopic(Map<String, Object> params);
 
@@ -55,7 +55,7 @@ public interface MBeanDao {
 
 	/** Clean consumer topic data. */
 	public void cleanConsumerTopic(int tm);
-	
+
 	/** Query os memory data. */
 	public List<KpiInfo> getOsMem(Map<String, Object> params);
 
