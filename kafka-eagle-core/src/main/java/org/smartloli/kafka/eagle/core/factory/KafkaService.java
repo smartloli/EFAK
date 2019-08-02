@@ -26,6 +26,7 @@ import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
+import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 
 /**
@@ -94,8 +95,12 @@ public interface KafkaService {
 	/** Get kafka 0.10.x consumer group & topic information. */
 	public String getKafkaConsumer(String clusterAlias);
 
+	@Deprecated
 	/** Get kafka consumer information pages. */
 	public String getKafkaActiverSize(String clusterAlias, String group);
+
+	/** Get kafka consumer information pages not owners. */
+	public OwnerInfo getKafkaActiverNotOwners(String clusterAlias, String group);
 
 	/** Get kafka broker bootstrap server. */
 	public String getKafkaBrokerServer(String clusterAlias);

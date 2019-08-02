@@ -71,6 +71,7 @@ import org.smartloli.kafka.eagle.common.protocol.HostsInfo;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
+import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
@@ -778,6 +779,27 @@ public class KafkaServiceImpl implements KafkaService {
 		activerAndTopics.put("activers", activerCounter);
 		activerAndTopics.put("topics", topics.size());
 		return activerAndTopics.toJSONString();
+	}
+
+	/** Get kafka consumer information pages not owners. */
+	public OwnerInfo getKafkaActiverNotOwners(String clusterAlias, String group) {
+		OwnerInfo ownerInfo = new OwnerInfo();
+		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
+		int activerCounter = 0;
+		Set<String> topics = new HashSet<>();
+		for (Object object : consumerGroups) {
+			JSONObject consumerGroup = (JSONObject) object;
+			if (!"".equals(consumerGroup.getString("owner")) && consumerGroup.getString("owner") != null) {
+				activerCounter++;
+			}
+			for (Object topicObject : consumerGroup.getJSONArray("topicSub")) {
+				JSONObject topic = (JSONObject) topicObject;
+				topics.add(topic.getString("topic"));
+			}
+		}
+		ownerInfo.setActiveSize(activerCounter);
+		ownerInfo.setTopicSets(topics);
+		return ownerInfo;
 	}
 
 	/** Get kafka 0.10.x, 1.x, 2.x consumer groups. */
