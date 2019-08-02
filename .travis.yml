@@ -1,9 +1,6 @@
 language: java  
-jdk:  
-  - oraclejdk8  
 before_install:  
   - "echo skipped"  
-install:  
-  - "echo skipped"  
+install: mvn install
 script:  
   - "echo skipped"
