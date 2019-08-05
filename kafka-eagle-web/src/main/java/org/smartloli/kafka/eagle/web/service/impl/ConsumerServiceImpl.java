@@ -228,7 +228,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 		for (Object object : consumerGroups) {
 			JSONObject consumerGroup = (JSONObject) object;
 			String group = consumerGroup.getString("group");
-			if (page.getSearch().length() > 0 && page.getSearch().equals(group)) {
+			if (page.getSearch().length() > 0 && group.contains(page.getSearch())) {
 				ConsumerInfo consumer = new ConsumerInfo();
 				consumer.setGroup(group);
 				consumer.setId(++id);
@@ -236,7 +236,6 @@ public class ConsumerServiceImpl implements ConsumerService {
 				consumer.setActiveNumber(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("activers"));
 				consumer.setTopics(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("topics"));
 				kafkaConsumerPages.add(consumer);
-				break;
 			} else if (page.getSearch().length() == 0) {
 				if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
 					ConsumerInfo consumer = new ConsumerInfo();
