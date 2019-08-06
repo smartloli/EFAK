@@ -36,7 +36,7 @@
 		<where>
 			`cluster`=#{cluster}
 			<if test="search!=null and search!=''">
-				and (`group`=#{search} or `topic`=#{search})
+				and (`group` like '%'||#{search}||'%' or `topic` like '%'||#{search}||'%')
 			</if>
 		</where>
 		order by `id` desc limit #{start},#{size}
@@ -44,7 +44,11 @@
 
 	<select id="alertCount" parameterType="map" resultType="Integer">
 		select
-		count(*) from ke_alarm where `cluster`=#{cluster}
+		count(*) from ke_alarm
+		where `cluster`=#{cluster}
+		<if test="search!=null and search!=''">
+			and (`group` like '%'||#{search}||'%' or `topic` like '%'||#{search}||'%')
+		</if>
 	</select>
 
 	<select id="isExistAlertByCGT" parameterType="map" resultType="Integer">
