@@ -17,16 +17,9 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
 import org.smartloli.kafka.eagle.common.protocol.ConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
@@ -35,6 +28,13 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
 import org.springframework.stereotype.Service;
+import scala.Tuple2;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Kafka consumer data interface, and set up the return data set.
@@ -114,7 +114,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get consumers from zookeeper. */
-	private String getConsumer(String clusterAlias, DisplayInfo page) {
+	private Tuple2<String, Integer> getConsumerZk(String clusterAlias, DisplayInfo page) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias, page);
 		List<ConsumerInfo> consumerPages = new ArrayList<ConsumerInfo>();
 		int id = 0;
@@ -127,15 +127,15 @@ public class ConsumerServiceImpl implements ConsumerService {
 			consumer.setActiveNumber(getActiveNumber(clusterAlias, entry.getKey(), entry.getValue()));
 			consumerPages.add(consumer);
 		}
-		return consumerPages.toString();
+		return new Tuple2<String,Integer>(consumerPages.toString(),consumers.size());
 	}
 
 	/** Judge consumers storage offset in kafka or zookeeper. */
-	public String getConsumer(String clusterAlias, String formatter, DisplayInfo page) {
+	public Tuple2<String,Integer> getConsumer(String clusterAlias, String formatter, DisplayInfo page) {
 		if ("kafka".equals(formatter)) {
 			return getKafkaConsumer(page, clusterAlias);
 		} else {
-			return getConsumer(clusterAlias, page);
+			return getConsumerZk(clusterAlias, page);
 		}
 	}
 
@@ -220,7 +220,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get kafka consumer & storage offset in kafka topic. */
-	private String getKafkaConsumer(DisplayInfo page, String clusterAlias) {
+	private Tuple2<String,Integer> getKafkaConsumer(DisplayInfo page, String clusterAlias) {
 		List<ConsumerInfo> kafkaConsumerPages = new ArrayList<ConsumerInfo>();
 		JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
 		int offset = 0;
@@ -229,13 +229,16 @@ public class ConsumerServiceImpl implements ConsumerService {
 			JSONObject consumerGroup = (JSONObject) object;
 			String group = consumerGroup.getString("group");
 			if (page.getSearch().length() > 0 && group.contains(page.getSearch())) {
-				ConsumerInfo consumer = new ConsumerInfo();
-				consumer.setGroup(group);
-				consumer.setId(++id);
-				consumer.setNode(consumerGroup.getString("node"));
-				consumer.setActiveNumber(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("activers"));
-				consumer.setTopics(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("topics"));
-				kafkaConsumerPages.add(consumer);
+				if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
+					ConsumerInfo consumer = new ConsumerInfo();
+					consumer.setGroup(group);
+					consumer.setId(++id);
+					consumer.setNode(consumerGroup.getString("node"));
+					consumer.setActiveNumber(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("activers"));
+					consumer.setTopics(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("topics"));
+					kafkaConsumerPages.add(consumer);
+				}
+				offset++;
 			} else if (page.getSearch().length() == 0) {
 				if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
 					ConsumerInfo consumer = new ConsumerInfo();
@@ -249,7 +252,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 				offset++;
 			}
 		}
-		return kafkaConsumerPages.toString();
+		return new Tuple2<>(kafkaConsumerPages.toString(),offset);
 	}
 
 	/** Get consumer detail from kafka topic. */

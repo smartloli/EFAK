@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.web.service;
 
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import scala.Tuple2;
 
 /**
  * Kafka consumer data interface.
@@ -43,7 +44,7 @@ public interface ConsumerService {
 	public String getConsumerDetail(String clusterAlias, String formatter, String group);
 
 	/** Judge consumers storage offset in kafka or zookeeper interface. */
-	public String getConsumer(String clusterAlias, String formatter, DisplayInfo page);
+	public Tuple2<String,Integer> getConsumer(String clusterAlias, String formatter, DisplayInfo page);
 
 	/** Get consumer size from kafka topic interface. */
 	public int getConsumerCount(String clusterAlias, String formatter);

@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +37,7 @@ import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
+import scala.Tuple2;
 
 /**
  * Kafka consumer controller to viewer data.
@@ -105,8 +107,8 @@ public class ConsumersController {
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
-		int count = consumerService.getConsumerCount(clusterAlias, formatter);
-		JSONArray consumers = JSON.parseArray(consumerService.getConsumer(clusterAlias, formatter, page));
+		Tuple2<String,Integer> reTuple = consumerService.getConsumer(clusterAlias, formatter, page);
+		JSONArray consumers = JSON.parseArray(reTuple._1);
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : consumers) {
 			JSONObject consumer = (JSONObject) object;
@@ -126,8 +128,10 @@ public class ConsumersController {
 
 		JSONObject target = new JSONObject();
 		target.put("sEcho", sEcho);
-		target.put("iTotalRecords", count);
-		target.put("iTotalDisplayRecords", count);
+		target.put("iTotalRecords", reTuple._2);
+		target.put("iTotalDisplayRecords", reTuple._2);
+
+
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
