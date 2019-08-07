@@ -179,6 +179,10 @@ public class KConstants {
 
 		public final static int BATCH_SIZE = 500;
 
+		public final static int RUNNING = 0;
+		public final static int SHUTDOWN = 1;
+		public final static int PENDING = 2;
+
 	}
 
 	public interface Component {

@@ -28,7 +28,7 @@ public class TopicConsumerInfo extends BaseProtocol{
 
 	private int id;
 	private String topic;
-	private boolean isConsumering;
+	private int isConsumering;
 
 	public int getId() {
 		return id;
@@ -46,11 +46,11 @@ public class TopicConsumerInfo extends BaseProtocol{
 		this.topic = topic;
 	}
 
-	public boolean isConsumering() {
+	public int isConsumering() {
 		return isConsumering;
 	}
 
-	public void setConsumering(boolean isConsumering) {
+	public void setConsumering(int isConsumering) {
 		this.isConsumering = isConsumering;
 	}
 

@@ -49,6 +49,6 @@ public interface ConsumerService {
 	public int getConsumerCount(String clusterAlias, String formatter);
 
 	/** Check if the application is consuming. */
-	public boolean isConsumering(String clusterAlias, String group, String topic);
+	public int isConsumering(String clusterAlias, String group, String topic);
 
 }

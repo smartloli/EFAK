@@ -30,6 +30,7 @@ import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
 import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
@@ -167,9 +168,9 @@ public class ConsumerServiceImpl implements ConsumerService {
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
 			if (actvTopics.containsKey(group + "_" + topic)) {
-				consumerDetail.setConsumering(true);
+				consumerDetail.setConsumering(Topic.RUNNING);
 			} else {
-				consumerDetail.setConsumering(false);
+				consumerDetail.setConsumering(Topic.SHUTDOWN);
 			}
 			kafkaConsumerDetails.add(consumerDetail);
 		}
@@ -246,7 +247,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 				Set<String> topicSets = ownerInfo.getTopicSets();
 				int activeSize = 0;
 				for (String topic : topicSets) {
-					if (isConsumering(clusterAlias, group, topic)) {
+					if (isConsumering(clusterAlias, group, topic) == Topic.RUNNING) {
 						activeSize++;
 					}
 				}
@@ -264,7 +265,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 					Set<String> topicSets = ownerInfo.getTopicSets();
 					int activeSize = 0;
 					for (String topic : topicSets) {
-						if (isConsumering(clusterAlias, group, topic)) {
+						if (isConsumering(clusterAlias, group, topic) == Topic.RUNNING) {
 							activeSize++;
 						}
 					}
@@ -282,7 +283,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 		Set<String> consumerTopics = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
 		Set<String> activerTopics = kafkaService.getKafkaActiverTopics(clusterAlias, group);
 		for (String topic : consumerTopics) {
-			if (isConsumering(clusterAlias, group, topic)) {
+			if (isConsumering(clusterAlias, group, topic) == Topic.RUNNING) {
 				activerTopics.add(topic);
 			}
 		}
@@ -292,18 +293,14 @@ public class ConsumerServiceImpl implements ConsumerService {
 			TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
-			if (activerTopics.contains(topic)) {
-				consumerDetail.setConsumering(true);
-			} else {
-				consumerDetail.setConsumering(false);
-			}
+			consumerDetail.setConsumering(isConsumering(clusterAlias, group, topic));
 			kafkaConsumerPages.add(consumerDetail);
 		}
 		return kafkaConsumerPages.toString();
 	}
 
 	/** Check if the application is consuming. */
-	public boolean isConsumering(String clusterAlias, String group, String topic) {
+	public int isConsumering(String clusterAlias, String group, String topic) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("cluster", clusterAlias);
 		params.put("group", group);
@@ -319,25 +316,31 @@ public class ConsumerServiceImpl implements ConsumerService {
 				 */
 				if (resultOffsets == 0) {
 					/**
-					 * logsize equal offsets,
-					 * 1. maybe application shutdown
-					 * 2. maybe application run, but producer rate equal consumer rate.
+					 * logsize equal offsets,follow two states.<br>
+					 * 1. maybe application shutdown.<br>
+					 * 2. maybe application run, but producer rate equal
+					 * consumer rate.<br>
 					 */
 					if (resultLogSize == 0) {
-						return true;
+						return Topic.PENDING;
 					} else {
-						return false;
+						return Topic.SHUTDOWN;
 					}
 				} else {
-					return true;
+					return Topic.RUNNING;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else {
-			return false;
+		} else if (topicOffsets.size() == 1) {
+			long resultLogSize = Math.abs(Long.parseLong(topicOffsets.get(0).getLogsize()) - Long.parseLong(topicOffsets.get(0).getOffsets()));
+			if (resultLogSize == 0) {
+				return Topic.PENDING;
+			} else {
+				return Topic.SHUTDOWN;
+			}
 		}
-		return false;
+		return Topic.SHUTDOWN;
 	}
 
 }

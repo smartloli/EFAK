@@ -21,6 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.web.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,11 +36,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.web.service.ConsumerService;
 
 /**
  * Kafka consumer controller to viewer data.
@@ -168,10 +168,12 @@ public class ConsumersController {
 				String topic = consumerDetail.getString("topic");
 				obj.put("id", consumerDetail.getInteger("id"));
 				obj.put("topic", topic);
-				if (consumerDetail.getBoolean("isConsumering")) {
+				if (consumerDetail.getInteger("isConsumering") == Topic.RUNNING) {
 					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-success btn-xs'>Running</a>");
+				} else if (consumerDetail.getInteger("isConsumering") == Topic.SHUTDOWN) {
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-danger btn-xs'>Shutdown</a>");
 				} else {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-danger btn-xs'>Pending</a>");
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-warning btn-xs'>Pending</a>");
 				}
 				aaDatas.add(obj);
 			}
