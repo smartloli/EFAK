@@ -588,9 +588,14 @@ public class KafkaServiceImpl implements KafkaService {
 		return sql;
 	}
 
-	private void sasl(Properties props, String bootstrapServers, String clusterAlias) {
+	/** Set topic sasl. */
+	private void sasl(Properties props, String clusterAlias) {
 		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
+		if (!"".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.client.id"))) {
+			props.put(CommonClientConfigs.CLIENT_ID_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.client.id"));
+		}
 		props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
+		props.put(SaslConfigs.SASL_JAAS_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.jaas.config"));
 	}
 
 	private KafkaSqlInfo segments(String clusterAlias, String sql) {
@@ -671,7 +676,7 @@ public class KafkaServiceImpl implements KafkaService {
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-			sasl(prop, getKafkaBrokerServer(clusterAlias), clusterAlias);
+			sasl(prop, clusterAlias);
 		}
 
 		AdminClient adminClient = null;
@@ -712,7 +717,7 @@ public class KafkaServiceImpl implements KafkaService {
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-			sasl(prop, bootstrapServers, clusterAlias);
+			sasl(prop, clusterAlias);
 		}
 
 		JSONArray consumerGroups = new JSONArray();
@@ -809,7 +814,7 @@ public class KafkaServiceImpl implements KafkaService {
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-			sasl(prop, parseBrokerServer(clusterAlias), clusterAlias);
+			sasl(prop, clusterAlias);
 		}
 
 		AdminClient adminClient = null;
@@ -857,7 +862,7 @@ public class KafkaServiceImpl implements KafkaService {
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-			sasl(prop, parseBrokerServer(clusterAlias), clusterAlias);
+			sasl(prop, clusterAlias);
 		}
 		JSONArray targets = new JSONArray();
 		AdminClient adminClient = null;
@@ -903,8 +908,7 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
-			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
+			sasl(props, clusterAlias);
 		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		TopicPartition tp = new TopicPartition(topic, partitionid);
@@ -932,8 +936,7 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
-			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
+			sasl(props, clusterAlias);
 		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		TopicPartition tp = new TopicPartition(topic, partitionid);
@@ -1029,8 +1032,7 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(Kafka.PARTITION_CLASS, KafkaPartitioner.class.getName());
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
-			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
+			sasl(props, clusterAlias);
 		}
 
 		Producer<String, String> producer = new KafkaProducer<>(props);
@@ -1066,7 +1068,7 @@ public class KafkaServiceImpl implements KafkaService {
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-			sasl(prop, parseBrokerServer(clusterAlias), clusterAlias);
+			sasl(prop, clusterAlias);
 		}
 		AdminClient adminClient = null;
 		try {

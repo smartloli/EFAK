@@ -69,17 +69,17 @@ public interface JConstants {
 
 	static String CREATE_TABLE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(64) DEFAULT NULL,`hour` varchar(2) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64) DEFAULT NULL,`broker` varchar(256) DEFAULT NULL,`type` varchar(32) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(256) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64) DEFAULT NULL,`broker` varchar(64) DEFAULT NULL,`type` varchar(32) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(128) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_ALARM = "CREATE TABLE IF NOT EXISTS `ke_alarm` (`id` int(11) NOT NULL AUTO_INCREMENT,`cluster` varchar(256) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(128) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`owner` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_ALARM = "CREATE TABLE IF NOT EXISTS `ke_alarm` (`id` int(11) NOT NULL AUTO_INCREMENT,`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(128) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`owner` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_CLUSTERS = "CREATE TABLE IF NOT EXISTS `ke_clusters` (`id` int(11) NOT NULL AUTO_INCREMENT,`type` varchar(32) DEFAULT NULL,`cluster` varchar(256) DEFAULT NULL,`server` text DEFAULT NULL,`owner` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_CLUSTERS = "CREATE TABLE IF NOT EXISTS `ke_clusters` (`id` int(11) NOT NULL AUTO_INCREMENT,`type` varchar(32) DEFAULT NULL,`cluster` varchar(64) DEFAULT NULL,`server` text DEFAULT NULL,`owner` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_consumer` (`cluster` varchar(256) DEFAULT NULL,`group` varchar(256) DEFAULT NULL,`topic` varchar(256) DEFAULT NULL,`logsize` varchar(256) DEFAULT NULL,`offsets` varchar(256) DEFAULT NULL,`lag` varchar(256) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_consumer` (`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(64) DEFAULT NULL,`logsize` varchar(128) DEFAULT NULL,`offsets` varchar(128) DEFAULT NULL,`lag` varchar(128) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_TOPIC_RANK = "CREATE TABLE IF NOT EXISTS `ke_topic_rank` (`cluster` varchar(256) NOT NULL,`topic` varchar(256) NOT NULL,`tkey` varchar(256) NOT NULL,`tvalue` bigint(20) DEFAULT NULL,PRIMARY KEY (`cluster`,`topic`,`tkey`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_TOPIC_RANK = "CREATE TABLE IF NOT EXISTS `ke_topic_rank` (`cluster` varchar(64) NOT NULL,`topic` varchar(64) NOT NULL,`tkey` varchar(64) NOT NULL,`tvalue` bigint(20) DEFAULT NULL,PRIMARY KEY (`cluster`,`topic`,`tkey`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_SQL_HISTORY = "CREATE TABLE IF NOT EXISTS `ke_sql_history` (`cluster` varchar(256) DEFAULT NULL,`username` varchar(256) DEFAULT NULL,`ksql` text DEFAULT NULL,`status` varchar(16) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_SQL_HISTORY = "CREATE TABLE IF NOT EXISTS `ke_sql_history` (`cluster` varchar(64) DEFAULT NULL,`username` varchar(64) DEFAULT NULL,`ksql` text DEFAULT NULL,`status` varchar(16) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` int(11) NOT NULL AUTO_INCREMENT,`user_id` int(11) NOT NULL,`role_id` tinyint(4) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1');";
@@ -99,17 +99,17 @@ public interface JConstants {
 
 	static String CREATE_TABLE_SQLITE_KE_TREND = "CREATE TABLE IF NOT EXISTS `ke_trend` (`cluster` varchar(64),`key` varchar(64) ,`value` varchar(64),`hour` varchar(2),`tm` varchar(16))";
 
-	static String CREATE_TABLE_SQLITE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64),`broker` varchar(256),`type` varchar(32),`key` varchar(64),`value` varchar(256),`timespan` bigint(20),`tm` varchar(16))";
+	static String CREATE_TABLE_SQLITE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64),`broker` varchar(128),`type` varchar(32),`key` varchar(64),`value` varchar(128),`timespan` bigint(20),`tm` varchar(16))";
 
-	static String CREATE_TABLE_SQLITE_KE_ALARM = "CREATE TABLE IF NOT EXISTS `ke_alarm` (`id` integer primary key autoincrement,`cluster` varchar(256),`group` varchar(128),`topic` varchar(128),`lag` bigint(20),`owner` text,`created` varchar(32),`modify` varchar(32))";
+	static String CREATE_TABLE_SQLITE_KE_ALARM = "CREATE TABLE IF NOT EXISTS `ke_alarm` (`id` integer primary key autoincrement,`cluster` varchar(64),`group` varchar(128),`topic` varchar(128),`lag` bigint(20),`owner` text,`created` varchar(32),`modify` varchar(32))";
 
-	static String CREATE_TABLE_SQLITE_KE_CLUSTERS = "CREATE TABLE IF NOT EXISTS `ke_clusters` (`id` integer primary key autoincrement,`type` varchar(32),`cluster` varchar(256),`server` text,`owner` text,`created` varchar(32),`modify` varchar(32))";
+	static String CREATE_TABLE_SQLITE_KE_CLUSTERS = "CREATE TABLE IF NOT EXISTS `ke_clusters` (`id` integer primary key autoincrement,`type` varchar(32),`cluster` varchar(64),`server` text,`owner` text,`created` varchar(32),`modify` varchar(32))";
 
-	static String CREATE_TABLE_SQLITE_KE_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_consumer` (`cluster` varchar(256),`group` varchar(256),`topic` varchar(256),`logsize` varchar(256),`offsets` varchar(256),`lag` varchar(256),`timespan` bigint(20),`tm` varchar(16))";
+	static String CREATE_TABLE_SQLITE_KE_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_consumer` (`cluster` varchar(64),`group` varchar(128),`topic` varchar(128),`logsize` varchar(128),`offsets` varchar(128),`lag` varchar(128),`timespan` bigint(20),`tm` varchar(16))";
 
-	static String CREATE_TABLE_SQLITE_KE_TOPIC_RANK = "CREATE TABLE IF NOT EXISTS `ke_topic_rank` (`cluster` varchar(256) ,`topic` varchar(256) ,`tkey` varchar(256) ,`tvalue` bigint(20),primary key (`cluster`,`topic`,`tkey`))";
+	static String CREATE_TABLE_SQLITE_KE_TOPIC_RANK = "CREATE TABLE IF NOT EXISTS `ke_topic_rank` (`cluster` varchar(64) ,`topic` varchar(128) ,`tkey` varchar(128) ,`tvalue` bigint(20),primary key (`cluster`,`topic`,`tkey`))";
 
-	static String CREATE_TABLE_SQLITE_KE_SQL_HISTORY = "CREATE TABLE IF NOT EXISTS `ke_sql_history` (`cluster` varchar(256) ,`username` varchar(256) ,`ksql` text ,`status` varchar(16) ,`timespan` bigint(20) ,`tm` varchar(16))";
+	static String CREATE_TABLE_SQLITE_KE_SQL_HISTORY = "CREATE TABLE IF NOT EXISTS `ke_sql_history` (`cluster` varchar(64) ,`username` varchar(64) ,`ksql` text ,`status` varchar(16) ,`timespan` bigint(20) ,`tm` varchar(16))";
 
 	static String CREATE_TABLE_SQLITE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` integer primary key autoincrement,`user_id` int(11),`role_id` tinyint(4))";
 	static String CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1')";

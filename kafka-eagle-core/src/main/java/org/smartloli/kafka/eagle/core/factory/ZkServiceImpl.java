@@ -21,20 +21,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
-import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Zookeeper;
+import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -59,10 +53,6 @@ public class ZkServiceImpl implements ZkService {
 
 	private final static Logger LOG = LoggerFactory.getLogger(ZkServiceImpl.class);
 
-	private final String KE_ROOT_PATH = "/kafka_eagle";
-	private final String STORE_OFFSETS = "offsets";
-	/** Request memory space. */
-	private KafkaZkClient zkc = null;
 	/** Instance Kafka Zookeeper client pool. */
 	private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
 
@@ -111,87 +101,6 @@ public class ZkServiceImpl implements ZkService {
 		return ret;
 	}
 
-	/**
-	 * Get consumer data that has group and topic as the only sign.
-	 * 
-	 * @param group
-	 *            Consumer group.
-	 * @param topic
-	 *            Consumer topic.
-	 * @return String.
-	 */
-	public String getOffsets(String clusterAlias, String group, String topic) {
-		String target = "";
-		if (zkc == null) {
-			zkc = kafkaZKPool.getZkClient(clusterAlias);
-		}
-		String path = KE_ROOT_PATH + "/" + STORE_OFFSETS + "/" + group + "/" + topic;
-		if (zkc.pathExists(path)) {
-			try {
-				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(path);
-				JSONObject object = JSON.parseObject(tuple._1.get().toString());
-				if (getZkHour().equals(object.getString("hour"))) {
-					target = object.toJSONString();
-				}
-			} catch (Exception ex) {
-				LOG.error("[ZK.getOffsets] has error,msg is " + ex.getMessage());
-			}
-		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
-		}
-		return target;
-	}
-
-	/**
-	 * According to the date of each hour to statistics the consume rate data.
-	 */
-	private String getZkHour() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHH");
-		return df.format(new Date());
-	}
-
-	/**
-	 * Insert new datasets.
-	 * 
-	 * @deprecated it will be removed in a future release, since = "1.3.0"
-	 * 
-	 * @param list
-	 *            New datasets.
-	 */
-	@Deprecated
-	public void insert(String clusterAlias, List<OffsetsLiteInfo> list) {
-		String hour = getZkHour();
-		for (OffsetsLiteInfo offset : list) {
-			JSONObject target = new JSONObject();
-			target.put("hour", hour);
-
-			JSONObject object = new JSONObject();
-			object.put("lag", offset.getLag());
-			object.put("lagsize", offset.getLogSize());
-			object.put("offsets", offset.getOffsets());
-			object.put("created", offset.getCreated());
-			String offsets = getOffsets(clusterAlias, offset.getGroup(), offset.getTopic());
-			JSONObject offsetsFormmatter = JSON.parseObject(offsets);
-			JSONArray offsetsOutputs = new JSONArray();
-			if (offsetsFormmatter != null && offsetsFormmatter.size() > 0) {
-				String zkHour = offsetsFormmatter.getString("hour");
-				if (hour.equals(zkHour)) {
-					String zkData = offsetsFormmatter.getString("data");
-					offsetsOutputs = JSON.parseArray(zkData);
-				}
-			}
-			if (offsetsOutputs.size() > 0) {
-				offsetsOutputs.add(object);
-				target.put("data", offsetsOutputs);
-			} else {
-				target.put("data", Arrays.asList(object));
-			}
-			update(clusterAlias, target.toJSONString(), STORE_OFFSETS + "/" + offset.getGroup() + "/" + offset.getTopic());
-		}
-	}
-
 	/** Zookeeper ls command. */
 	public String ls(String clusterAlias, String cmd) {
 		String target = "";
@@ -206,31 +115,6 @@ public class ZkServiceImpl implements ZkService {
 			zkc = null;
 		}
 		return target;
-	}
-
-	/**
-	 * Remove the metadata information in the Ke root directory in zookeeper,
-	 * with group and topic as the only sign.
-	 * 
-	 * @param group
-	 *            Consumer group.
-	 * @param topic
-	 *            Consumer topic.
-	 * @param theme
-	 *            Consumer theme.
-	 */
-	public void remove(String clusterAlias, String group, String topic, String theme) {
-		if (zkc == null) {
-			zkc = kafkaZKPool.getZkClient(clusterAlias);
-		}
-		String path = theme + "/" + group + "/" + topic;
-		if (zkc.pathExists(KE_ROOT_PATH + "/" + path)) {
-			zkc.deletePath(KE_ROOT_PATH + "/" + path);
-		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
-		}
 	}
 
 	/**
@@ -285,30 +169,6 @@ public class ZkServiceImpl implements ZkService {
 			}
 		}
 		return target;
-	}
-
-	/**
-	 * Update metadata information in ke root path in zookeeper.
-	 * 
-	 * @param data
-	 *            Update datasets.
-	 * @param path
-	 *            Update datasets path.
-	 */
-	private void update(String clusterAlias, String data, String path) {
-		if (zkc == null) {
-			zkc = kafkaZKPool.getZkClient(clusterAlias);
-		}
-		if (!zkc.pathExists(KE_ROOT_PATH + "/" + path)) {
-			zkc.createRecursive(path, data.getBytes(), false);
-		}
-		if (zkc.pathExists(KE_ROOT_PATH + "/" + path)) {
-			zkc.createRecursive(path, data.getBytes(), false);
-		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
-		}
 	}
 
 	/** Get zookeeper cluster information. */

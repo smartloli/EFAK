@@ -293,7 +293,11 @@ public class ConsumerServiceImpl implements ConsumerService {
 			TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
-			consumerDetail.setConsumering(isConsumering(clusterAlias, group, topic));
+			if (activerTopics.contains(topic)) {
+				consumerDetail.setConsumering(Topic.RUNNING);
+			} else {
+				consumerDetail.setConsumering(isConsumering(clusterAlias, group, topic));
+			}
 			kafkaConsumerPages.add(consumerDetail);
 		}
 		return kafkaConsumerPages.toString();
@@ -304,7 +308,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("cluster", clusterAlias);
 		params.put("group", group);
-		params.put("cluster", clusterAlias);
+		params.put("topic", topic);
 		List<TopicOffsetsInfo> topicOffsets = mbeanDao.getConsumerRateTopic(params);
 		if (topicOffsets.size() == 2) {
 			try {
