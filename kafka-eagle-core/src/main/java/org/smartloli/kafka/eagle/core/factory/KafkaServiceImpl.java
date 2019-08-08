@@ -726,21 +726,8 @@ public class KafkaServiceImpl implements KafkaService {
 			adminClient = AdminClient.create(prop);
 			DescribeConsumerGroupsResult descConsumerGroup = adminClient.describeConsumerGroups(Arrays.asList(group));
 			Collection<MemberDescription> consumerMetaInfos = descConsumerGroup.describedGroups().get(group).get().members();
-			if (consumerMetaInfos.size() == 0) {
-				ListConsumerGroupOffsetsResult noActiveTopic = adminClient.listConsumerGroupOffsets(group);
-				JSONObject topicSub = new JSONObject();
-				JSONArray topicSubs = new JSONArray();
-				for (Entry<TopicPartition, OffsetAndMetadata> entry : noActiveTopic.partitionsToOffsetAndMetadata().get().entrySet()) {
-					JSONObject object = new JSONObject();
-					object.put("topic", entry.getKey().topic());
-					object.put("partition", entry.getKey().partition());
-					topicSubs.add(object);
-				}
-				topicSub.put("owner", "");
-				topicSub.put("node", "-");
-				topicSub.put("topicSub", topicSubs);
-				consumerGroups.add(topicSub);
-			} else {
+			Set<String> hasOwnerTopics = new HashSet<>();
+			if (consumerMetaInfos.size() > 0) {
 				for (MemberDescription consumerMetaInfo : consumerMetaInfos) {
 					JSONObject topicSub = new JSONObject();
 					JSONArray topicSubs = new JSONArray();
@@ -749,6 +736,7 @@ public class KafkaServiceImpl implements KafkaService {
 						object.put("topic", topic.topic());
 						object.put("partition", topic.partition());
 						topicSubs.add(object);
+						hasOwnerTopics.add(topic.topic());
 					}
 					topicSub.put("owner", consumerMetaInfo.consumerId());
 					topicSub.put("node", consumerMetaInfo.host().replaceAll("/", ""));
@@ -756,6 +744,22 @@ public class KafkaServiceImpl implements KafkaService {
 					consumerGroups.add(topicSub);
 				}
 			}
+
+			ListConsumerGroupOffsetsResult noActiveTopic = adminClient.listConsumerGroupOffsets(group);
+			JSONObject topicSub = new JSONObject();
+			JSONArray topicSubs = new JSONArray();
+			for (Entry<TopicPartition, OffsetAndMetadata> entry : noActiveTopic.partitionsToOffsetAndMetadata().get().entrySet()) {
+				JSONObject object = new JSONObject();
+				object.put("topic", entry.getKey().topic());
+				object.put("partition", entry.getKey().partition());
+				if (!hasOwnerTopics.contains(entry.getKey().topic())) {
+					topicSubs.add(object);
+				}
+			}
+			topicSub.put("owner", "");
+			topicSub.put("node", "-");
+			topicSub.put("topicSub", topicSubs);
+			consumerGroups.add(topicSub);
 		} catch (Exception e) {
 			LOG.error("Get kafka consumer metadata has error, msg is " + e.getMessage());
 			e.printStackTrace();

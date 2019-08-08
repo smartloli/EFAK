@@ -82,7 +82,7 @@
 					<li id="navbar_list"><a href="/ke/topic/list"><i
 							class="fa fa-table fa-fw"></i> List</a></li>
 					<li id="navbar_list"><a href="/ke/topic/message"><i
-							class="fa fa-file-text fa-fw"></i> Message</a></li>
+							class="fa fa-file-text fa-fw"></i> KSQL</a></li>
 					<li id="navbar_list"><a href="/ke/topic/mock"><i
 							class="fa fa-maxcdn fa-fw"></i> Mock</a></li>
 					<li id="navbar_list"><a href="/ke/topic/manager"><i
