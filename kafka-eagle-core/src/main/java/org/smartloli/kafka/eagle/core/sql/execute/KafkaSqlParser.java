@@ -89,20 +89,6 @@ public class KafkaSqlParser {
 		return status.toJSONString();
 	}
 
-	// private static boolean hasTopic(String clusterAlias, KafkaSqlInfo
-	// kafkaSql) {
-	// String topics = kafkaService.getAllPartitions(clusterAlias);
-	// JSONArray topicDataSets = JSON.parseArray(topics);
-	// for (Object object : topicDataSets) {
-	// JSONObject topicDataSet = (JSONObject) object;
-	// if (topicDataSet.getString("topic").equals(kafkaSql.getTableName())) {
-	// kafkaSql.setTopic(topicDataSet.getString("topic"));
-	// return true;
-	// }
-	// }
-	// return false;
-	// }
-
 	private static boolean hasTopic(String clusterAlias, KafkaSqlInfo kafkaSql) {
 		boolean status = brokerService.findKafkaTopic(clusterAlias, kafkaSql.getTableName());
 		if (status) {

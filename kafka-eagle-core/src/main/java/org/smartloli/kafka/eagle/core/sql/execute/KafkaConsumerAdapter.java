@@ -32,6 +32,8 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -39,9 +41,6 @@ import org.smartloli.kafka.eagle.core.sql.schema.TopicSchema;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
-import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 
 /**
  * Parse the sql statement, and execute the sql content, get the message record
@@ -65,9 +64,13 @@ public class KafkaConsumerAdapter {
 		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sql.fix.error")) {
 			props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, Kafka.EARLIEST);
 		}
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty("kafka.eagle.sasl.protocol"));
-			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
+		if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.enable")) {
+			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.protocol"));
+			if (!"".equals(SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.client.id"))) {
+				props.put(CommonClientConfigs.CLIENT_ID_CONFIG, SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.client.id"));
+			}
+			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.mechanism"));
+			props.put(SaslConfigs.SASL_JAAS_CONFIG, SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.jaas.config"));
 		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		List<TopicPartition> topics = new ArrayList<>();

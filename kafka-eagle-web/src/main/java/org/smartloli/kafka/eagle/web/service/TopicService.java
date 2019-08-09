@@ -60,7 +60,7 @@ public interface TopicService {
 	public String mockTopics(String clusterAlias, String name);
 
 	/** Get manager topic property keys. */
-	public String listTopicKeys(String clusterAlias, String name);
+	public String getTopicProperties(String clusterAlias, String name);
 
 	/** Alter topic config. */
 	public String changeTopicConfig(String clusterAlias, TopicConfig topicConfig);
@@ -71,7 +71,7 @@ public interface TopicService {
 	/** Get topic metrics from brokers. */
 	public String getTopicMBean(String clusterAlias, String topic);
 
-	/** Get topic logsize, topicsize from jmx data. */
-	public String getTopicMsgByJMX(String clusterAlias, String topic);
+	/** Get topic logsize, topicsize. */
+	public String getTopicSizeAndCapacity(String clusterAlias, String topic);
 
 }

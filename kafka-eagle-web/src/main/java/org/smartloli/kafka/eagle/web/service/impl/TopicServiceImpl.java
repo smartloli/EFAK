@@ -119,7 +119,7 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	/** Get topic property keys */
-	public String listTopicKeys(String clusterAlias, String name) {
+	public String getTopicProperties(String clusterAlias, String name) {
 		JSONArray topics = new JSONArray();
 		int offset = 0;
 		for (String key : Topic.KEYS) {
@@ -229,7 +229,7 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	/** Get topic logsize, topicsize from jmx data. */
-	public String getTopicMsgByJMX(String clusterAlias, String topic) {
+	public String getTopicSizeAndCapacity(String clusterAlias, String topic) {
 		JSONObject object = new JSONObject();
 		long logSize = brokerService.getTopicRealLogSize(clusterAlias, topic);
 		JSONObject topicSize = kafkaMetricsService.topicSize(clusterAlias, topic);

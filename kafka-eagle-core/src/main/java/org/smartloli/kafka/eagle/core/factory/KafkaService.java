@@ -117,8 +117,11 @@ public interface KafkaService {
 	/** Get kafka topic history logsize . */
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid);
 
-	/** Get kafka topic real logsize. */
+	/** Get kafka topic real logsize by partitionid. */
 	public long getKafkaRealLogSize(String clusterAlias, String topic, int partitionid);
+
+	/** Get kafka topic real logsize by partitionid set. */
+	public long getKafkaRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
 
 	/** Get kafka sasl topic metadate. */
 	public List<MetadataInfo> findKafkaLeader(String clusterAlias, String topic);
@@ -135,7 +138,10 @@ public interface KafkaService {
 	/** Get kafka history logsize by old version. */
 	public long getLogSize(String clusterAlias, String topic, int partitionid);
 
-	/** Get kafka real logsize by old version. */
+	/** Get kafka history logsize by old version. */
+	public long getLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
+
+	/** Get kafka real logsize by old version partition set. */
 	public long getRealLogSize(String clusterAlias, String topic, int partitionid);
 
 	/** Get topic metadata. */

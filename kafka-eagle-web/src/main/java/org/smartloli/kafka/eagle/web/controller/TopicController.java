@@ -212,7 +212,7 @@ public class TopicController {
 	public void topicMsgByJmxAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
 		try {
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-			String target = topicService.getTopicMsgByJMX(clusterAlias, tname);
+			String target = topicService.getTopicSizeAndCapacity(clusterAlias, tname);
 
 			byte[] output = target.getBytes();
 			BaseController.response(output, response);
@@ -245,7 +245,7 @@ public class TopicController {
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			String name = request.getParameter("name");
 			JSONObject object = new JSONObject();
-			object.put("items", JSON.parseArray(topicService.listTopicKeys(clusterAlias, name)));
+			object.put("items", JSON.parseArray(topicService.getTopicProperties(clusterAlias, name)));
 			byte[] output = object.toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {

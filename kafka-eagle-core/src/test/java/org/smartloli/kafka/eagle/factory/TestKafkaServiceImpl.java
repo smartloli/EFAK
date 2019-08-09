@@ -20,7 +20,9 @@
  */
 package org.smartloli.kafka.eagle.factory;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -50,9 +52,15 @@ public class TestKafkaServiceImpl {
 	private static ZkService zkService = new ZkFactory().create();
 
 	public static void main(String[] args) {
-		System.out.println(kafkaService.getAllBrokersInfo("cluster1"));
-		String status = zkService.status("dn3", "2181");
-		System.out.println("status : " + status);
+		Set<Integer> partitionids = new HashSet<>();
+		long sumLogs=0;
+		for (int i = 0; i < 3; i++) {
+			partitionids.add(i);
+			 sumLogs += kafkaService.getKafkaRealLogSize("cluster1", "kv-test2", i);
+		}
+		long logsize = kafkaService.getKafkaRealLogSize("cluster1", "kv-test2", partitionids);
+		System.out.println("logsize: " + logsize);
+		System.out.println("sumLogs: " + sumLogs);
 	}
 
 	public List<String> findTopicPartition(String clusterAlias, String topic) {
