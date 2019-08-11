@@ -20,9 +20,11 @@ package org.smartloli.kafka.eagle.core.metrics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanServerConnection;
@@ -35,9 +37,11 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AlterConfigsResult;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
+import org.apache.kafka.clients.admin.DescribeLogDirsResult;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.ConfigResource.Type;
-import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.common.requests.DescribeLogDirsResponse;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +86,50 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 	/** Get topic config path in zookeeper. */
 	private final String CONFIG_TOPIC_PATH = "/config/topics/";
 
+	public JSONObject topicKafkaCapacity(String clusterAlias, String topic) {
+		Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			kafkaService.sasl(prop, clusterAlias);
+		}
+		long sum = 0L;
+		AdminClient adminClient = null;
+		try {
+			adminClient = AdminClient.create(prop);
+			List<MetadataInfo> leaders = kafkaService.findKafkaLeader(clusterAlias, topic);
+			Set<Integer> ids = new HashSet<>();
+			for (MetadataInfo metadata : leaders) {
+				ids.add(metadata.getLeader());
+			}
+			DescribeLogDirsResult logSizeBytes = adminClient.describeLogDirs(ids);
+			Map<Integer, Map<String, DescribeLogDirsResponse.LogDirInfo>> tmp = logSizeBytes.all().get();
+			if (tmp == null) {
+				return new JSONObject();
+			}
+
+			for (Map.Entry<Integer, Map<String, DescribeLogDirsResponse.LogDirInfo>> entry : tmp.entrySet()) {
+				Map<String, DescribeLogDirsResponse.LogDirInfo> logDirInfos = entry.getValue();
+				for (Map.Entry<String, DescribeLogDirsResponse.LogDirInfo> logDirInfo : logDirInfos.entrySet()) {
+					DescribeLogDirsResponse.LogDirInfo info = logDirInfo.getValue();
+					Map<TopicPartition, DescribeLogDirsResponse.ReplicaInfo> replicaInfoMap = info.replicaInfos;
+					for (Map.Entry<TopicPartition, DescribeLogDirsResponse.ReplicaInfo> replicas : replicaInfoMap.entrySet()) {
+						if (topic.equals(replicas.getKey().topic())) {
+							sum += replicas.getValue().size;
+						}
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			LOG.error("Get consumer offset has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			adminClient.close();
+		}
+		return StrUtils.stringifyByObject(sum);
+	}
+
 	/** Get topic size from kafka jmx. */
 	public JSONObject topicSize(String clusterAlias, String topic) {
 		String jmx = "";
@@ -121,7 +169,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-			sasl(prop, getKafkaBrokerServer(clusterAlias), clusterAlias);
+			kafkaService.sasl(prop, clusterAlias);
 		}
 		try {
 			switch (type) {
@@ -233,11 +281,6 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 			return "";
 		}
 		return brokerServer.substring(0, brokerServer.length() - 1);
-	}
-
-	private void sasl(Properties props, String bootstrapServers, String clusterAlias) {
-		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
-		props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
 	}
 
 	public String getKafkaBrokerServer(String clusterAlias) {

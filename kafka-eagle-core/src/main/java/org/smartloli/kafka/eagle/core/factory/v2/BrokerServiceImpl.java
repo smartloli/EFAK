@@ -302,12 +302,19 @@ public class BrokerServiceImpl implements BrokerService {
 				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
 				String tupleString = new String(tuple._1.get());
 				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+				Set<Integer> partitions = new HashSet<>();
 				for (String partition : partitionObject.keySet()) {
-					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-						logSize += kafkaService.getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
-					} else {
-						logSize += kafkaService.getLogSize(clusterAlias, topic, Integer.valueOf(partition));
+					try {
+						partitions.add(Integer.valueOf(partition));
+					} catch (Exception e) {
+						LOG.error("Convert partition string to integer has error, msg is " + e.getMessage());
+						e.printStackTrace();
 					}
+				}
+				if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+					logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partitions);
+				} else {
+					logSize = kafkaService.getLogSize(clusterAlias, topic, partitions);
 				}
 			}
 		}
@@ -339,9 +346,9 @@ public class BrokerServiceImpl implements BrokerService {
 					}
 				}
 				if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-					logSize += kafkaService.getKafkaRealLogSize(clusterAlias, topic, partitions);
+					logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partitions);
 				} else {
-					logSize += kafkaService.getLogSize(clusterAlias, topic, partitions);
+					logSize = kafkaService.getLogSize(clusterAlias, topic, partitions);
 				}
 			}
 		}

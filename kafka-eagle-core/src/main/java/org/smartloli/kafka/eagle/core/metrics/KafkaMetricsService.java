@@ -32,6 +32,9 @@ public interface KafkaMetricsService {
 
 	/** Get topic size by jmx and convert unit, such TB, GB ,MB etc. */
 	public JSONObject topicSize(String clusterAlias, String topic);
+	
+	/** Get topic size by adminclient and convert unit, such TB, GB ,MB etc. */
+	public JSONObject topicKafkaCapacity(String clusterAlias, String topic);
 
 	/** Get topic size by jmx no convert . */
 	public long topicCapacity(String clusterAlias, String topic);

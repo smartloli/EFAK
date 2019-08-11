@@ -239,7 +239,7 @@ public class TopicController {
 
 	/** Get topic datasets by ajax. */
 	@RequestMapping(value = "/topic/manager/keys/ajax", method = RequestMethod.GET)
-	public void managerTopicKeysAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void getTopicProperties(HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();

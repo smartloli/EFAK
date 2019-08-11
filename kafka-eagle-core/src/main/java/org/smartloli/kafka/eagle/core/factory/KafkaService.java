@@ -19,6 +19,7 @@ package org.smartloli.kafka.eagle.core.factory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
@@ -152,5 +153,8 @@ public interface KafkaService {
 
 	/** Get kafka os memory. */
 	public long getOSMemory(String host, int port, String property);
+
+	/** Set kafka sasl acl. */
+	public void sasl(Properties props, String clusterAlias);
 
 }

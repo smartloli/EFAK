@@ -31,6 +31,7 @@ import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
@@ -232,7 +233,12 @@ public class TopicServiceImpl implements TopicService {
 	public String getTopicSizeAndCapacity(String clusterAlias, String topic) {
 		JSONObject object = new JSONObject();
 		long logSize = brokerService.getTopicRealLogSize(clusterAlias, topic);
-		JSONObject topicSize = kafkaMetricsService.topicSize(clusterAlias, topic);
+		JSONObject topicSize;
+		if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+			topicSize = kafkaMetricsService.topicKafkaCapacity(clusterAlias, topic);
+		} else {
+			topicSize = kafkaMetricsService.topicSize(clusterAlias, topic);
+		}
 		object.put("logsize", logSize);
 		object.put("topicsize", topicSize.getString("size"));
 		object.put("sizetype", topicSize.getString("type"));

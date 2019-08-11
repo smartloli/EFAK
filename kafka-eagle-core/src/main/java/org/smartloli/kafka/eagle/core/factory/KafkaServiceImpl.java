@@ -589,7 +589,7 @@ public class KafkaServiceImpl implements KafkaService {
 	}
 
 	/** Set topic sasl. */
-	private void sasl(Properties props, String clusterAlias) {
+	public void sasl(Properties props, String clusterAlias) {
 		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
 		if (!"".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.client.id"))) {
 			props.put(CommonClientConfigs.CLIENT_ID_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.client.id"));
@@ -1033,32 +1033,24 @@ public class KafkaServiceImpl implements KafkaService {
 	public List<MetadataInfo> findKafkaLeader(String clusterAlias, String topic) {
 		List<MetadataInfo> targets = new ArrayList<>();
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-			if (topics.contains(topic)) {
-				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
-				String tupleString = new String(tuple._1.get());
-				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
-				for (String partition : partitionObject.keySet()) {
-					String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
-					Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
-					String tupleString2 = new String(tuple2._1.get());
-					JSONObject topicMetadata = JSON.parseObject(tupleString2);
-					MetadataInfo metadate = new MetadataInfo();
-					metadate.setIsr(topicMetadata.getString("isr"));
+		if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
+			Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+			String tupleString = new String(tuple._1.get());
+			JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+			for (String partition : partitionObject.keySet()) {
+				String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
+				Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
+				String tupleString2 = new String(tuple2._1.get());
+				JSONObject topicMetadata = JSON.parseObject(tupleString2);
+				MetadataInfo metadate = new MetadataInfo();
+				try {
 					metadate.setLeader(topicMetadata.getInteger("leader"));
-					metadate.setPartitionId(Integer.valueOf(partition));
-					metadate.setReplicas(getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
-					long logSize = 0L;
-					if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-						logSize = getKafkaLogSize(clusterAlias, topic, Integer.valueOf(partition));
-					} else {
-						logSize = getLogSize(clusterAlias, topic, Integer.valueOf(partition));
-					}
-					metadate.setLogSize(logSize);
-					targets.add(metadate);
+				} catch (Exception e) {
+					LOG.error("Parse string brokerid to int has error, brokerid[" + topicMetadata.getString("leader") + "]");
+					e.printStackTrace();
 				}
+				metadate.setPartitionId(Integer.valueOf(partition));
+				targets.add(metadate);
 			}
 		}
 		if (zkc != null) {
