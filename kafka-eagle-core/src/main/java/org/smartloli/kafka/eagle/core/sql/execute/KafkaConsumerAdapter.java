@@ -30,7 +30,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
@@ -54,6 +53,7 @@ public class KafkaConsumerAdapter {
 
 	private static KafkaService kafkaService = new KafkaFactory().create();
 
+	/** Executor ksql query topic data. */
 	public static List<JSONArray> executor(KafkaSqlInfo kafkaSql) {
 		List<JSONArray> messages = new ArrayList<>();
 		Properties props = new Properties();
@@ -65,12 +65,7 @@ public class KafkaConsumerAdapter {
 			props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, Kafka.EARLIEST);
 		}
 		if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.enable")) {
-			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.protocol"));
-			if (!"".equals(SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.client.id"))) {
-				props.put(CommonClientConfigs.CLIENT_ID_CONFIG, SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.client.id"));
-			}
-			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.mechanism"));
-			props.put(SaslConfigs.SASL_JAAS_CONFIG, SystemConfigUtils.getProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.jaas.config"));
+			kafkaService.sasl(props, kafkaSql.getClusterAlias());
 		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		List<TopicPartition> topics = new ArrayList<>();
