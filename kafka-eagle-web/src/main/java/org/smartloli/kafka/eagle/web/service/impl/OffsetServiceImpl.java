@@ -18,12 +18,16 @@
 package org.smartloli.kafka.eagle.web.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.kafka.common.TopicPartition;
 import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
+import org.smartloli.kafka.eagle.common.protocol.offsets.TopicOffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -56,55 +60,16 @@ public class OffsetServiceImpl implements OffsetService {
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
-	/** Get Kafka logsize from Kafka topic. */
-	private String getKafkaLogSize(String clusterAlias, String topic, String group) {
-		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
-		List<OffsetInfo> targets = new ArrayList<OffsetInfo>();
-		for (String partition : partitions) {
-			int partitionInt = Integer.parseInt(partition);
-			OffsetZkInfo offsetZk = getKafkaOffset(clusterAlias, topic, group, partitionInt);
-			OffsetInfo offset = new OffsetInfo();
-			long logSize = 0L;
-			logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partitionInt);
-			offset.setPartition(partitionInt);
-			offset.setLogSize(logSize);
-			offset.setCreate(offsetZk.getCreate());
-			offset.setModify(offsetZk.getModify());
-			offset.setOffset(offsetZk.getOffset());
-			offset.setLag(offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
-			offset.setOwner(offsetZk.getOwners());
-			targets.add(offset);
-		}
-		return targets.toString();
-	}
-
 	/** Get Kafka offset from Kafka topic. */
-	private OffsetZkInfo getKafkaOffset(String clusterAlias, String topic, String group, int partition) {
-		JSONArray kafkaOffsets = JSON.parseArray(kafkaService.getKafkaOffset(clusterAlias));
+	private OffsetZkInfo getKafkaOffsetOwner(String clusterAlias, String group, String topic, int partition) {
 		OffsetZkInfo targetOffset = new OffsetZkInfo();
-		if (kafkaOffsets == null) {
-			return targetOffset;
-		}
-		for (Object kafkaOffset : kafkaOffsets) {
-			JSONObject object = (JSONObject) kafkaOffset;
-			String _topic = object.getString("topic");
-			String _group = object.getString("group");
-			int _partition = object.getInteger("partition");
-			long timestamp = object.getLong("timestamp");
-			long offset = object.getLong("offset");
-			if (topic.equals(_topic) && group.equals(_group) && partition == _partition) {
-				targetOffset.setOffset(offset);
-				targetOffset.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
-				targetOffset.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
-				JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumerGroupTopic(clusterAlias, group));
-				for (Object consumerObject : consumerGroups) {
-					JSONObject consumerGroup = (JSONObject) consumerObject;
-					for (Object topicSubObject : consumerGroup.getJSONArray("topicSub")) {
-						JSONObject topicSub = (JSONObject) topicSubObject;
-						if (topic.equals(topicSub.getString("topic")) && partition == topicSub.getInteger("partition")) {
-							targetOffset.setOwners(consumerGroup.getString("node") + "-" + consumerGroup.getString("owner"));
-						}
-					}
+		JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumerGroupTopic(clusterAlias, group));
+		for (Object consumerObject : consumerGroups) {
+			JSONObject consumerGroup = (JSONObject) consumerObject;
+			for (Object topicSubObject : consumerGroup.getJSONArray("topicSub")) {
+				JSONObject topicSub = (JSONObject) topicSubObject;
+				if (topic.equals(topicSub.getString("topic")) && partition == topicSub.getInteger("partition")) {
+					targetOffset.setOwners(consumerGroup.getString("node") + "-" + consumerGroup.getString("owner"));
 				}
 			}
 		}
@@ -112,7 +77,7 @@ public class OffsetServiceImpl implements OffsetService {
 	}
 
 	/** Get logsize from zookeeper. */
-	private String getLogSize(String clusterAlias, String topic, String group) {
+	private List<OffsetInfo> getLogSize(String clusterAlias, String topic, String group) {
 		List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
 		List<OffsetInfo> targets = new ArrayList<OffsetInfo>();
 		for (String partition : partitions) {
@@ -134,16 +99,7 @@ public class OffsetServiceImpl implements OffsetService {
 			offset.setOwner(offsetZk.getOwners());
 			targets.add(offset);
 		}
-		return targets.toString();
-	}
-
-	/** Get logsize from Kafka topic or Zookeeper. */
-	public String getLogSize(String clusterAlias, String formatter, String topic, String group) {
-		if ("kafka".equals(formatter)) {
-			return getKafkaLogSize(clusterAlias, topic, group);
-		} else {
-			return getLogSize(clusterAlias, topic, group);
-		}
+		return targets;
 	}
 
 	/** Get kafka offset graph data. */
@@ -214,6 +170,50 @@ public class OffsetServiceImpl implements OffsetService {
 		target.put("outs", outs);
 
 		return target.toJSONString();
+	}
+
+	/** Get consumer logsize, offset, lag etc. */
+	public List<OffsetInfo> getConsumerOffsets(TopicOffsetInfo topicOffset) {
+		if ("kafka".equals(topicOffset.getFormatter())) {
+			return getKafkaLogSize(topicOffset);
+		} else {
+			return getLogSize(topicOffset.getCluster(), topicOffset.getTopic(), topicOffset.getGroup());
+		}
+	}
+
+	private List<OffsetInfo> getKafkaLogSize(TopicOffsetInfo topicOffset) {
+		List<String> partitions = kafkaService.findTopicPartition(topicOffset.getCluster(), topicOffset.getTopic());
+		Set<Integer> partitionsInts = new HashSet<>();
+		int offset = 0;
+		for (String partition : partitions) {
+			if (offset < (topicOffset.getStartPage() + topicOffset.getPageSize()) && offset >= topicOffset.getStartPage()) {
+				try {
+					partitionsInts.add(Integer.parseInt(partition));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			offset++;
+		}
+
+		Map<Integer, Long> partitionOffset = kafkaService.getKafkaOffset(topicOffset.getCluster(), topicOffset.getGroup(), topicOffset.getTopic(), partitionsInts);
+		Map<TopicPartition, Long> tps = kafkaService.getKafkaLogSize(topicOffset.getCluster(), topicOffset.getTopic(), partitionsInts);
+		List<OffsetInfo> targets = new ArrayList<OffsetInfo>();
+		if (tps != null && partitionOffset != null) {
+			for (Entry<TopicPartition, Long> entrySet : tps.entrySet()) {
+				OffsetInfo offsetInfo = new OffsetInfo();
+				int partition = entrySet.getKey().partition();
+				offsetInfo.setCreate(CalendarUtils.getDate());
+				offsetInfo.setModify(CalendarUtils.getDate());
+				offsetInfo.setLogSize(entrySet.getValue());
+				offsetInfo.setOffset(partitionOffset.get(partition));
+				offsetInfo.setLag(offsetInfo.getOffset() == -1 ? 0 : (offsetInfo.getLogSize() - offsetInfo.getOffset()));
+				offsetInfo.setOwner(getKafkaOffsetOwner(topicOffset.getCluster(), topicOffset.getGroup(), topicOffset.getTopic(), partition).getOwners());
+				offsetInfo.setPartition(partition);
+				targets.add(offsetInfo);
+			}
+		}
+		return targets;
 	}
 
 }

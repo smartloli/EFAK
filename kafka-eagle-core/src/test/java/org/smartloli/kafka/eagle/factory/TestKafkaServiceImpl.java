@@ -20,10 +20,19 @@
  */
 package org.smartloli.kafka.eagle.factory;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -52,15 +61,39 @@ public class TestKafkaServiceImpl {
 	private static ZkService zkService = new ZkFactory().create();
 
 	public static void main(String[] args) {
+		
+		String res = kafkaService.getKafkaOffset("cluster1");
+		System.out.println(res);
+		
 		Set<Integer> partitionids = new HashSet<>();
-		long sumLogs=0;
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 10; i++) {
 			partitionids.add(i);
-			 sumLogs += kafkaService.getKafkaRealLogSize("cluster1", "kv-test2", i);
 		}
-		long logsize = kafkaService.getKafkaRealLogSize("cluster1", "kv-test2", partitionids);
-		System.out.println("logsize: " + logsize);
-		System.out.println("sumLogs: " + sumLogs);
+		Map<Integer, Long> offsets = kafkaService.getKafkaOffset("cluster1","kafka_app0", "test_16", partitionids);
+		System.out.println("offsets: " + offsets);
+	}
+	
+	public Map<TopicPartition, Long> getKafkaLogSize( String topic, Set<Integer> partitionids) {
+		Properties props = new Properties();
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		Set<TopicPartition> tps = new HashSet<>();
+		Map<Integer, Long> partitionOffset = new HashMap<Integer, Long>();
+		for (int partitionid : partitionids) {
+			TopicPartition tp = new TopicPartition(topic, partitionid);
+			long offset= consumer.position(tp);
+			partitionOffset.put(partitionid, offset);
+		}
+
+		System.out.println(partitionOffset.toString());
+		
+		if (consumer != null) {
+			consumer.close();
+		}
+		return null;
 	}
 
 	public List<String> findTopicPartition(String clusterAlias, String topic) {

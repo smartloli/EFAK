@@ -18,15 +18,19 @@
 package org.smartloli.kafka.eagle.web.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
+import org.smartloli.kafka.eagle.common.protocol.offsets.TopicOffsetInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.OffsetService;
+import org.smartloli.kafka.eagle.web.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,6 +57,10 @@ public class OffsetController {
 	/** Offsets consumer data interface. */
 	@Autowired
 	private OffsetService offsetService;
+
+	/** Kafka topic service interface. */
+	@Autowired
+	private TopicService topicService;
 
 	/** Consumer viewer. */
 	@RequestMapping(value = "/consumers/offset/{group}/{topic}/", method = RequestMethod.GET)
@@ -105,38 +113,42 @@ public class OffsetController {
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
-		JSONArray logSizes = JSON.parseArray(offsetService.getLogSize(clusterAlias, formatter, topic, group));
-		int offset = 0;
+
+		TopicOffsetInfo topicOffset = new TopicOffsetInfo();
+		topicOffset.setCluster(clusterAlias);
+		topicOffset.setFormatter(formatter);
+		topicOffset.setGroup(group);
+		topicOffset.setPageSize(iDisplayLength);
+		topicOffset.setStartPage(iDisplayStart);
+		topicOffset.setTopic(topic);
+
+		List<OffsetInfo> logSizes = offsetService.getConsumerOffsets(topicOffset);
+		long count = topicService.getPartitionNumbers(clusterAlias, topic);
 		JSONArray aaDatas = new JSONArray();
-		for (Object object : logSizes) {
-			JSONObject logSize = (JSONObject) object;
-			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
-				JSONObject obj = new JSONObject();
-				obj.put("partition", logSize.getInteger("partition"));
-				if (logSize.getLong("logSize") == 0) {
-					obj.put("logsize", "<a class='btn btn-warning btn-xs'>0</a>");
-				} else {
-					obj.put("logsize", logSize.getLong("logSize"));
-				}
-				if (logSize.getLong("offset") == -1) {
-					obj.put("offset", "<a class='btn btn-warning btn-xs'>0</a>");
-				} else {
-					obj.put("offset", "<a class='btn btn-success btn-xs'>" + logSize.getLong("offset") + "</a>");
-				}
-				obj.put("lag", "<a class='btn btn-danger btn-xs'>" + logSize.getLong("lag") + "</a>");
-				obj.put("owner", logSize.getString("owner"));
-				obj.put("node", logSize.getString("node"));
-				obj.put("created", logSize.getString("create"));
-				obj.put("modify", logSize.getString("modify"));
-				aaDatas.add(obj);
+		for (OffsetInfo offsetInfo : logSizes) {
+			JSONObject object = new JSONObject();
+			object.put("partition", offsetInfo.getPartition());
+			if (offsetInfo.getLogSize() == 0) {
+				object.put("logsize", "<a class='btn btn-warning btn-xs'>0</a>");
+			} else {
+				object.put("logsize", offsetInfo.getLogSize());
 			}
-			offset++;
+			if (offsetInfo.getOffset() == -1) {
+				object.put("offset", "<a class='btn btn-warning btn-xs'>0</a>");
+			} else {
+				object.put("offset", "<a class='btn btn-success btn-xs'>" + offsetInfo.getOffset() + "</a>");
+			}
+			object.put("lag", "<a class='btn btn-danger btn-xs'>" + offsetInfo.getLag() + "</a>");
+			object.put("owner", offsetInfo.getOwner());
+			object.put("created", offsetInfo.getCreate());
+			object.put("modify", offsetInfo.getModify());
+			aaDatas.add(object);
 		}
 
 		JSONObject target = new JSONObject();
 		target.put("sEcho", sEcho);
-		target.put("iTotalRecords", logSizes.size());
-		target.put("iTotalDisplayRecords", logSizes.size());
+		target.put("iTotalRecords", count);
+		target.put("iTotalDisplayRecords", count);
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
@@ -159,17 +171,17 @@ public class OffsetController {
 			param.put("topic", topic);
 			param.put("stime", request.getParameter("stime"));
 			param.put("etime", request.getParameter("etime"));
-			
+
 			byte[] output = offsetService.getOffsetsGraph(param).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/** Get real-time offset graph data from Kafka by ajax. */
 	@RequestMapping(value = "/consumer/offset/rate/{group}/{topic}/realtime/ajax", method = RequestMethod.GET)
-	public void offsetRateGraphAjax(@PathVariable("group") String group,@PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
+	public void offsetRateGraphAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
@@ -177,7 +189,7 @@ public class OffsetController {
 		params.put("cluster", clusterAlias);
 		params.put("group", group);
 		params.put("topic", topic);
-		
+
 		try {
 			byte[] output = offsetService.getOffsetRate(params).getBytes();
 			BaseController.response(output, response);

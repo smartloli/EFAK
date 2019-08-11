@@ -45,6 +45,7 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
+import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsOptions;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
 import org.apache.kafka.clients.admin.MemberDescription;
@@ -898,6 +899,42 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets.toJSONString();
 	}
 
+	/** Get the data for the topic partition in the specified consumer group */
+	public Map<Integer, Long> getKafkaOffset(String clusterAlias, String group, String topic, Set<Integer> partitionids) {
+		Map<Integer, Long> partitionOffset = new HashMap<>();
+		Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, clusterAlias);
+		}
+		AdminClient adminClient = null;
+		try {
+			adminClient = AdminClient.create(prop);
+			List<TopicPartition> tps = new ArrayList<>();
+			for (int partitionid : partitionids) {
+				TopicPartition tp = new TopicPartition(topic, partitionid);
+				tps.add(tp);
+			}
+			
+			ListConsumerGroupOffsetsOptions consumerOffsetOptions = new ListConsumerGroupOffsetsOptions();
+			consumerOffsetOptions.topicPartitions(tps);
+			
+			ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(group,consumerOffsetOptions);
+			for (Entry<TopicPartition, OffsetAndMetadata> entry : offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
+				if (topic.equals(entry.getKey().topic())) {
+					partitionOffset.put(entry.getKey().partition(), entry.getValue().offset());
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Get consumer offset has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			adminClient.close();
+		}
+		return partitionOffset;
+	}
+
 	/** Get kafka 0.10.x broker bootstrap server. */
 	public String getKafkaBrokerServer(String clusterAlias) {
 		return parseBrokerServer(clusterAlias);
@@ -929,6 +966,31 @@ public class KafkaServiceImpl implements KafkaService {
 			}
 		}
 		return histyLogSize;
+	}
+
+	/** Get kafka 0.10.x topic history logsize. */
+	public Map<TopicPartition, Long> getKafkaLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
+		Properties props = new Properties();
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(props, clusterAlias);
+		}
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		Set<TopicPartition> tps = new HashSet<>();
+		for (int partitionid : partitionids) {
+			TopicPartition tp = new TopicPartition(topic, partitionid);
+			tps.add(tp);
+		}
+
+		consumer.assign(tps);
+		java.util.Map<TopicPartition, Long> endLogSize = consumer.endOffsets(tps);
+		if (consumer != null) {
+			consumer.close();
+		}
+		return endLogSize;
 	}
 
 	/** Get kafka 0.10.x topic real logsize by partitionid. */

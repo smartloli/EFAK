@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.kafka.common.TopicPartition;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
@@ -77,6 +78,9 @@ public interface KafkaService {
 
 	/** Get kafka 0.10.x offset from topic. */
 	public String getKafkaOffset(String clusterAlias);
+	
+	/** Get the data for the topic partition in the specified consumer group */
+	public Map<Integer, Long> getKafkaOffset(String clusterAlias,String group,String topic, Set<Integer> partitionids);
 
 	/** Use kafka console comand to create topic. */
 	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic);
@@ -117,6 +121,9 @@ public interface KafkaService {
 
 	/** Get kafka topic history logsize . */
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid);
+
+	/** Get kafka topic history batch logsize. */
+	public Map<TopicPartition, Long> getKafkaLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
 
 	/** Get kafka topic real logsize by partitionid. */
 	public long getKafkaRealLogSize(String clusterAlias, String topic, int partitionid);

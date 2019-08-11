@@ -17,7 +17,11 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
+import java.util.List;
 import java.util.Map;
+
+import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
+import org.smartloli.kafka.eagle.common.protocol.offsets.TopicOffsetInfo;
 
 /**
  * Offsets consumer data interface.
@@ -30,8 +34,8 @@ import java.util.Map;
  */
 public interface OffsetService {
 
-	/** Get logsize from Kafka topic or Zookeeper interface. */
-	public String getLogSize(String clusterAlias, String formatter, String topic, String group);
+	/** Get consumer logsize, offset, lag etc. */
+	public List<OffsetInfo> getConsumerOffsets(TopicOffsetInfo topicOffset);
 
 	/** Get Kafka offset graph data from Zookeeper interface. */
 	public String getOffsetsGraph(Map<String, Object> param);
