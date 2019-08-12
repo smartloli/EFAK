@@ -50,6 +50,7 @@ import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
@@ -87,6 +88,9 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 	private final String CONFIG_TOPIC_PATH = "/config/topics/";
 
 	public JSONObject topicKafkaCapacity(String clusterAlias, String topic) {
+		if(Kafka.CONSUMER_OFFSET_TOPIC.equals(topic)) {
+			return new JSONObject();
+		}
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 

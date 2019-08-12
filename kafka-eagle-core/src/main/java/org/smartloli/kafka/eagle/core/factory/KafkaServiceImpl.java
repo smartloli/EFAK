@@ -17,7 +17,6 @@
  */
 package org.smartloli.kafka.eagle.core.factory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -242,7 +241,7 @@ public class KafkaServiceImpl implements KafkaService {
 					String tupleString = new String(tuple._1.get());
 					if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 						String endpoints = JSON.parseObject(tupleString).getString("endpoints");
-						String tmp = endpoints.split(File.separator + File.separator)[1];
+						String tmp = endpoints.split("//")[1];
 						broker.setHost(tmp.substring(0, tmp.length() - 2).split(":")[0]);
 						broker.setPort(Integer.valueOf(tmp.substring(0, tmp.length() - 2).split(":")[1]));
 					} else {
@@ -1314,7 +1313,7 @@ public class KafkaServiceImpl implements KafkaService {
 				String host = "";
 				if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 					String endpoints = JSON.parseObject(tupleString).getString("endpoints");
-					String tmp = endpoints.split(File.separator + File.separator)[1];
+					String tmp = endpoints.split("//")[1];
 					host = tmp.substring(0, tmp.length() - 2).split(":")[0];
 				} else {
 					host = JSON.parseObject(tupleString).getString("host");
@@ -1322,7 +1321,7 @@ public class KafkaServiceImpl implements KafkaService {
 				int jmxPort = JSON.parseObject(tupleString).getInteger("jmx_port");
 				jni = host + ":" + jmxPort;
 			} catch (Exception ex) {
-				LOG.error("Get broker from ids has error, msg is " + ex.getMessage());
+				LOG.error("Get broker from ids has error, msg is " + ex.getCause().getMessage());
 				ex.printStackTrace();
 			}
 		}

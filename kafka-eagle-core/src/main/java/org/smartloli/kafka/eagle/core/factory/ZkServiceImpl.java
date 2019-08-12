@@ -142,8 +142,9 @@ public class ZkServiceImpl implements ZkService {
 			return "death";
 		}
 		BufferedReader reader = null;
+		OutputStream outstream = null;
 		try {
-			OutputStream outstream = sock.getOutputStream();
+			outstream = sock.getOutputStream();
 			outstream.write("stat".getBytes());
 			outstream.flush();
 			sock.shutdownOutput();
@@ -163,6 +164,9 @@ public class ZkServiceImpl implements ZkService {
 				sock.close();
 				if (reader != null) {
 					reader.close();
+				}
+				if (outstream != null) {
+					outstream.close();
 				}
 			} catch (Exception ex) {
 				LOG.error("Close read has error,msg is " + ex.getMessage());

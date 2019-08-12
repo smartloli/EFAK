@@ -18,10 +18,13 @@
 package org.smartloli.kafka.eagle.web.quartz;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
@@ -69,11 +72,36 @@ public class MetricsQuartz {
 						topicOffset.setCluster(clusterAlias);
 						topicOffset.setGroup(group);
 						topicOffset.setTopic(topic);
-						long logsize = brokerService.getTopicLogSizeTotal(clusterAlias, topic);
+
+						List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
+						Set<Integer> partitionsInts = new HashSet<>();
+						for (String partition : partitions) {
+							try {
+								partitionsInts.add(Integer.parseInt(partition));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+
+						Map<Integer, Long> partitionOffset = kafkaService.getKafkaOffset(topicOffset.getCluster(), topicOffset.getGroup(), topicOffset.getTopic(), partitionsInts);
+						Map<TopicPartition, Long> tps = kafkaService.getKafkaLogSize(topicOffset.getCluster(), topicOffset.getTopic(), partitionsInts);
+						long logsize = 0L;
+						long offsets = 0L;
+						if (tps != null && partitionOffset != null) {
+							for (Entry<TopicPartition, Long> entrySet : tps.entrySet()) {
+								try {
+									logsize += entrySet.getValue();
+									offsets += partitionOffset.get(entrySet.getKey().partition());
+								} catch (Exception e) {
+									LOG.error("Get logsize and offsets has error, msg is " + e.getCause().getMessage());
+									e.printStackTrace();
+								}
+							}
+						}
+
 						topicOffset.setLogsize(String.valueOf(logsize));
-						long lag = kafkaService.getKafkaLag(clusterAlias, group, topic);
-						topicOffset.setLag(String.valueOf(lag));
-						topicOffset.setOffsets(String.valueOf(logsize - lag));
+						topicOffset.setLag(String.valueOf(logsize - offsets));
+						topicOffset.setOffsets(String.valueOf(offsets));
 						topicOffset.setTimespan(CalendarUtils.getTimeSpan());
 						topicOffset.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
 						topicOffsets.add(topicOffset);
@@ -106,7 +134,7 @@ public class MetricsQuartz {
 				metricsServiceImpl.setConsumerTopic(topicOffsets);
 			}
 		} catch (Exception e) {
-			LOG.error("Collector consumer lag data has error,msg is " + e.getMessage());
+			LOG.error("Collector consumer lag data has error,msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		}
 	}

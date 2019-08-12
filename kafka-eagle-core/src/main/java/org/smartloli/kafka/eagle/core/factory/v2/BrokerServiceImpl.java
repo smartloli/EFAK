@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -67,9 +68,16 @@ public class BrokerServiceImpl implements BrokerService {
 	public long topicNumbers(String clusterAlias) {
 		long count = 0L;
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-			count = JavaConversions.seqAsJavaList(subBrokerTopicsPaths).size();
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+				excludeTopic(topics);
+				count = topics.size();
+			}
+		} catch (Exception e) {
+			LOG.error("Get topic numbers has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
@@ -78,18 +86,31 @@ public class BrokerServiceImpl implements BrokerService {
 		return count;
 	}
 
-	@Override
+	/** Exclude kafka topic(__consumer_offsets). */
+	private void excludeTopic(List<String> topics) {
+		if (topics.contains(Kafka.CONSUMER_OFFSET_TOPIC)) {
+			topics.remove(Kafka.CONSUMER_OFFSET_TOPIC);
+		}
+	}
+
+	/** Get search topic list numbers. */
 	public long topicNumbers(String clusterAlias, String topic) {
 		long count = 0L;
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-			for (String name : topics) {
-				if (topic != null && name.contains(topic)) {
-					count++;
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+				excludeTopic(topics);
+				for (String name : topics) {
+					if (topic != null && name.contains(topic)) {
+						count++;
+					}
 				}
 			}
+		} catch (Exception e) {
+			LOG.error("Get search topic list numbers has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
@@ -101,10 +122,18 @@ public class BrokerServiceImpl implements BrokerService {
 	/** Statistics topic partitions total used as page. */
 	public long partitionNumbers(String clusterAlias, String topic) {
 		long count = 0L;
+		if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic)) {
+			return count;
+		}
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic + "/partitions")) {
-			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
-			count = JavaConversions.seqAsJavaList(subBrokerTopicsPaths).size();
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic + "/partitions")) {
+				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
+				count = JavaConversions.seqAsJavaList(subBrokerTopicsPaths).size();
+			}
+		} catch (Exception e) {
+			LOG.error("Get topic partition numbers has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
@@ -117,17 +146,49 @@ public class BrokerServiceImpl implements BrokerService {
 	public List<PartitionsInfo> topicRecords(String clusterAlias, Map<String, Object> params) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		List<PartitionsInfo> targets = new ArrayList<PartitionsInfo>();
-		int start = Integer.parseInt(params.get("start").toString());
-		int length = Integer.parseInt(params.get("length").toString());
-		if (params.containsKey("search") && params.get("search").toString().length() > 0) {
-			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-				String search = params.get("search").toString();
-				int offset = 0;
-				int id = 1;
-				for (String topic : topics) {
-					if (search != null && topic.contains(search)) {
+		try {
+			int start = Integer.parseInt(params.get("start").toString());
+			int length = Integer.parseInt(params.get("length").toString());
+			if (params.containsKey("search") && params.get("search").toString().length() > 0) {
+				if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+					Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+					List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+					excludeTopic(topics);
+					String search = params.get("search").toString();
+					int offset = 0;
+					int id = 1;
+					for (String topic : topics) {
+						if (search != null && topic.contains(search)) {
+							if (offset < (start + length) && offset >= start) {
+								try {
+									Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+									PartitionsInfo partition = new PartitionsInfo();
+									partition.setId(id++);
+									partition.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
+									partition.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
+									partition.setTopic(topic);
+									String tupleString = new String(tuple._1.get());
+									JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+									partition.setPartitionNumbers(partitionObject.size());
+									partition.setPartitions(partitionObject.keySet());
+									targets.add(partition);
+								} catch (Exception ex) {
+									ex.printStackTrace();
+									LOG.error("Scan topic search from zookeeper has error, msg is " + ex.getMessage());
+								}
+							}
+							offset++;
+						}
+					}
+				}
+			} else {
+				if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+					Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+					List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+					excludeTopic(topics);
+					int offset = 0;
+					int id = 1;
+					for (String topic : topics) {
 						if (offset < (start + length) && offset >= start) {
 							try {
 								Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
@@ -143,41 +204,16 @@ public class BrokerServiceImpl implements BrokerService {
 								targets.add(partition);
 							} catch (Exception ex) {
 								ex.printStackTrace();
-								LOG.error("Scan topic search from zookeeper has error, msg is " + ex.getMessage());
+								LOG.error("Scan topic page from zookeeper has error, msg is " + ex.getMessage());
 							}
 						}
 						offset++;
 					}
 				}
 			}
-		} else {
-			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-				int offset = 0;
-				int id = 1;
-				for (String topic : topics) {
-					if (offset < (start + length) && offset >= start) {
-						try {
-							Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
-							PartitionsInfo partition = new PartitionsInfo();
-							partition.setId(id++);
-							partition.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
-							partition.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
-							partition.setTopic(topic);
-							String tupleString = new String(tuple._1.get());
-							JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
-							partition.setPartitionNumbers(partitionObject.size());
-							partition.setPartitions(partitionObject.keySet());
-							targets.add(partition);
-						} catch (Exception ex) {
-							ex.printStackTrace();
-							LOG.error("Scan topic page from zookeeper has error, msg is " + ex.getMessage());
-						}
-					}
-					offset++;
-				}
-			}
+		} catch (Exception e) {
+			LOG.error("Get topic records has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
@@ -208,7 +244,12 @@ public class BrokerServiceImpl implements BrokerService {
 	public boolean findKafkaTopic(String clusterAlias, String topic) {
 		boolean status = false;
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		status = zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic);
+		try {
+			status = zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic);
+		} catch (Exception e) {
+			LOG.error("Find kafka topic has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
 			zkc = null;
@@ -220,9 +261,14 @@ public class BrokerServiceImpl implements BrokerService {
 	public long brokerNumbers(String clusterAlias) {
 		long count = 0;
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		if (zkc.pathExists(BROKER_IDS_PATH)) {
-			Seq<String> subBrokerIdsPaths = zkc.getChildren(BROKER_IDS_PATH);
-			count = JavaConversions.seqAsJavaList(subBrokerIdsPaths).size();
+		try {
+			if (zkc.pathExists(BROKER_IDS_PATH)) {
+				Seq<String> subBrokerIdsPaths = zkc.getChildren(BROKER_IDS_PATH);
+				count = JavaConversions.seqAsJavaList(subBrokerIdsPaths).size();
+			}
+		} catch (Exception e) {
+			LOG.error("Get kafka broker numbers has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
@@ -235,9 +281,14 @@ public class BrokerServiceImpl implements BrokerService {
 	public List<String> topicList(String clusterAlias) {
 		List<String> topics = new ArrayList<>();
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-			topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+				topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+			}
+		} catch (Exception e) {
+			LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
@@ -250,39 +301,45 @@ public class BrokerServiceImpl implements BrokerService {
 	public List<MetadataInfo> topicMetadataRecords(String clusterAlias, String topic, Map<String, Object> params) {
 		List<MetadataInfo> targets = new ArrayList<>();
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-			if (topics.contains(topic)) {
-				int start = Integer.parseInt(params.get("start").toString());
-				int length = Integer.parseInt(params.get("length").toString());
-				int offset = 0;
-				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
-				String tupleString = new String(tuple._1.get());
-				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
-				for (String partition : partitionObject.keySet()) {
-					if (offset < (start + length) && offset >= start) {
-						String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
-						Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
-						String tupleString2 = new String(tuple2._1.get());
-						JSONObject topicMetadata = JSON.parseObject(tupleString2);
-						MetadataInfo metadate = new MetadataInfo();
-						metadate.setIsr(topicMetadata.getString("isr"));
-						metadate.setLeader(topicMetadata.getInteger("leader"));
-						metadate.setPartitionId(Integer.valueOf(partition));
-						metadate.setReplicas(kafkaService.getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
-						long logSize = 0L;
-						if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-							logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
-						} else {
-							logSize = kafkaService.getRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+				excludeTopic(topics);
+				if (topics.contains(topic)) {
+					int start = Integer.parseInt(params.get("start").toString());
+					int length = Integer.parseInt(params.get("length").toString());
+					int offset = 0;
+					Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+					String tupleString = new String(tuple._1.get());
+					JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+					for (String partition : partitionObject.keySet()) {
+						if (offset < (start + length) && offset >= start) {
+							String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
+							Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
+							String tupleString2 = new String(tuple2._1.get());
+							JSONObject topicMetadata = JSON.parseObject(tupleString2);
+							MetadataInfo metadate = new MetadataInfo();
+							metadate.setIsr(topicMetadata.getString("isr"));
+							metadate.setLeader(topicMetadata.getInteger("leader"));
+							metadate.setPartitionId(Integer.valueOf(partition));
+							metadate.setReplicas(kafkaService.getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
+							long logSize = 0L;
+							if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+								logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
+							} else {
+								logSize = kafkaService.getRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
+							}
+							metadate.setLogSize(logSize);
+							targets.add(metadate);
 						}
-						metadate.setLogSize(logSize);
-						targets.add(metadate);
+						offset++;
 					}
-					offset++;
 				}
 			}
+		} catch (Exception e) {
+			LOG.error("Get topic metadata records has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
@@ -294,11 +351,12 @@ public class BrokerServiceImpl implements BrokerService {
 	/** Get topic producer logsize total. */
 	public long getTopicLogSizeTotal(String clusterAlias, String topic) {
 		long logSize = 0L;
+		if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic)) {
+			return logSize;
+		}
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-			if (topics.contains(topic)) {
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
 				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
 				String tupleString = new String(tuple._1.get());
 				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
@@ -307,7 +365,7 @@ public class BrokerServiceImpl implements BrokerService {
 					try {
 						partitions.add(Integer.valueOf(partition));
 					} catch (Exception e) {
-						LOG.error("Convert partition string to integer has error, msg is " + e.getMessage());
+						LOG.error("Convert partition string to integer has error, msg is " + e.getCause().getMessage());
 						e.printStackTrace();
 					}
 				}
@@ -317,6 +375,9 @@ public class BrokerServiceImpl implements BrokerService {
 					logSize = kafkaService.getLogSize(clusterAlias, topic, partitions);
 				}
 			}
+		} catch (Exception e) {
+			LOG.error("Get topic logsize total has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);
@@ -328,11 +389,12 @@ public class BrokerServiceImpl implements BrokerService {
 	/** Get topic real logsize records. */
 	public long getTopicRealLogSize(String clusterAlias, String topic) {
 		long logSize = 0L;
+		if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic)) {
+			return logSize;
+		}
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-			if (topics.contains(topic)) {
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
 				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
 				String tupleString = new String(tuple._1.get());
 				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
@@ -341,7 +403,7 @@ public class BrokerServiceImpl implements BrokerService {
 					try {
 						partitions.add(Integer.valueOf(partition));
 					} catch (Exception e) {
-						LOG.error("Convert partition string to integer has error, msg is " + e.getMessage());
+						LOG.error("Convert partition string to integer has error, msg is " + e.getCause().getMessage());
 						e.printStackTrace();
 					}
 				}
@@ -351,6 +413,9 @@ public class BrokerServiceImpl implements BrokerService {
 					logSize = kafkaService.getLogSize(clusterAlias, topic, partitions);
 				}
 			}
+		} catch (Exception e) {
+			LOG.error("Get topic real logsize has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
 		}
 		if (zkc != null) {
 			kafkaZKPool.release(clusterAlias, zkc);

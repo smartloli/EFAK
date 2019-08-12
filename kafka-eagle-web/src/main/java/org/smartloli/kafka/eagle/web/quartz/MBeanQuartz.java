@@ -214,11 +214,11 @@ public class MBeanQuartz {
 				}
 				broker += ip + ",";
 				try {
-					ZkClusterInfo zkInfo = ZKMetricsUtils.zkClusterInfo(ip, Integer.parseInt(port));
+					ZkClusterInfo zkInfo = ZKMetricsUtils.zkClusterMntrInfo(ip, Integer.parseInt(port));
 					zkAssembly(zkInfo, kpi, kpiInfo);
 				} catch (Exception ex) {
 					ex.printStackTrace();
-					LOG.error("Transcation string to int has error,msg is " + ex.getMessage());
+					LOG.error("Transcation string[" + port + "] to int has error,msg is " + ex.getCause().getMessage());
 				}
 			}
 			kpiInfo.setBroker(broker.length() == 0 ? "unkowns" : broker.substring(0, broker.length() - 1));

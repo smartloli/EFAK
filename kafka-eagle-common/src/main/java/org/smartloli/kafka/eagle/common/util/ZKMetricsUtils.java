@@ -19,6 +19,8 @@ package org.smartloli.kafka.eagle.common.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,18 +45,26 @@ public class ZKMetricsUtils {
 	private static final String zk_open_file_descriptor_count = "zk_open_file_descriptor_count";
 	private static final String zk_max_file_descriptor_count = "zk_max_file_descriptor_count";
 
-	/** Get zookeeper metrics. */
-	public static ZkClusterInfo zkClusterInfo(String ip, int port) {
-		Process pro = null;
-		Runtime rt = Runtime.getRuntime();
+	public static ZkClusterInfo zkClusterMntrInfo(String ip, int port) {
 		ZkClusterInfo zk = new ZkClusterInfo();
+		Socket sock = null;
 		try {
-			// Linux server must be install nc tools.
-			String[] command = { "/bin/sh", "-c", "echo mntr | nc " + ip + " " + port };
-			pro = rt.exec(command);
-			BufferedReader buffer = new BufferedReader(new InputStreamReader(pro.getInputStream()));
-			String line = null;
-			while ((line = buffer.readLine()) != null) {
+			sock = new Socket(ip, port);
+		} catch (Exception e) {
+			LOG.error("Socket[" + ip + ":" + port + "] connect refused");
+			return zk;
+		}
+		BufferedReader reader = null;
+		OutputStream outstream = null;
+		try {
+			outstream = sock.getOutputStream();
+			outstream.write("mntr".getBytes());
+			outstream.flush();
+			sock.shutdownOutput();
+
+			reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
 				String[] rs = line.split("\\s+");
 				try {
 					switch (rs[0]) {
@@ -86,10 +96,21 @@ public class ZKMetricsUtils {
 					LOG.error("Split zookeeper metrics data has error, msg is " + ex.getMessage());
 				}
 			}
-			buffer.close();
-			pro.destroy();
-		} catch (Exception e) {
-			LOG.error("Collector tcps has error, msg is " + e.getMessage());
+		} catch (Exception ex) {
+			LOG.error("Read ZK buffer has error,msg is " + ex.getMessage());
+			return zk;
+		} finally {
+			try {
+				sock.close();
+				if (reader != null) {
+					reader.close();
+				}
+				if (outstream != null) {
+					outstream.close();
+				}
+			} catch (Exception ex) {
+				LOG.error("Close read has error,msg is " + ex.getMessage());
+			}
 		}
 		return zk;
 	}
