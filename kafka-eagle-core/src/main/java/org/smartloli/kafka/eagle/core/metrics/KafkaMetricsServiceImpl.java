@@ -126,7 +126,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 			}
 
 		} catch (Exception e) {
-			LOG.error("Get consumer offset has error, msg is " + e.getMessage());
+			LOG.error("Get topic capacity has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		} finally {
 			adminClient.close();

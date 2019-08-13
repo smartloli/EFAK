@@ -235,7 +235,7 @@ public class TopicServiceImpl implements TopicService {
 		long logSize = brokerService.getTopicRealLogSize(clusterAlias, topic);
 		JSONObject topicSize;
 		if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-			topicSize = kafkaMetricsService.topicKafkaCapacity(clusterAlias, topic);
+			topicSize = kafkaMetricsService.topicSize(clusterAlias, topic);
 		} else {
 			topicSize = kafkaMetricsService.topicSize(clusterAlias, topic);
 		}

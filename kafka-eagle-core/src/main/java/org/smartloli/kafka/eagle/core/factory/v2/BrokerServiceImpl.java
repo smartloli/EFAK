@@ -285,6 +285,7 @@ public class BrokerServiceImpl implements BrokerService {
 			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
 				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
 				topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+				excludeTopic(topics);
 			}
 		} catch (Exception e) {
 			LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
