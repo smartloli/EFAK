@@ -455,8 +455,6 @@ public class KafkaServiceImpl implements KafkaService {
 	public String getReplicasIsr(String clusterAlias, String topic, int partitionid) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		TopicPartition tp = new TopicPartition(topic, partitionid);
-//		Option<Seq<Object>> repclicasAndPartition = zkc.getInSyncReplicasForPartition(tp);
-//		List<Object> targets = JavaConversions.seqAsJavaList(repclicasAndPartition.get());
 		Seq<Object> replis = zkc.getReplicasForPartition(tp);
 		List<Object> targets = JavaConversions.seqAsJavaList(replis);
 		if (zkc != null) {
