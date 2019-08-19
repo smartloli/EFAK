@@ -81,7 +81,7 @@ public class ZkServiceImpl implements ZkService {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		if (zkc.pathExists(cmd)) {
 			Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(cmd);
-			ret += tuple2._1.get().toString() + "\n";
+			ret += new String(tuple2._1.get()) + "\n";
 			ret += "cZxid = " + tuple2._2.getCzxid() + "\n";
 			ret += "ctime = " + tuple2._2.getCtime() + "\n";
 			ret += "mZxid = " + tuple2._2.getMzxid() + "\n";
