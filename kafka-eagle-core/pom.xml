@@ -24,7 +24,7 @@
 	<!-- Reference to other modules -->
 
 	<properties>
-		<calcite.version>1.6.0</calcite.version>
+		<calcite.version>1.7.0</calcite.version>
 	</properties>
 
 	<dependencies>
@@ -38,21 +38,6 @@
 			<groupId>org.apache.calcite</groupId>
 			<artifactId>calcite-core</artifactId>
 			<version>${calcite.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.calcite</groupId>
-			<artifactId>calcite-avatica</artifactId>
-			<version>1.6.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.calcite</groupId>
