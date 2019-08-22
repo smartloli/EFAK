@@ -51,7 +51,7 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
  *
  *         Created by Jan 17, 2017
  * 
- * @see org.smartloli.kafka.eagle.factory.MailService
+ * @see org.smartloli.kafka.eagle.api.email.MailService
  */
 public class MailServiceImpl implements MailService {
 
