@@ -99,6 +99,9 @@ public interface KafkaService {
 
 	/** Get kafka 0.10.x consumer group & topic information. */
 	public String getKafkaConsumer(String clusterAlias);
+	
+	/** Get kafka 0.10.x consumer group & topic information used for page. */
+	public String getKafkaConsumer(String clusterAlias,DisplayInfo page);
 
 	@Deprecated
 	/** Get kafka consumer information pages. */

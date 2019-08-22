@@ -711,6 +711,95 @@ public class KafkaServiceImpl implements KafkaService {
 		return consumerGroups.toJSONString();
 	}
 
+	/** Get kafka 0.10.x consumer group & topic information used for page. */
+	public String getKafkaConsumer(String clusterAlias, DisplayInfo page) {
+		Properties prop = new Properties();
+		JSONArray consumerGroups = new JSONArray();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, clusterAlias);
+		}
+
+		AdminClient adminClient = null;
+		try {
+			adminClient = AdminClient.create(prop);
+			ListConsumerGroupsResult cgrs = adminClient.listConsumerGroups();
+			java.util.Iterator<ConsumerGroupListing> itor = cgrs.all().get().iterator();
+			
+			int start = page.getiDisplayStart();
+			int length = page.getiDisplayLength();
+			if(page.getSearch().length()>0) {
+				int offset = 0;
+				boolean flag = itor.hasNext();
+				while (flag) {
+					if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
+						ConsumerGroupListing gs = itor.next();
+						JSONObject consumerGroup = new JSONObject();
+						String groupId = gs.groupId();
+						DescribeConsumerGroupsResult descConsumerGroup = adminClient.describeConsumerGroups(Arrays.asList(groupId));
+						if (!groupId.contains("kafka.eagle")) {
+							consumerGroup.put("group", groupId);
+							try {
+								Node node = descConsumerGroup.all().get().get(groupId).coordinator();
+								consumerGroup.put("node", node.host() + ":" + node.port());
+							} catch (Exception e) {
+								LOG.error("Get coordinator node has error, msg is " + e.getMessage());
+								e.printStackTrace();
+							}
+							consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId, clusterAlias));
+							consumerGroups.add(consumerGroup);
+						}
+					}
+					offset++;
+					flag = itor.hasNext();
+					if (offset >= page.getiDisplayLength() + page.getiDisplayStart()) {
+						flag = false;
+					}
+				}
+			
+			}else {
+				
+			}
+			
+			int offset = 0;
+			boolean flag = itor.hasNext();
+			
+			
+			while (flag) {
+				if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
+					ConsumerGroupListing gs = itor.next();
+					JSONObject consumerGroup = new JSONObject();
+					String groupId = gs.groupId();
+					DescribeConsumerGroupsResult descConsumerGroup = adminClient.describeConsumerGroups(Arrays.asList(groupId));
+					if (!groupId.contains("kafka.eagle")) {
+						consumerGroup.put("group", groupId);
+						try {
+							Node node = descConsumerGroup.all().get().get(groupId).coordinator();
+							consumerGroup.put("node", node.host() + ":" + node.port());
+						} catch (Exception e) {
+							LOG.error("Get coordinator node has error, msg is " + e.getMessage());
+							e.printStackTrace();
+						}
+						consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId, clusterAlias));
+						consumerGroups.add(consumerGroup);
+					}
+				}
+				offset++;
+				flag = itor.hasNext();
+				if (offset >= page.getiDisplayLength() + page.getiDisplayStart()) {
+					flag = false;
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Get kafka consumer has error,msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			adminClient.close();
+		}
+		return consumerGroups.toJSONString();
+	}
+
 	/** Get kafka 0.10.x consumer metadata. */
 	private JSONArray getKafkaMetadata(String bootstrapServers, String group, String clusterAlias) {
 		Properties prop = new Properties();
@@ -915,11 +1004,11 @@ public class KafkaServiceImpl implements KafkaService {
 				TopicPartition tp = new TopicPartition(topic, partitionid);
 				tps.add(tp);
 			}
-			
+
 			ListConsumerGroupOffsetsOptions consumerOffsetOptions = new ListConsumerGroupOffsetsOptions();
 			consumerOffsetOptions.topicPartitions(tps);
-			
-			ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(group,consumerOffsetOptions);
+
+			ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(group, consumerOffsetOptions);
 			for (Entry<TopicPartition, OffsetAndMetadata> entry : offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
 				if (topic.equals(entry.getKey().topic())) {
 					partitionOffset.put(entry.getKey().partition(), entry.getValue().offset());
