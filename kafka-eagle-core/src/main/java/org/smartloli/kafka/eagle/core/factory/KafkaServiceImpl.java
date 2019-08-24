@@ -726,19 +726,16 @@ public class KafkaServiceImpl implements KafkaService {
 			adminClient = AdminClient.create(prop);
 			ListConsumerGroupsResult cgrs = adminClient.listConsumerGroups();
 			java.util.Iterator<ConsumerGroupListing> itor = cgrs.all().get().iterator();
-			
-			int start = page.getiDisplayStart();
-			int length = page.getiDisplayLength();
-			if(page.getSearch().length()>0) {
+			if (page.getSearch().length() > 0) {
 				int offset = 0;
 				boolean flag = itor.hasNext();
 				while (flag) {
-					if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
-						ConsumerGroupListing gs = itor.next();
-						JSONObject consumerGroup = new JSONObject();
-						String groupId = gs.groupId();
-						DescribeConsumerGroupsResult descConsumerGroup = adminClient.describeConsumerGroups(Arrays.asList(groupId));
-						if (!groupId.contains("kafka.eagle")) {
+					ConsumerGroupListing gs = itor.next();
+					JSONObject consumerGroup = new JSONObject();
+					String groupId = gs.groupId();
+					DescribeConsumerGroupsResult descConsumerGroup = adminClient.describeConsumerGroups(Arrays.asList(groupId));
+					if (!groupId.contains("kafka.eagle") && groupId.contains(page.getSearch())) {
+						if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
 							consumerGroup.put("group", groupId);
 							try {
 								Node node = descConsumerGroup.all().get().get(groupId).coordinator();
@@ -750,45 +747,40 @@ public class KafkaServiceImpl implements KafkaService {
 							consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId, clusterAlias));
 							consumerGroups.add(consumerGroup);
 						}
+						offset++;
 					}
-					offset++;
 					flag = itor.hasNext();
 					if (offset >= page.getiDisplayLength() + page.getiDisplayStart()) {
 						flag = false;
 					}
 				}
-			
-			}else {
-				
-			}
-			
-			int offset = 0;
-			boolean flag = itor.hasNext();
-			
-			
-			while (flag) {
-				if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
+			} else {
+				int offset = 0;
+				boolean flag = itor.hasNext();
+				while (flag) {
 					ConsumerGroupListing gs = itor.next();
 					JSONObject consumerGroup = new JSONObject();
 					String groupId = gs.groupId();
 					DescribeConsumerGroupsResult descConsumerGroup = adminClient.describeConsumerGroups(Arrays.asList(groupId));
 					if (!groupId.contains("kafka.eagle")) {
-						consumerGroup.put("group", groupId);
-						try {
-							Node node = descConsumerGroup.all().get().get(groupId).coordinator();
-							consumerGroup.put("node", node.host() + ":" + node.port());
-						} catch (Exception e) {
-							LOG.error("Get coordinator node has error, msg is " + e.getMessage());
-							e.printStackTrace();
+						if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
+							consumerGroup.put("group", groupId);
+							try {
+								Node node = descConsumerGroup.all().get().get(groupId).coordinator();
+								consumerGroup.put("node", node.host() + ":" + node.port());
+							} catch (Exception e) {
+								LOG.error("Get coordinator node has error, msg is " + e.getMessage());
+								e.printStackTrace();
+							}
+							consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId, clusterAlias));
+							consumerGroups.add(consumerGroup);
 						}
-						consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId, clusterAlias));
-						consumerGroups.add(consumerGroup);
+						offset++;
 					}
-				}
-				offset++;
-				flag = itor.hasNext();
-				if (offset >= page.getiDisplayLength() + page.getiDisplayStart()) {
-					flag = false;
+					flag = itor.hasNext();
+					if (offset >= page.getiDisplayLength() + page.getiDisplayStart()) {
+						flag = false;
+					}
 				}
 			}
 		} catch (Exception e) {

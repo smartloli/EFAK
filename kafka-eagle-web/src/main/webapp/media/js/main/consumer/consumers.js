@@ -46,7 +46,9 @@ $(document).ready(function() {
 			}, {
 				"mData" : 'node'
 			}, {
-				"mData" : 'activeNumber'
+				"mData" : 'activeTopics'
+			}, {
+				"mData" : 'activeThreads'
 			}  ]
 		});
 
@@ -177,17 +179,7 @@ $(document).ready(function() {
 	var offset = 0;
 	$(document).on('click', 'a[class=link]', function() {
 		var group = $(this).html();
-		$('#doc_info').modal('show')
-//		$('#doc_info').modal({
-//			backdrop : 'static',
-//			keyboard : false
-//		});
-//		$('#doc_info').modal('show').css({
-//			position : 'fixed',
-//			left : '50%',
-//			top : '50%',
-//			transform : 'translateX(-50%) translateY(-50%)'
-//		});
+		$('#doc_info').modal('show');
 
 		$("#consumer_detail_children").append("<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr><th>ID</th><th>Topic</th><th>Consumer Status</th></tr></thead></table></div>");
 		if (offset > 0) {

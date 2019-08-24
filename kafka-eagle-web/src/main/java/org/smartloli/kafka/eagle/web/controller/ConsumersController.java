@@ -115,12 +115,19 @@ public class ConsumersController {
 			obj.put("group", "<a class='link' href='#" + consumer.getString("group") + "'>" + consumer.getString("group") + "</a>");
 			obj.put("topics", consumer.getInteger("topics"));
 			obj.put("node", consumer.getString("node"));
-			int activerNumber = consumer.getInteger("activeNumber");
-			if (activerNumber > 0) {
-				obj.put("activeNumber", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeNumber") + "</a>");
+			int activeTopics = consumer.getInteger("activeTopics");
+			int activeThreads = consumer.getInteger("activeThreads");
+			if (activeTopics > 0) {
+				obj.put("activeTopics", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
 			} else {
-				obj.put("activeNumber", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeNumber") + "</a>");
+				obj.put("activeTopics", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
 			}
+			if (activeThreads > 0) {
+				obj.put("activeThreads", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+			} else {
+				obj.put("activeThreads", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+			}
+
 			aaDatas.add(obj);
 		}
 
