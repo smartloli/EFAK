@@ -18,20 +18,22 @@
 # -----------------------------------------------------------------------------
 # Commons Daemon wrapper script.
 # -----------------------------------------------------------------------------
-#
+
 # resolve links - $0 may be a softlink
-ARG0="$0"
-while [ -h "$ARG0" ]; do
-  ls=`ls -ld "$ARG0"`
+PRG="$0"
+
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
   link=`expr "$ls" : '.*-> \(.*\)$'`
   if expr "$link" : '/.*' > /dev/null; then
-    ARG0="$link"
+    PRG="$link"
   else
-    ARG0="`dirname $ARG0`/$link"
+    PRG=`dirname "$PRG"`/"$link"
   fi
 done
-DIRNAME="`dirname $ARG0`"
-PROGRAM="`basename $ARG0`"
+
+DIRNAME="`dirname "$PRG"`"
+PROGRAM="`basename "$PRG"`"
 while [ ".$1" != . ]
 do
   case "$1" in
@@ -94,7 +96,16 @@ test ".$TOMCAT_USER" = . && TOMCAT_USER=tomcat
 #
 if [ -z "$JAVA_HOME" ]; then
     JAVA_BIN="`which java 2>/dev/null || type java 2>&1`"
-    test -x "$JAVA_BIN" && JAVA_HOME="`dirname $JAVA_BIN`"
+    while [ -h "$JAVA_BIN" ]; do
+        ls=`ls -ld "$JAVA_BIN"`
+        link=`expr "$ls" : '.*-> \(.*\)$'`
+        if expr "$link" : '/.*' > /dev/null; then
+            JAVA_BIN="$link"
+        else
+            JAVA_BIN="`dirname "$JAVA_BIN"`/$link"
+        fi
+    done
+    test -x "$JAVA_BIN" && JAVA_HOME="`dirname "$JAVA_BIN"`"
     test ".$JAVA_HOME" != . && JAVA_HOME=`cd "$JAVA_HOME/.." >/dev/null; pwd`
 else
     JAVA_BIN="$JAVA_HOME/bin/java"
@@ -103,7 +114,7 @@ fi
 # Only set CATALINA_HOME if not already set
 test ".$CATALINA_HOME" = . && CATALINA_HOME=`cd "$DIRNAME/.." >/dev/null; pwd`
 test ".$CATALINA_BASE" = . && CATALINA_BASE="$CATALINA_HOME"
-test ".$CATALINA_MAIN" = . && CATALINA_MAIN=org.apache.catalina.startup.Bootstrap
+test ".$CATALINA_MAIN" = . && CATALINA_MAIN=org.apache.catalina.startup.KafkaEagle
 # If not explicitly set, look for jsvc in CATALINA_BASE first then CATALINA_HOME
 if [ -z "$JSVC" ]; then
     JSVC="$CATALINA_BASE/bin/jsvc"
@@ -125,7 +136,7 @@ elif [ -r "$CATALINA_HOME/bin/setenv.sh" ]; then
 fi
 
 # Add on extra jar files to CLASSPATH
-test ".$CLASSPATH" != . && CLASSPATH="${CLASSPATH}:"
+test ".$CLASSPATH" != . && CLASSPATH="$CLASSPATH:"
 CLASSPATH="$CLASSPATH$CATALINA_HOME/bin/bootstrap.jar:$CATALINA_HOME/bin/commons-daemon.jar"
 
 test ".$CATALINA_OUT" = . && CATALINA_OUT="$CATALINA_BASE/logs/catalina-daemon.out"
@@ -159,7 +170,7 @@ if [ "$cygwin" = "false" ]; then
     MAX_FD_LIMIT=`ulimit -H -n`
     if [ "$?" -eq 0 ]; then
         # Darwin does not allow RLIMIT_INFINITY on file soft limit
-        if [ "$darwin" = "true" -a "$MAX_FD_LIMIT" = "unlimited" ]; then
+        if [ "$darwin" = "true" ] && [ "$MAX_FD_LIMIT" = "unlimited" ]; then
             MAX_FD_LIMIT=`/usr/sbin/sysctl -n kern.maxfilesperproc`
         fi
         test ".$MAX_FD" = ".maximum" && MAX_FD="$MAX_FD_LIMIT"
@@ -170,6 +181,18 @@ if [ "$cygwin" = "false" ]; then
     else
         echo "$PROGRAM: Could not query system maximum file descriptor limit: $MAX_FD_LIMIT"
     fi
+fi
+
+# Java 9 no longer supports the java.endorsed.dirs
+# system property. Only try to use it if
+# JAVA_ENDORSED_DIRS was explicitly set
+# or CATALINA_HOME/endorsed exists.
+ENDORSED_PROP=ignore.endorsed.dirs
+if [ -n "$JAVA_ENDORSED_DIRS" ]; then
+    ENDORSED_PROP=java.endorsed.dirs
+fi
+if [ -d "$CATALINA_HOME/endorsed" ]; then
+    ENDORSED_PROP=java.endorsed.dirs
 fi
 
 # ----- Execute The Requested Command -----------------------------------------
@@ -186,6 +209,7 @@ case "$1" in
       -errfile "&2" \
       -classpath "$CLASSPATH" \
       "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
+      -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
       -Dcatalina.base="$CATALINA_BASE" \
       -Dcatalina.home="$CATALINA_HOME" \
       -Djava.io.tmpdir="$CATALINA_TMP" \
@@ -202,6 +226,7 @@ case "$1" in
       -errfile "&1" \
       -classpath "$CLASSPATH" \
       "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
+      -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
       -Dcatalina.base="$CATALINA_BASE" \
       -Dcatalina.home="$CATALINA_HOME" \
       -Djava.io.tmpdir="$CATALINA_TMP" \
@@ -213,6 +238,7 @@ case "$1" in
       -stop \
       -pidfile "$CATALINA_PID" \
       -classpath "$CLASSPATH" \
+      -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
       -Dcatalina.base="$CATALINA_BASE" \
       -Dcatalina.home="$CATALINA_HOME" \
       -Djava.io.tmpdir="$CATALINA_TMP" \
@@ -236,7 +262,7 @@ case "$1" in
       exit $?
     ;;
     *       )
-      echo "Unknown command: \`$1'"
+      echo "Unknown command: '$1'"
       echo "Usage: $PROGRAM ( commands ... )"
       echo "commands:"
       echo "  run               Start Tomcat without detaching from console"
