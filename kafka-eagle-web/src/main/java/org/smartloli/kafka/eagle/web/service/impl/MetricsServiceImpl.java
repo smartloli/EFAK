@@ -36,6 +36,7 @@ import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
 import org.smartloli.kafka.eagle.core.factory.Mx4jService;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
+import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,9 @@ public class MetricsServiceImpl implements MetricsService {
 
 	@Autowired
 	private MBeanDao mbeanDao;
+	
+	@Autowired
+	private TopicDao topicDao;
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
@@ -264,5 +268,17 @@ public class MetricsServiceImpl implements MetricsService {
 	public void cleanConsumerTopic(int tm) {
 		mbeanDao.cleanConsumerTopic(tm);
 	}
+
+	@Override
+	public void cleanTopicLogSize(int tm) {
+		topicDao.cleanTopicLogSize(tm);
+	}
+
+	@Override
+	public void cleanTopicRank(int tm) {
+		topicDao.cleanTopicRank(tm);		
+	}
+	
+	
 
 }

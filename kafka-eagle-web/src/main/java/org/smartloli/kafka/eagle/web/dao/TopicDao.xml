@@ -17,6 +17,14 @@
 		<result property="tkey" column="tkey" />
 		<result property="tvalue" column="tvalue" />
 	</resultMap>
+	
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize" id="tlogsize">
+		<result property="cluster" column="cluster" />
+		<result property="topic" column="topic" />
+		<result property="logsize" column="logsize" />
+		<result property="timespan" column="timespan" />
+		<result property="tm" column="tm" />
+	</resultMap>
 
 	<!-- TopicRank -->
 	<select id="readTopicRank" parameterType="map" resultMap="trank">
@@ -31,6 +39,16 @@
 		values
 		<foreach collection="list" item="item" index="index" separator=",">
 			(#{item.cluster},#{item.topic},#{item.tkey},#{item.tvalue})
+		</foreach>
+	</insert>
+	
+	<!-- TopicLogSize -->
+	<insert id="writeTopicLogSize" parameterType="java.util.List">
+		insert into
+		ke_logsize(`cluster`,`topic`,`logsize`,`timespan`,`tm`)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.cluster},#{item.topic},#{item.logsize},#{item.timespan},#{item.tm})
 		</foreach>
 	</insert>
 
@@ -53,8 +71,17 @@
 		select count(*) from ke_sql_history
 	</select>
 
+	<!-- Clean -->
 	<delete id="cleanTopicSqlHistory" parameterType="int">
 		delete from ke_sql_history where tm&lt;=#{tm}
+	</delete>
+	
+	<delete id="cleanTopicRank" parameterType="int">
+		delete from ke_topic_rank where tm&lt;=#{tm}
+	</delete>
+	
+	<delete id="cleanTopicLogSize" parameterType="int">
+		delete from ke_logsize where tm&lt;=#{tm}
 	</delete>
 
 </mapper>

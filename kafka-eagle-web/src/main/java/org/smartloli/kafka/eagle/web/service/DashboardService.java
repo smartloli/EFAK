@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.web.service;
 import java.util.List;
 import java.util.Map;
 
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 
 import com.alibaba.fastjson.JSONArray;
@@ -43,6 +44,9 @@ public interface DashboardService {
 
 	/** Write statistics topic rank data from kafka jmx & insert into table. */
 	public int writeTopicRank(List<TopicRank> topicRanks);
+	
+	/** Write statistics topic logsize data from kafka jmx & insert into table. */
+	public int writeTopicLogSize(List<TopicLogSize> topicLogSize);
 
 	/** Get os memory data. */
 	public String getOSMem(Map<String, Object> params);

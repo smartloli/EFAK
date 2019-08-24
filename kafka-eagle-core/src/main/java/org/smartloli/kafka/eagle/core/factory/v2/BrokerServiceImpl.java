@@ -424,5 +424,43 @@ public class BrokerServiceImpl implements BrokerService {
 		}
 		return logSize;
 	}
+	
+	/** Get topic producer send logsize records. */
+	public long getTopicProducerLogSize(String clusterAlias, String topic) {
+		long logSize = 0L;
+		if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic)) {
+			return logSize;
+		}
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
+				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+				String tupleString = new String(tuple._1.get());
+				JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+				Set<Integer> partitions = new HashSet<>();
+				for (String partition : partitionObject.keySet()) {
+					try {
+						partitions.add(Integer.valueOf(partition));
+					} catch (Exception e) {
+						LOG.error("Convert partition string to integer has error, msg is " + e.getCause().getMessage());
+						e.printStackTrace();
+					}
+				}
+				if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+					logSize = kafkaService.getKafkaProducerLogSize(clusterAlias, topic, partitions);
+				} else {
+					logSize = kafkaService.getLogSize(clusterAlias, topic, partitions);
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Get topic real logsize has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return logSize;
+	}
 
 }

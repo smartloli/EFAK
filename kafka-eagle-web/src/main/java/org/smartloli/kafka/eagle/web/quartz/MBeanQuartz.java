@@ -72,6 +72,8 @@ public class MBeanQuartz {
 			int retain = SystemConfigUtils.getIntProperty("kafka.eagle.metrics.retain");
 			metrics.remove(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
 			metrics.cleanConsumerTopic(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
+			metrics.cleanTopicLogSize(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
+			metrics.cleanTopicRank(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
 		}
 	}
 

@@ -22,7 +22,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
@@ -53,14 +55,21 @@ public class TopicRankQuartz {
 		try {
 			topicLogsizeStats();
 		} catch (Exception e) {
-			LOG.error("Collector topic logsize has error, msg is " + e.getMessage());
+			LOG.error("Collector topic logsize has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		}
 
 		try {
 			topicCapacityStats();
 		} catch (Exception e) {
-			LOG.error("Collector topic capacity has error, msg is " + e.getMessage());
+			LOG.error("Collector topic capacity has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+		
+		try {
+			topicProducerLogSizeStats();
+		} catch (Exception e) {
+			LOG.error("Collector topic logsize has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -148,6 +157,50 @@ public class TopicRankQuartz {
 			}
 		} catch (Exception e) {
 			LOG.error("Write topic rank logsize end data has error,msg is " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	private void topicProducerLogSizeStats() {
+		DashboardServiceImpl dashboardServiceImpl = null;
+		try {
+			dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
+		} catch (Exception e) {
+			LOG.error("Create topic producer logsize object has error,msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+
+		List<TopicLogSize> topicLogSizes = new ArrayList<>();
+		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+		for (String clusterAlias : clusterAliass) {
+			List<String> topics = brokerService.topicList(clusterAlias);
+			for (String topic : topics) {
+				long logsize = brokerService.getTopicProducerLogSize(clusterAlias, topic);
+				TopicLogSize topicLogSize = new TopicLogSize();
+				topicLogSize.setCluster(clusterAlias);
+				topicLogSize.setTopic(topic);
+				topicLogSize.setLogsize(logsize);
+				topicLogSize.setTimespan(CalendarUtils.getTimeSpan());
+				topicLogSize.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+				topicLogSizes.add(topicLogSize);
+				if (topicLogSizes.size() > Topic.BATCH_SIZE) {
+					try {
+						dashboardServiceImpl.writeTopicLogSize(topicLogSizes);
+						topicLogSizes.clear();
+					} catch (Exception e) {
+						e.printStackTrace();
+						LOG.error("Write topic producer logsize has error, msg is " + e.getCause().getMessage());
+					}
+				}
+			}
+		}
+		try {
+			if (topicLogSizes.size() > 0) {
+				dashboardServiceImpl.writeTopicLogSize(topicLogSizes);
+				topicLogSizes.clear();
+			}
+		} catch (Exception e) {
+			LOG.error("Write topic producer logsize end data has error,msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		}
 	}

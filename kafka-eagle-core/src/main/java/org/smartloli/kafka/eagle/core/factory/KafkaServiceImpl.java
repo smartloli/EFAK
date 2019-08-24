@@ -1101,7 +1101,7 @@ public class KafkaServiceImpl implements KafkaService {
 		}
 		return realLogSize;
 	}
-
+	
 	/** Get kafka 0.10.x topic real logsize by partitionid set. */
 	public long getKafkaRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
 		long realLogSize = 0L;
@@ -1141,6 +1141,40 @@ public class KafkaServiceImpl implements KafkaService {
 			}
 		}
 		return realLogSize;
+	}
+
+	/** Get topic producer send logsize records. */
+	public long getKafkaProducerLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
+		long producerLogSize = 0L;
+		Properties props = new Properties();
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(props, clusterAlias);
+		}
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		Set<TopicPartition> tps = new HashSet<>();
+		for (int partitionid : partitionids) {
+			TopicPartition tp = new TopicPartition(topic, partitionid);
+			tps.add(tp);
+		}
+		consumer.assign(tps);
+		java.util.Map<TopicPartition, Long> endLogSize = consumer.endOffsets(tps);
+		try {
+			for (Entry<TopicPartition, Long> entry : endLogSize.entrySet()) {
+				producerLogSize += entry.getValue();
+			}
+		} catch (Exception e) {
+			LOG.error("Get producer topic logsize has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (consumer != null) {
+				consumer.close();
+			}
+		}
+		return producerLogSize;
 	}
 
 	/** Get kafka version. */
@@ -1437,4 +1471,5 @@ public class KafkaServiceImpl implements KafkaService {
 		}
 		return memory;
 	}
+
 }

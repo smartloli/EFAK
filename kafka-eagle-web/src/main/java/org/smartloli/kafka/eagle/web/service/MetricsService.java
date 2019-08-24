@@ -50,5 +50,11 @@ public interface MetricsService {
 
 	/** Clean consumer topic data. */
 	public void cleanConsumerTopic(int tm);
+	
+	/** Crontab clean topic logsize history data. */
+	public void cleanTopicLogSize(int tm);
+	
+	/** Crontab clean topic rank history data. */
+	public void cleanTopicRank(int tm);
 
 }

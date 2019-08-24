@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.web.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 
@@ -34,6 +35,15 @@ public interface TopicDao {
 
 	/** Write statistics topic rank data from kafka jmx & insert into table. */
 	public int writeTopicRank(List<TopicRank> topicRanks);
+	
+	/** Crontab clean topic rank history data. */
+	public void cleanTopicRank(int tm);
+	
+	/** Write statistics topic logsize data from kafka jmx & insert into table. */
+	public int writeTopicLogSize(List<TopicLogSize> topicLogSize);
+	
+	/** Crontab clean topic logsize history data. */
+	public void cleanTopicLogSize(int tm);
 
 	/** Read topic rank data. */
 	public List<TopicRank> readTopicRank(Map<String, Object> params);

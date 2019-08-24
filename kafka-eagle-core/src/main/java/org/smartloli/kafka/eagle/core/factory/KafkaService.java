@@ -133,6 +133,9 @@ public interface KafkaService {
 
 	/** Get kafka topic real logsize by partitionid set. */
 	public long getKafkaRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
+	
+	/** Get topic producer send logsize records. */
+	public long getKafkaProducerLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
 
 	/** Get kafka sasl topic metadate. */
 	public List<MetadataInfo> findKafkaLeader(String clusterAlias, String topic);
