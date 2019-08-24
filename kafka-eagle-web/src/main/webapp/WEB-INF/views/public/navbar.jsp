@@ -10,7 +10,7 @@
 			style="border: 3px solid #fff; border-radius: 50%; margin-top: 6px; margin-left: 10px; float: left;"
 			src="/ke/media/img/ke_login.png" width="40px"> <a
 			class="navbar-brand" href="/ke"> Kafka Eagle</a>
-		<div class="modal fade" aria-labelledby="mfModalLabel"
+		<div class="modal fade" aria-labelledby="keModalLabel"
 			aria-hidden="true" id="ke_account_reset_dialog" tabindex="-1"
 			role="dialog">
 			<div class="modal-dialog">
@@ -27,14 +27,14 @@
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">New</label>
 									<div class="col-sm-10">
-										<input id="mf_new_password_name" name="ke_new_password_name"
+										<input id="ke_new_password_name" name="ke_new_password_name"
 											type="password" class="form-control" maxlength="16"
 											placeholder="New Password">
 									</div>
 								</div>
 								<div id="alert_mssage" style="display: none"
 									class="alert alert-danger">
-									<label> Passwords can only be data and letters or
+									<label> Passwords can only be number and letters or
 										special symbols .</label>
 								</div>
 							</fieldset>
@@ -112,15 +112,6 @@
 					<li id="navbar_cli"><a href="/ke/metrics/zk"><i
 							class="fa fa-area-chart fa-fw"></i> Zookeeper</a></li>
 				</ul></li>
-			<!-- <li><a href="#" data-toggle="collapse" data-target="#demo1"><i
-					class="fa fa-fw fa-bell"></i> Alarm <i
-					class="fa fa-fw fa-caret-down"></i></a>
-				<ul id="demo1" class="collapse">
-					<li id="navbar_add"><a href="/ke/alarm/add"><i
-							class="fa fa-info-circle fa-fw"></i> Add</a></li>
-					<li id="navbar_modify"><a href="/ke/alarm/modify"><i
-							class="fa fa-edit fa-fw"></i> Modify</a></li>
-				</ul></li> -->
 			<li><a href="#" data-toggle="collapse" data-target="#demo1"><i
 					class="fa fa-fw fa-bell"></i> Alarm <i
 					class="fa fa-fw fa-caret-down"></i></a>

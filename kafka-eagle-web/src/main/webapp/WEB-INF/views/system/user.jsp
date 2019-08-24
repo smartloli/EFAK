@@ -215,6 +215,47 @@
 					</div>
 				</div>
 			</div>
+			<!-- Reset -->
+			<div class="modal fade" aria-labelledby="keModalLabel"
+				aria-hidden="true" id="ke_user_reset_dialog" tabindex="-1"
+				role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabel">Reset User
+								Password</h4>
+						</div>
+						<!-- /.row -->
+						<form role="form" action="/ke/system/user/reset/" method="post"
+							onsubmit="return contextResetFormValid();return false;">
+							<fieldset class="form-horizontal">
+								<div class="form-group">
+									<label for="path" class="col-sm-2 control-label">New</label>
+									<div class="col-sm-9">
+										<input id="ke_user_new_pwd_reset" name="ke_user_new_pwd_reset"
+											type="password" class="form-control"
+											placeholder="New Password"> <input
+											id="ke_user_rtxno_reset" name="ke_user_rtxno_reset" type="hidden"
+											class="form-control">
+									</div>
+								</div>
+								<div id="alert_mssage_reset" style="display: none"
+									class="alert alert-danger">
+									<label id="alert_mssage_reset_label"></label>
+								</div>
+							</fieldset>
+
+							<div id="remove_div" class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Cancle</button>
+								<button type="submit" class="btn btn-primary" id="create-modify">Submit
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 			<!-- /#page-wrapper -->
 		</div>
 	</div>
@@ -269,6 +310,21 @@
 			$("#alert_mssage_modify_label").text("Oops! Please enter the complete information.");
 			setTimeout(function() {
 				$("#alert_mssage_modify").hide()
+			}, 3000);
+			return false;
+		}
+
+		return true;
+	}
+
+	function contextResetFormValid() {
+		var ke_user_new_pwd_reset = $("#ke_user_new_pwd_reset").val();
+		var reg = /^[u4E00-u9FA5]+$/;
+		if (ke_user_new_pwd_reset.length == 0 || !reg.test(ke_user_new_pwd_reset)) {
+			$("#alert_mssage_reset").show();
+			$("#alert_mssage_reset_label").text("Passwords can only be number and letters or special symbols .");
+			setTimeout(function() {
+				$("#alert_mssage_reset").hide()
 			}, 3000);
 			return false;
 		}

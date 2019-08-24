@@ -67,6 +67,20 @@ $(document).ready(function() {
 		});
 
 	});
+	
+	$(document).on('click', 'a[name=operater_reset_modal]', function() {
+		$('#ke_user_reset_dialog').modal('show');
+		var href = $(this).attr("href");
+		var id = href.split("#")[1];
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/system/user/signin/' + id + '/ajax',
+			success : function(datas) {
+				$("#ke_user_rtxno_reset").val(datas.rtxno);
+			}
+		});
+	});
 
 	var id = "";
 	$(document).on('click', 'a[name=operater_modal]', function() {
