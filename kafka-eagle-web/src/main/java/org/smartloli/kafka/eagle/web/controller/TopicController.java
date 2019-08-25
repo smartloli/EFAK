@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
@@ -206,7 +207,7 @@ public class TopicController {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/** Get cluster data by ajax. */
 	@RequestMapping(value = "/topic/meta/jmx/{tname}/ajax", method = RequestMethod.GET)
 	public void topicMsgByJmxAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
@@ -461,6 +462,28 @@ public class TopicController {
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get producer chart data by ajax. */
+	@RequestMapping(value = "/topic/producer/chart/ajax", method = RequestMethod.GET)
+	public void topicProducerChartAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+		try {
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+			Map<String, Object> param = new HashMap<>();
+			param.put("cluster", clusterAlias);
+			param.put("stime", request.getParameter("stime"));
+			param.put("etime", request.getParameter("etime"));
+			param.put("topic", request.getParameter("topic"));
+			String target = topicService.queryTopicProducerChart(param);
+			if (StringUtils.isEmpty(target)) {
+				target = "";
+			}
+			byte[] output = target.getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

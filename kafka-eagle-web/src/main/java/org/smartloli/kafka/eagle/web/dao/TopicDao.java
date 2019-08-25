@@ -39,14 +39,21 @@ public interface TopicDao {
 	/** Crontab clean topic rank history data. */
 	public void cleanTopicRank(int tm);
 	
+	/** Read topic rank data. */
+	public List<TopicRank> readTopicRank(Map<String, Object> params);
+
 	/** Write statistics topic logsize data from kafka jmx & insert into table. */
 	public int writeTopicLogSize(List<TopicLogSize> topicLogSize);
 	
 	/** Crontab clean topic logsize history data. */
 	public void cleanTopicLogSize(int tm);
+	
+	/** Read topic lastest logsize diffval data. */
+	public TopicLogSize readLastTopicLogSize(Map<String, Object> params);
+	
+	/** Get topic producer logsize chart datasets. */
+	public List<TopicLogSize> queryTopicProducerChart(Map<String, Object> params);
 
-	/** Read topic rank data. */
-	public List<TopicRank> readTopicRank(Map<String, Object> params);
 
 	/** Write topic sql history data into table. */
 	public int writeTopicSqlHistory(List<TopicSqlHistory> topicSqlHistorys);

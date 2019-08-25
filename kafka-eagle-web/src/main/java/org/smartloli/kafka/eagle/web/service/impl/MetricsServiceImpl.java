@@ -278,7 +278,5 @@ public class MetricsServiceImpl implements MetricsService {
 	public void cleanTopicRank(int tm) {
 		topicDao.cleanTopicRank(tm);		
 	}
-	
-	
 
 }

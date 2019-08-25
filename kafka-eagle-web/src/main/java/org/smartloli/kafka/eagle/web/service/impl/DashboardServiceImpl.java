@@ -193,4 +193,9 @@ public class DashboardServiceImpl implements DashboardService {
 		return object.toJSONString();
 	}
 
+	/** Read topic lastest logsize diffval data. */
+	public TopicLogSize readLastTopicLogSize(Map<String, Object> params) {
+		return topicDao.readLastTopicLogSize(params);
+	}
+
 }

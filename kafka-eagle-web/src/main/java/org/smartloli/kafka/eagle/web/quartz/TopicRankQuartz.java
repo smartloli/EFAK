@@ -18,7 +18,9 @@
 package org.smartloli.kafka.eagle.web.quartz;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +67,7 @@ public class TopicRankQuartz {
 			LOG.error("Collector topic capacity has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		}
-		
+
 		try {
 			topicProducerLogSizeStats();
 		} catch (Exception e) {
@@ -160,7 +162,7 @@ public class TopicRankQuartz {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void topicProducerLogSizeStats() {
 		DashboardServiceImpl dashboardServiceImpl = null;
 		try {
@@ -176,7 +178,16 @@ public class TopicRankQuartz {
 			List<String> topics = brokerService.topicList(clusterAlias);
 			for (String topic : topics) {
 				long logsize = brokerService.getTopicProducerLogSize(clusterAlias, topic);
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put("cluster", clusterAlias);
+				params.put("topic", topic);
+				TopicLogSize lastTopicLogSize = dashboardServiceImpl.readLastTopicLogSize(params);
 				TopicLogSize topicLogSize = new TopicLogSize();
+				if (lastTopicLogSize == null || lastTopicLogSize.getLogsize() == 0) {
+					topicLogSize.setDiffval(0);
+				} else {
+					topicLogSize.setDiffval(logsize - lastTopicLogSize.getLogsize());
+				}
 				topicLogSize.setCluster(clusterAlias);
 				topicLogSize.setTopic(topic);
 				topicLogSize.setLogsize(logsize);

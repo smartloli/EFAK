@@ -31,8 +31,17 @@ public class TopicLogSize extends BaseProtocol {
 	private String cluster;
 	private String topic;
 	private long logsize;
+	private long diffval;
 	private long timespan;
 	private String tm;
+
+	public long getDiffval() {
+		return diffval;
+	}
+
+	public void setDiffval(long diffval) {
+		this.diffval = diffval;
+	}
 
 	public String getCluster() {
 		return cluster;

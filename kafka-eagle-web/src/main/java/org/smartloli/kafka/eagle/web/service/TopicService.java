@@ -73,5 +73,8 @@ public interface TopicService {
 
 	/** Get topic logsize, topicsize. */
 	public String getTopicSizeAndCapacity(String clusterAlias, String topic);
+	
+	/** Get topic producer logsize chart datasets. */
+	public String queryTopicProducerChart(Map<String, Object> params);
 
 }

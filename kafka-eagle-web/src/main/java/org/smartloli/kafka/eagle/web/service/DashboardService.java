@@ -47,6 +47,9 @@ public interface DashboardService {
 	
 	/** Write statistics topic logsize data from kafka jmx & insert into table. */
 	public int writeTopicLogSize(List<TopicLogSize> topicLogSize);
+	
+	/** Read topic lastest logsize diffval data. */
+	public TopicLogSize readLastTopicLogSize(Map<String, Object> params);
 
 	/** Get os memory data. */
 	public String getOSMem(Map<String, Object> params);
