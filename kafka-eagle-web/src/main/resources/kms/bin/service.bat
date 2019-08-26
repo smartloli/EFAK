@@ -221,8 +221,8 @@ if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
     --StopMode jvm ^
     --StartPath "%CATALINA_HOME%" ^
     --StopPath "%CATALINA_HOME%" ^
-    --StartClass org.apache.catalina.startup.Bootstrap ^
-    --StopClass org.apache.catalina.startup.Bootstrap ^
+    --StartClass org.apache.catalina.startup.KafkaEagle ^
+    --StopClass org.apache.catalina.startup.KafkaEagle ^
     --StartParams start ^
     --StopParams stop ^
     --JvmOptions "-Dcatalina.home=%CATALINA_HOME%;-Dcatalina.base=%CATALINA_BASE%;-D%ENDORSED_PROP%=%CATALINA_HOME%\endorsed;-Djava.io.tmpdir=%CATALINA_BASE%\temp;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager;-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties;%JvmArgs%" ^

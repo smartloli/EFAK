@@ -179,7 +179,7 @@ $(document).ready(
 					producerMsg(stime, etime);
 				});
 				setInterval(function() {
-					producerMsg(stime, etime, type)
+					producerMsg(stime, etime)
 				}, 1000 * 60 * 5);
 			} catch (e) {
 				console.log(e.message);
