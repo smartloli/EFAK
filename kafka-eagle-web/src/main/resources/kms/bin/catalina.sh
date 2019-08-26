@@ -107,8 +107,6 @@
 #                   case the default is "true"
 # -----------------------------------------------------------------------------
 
-JAVA_OPTS="-server -Xms2048M -Xmx2048M -Xmn1024M -Xss512k -XX:+AggressiveOpts -XX:SurvivorRatio=8 -XX:MetaspaceSize=96M -XX:+UseBiasedLocking -XX:CMSInitiatingOccupancyFraction=75 -XX:+DisableExplicitGC -XX:MaxTenuringThreshold=15 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -Djava.awt.headless=true"
-
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false
 darwin=false
@@ -230,7 +228,7 @@ fi
 
 # Bugzilla 37848: When no TTY is available, don't output to console
 have_tty=0
-if [ -t 0 ]; then
+if [ "`tty`" != "not a tty" ]; then
     have_tty=1
 fi
 
@@ -516,7 +514,7 @@ elif [ "$1" = "stop" ] ; then
     fi
   fi
 
-  eval "\"$_RUNJAVA\"" $LOGGING_MANAGER $JAVA_OPTS \
+  eval "\"$_RUNJAVA\"" $JAVA_OPTS \
     -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
     -classpath "\"$CLASSPATH\"" \
     -Dcatalina.base="\"$CATALINA_BASE\"" \
