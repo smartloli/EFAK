@@ -15,27 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.plugin.font;
-
-import java.io.File;
-import java.io.IOException;
+package org.smartloli.kafka.eagle.web.service;
 
 /**
- * Print kafka eagle system version.
+ * Big screen service interface.
  * 
  * @author smartloli.
  *
- *         Created by Jan 23, 2018
+ *         Created by Aug 29, 2019
  */
-public class KafkaEagleVersion {
+public interface BScreenService {
 
-	public static void main(String[] args) throws IOException {
-		String name = System.getProperty("user.dir") + "/font/slant.flf";
-		File file = new File(name);
-		String asciiArt = FigletFont.convertOneLine(file, "KAfKA EAGLE");
-		System.out.println("Welcome to");
-		System.out.println(asciiArt);
-		System.out.println("Version 1.3.9");
-	}
+	/** Get producer and consumer real rate data . */
+	public String getProducerAndConsumerRate(String clusterAlias);
+
+	/** Get topic total logsize data . */
+	public String getTopicTotalLogSize(String clusterAlias);
+
+	/** Get producer history data. */
+	public String getProducerOrConsumerHistory(String clusterAlias,String type);
 
 }
