@@ -18,10 +18,16 @@
 package org.smartloli.kafka.eagle.web.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenProducerInfo;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.BScreenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
@@ -36,6 +42,9 @@ import com.alibaba.fastjson.JSONObject;
  */
 @Service
 public class BScreenServiceImpl implements BScreenService {
+
+	@Autowired
+	private TopicDao topicDao;
 
 	/** Get producer and consumer real rate data . */
 	public String getProducerAndConsumerRate(String clusterAlias) {
@@ -52,15 +61,45 @@ public class BScreenServiceImpl implements BScreenService {
 		return object.toJSONString();
 	}
 
-	/** Get producer history data. */
+	/** Get producer and consumer history data. */
 	public String getProducerOrConsumerHistory(String clusterAlias, String type) {
 		JSONArray array = new JSONArray();
-		for (int i = 0; i < 7; i++) {
-			JSONObject object = new JSONObject();
-			object.put("x", "08-" + (23 + i));
-			object.put("y", new Random().nextInt(1000) + 100);
-			array.add(object);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("cluster", clusterAlias);
+		params.put("stime", CalendarUtils.getCustomLastDay(7));
+		params.put("etime", CalendarUtils.getCustomDate("yyyyMMdd"));
+		if ("producer".equals(type)) {
+			List<BScreenProducerInfo> bsProducers = topicDao.queryProducerHistoryBar(params);
+			Map<String, Object> bsMaps = new HashMap<>();
+			for (BScreenProducerInfo bsProducer : bsProducers) {
+				if (bsProducer != null) {
+					bsMaps.put(bsProducer.getTm(), bsProducer.getValue());
+				}
+			}
+			for (int i = 6; i >= 0; i--) {
+				String tm = CalendarUtils.getCustomLastDay(i);
+				if (bsMaps.containsKey(tm)) {
+					JSONObject object = new JSONObject();
+					object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+					object.put("y", bsMaps.get(tm).toString());
+					array.add(object);
+				} else {
+					JSONObject object = new JSONObject();
+					object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+					object.put("y", 0);
+					array.add(object);
+				}
+			}
+		} else {
+			// mock consumer
+			for (int i = 0; i < 7; i++) {
+				JSONObject object = new JSONObject();
+				object.put("x", "08-" + (23 + i));
+				object.put("y", new Random().nextInt(1000) + 100);
+				array.add(object);
+			}
 		}
+
 		return array.toJSONString();
 	}
 
@@ -77,7 +116,7 @@ public class BScreenServiceImpl implements BScreenService {
 			}
 			object.put("producers", producers);
 			object.put("consumers", consumers);
-		} else if("history".equals(type)){
+		} else if ("history".equals(type)) {
 			List<String> xAxis = new ArrayList<String>();
 			for (int i = 0; i < 7; i++) {
 				xAxis.add("08-" + (23 + i));
@@ -87,7 +126,7 @@ public class BScreenServiceImpl implements BScreenService {
 			object.put("producers", producers);
 			object.put("consumers", consumers);
 			object.put("xAxis", xAxis);
-		}else if("lag".equals(type)) {
+		} else if ("lag".equals(type)) {
 			List<String> lags = new ArrayList<String>();
 			for (int i = 0; i < 24; i++) {
 				lags.add((new Random().nextInt(1000) + 100) + "");

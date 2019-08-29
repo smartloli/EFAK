@@ -751,4 +751,14 @@
 			}
 		});
 	}
+
+	setInterval(function() {
+		getRealProducerAndConsumerRate();
+		getTopicTotalLogSize();
+		proudcerHistory();
+		consumerHistory();
+		getTodayConsumerAndProducer();
+		getHistoryConsumerAndProducer();
+		getTodayLag();
+	}, 1000 * 60);
 });

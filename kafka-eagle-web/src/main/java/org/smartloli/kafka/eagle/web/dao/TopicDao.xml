@@ -26,6 +26,11 @@
 		<result property="timespan" column="timespan" />
 		<result property="tm" column="tm" />
 	</resultMap>
+	
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenProducerInfo" id="bsproducer">
+		<result property="tm" column="tm" />
+		<result property="value" column="total" />
+	</resultMap>
 
 	<!-- TopicRank -->
 	<select id="readTopicRank" parameterType="map" resultMap="trank">
@@ -63,6 +68,10 @@
 		select `cluster`,`topic`,`logsize`,`diffval`,`timespan` from ke_logsize
 		where `cluster`=#{cluster} and `topic`=#{topic}
 		and tm between #{stime} and #{etime}
+	</select>
+	
+	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsproducer">
+		select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster} and tm between #{stime} and #{etime} group by tm
 	</select>
 
 	<!-- TopicSqlHistory -->

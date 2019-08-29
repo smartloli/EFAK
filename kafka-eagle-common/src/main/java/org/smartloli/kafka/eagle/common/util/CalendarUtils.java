@@ -118,6 +118,16 @@ public class CalendarUtils {
 		calendar.add(Calendar.DAY_OF_MONTH, -day);
 		return df.format(calendar.getTime());
 	}
+	
+	/** Get custom day. */
+	public static String getCustomLastDay(String formatter,int day) {
+		SimpleDateFormat df = new SimpleDateFormat(formatter);
+		Calendar calendar = Calendar.getInstance();
+		Date date = new Date();
+		calendar.setTime(date);
+		calendar.add(Calendar.DAY_OF_MONTH, -day);
+		return df.format(calendar.getTime());
+	}
 
 	/** Convert date to date. */
 	public static String convertDate2Date(String date) throws ParseException {
