@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.smartloli.kafka.eagle.web.service.BScreenService;
@@ -51,7 +53,7 @@ public class BScreenServiceImpl implements BScreenService {
 	}
 
 	/** Get producer history data. */
-	public String getProducerOrConsumerHistory(String clusterAlias,String type) {
+	public String getProducerOrConsumerHistory(String clusterAlias, String type) {
 		JSONArray array = new JSONArray();
 		for (int i = 0; i < 7; i++) {
 			JSONObject object = new JSONObject();
@@ -60,6 +62,39 @@ public class BScreenServiceImpl implements BScreenService {
 			array.add(object);
 		}
 		return array.toJSONString();
+	}
+
+	@Override
+	public String getTodayOrHistoryConsumerProducer(String clusterAlias, String type) {
+		List<String> producers = new ArrayList<String>();
+		List<String> consumers = new ArrayList<String>();
+		JSONObject object = new JSONObject();
+
+		if ("today".equals(type)) {
+			for (int i = 0; i < 24; i++) {
+				producers.add((new Random().nextInt(1000) + 100) + "");
+				consumers.add((new Random().nextInt(2000) + 100) + "");
+			}
+			object.put("producers", producers);
+			object.put("consumers", consumers);
+		} else if("history".equals(type)){
+			List<String> xAxis = new ArrayList<String>();
+			for (int i = 0; i < 7; i++) {
+				xAxis.add("08-" + (23 + i));
+				producers.add((new Random().nextInt(10000) + 100) + "");
+				consumers.add((new Random().nextInt(20000) + 100) + "");
+			}
+			object.put("producers", producers);
+			object.put("consumers", consumers);
+			object.put("xAxis", xAxis);
+		}else if("lag".equals(type)) {
+			List<String> lags = new ArrayList<String>();
+			for (int i = 0; i < 24; i++) {
+				lags.add((new Random().nextInt(1000) + 100) + "");
+			}
+			object.put("lags", lags);
+		}
+		return object.toJSONString();
 	}
 
 }

@@ -34,5 +34,8 @@ public interface BScreenService {
 
 	/** Get producer history data. */
 	public String getProducerOrConsumerHistory(String clusterAlias,String type);
+	
+	/** Get today or last 7 day consumer and producer data . */
+	public String getTodayOrHistoryConsumerProducer(String clusterAlias,String type);
 
 }

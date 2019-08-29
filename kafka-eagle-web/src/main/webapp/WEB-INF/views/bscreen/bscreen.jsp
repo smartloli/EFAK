@@ -124,18 +124,18 @@
 			<li>
 				<div class="boxall" style="height: 3.4rem">
 					<div class="alltitle">Today Consumer & Producer (msg/min)</div>
-					<div class="allnav" id="echart4"></div>
+					<div class="allnav" id="ke_bs_today_consumer_producer"></div>
 					<div class="boxfoot"></div>
 				</div>
-				<div class="boxall" style="height: 3.2rem">
+				<div class="boxall" style="height: 3.4rem">
 					<div class="alltitle">Last 7 Todays Consumer & Producer
 						(msg/min)</div>
-					<div class="allnav" id="echart5"></div>
+					<div class="allnav" id="ke_bs_history_consumer_producer"></div>
 					<div class="boxfoot"></div>
 				</div>
-				<div class="boxall" style="height: 3rem">
-					<div class="alltitle">Large Topic Distribute</div>
-					<div class="allnav" id="echart6"></div>
+				<div class="boxall" style="height: 3.4rem">
+					<div class="alltitle">Today Lags (msg/min)</div>
+					<div class="allnav" id="ke_bs_today_lag"></div>
 					<div class="boxfoot"></div>
 				</div>
 			</li>

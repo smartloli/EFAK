@@ -43,7 +43,7 @@ public class BScreenController {
 
 	@Autowired
 	private BScreenService bscreen;
-	
+
 	/** Big screen viewer. */
 	@RequestMapping(value = "/bs", method = RequestMethod.GET)
 	public ModelAndView indexView(HttpSession session) {
@@ -51,7 +51,7 @@ public class BScreenController {
 		mav.setViewName("/bscreen/bscreen");
 		return mav;
 	}
-	
+
 	/** Get producer and consumer real rate data by ajax. */
 	@RequestMapping(value = "/bs/producer/consumer/realrate/ajax", method = RequestMethod.GET)
 	public void getProducerAndConsumerRealRateAjax(HttpServletResponse response, HttpServletRequest request) {
@@ -64,7 +64,7 @@ public class BScreenController {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/** Get producer and consumer real rate data by ajax. */
 	@RequestMapping(value = "/bs/topic/total/logsize/ajax", method = RequestMethod.GET)
 	public void getTopicTotalLogSizeAjax(HttpServletResponse response, HttpServletRequest request) {
@@ -77,14 +77,27 @@ public class BScreenController {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/** Get producer history data by ajax. */
 	@RequestMapping(value = "/bs/{type}/history/ajax", method = RequestMethod.GET)
-	public void getProducerOrConsumerHistoryAjax(@PathVariable("type") String type,HttpServletResponse response, HttpServletRequest request) {
+	public void getProducerOrConsumerHistoryAjax(@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		try {
-			byte[] output = bscreen.getProducerOrConsumerHistory(clusterAlias,type).getBytes();
+			byte[] output = bscreen.getProducerOrConsumerHistory(clusterAlias, type).getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get today or last 7 day consumer and producer data or lag data by ajax. */
+	@RequestMapping(value = "/bs/{dtype}/day/consuer/producer/ajax", method = RequestMethod.GET)
+	public void getTodayOrHistoryConsumerProducerAjax(@PathVariable("dtype") String dtype, HttpServletResponse response, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		try {
+			byte[] output = bscreen.getTodayOrHistoryConsumerProducer(clusterAlias, dtype).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
