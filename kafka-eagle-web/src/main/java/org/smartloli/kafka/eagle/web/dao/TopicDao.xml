@@ -105,5 +105,5 @@
 	<delete id="cleanTopicLogSize" parameterType="int">
 		delete from ke_logsize where tm&lt;=#{tm}
 	</delete>
-
+	
 </mapper>

@@ -56,5 +56,5 @@ public interface MetricsService {
 	
 	/** Crontab clean topic rank history data. */
 	public void cleanTopicRank(int tm);
-
+	
 }

@@ -225,7 +225,7 @@ gc()
    SPID=`cat $KE_HOME/bin/ke.pid`
    if [ "$SPID" != "" ];then
     echo "[$stime] INFO : Kafka Eagle Process[$SPID] GC."
-    jstat -gcutil $SPID 1000
+    ${JAVA_HOME}/bin/jstat -gcutil $SPID 1000
    fi
   fi
 }

@@ -57,7 +57,7 @@ public class MetricsServiceImpl implements MetricsService {
 
 	@Autowired
 	private MBeanDao mbeanDao;
-	
+
 	@Autowired
 	private TopicDao topicDao;
 
@@ -276,7 +276,7 @@ public class MetricsServiceImpl implements MetricsService {
 
 	@Override
 	public void cleanTopicRank(int tm) {
-		topicDao.cleanTopicRank(tm);		
+		topicDao.cleanTopicRank(tm);
 	}
 
 }

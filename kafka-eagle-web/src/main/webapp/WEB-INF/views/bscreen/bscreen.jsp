@@ -36,7 +36,7 @@
 <script type="text/javascript" src="/ke/media/js/bscreen/js/bscreen.js"></script>
 <body>
 	<div class="head">
-		<h1>Kafka Eagle Data Quality Metrics</h1>
+		<h1>Kafka Eagle BScreen</h1>
 		<div class="weather">
 			<span id="showTime"></span>
 		</div>
@@ -88,7 +88,7 @@
 				</div>
 				<div class="boxall" style="height: 3.2rem">
 					<div style="height: 100%; width: 100%;">
-						<div class="alltitle">Topic Total Records (msg)</div>
+						<div class="alltitle">Topic History Total Records (msg)</div>
 						<div id="ke_topics_total_logsize"
 							style="width: 100%; height: 100%; margin-top: 10%; text-align: center; color: #fff; font-size: .7rem; font-family: electronicFont; font-weight: bold">0</div>
 					</div>
@@ -98,14 +98,14 @@
 				<div class="bar">
 					<div class="barbox">
 						<ul class="clearfix">
-							<li id="ke_bs_producer_rate" class="pulll_left counter">0</li>
-							<li id="ke_bs_consumer_rate" class="pulll_left counter">0</li>
+							<li id="ke_bs_ins_rate" class="pulll_left counter">0</li>
+							<li id="ke_bs_outs_rate" class="pulll_left counter">0</li>
 						</ul>
 					</div>
 					<div class="barbox2">
 						<ul class="clearfix">
-							<li class="pulll_left">Producer (msg/min)</li>
-							<li class="pulll_left">Consumer (msg/min)</li>
+							<li class="pulll_left">Brokers ByteIn (per/min)</li>
+							<li class="pulll_left">Brokers ByteOut (per/min)</li>
 						</ul>
 					</div>
 				</div>

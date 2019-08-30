@@ -53,7 +53,7 @@ public class BScreenController {
 	}
 
 	/** Get producer and consumer real rate data by ajax. */
-	@RequestMapping(value = "/bs/producer/consumer/realrate/ajax", method = RequestMethod.GET)
+	@RequestMapping(value = "/bs/brokers/ins/outs/realrate/ajax", method = RequestMethod.GET)
 	public void getProducerAndConsumerRealRateAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();

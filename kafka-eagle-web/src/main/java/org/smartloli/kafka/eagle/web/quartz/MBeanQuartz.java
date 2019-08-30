@@ -81,8 +81,18 @@ public class MBeanQuartz {
 		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.metrics.charts")) {
 			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 			for (String clusterAlias : clusterAliass) {
-				kafkaCluster(clusterAlias);
-				zkCluster(clusterAlias);
+				try {
+					kafkaCluster(clusterAlias);
+				} catch (Exception e) {
+					LOG.error("Get kafka cluster metrics has error, msg is " + e.getCause().getMessage());
+					e.printStackTrace();
+				}
+				try {
+					zkCluster(clusterAlias);
+				} catch (Exception e) {
+					LOG.error("Get zookeeper cluster metrics has error, msg is " + e.getCause().getMessage());
+					e.printStackTrace();
+				}
 			}
 		}
 	}

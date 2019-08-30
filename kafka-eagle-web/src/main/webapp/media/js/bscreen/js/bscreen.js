@@ -11,11 +11,11 @@
 			$.ajax({
 				type : 'get',
 				dataType : 'json',
-				url : '/ke/bs/producer/consumer/realrate/ajax',
+				url : '/ke/bs/brokers/ins/outs/realrate/ajax',
 				success : function(datas) {
 					if (datas != null) {
-						$("#ke_bs_producer_rate").text(datas.producer);
-						$("#ke_bs_consumer_rate").text(datas.consumer);
+						$("#ke_bs_ins_rate").text(datas.ins);
+						$("#ke_bs_outs_rate").text(datas.outs);
 					}
 				}
 			});

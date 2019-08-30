@@ -23,8 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenProducerInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
+import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
+import org.smartloli.kafka.eagle.web.dao.MBeanDao;
 import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.BScreenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +53,47 @@ public class BScreenServiceImpl implements BScreenService {
 	@Autowired
 	private TopicDao topicDao;
 
+	@Autowired
+	private MBeanDao mbeanDao;
+
+	/** Broker service interface. */
+	private static BrokerService brokerService = new BrokerFactory().create();
+
 	/** Get producer and consumer real rate data . */
 	public String getProducerAndConsumerRate(String clusterAlias) {
+		List<KpiInfo> byteIns = getBrokersKpi(clusterAlias, MBean.BYTEIN);
+		List<KpiInfo> byteOuts = getBrokersKpi(clusterAlias, MBean.BYTEOUT);
+		long ins = 0L;
+		for (KpiInfo kpi : byteIns) {
+			try {
+				ins += Long.parseLong(kpi.getValue());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		long outs = 0L;
+		for (KpiInfo kpi : byteOuts) {
+			try {
+				outs += Long.parseLong(kpi.getValue());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		JSONObject object = new JSONObject();
-		object.put("producer", new Random().nextInt(1000) + 100);
-		object.put("consumer", new Random().nextInt(1200) + 100);
+		object.put("ins", StrUtils.stringify(ins));
+		object.put("outs", StrUtils.stringify(outs));
 		return object.toJSONString();
+	}
+
+	private List<KpiInfo> getBrokersKpi(String clusterAlias, String key) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("cluster", clusterAlias);
+		param.put("stime", CalendarUtils.getDate());
+		param.put("etime", CalendarUtils.getDate());
+		param.put("type", CollectorType.KAFKA);
+		param.put("key", key);
+		param.put("size", brokerService.brokerNumbers(clusterAlias));
+		return mbeanDao.getBrokersKpi(param);
 	}
 
 	/** Get topic total logsize data . */

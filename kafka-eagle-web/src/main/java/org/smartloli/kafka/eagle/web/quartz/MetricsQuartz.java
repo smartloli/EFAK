@@ -59,6 +59,15 @@ public class MetricsQuartz {
 	private static BrokerService brokerService = new BrokerFactory().create();
 
 	public void metricsConsumerTopicQuartz() {
+		try {
+			consumerTopicQuartz();
+		} catch (Exception e) {
+			LOG.error("Collector consumer topic data has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private void consumerTopicQuartz() {
 		List<TopicOffsetsInfo> topicOffsets = new ArrayList<>();
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
