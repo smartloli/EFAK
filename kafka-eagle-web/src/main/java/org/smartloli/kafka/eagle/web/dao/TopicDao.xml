@@ -26,7 +26,7 @@
 		<result property="timespan" column="timespan" />
 		<result property="tm" column="tm" />
 	</resultMap>
-	
+
 	<resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenProducerInfo" id="bsproducer">
 		<result property="tm" column="tm" />
 		<result property="value" column="total" />
@@ -69,7 +69,7 @@
 		where `cluster`=#{cluster} and `topic`=#{topic}
 		and tm between #{stime} and #{etime}
 	</select>
-	
+
 	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsproducer">
 		select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster} and tm between #{stime} and #{etime} group by tm
 	</select>
@@ -105,5 +105,18 @@
 	<delete id="cleanTopicLogSize" parameterType="int">
 		delete from ke_logsize where tm&lt;=#{tm}
 	</delete>
-	
+
+	<select id="getBScreenTotalRecords" parameterType="map" resultType="long">
+		select sum(a.logsize) from (select `logsize` from ke_logsize
+		where `cluster`=#{cluster}
+		<if test="topics != '' and topics != null">
+			and `topic` in (
+			<foreach collection="topics" item="item" index="index" separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
+		and tm=#{tday} order by `timespan` desc limit #{size}) a
+	</select>
+
 </mapper>

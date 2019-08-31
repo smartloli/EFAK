@@ -303,23 +303,23 @@ $(document).ready(function() {
 		var object = new Object();
 		if (byteNumber / TB_IN_BYTES > 1) {
 			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
-			object.type = " (TB/min)";
+			object.type = " (TB/sec)";
 			return object;
 		} else if (byteNumber / GB_IN_BYTES > 1) {
 			object.value = (byteNumber / GB_IN_BYTES).toFixed(2);
-			object.type = " (GB/min)";
+			object.type = " (GB/sec)";
 			return object;
 		} else if (byteNumber / MB_IN_BYTES > 1) {
 			object.value = (byteNumber / MB_IN_BYTES).toFixed(2);
-			object.type = " (MB/min)";
+			object.type = " (MB/sec)";
 			return object;
 		} else if (byteNumber / KB_IN_BYTES > 1) {
 			object.value = (byteNumber / KB_IN_BYTES).toFixed(2);
-			object.type = " (KB/min)";
+			object.type = " (KB/sec)";
 			return object;
 		} else {
 			object.value = (byteNumber / 1).toFixed(2);
-			object.type = " (B/min)";
+			object.type = " (B/sec)";
 			return object;
 		}
 	}

@@ -104,8 +104,8 @@
 					</div>
 					<div class="barbox2">
 						<ul class="clearfix">
-							<li class="pulll_left">Brokers ByteIn (per/min)</li>
-							<li class="pulll_left">Brokers ByteOut (per/min)</li>
+							<li class="pulll_left">Brokers ByteIn (per/sec)</li>
+							<li class="pulll_left">Brokers ByteOut (per/sec)</li>
 						</ul>
 					</div>
 				</div>

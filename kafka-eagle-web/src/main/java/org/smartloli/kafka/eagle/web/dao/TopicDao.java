@@ -72,4 +72,7 @@ public interface TopicDao {
 	/** Crontab clean topic sql history data. */
 	public void cleanTopicSqlHistory(int tm);
 
+	/** Get bscreen topic total records. */
+	public long getBScreenTotalRecords(Map<String,Object> params);
+
 }

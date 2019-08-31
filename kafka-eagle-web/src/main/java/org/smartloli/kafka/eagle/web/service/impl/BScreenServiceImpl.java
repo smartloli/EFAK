@@ -98,8 +98,14 @@ public class BScreenServiceImpl implements BScreenService {
 
 	/** Get topic total logsize data . */
 	public String getTopicTotalLogSize(String clusterAlias) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("cluster", clusterAlias);
+		params.put("topics", brokerService.topicList(clusterAlias));
+		params.put("size", brokerService.topicList(clusterAlias).size());
+		params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
+		long totalRecords = topicDao.getBScreenTotalRecords(params);
 		JSONObject object = new JSONObject();
-		object.put("total", new Random().nextInt(100000) + 1000);
+		object.put("total", totalRecords);
 		return object.toJSONString();
 	}
 
