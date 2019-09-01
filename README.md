@@ -20,7 +20,7 @@ Supported JDK: ```JDK8+```
 Here are a few Kafka Eagle system screenshots:
 
 # Big Screen Support
-![BScreen](https://docs.kafka-eagle.org/res/bscreen@2x.png)
+![BScreen](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-LnhzyWefw2gURVMl-Km%2F-LnhzzESQ0FVm_ReDJkb%2Fbscreen@2x.png?generation=1567361072225328&alt=media)
 
 # Alert Support
 In addition to supporting ```email``` alerts, Kafka Eagle also supports im alerts, such as ```DingDing``` and ```WeChat```.
