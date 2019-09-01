@@ -21,10 +21,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
-import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenProducerInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
@@ -117,9 +118,9 @@ public class BScreenServiceImpl implements BScreenService {
 		params.put("stime", CalendarUtils.getCustomLastDay(7));
 		params.put("etime", CalendarUtils.getCustomDate("yyyyMMdd"));
 		if ("producer".equals(type)) {
-			List<BScreenProducerInfo> bsProducers = topicDao.queryProducerHistoryBar(params);
+			List<BScreenBarInfo> bsProducers = topicDao.queryProducerHistoryBar(params);
 			Map<String, Object> bsMaps = new HashMap<>();
-			for (BScreenProducerInfo bsProducer : bsProducers) {
+			for (BScreenBarInfo bsProducer : bsProducers) {
 				if (bsProducer != null) {
 					bsMaps.put(bsProducer.getTm(), bsProducer.getValue());
 				}
@@ -139,12 +140,26 @@ public class BScreenServiceImpl implements BScreenService {
 				}
 			}
 		} else {
-			// mock consumer
-			for (int i = 0; i < 7; i++) {
-				JSONObject object = new JSONObject();
-				object.put("x", "08-" + (23 + i));
-				object.put("y", new Random().nextInt(1000) + 100);
-				array.add(object);
+			List<BScreenBarInfo> bsConsumers = topicDao.queryConsumerHistoryBar(params);
+			Map<String, Object> bsMaps = new HashMap<>();
+			for (BScreenBarInfo bsConsumer : bsConsumers) {
+				if (bsConsumer != null) {
+					bsMaps.put(bsConsumer.getTm(), bsConsumer.getValue());
+				}
+			}
+			for (int i = 6; i >= 0; i--) {
+				String tm = CalendarUtils.getCustomLastDay(i);
+				if (bsMaps.containsKey(tm)) {
+					JSONObject object = new JSONObject();
+					object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+					object.put("y", bsMaps.get(tm).toString());
+					array.add(object);
+				} else {
+					JSONObject object = new JSONObject();
+					object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+					object.put("y", 0);
+					array.add(object);
+				}
 			}
 		}
 
@@ -153,31 +168,89 @@ public class BScreenServiceImpl implements BScreenService {
 
 	@Override
 	public String getTodayOrHistoryConsumerProducer(String clusterAlias, String type) {
-		List<String> producers = new ArrayList<String>();
-		List<String> consumers = new ArrayList<String>();
 		JSONObject object = new JSONObject();
-
-		if ("today".equals(type)) {
+		if ("producers".equals(type)) {
+			List<Long> producers = new ArrayList<Long>();
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
+			List<BScreenConsumerInfo> bscreenConsumers = topicDao.queryTodayBScreenConsumer(params);
+			Map<String, List<Long>> producerKeys = new HashMap<>();
 			for (int i = 0; i < 24; i++) {
-				producers.add((new Random().nextInt(1000) + 100) + "");
-				consumers.add((new Random().nextInt(2000) + 100) + "");
+				if (i < 10) {
+					producerKeys.put("0" + i, new ArrayList<>());
+				} else {
+					producerKeys.put(i + "", new ArrayList<>());
+				}
+			}
+			for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
+				String key = CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH");
+				if (producerKeys.containsKey(key)) {
+					producerKeys.get(key).add(bscreenConsumer.getDifflogsize());
+				}
+			}
+			for (Entry<String, List<Long>> entry : producerKeys.entrySet()) {
+				long sum = 0L;
+				for (Long logsize : entry.getValue()) {
+					sum += logsize;
+				}
+				producers.add(sum);
 			}
 			object.put("producers", producers);
-			object.put("consumers", consumers);
-		} else if ("history".equals(type)) {
-			List<String> xAxis = new ArrayList<String>();
-			for (int i = 0; i < 7; i++) {
-				xAxis.add("08-" + (23 + i));
-				producers.add((new Random().nextInt(10000) + 100) + "");
-				consumers.add((new Random().nextInt(20000) + 100) + "");
+		} else if ("consumers".equals(type)) {
+			List<Long> consumers = new ArrayList<Long>();
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
+			List<BScreenConsumerInfo> bscreenConsumers = topicDao.queryTodayBScreenConsumer(params);
+			Map<String, List<Long>> consumerKeys = new HashMap<>();
+			for (int i = 0; i < 24; i++) {
+				if (i < 10) {
+					consumerKeys.put("0" + i, new ArrayList<>());
+				} else {
+					consumerKeys.put(i + "", new ArrayList<>());
+				}
 			}
-			object.put("producers", producers);
+			for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
+				String key = CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH");
+				if (consumerKeys.containsKey(key)) {
+					consumerKeys.get(key).add(bscreenConsumer.getDiffoffsets());
+				}
+			}
+			for (Entry<String, List<Long>> entry : consumerKeys.entrySet()) {
+				long sum = 0L;
+				for (Long offsets : entry.getValue()) {
+					sum += offsets;
+				}
+				consumers.add(sum);
+			}			
 			object.put("consumers", consumers);
-			object.put("xAxis", xAxis);
 		} else if ("lag".equals(type)) {
-			List<String> lags = new ArrayList<String>();
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
+			List<BScreenConsumerInfo> bscreenConsumers = topicDao.queryTodayBScreenConsumer(params);
+			List<Long> lags = new ArrayList<Long>();
+			Map<String, List<Long>> keys = new HashMap<>();
 			for (int i = 0; i < 24; i++) {
-				lags.add((new Random().nextInt(1000) + 100) + "");
+				if (i < 10) {
+					keys.put("0" + i, new ArrayList<>());
+				} else {
+					keys.put(i + "", new ArrayList<>());
+				}
+			}
+			for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
+				String key = CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH");
+				if (keys.containsKey(key)) {
+					keys.get(key).add(bscreenConsumer.getLag());
+				}
+			}
+			for (Entry<String, List<Long>> entry : keys.entrySet()) {
+				long sum = 0L;
+				for (Long lag : entry.getValue()) {
+					sum += lag;
+				}
+				lags.add(sum);
 			}
 			object.put("lags", lags);
 		}

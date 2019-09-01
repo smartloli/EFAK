@@ -78,7 +78,7 @@ public class BScreenController {
 		}
 	}
 
-	/** Get producer history data by ajax. */
+	/** Get producer history bar data by ajax. */
 	@RequestMapping(value = "/bs/{type}/history/ajax", method = RequestMethod.GET)
 	public void getProducerOrConsumerHistoryAjax(@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -91,8 +91,8 @@ public class BScreenController {
 		}
 	}
 
-	/** Get today or last 7 day consumer and producer data or lag data by ajax. */
-	@RequestMapping(value = "/bs/{dtype}/day/consuer/producer/ajax", method = RequestMethod.GET)
+	/** Get today consumer and producer data and lag data by ajax. */
+	@RequestMapping(value = "/bs/{dtype}/day/ajax", method = RequestMethod.GET)
 	public void getTodayOrHistoryConsumerProducerAjax(@PathVariable("dtype") String dtype, HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();

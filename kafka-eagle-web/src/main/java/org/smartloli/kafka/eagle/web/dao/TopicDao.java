@@ -20,7 +20,8 @@ package org.smartloli.kafka.eagle.web.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenProducerInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
@@ -58,7 +59,7 @@ public interface TopicDao {
 	public List<TopicLogSize> queryTopicProducerChart(Map<String, Object> params);
 
 	/** Get producer history bar data. */
-	public List<BScreenProducerInfo> queryProducerHistoryBar(Map<String, Object> params);
+	public List<BScreenBarInfo> queryProducerHistoryBar(Map<String, Object> params);
 
 	/** Write topic sql history data into table. */
 	public int writeTopicSqlHistory(List<TopicSqlHistory> topicSqlHistorys);
@@ -73,6 +74,23 @@ public interface TopicDao {
 	public void cleanTopicSqlHistory(int tm);
 
 	/** Get bscreen topic total records. */
-	public long getBScreenTotalRecords(Map<String,Object> params);
+	public long getBScreenTotalRecords(Map<String, Object> params);
+
+	/**
+	 * Write statistics big screen consumer topic.
+	 */
+	public int writeBSreenConsumerTopic(List<BScreenConsumerInfo> bscreenConsumers);
+
+	/** Crontab clean big screen topic history data. */
+	public void cleanBScreenConsumerTopic(int tm);
+
+	/** Read big screen topic lastest diffval data. */
+	public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params);
+
+	/** Get consumer history bar data. */
+	public List<BScreenBarInfo> queryConsumerHistoryBar(Map<String, Object> params);
+
+	/** Get bscreen consumer by today, such logsize offset and lag diff. */
+	public List<BScreenConsumerInfo> queryTodayBScreenConsumer(Map<String, Object> params);
 
 }

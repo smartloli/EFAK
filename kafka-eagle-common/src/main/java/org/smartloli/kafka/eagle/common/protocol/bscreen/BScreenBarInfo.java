@@ -26,7 +26,7 @@ import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
  *
  *         Created by Aug 29, 2019
  */
-public class BScreenProducerInfo extends BaseProtocol {
+public class BScreenBarInfo extends BaseProtocol {
 
 	private long value;
 	private String tm;

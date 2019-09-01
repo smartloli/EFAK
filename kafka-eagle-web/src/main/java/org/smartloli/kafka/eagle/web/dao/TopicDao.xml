@@ -27,9 +27,22 @@
 		<result property="tm" column="tm" />
 	</resultMap>
 
-	<resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenProducerInfo" id="bsproducer">
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo" id="bsbar">
 		<result property="tm" column="tm" />
 		<result property="value" column="total" />
+	</resultMap>
+
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo" id="bsconsumer">
+		<result property="cluster" column="cluster" />
+		<result property="group" column="group" />
+		<result property="topic" column="topic" />
+		<result property="logsize" column="logsize" />
+		<result property="difflogsize" column="difflogsize" />
+		<result property="offsets" column="offsets" />
+		<result property="diffoffsets" column="diffoffsets" />
+		<result property="lag" column="lag" />
+		<result property="timespan" column="timespan" />
+		<result property="tm" column="tm" />
 	</resultMap>
 
 	<!-- TopicRank -->
@@ -70,7 +83,7 @@
 		and tm between #{stime} and #{etime}
 	</select>
 
-	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsproducer">
+	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
 		select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster} and tm between #{stime} and #{etime} group by tm
 	</select>
 
@@ -106,6 +119,10 @@
 		delete from ke_logsize where tm&lt;=#{tm}
 	</delete>
 
+	<delete id="cleanBScreenConsumerTopic" parameterType="int">
+		delete from ke_consumer_bscreen where tm&lt;=#{tm}
+	</delete>
+
 	<select id="getBScreenTotalRecords" parameterType="map" resultType="long">
 		select sum(a.logsize) from (select `logsize` from ke_logsize
 		where `cluster`=#{cluster}
@@ -117,6 +134,32 @@
 			)
 		</if>
 		and tm=#{tday} order by `timespan` desc limit #{size}) a
+	</select>
+
+	<!-- BScreen Topic -->
+	<insert id="writeBSreenConsumerTopic" parameterType="java.util.List">
+		insert into
+		ke_consumer_bscreen(`cluster`,`group`,`topic`,`logsize`,`difflogsize`,`offsets`,`diffoffsets`,`lag`,`timespan`,`tm`)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.cluster},#{item.group},#{item.topic},#{item.logsize},#{item.difflogsize},#{item.offsets},#{item.diffoffsets},#{item.lag},#{item.timespan},#{item.tm})
+		</foreach>
+	</insert>
+
+	<select id="readBScreenLastTopic" parameterType="map" resultMap="bsconsumer">
+		select `cluster`,`group`,`topic`,`logsize`,`difflogsize`,`offsets`,`diffoffsets`,`lag` from ke_consumer_bscreen
+		where `cluster` =#{cluster} and
+		`group`=#{group} and `topic`=#{topic}
+		order by `timespan` desc limit 1
+	</select>
+
+	<select id="queryConsumerHistoryBar" parameterType="map" resultMap="bsbar">
+		select tm,sum(diffoffsets) as total from ke_consumer_bscreen where cluster=#{cluster} and tm between #{stime} and #{etime} group by tm
+	</select>
+
+	<select id="queryTodayBScreenConsumer" parameterType="map" resultMap="bsconsumer">
+		select `difflogsize`,`diffoffsets`,`lag`,`timespan` from ke_consumer_bscreen
+		where `cluster`=#{cluster} and tm=#{tday}
 	</select>
 
 </mapper>

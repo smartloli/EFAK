@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
@@ -277,6 +278,21 @@ public class MetricsServiceImpl implements MetricsService {
 	@Override
 	public void cleanTopicRank(int tm) {
 		topicDao.cleanTopicRank(tm);
+	}
+
+	@Override
+	public void cleanBScreenConsumerTopic(int tm) {
+		topicDao.cleanBScreenConsumerTopic(tm);
+	}
+
+	@Override
+	public int writeBSreenConsumerTopic(List<BScreenConsumerInfo> bscreenConsumers) {
+		return topicDao.writeBSreenConsumerTopic(bscreenConsumers);
+	}
+
+	@Override
+	public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params) {
+		return topicDao.readBScreenLastTopic(params);
 	}
 
 }

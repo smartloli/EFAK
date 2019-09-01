@@ -27,6 +27,7 @@ package org.smartloli.kafka.eagle.common.util;
 public class TestConstant {
 
 	public static void main(String[] args) {
+		System.out.println(CalendarUtils.convertUnixTime(1567354201078L,"HH"));
 	}
 
 }

@@ -267,7 +267,7 @@
 		});
 	}
 
-	toDayConsumerProducerOption = {
+	toDayProducerOption = {
 		tooltip : {
 			trigger : 'axis',
 			axisPointer : {
@@ -278,7 +278,7 @@
 		},
 		legend : {
 			top : '0%',
-			data : [ 'Producer', 'Consumer' ],
+			data : [ 'Producer' ],
 			textStyle : {
 				color : 'rgba(255,255,255,.5)',
 				fontSize : '12',
@@ -306,7 +306,7 @@
 				}
 
 			},
-			data : [ '01', '02', '03', '04', '05', '06', '07', '08', '09', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24' ]
+			data : [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23' ]
 		}, {
 			axisPointer : {
 				show : false
@@ -315,8 +315,7 @@
 				show : false
 			},
 			position : 'bottom',
-			offset : 20,
-
+			offset : 20
 		} ],
 		yAxis : [ {
 			type : 'value',
@@ -334,7 +333,6 @@
 					fontSize : 12,
 				},
 			},
-
 			splitLine : {
 				lineStyle : {
 					color : 'rgba(255,255,255,.1)'
@@ -375,73 +373,38 @@
 			},
 			data : []
 
-		}, {
-			name : 'Consumer',
-			type : 'line',
-			smooth : true,
-			symbol : 'circle',
-			symbolSize : 5,
-			showSymbol : false,
-			lineStyle : {
-
-				normal : {
-					color : '#00d887',
-					width : 2
-				}
-			},
-			areaStyle : {
-				normal : {
-					color : new echarts.graphic.LinearGradient(0, 0, 0, 1, [ {
-						offset : 0,
-						color : 'rgba(0, 216, 135, 0.4)'
-					}, {
-						offset : 0.8,
-						color : 'rgba(0, 216, 135, 0.1)'
-					} ], false),
-					shadowColor : 'rgba(0, 0, 0, 0.1)',
-				}
-			},
-			itemStyle : {
-				normal : {
-					color : '#00d887',
-					borderColor : 'rgba(221, 220, 107, .1)',
-					borderWidth : 12
-				}
-			},
-			data : []
 		} ]
 	};
 
-	// Get today consumer and producer
-	getTodayConsumerAndProducer();
+	// Get today producer
+	getTodayProducer();
 
-	function getTodayConsumerAndProducer() {
-		var ke_bs_today_consumer_producer = echarts.init(document.getElementById('ke_bs_today_consumer_producer'));
-		ke_bs_today_consumer_producer.setOption(toDayConsumerProducerOption);
+	function getTodayProducer() {
+		var ke_bs_today_producer = echarts.init(document.getElementById('ke_bs_today_producer'));
+		ke_bs_today_producer.setOption(toDayProducerOption);
 		window.addEventListener("resize", function() {
-			ke_bs_today_consumer_producer.resize();
+			ke_bs_today_producer.resize();
 		});
 
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/bs/today/day/consuer/producer/ajax',
+			url : '/ke/bs/producers/day/ajax',
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");
 			},
 			success : function(datas) {
 				if (datas != null) {
-					toDayConsumerProducerOption.series[0].data = datas.producers;
-					toDayConsumerProducerOption.series[1].data = datas.consumers;
-					ke_bs_today_consumer_producer.setOption(toDayConsumerProducerOption);
+					toDayProducerOption.series[0].data = datas.producers;
+					ke_bs_today_producer.setOption(toDayProducerOption);
 					datas = null;
 				}
 			}
 		});
 	}
 
-	toHistoryConsumerProducerOption = {
+	toDayConsumerOption = {
 		tooltip : {
 			trigger : 'axis',
 			axisPointer : {
@@ -452,7 +415,7 @@
 		},
 		legend : {
 			top : '0%',
-			data : [ 'Producer', 'Consumer' ],
+			data : [ 'Consumer' ],
 			textStyle : {
 				color : 'rgba(255,255,255,.5)',
 				fontSize : '12',
@@ -480,7 +443,7 @@
 				}
 
 			},
-			data : []
+			data : [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23' ]
 		}, {
 			axisPointer : {
 				show : false
@@ -489,7 +452,7 @@
 				show : false
 			},
 			position : 'bottom',
-			offset : 20,
+			offset : 20
 		} ],
 		yAxis : [ {
 			type : 'value',
@@ -507,7 +470,6 @@
 					fontSize : 12,
 				},
 			},
-
 			splitLine : {
 				lineStyle : {
 					color : 'rgba(255,255,255,.1)'
@@ -515,40 +477,6 @@
 			}
 		} ],
 		series : [ {
-			name : 'Producer',
-			type : 'line',
-			smooth : true,
-			symbol : 'circle',
-			symbolSize : 5,
-			showSymbol : false,
-			lineStyle : {
-				normal : {
-					color : '#0184d5',
-					width : 2
-				}
-			},
-			areaStyle : {
-				normal : {
-					color : new echarts.graphic.LinearGradient(0, 0, 0, 1, [ {
-						offset : 0,
-						color : 'rgba(1, 132, 213, 0.4)'
-					}, {
-						offset : 0.8,
-						color : 'rgba(1, 132, 213, 0.1)'
-					} ], false),
-					shadowColor : 'rgba(0, 0, 0, 0.1)',
-				}
-			},
-			itemStyle : {
-				normal : {
-					color : '#0184d5',
-					borderColor : 'rgba(221, 220, 107, .1)',
-					borderWidth : 12
-				}
-			},
-			data : []
-
-		}, {
 			name : 'Consumer',
 			type : 'line',
 			smooth : true,
@@ -556,7 +484,6 @@
 			symbolSize : 5,
 			showSymbol : false,
 			lineStyle : {
-
 				normal : {
 					color : '#00d887',
 					width : 2
@@ -585,30 +512,28 @@
 		} ]
 	};
 
-	// Get today consumer and producer
-	getHistoryConsumerAndProducer();
+	// Get today consumer
+	getTodayConsumer();
 
-	function getHistoryConsumerAndProducer() {
-		var ke_bs_history_consumer_producer = echarts.init(document.getElementById('ke_bs_history_consumer_producer'));
-		ke_bs_history_consumer_producer.setOption(toHistoryConsumerProducerOption);
+	function getTodayConsumer() {
+		var ke_bs_today_consumer = echarts.init(document.getElementById('ke_bs_today_consumer'));
+		ke_bs_today_consumer.setOption(toDayConsumerOption);
 		window.addEventListener("resize", function() {
-			ke_bs_history_consumer_producer.resize();
+			ke_bs_today_consumer.resize();
 		});
 
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/bs/history/day/consuer/producer/ajax',
+			url : '/ke/bs/consumers/day/ajax',
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");
 			},
 			success : function(datas) {
 				if (datas != null) {
-					toHistoryConsumerProducerOption.xAxis[0].data = datas.xAxis;
-					toHistoryConsumerProducerOption.series[0].data = datas.producers;
-					toHistoryConsumerProducerOption.series[1].data = datas.consumers;
-					ke_bs_history_consumer_producer.setOption(toHistoryConsumerProducerOption);
+					toDayConsumerOption.series[0].data = datas.consumers;
+					ke_bs_today_consumer.setOption(toDayConsumerOption);
 					datas = null;
 				}
 			}
@@ -652,9 +577,8 @@
 				lineStyle : {
 					color : 'rgba(255,255,255,.2)'
 				}
-
 			},
-			data : [ '01', '02', '03', '04', '05', '06', '07', '08', '09', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24' ]
+			data : [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23' ]
 		}, {
 			axisPointer : {
 				show : false
@@ -663,8 +587,7 @@
 				show : false
 			},
 			position : 'bottom',
-			offset : 20,
-
+			offset : 20
 		} ],
 		yAxis : [ {
 			type : 'value',
@@ -737,7 +660,7 @@
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/bs/lag/day/consuer/producer/ajax',
+			url : '/ke/bs/lag/day/ajax',
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");
@@ -757,8 +680,8 @@
 		getTopicTotalLogSize();
 		proudcerHistory();
 		consumerHistory();
-		getTodayConsumerAndProducer();
-		getHistoryConsumerAndProducer();
+		getTodayProducer();
+		getTodayConsumer();
 		getTodayLag();
 	}, 1000 * 60);
 });

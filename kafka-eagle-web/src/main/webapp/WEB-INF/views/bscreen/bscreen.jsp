@@ -123,14 +123,13 @@
 			</li>
 			<li>
 				<div class="boxall" style="height: 3.4rem">
-					<div class="alltitle">Today Consumer & Producer (msg/min)</div>
-					<div class="allnav" id="ke_bs_today_consumer_producer"></div>
+					<div class="alltitle">Today Producer (msg/min)</div>
+					<div class="allnav" id="ke_bs_today_producer"></div>
 					<div class="boxfoot"></div>
 				</div>
 				<div class="boxall" style="height: 3.4rem">
-					<div class="alltitle">Last 7 Todays Consumer & Producer
-						(msg/min)</div>
-					<div class="allnav" id="ke_bs_history_consumer_producer"></div>
+					<div class="alltitle">Today Consumer (msg/min)</div>
+					<div class="allnav" id="ke_bs_today_consumer"></div>
 					<div class="boxfoot"></div>
 				</div>
 				<div class="boxall" style="height: 3.4rem">

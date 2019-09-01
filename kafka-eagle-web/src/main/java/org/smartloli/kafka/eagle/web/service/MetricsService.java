@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 
 /**
@@ -50,11 +51,19 @@ public interface MetricsService {
 
 	/** Clean consumer topic data. */
 	public void cleanConsumerTopic(int tm);
-	
+
 	/** Crontab clean topic logsize history data. */
 	public void cleanTopicLogSize(int tm);
-	
+
 	/** Crontab clean topic rank history data. */
 	public void cleanTopicRank(int tm);
+
+	/** Crontab clean big screen topic history data. */
+	public void cleanBScreenConsumerTopic(int tm);
+
+	/** Write statistics big screen consumer topic. */
+	public int writeBSreenConsumerTopic(List<BScreenConsumerInfo> bscreenConsumers);
 	
+	/** Read big screen topic lastest diffval data. */
+	public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params);
 }
