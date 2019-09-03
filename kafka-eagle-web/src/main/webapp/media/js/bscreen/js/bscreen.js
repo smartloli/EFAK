@@ -1,5 +1,11 @@
 ﻿$(document).ready(function() {
 
+	// defined byte size
+	var KB_IN_BYTES = 1024;
+	var MB_IN_BYTES = 1024 * KB_IN_BYTES;
+	var GB_IN_BYTES = 1024 * MB_IN_BYTES;
+	var TB_IN_BYTES = 1024 * GB_IN_BYTES;
+
 	// Get producer and consumer rate data
 	getRealProducerAndConsumerRate();
 
@@ -14,13 +20,41 @@
 				url : '/ke/bs/brokers/ins/outs/realrate/ajax',
 				success : function(datas) {
 					if (datas != null) {
-						$("#ke_bs_ins_rate").text(datas.ins);
-						$("#ke_bs_outs_rate").text(datas.outs);
+						$("#ke_bs_ins_rate").text(stringify(datas.ins).value);
+						$("#ke_bs_ins_rate_name").text(stringify(datas.ins).type);
+						$("#ke_bs_outs_rate").text(stringify(datas.outs).value);
+						$("#ke_bs_outs_rate_name").text(stringify(datas.outs).type);
 					}
 				}
 			});
 		} catch (e) {
 			console.log(e.message);
+		}
+	}
+
+	// formatter byte to kb,mb or gb etc.
+	function stringify(byteNumber) {
+		var object = new Object();
+		if (byteNumber / TB_IN_BYTES > 1) {
+			object.value = (byteNumber / TB_IN_BYTES).toFixed(2);
+			object.type = " (TB/sec)";
+			return object;
+		} else if (byteNumber / GB_IN_BYTES > 1) {
+			object.value = (byteNumber / GB_IN_BYTES).toFixed(2);
+			object.type = " (GB/sec)";
+			return object;
+		} else if (byteNumber / MB_IN_BYTES > 1) {
+			object.value = (byteNumber / MB_IN_BYTES).toFixed(2);
+			object.type = " (MB/sec)";
+			return object;
+		} else if (byteNumber / KB_IN_BYTES > 1) {
+			object.value = (byteNumber / KB_IN_BYTES).toFixed(2);
+			object.type = " (KB/sec)";
+			return object;
+		} else {
+			object.value = (byteNumber / 1).toFixed(2);
+			object.type = " (B/sec)";
+			return object;
 		}
 	}
 
@@ -304,9 +338,8 @@
 				lineStyle : {
 					color : 'rgba(255,255,255,.2)'
 				}
-
 			},
-			data : [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23' ]
+			data : []
 		}, {
 			axisPointer : {
 				show : false
@@ -372,7 +405,6 @@
 				}
 			},
 			data : []
-
 		} ]
 	};
 
@@ -396,7 +428,8 @@
 			},
 			success : function(datas) {
 				if (datas != null) {
-					toDayProducerOption.series[0].data = datas.producers;
+					toDayProducerOption.xAxis[0].data = filter(datas.producers).x;
+					toDayProducerOption.series[0].data = filter(datas.producers).y;
 					ke_bs_today_producer.setOption(toDayProducerOption);
 					datas = null;
 				}
@@ -443,7 +476,7 @@
 				}
 
 			},
-			data : [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23' ]
+			data : []
 		}, {
 			axisPointer : {
 				show : false
@@ -532,7 +565,8 @@
 			},
 			success : function(datas) {
 				if (datas != null) {
-					toDayConsumerOption.series[0].data = datas.consumers;
+					toDayConsumerOption.xAxis[0].data = filter(datas.consumers).x;
+					toDayConsumerOption.series[0].data = filter(datas.consumers).y;
 					ke_bs_today_consumer.setOption(toDayConsumerOption);
 					datas = null;
 				}
@@ -578,7 +612,7 @@
 					color : 'rgba(255,255,255,.2)'
 				}
 			},
-			data : [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23' ]
+			data : []
 		}, {
 			axisPointer : {
 				show : false
@@ -667,7 +701,8 @@
 			},
 			success : function(datas) {
 				if (datas != null) {
-					toDayLagOption.series[0].data = datas.lags;
+					toDayLagOption.xAxis[0].data = filter(datas.lags).x;
+					toDayLagOption.series[0].data = filter(datas.lags).y;
 					ke_bs_today_lag.setOption(toDayLagOption);
 					datas = null;
 				}

@@ -104,8 +104,8 @@
 					</div>
 					<div class="barbox2">
 						<ul class="clearfix">
-							<li class="pulll_left">Brokers ByteIn (per/sec)</li>
-							<li class="pulll_left">Brokers ByteOut (per/sec)</li>
+							<li id="ke_bs_ins_rate_name" class="pulll_left">Brokers ByteIn (B/sec)</li>
+							<li id="ke_bs_outs_rate_name" class="pulll_left">Brokers ByteOut (B/sec)</li>
 						</ul>
 					</div>
 				</div>

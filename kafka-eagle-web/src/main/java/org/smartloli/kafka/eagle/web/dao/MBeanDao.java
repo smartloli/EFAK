@@ -39,7 +39,7 @@ public interface MBeanDao {
 	public List<KpiInfo> query(Map<String, Object> params);
 
 	/** Get broker kpi, such bytein or byteout etc. */
-	public List<KpiInfo> getBrokersKpi(Map<String, Object> params);
+	public KpiInfo getBrokersKpi(Map<String, Object> params);
 
 	/** Crontab clean data. */
 	public void remove(int tm);

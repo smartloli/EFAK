@@ -54,10 +54,10 @@
 	</select>
 
 	<select id="getBrokersKpi" parameterType="map" resultMap="kpi">
-		select `broker`,`key`,`value`,`timespan` from ke_metrics
+		select `key`,`value` from ke_metrics
 		where `cluster`=#{cluster} and `type` =#{type}
 		and `key`=#{key}
-		and tm between #{stime} and #{etime} order by timespan limit #{size}
+		and tm=#{tday} order by timespan desc limit 1
 	</select>
 
 	<select id="getOsMem" parameterType="map" resultMap="kpi">
