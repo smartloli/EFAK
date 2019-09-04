@@ -428,8 +428,8 @@
 			},
 			success : function(datas) {
 				if (datas != null) {
-					toDayProducerOption.xAxis[0].data = filter(datas.producers).x;
-					toDayProducerOption.series[0].data = filter(datas.producers).y;
+					toDayProducerOption.xAxis[0].data = filter(datas).x;
+					toDayProducerOption.series[0].data = filter(datas).y;
 					ke_bs_today_producer.setOption(toDayProducerOption);
 					datas = null;
 				}
@@ -565,8 +565,8 @@
 			},
 			success : function(datas) {
 				if (datas != null) {
-					toDayConsumerOption.xAxis[0].data = filter(datas.consumers).x;
-					toDayConsumerOption.series[0].data = filter(datas.consumers).y;
+					toDayConsumerOption.xAxis[0].data = filter(datas).x;
+					toDayConsumerOption.series[0].data = filter(datas).y;
 					ke_bs_today_consumer.setOption(toDayConsumerOption);
 					datas = null;
 				}
@@ -701,8 +701,8 @@
 			},
 			success : function(datas) {
 				if (datas != null) {
-					toDayLagOption.xAxis[0].data = filter(datas.lags).x;
-					toDayLagOption.series[0].data = filter(datas.lags).y;
+					toDayLagOption.xAxis[0].data = filter(datas).x;
+					toDayLagOption.series[0].data = filter(datas).y;
 					ke_bs_today_lag.setOption(toDayLagOption);
 					datas = null;
 				}

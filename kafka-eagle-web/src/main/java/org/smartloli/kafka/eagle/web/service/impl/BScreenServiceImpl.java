@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.web.service.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
@@ -149,42 +150,64 @@ public class BScreenServiceImpl implements BScreenService {
 
 	@Override
 	public String getTodayOrHistoryConsumerProducer(String clusterAlias, String type) {
-		JSONObject target = new JSONObject();
+		JSONArray targets = new JSONArray();
 		Map<String, Object> params = new HashMap<>();
 		params.put("cluster", clusterAlias);
 		params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
 		List<BScreenConsumerInfo> bscreenConsumers = topicDao.queryTodayBScreenConsumer(params);
+		Map<Integer, Long> map = new HashMap<>();
 		if (bscreenConsumers != null) {
 			if (Topic.PRODUCERS.equals(type)) {
-				JSONArray producers = new JSONArray();
 				for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
-					JSONObject object = new JSONObject();
-					object.put("x", CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH:mm"));
-					object.put("y", bscreenConsumer.getDifflogsize());
-					producers.add(object);
+					int hour = 0;
+					try {
+						hour = Integer.parseInt(CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH"));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					if (map.containsKey(hour)) {
+						map.put(hour, map.get(hour) + bscreenConsumer.getDifflogsize());
+					} else {
+						map.put(hour, bscreenConsumer.getDifflogsize());
+					}
 				}
-				target.put("producers", producers);
 			} else if (Topic.CONSUMERS.equals(type)) {
-				JSONArray consumers = new JSONArray();
 				for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
-					JSONObject object = new JSONObject();
-					object.put("x", CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH:mm"));
-					object.put("y", bscreenConsumer.getDiffoffsets());
-					consumers.add(object);
+					int hour = 0;
+					try {
+						hour = Integer.parseInt(CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH"));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					if (map.containsKey(hour)) {
+						map.put(hour, map.get(hour) + bscreenConsumer.getDiffoffsets());
+					} else {
+						map.put(hour, bscreenConsumer.getDiffoffsets());
+					}
 				}
-				target.put("consumers", consumers);
 			} else if (Topic.LAG.equals(type)) {
-				JSONArray lags = new JSONArray();
 				for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
-					JSONObject object = new JSONObject();
-					object.put("x", CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH:mm"));
-					object.put("y", bscreenConsumer.getLag());
-					lags.add(object);
+					int hour = 0;
+					try {
+						hour = Integer.parseInt(CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH"));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					if (map.containsKey(hour)) {
+						map.put(hour, map.get(hour) + bscreenConsumer.getLag());
+					} else {
+						map.put(hour, bscreenConsumer.getLag());
+					}
 				}
-				target.put("lags", lags);
 			}
 		}
-		return target.toJSONString();
+		for (Entry<Integer, Long> entry : map.entrySet()) {
+			JSONObject object = new JSONObject();
+			object.put("x", entry.getKey());
+			object.put("y", entry.getValue());
+			targets.add(object);
+		}
+		return targets.toJSONString();
 	}
 
 }
