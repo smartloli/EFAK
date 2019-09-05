@@ -21,9 +21,9 @@
 				success : function(datas) {
 					if (datas != null) {
 						$("#ke_bs_ins_rate").text(stringify(datas.ins).value);
-						$("#ke_bs_ins_rate_name").text(stringify(datas.ins).type);
+						$("#ke_bs_ins_rate_name").text("ByteIn" + stringify(datas.ins).type);
 						$("#ke_bs_outs_rate").text(stringify(datas.outs).value);
-						$("#ke_bs_outs_rate_name").text(stringify(datas.outs).type);
+						$("#ke_bs_outs_rate_name").text("ByteOut" + stringify(datas.outs).type);
 					}
 				}
 			});
