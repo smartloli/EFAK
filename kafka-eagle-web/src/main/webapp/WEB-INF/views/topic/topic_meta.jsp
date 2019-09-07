@@ -61,9 +61,6 @@
 		<div id="page-wrapper">
 			<div class="row">
 				<div class="col-lg-12">
-					<!-- <h1 class="page-header">
-						Topic <small>meta</small>
-					</h1> -->
 					<div class="box">
 						<p class="left">
 							Topic <small>meta</small>

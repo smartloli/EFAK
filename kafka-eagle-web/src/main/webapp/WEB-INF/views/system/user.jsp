@@ -216,14 +216,14 @@
 				</div>
 			</div>
 			<!-- Reset -->
-			<div class="modal fade" aria-labelledby="keModalLabel"
+			<div class="modal fade" aria-labelledby="keUserModalLabel"
 				aria-hidden="true" id="ke_user_reset_dialog" tabindex="-1"
 				role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
 							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keModalLabel">Reset User
+							<h4 class="modal-title" id="keUserModalLabel">Reset User
 								Password</h4>
 						</div>
 						<!-- /.row -->
@@ -319,8 +319,8 @@
 
 	function contextResetFormValid() {
 		var ke_user_new_pwd_reset = $("#ke_user_new_pwd_reset").val();
-		var reg = /^[u4E00-u9FA5]+$/;
-		if (ke_user_new_pwd_reset.length == 0 || !reg.test(ke_user_new_pwd_reset)) {
+		var userResetRegular = /[\u4E00-\u9FA5]/;
+		if (ke_user_new_pwd_reset.length == 0 || userResetRegular.test(ke_user_new_pwd_reset)) {
 			$("#alert_mssage_reset").show();
 			$("#alert_mssage_reset_label").text("Passwords can only be number and letters or special symbols .");
 			setTimeout(function() {

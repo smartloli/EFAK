@@ -26,6 +26,7 @@ import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
@@ -263,6 +264,44 @@ public class TopicServiceImpl implements TopicService {
 			arrays.add(object);
 		}
 		return arrays.toJSONString();
+	}
+
+	@Override
+	public String getSelectTopics(String clusterAlias, String prefixTopic) {
+		return brokerService.topicListParams(clusterAlias, prefixTopic);
+	}
+
+	@Override
+	public String getSelectTopicsLogSize(String clusterAlias, Map<String, Object> params) {
+		JSONArray array = new JSONArray();
+		List<BScreenBarInfo> bsProducers = topicDao.queryProducerHistoryBar(params);
+		Map<String, Object> bsMaps = new HashMap<>();
+		for (BScreenBarInfo bsProducer : bsProducers) {
+			if (bsProducer != null) {
+				bsMaps.put(bsProducer.getTm(), bsProducer.getValue());
+			}
+		}
+		int index = 0;
+		try {
+			index = CalendarUtils.getDiffDay(params.get("stime").toString(), params.get("etime").toString());
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		for (int i = index; i >= 0; i--) {
+			String tm = CalendarUtils.getCustomLastDay(i);
+			if (bsMaps.containsKey(tm)) {
+				JSONObject object = new JSONObject();
+				object.put("x", CalendarUtils.getCustomLastDay("yyyy-MM-dd", i));
+				object.put("y", bsMaps.get(tm).toString());
+				array.add(object);
+			} else {
+				JSONObject object = new JSONObject();
+				object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+				object.put("y", 0);
+				array.add(object);
+			}
+		}
+		return array.toJSONString();
 	}
 
 }

@@ -91,7 +91,7 @@ public class CalendarUtils {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return df.format(new Date(unixtime));
 	}
-	
+
 	/** Get the date of the day,accurate to seconds. */
 	public static String getDate() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -118,9 +118,9 @@ public class CalendarUtils {
 		calendar.add(Calendar.DAY_OF_MONTH, -day);
 		return df.format(calendar.getTime());
 	}
-	
+
 	/** Get custom day. */
-	public static String getCustomLastDay(String formatter,int day) {
+	public static String getCustomLastDay(String formatter, int day) {
 		SimpleDateFormat df = new SimpleDateFormat(formatter);
 		Calendar calendar = Calendar.getInstance();
 		Date date = new Date();
@@ -136,4 +136,9 @@ public class CalendarUtils {
 		return newly.format(oldly.parse(date));
 	}
 
+	public static int getDiffDay(String beforeDate, String afterDate) throws ParseException {
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+		return Integer.parseInt((df.parse(afterDate).getTime() - df.parse(beforeDate).getTime()) / (1000 * 3600 * 24) + "");
+	}
+	
 }

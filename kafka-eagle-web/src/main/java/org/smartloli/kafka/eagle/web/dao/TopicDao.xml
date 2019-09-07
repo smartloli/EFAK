@@ -84,7 +84,15 @@
 	</select>
 
 	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
-		select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster} and tm between #{stime} and #{etime} group by tm
+		select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster}
+		<if test="topics != '' and topics != null">
+			and `topic` in (
+			<foreach collection="topics" item="item" index="index" separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
+		and tm between #{stime} and #{etime} group by tm
 	</select>
 
 	<!-- TopicSqlHistory -->
@@ -149,7 +157,8 @@
 	<select id="readBScreenLastTopic" parameterType="map" resultMap="bsconsumer">
 		select `cluster`,`group`,`topic`,`logsize`,`difflogsize`,`offsets`,`diffoffsets`,`lag` from ke_consumer_bscreen
 		where `cluster` =#{cluster} and
-		`group`=#{group} and `topic`=#{topic}
+		`group`=#{group} and
+		`topic`=#{topic}
 		order by `timespan` desc limit 1
 	</select>
 

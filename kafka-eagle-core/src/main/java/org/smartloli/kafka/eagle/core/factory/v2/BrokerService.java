@@ -38,6 +38,9 @@ public interface BrokerService {
 
 	/** Get topic list. */
 	public List<String> topicList(String clusterAlias);
+	
+	/** Get select topic list. */
+	public String topicListParams(String clusterAlias,String search);
 
 	/** Get kafka broker numbers. */
 	public long brokerNumbers(String clusterAlias);

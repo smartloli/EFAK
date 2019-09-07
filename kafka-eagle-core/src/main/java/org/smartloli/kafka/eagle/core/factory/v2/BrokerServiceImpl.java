@@ -36,7 +36,9 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Strings;
 
 import kafka.zk.KafkaZkClient;
 import scala.Option;
@@ -298,6 +300,55 @@ public class BrokerServiceImpl implements BrokerService {
 		return topics;
 	}
 
+	/** Get select topic list from zookeeper. */
+	public String topicListParams(String clusterAlias, String search) {
+		JSONArray targets = new JSONArray();
+		int limit = 15;
+
+		List<String> topics = new ArrayList<>();
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+				topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+				excludeTopic(topics);
+				if (Strings.isNullOrEmpty(search)) {
+					int id = 1;
+					for (String topic : topics) {
+						if (id <= limit) {
+							JSONObject object = new JSONObject();
+							object.put("id", id);
+							object.put("name", topic);
+							targets.add(object);
+							id++;
+						}
+					}
+				} else {
+					int id = 1;
+					for (String topic : topics) {
+						if (topic.contains(search)) {
+							if (id <= limit) {
+								JSONObject object = new JSONObject();
+								object.put("id", id);
+								object.put("name", topic);
+								targets.add(object);
+								id++;
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return targets.toJSONString();
+	}
+
 	/** Scan topic meta page display from zookeeper. */
 	public List<MetadataInfo> topicMetadataRecords(String clusterAlias, String topic, Map<String, Object> params) {
 		List<MetadataInfo> targets = new ArrayList<>();
@@ -424,7 +475,7 @@ public class BrokerServiceImpl implements BrokerService {
 		}
 		return logSize;
 	}
-	
+
 	/** Get topic producer send logsize records. */
 	public long getTopicProducerLogSize(String clusterAlias, String topic) {
 		long logSize = 0L;

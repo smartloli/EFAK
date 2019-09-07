@@ -21,7 +21,7 @@
 					</div>
 					<!-- /.row -->
 					<form role="form" action="/ke/account/reset/" method="post"
-						onsubmit="return contextFormValid();return false;">
+						onsubmit="return contextPasswdFormValid();return false;">
 						<div class="modal-body">
 							<fieldset class="form-horizontal">
 								<div class="form-group">
@@ -157,15 +157,17 @@
 							class="fa fa-bullhorn fa-fw"></i> Notice</a></li> -->
 					</ul></li>
 			</c:if>
+			<li><a href="/ke/bs" target="_blank"><i
+					class="fa fa-fw fa-desktop"></i> BScreen</a></li>
 		</ul>
 	</div>
 	<!-- /.navbar-collapse -->
 </nav>
 <script type="text/javascript">
-	function contextFormValid() {
+	function contextPasswdFormValid() {
 		var ke_new_password_name = $("#ke_new_password_name").val();
-		var reg = /^[u4E00-u9FA5]+$/;
-		if (ke_new_password_name.length == 0 || !reg.test(ke_new_password_name)) {
+		var resetRegular = /[\u4E00-\u9FA5]/;
+		if (ke_new_password_name.length == 0 || resetRegular.test(ke_new_password_name)) {
 			$("#alert_mssage").show();
 			setTimeout(function() {
 				$("#alert_mssage").hide()

@@ -18,8 +18,10 @@
 package org.smartloli.kafka.eagle.web.controller;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +51,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Strings;
 
 /**
  * Kafka topic controller to viewer data.
@@ -356,6 +359,50 @@ public class TopicController {
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get select topic datasets by ajax. */
+	@RequestMapping(value = "/topic/list/select/ajax", method = RequestMethod.POST)
+	public void topicSelectListAjax(HttpServletResponse response, HttpServletRequest request) {
+		try {
+			String topic = request.getParameter("topic");
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			byte[] output = topicService.getSelectTopics(clusterAlias, topic).getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get select filter topic datasets by ajax. */
+	@RequestMapping(value = "/topic/list/filter/select/ajax", method = RequestMethod.GET)
+	public void topicSelectFilterListAjax(HttpServletResponse response, HttpServletRequest request) {
+		try {
+			String topics = request.getParameter("topics");
+			String stime = request.getParameter("stime");
+			String etime = request.getParameter("etime");
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("stime", stime);
+			params.put("etime", etime);
+			if (!Strings.isNullOrEmpty(topics)) {
+				String[] topicStrs = topics.split(",");
+				Set<String> topicSets = new HashSet<>();
+				for (String topic : topicStrs) {
+					topicSets.add(topic);
+				}
+				params.put("topics", topicSets);
+			}
+
+			byte[] output = topicService.getSelectTopicsLogSize(clusterAlias, params).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
