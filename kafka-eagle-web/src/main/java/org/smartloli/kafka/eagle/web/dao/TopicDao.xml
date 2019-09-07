@@ -132,7 +132,7 @@
 	</delete>
 
 	<select id="getBScreenTotalRecords" parameterType="map" resultType="long">
-		select sum(a.logsize) from (select `logsize` from ke_logsize
+		select ifnull(sum(a.logsize),0) from (select `logsize` from ke_logsize
 		where `cluster`=#{cluster}
 		<if test="topics != '' and topics != null">
 			and `topic` in (
