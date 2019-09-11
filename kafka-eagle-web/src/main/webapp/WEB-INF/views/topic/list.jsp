@@ -50,6 +50,7 @@
 <jsp:include page="../public/css.jsp">
 	<jsp:param value="plugins/datatimepicker/daterangepicker.css"
 		name="css" />
+	<jsp:param value="plugins/select2/select2.min.css" name="css" />
 </jsp:include>
 <jsp:include page="../public/tcss.jsp"></jsp:include>
 </head>
@@ -126,12 +127,13 @@
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label>Topic Name (*)</label> <input
-											id="ke_topic_filter_select" name="ke_topic_filter_select"
-											class="form-control" value="1"> <br/> <label
-											for="inputError" class="control-label text-danger">
-											<i class="fa fa-info-circle"></i> Select the topic you need to
-											filter .</label>
+										<label>Topic Name (*)</label> <select multiple="multiple" id="select2val"
+											name="select2val" tabindex="-1"
+											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+										<input id="ke_topic_aggrate" name="ke_topic_aggrate" type="hidden" />
+										<label for="inputError" class="control-label text-danger"><i
+											class="fa fa-info-circle"></i> Select the topic you need to
+											alarm .</label>
 									</div>
 									<button id="ke_topic_select_query" class="btn btn-success">Query</button>
 								</div>
@@ -193,6 +195,7 @@
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/daterangepicker.js"
 		name="loader" />
+	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
 	<jsp:param value="plugins/magicsuggest/magicsuggest.js" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>

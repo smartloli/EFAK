@@ -67,7 +67,7 @@ public interface JConstants {
 	static String CREATE_TABLE_KE_ROLE_RESOURCE = "CREATE TABLE IF NOT EXISTS `ke_role_resource` (`id` int(11) NOT NULL AUTO_INCREMENT,`role_id` int(11) NOT NULL,`resource_id` int(11) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16'), ('19', '1', '18'), ('20', '1', '19'), ('21', '1', '20'), ('22', '1', '21')";
 
-	static String CREATE_TABLE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64) DEFAULT NULL,`broker` varchar(64) DEFAULT NULL,`type` varchar(32) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(128) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64) DEFAULT NULL,`broker` text DEFAULT NULL,`type` varchar(32) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(128) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_ALARM = "CREATE TABLE IF NOT EXISTS `ke_alarm` (`id` int(11) NOT NULL AUTO_INCREMENT,`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(128) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`owner` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -99,7 +99,7 @@ public interface JConstants {
 	static String CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE = "CREATE TABLE IF NOT EXISTS `ke_role_resource` (`id` integer primary key autoincrement,`role_id` int(11),`resource_id` int(11))";
 	static String CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16'), ('19', '1', '18'), ('20', '1', '19'), ('21', '1', '20'), ('22', '1', '21')";
 
-	static String CREATE_TABLE_SQLITE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64),`broker` varchar(128),`type` varchar(32),`key` varchar(64),`value` varchar(128),`timespan` bigint(20),`tm` varchar(16))";
+	static String CREATE_TABLE_SQLITE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64),`broker` text,`type` varchar(32),`key` varchar(64),`value` varchar(128),`timespan` bigint(20),`tm` varchar(16))";
 
 	static String CREATE_TABLE_SQLITE_KE_ALARM = "CREATE TABLE IF NOT EXISTS `ke_alarm` (`id` integer primary key autoincrement,`cluster` varchar(64),`group` varchar(128),`topic` varchar(128),`lag` bigint(20),`owner` text,`created` varchar(32),`modify` varchar(32))";
 

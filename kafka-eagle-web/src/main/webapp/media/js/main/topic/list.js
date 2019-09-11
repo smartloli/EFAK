@@ -76,13 +76,60 @@ $(document).ready(function() {
 		}
 	});
 
-	// Initialization topic
-	var ms_topic = $("#ke_topic_filter_select").magicSuggest({
-		allowFreeEntries : false,
-		autoSelect : true,
-		allowDuplicates : false,
-		data : '/ke/topic/list/select/ajax',
-		queryParam : 'topic'
+	$("#select2val").select2({
+		placeholder : "Topic",
+		ajax : {
+			url : "/ke/topic/mock/list/ajax",
+			dataType : 'json',
+			delay : 250,
+			data : function(params) {
+				params.offset = 10;
+				params.page = params.page || 1;
+				return {
+					name : params.term,
+					page : params.page,
+					offset : params.offset
+				};
+			},
+			cache : true,
+			processResults : function(data, params) {
+				if (data.items.length > 0) {
+					var datas = new Array();
+					$.each(data.items, function(index, e) {
+						var s = {};
+						s.id = index + 1;
+						s.text = e.text;
+						datas[index] = s;
+					});
+					return {
+						results : datas,
+						pagination : {
+							more : (params.page * params.offset) < data.total
+						}
+					};
+				} else {
+					return {
+						results : []
+					}
+				}
+			},
+			escapeMarkup : function(markup) {
+				return markup;
+			},
+			minimumInputLength : 0,
+			allowClear : true
+		}
+	});
+
+	$('#select2val').on('change', function(evt) {
+		var o = document.getElementById('select2val').getElementsByTagName('option');
+		var arrs = [];
+		for (var i = 0; i < o.length; i++) {
+			if (o[i].selected) {
+				arrs.push(o[i].innerText);
+			}
+		}
+		$("#ke_topic_aggrate").val(arrs);
 	});
 
 	// Init chart common
@@ -229,11 +276,8 @@ $(document).ready(function() {
 	}
 
 	function producerSelect() {
-		var topicsSets = $('#ke_topic_filter_select').magicSuggest().getSelection();
 		var topics = new Array();
-		for (var i = 0; i < topicsSets.length; i++) {
-			topics.push(topicsSets[i].name);
-		}
+		var topics = $("#ke_topic_aggrate").val().split(",");
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
