@@ -182,7 +182,7 @@ public class KConstants {
 		public final static int RUNNING = 0;
 		public final static int SHUTDOWN = 1;
 		public final static int PENDING = 2;
-		
+
 		public final static String RUNNING_STRING = "Running";
 		public final static String SHUTDOWN_STRING = "Shutdown";
 		public final static String PENDING_STRING = "Pending";
@@ -196,6 +196,10 @@ public class KConstants {
 		/** Flink app consumer don't commit consumer info into kafka. */
 		public static String UNKNOW = "unknow-host";
 
+	}
+
+	public interface AlarmType {
+		public static String[] TYPE = new String[] { "Email", "SMS", "DingDing", "Wechat", "WebHook" };
 	}
 
 }

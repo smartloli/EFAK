@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.dao.AlertDao;
@@ -166,6 +167,21 @@ public class AlertServiceImpl implements AlertService {
 	@Override
 	public List<ClustersInfo> historys() {
 		return alertDao.historys();
+	}
+
+	/** Get alert type list. */
+	public String getAlertTypeList() {
+		int offset = 0;
+		JSONArray typeList = new JSONArray();
+		for (String type : AlarmType.TYPE) {
+
+			JSONObject object = new JSONObject();
+			object.put("text", type);
+			object.put("id", offset);
+			typeList.add(object);
+			offset++;
+		}
+		return typeList.toJSONString();
 	}
 
 }

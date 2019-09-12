@@ -14,7 +14,7 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<title>Mock - KafkaEagle</title>
+<title>Alarm - KafkaEagle</title>
 <jsp:include page="../public/css.jsp">
 	<jsp:param value="plugins/select2/select2.min.css" name="css" />
 </jsp:include>
@@ -27,7 +27,7 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">
-						Mock <small>message</small>
+						Config <small>message</small>
 					</h1>
 				</div>
 				<!-- /.col-lg-12 -->
@@ -55,30 +55,40 @@
 						<!-- /.panel-heading -->
 						<div class="panel-body">
 							<div class="form-group">
-								<label>Topic Name (*)</label> <select id="select2val"
+								<label>Alarm Group Name (*)</label> <input
+									id="ke_alarm_group_name" name="ke_alarm_group_name"
+									class="form-control" placeholder="Enter Alarm Group Name">
+								<label for="inputError" class="control-label text-danger"><i
+									class="fa fa-info-circle"></i> Input the alarm group name .</label>
+							</div>
+							<div class="form-group">
+								<label>Alarm Type (*)</label> <select id="select2val"
 									name="select2val" tabindex="-1"
 									style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
-								<input id="ke_topic_mock" name="ke_topic_mock" type="hidden" />
+								<input id="ke_alarm_type" name="ke_alarm_type" type="hidden" />
 								<label for="inputError" class="control-label text-danger"><i
-									class="fa fa-info-circle"></i> Select the topic you need to
+									class="fa fa-info-circle"></i> Select the type you need to
 									alarm .</label>
 							</div>
 							<div class="form-group">
 								<label>Message (*)</label>
 								<textarea id="ke_mock_content" name="ke_mock_content"
-									class="form-control" placeholder="Send mock data" rows="10"></textarea>
+									class="form-control" placeholder="Limit 120 words." rows="3"
+									maxlength="120"></textarea>
 								<label for="inputError" class="control-label text-danger"><i
 									class="fa fa-info-circle"></i> Write something and send message
-									to topic .</label>
+									to owner .</label>
 							</div>
-							<button type="button" class="btn btn-primary" id="btn_send">Send
+							<button type="button" class="btn btn-success" id="btn_send">Save
 							</button>
-							<div id="alert_mssage_mock" style="display: none"
+							<button type="button" class="btn btn-primary" id="btn_send_test">Send Test
+							</button>
+							<div id="alert_mssage_alarm_config" style="display: none"
 								class="alert alert-danger">
 								<label>Oops! Please make some changes . (*) is required
 									.</label>
 							</div>
-							<div id="success_mssage_mock" style="display: none"
+							<div id="success_mssage_alarm_config" style="display: none"
 								class="alert alert-success">
 								<label>Message sent success .</label>
 							</div>
@@ -94,6 +104,6 @@
 </body>
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
-	<jsp:param value="main/topic/mock.js" name="loader" />
+	<jsp:param value="main/alarm/config.js" name="loader" />
 </jsp:include>
 </html>

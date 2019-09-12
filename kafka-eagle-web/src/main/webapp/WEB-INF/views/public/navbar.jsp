@@ -56,7 +56,7 @@
 			data-toggle="dropdown"><i class="fa fa-sitemap"></i>
 				${clusterAlias} </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.3.9 </a></li>
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.4.0 </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
 			data-toggle="dropdown" aria-expanded="false"><i
 				class="fa fa-user"></i> ${LOGIN_USER_SESSION.realname} <b
@@ -116,6 +116,8 @@
 					class="fa fa-fw fa-bell"></i> Alarm <i
 					class="fa fa-fw fa-caret-down"></i></a>
 				<ul id="demo1" class="collapse">
+					<li id="navbar_cli"><a href="/ke/alarm/config"><i
+							class="fa fa-bullhorn fa-fw"></i> Config</a></li>
 					<li><a href="#" data-toggle="collapse" data-target="#demo1_1"><i
 							class="fa fa-fw fa-users"></i> Consumer <i
 							class="fa fa-fw fa-caret-down"></i></a>

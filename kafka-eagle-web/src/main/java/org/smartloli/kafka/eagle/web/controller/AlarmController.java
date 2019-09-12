@@ -28,6 +28,12 @@ import javax.servlet.http.HttpSession;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
+import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.web.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,13 +44,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
-import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.web.service.AlertService;
 
 /**
  * Alarm controller to viewer data.
@@ -70,6 +69,15 @@ public class AlarmController {
 	public ModelAndView addView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/alarm/add");
+		return mav;
+	}
+
+	/** Add alarmer config group. */
+	@RequiresPermissions("/alarm/config")
+	@RequestMapping(value = "/alarm/config", method = RequestMethod.GET)
+	public ModelAndView configView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/alarm/config");
 		return mav;
 	}
 
@@ -445,6 +453,19 @@ public class AlarmController {
 			return "redirect:/alarm/history";
 		} else {
 			return "redirect:/errors/500";
+		}
+	}
+
+	/** Get alarm type list. */
+	@RequestMapping(value = "/alarm/type/list/ajax", method = RequestMethod.GET)
+	public void topicMockAjax(HttpServletResponse response, HttpServletRequest request) {
+		try {
+			JSONObject object = new JSONObject();
+			object.put("items", JSON.parseArray(alertService.getAlertTypeList()));
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 }
