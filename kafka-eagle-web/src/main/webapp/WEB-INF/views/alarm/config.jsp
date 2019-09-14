@@ -38,9 +38,8 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Select kafka
-							topic, then edit the simulation message, and then click send to
-							produce the message.</strong>
+						<i class="fa fa-info-circle"></i> <strong>Choose
+							different warning types to warn consumers and cluster health.</strong>
 					</div>
 				</div>
 			</div>
@@ -71,6 +70,13 @@
 									alarm .</label>
 							</div>
 							<div class="form-group">
+								<label>Alarm URL (*)</label> <input id="ke_alarm_url"
+									name="ke_alarm_url" class="form-control"
+									placeholder="Enter Alarm URL"> <label for="inputError"
+									class="control-label text-danger"><i
+									class="fa fa-info-circle"></i> Input the alarm url .</label>
+							</div>
+							<div class="form-group">
 								<label>Message (*)</label>
 								<textarea id="ke_mock_content" name="ke_mock_content"
 									class="form-control" placeholder="Limit 120 words." rows="3"
@@ -81,8 +87,8 @@
 							</div>
 							<button type="button" class="btn btn-success" id="btn_send">Save
 							</button>
-							<button type="button" class="btn btn-primary" id="btn_send_test">Send Test
-							</button>
+							<button type="button" class="btn btn-primary" id="btn_send_test">Send
+								Test</button>
 							<div id="alert_mssage_alarm_config" style="display: none"
 								class="alert alert-danger">
 								<label>Oops! Please make some changes . (*) is required
