@@ -76,6 +76,24 @@
 									class="control-label text-danger"><i
 									class="fa fa-info-circle"></i> Input the alarm url .</label>
 							</div>
+							<div id="div_alarm_http" style="display: none" class="form-group">
+								<label>Http Method (*)</label> <br /> <label class="radio-inline">
+									<input type="radio" name="ke_alarm_http" id="ke_alarm_http_get"
+									value="get" checked="">GET
+								</label><label class="radio-inline"> <input type="radio"
+									name="ke_alarm_http" id="ke_alarm_http_post" value="post"
+									>POST
+								</label> <br />
+								<label for="inputError" class="control-label text-danger"><i
+									class="fa fa-info-circle"></i> Select the alarm http method .</label>
+							</div>
+							<div id="div_alarm_address" style="display: none" class="form-group">
+								<label>Address (*)</label> <input id="ke_alarm_address"
+									name="ke_alarm_address" class="form-control"
+									placeholder=""> <label for="inputError"
+									class="control-label text-danger"><i
+									class="fa fa-info-circle"></i> You can enter multiple email or im addresses using a ";" separator .</label>
+							</div>
 							<div class="form-group">
 								<label>Message (*)</label>
 								<textarea id="ke_mock_content" name="ke_mock_content"

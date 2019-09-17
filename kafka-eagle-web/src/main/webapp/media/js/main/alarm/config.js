@@ -48,5 +48,22 @@ $(document).ready(function() {
 		var text = evt.params.data.text;
 		$("#select2val").val(text);
 		$("#ke_alarm_type").val(text);
+		if (text.indexOf("Email") > -1) {
+			$("#div_alarm_http").show();
+			$("#div_alarm_address").show();
+			$("#ke_alarm_url").attr('placeholder',"http://127.0.0.1:10086/email");
+		} else if (text.indexOf("WebHook") > -1) {
+			$("#div_alarm_http").show();
+			$("#div_alarm_address").show();
+			$("#ke_alarm_url").attr('placeholder',"http://127.0.0.1:10086/webhook");
+		} else if (text.indexOf("DingDing") > -1) {
+			$("#div_alarm_http").hide();
+			$("#div_alarm_address").hide();
+			$("#ke_alarm_url").attr('placeholder',"https://oapi.dingtalk.com/robot/send?access_token=");
+		} else if (text.indexOf("WeChat") > -1) {
+			$("#div_alarm_http").hide();
+			$("#div_alarm_address").hide();
+			$("#ke_alarm_url").attr('placeholder',"http://127.0.0.1:10086/wechat");
+		}
 	});
 });

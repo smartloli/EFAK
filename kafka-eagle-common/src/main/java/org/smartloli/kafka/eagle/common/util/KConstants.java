@@ -199,7 +199,7 @@ public class KConstants {
 	}
 
 	public interface AlarmType {
-		public static String[] TYPE = new String[] { "Email", "DingDing", "Wechat", "WebHook" };
+		public static String[] TYPE = new String[] { "Email", "DingDing", "WeChat", "WebHook" };
 	}
 
 }
