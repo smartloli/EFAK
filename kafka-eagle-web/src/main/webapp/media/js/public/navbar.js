@@ -19,9 +19,12 @@ $(document).ready(function() {
 		if (ret.indexOf("/alarm/add") > -1 || ret.indexOf("/alarm/modify") > -1) {
 			$("#demo1_1").addClass('collapse in');
 			$("#demo1_1").attr("aria-expanded", true);
-		} else {
+		} else if (ret.indexOf("/alarm/create") > -1 || ret.indexOf("/alarm/history") > -1) {
 			$("#demo1_2").addClass('collapse in');
 			$("#demo1_2").attr("aria-expanded", true);
+		} else if (ret.indexOf("/alarm/config") > -1 || ret.indexOf("/alarm/list") > -1) {
+			$("#demo1_3").addClass('collapse in');
+			$("#demo1_3").attr("aria-expanded", true);
 		}
 	} else if (ret.indexOf("/system") > -1) {
 		$("#demo3").addClass('collapse in');

@@ -116,8 +116,18 @@
 					class="fa fa-fw fa-bell"></i> Alarm <i
 					class="fa fa-fw fa-caret-down"></i></a>
 				<ul id="demo1" class="collapse">
-					<li id="navbar_cli"><a href="/ke/alarm/config"><i
-							class="fa fa-bullhorn fa-fw"></i> Config</a></li>
+					<li><a href="#" data-toggle="collapse" data-target="#demo1_3"><i
+							class="fa fa-fw fa-bullhorn"></i> Channel <i
+							class="fa fa-fw fa-caret-down"></i></a>
+						<ul id="demo1_3" class="collapse"
+							style="list-style: none; margin-left: -40px">
+							<li id="navbar_config"><a href="/ke/alarm/config"
+								style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;"><i
+									class="fa fa-info-circle fa-fw"></i> Config</a></li>
+							<li id="navbar_list"><a href="/ke/alarm/list"
+								style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;"><i
+									class="fa fa-edit fa-fw"></i> List</a></li>
+						</ul></li>
 					<li><a href="#" data-toggle="collapse" data-target="#demo1_1"><i
 							class="fa fa-fw fa-users"></i> Consumer <i
 							class="fa fa-fw fa-caret-down"></i></a>
