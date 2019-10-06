@@ -55,6 +55,7 @@
 								width="100%">
 								<thead>
 									<tr>
+										<th>Cluster</th>
 										<th>Alarm Group</th>
 										<th>Alarm Type</th>
 										<th>Alarm URL</th>
@@ -74,7 +75,8 @@
 			</div>
 			<!-- /.row -->
 			<div class="modal fade" aria-labelledby="keModalLabel"
-				aria-hidden="true" id="doc_info" tabindex="-1" role="dialog">
+				aria-hidden="true" id="ke_alarm_config_delete" tabindex="-1"
+				role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -92,7 +94,8 @@
 			</div>
 			<!-- modify -->
 			<div class="modal fade" aria-labelledby="keModalLabelModify"
-				aria-hidden="true" id="modfiy_info" tabindex="-1" role="dialog">
+				aria-hidden="true" id="ke_alarm_config_modify" tabindex="-1"
+				role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -100,26 +103,28 @@
 							<h4 class="modal-title" id="keModalLabelModify">Modify</h4>
 						</div>
 						<!-- /.row -->
-						<form role="form" action="/ke/alarm/history/modify/" method="post"
+						<form role="form" action="/ke/alarm/config/modify/form/"
+							method="post"
 							onsubmit="return contextModifyConfigFormValid();return false;">
 							<fieldset class="form-horizontal">
 								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">Server</label>
+									<label for="path" class="col-sm-2 control-label">URL</label>
 									<div class="col-sm-9">
-										<input id="ke_history_id_lag" name="ke_history_id_lag"
+										<input id="ke_alarm_group_m_name" name="ke_alarm_group_m_name"
 											type="hidden" class="form-control" placeholder=""> <input
-											id="ke_history_name_lag" name="ke_history_name_lag"
+											id="ke_alarm_config_m_url" name="ke_alarm_config_m_url"
 											type="text" class="form-control" placeholder="">
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">Owners</label>
+									<label for="path" class="col-sm-2 control-label">Address</label>
 									<div class="col-sm-9">
-										<textarea id="ke_owners_modify" name="ke_owners_modify"
-											class="form-control" rows="3"></textarea>
+										<textarea id="ke_alarm_config_m_address"
+											name="ke_alarm_config_m_address" class="form-control"
+											rows="3"></textarea>
 									</div>
 								</div>
-								<div id="alert_message_modify" style="display: none"
+								<div id="alert_config_message_modify" style="display: none"
 									class="alert alert-danger">
 									<label> Oops! Please make some changes .</label>
 								</div>
@@ -135,23 +140,51 @@
 					</div>
 				</div>
 			</div>
+			<!-- More detail info -->
+			<div class="modal fade" aria-labelledby="keModalLabelModify"
+				aria-hidden="true" id="ke_alarm_config_detail" tabindex="-1"
+				role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabelModify">Detail</h4>
+						</div>
+						<!-- /.row -->
+						<fieldset class="form-horizontal">
+							<div class="form-group">
+								<label for="path" class="col-sm-2 control-label">Content</label>
+								<div class="col-sm-9">
+									<textarea id="ke_alarm_config_property"
+										name="ke_alarm_config_property" class="form-control"
+										readonly="readonly" rows="3"></textarea>
+								</div>
+							</div>
+						</fieldset>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">Cancle</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<!-- /#page-wrapper -->
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/alarm/history.js" name="loader" />
+	<jsp:param value="main/alarm/list.js" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
 <script type="text/javascript">
 	function contextModifyConfigFormValid() {
-		var ke_history_name_lag = $("#ke_history_name_lag").val();
-		var ke_owners_modify = $("#ke_owners_modify").val();
+		var ke_alarm_config_m_url = $("#ke_alarm_config_m_url").val();
 
-		if (ke_history_name_lag.length == 0 || ke_owners_modify.length == 0) {
-			$("#alert_message_modify").show();
+		if (ke_alarm_config_m_url.length == 0) {
+			$("#alert_config_message_modify").show();
 			setTimeout(function() {
-				$("#alert_message_modify").hide()
+				$("#alert_config_message_modify").hide()
 			}, 3000);
 			return false;
 		}

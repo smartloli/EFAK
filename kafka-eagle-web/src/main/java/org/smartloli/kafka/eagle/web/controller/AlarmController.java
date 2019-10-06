@@ -30,8 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
+import org.smartloli.kafka.eagle.common.util.AlertUtils;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +85,15 @@ public class AlarmController {
 		return mav;
 	}
 
+	/** Add alarmer config group. */
+	@RequiresPermissions("/alarm/list")
+	@RequestMapping(value = "/alarm/list", method = RequestMethod.GET)
+	public ModelAndView listView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/alarm/list");
+		return mav;
+	}
+
 	/** Create cluster alarmer viewer. */
 	@RequiresPermissions("/alarm/create")
 	@RequestMapping(value = "/alarm/create", method = RequestMethod.GET)
@@ -121,6 +134,22 @@ public class AlarmController {
 	public ModelAndView addFailedView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/alarm/add_failed");
+		return mav;
+	}
+
+	/** Config alarmer success viewer. */
+	@RequestMapping(value = "/alarm/config/success", method = RequestMethod.GET)
+	public ModelAndView configSuccessView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/alarm/config_success");
+		return mav;
+	}
+
+	/** Config alarmer failed viewer. */
+	@RequestMapping(value = "/alarm/config/failed", method = RequestMethod.GET)
+	public ModelAndView configFailedView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/alarm/config_failed");
 		return mav;
 	}
 
@@ -456,13 +485,237 @@ public class AlarmController {
 		}
 	}
 
-	/** Get alarm type list. */
+	/** Get alarm type list, such as email, dingding, wechat and so on. */
 	@RequestMapping(value = "/alarm/type/list/ajax", method = RequestMethod.GET)
-	public void topicMockAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void alarmTypeListAjax(HttpServletResponse response, HttpServletRequest request) {
 		try {
 			JSONObject object = new JSONObject();
 			object.put("items", JSON.parseArray(alertService.getAlertTypeList()));
 			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Check alarm group name. */
+	@RequestMapping(value = "/alarm/check/{group}/ajax", method = RequestMethod.GET)
+	public void alarmGroupCheckAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("alarmGroup", group);
+			JSONObject object = new JSONObject();
+			object.put("result", alertService.findAlarmConfigByGroupName(params));
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Add alarm config . */
+	@RequestMapping(value = "/alarm/config/storage/form", method = RequestMethod.POST)
+	public ModelAndView alarmAddConfigForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		String group = request.getParameter("ke_alarm_group_name");
+		String type = request.getParameter("ke_alarm_type");
+		String url = request.getParameter("ke_alarm_url");
+		String http = request.getParameter("ke_alarm_http");
+		String address = request.getParameter("ke_alarm_address");
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+		AlarmConfigInfo alarmConfig = new AlarmConfigInfo();
+		alarmConfig.setCluster(clusterAlias);
+		alarmConfig.setAlarmGroup(group);
+		alarmConfig.setAlarmType(type);
+		alarmConfig.setAlarmUrl(url);
+		alarmConfig.setHttpMethod(http);
+		alarmConfig.setAlarmAddress(address);
+		alarmConfig.setCreated(CalendarUtils.getDate());
+		alarmConfig.setModify(CalendarUtils.getDate());
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("cluster", clusterAlias);
+		params.put("alarmGroup", group);
+		boolean findCode = alertService.findAlarmConfigByGroupName(params);
+
+		if (findCode) {
+			session.removeAttribute("Alarm_Config_Status");
+			session.setAttribute("Alarm_Config_Status", "Insert failed alarm group[" + alarmConfig.getAlarmGroup() + "] has exist.");
+			mav.setViewName("redirect:/alarm/config/failed");
+		} else {
+			int resultCode = alertService.insertOrUpdateAlarmConfig(alarmConfig);
+			if (resultCode > 0) {
+				session.removeAttribute("Alarm_Config_Status");
+				session.setAttribute("Alarm_Config_Status", "Insert success.");
+				mav.setViewName("redirect:/alarm/config/success");
+			} else {
+				session.removeAttribute("Alarm_Config_Status");
+				session.setAttribute("Alarm_Config_Status", "Insert failed.");
+				mav.setViewName("redirect:/alarm/config/failed");
+			}
+		}
+
+		return mav;
+	}
+
+	/** Get alarm config list. */
+	@RequestMapping(value = "/alarm/config/table/ajax", method = RequestMethod.GET)
+	public void getAlarmConfigTableAjax(HttpServletResponse response, HttpServletRequest request) {
+		String aoData = request.getParameter("aoData");
+		JSONArray params = JSON.parseArray(aoData);
+		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+		String search = "";
+		for (Object object : params) {
+			JSONObject param = (JSONObject) object;
+			if ("sEcho".equals(param.getString("name"))) {
+				sEcho = param.getIntValue("value");
+			} else if ("iDisplayStart".equals(param.getString("name"))) {
+				iDisplayStart = param.getIntValue("value");
+			} else if ("iDisplayLength".equals(param.getString("name"))) {
+				iDisplayLength = param.getIntValue("value");
+			} else if ("sSearch".equals(param.getString("name"))) {
+				search = param.getString("value");
+			}
+		}
+
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("search", "%" + search + "%");
+		map.put("start", iDisplayStart);
+		map.put("size", iDisplayLength);
+		map.put("cluster", clusterAlias);
+
+		JSONArray configList = JSON.parseArray(alertService.getAlarmConfigList(map).toString());
+		JSONArray aaDatas = new JSONArray();
+
+		for (Object object : configList) {
+			JSONObject config = (JSONObject) object;
+			JSONObject obj = new JSONObject();
+			String alarmGroup = StrUtils.convertNull(config.getString("alarmGroup"));
+			String url = StrUtils.convertNull(config.getString("alarmUrl"));
+			String address = StrUtils.convertNull(config.getString("alarmAddress"));
+			obj.put("cluster", config.getString("cluster"));
+			obj.put("alarmGroup", alarmGroup.length() > 16 ? alarmGroup.substring(0, 16) + "..." : alarmGroup);
+			obj.put("alarmType", config.getString("alarmType"));
+			obj.put("alarmUrl", "<a name='ke_alarm_config_detail' href='#" + alarmGroup + "/url'>" + (url.length() > 16 ? url.substring(0, 16) + "..." : url) + "</a>");
+			obj.put("httpMethod", config.getString("httpMethod"));
+			obj.put("alarmAddress", "<a name='ke_alarm_config_detail' href='#" + alarmGroup + "/address'>" + (address.length() > 16 ? address.substring(0, 16) + "..." : address) + "</a>");
+			obj.put("created", config.getString("created"));
+			obj.put("modify", config.getString("modify"));
+			obj.put("operate",
+					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_config_modify' href='#"
+							+ alarmGroup + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='alarm_config_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			aaDatas.add(obj);
+		}
+
+		int count = alertService.alarmConfigCount(map); // only need cluster
+		JSONObject target = new JSONObject();
+		target.put("sEcho", sEcho);
+		target.put("iTotalRecords", count);
+		target.put("iTotalDisplayRecords", count);
+		target.put("aaData", aaDatas);
+		try {
+			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Delete alarm config. */
+	@RequestMapping(value = "/alarm/config/{group}/del", method = RequestMethod.GET)
+	public ModelAndView alarmDelete(@PathVariable("group") String group, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		Map<String, Object> map = new HashMap<>();
+		map.put("cluster", clusterAlias);
+		map.put("alarmGroup", group);
+
+		int code = alertService.deleteAlertByGroupName(map);
+		if (code > 0) {
+			return new ModelAndView("redirect:/alarm/list");
+		} else {
+			return new ModelAndView("redirect:/errors/500");
+		}
+	}
+
+	/** Get alarm config by group name. */
+	@RequestMapping(value = "/alarm/config/get/{type}/{group}/ajax", method = RequestMethod.GET)
+	public void getAlarmConfigByGroupAjax(@PathVariable("type") String type, @PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("alarmGroup", group);
+			JSONObject object = new JSONObject();
+			if ("url".equals(type)) {
+				object.put("result", alertService.getAlarmConfigByGroupName(params).getAlarmUrl());
+			} else if ("address".equals(type)) {
+				object.put("result", alertService.getAlarmConfigByGroupName(params).getAlarmAddress());
+			} else if ("modify".equals(type)) {
+				object.put("url", alertService.getAlarmConfigByGroupName(params).getAlarmUrl());
+				object.put("address", alertService.getAlarmConfigByGroupName(params).getAlarmAddress());
+			}
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Modify alarm config. */
+	@RequestMapping(value = "/alarm/config/modify/form/", method = RequestMethod.POST)
+	public ModelAndView alarmModifyConfigForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		String group = request.getParameter("ke_alarm_group_m_name");
+		String url = request.getParameter("ke_alarm_config_m_url");
+		String address = request.getParameter("ke_alarm_config_m_address");
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("cluster", clusterAlias);
+		params.put("alarmGroup", group);
+
+		AlarmConfigInfo alarmConfig = alertService.getAlarmConfigByGroupName(params);
+
+		alarmConfig.setAlarmUrl(url);
+		alarmConfig.setAlarmAddress(address);
+		alarmConfig.setModify(CalendarUtils.getDate());
+
+		int resultCode = alertService.insertOrUpdateAlarmConfig(alarmConfig);
+		if (resultCode > 0) {
+			mav.setViewName("redirect:/alarm/list");
+		} else {
+			mav.setViewName("redirect:/errors/500");
+		}
+		return mav;
+	}
+
+	/** Send test message by alarm config . */
+	@RequestMapping(value = "/alarm/config/test/send/ajax", method = RequestMethod.GET)
+	public void sendTestMsgAlarmConfig(HttpServletResponse response, HttpServletRequest request) {
+		try {
+			String type = request.getParameter("type");
+			String url = request.getParameter("url");
+			String http = request.getParameter("http");
+			String msg = request.getParameter("msg");
+			String result = "";
+			if (AlarmType.EMAIL.equals(type)) {
+			} else if (AlarmType.DingDing.equals(type)) {
+				result = AlertUtils.sendTestMsgByDingDing(url, msg);
+			} else if (AlarmType.WebHook.equals(type)) {
+
+			} else if (AlarmType.WeChat.equals(type)) {
+				
+			}
+			byte[] output = result.getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

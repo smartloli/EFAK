@@ -200,6 +200,10 @@ public class KConstants {
 
 	public interface AlarmType {
 		public static String[] TYPE = new String[] { "Email", "DingDing", "WeChat", "WebHook" };
+		public static String EMAIL = "Email";
+		public static String DingDing = "DingDing";
+		public static String WeChat = "WeChat";
+		public static String WebHook = "WebHook";
 	}
 
 }

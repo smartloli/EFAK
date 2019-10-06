@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 
 /**
  * Store kafka alert data & metrics data into database.
@@ -57,22 +58,39 @@ public interface AlertDao {
 
 	/** Insert alert data into db. */
 	public int insertKafkaOrZK(ClustersInfo clusterInfo);
-	
+
 	/** Query cluster collector data. */
 	public List<ClustersInfo> history(Map<String, Object> params);
-	
+
 	public int alertHistoryCount(Map<String, Object> params);
-	
+
 	/** Delete alert by id. */
 	public int deleteClusterAlertById(int id);
-	
+
 	/** Find alert info by id. */
 	public ClustersInfo findClusterAlertById(int id);
-	
+
 	/** Modify alert info by id. */
 	public int modifyClusterAlertById(ClustersInfo cluster);
-	
+
 	/** Query clusters collector data. */
 	public List<ClustersInfo> historys();
+
+	/** Storage or update alarm config info. */
+	public int insertOrUpdateAlarmConfig(AlarmConfigInfo alarmConfig);
+
+	/** Find alarm config by group name. */
+	public int findAlarmConfigByGroupName(Map<String, Object> params);
+
+	/** Get alarm config list. */
+	public List<AlarmConfigInfo> getAlarmConfigList(Map<String, Object> params);
 	
+	/** Get alarm config count. */
+	public int alarmConfigCount(Map<String, Object> params);
+	
+	/** Delete alarm config by group name. */
+	public int deleteAlertByGroupName(Map<String, Object> params);
+	
+	/** Get alarm config by group name. */
+	public AlarmConfigInfo getAlarmConfigByGroupName(Map<String, Object> params);
 }

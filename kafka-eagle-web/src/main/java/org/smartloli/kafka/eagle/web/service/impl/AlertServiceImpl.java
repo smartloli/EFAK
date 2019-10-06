@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -182,6 +183,36 @@ public class AlertServiceImpl implements AlertService {
 			offset++;
 		}
 		return typeList.toJSONString();
+	}
+
+	@Override
+	public int insertOrUpdateAlarmConfig(AlarmConfigInfo alarmConfig) {
+		return alertDao.insertOrUpdateAlarmConfig(alarmConfig);
+	}
+
+	@Override
+	public boolean findAlarmConfigByGroupName(Map<String, Object> params) {
+		return alertDao.findAlarmConfigByGroupName(params) > 0 ? true : false;
+	}
+
+	@Override
+	public List<AlarmConfigInfo> getAlarmConfigList(Map<String, Object> params) {
+		return alertDao.getAlarmConfigList(params);
+	}
+
+	@Override
+	public int alarmConfigCount(Map<String, Object> params) {
+		return alertDao.alarmConfigCount(params);
+	}
+
+	@Override
+	public int deleteAlertByGroupName(Map<String, Object> params) {
+		return alertDao.deleteAlertByGroupName(params);
+	}
+
+	@Override
+	public AlarmConfigInfo getAlarmConfigByGroupName(Map<String, Object> params) {
+		return alertDao.getAlarmConfigByGroupName(params);
 	}
 
 }

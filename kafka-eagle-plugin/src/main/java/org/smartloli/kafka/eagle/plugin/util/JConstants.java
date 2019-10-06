@@ -56,20 +56,22 @@ public interface JConstants {
 	public static String CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS %s";
 
 	/** Automatically create databases and tables. */
-	public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_alarm", "ke_consumer", "ke_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history","ke_logsize","ke_consumer_bscreen");
+	public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_alarm", "ke_consumer", "ke_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history","ke_logsize","ke_consumer_bscreen","ke_alarm_config");
 
 	static String CREATE_TABLE_KE_P_ROLE = "CREATE TABLE IF NOT EXISTS `ke_p_role` (`id` tinyint(4) NOT NULL AUTO_INCREMENT,`name` varchar(64) CHARACTER SET utf8 NOT NULL COMMENT 'role name',`seq` tinyint(4) NOT NULL COMMENT 'rank',`description` varchar(128) CHARACTER SET utf8 NOT NULL COMMENT 'role describe',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_P_ROLE_INSERT = "INSERT INTO `ke_p_role` VALUES ('1', 'Administrator', '1', 'Have all permissions'), ('2', 'Devs', '2', 'Own add or delete'), ('3', 'Tourist', '3', 'Only viewer')";
 
 	static String CREATE_TABLE_KE_RESOURCES = "CREATE TABLE IF NOT EXISTS `ke_resources` (`resource_id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(255) CHARACTER SET utf8 NOT NULL COMMENT 'resource name',`url` varchar(255) NOT NULL,`parent_id` int(11) NOT NULL,PRIMARY KEY (`resource_id`)) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4";
-	static String CREATE_TABLE_KE_RESOURCES_INSERT = "INSERT INTO `ke_resources` VALUES ('1', 'System', '/system', '-1'), ('2', 'User', '/system/user', '1'), ('3', 'Role', '/system/role', '1'), ('4', 'Resource', '/system/resource', '1'), ('5', 'Notice', '/system/notice', '1'), ('6', 'Topic', '/topic', '-1'), ('7', 'Message', '/topic/message', '6'), ('8', 'Create', '/topic/create', '6'), ('9', 'Alarm', '/alarm', '-1'), ('10', 'Add', '/alarm/add', '9'), ('11', 'Modify', '/alarm/modify', '9'), ('12', 'Cluster', '/cluster', '-1'), ('13', 'ZkCli', '/cluster/zkcli', '12'), ('14', 'UserDelete', '/system/user/delete', '1'), ('15', 'UserModify', '/system/user/modify', '1'), ('16', 'Mock', '/topic/mock', '6'), ('18', 'Create', '/alarm/create', '9'), ('19', 'History', '/alarm/history', '9'), ('20', 'Manager', '/topic/manager', '6'), ('21', 'PasswdReset', '/system/user/reset', '1')";
+	static String CREATE_TABLE_KE_RESOURCES_INSERT = "INSERT INTO `ke_resources` VALUES ('1', 'System', '/system', '-1'), ('2', 'User', '/system/user', '1'), ('3', 'Role', '/system/role', '1'), ('4', 'Resource', '/system/resource', '1'), ('5', 'Notice', '/system/notice', '1'), ('6', 'Topic', '/topic', '-1'), ('7', 'Message', '/topic/message', '6'), ('8', 'Create', '/topic/create', '6'), ('9', 'Alarm', '/alarm', '-1'), ('10', 'Add', '/alarm/add', '9'), ('11', 'Modify', '/alarm/modify', '9'), ('12', 'Cluster', '/cluster', '-1'), ('13', 'ZkCli', '/cluster/zkcli', '12'), ('14', 'UserDelete', '/system/user/delete', '1'), ('15', 'UserModify', '/system/user/modify', '1'), ('16', 'Mock', '/topic/mock', '6'), ('18', 'Create', '/alarm/create', '9'), ('19', 'History', '/alarm/history', '9'), ('20', 'Manager', '/topic/manager', '6'), ('21', 'PasswdReset', '/system/user/reset', '1'), ('22', 'Config', '/alarm/config', '9'), ('23', 'List', '/alarm/list', '9')";
 
 	static String CREATE_TABLE_KE_ROLE_RESOURCE = "CREATE TABLE IF NOT EXISTS `ke_role_resource` (`id` int(11) NOT NULL AUTO_INCREMENT,`role_id` int(11) NOT NULL,`resource_id` int(11) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4";
-	static String CREATE_TABLE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16'), ('19', '1', '18'), ('20', '1', '19'), ('21', '1', '20'), ('22', '1', '21')";
+	static String CREATE_TABLE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16'), ('19', '1', '18'), ('20', '1', '19'), ('21', '1', '20'), ('22', '1', '21'), ('23', '1', '22'), ('24', '1', '23')";
 
 	static String CREATE_TABLE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64) DEFAULT NULL,`broker` text DEFAULT NULL,`type` varchar(32) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(128) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_ALARM = "CREATE TABLE IF NOT EXISTS `ke_alarm` (`id` int(11) NOT NULL AUTO_INCREMENT,`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(128) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`owner` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	
+	static String CREATE_TABLE_KE_ALARM_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_alarm_config` (`cluster` varchar(64) NOT NULL,`alarm_group` varchar(128) NOT NULL,`alarm_type` varchar(16) DEFAULT NULL,`alarm_url` text DEFAULT NULL,`http_method` varchar(16) DEFAULT NULL,`alarm_address` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`cluster`,`alarm_group`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_CLUSTERS = "CREATE TABLE IF NOT EXISTS `ke_clusters` (`id` int(11) NOT NULL AUTO_INCREMENT,`type` varchar(32) DEFAULT NULL,`cluster` varchar(64) DEFAULT NULL,`server` text DEFAULT NULL,`owner` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -94,14 +96,16 @@ public interface JConstants {
 	static String CREATE_TABLE_SQLITE_KE_P_ROLE_INSERT = "INSERT INTO `ke_p_role` VALUES ('1', 'Administrator', '1', 'Have all permissions'), ('2', 'Devs', '2', 'Own add or delete'), ('3', 'Tourist', '3', 'Only viewer')";
 
 	static String CREATE_TABLE_SQLITE_KE_RESOURCES = "CREATE TABLE IF NOT EXISTS `ke_resources` (`resource_id` integer primary key autoincrement,`name` varchar(255),`url` varchar(255),`parent_id` int(11))";
-	static String CREATE_TABLE_SQLITE_KE_RESOURCES_INSERT = "INSERT INTO `ke_resources` VALUES ('1', 'System', '/system', '-1'), ('2', 'User', '/system/user', '1'), ('3', 'Role', '/system/role', '1'), ('4', 'Resource', '/system/resource', '1'), ('5', 'Notice', '/system/notice', '1'), ('6', 'Topic', '/topic', '-1'), ('7', 'Message', '/topic/message', '6'), ('8', 'Create', '/topic/create', '6'), ('9', 'Alarm', '/alarm', '-1'), ('10', 'Add', '/alarm/add', '9'), ('11', 'Modify', '/alarm/modify', '9'), ('12', 'Cluster', '/cluster', '-1'), ('13', 'ZkCli', '/cluster/zkcli', '12'), ('14', 'UserDelete', '/system/user/delete', '1'), ('15', 'UserModify', '/system/user/modify', '1'), ('16', 'Mock', '/topic/mock', '6'), ('18', 'Create', '/alarm/create', '9'), ('19', 'History', '/alarm/history', '9'), ('20', 'Manager', '/topic/manager', '6'), ('21', 'PasswdReset', '/system/user/reset', '1')";
+	static String CREATE_TABLE_SQLITE_KE_RESOURCES_INSERT = "INSERT INTO `ke_resources` VALUES ('1', 'System', '/system', '-1'), ('2', 'User', '/system/user', '1'), ('3', 'Role', '/system/role', '1'), ('4', 'Resource', '/system/resource', '1'), ('5', 'Notice', '/system/notice', '1'), ('6', 'Topic', '/topic', '-1'), ('7', 'Message', '/topic/message', '6'), ('8', 'Create', '/topic/create', '6'), ('9', 'Alarm', '/alarm', '-1'), ('10', 'Add', '/alarm/add', '9'), ('11', 'Modify', '/alarm/modify', '9'), ('12', 'Cluster', '/cluster', '-1'), ('13', 'ZkCli', '/cluster/zkcli', '12'), ('14', 'UserDelete', '/system/user/delete', '1'), ('15', 'UserModify', '/system/user/modify', '1'), ('16', 'Mock', '/topic/mock', '6'), ('18', 'Create', '/alarm/create', '9'), ('19', 'History', '/alarm/history', '9'), ('20', 'Manager', '/topic/manager', '6'), ('21', 'PasswdReset', '/system/user/reset', '1'), ('22', 'Config', '/alarm/config', '9'), ('23', 'List', '/alarm/list', '9')";
 
 	static String CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE = "CREATE TABLE IF NOT EXISTS `ke_role_resource` (`id` integer primary key autoincrement,`role_id` int(11),`resource_id` int(11))";
-	static String CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16'), ('19', '1', '18'), ('20', '1', '19'), ('21', '1', '20'), ('22', '1', '21')";
+	static String CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16'), ('19', '1', '18'), ('20', '1', '19'), ('21', '1', '20'), ('22', '1', '21'), ('23', '1', '22'), ('24', '1', '23')";
 
 	static String CREATE_TABLE_SQLITE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64),`broker` text,`type` varchar(32),`key` varchar(64),`value` varchar(128),`timespan` bigint(20),`tm` varchar(16))";
 
 	static String CREATE_TABLE_SQLITE_KE_ALARM = "CREATE TABLE IF NOT EXISTS `ke_alarm` (`id` integer primary key autoincrement,`cluster` varchar(64),`group` varchar(128),`topic` varchar(128),`lag` bigint(20),`owner` text,`created` varchar(32),`modify` varchar(32))";
+	
+	static String CREATE_TABLE_SQLITE_KE_ALARM_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_alarm_config` (`cluster` varchar(64) ,`alarm_group` varchar(128) ,`alarm_type` varchar(16) ,`alarm_url` text ,`http_method` varchar(16) ,`alarm_address` text ,`created` varchar(32) ,`modify` varchar(32) , PRIMARY KEY (`cluster`,`alarm_group`))";
 
 	static String CREATE_TABLE_SQLITE_KE_CLUSTERS = "CREATE TABLE IF NOT EXISTS `ke_clusters` (`id` integer primary key autoincrement,`type` varchar(32),`cluster` varchar(64),`server` text,`owner` text,`created` varchar(32),`modify` varchar(32))";
 
@@ -136,6 +140,7 @@ public interface JConstants {
 			put("CREATE_TABLE_KE_ROLE_RESOURCE_INSERT", CREATE_TABLE_KE_ROLE_RESOURCE_INSERT);
 			put("CREATE_TABLE_KE_METRICS", CREATE_TABLE_KE_METRICS);
 			put("CREATE_TABLE_KE_ALARM", CREATE_TABLE_KE_ALARM);
+			put("CREATE_TABLE_KE_ALARM_CONFIG", CREATE_TABLE_KE_ALARM_CONFIG);
 			put("CREATE_TABLE_KE_CLUSTERS", CREATE_TABLE_KE_CLUSTERS);
 			put("CREATE_TABLE_KE_CONSUMER", CREATE_TABLE_KE_CONSUMER);
 			put("CREATE_TABLE_KE_TOPIC_RANK", CREATE_TABLE_KE_TOPIC_RANK);
@@ -155,6 +160,7 @@ public interface JConstants {
 			put("CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT", CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT);
 			put("CREATE_TABLE_SQLITE_KE_METRICS", CREATE_TABLE_SQLITE_KE_METRICS);
 			put("CREATE_TABLE_SQLITE_KE_ALARM", CREATE_TABLE_SQLITE_KE_ALARM);
+			put("CREATE_TABLE_SQLITE_KE_ALARM_CONFIG", CREATE_TABLE_SQLITE_KE_ALARM_CONFIG);
 			put("CREATE_TABLE_SQLITE_KE_CLUSTERS", CREATE_TABLE_SQLITE_KE_CLUSTERS);
 			put("CREATE_TABLE_SQLITE_KE_CONSUMER", CREATE_TABLE_SQLITE_KE_CONSUMER);
 			put("CREATE_TABLE_SQLITE_KE_TOPIC_RANK", CREATE_TABLE_SQLITE_KE_TOPIC_RANK);

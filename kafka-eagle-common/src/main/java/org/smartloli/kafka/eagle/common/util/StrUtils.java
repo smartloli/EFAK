@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * String conversion tool.
+ * String conversion tool and null convert.
  * 
  * @author smartloli.
  *
@@ -97,9 +97,9 @@ public class StrUtils {
 		DecimalFormat formatter = new DecimalFormat("###.##");
 		return Double.valueOf(formatter.format(Double.valueOf(number)));
 	}
-	
+
 	/** Formmatter number. */
-	public static double numberic(String number,String format) {
+	public static double numberic(String number, String format) {
 		DecimalFormat formatter = new DecimalFormat(format);
 		return Double.valueOf(formatter.format(Double.valueOf(number)));
 	}
@@ -113,4 +113,21 @@ public class StrUtils {
 	public static String assembly(String number) {
 		return stringify(integer(numberic(number)));
 	}
+
+	/** whether it is empty. */
+	public static boolean isNull(String value) {
+		if (value == null || value.length() == 0 || "".equals(value)) {
+			return true;
+		}
+		return false;
+	}
+
+	/** Convert null to string. */
+	public static String convertNull(String value) {
+		if (isNull(value)) {
+			return "";
+		}
+		return value;
+	}
+
 }

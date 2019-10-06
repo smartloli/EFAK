@@ -23,6 +23,54 @@
 		<result property="modify" column="modify" />
 	</resultMap>
 
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo" id="alarmConfig">
+		<result property="cluster" column="cluster" />
+		<result property="alarmGroup" column="alarm_group" />
+		<result property="alarmType" column="alarm_type" />
+		<result property="alarmUrl" column="alarm_url" />
+		<result property="httpMethod" column="http_method" />
+		<result property="alarmAddress" column="alarm_address" />
+		<result property="created" column="created" />
+		<result property="modify" column="modify" />
+	</resultMap>
+
+	<insert id="insertOrUpdateAlarmConfig" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo">
+		replace into
+		ke_alarm_config(`cluster`,`alarm_group`,`alarm_type`,`alarm_url`,`http_method`,`alarm_address`,`created`,`modify`)
+		values(#{cluster},#{alarmGroup},#{alarmType},#{alarmUrl},#{httpMethod},#{alarmAddress},#{created},#{modify})
+	</insert>
+
+	<select id="findAlarmConfigByGroupName" parameterType="map" resultType="Integer">
+		select count(*) from ke_alarm_config where `cluster`=#{cluster} and `alarm_group`=#{alarmGroup}
+	</select>
+
+	<select id="getAlarmConfigList" parameterType="map" resultMap="alarmConfig">
+		select * from ke_alarm_config
+		<where>
+			`cluster`=#{cluster}
+			<if test="search!=null and search!=''">
+				and `alarm_group` like #{search}
+			</if>
+		</where>
+		limit #{start},#{size}
+	</select>
+
+	<select id="getAlarmConfigByGroupName" parameterType="map" resultMap="alarmConfig">
+		select * from ke_alarm_config
+		<where>
+			`cluster`=#{cluster}
+			and `alarm_group`=#{alarmGroup}
+		</where>
+	</select>
+
+	<select id="alarmConfigCount" parameterType="map" resultType="Integer">
+		select count(*) from ke_alarm_config where `cluster`=#{cluster}
+	</select>
+
+	<delete id="deleteAlertByGroupName" parameterType="map">
+		delete from ke_alarm_config where `cluster`=#{cluster} and `alarm_group`=#{alarmGroup}
+	</delete>
+
 	<insert id="insertAlert" parameterType="org.smartloli.kafka.eagle.common.protocol.AlertInfo">
 		insert into
 		ke_alarm(`cluster`,`group`,`topic`,`lag`,`owner`,`created`,`modify`)

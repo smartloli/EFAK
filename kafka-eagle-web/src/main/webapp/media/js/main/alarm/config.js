@@ -19,7 +19,6 @@ $(document).ready(function() {
 				if (data.items.length > 0) {
 					var datas = new Array();
 					$.each(data.items, function(index, e) {
-						console.log(e);
 						var s = {};
 						s.id = index + 1;
 						s.text = e.text;
@@ -51,19 +50,50 @@ $(document).ready(function() {
 		if (text.indexOf("Email") > -1) {
 			$("#div_alarm_http").show();
 			$("#div_alarm_address").show();
-			$("#ke_alarm_url").attr('placeholder',"http://127.0.0.1:10086/email");
+			$("#ke_alarm_url").attr('placeholder', "http://127.0.0.1:10086/email");
 		} else if (text.indexOf("WebHook") > -1) {
 			$("#div_alarm_http").show();
 			$("#div_alarm_address").show();
-			$("#ke_alarm_url").attr('placeholder',"http://127.0.0.1:10086/webhook");
+			$("#ke_alarm_url").attr('placeholder', "http://127.0.0.1:10086/webhook");
 		} else if (text.indexOf("DingDing") > -1) {
 			$("#div_alarm_http").hide();
 			$("#div_alarm_address").hide();
-			$("#ke_alarm_url").attr('placeholder',"https://oapi.dingtalk.com/robot/send?access_token=");
+			$("#ke_alarm_url").attr('placeholder', "https://oapi.dingtalk.com/robot/send?access_token=");
 		} else if (text.indexOf("WeChat") > -1) {
 			$("#div_alarm_http").hide();
 			$("#div_alarm_address").hide();
-			$("#ke_alarm_url").attr('placeholder',"http://127.0.0.1:10086/wechat");
+			$("#ke_alarm_url").attr('placeholder', "http://127.0.0.1:10086/wechat");
 		}
 	});
+
+	$("#btn_send_test").click(function() {
+		var type = $("#ke_alarm_type").val();
+		var url = $("#ke_alarm_url").val();
+		var http = $('input:radio:checked').val();
+		var msg = $("#ke_test_msg").val();
+		if (type.length == 0 || url.length == 0 || msg.length == 0) {
+			$("#alert_msg_alarm_send").show();
+			setTimeout(function() {
+				$("#alert_msg_alarm_send").hide()
+			}, 3000);
+		} else {
+			$.ajax({
+				type : 'get',
+				dataType : 'json',
+				url : '/ke/alarm/config/test/send/ajax?type=' + type + '&url=' + url + '&http=' + http + '&msg=' + msg,
+				success : function(datas) {
+					if (type.indexOf("DingDing") > -1) {
+						if (datas.errcode == 0) {
+							$("#success_mssage_alarm_config").show();
+							setTimeout(function() {
+								$("#success_mssage_alarm_config").hide()
+							}, 5000);
+						}
+					}
+
+				}
+			});
+		}
+	});
+
 });
