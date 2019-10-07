@@ -13,12 +13,17 @@
 		<result property="modify" column="modify" />
 	</resultMap>
 
-	<resultMap type="org.smartloli.kafka.eagle.common.protocol.ClustersInfo" id="clustersInfo">
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo" id="clustersInfo">
 		<result property="id" column="id" />
 		<result property="type" column="type" />
 		<result property="cluster" column="cluster" />
 		<result property="server" column="server" />
-		<result property="owner" column="owner" />
+		<result property="alarmGroup" column="alarm_group" />
+		<result property="alarmTimes" column="alarm_times" />
+		<result property="alarmMaxTimes" column="alarm_max_times" />
+		<result property="alarmLevel" column="alarm_level" />
+		<result property="isNormal" column="is_normal" />
+		<result property="isEnable" column="is_enable" />
 		<result property="created" column="created" />
 		<result property="modify" column="modify" />
 	</resultMap>
@@ -118,8 +123,8 @@
 		update ke_alarm set `lag`=#{lag},`owner`=#{owner},`modify`=#{modify} where `id`=#{id}
 	</update>
 
-	<insert id="insertKafkaOrZK" parameterType="org.smartloli.kafka.eagle.common.protocol.ClustersInfo">
-		insert into ke_clusters(`type`,`cluster`,`server`,`owner`,`created`,`modify`) values(#{type},#{cluster},#{server},#{owner},#{created},#{modify})
+	<insert id="insertAlarmCluster" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo">
+		insert into ke_alarm_clusters(`type`,`cluster`,`server`,`alarm_group`,`alarm_times`,`alarm_max_times`,`alarm_level`,`is_normal`,`is_enable`,`created`,`modify`) values(#{type},#{cluster},#{server},#{alarmGroup},#{alarmTimes},#{alarmMaxTimes},#{alarmLevel},#{isNormal},#{isEnable},#{created},#{modify})
 	</insert>
 
 	<select id="history" parameterType="map" resultMap="clustersInfo">

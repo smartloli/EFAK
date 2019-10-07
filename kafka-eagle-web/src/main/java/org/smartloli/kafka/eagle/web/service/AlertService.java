@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 
 /**
@@ -62,8 +63,8 @@ public interface AlertService {
 	/** Find alert info by id. */
 	public int modifyAlertById(AlertInfo alert);
 
-	/** Insert alert data into db. */
-	public int create(ClustersInfo clusterInfo);
+	/** Storage or update alarm cluster,such as kafka or zookeeper. */
+	public int create(AlarmClusterInfo clusterInfo);
 
 	/** List cluster information from alert. */
 	public List<ClustersInfo> history(Map<String, Object> params);
@@ -84,6 +85,9 @@ public interface AlertService {
 
 	/** Get alert type list. */
 	public String getAlertTypeList();
+	
+	/** Get alert cluster type list. */
+	public String getAlertClusterTypeList(String type,Map<String, Object> params);
 
 	/** Storage or update alarm config info. */
 	public int insertOrUpdateAlarmConfig(AlarmConfigInfo alarmConfig);

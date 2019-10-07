@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.util.AlertUtils;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
@@ -355,24 +356,31 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/create/form", method = RequestMethod.POST)
 	public ModelAndView alarmCreateForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
-		String ke_type_alarm_id = request.getParameter("ke_type_alarm_id");
-		String ke_server_alarm = request.getParameter("ke_server_alarm");
-		String ke_cluster_email = request.getParameter("ke_cluster_email");
-		JSONArray types = JSON.parseArray(ke_type_alarm_id);
-		ClustersInfo clusterInfo = new ClustersInfo();
-		for (Object object : types) {
-			JSONObject type = (JSONObject) object;
-			clusterInfo.setType(type.getString("name"));
+		String type = request.getParameter("ke_alarm_cluster_type");
+		String servers = request.getParameter("ke_server_alarm");
+		String level = request.getParameter("ke_alarm_cluster_level");
+		String alarmGroup = request.getParameter("ke_alarm_cluster_group");
+		int maxTimes = 10;
+		try {
+			maxTimes = Integer.parseInt(request.getParameter("ke_alarm_cluster_maxtimes"));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		clusterInfo.setOwner(ke_cluster_email);
-		clusterInfo.setServer(ke_server_alarm);
-		clusterInfo.setCreated(CalendarUtils.getDate());
-		clusterInfo.setModify(CalendarUtils.getDate());
-
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		clusterInfo.setCluster(clusterAlias);
-		int code = alertService.create(clusterInfo);
+		AlarmClusterInfo alarmClusterInfo = new AlarmClusterInfo();
+		alarmClusterInfo.setAlarmGroup(alarmGroup);
+		alarmClusterInfo.setAlarmLevel(level);
+		alarmClusterInfo.setAlarmMaxTimes(maxTimes);
+		alarmClusterInfo.setAlarmTimes(0);
+		alarmClusterInfo.setCluster(clusterAlias);
+		alarmClusterInfo.setCreated(CalendarUtils.getDate());
+		alarmClusterInfo.setIsEnable("Y");
+		alarmClusterInfo.setIsNormal("Y");
+		alarmClusterInfo.setModify(CalendarUtils.getDate());
+		alarmClusterInfo.setServer(servers);
+		alarmClusterInfo.setType(type);
+
+		int code = alertService.create(alarmClusterInfo);
 		if (code > 0) {
 			session.removeAttribute("Alarm_Submit_Status");
 			session.setAttribute("Alarm_Submit_Status", "Insert success.");
@@ -491,6 +499,30 @@ public class AlarmController {
 		try {
 			JSONObject object = new JSONObject();
 			object.put("items", JSON.parseArray(alertService.getAlertTypeList()));
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get alarm cluster type list, such as kafka, zookeeper and so on. */
+	@RequestMapping(value = "/alarm/cluster/{type}/list/ajax", method = RequestMethod.GET)
+	public void alarmClusterTypeListAjax(@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			JSONObject object = new JSONObject();
+			String search = "";
+			Map<String, Object> map = new HashMap<>();
+			if ("group".equals(type)) {
+				HttpSession session = request.getSession();
+				String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+				search = StrUtils.convertNull(request.getParameter("name"));
+				map.put("search", "%" + search + "%");
+				map.put("start", 0);
+				map.put("size", 10);
+				map.put("cluster", clusterAlias);
+			}
+			object.put("items", JSON.parseArray(alertService.getAlertClusterTypeList(type, map)));
 			byte[] output = object.toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {

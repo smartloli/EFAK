@@ -14,8 +14,9 @@
 <meta name="author" content="">
 
 <title>Alarm - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
-<jsp:include page="../public/tagcss.jsp"></jsp:include>
+<jsp:include page="../public/css.jsp">
+	<jsp:param value="plugins/select2/select2.min.css" name="css" />
+</jsp:include>
 </head>
 
 <body>
@@ -54,15 +55,16 @@
 							<div class="row">
 								<div class="col-lg-12">
 									<form role="form" action="/ke/alarm/create/form" method="post"
-										onsubmit="return contextFormValid();return false;">
+										onsubmit="return contextAlarmAddFormValid();return false;">
 										<div class="form-group">
-											<label>Type (*)</label> <input id="ke_type_alarm_name"
-												name="ke_type_alarm_name" class="form-control" maxlength=50
-												value="1"><input id="ke_type_alarm_id"
-												name="ke_type_alarm_id" type="hidden"> <label
+											<label>Alarm Type (*)</label> <select id="select2type"
+												name="select2type" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_type"
+												name="ke_alarm_cluster_type" type="hidden" /> <label
 												for="inputError" class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Select the type you need to
-												alarm .</label>
+												class="fa fa-info-circle"></i> Select the cluster type you
+												need to alarm .</label>
 										</div>
 										<div class="form-group">
 											<label>Server (*)</label>
@@ -73,15 +75,37 @@
 												dn1:2181,dn2:2181,dn3:2181.</label>
 										</div>
 										<div class="form-group">
-											<label>Owner Email (*)</label> <input id="ke_cluster_email"
-												name="ke_cluster_email" class="form-control" maxlength=50
-												value="example1@email.com"><label for="inputError"
-												class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> To whom the alarm topic
-												information, Such as 'example@email.com' .</label>
+											<label>Alarm Level (*)</label> <select id="select2level"
+												name="select2level" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_level"
+												name="ke_alarm_cluster_level" type="hidden" /> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the cluster level you
+												need to alarm .</label>
+										</div>
+										<div class="form-group">
+											<label>Alarm Max Times (*)</label> <select
+												id="select2maxtimes" name="select2maxtimes" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_maxtimes"
+												name="ke_alarm_cluster_maxtimes" type="hidden" /> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the cluster alarm max
+												times you need to alarm .</label>
+										</div>
+										<div class="form-group">
+											<label>Alarm Group (*)</label> <select id="select2group"
+												name="select2group" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_group"
+												name="ke_alarm_cluster_group" type="hidden" /> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the cluster alarm
+												group you need to alarm .</label>
 										</div>
 										<button type="submit" class="btn btn-success">Add</button>
-										<div id="alert_message" style="display: none"
+										<div id="alert_create_message" style="display: none"
 											class="alert alert-danger">
 											<label>Oops! Please make some changes . (*) is
 												required .</label>
@@ -101,42 +125,26 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="plugins/magicsuggest/magicsuggest.js" name="loader" />
-	<jsp:param value="plugins/tokenfield/bootstrap-tokenfield.js"
-		name="loader" />
+	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
 	<jsp:param value="main/alarm/create.js" name="loader" />
 </jsp:include>
 <script type="text/javascript">
-	function contextFormValid() {
+	function contextAlarmAddFormValid() {
+		var ke_alarm_cluster_type = $("#ke_alarm_cluster_type").val();
 		var ke_server_alarm = $("#ke_server_alarm").val();
-		var ke_cluster_email = $("#ke_cluster_email").val();
-		var ke_type_alarm_name = JSON.stringify($('#ke_type_alarm_name').magicSuggest().getSelection());
+		var ke_alarm_cluster_level = $("#ke_alarm_cluster_level").val();
+		var ke_alarm_max_times = $("#ke_alarm_max_times").val();
+		var ke_alarm_cluster_group = $("#ke_alarm_cluster_group").val();
+		var ke_alarm_cluster_maxtimes = $("#ke_alarm_cluster_maxtimes").val();
 
-		if (ke_type_alarm_name.length == 2) {
-			$("#alert_message").show();
+		if (ke_alarm_cluster_type.length == 0 || ke_server_alarm.length == 0 || ke_alarm_cluster_level.length == 0 || ke_alarm_max_times.length == 0 || ke_alarm_cluster_group.length == 0 || ke_alarm_cluster_maxtimes.length == 0) {
+			$("#alert_create_message").show();
 			setTimeout(function() {
-				$("#alert_message").hide()
-			}, 3000);
-			return false;
-		}
-		if (ke_server_alarm.length == 2) {
-			$("#alert_message").show();
-			setTimeout(function() {
-				$("#alert_message").hide()
-			}, 3000);
-			return false;
-		}
-		
-		var reg = /^((([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6}\, ))*(([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})))$/;
-		if (!reg.test(ke_cluster_email)) {
-			$("#alert_message").show();
-			setTimeout(function() {
-				$("#alert_message").hide()
+				$("#alert_create_message").hide()
 			}, 3000);
 			return false;
 		}
 
-		$('#ke_type_alarm_id').val(ke_type_alarm_name);
 		return true;
 	}
 </script>

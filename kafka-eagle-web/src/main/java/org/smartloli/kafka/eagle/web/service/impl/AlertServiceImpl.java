@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -132,8 +133,8 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public int create(ClustersInfo clusterInfo) {
-		return alertDao.insertKafkaOrZK(clusterInfo);
+	public int create(AlarmClusterInfo clusterInfo) {
+		return alertDao.insertAlarmCluster(clusterInfo);
 	}
 
 	@Override
@@ -213,6 +214,50 @@ public class AlertServiceImpl implements AlertService {
 	@Override
 	public AlarmConfigInfo getAlarmConfigByGroupName(Map<String, Object> params) {
 		return alertDao.getAlarmConfigByGroupName(params);
+	}
+
+	@Override
+	public String getAlertClusterTypeList(String type, Map<String, Object> params) {
+		int offset = 0;
+		JSONArray typeList = new JSONArray();
+		if ("type".equals(type)) {
+			for (String cluster : AlarmType.CLUSTER) {
+				JSONObject object = new JSONObject();
+				object.put("text", cluster);
+				object.put("id", offset);
+				typeList.add(object);
+				offset++;
+			}
+		} else if ("level".equals(type)) {
+			for (String level : AlarmType.LEVEL) {
+				JSONObject object = new JSONObject();
+				object.put("text", level);
+				object.put("id", offset);
+				typeList.add(object);
+				offset++;
+			}
+		} else if ("group".equals(type)) {
+			List<AlarmConfigInfo> alarmGroups = alertDao.getAlarmConfigList(params);
+			if (alarmGroups != null) {
+				for (AlarmConfigInfo alarmGroup : alarmGroups) {
+					JSONObject object = new JSONObject();
+					object.put("text", alarmGroup.getAlarmGroup());
+					object.put("id", offset);
+					typeList.add(object);
+					offset++;
+				}
+			}
+		} else if ("maxtimes".equals(type)) {
+			for (int maxtimes : AlarmType.MAXTIMES) {
+				JSONObject object = new JSONObject();
+				object.put("text", maxtimes);
+				object.put("id", offset);
+				typeList.add(object);
+				offset++;
+			}
+		}
+
+		return typeList.toJSONString();
 	}
 
 }
