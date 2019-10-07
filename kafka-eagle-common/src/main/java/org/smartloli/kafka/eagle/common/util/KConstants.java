@@ -204,6 +204,8 @@ public class KConstants {
 		public static String DingDing = "DingDing";
 		public static String WeChat = "WeChat";
 		public static String WebHook = "WebHook";
+		public static String HTTP_GET = "get";
+		public static String HTTP_POST = "post";
 	}
 
 }

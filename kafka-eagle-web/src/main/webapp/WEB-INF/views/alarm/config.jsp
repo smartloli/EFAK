@@ -60,7 +60,7 @@
 									<label>Alarm Group Name (*)</label> <input
 										id="ke_alarm_group_name" name="ke_alarm_group_name"
 										class="form-control"
-										placeholder="Alarm Group Name Limit 32 words" maxlength="32">
+										placeholder="Alarm Group Name Limit 64 words" maxlength="64">
 									<label for="inputError" class="control-label text-danger"><i
 										class="fa fa-info-circle"></i> Input the alarm group name .</label>
 								</div>

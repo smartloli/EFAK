@@ -20,8 +20,6 @@ package org.smartloli.kafka.eagle.common.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.KConstants.IM;
 
 import com.alibaba.fastjson.JSONObject;
@@ -34,8 +32,6 @@ import com.alibaba.fastjson.JSONObject;
  *         Created by Oct 6, 2019
  */
 public class AlertUtils {
-
-	private final static Logger LOG = LoggerFactory.getLogger(AlertUtils.class);
 
 	/** Send Json msg by dingding. */
 	public static String sendTestMsgByDingDing(String uri, String data) {
