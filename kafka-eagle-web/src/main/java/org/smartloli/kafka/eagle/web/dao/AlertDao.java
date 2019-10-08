@@ -60,22 +60,23 @@ public interface AlertDao {
 	/** Storage alarm cluster,such as kafka or zookeeper. */
 	public int insertAlarmCluster(AlarmClusterInfo clusterInfo);
 
-	/** Query cluster collector data. */
-	public List<ClustersInfo> history(Map<String, Object> params);
+	/** Get alarm cluster list. */
+	public List<AlarmClusterInfo> getAlarmClusterList(Map<String, Object> params);
 
-	public int alertHistoryCount(Map<String, Object> params);
+	/** Get alarm cluster count. */
+	public int getAlarmClusterCount(Map<String, Object> params);
 
-	/** Delete alert by id. */
-	public int deleteClusterAlertById(int id);
+	/** Delete alert cluster by id. */
+	public int deleteAlarmClusterAlertById(int id);
 
-	/** Find alert info by id. */
-	public ClustersInfo findClusterAlertById(int id);
+	/** Find alert cluster info by id. */
+	public AlarmClusterInfo findAlarmClusterAlertById(int id);
 
 	/** Modify alert info by id. */
 	public int modifyClusterAlertById(ClustersInfo cluster);
 
-	/** Query clusters collector data. */
-	public List<ClustersInfo> historys();
+	/** Get all alarm tasks. */
+	public List<AlarmClusterInfo> getAllAlarmTasks();
 
 	/** Storage or update alarm config info. */
 	public int insertOrUpdateAlarmConfig(AlarmConfigInfo alarmConfig);
@@ -85,13 +86,13 @@ public interface AlertDao {
 
 	/** Get alarm config list. */
 	public List<AlarmConfigInfo> getAlarmConfigList(Map<String, Object> params);
-	
+
 	/** Get alarm config count. */
 	public int alarmConfigCount(Map<String, Object> params);
-	
+
 	/** Delete alarm config by group name. */
 	public int deleteAlertByGroupName(Map<String, Object> params);
-	
+
 	/** Get alarm config by group name. */
 	public AlarmConfigInfo getAlarmConfigByGroupName(Map<String, Object> params);
 }

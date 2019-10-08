@@ -67,21 +67,21 @@ public interface AlertService {
 	public int create(AlarmClusterInfo clusterInfo);
 
 	/** List cluster information from alert. */
-	public List<ClustersInfo> history(Map<String, Object> params);
+	public List<AlarmClusterInfo> getAlarmClusterList(Map<String, Object> params);
+	
+	/** Get all alarm tasks. */
+	public List<AlarmClusterInfo> getAllAlarmTasks();
 
-	public int alertHistoryCount(Map<String, Object> params);
+	public int getAlarmClusterCount(Map<String, Object> params);
 
 	/** Delete alert by id. */
-	public int deleteClusterAlertById(int id);
+	public int deleteAlarmClusterAlertById(int id);
 
-	/** Find alert info by id. */
-	public String findClusterAlertById(int id);
+	/** Find alert cluster info by id. */
+	public AlarmClusterInfo findAlarmClusterAlertById(int id);
 
 	/** Modify alert info by id. */
 	public int modifyClusterAlertById(ClustersInfo cluster);
-
-	/** Query clusters collector data. */
-	public List<ClustersInfo> historys();
 
 	/** Get alert type list. */
 	public String getAlertTypeList();

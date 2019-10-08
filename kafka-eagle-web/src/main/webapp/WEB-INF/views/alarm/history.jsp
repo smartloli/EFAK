@@ -14,7 +14,10 @@
 <meta name="author" content="">
 
 <title>Alarm - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/css.jsp">
+	<jsp:param value="plugins/select2/select2.min.css" name="css" />
+	<jsp:param value="plugins/switch/bootstrap-switch.min.css" name="css" />
+</jsp:include>
 <jsp:include page="../public/tcss.jsp"></jsp:include>
 </head>
 
@@ -36,8 +39,8 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Manage cluster alarm
-							records .</strong>
+						<i class="fa fa-info-circle"></i> <strong>Manage cluster
+							alarm records .</strong>
 					</div>
 				</div>
 			</div>
@@ -57,9 +60,13 @@
 									<tr>
 										<th>ID</th>
 										<th>Type</th>
-										<th>Cluster</th>
 										<th>Server</th>
-										<th>Owner</th>
+										<th>AlarmGroup</th>
+										<th>AlarmTimes</th>
+										<th>AlarmMaxTimes</th>
+										<th>AlarmLevel</th>
+										<th>IsNormal</th>
+										<th>IsEnable</th>
 										<th>Created</th>
 										<th>Modify</th>
 										<th>Operate</th>
@@ -74,7 +81,8 @@
 			</div>
 			<!-- /.row -->
 			<div class="modal fade" aria-labelledby="keModalLabel"
-				aria-hidden="true" id="doc_info" tabindex="-1" role="dialog">
+				aria-hidden="true" id="alarm_cluster_remove" tabindex="-1"
+				role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -82,17 +90,15 @@
 							<h4 class="modal-title" id="keModalLabel">Notify</h4>
 						</div>
 						<!-- /.row -->
-						<div class="modal-body">
-							<p>Are you sure you want to delete it?
-							<p>
-						</div>
+						<div id="alarm_cluster_remove_content" class="modal-body"></div>
 						<div id="remove_div" class="modal-footer"></div>
 					</div>
 				</div>
 			</div>
 			<!-- modify -->
 			<div class="modal fade" aria-labelledby="keModalLabelModify"
-				aria-hidden="true" id="modfiy_info" tabindex="-1" role="dialog">
+				aria-hidden="true" id="alarm_cluster_modify" tabindex="-1"
+				role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -100,24 +106,44 @@
 							<h4 class="modal-title" id="keModalLabelModify">Modify</h4>
 						</div>
 						<!-- /.row -->
-						<form role="form" action="/ke/alarm/history/modify/"
-							method="post"
+						<form role="form" action="/ke/alarm/history/modify/" method="post"
 							onsubmit="return contextModifyFormValid();return false;">
 							<fieldset class="form-horizontal">
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">Server</label>
 									<div class="col-sm-9">
-										<input id="ke_history_id_lag" name="ke_history_id_lag"
+										<input id="ke_alarm_cluster_id_server" name="ke_alarm_cluster_id_server"
 											type="hidden" class="form-control" placeholder=""> <input
-											id="ke_history_name_lag" name="ke_history_name_lag"
+											id="ke_alarm_cluster_name_server" name="ke_alarm_cluster_name_server"
 											type="text" class="form-control" placeholder="">
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">Owners</label>
+									<label class="col-sm-2 control-label">Group</label>
 									<div class="col-sm-9">
-										<textarea id="ke_owners_modify" name="ke_owners_modify"
-											class="form-control" rows="3"></textarea>
+										<select id="select2group" name="select2group" tabindex="-1"
+											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+										<input id="ke_alarm_cluster_group"
+											name="ke_alarm_cluster_group" type="hidden" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">MaxTimes</label>
+									<div class="col-sm-9">
+										<select id="select2maxtimes" name="select2maxtimes"
+											tabindex="-1"
+											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+										<input id="ke_alarm_cluster_maxtimes"
+											name="ke_alarm_cluster_maxtimes" type="hidden" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">Level</label>
+									<div class="col-sm-9">
+										<select id="select2level" name="select2level" tabindex="-1"
+											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+										<input id="ke_alarm_cluster_level"
+											name="ke_alarm_cluster_level" type="hidden" />
 									</div>
 								</div>
 								<div id="alert_message_modify" style="display: none"
@@ -136,20 +162,50 @@
 					</div>
 				</div>
 			</div>
+			<!-- More then detail -->
+			<div class="modal fade" aria-labelledby="keModalLabelModify"
+				aria-hidden="true" id="ke_alarm_cluster_detail" tabindex="-1"
+				role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabelModify">Detail</h4>
+						</div>
+						<!-- /.row -->
+						<fieldset class="form-horizontal">
+							<div class="form-group">
+								<label for="path" class="col-sm-2 control-label">Content</label>
+								<div class="col-sm-9">
+									<textarea id="ke_alarm_cluster_property"
+										name="ke_alarm_cluster_property" class="form-control"
+										readonly="readonly" rows="3"></textarea>
+								</div>
+							</div>
+						</fieldset>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">Cancle</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<!-- /#page-wrapper -->
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="main/alarm/history.js" name="loader" />
+	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
+	<jsp:param value="plugins/switch/bootstrap-switch.min.js" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
 <script type="text/javascript">
 	function contextModifyFormValid() {
-		var ke_history_name_lag = $("#ke_history_name_lag").val();
-		var ke_owners_modify = $("#ke_owners_modify").val();
-		
-		if (ke_history_name_lag.length == 0 || ke_owners_modify.length == 0) {
+		var ke_alarm_cluster_name_server = $("#ke_alarm_cluster_name_server").val();
+
+		if (ke_alarm_cluster_name_server.length == 0) {
 			$("#alert_message_modify").show();
 			setTimeout(function() {
 				$("#alert_message_modify").hide()

@@ -35,9 +35,9 @@ import org.smartloli.kafka.eagle.api.im.IMFactory;
 import org.smartloli.kafka.eagle.api.im.IMProvider;
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
-import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -73,7 +73,7 @@ public class AlertQuartz {
 
 			// Run cluster job
 			Cluster cluster = new Cluster();
-			cluster.cluster();
+			// cluster.cluster();
 		}
 	}
 
@@ -245,7 +245,7 @@ public class AlertQuartz {
 
 		public void cluster() {
 			AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
-			for (ClustersInfo cluster : alertService.historys()) {
+			for (AlarmClusterInfo cluster : alertService.getAllAlarmTasks()) {
 				String[] servers = cluster.getServer().split(",");
 				for (String server : servers) {
 					String host = server.split(":")[0];
@@ -263,11 +263,10 @@ public class AlertQuartz {
 								ccm.setServer(host + ":" + port);
 								ccm.setTime(CalendarUtils.getDate());
 								ccm.setType(cluster.getType());
-								ccm.setUser(cluster.getOwner());
-								provider.create().send(subject, cluster.getOwner(), ccm.toString(), "");
+								provider.create().send(subject, cluster.getAlarmGroup(), ccm.toString(), "");
 							} catch (Exception ex) {
 								ex.printStackTrace();
-								LOG.error("Alertor[" + cluster.getOwner() + "] Send alarm mail has error,msg is " + ex.getMessage());
+								LOG.error("Alertor[" + cluster.getAlarmGroup() + "] Send alarm mail has error,msg is " + ex.getMessage());
 							}
 
 							// IM (WeChat & DingDing)
@@ -278,7 +277,6 @@ public class AlertQuartz {
 								ccm.setServer(host + ":" + port);
 								ccm.setTime(CalendarUtils.getDate());
 								ccm.setType(cluster.getType());
-								ccm.setUser(cluster.getOwner());
 								provider.create().sendJsonMsgByDingDing(ccm.toDingDingMarkDown());
 								provider.create().sendJsonMsgByWeChat(ccm.toWeChatMarkDown());
 							} catch (Exception ex) {

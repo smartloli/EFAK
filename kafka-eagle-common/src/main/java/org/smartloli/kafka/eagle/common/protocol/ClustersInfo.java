@@ -24,6 +24,7 @@ package org.smartloli.kafka.eagle.common.protocol;
  *
  *         Created by Oct 28, 2018
  */
+@Deprecated
 public class ClustersInfo extends BaseProtocol {
 
 	private int id;

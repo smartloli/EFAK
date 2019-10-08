@@ -423,28 +423,70 @@ public class AlarmController {
 		map.put("start", iDisplayStart);
 		map.put("size", iDisplayLength);
 
-		List<ClustersInfo> clusters = alertService.history(map);
+		List<AlarmClusterInfo> alarmClusters = alertService.getAlarmClusterList(map);
 		JSONArray aaDatas = new JSONArray();
-		for (ClustersInfo clustersInfo : clusters) {
+		for (AlarmClusterInfo clustersInfo : alarmClusters) {
 			JSONObject obj = new JSONObject();
-			obj.put("id", clustersInfo.getId());
+			int id = clustersInfo.getId();
+			String server = StrUtils.convertNull(clustersInfo.getServer());
+			String group = StrUtils.convertNull(clustersInfo.getAlarmGroup());
+			obj.put("id", id);
 			obj.put("type", clustersInfo.getType());
-			obj.put("cluster", clustersInfo.getCluster());
-			obj.put("server", clustersInfo.getServer().length() > 30 ? clustersInfo.getServer().substring(0, 30) + "..." : clustersInfo.getServer());
-			obj.put("owner", clustersInfo.getOwner().length() > 30 ? clustersInfo.getOwner().substring(0, 30) + "..." : clustersInfo.getOwner());
+			obj.put("server", "<a href='#" + id + "/server' name='ke_alarm_cluster_detail'>" + (server.length() > 8 ? server.substring(0, 8) + "..." : server) + "</a>");
+			obj.put("alarmGroup", "<a href='#" + id + "/group' name='ke_alarm_cluster_detail'>" + (group.length() > 8 ? group.substring(0, 8) + "..." : group) + "</a>");
+			obj.put("alarmTimes", clustersInfo.getAlarmTimes());
+			obj.put("alarmMaxTimes", clustersInfo.getAlarmMaxTimes());
+			if (clustersInfo.getAlarmLevel().equals("P0")) {
+				obj.put("alarmLevel", "<a class='btn btn-danger btn-xs'>" + clustersInfo.getAlarmLevel() + "</a>");
+			} else if (clustersInfo.getAlarmLevel().equals("P1")) {
+				obj.put("alarmLevel", "<a class='btn btn-warning btn-xs'>" + clustersInfo.getAlarmLevel() + "</a>");
+			} else if (clustersInfo.getAlarmLevel().equals("P2")) {
+				obj.put("alarmLevel", "<a class='btn btn-info btn-xs'>" + clustersInfo.getAlarmLevel() + "</a>");
+			} else {
+				obj.put("alarmLevel", "<a class='btn btn-primary btn-xs'>" + clustersInfo.getAlarmLevel() + "</a>");
+			}
+			if (clustersInfo.getIsNormal().equals("Y")) {
+				obj.put("alarmIsNormal", "<a class='btn btn-success btn-xs'>Y</a>");
+			} else {
+				obj.put("alarmIsNormal", "<a class='btn btn-danger btn-xs'>N</a>");
+			}
+			if (clustersInfo.getIsEnable().equals("Y")) {
+				obj.put("alarmIsEnable", "<div class='switch' data-on='success' data-off='danger'><input type='checkbox' checked /></div>");
+			} else {
+				obj.put("alarmIsEnable", "<div class='switch' data-on='success' data-off='danger'><input type='checkbox' /></div>");
+			}
 			obj.put("created", clustersInfo.getCreated());
 			obj.put("modify", clustersInfo.getModify());
-			obj.put("operate", "<a name='remove' href='#" + clustersInfo.getId() + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp<a name='modify' href='#" + clustersInfo.getId() + "' class='btn btn-warning btn-xs'>Modify</a>&nbsp");
+			obj.put("operate",
+					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_cluster_modify' href='#"
+							+ id + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_cluster_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 
 		JSONObject target = new JSONObject();
 		target.put("sEcho", sEcho);
-		target.put("iTotalRecords", alertService.alertHistoryCount(map));
-		target.put("iTotalDisplayRecords", alertService.alertHistoryCount(map));
+		target.put("iTotalRecords", alertService.getAlarmClusterCount(map));
+		target.put("iTotalDisplayRecords", alertService.getAlarmClusterCount(map));
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	/** Get alarm config by group name. */
+	@RequestMapping(value = "/alarm/cluster/detail/{type}/{id}/ajax", method = RequestMethod.GET)
+	public void getAlarmClusterDetailByIdAjax(@PathVariable("id") int id,@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			JSONObject object = new JSONObject();
+			if ("server".equals(type)) {
+				object.put("result", alertService.findAlarmClusterAlertById(id).getServer());
+			} else if ("group".equals(type)) {
+				object.put("result", alertService.findAlarmClusterAlertById(id).getAlarmGroup());
+			} 
+			byte[] output = object.toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -454,7 +496,7 @@ public class AlarmController {
 	/** Delete alarmer. */
 	@RequestMapping(value = "/alarm/history/{id}/del", method = RequestMethod.GET)
 	public ModelAndView alarmClusterDelete(@PathVariable("id") int id, HttpServletRequest request) {
-		int code = alertService.deleteClusterAlertById(id);
+		int code = alertService.deleteAlarmClusterAlertById(id);
 		if (code > 0) {
 			return new ModelAndView("redirect:/alarm/history");
 		} else {
@@ -466,7 +508,7 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/history/modify/{id}/ajax", method = RequestMethod.GET)
 	public void findClusterAlertByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
 		try {
-			byte[] output = alertService.findClusterAlertById(id).getBytes();
+			byte[] output = alertService.findAlarmClusterAlertById(id).toString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -641,8 +683,8 @@ public class AlarmController {
 			obj.put("created", config.getString("created"));
 			obj.put("modify", config.getString("modify"));
 			obj.put("operate",
-					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_config_modify' href='#"
-							+ alarmGroup + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='alarm_config_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_cluster_modify' href='#"
+							+ alarmGroup + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='alarm_cluster_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 
@@ -662,7 +704,7 @@ public class AlarmController {
 
 	/** Delete alarm config. */
 	@RequestMapping(value = "/alarm/config/{group}/del", method = RequestMethod.GET)
-	public ModelAndView alarmDelete(@PathVariable("group") String group, HttpServletRequest request) {
+	public ModelAndView alarmConfigDelete(@PathVariable("group") String group, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		Map<String, Object> map = new HashMap<>();
@@ -679,7 +721,7 @@ public class AlarmController {
 
 	/** Get alarm config by group name. */
 	@RequestMapping(value = "/alarm/config/get/{type}/{group}/ajax", method = RequestMethod.GET)
-	public void getAlarmConfigByGroupAjax(@PathVariable("type") String type, @PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
+	public void getAlarmConfigDetailByGroupAjax(@PathVariable("type") String type, @PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();

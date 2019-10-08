@@ -138,27 +138,23 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public List<ClustersInfo> history(Map<String, Object> params) {
-		return alertDao.history(params);
+	public List<AlarmClusterInfo> getAlarmClusterList(Map<String, Object> params) {
+		return alertDao.getAlarmClusterList(params);
 	}
 
 	@Override
-	public int alertHistoryCount(Map<String, Object> params) {
-		return alertDao.alertHistoryCount(params);
+	public int getAlarmClusterCount(Map<String, Object> params) {
+		return alertDao.getAlarmClusterCount(params);
 	}
 
 	@Override
-	public int deleteClusterAlertById(int id) {
-		return alertDao.deleteClusterAlertById(id);
+	public int deleteAlarmClusterAlertById(int id) {
+		return alertDao.deleteAlarmClusterAlertById(id);
 	}
 
 	@Override
-	public String findClusterAlertById(int id) {
-		ClustersInfo cluster = alertDao.findClusterAlertById(id);
-		JSONObject object = new JSONObject();
-		object.put("server", cluster.getServer());
-		object.put("owners", cluster.getOwner());
-		return object.toJSONString();
+	public AlarmClusterInfo findAlarmClusterAlertById(int id) {
+		return alertDao.findAlarmClusterAlertById(id);
 	}
 
 	@Override
@@ -167,8 +163,8 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public List<ClustersInfo> historys() {
-		return alertDao.historys();
+	public List<AlarmClusterInfo> getAllAlarmTasks() {
+		return alertDao.getAllAlarmTasks();
 	}
 
 	/** Get alert type list. */
@@ -176,7 +172,6 @@ public class AlertServiceImpl implements AlertService {
 		int offset = 0;
 		JSONArray typeList = new JSONArray();
 		for (String type : AlarmType.TYPE) {
-
 			JSONObject object = new JSONObject();
 			object.put("text", type);
 			object.put("id", offset);
