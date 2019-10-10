@@ -29,7 +29,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
-import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.util.AlertUtils;
@@ -451,9 +450,11 @@ public class AlarmController {
 				obj.put("alarmIsNormal", "<a class='btn btn-danger btn-xs'>N</a>");
 			}
 			if (clustersInfo.getIsEnable().equals("Y")) {
-				obj.put("alarmIsEnable", "<div class='switch' data-on='success' data-off='danger'><input type='checkbox' checked /></div>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id
+						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			} else {
-				obj.put("alarmIsEnable", "<div class='switch' data-on='success' data-off='danger'><input type='checkbox' /></div>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id
+						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			}
 			obj.put("created", clustersInfo.getCreated());
 			obj.put("modify", clustersInfo.getModify());
@@ -475,17 +476,17 @@ public class AlarmController {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/** Get alarm config by group name. */
 	@RequestMapping(value = "/alarm/cluster/detail/{type}/{id}/ajax", method = RequestMethod.GET)
-	public void getAlarmClusterDetailByIdAjax(@PathVariable("id") int id,@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
+	public void getAlarmClusterDetailByIdAjax(@PathVariable("id") int id, @PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			JSONObject object = new JSONObject();
 			if ("server".equals(type)) {
 				object.put("result", alertService.findAlarmClusterAlertById(id).getServer());
 			} else if ("group".equals(type)) {
 				object.put("result", alertService.findAlarmClusterAlertById(id).getAlarmGroup());
-			} 
+			}
 			byte[] output = object.toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
@@ -493,9 +494,9 @@ public class AlarmController {
 		}
 	}
 
-	/** Delete alarmer. */
+	/** Delete history alarmer. */
 	@RequestMapping(value = "/alarm/history/{id}/del", method = RequestMethod.GET)
-	public ModelAndView alarmClusterDelete(@PathVariable("id") int id, HttpServletRequest request) {
+	public ModelAndView alarmHistoryClusterDelete(@PathVariable("id") int id, HttpServletRequest request) {
 		int code = alertService.deleteAlarmClusterAlertById(id);
 		if (code > 0) {
 			return new ModelAndView("redirect:/alarm/history");
@@ -514,20 +515,44 @@ public class AlarmController {
 			ex.printStackTrace();
 		}
 	}
+	
+	/** Get alert info. */
+	@RequestMapping(value = "/alarm/history/modify/switch/{id}/ajax", method = RequestMethod.GET)
+	public ModelAndView modifyClusterAlertSwitchByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			AlarmClusterInfo alarmCluster = alertService.findAlarmClusterAlertById(id);
+			if(alarmCluster.getIsEnable().equals("Y")) {
+				alarmCluster.setIsEnable("N");
+			}else {
+				alarmCluster.setIsEnable("Y");
+			}
+			int code = alertService.modifyClusterAlertSwitchById(alarmCluster);
+			if (code > 0) {
+				return new ModelAndView("redirect:/alarm/history");
+			} else {
+				return new ModelAndView("redirect:/errors/500");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return new ModelAndView("redirect:/errors/500");
+		}
+	}
 
 	/** Modify consumer topic alert info. */
 	@RequestMapping(value = "/alarm/history/modify/", method = RequestMethod.POST)
 	public String modifyClusterAlertInfo(HttpSession session, HttpServletRequest request) {
-		String id = request.getParameter("ke_history_id_lag");
-		String server = request.getParameter("ke_history_name_lag");
-		String owners = request.getParameter("ke_owners_modify");
+		String id = request.getParameter("ke_alarm_cluster_id_server");
+		String server = request.getParameter("ke_alarm_cluster_name_server");
+		String group = request.getParameter("ke_alarm_cluster_group");
+		String maxtimes = request.getParameter("ke_alarm_cluster_maxtimes");
+		String level = request.getParameter("ke_alarm_cluster_level");
 
-		ClustersInfo cluster = new ClustersInfo();
+		AlarmClusterInfo cluster = new AlarmClusterInfo();
 		cluster.setId(Integer.parseInt(id));
 		cluster.setServer(server);
-		cluster.setOwner(owners);
-		cluster.setModify(CalendarUtils.getDate());
-
+		cluster.setAlarmGroup(group);
+		cluster.setAlarmMaxTimes(Integer.parseInt(maxtimes));
+		cluster.setAlarmLevel(level);
 		if (alertService.modifyClusterAlertById(cluster) > 0) {
 			return "redirect:/alarm/history";
 		} else {

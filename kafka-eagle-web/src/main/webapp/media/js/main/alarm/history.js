@@ -238,11 +238,24 @@ $(document).ready(function() {
 			minimumInputLength : 1
 		}
 	});
-
+	
 	$('#select2group').on('select2:select', function(evt) {
 		var text = evt.params.data.text;
+		console.log(text);
 		$("#select2group").val(text);
 		$("#ke_alarm_cluster_group").val(text);
+	});
+
+	// Alarm is enable
+	$(document).on('click', 'label[name=is_enable_label]', function() {
+		var id = $(this).attr("val");
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/alarm/history/modify/switch/' + id + '/ajax',
+			success : function(datas) {
+			}
+		});
 	});
 
 	// Alarm cluster modify
@@ -267,6 +280,16 @@ $(document).ready(function() {
 			url : '/ke/alarm/history/modify/' + id + '/ajax',
 			success : function(datas) {
 				$("#ke_alarm_cluster_name_server").val(datas.server);
+//				// select2group
+//				var data = [ {
+//					id : "1",
+//					text : datas.alarmGroup,
+//					selected : true
+//				} ];
+//				$("#select2group").select2({
+//					data : data
+//				});
+				
 			}
 		});
 	});

@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
-import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 
@@ -80,8 +79,11 @@ public interface AlertService {
 	/** Find alert cluster info by id. */
 	public AlarmClusterInfo findAlarmClusterAlertById(int id);
 
-	/** Modify alert info by id. */
-	public int modifyClusterAlertById(ClustersInfo cluster);
+	/** Modify alarm cluster switch by id. */
+	public int modifyClusterAlertSwitchById(AlarmClusterInfo clusterInfo);
+	
+	/** Modify alert cluster(server,alarm group,alarm level) info by id. */
+	public int modifyClusterAlertById(AlarmClusterInfo cluster);
 
 	/** Get alert type list. */
 	public String getAlertTypeList();

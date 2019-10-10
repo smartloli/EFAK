@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
-import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
@@ -158,7 +157,7 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public int modifyClusterAlertById(ClustersInfo cluster) {
+	public int modifyClusterAlertById(AlarmClusterInfo cluster) {
 		return alertDao.modifyClusterAlertById(cluster);
 	}
 
@@ -253,6 +252,11 @@ public class AlertServiceImpl implements AlertService {
 		}
 
 		return typeList.toJSONString();
+	}
+
+	@Override
+	public int modifyClusterAlertSwitchById(AlarmClusterInfo clusterInfo) {
+		return alertDao.modifyClusterAlertSwitchById(clusterInfo);
 	}
 
 }

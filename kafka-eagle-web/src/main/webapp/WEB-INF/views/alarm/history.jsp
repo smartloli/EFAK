@@ -16,9 +16,51 @@
 <title>Alarm - KafkaEagle</title>
 <jsp:include page="../public/css.jsp">
 	<jsp:param value="plugins/select2/select2.min.css" name="css" />
-	<jsp:param value="plugins/switch/bootstrap-switch.min.css" name="css" />
 </jsp:include>
 <jsp:include page="../public/tcss.jsp"></jsp:include>
+<!-- switch css -->
+<style type="text/css">
+.chooseBtn {
+	display: none;
+}
+
+.choose-label:hover {
+	cursor: pointer
+}
+
+.choose-label {
+	box-shadow: #ccc 0px 0px 0px 1px;
+	width: 40px;
+	height: 20px;
+	display: inline-block;
+	border-radius: 20px;
+	position: relative;
+	background-color: #bdbdbd;
+	overflow: hidden;
+}
+
+.choose-label:before {
+	content: '';
+	position: absolute;
+	left: 0;
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	border-radius: 20px;
+	background-color: #fff;
+	z-index: 20;
+	-webkit-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+.chooseBtn:checked+label.choose-label:before {
+	left: 20px;
+}
+
+.chooseBtn:checked+label.choose-label {
+	background-color: #2196F3;
+}
+</style>
 </head>
 
 <body>
@@ -61,10 +103,10 @@
 										<th>ID</th>
 										<th>Type</th>
 										<th>Server</th>
-										<th>AlarmGroup</th>
-										<th>AlarmTimes</th>
-										<th>AlarmMaxTimes</th>
-										<th>AlarmLevel</th>
+										<th>Name</th>
+										<th>Times</th>
+										<th>MaxTimes</th>
+										<th>Level</th>
 										<th>IsNormal</th>
 										<th>IsEnable</th>
 										<th>Created</th>
@@ -112,10 +154,12 @@
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">Server</label>
 									<div class="col-sm-9">
-										<input id="ke_alarm_cluster_id_server" name="ke_alarm_cluster_id_server"
-											type="hidden" class="form-control" placeholder=""> <input
-											id="ke_alarm_cluster_name_server" name="ke_alarm_cluster_name_server"
-											type="text" class="form-control" placeholder="">
+										<input id="ke_alarm_cluster_id_server"
+											name="ke_alarm_cluster_id_server" type="hidden"
+											class="form-control" placeholder=""> <input
+											id="ke_alarm_cluster_name_server"
+											name="ke_alarm_cluster_name_server" type="text"
+											class="form-control" placeholder="">
 									</div>
 								</div>
 								<div class="form-group">
@@ -198,14 +242,16 @@
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="main/alarm/history.js" name="loader" />
 	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
-	<jsp:param value="plugins/switch/bootstrap-switch.min.js" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
 <script type="text/javascript">
 	function contextModifyFormValid() {
 		var ke_alarm_cluster_name_server = $("#ke_alarm_cluster_name_server").val();
+		var ke_alarm_cluster_group = $("#ke_alarm_cluster_group").val();
+		var ke_alarm_cluster_maxtimes = $("#ke_alarm_cluster_maxtimes").val();
+		var ke_alarm_cluster_level = $("#ke_alarm_cluster_level").val();
 
-		if (ke_alarm_cluster_name_server.length == 0) {
+		if (ke_alarm_cluster_name_server.length == 0 || ke_alarm_cluster_group.length == 0 || ke_alarm_cluster_maxtimes.length == 0 || ke_alarm_cluster_level.length == 0) {
 			$("#alert_message_modify").show();
 			setTimeout(function() {
 				$("#alert_message_modify").hide()
