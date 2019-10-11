@@ -42,7 +42,7 @@ $(document).ready(function() {
 		});
 	}
 
-	$(document).on('click', 'a[name=alarm_config_remove]', function() {
+	$(document).on('click', 'a[name=ke_alarm_config_remove]', function() {
 		var href = $(this).attr("href");
 		var group = href.split("#")[1];
 		$("#remove_div").html("");
@@ -84,7 +84,7 @@ $(document).ready(function() {
 		});
 	});
 
-	$(document).on('click', 'a[name=alarm_config_modify]', function() {
+	$(document).on('click', 'a[name=ke_alarm_config_modify]', function() {
 		var href = $(this).attr("href");
 		var group = href.split("#")[1].split("/")[0];
 		var type = href.split("#")[1].split("/")[1];

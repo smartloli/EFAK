@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.web.service.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
@@ -215,20 +216,44 @@ public class AlertServiceImpl implements AlertService {
 		int offset = 0;
 		JSONArray typeList = new JSONArray();
 		if ("type".equals(type)) {
-			for (String cluster : AlarmType.CLUSTER) {
-				JSONObject object = new JSONObject();
-				object.put("text", cluster);
-				object.put("id", offset);
-				typeList.add(object);
-				offset++;
+			if (params.get("search").toString().length() > 0) {
+				for (String cluster : AlarmType.CLUSTER) {
+					if (cluster.contains(params.get("search").toString())) {
+						JSONObject object = new JSONObject();
+						object.put("text", cluster);
+						object.put("id", offset);
+						typeList.add(object);
+						offset++;
+					}
+				}
+			} else {
+				for (String cluster : AlarmType.CLUSTER) {
+					JSONObject object = new JSONObject();
+					object.put("text", cluster);
+					object.put("id", offset);
+					typeList.add(object);
+					offset++;
+				}
 			}
 		} else if ("level".equals(type)) {
-			for (String level : AlarmType.LEVEL) {
-				JSONObject object = new JSONObject();
-				object.put("text", level);
-				object.put("id", offset);
-				typeList.add(object);
-				offset++;
+			if (params.get("search").toString().length() > 0) {
+				for (String level : AlarmType.LEVEL) {
+					if (level.contains(params.get("search").toString())) {
+						JSONObject object = new JSONObject();
+						object.put("text", level);
+						object.put("id", offset);
+						typeList.add(object);
+						offset++;
+					}
+				}
+			} else {
+				for (String level : AlarmType.LEVEL) {
+					JSONObject object = new JSONObject();
+					object.put("text", level);
+					object.put("id", offset);
+					typeList.add(object);
+					offset++;
+				}
 			}
 		} else if ("group".equals(type)) {
 			List<AlarmConfigInfo> alarmGroups = alertDao.getAlarmConfigList(params);
@@ -242,12 +267,25 @@ public class AlertServiceImpl implements AlertService {
 				}
 			}
 		} else if ("maxtimes".equals(type)) {
-			for (int maxtimes : AlarmType.MAXTIMES) {
-				JSONObject object = new JSONObject();
-				object.put("text", maxtimes);
-				object.put("id", offset);
-				typeList.add(object);
-				offset++;
+			if (params.get("search").toString().length() > 0) {
+				for (int maxtimes : AlarmType.MAXTIMES) {
+					Pattern pattern = Pattern.compile("^[+-]?\\d");
+					if (pattern.matcher(params.get("search").toString()).matches() && maxtimes == Integer.parseInt(params.get("search").toString())) {
+						JSONObject object = new JSONObject();
+						object.put("text", maxtimes);
+						object.put("id", offset);
+						typeList.add(object);
+						offset++;
+					}
+				}
+			} else {
+				for (int maxtimes : AlarmType.MAXTIMES) {
+					JSONObject object = new JSONObject();
+					object.put("text", maxtimes);
+					object.put("id", offset);
+					typeList.add(object);
+					offset++;
+				}
 			}
 		}
 

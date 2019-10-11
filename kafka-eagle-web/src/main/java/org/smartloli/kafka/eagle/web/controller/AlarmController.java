@@ -515,17 +515,18 @@ public class AlarmController {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/** Get alert info. */
 	@RequestMapping(value = "/alarm/history/modify/switch/{id}/ajax", method = RequestMethod.GET)
 	public ModelAndView modifyClusterAlertSwitchByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			AlarmClusterInfo alarmCluster = alertService.findAlarmClusterAlertById(id);
-			if(alarmCluster.getIsEnable().equals("Y")) {
+			if (alarmCluster.getIsEnable().equals("Y")) {
 				alarmCluster.setIsEnable("N");
-			}else {
+			} else {
 				alarmCluster.setIsEnable("Y");
 			}
+			alarmCluster.setModify(CalendarUtils.getDate());
 			int code = alertService.modifyClusterAlertSwitchById(alarmCluster);
 			if (code > 0) {
 				return new ModelAndView("redirect:/alarm/history");
@@ -553,6 +554,7 @@ public class AlarmController {
 		cluster.setAlarmGroup(group);
 		cluster.setAlarmMaxTimes(Integer.parseInt(maxtimes));
 		cluster.setAlarmLevel(level);
+		cluster.setModify(CalendarUtils.getDate());
 		if (alertService.modifyClusterAlertById(cluster) > 0) {
 			return "redirect:/alarm/history";
 		} else {
@@ -588,6 +590,9 @@ public class AlarmController {
 				map.put("start", 0);
 				map.put("size", 10);
 				map.put("cluster", clusterAlias);
+			} else {
+				search = StrUtils.convertNull(request.getParameter("name"));
+				map.put("search", search);
 			}
 			object.put("items", JSON.parseArray(alertService.getAlertClusterTypeList(type, map)));
 			byte[] output = object.toJSONString().getBytes();
@@ -708,8 +713,8 @@ public class AlarmController {
 			obj.put("created", config.getString("created"));
 			obj.put("modify", config.getString("modify"));
 			obj.put("operate",
-					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_cluster_modify' href='#"
-							+ alarmGroup + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='alarm_cluster_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='ke_alarm_config_modify' href='#"
+							+ alarmGroup + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='ke_alarm_config_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 

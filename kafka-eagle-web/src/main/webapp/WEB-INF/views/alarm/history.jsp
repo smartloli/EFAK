@@ -81,8 +81,10 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Manage cluster
-							alarm records .</strong>
+						<i class="fa fa-info-circle"></i> <strong>Manage cluster alarm records .</strong><br/>
+						<i class="fa fa-info-circle"></i> <strong>MaxTime: -1 means no limit.</strong><br/>
+						<i class="fa fa-info-circle"></i> <strong>Level: P0 is the highest level.</strong><br/>
+							
 					</div>
 				</div>
 			</div>

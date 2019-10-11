@@ -92,159 +92,68 @@ $(document).ready(function() {
 		});
 	});
 
-	// alarm level
-	$("#select2level").select2({
-		placeholder : "Alarm Cluster Level",
-		ajax : {
-			url : "/ke/alarm/cluster/level/list/ajax",
-			dataType : 'json',
-			delay : 250,
-			data : function(params) {
-				params.offset = 10;
-				params.page = params.page || 1;
-				return {
-					name : params.term,
-					page : params.page,
-					offset : params.offset
-				};
-			},
-			cache : true,
-			processResults : function(data, params) {
-				if (data.items.length > 0) {
-					var datas = new Array();
-					$.each(data.items, function(index, e) {
-						var s = {};
-						s.id = index + 1;
-						s.text = e.text;
-						datas[index] = s;
-					});
+	var select2arrays = [ "select2level", "select2maxtimes", "select2group" ];
+	var select2placeholder = [ "Alarm Cluster Level", "Alarm Cluster Max Times", "Alarm Cluster Group" ];
+
+	function select2common(id, url, placeholder) {
+		return $("#" + id).select2({
+			placeholder : placeholder,
+			ajax : {
+				url : url,
+				dataType : 'json',
+				delay : 250,
+				data : function(params) {
+					params.offset = 10;
+					params.page = params.page || 1;
 					return {
-						results : datas,
-						pagination : {
-							more : (params.page * params.offset) < data.total
-						}
+						name : params.term,
+						page : params.page,
+						offset : params.offset
 					};
-				} else {
-					return {
-						results : []
-					}
-				}
-			},
-			escapeMarkup : function(markup) {
-				return markup;
-			},
-			minimumInputLength : 1
-		}
-	});
-
-	$('#select2level').on('select2:select', function(evt) {
-		var text = evt.params.data.text;
-		$("#select2level").val(text);
-		$("#ke_alarm_cluster_level").val(text);
-	});
-
-	// alarm max times
-	$("#select2maxtimes").select2({
-		placeholder : "Alarm Cluster Max Times",
-		ajax : {
-			url : "/ke/alarm/cluster/maxtimes/list/ajax",
-			dataType : 'json',
-			delay : 250,
-			data : function(params) {
-				params.offset = 10;
-				params.page = params.page || 1;
-				return {
-					name : params.term,
-					page : params.page,
-					offset : params.offset
-				};
-			},
-			cache : true,
-			processResults : function(data, params) {
-				if (data.items.length > 0) {
-					var datas = new Array();
-					$.each(data.items, function(index, e) {
-						var s = {};
-						s.id = index + 1;
-						s.text = e.text;
-						datas[index] = s;
-					});
-					return {
-						results : datas,
-						pagination : {
-							more : (params.page * params.offset) < data.total
+				},
+				cache : true,
+				processResults : function(data, params) {
+					if (data.items.length > 0) {
+						var datas = new Array();
+						$.each(data.items, function(index, e) {
+							var s = {};
+							s.id = index + 1;
+							s.text = e.text;
+							datas[index] = s;
+						});
+						return {
+							results : datas,
+							pagination : {
+								more : (params.page * params.offset) < data.total
+							}
+						};
+					} else {
+						return {
+							results : []
 						}
-					};
-				} else {
-					return {
-						results : []
 					}
-				}
-			},
-			escapeMarkup : function(markup) {
-				return markup;
-			},
-			minimumInputLength : 1
-		}
-	});
+				},
+				escapeMarkup : function(markup) {
+					return markup;
+				},
+				minimumInputLength : 1
+			}
+		});
+	}
 
-	$('#select2maxtimes').on('select2:select', function(evt) {
-		var text = evt.params.data.text;
-		$("#select2maxtimes").val(text);
-		$("#ke_alarm_cluster_maxtimes").val(text);
-	});
-
-	// alarm group
-	$("#select2group").select2({
-		placeholder : "Alarm Cluster Group",
-		ajax : {
-			url : "/ke/alarm/cluster/group/list/ajax",
-			dataType : 'json',
-			delay : 250,
-			data : function(params) {
-				params.offset = 10;
-				params.page = params.page || 1;
-				return {
-					name : params.term,
-					page : params.page,
-					offset : params.offset
-				};
-			},
-			cache : true,
-			processResults : function(data, params) {
-				if (data.items.length > 0) {
-					var datas = new Array();
-					$.each(data.items, function(index, e) {
-						var s = {};
-						s.id = index + 1;
-						s.text = e.text;
-						datas[index] = s;
-					});
-					return {
-						results : datas,
-						pagination : {
-							more : (params.page * params.offset) < data.total
-						}
-					};
-				} else {
-					return {
-						results : []
-					}
-				}
-			},
-			escapeMarkup : function(markup) {
-				return markup;
-			},
-			minimumInputLength : 1
-		}
-	});
-	
-	$('#select2group').on('select2:select', function(evt) {
-		var text = evt.params.data.text;
-		console.log(text);
-		$("#select2group").val(text);
-		$("#ke_alarm_cluster_group").val(text);
-	});
+	function select2select(id) {
+		$("#" + id).on('select2:select', function(evt) {
+			var text = evt.params.data.text;
+			$("#" + id).val(text);
+			if (id.indexOf("select2level") > -1) {
+				$("#ke_alarm_cluster_level").val(text);
+			} else if (id.indexOf("select2maxtimes") > -1) {
+				$("#ke_alarm_cluster_maxtimes").val(text);
+			} else if (id.indexOf("select2group") > -1) {
+				$("#ke_alarm_cluster_group").val(text);
+			}
+		});
+	}
 
 	// Alarm is enable
 	$(document).on('click', 'label[name=is_enable_label]', function() {
@@ -279,17 +188,42 @@ $(document).ready(function() {
 			dataType : 'json',
 			url : '/ke/alarm/history/modify/' + id + '/ajax',
 			success : function(datas) {
+				$.fn.modal.Constructor.prototype.enforceFocus = function () { };
 				$("#ke_alarm_cluster_name_server").val(datas.server);
-//				// select2group
-//				var data = [ {
-//					id : "1",
-//					text : datas.alarmGroup,
-//					selected : true
-//				} ];
-//				$("#select2group").select2({
-//					data : data
-//				});
-				
+				for (var i = 0; i < select2arrays.length; i++) {
+					var id = select2arrays[i];
+					var placeholder = "";
+					var url = "";
+					var option;
+					if (id.indexOf("select2level") > -1) {
+						placeholder = select2placeholder[0];
+						url = "/ke/alarm/cluster/level/list/ajax";
+						option = new Option(datas.alarmLevel, "0", true, true);
+						$("#ke_alarm_cluster_level").val(datas.alarmLevel);
+					} else if (id.indexOf("select2maxtimes") > -1) {
+						placeholder = select2placeholder[1];
+						url = "/ke/alarm/cluster/maxtimes/list/ajax";
+						option = new Option(datas.alarmMaxTimes, "0", true, true);
+						$("#ke_alarm_cluster_maxtimes").val(datas.alarmMaxTimes);
+					} else if (id.indexOf("select2group") > -1) {
+						placeholder = select2placeholder[2];
+						url = "/ke/alarm/cluster/group/list/ajax";
+						option = new Option(datas.alarmGroup, "0", true, true);
+						$("#ke_alarm_cluster_group").val(datas.alarmGroup);
+					}
+					var select2object = select2common(id, url, placeholder);
+					select2select(id);
+
+					// change exist value
+					if (select2object.find("option[value='0']").length) {
+						select2object.val(null).trigger('change');
+						select2object.append(option).trigger('change');
+					} else {
+						// append it to the select
+						select2object.append(option).trigger('change');
+					}
+				}
+
 			}
 		});
 	});

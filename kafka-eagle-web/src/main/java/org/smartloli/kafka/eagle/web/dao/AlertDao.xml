@@ -155,7 +155,7 @@
 	</select>
 
 	<update id="modifyClusterAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
-		update ke_alarm_clusters set `server`=#{server},`alarm_group`=#{alarmGroup},`alarm_max_times`=#{alarmMaxTimes},`alarm_level`=#{alarmLevel} where `id`=#{id}
+		update ke_alarm_clusters set `server`=#{server},`alarm_group`=#{alarmGroup},`alarm_max_times`=#{alarmMaxTimes},`alarm_level`=#{alarmLevel},`modify`=#{modify} where `id`=#{id}
 	</update>
 
 	<select id="getAllAlarmTasks" resultMap="clustersInfo">
@@ -163,7 +163,7 @@
 	</select>
 	
 	<update id="modifyClusterAlertSwitchById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
-		update ke_alarm_clusters set `is_enable`=#{isEnable} where `id`=#{id}
+		update ke_alarm_clusters set `is_enable`=#{isEnable},`modify`=#{modify} where `id`=#{id}
 	</update>
 
 </mapper>
