@@ -169,16 +169,37 @@ public class AlarmController {
 		return mav;
 	}
 
-	/** Get alarmer monitor topic by ajax. */
-	@RequestMapping(value = "/alarm/topic/ajax", method = RequestMethod.GET)
-	public void alarmTopicAjax(HttpServletResponse response, HttpServletRequest request) {
-
+	/** Get alarmer consumer group by ajax. */
+	@RequestMapping(value = "/alarm/consumer/group/ajax", method = RequestMethod.GET)
+	public void alarmConsumerGroupAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String search = StrUtils.convertNull(request.getParameter("name"));
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		try {
-			byte[] output = alertService.get(clusterAlias, formatter).getBytes();
+			JSONObject object = new JSONObject();
+			object.put("items", JSON.parseArray(alertService.getAlarmConsumerGroup(clusterAlias, formatter, search)));
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get alarmer consumer group by ajax. */
+	@RequestMapping(value = "/alarm/consumer/{group}/topic/ajax", method = RequestMethod.GET)
+	public void alarmConsumerTopicAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
+
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String search = StrUtils.convertNull(request.getParameter("name"));
+
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+		try {
+			JSONObject object = new JSONObject();
+			object.put("items", JSON.parseArray(alertService.getAlarmConsumerTopic(clusterAlias, formatter, group, search)));
+			byte[] output = object.toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

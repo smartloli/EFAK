@@ -14,7 +14,9 @@
 <meta name="author" content="">
 
 <title>Alarm - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/css.jsp">
+	<jsp:param value="plugins/select2/select2.min.css" name="css" />
+</jsp:include>
 <jsp:include page="../public/tagcss.jsp"></jsp:include>
 </head>
 
@@ -46,7 +48,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-tasks fa-fw"></i> Topic Setting
+							<i class="fa fa-tasks fa-fw"></i> Consumer Setting
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
@@ -56,38 +58,64 @@
 									<form role="form" action="/ke/alarm/add/form" method="post"
 										onsubmit="return contextFormValid();return false;">
 										<div class="form-group">
-											<label>Topic Group (*)</label> <input id="ke_group_alarm"
-												name="ke_group_alarm" class="form-control" maxlength=50
-												value="1"><input id="ke_group_alarms"
-												name="ke_group_alarms" type="hidden"> <label
+											<label>Consumer Group (*)</label> <select
+												id="select2consumergroup" name="select2consumergroup"
+												tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_consumer_group_alarm"
+												name="ke_alarm_consumer_group" type="hidden" /><label
 												for="inputError" class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Select the group you need to
-												alarm .</label>
+												class="fa fa-info-circle"></i> Select the consumer group you
+												need to alarm .</label>
 										</div>
 										<div class="form-group">
-											<label>Topic Name (*)</label> <input id="ke_topic_alarm"
-												name="ke_topic_alarm" class="form-control" maxlength=50
-												value="1"><input id="ke_topic_alarms"
-												name="ke_topic_alarms" type="hidden"> <label
+											<label>Consumer Topic (*)</label> <select
+												id="select2consumertopic" name="select2consumertopic"
+												tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_consumer_topic"
+												name="ke_consumer_topic_alarm" type="hidden" /><label
 												for="inputError" class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Select the topic you need to
-												alarm .</label>
+												class="fa fa-info-circle"></i> Select the consumer topic you
+												need to alarm .</label>
 										</div>
 										<div class="form-group">
 											<label>Lag Threshold (*)</label> <input id="ke_topic_lag"
 												name="ke_topic_lag" class="form-control" maxlength=50
 												value="1"> <label for="inputError"
 												class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Setting the blocking
-												threshold, Parameters must be numeric .</label>
+												class="fa fa-info-circle"></i> Setting the lag threshold,
+												input must be numeric .</label>
 										</div>
 										<div class="form-group">
-											<label>Owner Email (*)</label> <input id="ke_topic_email"
-												name="ke_topic_email" class="form-control" maxlength=50
-												value="example1@email.com"><label for="inputError"
-												class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> To whom the alarm topic
-												information, Such as 'example@email.com' .</label>
+											<label>Alarm Level (*)</label> <select id="select2level"
+												name="select2level" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_level"
+												name="ke_alarm_cluster_level" type="hidden" /> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the cluster level you
+												need to alarm .</label>
+										</div>
+										<div class="form-group">
+											<label>Alarm Max Times (*)</label> <select
+												id="select2maxtimes" name="select2maxtimes" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_maxtimes"
+												name="ke_alarm_cluster_maxtimes" type="hidden" /> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the cluster alarm max
+												times you need to alarm .</label>
+										</div>
+										<div class="form-group">
+											<label>Alarm Group (*)</label> <select id="select2group"
+												name="select2group" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_group"
+												name="ke_alarm_cluster_group" type="hidden" /> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the cluster alarm
+												group you need to alarm .</label>
 										</div>
 										<button type="submit" class="btn btn-success">Add</button>
 										<div id="alert_mssage" style="display: none"
@@ -110,10 +138,8 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="plugins/magicsuggest/magicsuggest.js" name="loader" />
-	<jsp:param value="plugins/tokenfield/bootstrap-tokenfield.js"
-		name="loader" />
 	<jsp:param value="main/alarm/add.js" name="loader" />
+	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
 </jsp:include>
 <script type="text/javascript">
 	function contextFormValid() {

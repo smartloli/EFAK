@@ -38,8 +38,11 @@ public interface AlertService {
 	/** Add alerter interface. */
 	public int add(AlertInfo alert);
 
-	/** Get alarmer interface. */
-	public String get(String clusterAlias, String formatter);
+	/** Get consumer group alarm. */
+	public String getAlarmConsumerGroup(String clusterAlias, String formatter,String search);
+	
+	/** Get consumer topic alarm. */
+	public String getAlarmConsumerTopic(String clusterAlias, String formatter,String group,String search);
 
 	/** List alarmer information. */
 	public List<AlertInfo> list(Map<String, Object> params);

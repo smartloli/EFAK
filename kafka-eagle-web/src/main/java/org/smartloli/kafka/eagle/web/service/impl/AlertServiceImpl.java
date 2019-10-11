@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.web.service.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
@@ -59,36 +60,126 @@ public class AlertServiceImpl implements AlertService {
 		return alertDao.insertAlert(alert);
 	}
 
-	public String get(String clusterAlias, String formatter) {
+	/** Get consumer group to alert. */
+	public String getAlarmConsumerGroup(String clusterAlias, String formatter, String search) {
 		if ("kafka".equals(formatter)) {
-			return getKafka(clusterAlias);
+			return getAlarmConsumerGroupKafka(clusterAlias, search);
 		} else {
-			return get(clusterAlias);
+			return getAlarmConsumerGroup(clusterAlias, search);
 		}
 	}
 
-	/** Get consumer topics to alert. */
-	private String get(String clusterAlias) {
+	/** Get consumer topic to alert. */
+	public String getAlarmConsumerTopic(String clusterAlias, String formatter, String group, String search) {
+		if ("kafka".equals(formatter)) {
+			return getAlarmConsumerTopicKafka(clusterAlias, group, search);
+		} else {
+			return getAlarmConsumerTopic(clusterAlias, group, search);
+		}
+	}
+
+	private String getAlarmConsumerGroup(String clusterAlias, String search) {
+		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
+		JSONArray groups = new JSONArray();
+		int offset = 0;
+		if (search.length() > 0) {
+			for (Entry<String, List<String>> entry : consumers.entrySet()) {
+				if (entry.getKey().contains(search)) {
+					JSONObject object = new JSONObject();
+					object.put("text", entry.getKey());
+					object.put("id", offset);
+					groups.add(object);
+					offset++;
+				}
+			}
+		} else {
+			for (Entry<String, List<String>> entry : consumers.entrySet()) {
+				JSONObject object = new JSONObject();
+				object.put("text", entry.getKey());
+				object.put("id", offset);
+				groups.add(object);
+				offset++;
+			}
+		}
+		return groups.toJSONString();
+	}
+
+	private String getAlarmConsumerGroupKafka(String clusterAlias, String search) {
+		int offset = 0;
+		JSONArray groups = new JSONArray();
+		JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+		if (search.length() > 0) {
+			for (Object object : consumerGroups) {
+				JSONObject consumerGroup = (JSONObject) object;
+				if (consumerGroup.getString("group").contains(search)) {
+					JSONObject group = new JSONObject();
+					group.put("text", consumerGroup.getString("group"));
+					group.put("id", offset);
+					groups.add(group);
+					offset++;
+				}
+			}
+		} else {
+			for (Object object : consumerGroups) {
+				JSONObject consumerGroup = (JSONObject) object;
+				JSONObject group = new JSONObject();
+				group.put("text", consumerGroup.getString("group"));
+				group.put("id", offset);
+				groups.add(group);
+				offset++;
+			}
+		}
+		return groups.toJSONString();
+	}
+
+	private String getAlarmConsumerTopic(String clusterAlias, String group, String search) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
 		JSONArray topics = new JSONArray();
-		for (Entry<String, List<String>> entry : consumers.entrySet()) {
-			JSONObject groupAndTopics = new JSONObject();
-			groupAndTopics.put("group", entry.getKey());
-			groupAndTopics.put("topics", entry.getValue());
-			topics.add(groupAndTopics);
+		int offset = 0;
+		if (search.length() > 0) {
+			for (Entry<String, List<String>> entry : consumers.entrySet()) {
+				if (entry.getKey().contains(search) && entry.getKey().equals(group)) {
+					JSONObject object = new JSONObject();
+					object.put("text", entry.getValue());
+					object.put("id", offset);
+					topics.add(object);
+					offset++;
+				}
+			}
+		} else {
+			for (Entry<String, List<String>> entry : consumers.entrySet()) {
+				JSONObject object = new JSONObject();
+				object.put("text", entry.getValue());
+				object.put("id", offset);
+				topics.add(object);
+				offset++;
+			}
 		}
 		return topics.toJSONString();
 	}
 
-	private String getKafka(String clusterAlias) {
+	private String getAlarmConsumerTopicKafka(String clusterAlias, String group, String search) {
+		int offset = 0;
 		JSONArray topics = new JSONArray();
-		JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
-		for (Object object : consumerGroups) {
-			JSONObject consumerGroup = (JSONObject) object;
-			JSONObject groupAndTopics = new JSONObject();
-			groupAndTopics.put("group", consumerGroup.getString("group"));
-			groupAndTopics.put("topics", kafkaService.getKafkaConsumerTopic(clusterAlias, consumerGroup.getString("group")));
-			topics.add(groupAndTopics);
+		Set<String> topicSets = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
+		if (search.length() > 0) {
+			for (String topic : topicSets) {
+				if (topic.contains(search)) {
+					JSONObject object = new JSONObject();
+					object.put("text", topic);
+					object.put("id", offset);
+					topics.add(object);
+					offset++;
+				}
+			}
+		} else {
+			for (String topic : topicSets) {
+				JSONObject object = new JSONObject();
+				object.put("text", topic);
+				object.put("id", offset);
+				topics.add(object);
+				offset++;
+			}
 		}
 		return topics.toJSONString();
 	}
