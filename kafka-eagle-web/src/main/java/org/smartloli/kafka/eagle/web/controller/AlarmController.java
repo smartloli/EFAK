@@ -28,9 +28,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 import org.smartloli.kafka.eagle.common.util.AlertUtils;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
@@ -209,45 +209,41 @@ public class AlarmController {
 	/** Add alarmer form. */
 	@RequestMapping(value = "/alarm/add/form", method = RequestMethod.POST)
 	public ModelAndView alarmAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
-		ModelAndView mav = new ModelAndView();
-		String ke_group_alarms = request.getParameter("ke_group_alarms");
-		String ke_topic_alarms = request.getParameter("ke_topic_alarms");
-		String ke_topic_lag = request.getParameter("ke_topic_lag");
-		String ke_topic_email = request.getParameter("ke_topic_email");
-		JSONArray topics = JSON.parseArray(ke_topic_alarms);
-		JSONArray groups = JSON.parseArray(ke_group_alarms);
-		AlertInfo alert = new AlertInfo();
-		for (Object object : groups) {
-			JSONObject group = (JSONObject) object;
-			alert.setGroup(group.getString("name"));
-		}
-		for (Object object : topics) {
-			JSONObject topic = (JSONObject) object;
-			alert.setTopic(topic.getString("name"));
-		}
-		try {
-			alert.setLag(Long.parseLong(ke_topic_lag));
-		} catch (Exception ex) {
-			LOG.error("Parse long has error,msg is " + ex.getMessage());
-		}
-		alert.setCreated(CalendarUtils.getDate());
-		alert.setModify(CalendarUtils.getDate());
-		alert.setOwner(ke_topic_email);
-
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		alert.setCluster(clusterAlias);
+
+		ModelAndView mav = new ModelAndView();
+		String group = request.getParameter("ke_alarm_consumer_group");
+		String topic = request.getParameter("ke_alarm_consumer_topic");
+		String lag = request.getParameter("ke_topic_lag");
+		String alarmLevel = request.getParameter("ke_alarm_cluster_level");
+		String alarmMaxTimes = request.getParameter("ke_alarm_cluster_maxtimes");
+		String alarmGroup = request.getParameter("ke_alarm_cluster_group");
+		AlarmConsumerInfo alarmConsumer = new AlarmConsumerInfo();
+		alarmConsumer.setGroup(group);
+		alarmConsumer.setAlarmGroup(alarmGroup);
+		alarmConsumer.setAlarmLevel(alarmLevel);
+		alarmConsumer.setAlarmMaxTimes(Integer.parseInt(alarmMaxTimes));
+		alarmConsumer.setAlarmTimes(0);
+		alarmConsumer.setCluster(clusterAlias);
+		alarmConsumer.setCreated(CalendarUtils.getDate());
+		alarmConsumer.setIsEnable("Y");
+		alarmConsumer.setIsNormal("Y");
+		alarmConsumer.setLag(Long.parseLong(lag));
+		alarmConsumer.setModify(CalendarUtils.getDate());
+		alarmConsumer.setTopic(topic);
+
 		Map<String, Object> map = new HashMap<>();
 		map.put("cluster", clusterAlias);
-		map.put("group", alert.getGroup());
-		map.put("topic", alert.getTopic());
+		map.put("group", group);
+		map.put("topic", topic);
 		int findCode = alertService.isExistAlertByCGT(map);
 
 		if (findCode > 0) {
 			session.removeAttribute("Alarm_Submit_Status");
-			session.setAttribute("Alarm_Submit_Status", "Insert failed,msg is group[" + alert.getGroup() + "] and topic[" + alert.getTopic() + "] has exist.");
+			session.setAttribute("Alarm_Submit_Status", "Insert failed,msg is alarm group[" + group + "] and topic[" + topic + "] has exist.");
 			mav.setViewName("redirect:/alarm/add/failed");
 		} else {
-			int code = alertService.add(alert);
+			int code = alertService.insertAlarmConsumer(alarmConsumer);
 			if (code > 0) {
 				session.removeAttribute("Alarm_Submit_Status");
 				session.setAttribute("Alarm_Submit_Status", "Insert success.");
@@ -264,7 +260,7 @@ public class AlarmController {
 
 	/** Get alarmer datasets by ajax. */
 	@RequestMapping(value = "/alarm/list/table/ajax", method = RequestMethod.GET)
-	public void alarmTopicListAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void alarmConsumerListAjax(HttpServletResponse response, HttpServletRequest request) {
 		String aoData = request.getParameter("aoData");
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -291,24 +287,54 @@ public class AlarmController {
 		map.put("start", iDisplayStart);
 		map.put("size", iDisplayLength);
 
-		List<AlertInfo> alerts = alertService.list(map);
+		List<AlarmConsumerInfo> alarmConsumers = alertService.getAlarmConsumerAppList(map);
 		JSONArray aaDatas = new JSONArray();
-		for (AlertInfo alertInfo : alerts) {
+		for (AlarmConsumerInfo alertConsumer : alarmConsumers) {
 			JSONObject obj = new JSONObject();
-			obj.put("group", alertInfo.getGroup());
-			obj.put("topic", alertInfo.getTopic());
-			obj.put("lag", alertInfo.getLag());
-			obj.put("owner", alertInfo.getOwner().length() > 30 ? alertInfo.getOwner().substring(0, 30) + "..." : alertInfo.getOwner());
-			obj.put("created", alertInfo.getCreated());
-			obj.put("modify", alertInfo.getModify());
-			obj.put("operate", "<a name='remove' href='#" + alertInfo.getId() + "' class='btn btn-danger btn-xs'>Remove</a>&nbsp<a name='modify' href='#" + alertInfo.getId() + "' class='btn btn-warning btn-xs'>Modify</a>&nbsp");
+			int id = alertConsumer.getId();
+			String group  = alertConsumer.getGroup();
+			String topic  = alertConsumer.getTopic();
+			String alarmGroup  = alertConsumer.getAlarmGroup();
+			obj.put("id", id);
+			obj.put("group", "<a href='#" + id + "/cgroup' name='ke_alarm_consumer_detail'>" + (group.length() > 8 ? group.substring(0, 8) + "..." : group) + "</a>");
+			obj.put("topic", "<a href='#" + id + "/topic' name='ke_alarm_consumer_detail'>" + (topic.length() > 8 ? topic.substring(0, 8) + "..." : topic) + "</a>");
+			obj.put("lag", alertConsumer.getLag());
+			obj.put("alarmGroup", "<a href='#" + id + "/agroup' name='ke_alarm_consumer_detail'>" + (alarmGroup.length() > 8 ? alarmGroup.substring(0, 8) + "..." : alarmGroup) + "</a>");
+			obj.put("alarmTimes", alertConsumer.getAlarmTimes());
+			obj.put("alarmMaxTimes", alertConsumer.getAlarmMaxTimes());
+			if (alertConsumer.getAlarmLevel().equals("P0")) {
+				obj.put("alarmLevel", "<a class='btn btn-danger btn-xs'>" + alertConsumer.getAlarmLevel() + "</a>");
+			} else if (alertConsumer.getAlarmLevel().equals("P1")) {
+				obj.put("alarmLevel", "<a class='btn btn-warning btn-xs'>" + alertConsumer.getAlarmLevel() + "</a>");
+			} else if (alertConsumer.getAlarmLevel().equals("P2")) {
+				obj.put("alarmLevel", "<a class='btn btn-info btn-xs'>" + alertConsumer.getAlarmLevel() + "</a>");
+			} else {
+				obj.put("alarmLevel", "<a class='btn btn-primary btn-xs'>" + alertConsumer.getAlarmLevel() + "</a>");
+			}
+			if (alertConsumer.getIsNormal().equals("Y")) {
+				obj.put("alarmIsNormal", "<a class='btn btn-success btn-xs'>Y</a>");
+			} else {
+				obj.put("alarmIsNormal", "<a class='btn btn-danger btn-xs'>N</a>");
+			}
+			if (alertConsumer.getIsEnable().equals("Y")) {
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id
+						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+			} else {
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id
+						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+			}
+			obj.put("created", alertConsumer.getCreated());
+			obj.put("modify", alertConsumer.getModify());
+			obj.put("operate",
+					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_consumer_modify' href='#"
+							+ id + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_consumer_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 
 		JSONObject target = new JSONObject();
 		target.put("sEcho", sEcho);
-		target.put("iTotalRecords", alertService.alertCount(map));
-		target.put("iTotalDisplayRecords", alertService.alertCount(map));
+		target.put("iTotalRecords", alertService.alertConsumerAppCount(map));
+		target.put("iTotalDisplayRecords", alertService.alertConsumerAppCount(map));
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
@@ -358,11 +384,10 @@ public class AlarmController {
 		String lag = request.getParameter("ke_consumer_name_lag");
 		String owners = request.getParameter("ke_owners_modify");
 
-		AlertInfo alert = new AlertInfo();
+		AlarmConsumerInfo alert = new AlarmConsumerInfo();
 		// JavaScript has already judged.
 		alert.setId(Integer.parseInt(id));
 		alert.setLag(Long.parseLong(lag));
-		alert.setOwner(owners);
 		alert.setModify(CalendarUtils.getDate());
 
 		if (alertService.modifyAlertById(alert) > 0) {

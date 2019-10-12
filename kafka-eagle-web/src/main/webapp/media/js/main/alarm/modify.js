@@ -7,13 +7,25 @@ $(document).ready(function() {
 		"fnServerData" : retrieveData,
 		"sAjaxSource" : "/ke/alarm/list/table/ajax",
 		"aoColumns" : [ {
+			"mData" : 'id'
+		}, {
 			"mData" : 'group'
 		}, {
 			"mData" : 'topic'
 		}, {
 			"mData" : 'lag'
 		}, {
-			"mData" : 'owner'
+			"mData" : 'alarmGroup'
+		}, {
+			"mData" : 'alarmTimes'
+		}, {
+			"mData" : 'alarmMaxTimes'
+		}, {
+			"mData" : 'alarmLevel'
+		}, {
+			"mData" : 'alarmIsNormal'
+		}, {
+			"mData" : 'alarmIsEnable'
 		}, {
 			"mData" : 'created'
 		}, {

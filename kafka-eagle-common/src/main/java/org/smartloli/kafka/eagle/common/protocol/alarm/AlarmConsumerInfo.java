@@ -15,23 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.protocol;
+package org.smartloli.kafka.eagle.common.protocol.alarm;
+
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * Definition AlertInfo information.
+ * Definition AlertConsumerInfo information.
  * 
  * @author smartloli.
  *
  *         Created by Oct 27, 2018
  */
-public class AlertInfo extends BaseProtocol {
+public class AlarmConsumerInfo extends BaseProtocol {
 
 	private int id;
-	private String group = "";
 	private String cluster = "";
+	private String group = "";
 	private String topic = "";
 	private long lag = 0L;
-	private String owner = "";
+	private String alarmGroup = "";
+	private int alarmTimes;
+	private int alarmMaxTimes ;
+	private String alarmLevel = "";
+	private String isNormal = "";
+	private String isEnable = "";
 	private String created = "";
 	private String modify = "";
 
@@ -75,12 +82,54 @@ public class AlertInfo extends BaseProtocol {
 		this.lag = lag;
 	}
 
-	public String getOwner() {
-		return owner;
+	
+
+	public String getAlarmGroup() {
+		return alarmGroup;
 	}
 
-	public void setOwner(String owner) {
-		this.owner = owner;
+	public void setAlarmGroup(String alarmGroup) {
+		this.alarmGroup = alarmGroup;
+	}
+
+	public int getAlarmTimes() {
+		return alarmTimes;
+	}
+
+	public void setAlarmTimes(int alarmTimes) {
+		this.alarmTimes = alarmTimes;
+	}
+
+	public int getAlarmMaxTimes() {
+		return alarmMaxTimes;
+	}
+
+	public void setAlarmMaxTimes(int alarmMaxTimes) {
+		this.alarmMaxTimes = alarmMaxTimes;
+	}
+
+	public String getAlarmLevel() {
+		return alarmLevel;
+	}
+
+	public void setAlarmLevel(String alarmLevel) {
+		this.alarmLevel = alarmLevel;
+	}
+
+	public String getIsNormal() {
+		return isNormal;
+	}
+
+	public void setIsNormal(String isNormal) {
+		this.isNormal = isNormal;
+	}
+
+	public String getIsEnable() {
+		return isEnable;
+	}
+
+	public void setIsEnable(String isEnable) {
+		this.isEnable = isEnable;
 	}
 
 	public String getCreated() {

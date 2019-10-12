@@ -33,11 +33,11 @@ import org.smartloli.kafka.eagle.api.email.module.ClusterContentModule;
 import org.smartloli.kafka.eagle.api.email.module.LagContentModule;
 import org.smartloli.kafka.eagle.api.im.IMFactory;
 import org.smartloli.kafka.eagle.api.im.IMProvider;
-import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -160,14 +160,14 @@ public class AlertQuartz {
 				params.put("topic", offset.getTopic());
 
 				AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
-				AlertInfo alertInfo = alertService.findAlertByCGT(params);
+				AlarmConsumerInfo alertInfo = alertService.findAlertByCGT(params);
 
 				if (alertInfo != null && offset.getLag() > alertInfo.getLag()) {
 					// Mail
 					try {
 						MailProvider provider = new MailFactory();
 						String subject = "Kafka Eagle Consumer Alert";
-						String address = alertInfo.getOwner();
+						String address = ""; //alertInfo.getOwner();
 						LagContentModule lcm = new LagContentModule();
 						lcm.setCluster(clusterAlias);
 						lcm.setConsumerLag(offset.getLag() + "");
@@ -176,7 +176,7 @@ public class AlertQuartz {
 						lcm.setTime(CalendarUtils.getDate());
 						lcm.setTopic(alertInfo.getTopic());
 						lcm.setType("Consumer");
-						lcm.setUser(alertInfo.getOwner());
+						// lcm.setUser(alertInfo.getOwner());
 						provider.create().send(subject, address, lcm.toString(), "");
 					} catch (Exception ex) {
 						ex.printStackTrace();
@@ -194,7 +194,7 @@ public class AlertQuartz {
 						lcm.setTime(CalendarUtils.getDate());
 						lcm.setTopic(alertInfo.getTopic());
 						lcm.setType("Consumer");
-						lcm.setUser(alertInfo.getOwner());
+						// lcm.setUser(alertInfo.getOwner());
 						provider.create().sendJsonMsgByWeChat(lcm.toWeChatMarkDown());
 						provider.create().sendJsonMsgByDingDing(lcm.toDingDingMarkDown());
 					} catch (Exception ex) {

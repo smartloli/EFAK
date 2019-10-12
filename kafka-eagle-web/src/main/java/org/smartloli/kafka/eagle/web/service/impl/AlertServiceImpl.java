@@ -23,9 +23,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -56,8 +56,8 @@ public class AlertServiceImpl implements AlertService {
 	private AlertDao alertDao;
 
 	@Override
-	public int add(AlertInfo alert) {
-		return alertDao.insertAlert(alert);
+	public int insertAlarmConsumer(AlarmConsumerInfo alarmConsumer) {
+		return alertDao.insertAlarmConsumer(alarmConsumer);
 	}
 
 	/** Get consumer group to alert. */
@@ -185,13 +185,13 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public List<AlertInfo> list(Map<String, Object> params) {
-		return alertDao.query(params);
+	public List<AlarmConsumerInfo> getAlarmConsumerAppList(Map<String, Object> params) {
+		return alertDao.getAlarmConsumerAppList(params);
 	}
 
 	@Override
-	public int alertCount(Map<String, Object> params) {
-		return alertDao.alertCount(params);
+	public int alertConsumerAppCount(Map<String, Object> params) {
+		return alertDao.alertConsumerAppCount(params);
 	}
 
 	@Override
@@ -206,20 +206,20 @@ public class AlertServiceImpl implements AlertService {
 
 	@Override
 	public String findAlertById(int id) {
-		AlertInfo alert = alertDao.findAlertById(id);
+		AlarmConsumerInfo alert = alertDao.findAlertById(id);
 		JSONObject object = new JSONObject();
 		object.put("lag", alert.getLag());
-		object.put("owners", alert.getOwner());
+		// object.put("owners", alert.getOwner());
 		return object.toJSONString();
 	}
 
 	@Override
-	public int modifyAlertById(AlertInfo alert) {
+	public int modifyAlertById(AlarmConsumerInfo alert) {
 		return alertDao.modifyAlertById(alert);
 	}
 
 	@Override
-	public AlertInfo findAlertByCGT(Map<String, Object> params) {
+	public AlarmConsumerInfo findAlertByCGT(Map<String, Object> params) {
 		return alertDao.findAlertByCGT(params);
 	}
 

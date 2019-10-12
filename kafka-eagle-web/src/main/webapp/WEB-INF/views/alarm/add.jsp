@@ -56,25 +56,23 @@
 							<div class="row">
 								<div class="col-lg-12">
 									<form role="form" action="/ke/alarm/add/form" method="post"
-										onsubmit="return contextFormValid();return false;">
+										onsubmit="return contextConsumerFormValid();return false;">
 										<div class="form-group">
 											<label>Consumer Group (*)</label> <select
 												id="select2consumergroup" name="select2consumergroup"
 												tabindex="-1"
 												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
-											<input id="ke_consumer_group_alarm"
+											<input id="ke_alarm_consumer_group"
 												name="ke_alarm_consumer_group" type="hidden" /><label
 												for="inputError" class="control-label text-danger"><i
 												class="fa fa-info-circle"></i> Select the consumer group you
 												need to alarm .</label>
 										</div>
 										<div class="form-group">
-											<label>Consumer Topic (*)</label> <select
-												id="select2consumertopic" name="select2consumertopic"
-												tabindex="-1"
-												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<label>Consumer Topic (*)</label>
+											<div id="div_select_consumer_topic"></div>
 											<input id="ke_alarm_consumer_topic"
-												name="ke_consumer_topic_alarm" type="hidden" /><label
+												name="ke_alarm_consumer_topic" type="hidden" /><label
 												for="inputError" class="control-label text-danger"><i
 												class="fa fa-info-circle"></i> Select the consumer topic you
 												need to alarm .</label>
@@ -118,7 +116,7 @@
 												group you need to alarm .</label>
 										</div>
 										<button type="submit" class="btn btn-success">Add</button>
-										<div id="alert_mssage" style="display: none"
+										<div id="alert_consumer_message" style="display: none"
 											class="alert alert-danger">
 											<label>Oops! Please make some changes . (*) is
 												required .</label>
@@ -142,44 +140,30 @@
 	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
 </jsp:include>
 <script type="text/javascript">
-	function contextFormValid() {
+	function contextConsumerFormValid() {
+		var ke_alarm_consumer_group = $("#ke_alarm_consumer_group").val();
+		var ke_alarm_consumer_topic = $("#ke_alarm_consumer_topic").val();
 		var ke_topic_lag = $("#ke_topic_lag").val();
-		var ke_topic_email = $("#ke_topic_email").val();
-		var ke_topic_alarms = JSON.stringify($('#ke_topic_alarm').magicSuggest().getSelection());
-		var ke_group_alarms = JSON.stringify($('#ke_group_alarm').magicSuggest().getSelection());
+		var ke_alarm_cluster_level = $("#ke_alarm_cluster_level").val();
+		var ke_alarm_cluster_maxtimes = $("#ke_alarm_cluster_maxtimes").val();
+		var ke_alarm_cluster_group = $("#ke_alarm_cluster_group").val();
 
-		if (ke_group_alarms.length == 2) {
-			$("#alert_mssage").show();
+		if (ke_alarm_consumer_group.length == 0 || ke_alarm_consumer_topic.length == 0 || ke_topic_lag.length == 0 || ke_alarm_cluster_level.length == 0 || ke_alarm_cluster_maxtimes.length == 0 || ke_alarm_cluster_group.length == 0) {
+			$("#alert_consumer_message").show();
 			setTimeout(function() {
-				$("#alert_mssage").hide()
+				$("#alert_consumer_message").hide()
 			}, 3000);
 			return false;
 		}
-		if (ke_topic_alarms.length == 2) {
-			$("#alert_mssage").show();
-			setTimeout(function() {
-				$("#alert_mssage").hide()
-			}, 3000);
-			return false;
-		}
+		
 		if (isNaN(ke_topic_lag)) {
-			$("#alert_mssage").show();
+			$("#alert_consumer_message").show();
 			setTimeout(function() {
-				$("#alert_mssage").hide()
-			}, 3000);
-			return false;
-		}
-		var reg = /^((([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6}\, ))*(([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})))$/;
-		if (!reg.test(ke_topic_email)) {
-			$("#alert_mssage").show();
-			setTimeout(function() {
-				$("#alert_mssage").hide()
+				$("#alert_consumer_message").hide()
 			}, 3000);
 			return false;
 		}
 
-		$('#ke_topic_alarms').val(ke_topic_alarms);
-		$('#ke_group_alarms').val(ke_group_alarms);
 		return true;
 	}
 </script>

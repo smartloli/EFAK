@@ -1,5 +1,6 @@
 $(document).ready(function() {
 
+	// select2consumertopic
 	var select2arrays = [ "select2consumergroup", "select2consumertopic", "select2level", "select2maxtimes", "select2group" ];
 	var select2placeholder = [ "Alarm Consumer Group", "Alarm Consumer Topic", "Alarm Cluster Level", "Alarm Cluster Max Times", "Alarm Cluster Group" ];
 
@@ -15,6 +16,7 @@ $(document).ready(function() {
 				url = "/ke/alarm/consumer/group/ajax";
 			} else if (id.indexOf("select2consumertopic") > -1) {
 				placeholder = select2placeholder[1];
+				$("#div_select_consumer_topic").html("<select id='select2consumertopic' name='select2consumertopic' tabindex='-1' style='width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;'></select>");
 			} else if (id.indexOf("select2level") > -1) {
 				placeholder = select2placeholder[2];
 				url = "/ke/alarm/cluster/level/list/ajax";
@@ -29,6 +31,18 @@ $(document).ready(function() {
 			select2select(id);
 		}
 	}
+
+	// $("#select2consumertopic")
+	function getConsumerTopicURL() {
+		var url = "";
+		var group = $("#ke_alarm_consumer_group").val();
+		if (group.length > 0) {
+			url = "/ke/alarm/consumer/" + group + "/topic/ajax";
+		}
+		return url;
+	}
+
+	// <select id="select2consumertopic" name="select2consumertopic" tabindex="-1" style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
 
 	function select2common(id, url, placeholder) {
 		return $("#" + id).select2({
@@ -84,12 +98,13 @@ $(document).ready(function() {
 				$("#ke_alarm_consumer_group").val(text);
 				var placeholder = select2placeholder[1];
 				var url = "/ke/alarm/consumer/" + text + "/topic/ajax";
+				$("#div_select_consumer_topic").html("");
+				$("#div_select_consumer_topic").html("<select id='select2consumertopic' name='select2consumertopic' tabindex='-1' style='width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;'></select>");
 				select2common("select2consumertopic", url, placeholder);
 				$("#select2consumertopic").on('select2:select', function(e) {
 					var value = e.params.data.text;
-					// $("#select2consumertopic").val(null).trigger('change');
-					$("#select2consumertopic").val(value);
-					$("#ke_alarm_consumer_topic").val(text);
+					$("#select2consumertopic").val(value).select();
+					$("#ke_alarm_consumer_topic").val(value);
 				});
 			} else if (id.indexOf("select2level") > -1) {
 				$("#ke_alarm_cluster_level").val(text);
@@ -101,61 +116,4 @@ $(document).ready(function() {
 		});
 	}
 
-	// // Initialization group
-	// var ms_group = $("#ke_group_alarm").magicSuggest({
-	// allowFreeEntries : false,
-	// autoSelect : true,
-	// maxSelection : 1
-	// });
-
-	// // Initialization topic
-	// var ms_topic = $("#ke_topic_alarm").magicSuggest({
-	// allowFreeEntries : false,
-	// autoSelect : true,
-	// maxSelection : 1
-	// });
-	//
-	// $('#ke_topic_email').tokenfield({
-	// autocomplete : {
-	// source : [ 'example1@email.com' ],
-	// delay : 100
-	// },
-	// showAutocompleteOnFocus : true
-	// });
-	//
-	// var ms_data;
-	// $.ajax({
-	// type : 'get',
-	// dataType : 'json',
-	// url : '/ke/alarm/topic/ajax',
-	// success : function(datas) {
-	// if (datas != null) {
-	// ms_data = datas;
-	// var groups = new Array();
-	// for (var i = 0; i < datas.length; i++) {
-	// var obj = new Object();
-	// obj.id = i + 1;
-	// obj.name = datas[i].group;
-	// groups.push(obj)
-	// }
-	// ms_group.setData(groups);
-	// }
-	// }
-	// });
-	//
-	// $(ms_group).on('selectionchange', function(e, m) {
-	// var val = this.getSelection();
-	// var topics = new Array();
-	// for (var i = 0; i < ms_data.length; i++) {
-	// if (ms_data[i].group == val[0].name) {
-	// for (var j = 0; j < ms_data[i].topics.length; j++) {
-	// var obj = new Object();
-	// obj.id = j + 1;
-	// obj.name = ms_data[i].topics[j];
-	// topics.push(obj);
-	// }
-	// }
-	// }
-	// ms_topic.setData(topics);
-	// });
 });

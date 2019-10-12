@@ -16,6 +16,49 @@
 <title>Alarm - KafkaEagle</title>
 <jsp:include page="../public/css.jsp"></jsp:include>
 <jsp:include page="../public/tcss.jsp"></jsp:include>
+<!-- switch css -->
+<style type="text/css">
+.chooseBtn {
+	display: none;
+}
+
+.choose-label:hover {
+	cursor: pointer
+}
+
+.choose-label {
+	box-shadow: #ccc 0px 0px 0px 1px;
+	width: 40px;
+	height: 20px;
+	display: inline-block;
+	border-radius: 20px;
+	position: relative;
+	background-color: #bdbdbd;
+	overflow: hidden;
+}
+
+.choose-label:before {
+	content: '';
+	position: absolute;
+	left: 0;
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	border-radius: 20px;
+	background-color: #fff;
+	z-index: 20;
+	-webkit-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+.chooseBtn:checked+label.choose-label:before {
+	left: 20px;
+}
+
+.chooseBtn:checked+label.choose-label {
+	background-color: #2196F3;
+}
+</style>
 </head>
 
 <body>
@@ -36,8 +79,9 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Manage alarm
-							records .</strong>
+						<i class="fa fa-info-circle"></i> <strong>Manage consumer application alarm records .</strong><br/>
+						<i class="fa fa-info-circle"></i> <strong>MaxTime: -1 means no limit.</strong><br/>
+						<i class="fa fa-info-circle"></i> <strong>Level: P0 is the highest level.</strong><br/>
 					</div>
 				</div>
 			</div>
@@ -55,10 +99,16 @@
 								width="100%">
 								<thead>
 									<tr>
+										<th>ID</th>
 										<th>Group</th>
 										<th>Topic</th>
 										<th>Lag</th>
-										<th>Owner</th>
+										<th>Name</th>
+										<th>Times</th>
+										<th>MaxTimes</th>
+										<th>Level</th>
+										<th>IsNormal</th>
+										<th>IsEnable</th>
 										<th>Created</th>
 										<th>Modify</th>
 										<th>Operate</th>
@@ -147,7 +197,7 @@
 	function contextModifyFormValid() {
 		var ke_consumer_name_lag = $("#ke_consumer_name_lag").val();
 		var ke_owners_modify = $("#ke_owners_modify").val();
-		
+
 		if (isNaN(ke_consumer_name_lag)) {
 			$("#alert_message_modify").show();
 			setTimeout(function() {
@@ -155,7 +205,7 @@
 			}, 3000);
 			return false;
 		}
-		
+
 		if (ke_consumer_name_lag.length == 0 || ke_owners_modify.length == 0) {
 			$("#alert_message_modify").show();
 			setTimeout(function() {

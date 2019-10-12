@@ -2,13 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.smartloli.kafka.eagle.web.dao.AlertDao">
 
-	<resultMap type="org.smartloli.kafka.eagle.common.protocol.AlertInfo" id="alertInfo">
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo" id="alarmConsumer">
 		<result property="id" column="id" />
 		<result property="cluster" column="cluster" />
 		<result property="group" column="group" />
 		<result property="topic" column="topic" />
 		<result property="lag" column="lag" />
-		<result property="owner" column="owner" />
+		<result property="alarmGroup" column="alarm_group" />
+		<result property="alarmTimes" column="alarm_times" />
+		<result property="alarmMaxTimes" column="alarm_max_times" />
+		<result property="alarmMaxTimes" column="alarm_max_times" />
+		<result property="alarmLevel" column="alarm_level" />
+		<result property="isNormal" column="is_normal" />
+		<result property="isEnable" column="is_enable" />
 		<result property="created" column="created" />
 		<result property="modify" column="modify" />
 	</resultMap>
@@ -76,35 +82,35 @@
 		delete from ke_alarm_config where `cluster`=#{cluster} and `alarm_group`=#{alarmGroup}
 	</delete>
 
-	<insert id="insertAlert" parameterType="org.smartloli.kafka.eagle.common.protocol.AlertInfo">
+	<insert id="insertAlarmConsumer" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
 		insert into
-		ke_alarm(`cluster`,`group`,`topic`,`lag`,`owner`,`created`,`modify`)
-		values(#{cluster},#{group},#{topic},#{lag},#{owner},#{created},#{modify})
+		ke_alarm_consumer(`cluster`,`group`,`topic`,`lag`,`alarm_group`,`alarm_times`,`alarm_max_times`,`alarm_level`,`is_normal`,`is_enable`,`created`,`modify`)
+		values(#{cluster},#{group},#{topic},#{lag},#{alarmGroup},#{alarmTimes},#{alarmMaxTimes},#{alarmLevel},#{isNormal},#{isEnable},#{created},#{modify})
 	</insert>
 
-	<select id="query" parameterType="map" resultMap="alertInfo">
-		select * from ke_alarm
+	<select id="getAlarmConsumerAppList" parameterType="map" resultMap="alarmConsumer">
+		select * from ke_alarm_consumer
 		<where>
 			`cluster`=#{cluster}
 			<if test="search!=null and search!=''">
 				and (`group`=#{search} or `topic`=#{search})
 			</if>
 		</where>
-		order by `id` desc limit #{start},#{size}
+		limit #{start},#{size}
 	</select>
 
-	<select id="alertCount" parameterType="map" resultType="Integer">
-		select count(*) from ke_alarm where `cluster`=#{cluster}
+	<select id="alertConsumerAppCount" parameterType="map" resultType="Integer">
+		select count(*) from ke_alarm_consumer where `cluster`=#{cluster}
 	</select>
 
 	<select id="isExistAlertByCGT" parameterType="map" resultType="Integer">
-		select count(*) from ke_alarm
+		select count(*) from ke_alarm_consumer
 		<where>
 			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
 		</where>
 	</select>
 
-	<select id="findAlertByCGT" parameterType="map" resultMap="alertInfo">
+	<select id="findAlertByCGT" parameterType="map" resultMap="alarmConsumer">
 		select * from ke_alarm
 		<where>
 			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
@@ -115,11 +121,11 @@
 		delete from ke_alarm where `id`=#{id}
 	</delete>
 
-	<select id="findAlertById" parameterType="Integer" resultMap="alertInfo">
+	<select id="findAlertById" parameterType="Integer" resultMap="alarmConsumer">
 		select * from ke_alarm where `id`=#{id}
 	</select>
 
-	<update id="modifyAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.AlertInfo">
+	<update id="modifyAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
 		update ke_alarm set `lag`=#{lag},`owner`=#{owner},`modify`=#{modify} where `id`=#{id}
 	</update>
 
@@ -161,7 +167,7 @@
 	<select id="getAllAlarmTasks" resultMap="clustersInfo">
 		select * from ke_alarm_clusters
 	</select>
-	
+
 	<update id="modifyClusterAlertSwitchById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
 		update ke_alarm_clusters set `is_enable`=#{isEnable},`modify`=#{modify} where `id`=#{id}
 	</update>

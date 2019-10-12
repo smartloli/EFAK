@@ -20,9 +20,9 @@ package org.smartloli.kafka.eagle.web.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 
 /**
  * Store kafka alert data & metrics data into database.
@@ -33,28 +33,29 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
  */
 public interface AlertDao {
 
-	/** Insert alert data into db. */
-	public int insertAlert(AlertInfo alert);
+	/** Insert alarm consumer application. */
+	public int insertAlarmConsumer(AlarmConsumerInfo alarmConsumer);
 
-	/** Query collector data. */
-	public List<AlertInfo> query(Map<String, Object> params);
+	/** Get alarm consumer application list. */
+	public List<AlarmConsumerInfo> getAlarmConsumerAppList(Map<String, Object> params);
 
-	public int alertCount(Map<String, Object> params);
+	/** Count alarm consumer application size. */
+	public int alertConsumerAppCount(Map<String, Object> params);
 
 	/** Exist alert by cluster_group_topic from table. */
 	public int isExistAlertByCGT(Map<String, Object> params);
 
 	/** Find alert by cluster_group_topic from table. */
-	public AlertInfo findAlertByCGT(Map<String, Object> params);
+	public AlarmConsumerInfo findAlertByCGT(Map<String, Object> params);
 
 	/** Delete alert by id. */
 	public int deleteAlertById(int id);
 
 	/** Find alert info by id. */
-	public AlertInfo findAlertById(int id);
+	public AlarmConsumerInfo findAlertById(int id);
 
 	/** Modify alert info by id. */
-	public int modifyAlertById(AlertInfo alert);
+	public int modifyAlertById(AlarmConsumerInfo alert);
 
 	/** Storage alarm cluster,such as kafka or zookeeper. */
 	public int insertAlarmCluster(AlarmClusterInfo clusterInfo);

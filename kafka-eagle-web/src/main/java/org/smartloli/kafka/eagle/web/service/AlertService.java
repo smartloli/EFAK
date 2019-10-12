@@ -20,9 +20,9 @@ package org.smartloli.kafka.eagle.web.service;
 import java.util.List;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 
 /**
  * Alarm service interface.
@@ -36,7 +36,7 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 public interface AlertService {
 
 	/** Add alerter interface. */
-	public int add(AlertInfo alert);
+	public int insertAlarmConsumer(AlarmConsumerInfo alarmConsumer);
 
 	/** Get consumer group alarm. */
 	public String getAlarmConsumerGroup(String clusterAlias, String formatter,String search);
@@ -45,16 +45,16 @@ public interface AlertService {
 	public String getAlarmConsumerTopic(String clusterAlias, String formatter,String group,String search);
 
 	/** List alarmer information. */
-	public List<AlertInfo> list(Map<String, Object> params);
+	public List<AlarmConsumerInfo> getAlarmConsumerAppList(Map<String, Object> params);
 
-	/** Count alert size. */
-	public int alertCount(Map<String, Object> params);
+	/** Count alarm consumer application size. */
+	public int alertConsumerAppCount(Map<String, Object> params);
 
 	/** Exist alert by cluster_group_topic from table. */
 	public int isExistAlertByCGT(Map<String, Object> params);
 
 	/** Find alert by cluster_group_topic from table. */
-	public AlertInfo findAlertByCGT(Map<String, Object> params);
+	public AlarmConsumerInfo findAlertByCGT(Map<String, Object> params);
 
 	/** Delete alert by id. */
 	public int deleteAlertById(int id);
@@ -63,7 +63,7 @@ public interface AlertService {
 	public String findAlertById(int id);
 
 	/** Find alert info by id. */
-	public int modifyAlertById(AlertInfo alert);
+	public int modifyAlertById(AlarmConsumerInfo alert);
 
 	/** Storage or update alarm cluster,such as kafka or zookeeper. */
 	public int create(AlarmClusterInfo clusterInfo);
