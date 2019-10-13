@@ -81,8 +81,8 @@ public interface AlertDao {
 	/** Modify alert cluster(server,alarm group,alarm level) info by id. */
 	public int modifyClusterAlertById(AlarmClusterInfo cluster);
 
-	/** Get all alarm tasks. */
-	public List<AlarmClusterInfo> getAllAlarmTasks();
+	/** Get all alarm cluster tasks. */
+	public List<AlarmClusterInfo> getAllAlarmClusterTasks();
 
 	/** Storage or update alarm config info. */
 	public int insertOrUpdateAlarmConfig(AlarmConfigInfo alarmConfig);

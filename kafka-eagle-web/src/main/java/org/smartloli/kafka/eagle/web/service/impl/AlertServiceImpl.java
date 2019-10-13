@@ -245,8 +245,8 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public List<AlarmClusterInfo> getAllAlarmTasks() {
-		return alertDao.getAllAlarmTasks();
+	public List<AlarmClusterInfo> getAllAlarmClusterTasks() {
+		return alertDao.getAllAlarmClusterTasks();
 	}
 
 	/** Get alert type list. */

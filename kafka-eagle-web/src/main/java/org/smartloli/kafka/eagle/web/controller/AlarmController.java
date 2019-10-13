@@ -389,7 +389,7 @@ public class AlarmController {
 		}
 	}
 
-	/** Delete alarmer. */
+	/** Delete alarm consumer application. */
 	@RequestMapping(value = "/alarm/consumer/{id}/del", method = RequestMethod.GET)
 	public ModelAndView alarmConsumerDelete(@PathVariable("id") int id, HttpServletRequest request) {
 		int code = alertService.deleteAlarmConsumerById(id);

@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.api.email.MailFactory;
 import org.smartloli.kafka.eagle.api.email.MailProvider;
-import org.smartloli.kafka.eagle.api.email.module.ClusterContentModule;
 import org.smartloli.kafka.eagle.api.email.module.LagContentModule;
 import org.smartloli.kafka.eagle.api.im.IMFactory;
 import org.smartloli.kafka.eagle.api.im.IMProvider;
@@ -37,8 +36,10 @@ import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -69,7 +70,7 @@ public class AlertQuartz {
 		for (String clusterAlias : clusterAliass) {
 			// Run consumer job
 			Consumer consumer = new Consumer();
-			consumer.consumer(clusterAlias);
+			// consumer.consumer(clusterAlias);
 
 			// Run cluster job
 			Cluster cluster = new Cluster();
@@ -167,7 +168,7 @@ public class AlertQuartz {
 					try {
 						MailProvider provider = new MailFactory();
 						String subject = "Kafka Eagle Consumer Alert";
-						String address = ""; //alertInfo.getOwner();
+						String address = ""; // alertInfo.getOwner();
 						LagContentModule lcm = new LagContentModule();
 						lcm.setCluster(clusterAlias);
 						lcm.setConsumerLag(offset.getLag() + "");
@@ -245,8 +246,14 @@ public class AlertQuartz {
 
 		public void cluster() {
 			AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
-			for (AlarmClusterInfo cluster : alertService.getAllAlarmTasks()) {
+
+			for (AlarmClusterInfo cluster : alertService.getAllAlarmClusterTasks()) {
 				String[] servers = cluster.getServer().split(",");
+				String alarmGroup = cluster.getAlarmGroup();
+				Map<String, Object> params = new HashMap<>();
+				params.put("cluster", cluster.getCluster());
+				params.put("alarmGroup", alarmGroup);
+				AlarmConfigInfo alarmConfing = alertService.getAlarmConfigByGroupName(params);
 				for (String server : servers) {
 					String host = server.split(":")[0];
 					int port = 0;
@@ -254,34 +261,47 @@ public class AlertQuartz {
 						port = Integer.parseInt(server.split(":")[1]);
 						boolean status = NetUtils.telnet(host, port);
 						if (!status) {
-							// Mail
-							try {
-								MailProvider provider = new MailFactory();
-								String subject = "Kafka Eagle Alert";
-								ClusterContentModule ccm = new ClusterContentModule();
-								ccm.setCluster(cluster.getCluster());
-								ccm.setServer(host + ":" + port);
-								ccm.setTime(CalendarUtils.getDate());
-								ccm.setType(cluster.getType());
-								provider.create().send(subject, cluster.getAlarmGroup(), ccm.toString(), "");
-							} catch (Exception ex) {
-								ex.printStackTrace();
-								LOG.error("Alertor[" + cluster.getAlarmGroup() + "] Send alarm mail has error,msg is " + ex.getMessage());
-							}
-
-							// IM (WeChat & DingDing)
-							try {
-								IMProvider provider = new IMFactory();
-								ClusterContentModule ccm = new ClusterContentModule();
-								ccm.setCluster(cluster.getCluster());
-								ccm.setServer(host + ":" + port);
-								ccm.setTime(CalendarUtils.getDate());
-								ccm.setType(cluster.getType());
-								provider.create().sendJsonMsgByDingDing(ccm.toDingDingMarkDown());
-								provider.create().sendJsonMsgByWeChat(ccm.toWeChatMarkDown());
-							} catch (Exception ex) {
-								ex.printStackTrace();
-								LOG.error("Send alarm wechat or dingding has error,msg is " + ex.getMessage());
+							cluster.setAlarmTimes(cluster.getAlarmTimes() + 1);
+							cluster.setIsNormal("N");
+							sendAlarm(alarmConfing, cluster);
+							
+//							// Mail
+//							try {
+//								MailProvider provider = new MailFactory();
+//								String subject = "Kafka Eagle Alert";
+//								ClusterContentModule ccm = new ClusterContentModule();
+//								ccm.setCluster(cluster.getCluster());
+//								ccm.setServer(host + ":" + port);
+//								ccm.setTime(CalendarUtils.getDate());
+//								ccm.setType(cluster.getType());
+//								provider.create().send(subject, cluster.getAlarmGroup(), ccm.toString(), "");
+//							} catch (Exception ex) {
+//								ex.printStackTrace();
+//								LOG.error("Alertor[" + cluster.getAlarmGroup() + "] Send alarm mail has error,msg is " + ex.getMessage());
+//							}
+//
+//							// IM (WeChat & DingDing)
+//							try {
+//								IMProvider provider = new IMFactory();
+//								ClusterContentModule ccm = new ClusterContentModule();
+//								ccm.setCluster(cluster.getCluster());
+//								ccm.setServer(host + ":" + port);
+//								ccm.setTime(CalendarUtils.getDate());
+//								ccm.setType(cluster.getType());
+//								provider.create().sendJsonMsgByDingDing(ccm.toDingDingMarkDown());
+//								provider.create().sendJsonMsgByWeChat(ccm.toWeChatMarkDown());
+//							} catch (Exception ex) {
+//								ex.printStackTrace();
+//								LOG.error("Send alarm wechat or dingding has error,msg is " + ex.getMessage());
+//							}
+						} else {
+							if (cluster.getIsNormal().equals("N")) {
+								cluster.setIsNormal("Y");
+								// clear error alarm and reset
+								cluster.setAlarmTimes(0);
+								// Notify the cancel of the alarm
+								// TODO
+								// execute api
 							}
 						}
 					} catch (Exception e) {
@@ -290,6 +310,35 @@ public class AlertQuartz {
 				}
 			}
 		}
+
+		private void sendAlarm(AlarmConfigInfo alarmConfing, AlarmClusterInfo cluster) {
+			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL) && cluster.getAlarmTimes() <= cluster.getAlarmMaxTimes()) {
+				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
+
+				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
+
+				}
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing) && cluster.getAlarmTimes() <= cluster.getAlarmMaxTimes()) {
+				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
+
+				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
+
+				}
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat) && cluster.getAlarmTimes() <= cluster.getAlarmMaxTimes()) {
+				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
+
+				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
+
+				}
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook) && cluster.getAlarmTimes() <= cluster.getAlarmMaxTimes()) {
+				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
+
+				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
+
+				}
+			}
+		}
+
 	}
 
 }

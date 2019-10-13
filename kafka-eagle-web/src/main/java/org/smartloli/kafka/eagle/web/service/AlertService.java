@@ -74,8 +74,8 @@ public interface AlertService {
 	/** List cluster information from alert. */
 	public List<AlarmClusterInfo> getAlarmClusterList(Map<String, Object> params);
 
-	/** Get all alarm tasks. */
-	public List<AlarmClusterInfo> getAllAlarmTasks();
+	/** Get all alarm cluster tasks. */
+	public List<AlarmClusterInfo> getAllAlarmClusterTasks();
 
 	public int getAlarmClusterCount(Map<String, Object> params);
 
