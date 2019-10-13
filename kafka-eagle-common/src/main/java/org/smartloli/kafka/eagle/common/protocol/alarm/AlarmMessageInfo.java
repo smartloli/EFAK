@@ -29,22 +29,31 @@ import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 public class AlarmMessageInfo extends BaseProtocol {
 
 	/**
-	 * AlarmStatus  : [ PROBLEM ]
-	 * AlarmLevel   : [ P0 ]
+	 * AlarmStatus : [ PROBLEM ]
+	 * 
+	 * AlarmLevel : [ P0 ]
+	 * 
 	 * AlarmProject : [ Kafka ]
-	 * AlarmTimes 	: [ current(1), max(7) ]
-	 * AlarmDate    : [ 2019-10-07 21:43:22 ]
+	 * 
+	 * AlarmTimes : [ current(1), max(7) ]
+	 * 
+	 * AlarmDate : [ 2019-10-07 21:43:22 ]
+	 * 
 	 * AlarmContent : [ node.shutdown [ localhost:9092 ] ]
-	 * AlarmUrl		: [ http://localhost:8048/ke/alarm/list ] 
+	 * 
 	 */
-	
+
 	private String alarmStatus;
 	private String alarmProject;
 	private String alarmLevel;
 	private String alarmTimes;
 	private String alarmContent;
 	private String alarmDate;
-	private String alarmUrl;
+
+	public String toDingDingMarkDown() {
+		return ">#### AlarmStatus     : [ **" + alarmStatus + "** ]\n" + "> #### AlarmLevel       : [ " + alarmLevel + " ]\n" + "> #### AlarmProject    : [ " + alarmProject + " ]\n" + "> #### AlarmTimes 	    : [ " + alarmTimes + " ]\n"
+				+ "> #### AlarmDate        : [ " + alarmDate + " ]\n" + "> #### AlarmContent  : [ " + alarmContent + " ]";
+	}
 
 	public String getAlarmStatus() {
 		return alarmStatus;
@@ -92,14 +101,6 @@ public class AlarmMessageInfo extends BaseProtocol {
 
 	public void setAlarmDate(String alarmDate) {
 		this.alarmDate = alarmDate;
-	}
-
-	public String getAlarmUrl() {
-		return alarmUrl;
-	}
-
-	public void setAlarmUrl(String alarmUrl) {
-		this.alarmUrl = alarmUrl;
 	}
 
 }

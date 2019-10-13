@@ -43,12 +43,14 @@ public class IMServiceImpl implements IMService {
 
 	/** Send Json msg by dingding. */
 	@Override
-	public void sendJsonMsgByDingDing(String data) {
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.im.dingding.enable")) {
-			String uri = SystemConfigUtils.getProperty("kafka.eagle.im.dingding.url");
-			Map<String, Object> dingDingMarkdownMessage = getDingDingMarkdownMessage(IM.TITLE, data, true);
-			LOG.info("IM[DingDing] response: " + HttpClientUtils.doPostJson(uri, JSONObject.toJSONString(dingDingMarkdownMessage)));
-		}
+	public void sendPostMsgByDingDing(String data, String url) {
+		Map<String, Object> dingDingMarkdownMessage = getDingDingMarkdownMessage(IM.TITLE, data, true);
+		LOG.info("IM[DingDing] response: " + HttpClientUtils.doPostJson(url, JSONObject.toJSONString(dingDingMarkdownMessage)));
+	}
+
+	@Override
+	public void sendGetMsgByDingDing(String data, String url) {
+		
 	}
 
 	/**
@@ -106,7 +108,7 @@ public class IMServiceImpl implements IMService {
 	@Override
 	public void sendJsonMsgByWebhook(String data, String maillist) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

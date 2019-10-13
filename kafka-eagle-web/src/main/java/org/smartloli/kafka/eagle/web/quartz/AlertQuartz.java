@@ -196,8 +196,8 @@ public class AlertQuartz {
 						lcm.setTopic(alertInfo.getTopic());
 						lcm.setType("Consumer");
 						// lcm.setUser(alertInfo.getOwner());
-						provider.create().sendJsonMsgByWeChat(lcm.toWeChatMarkDown());
-						provider.create().sendJsonMsgByDingDing(lcm.toDingDingMarkDown());
+//						provider.create().sendJsonMsgByWeChat(lcm.toWeChatMarkDown());
+//						provider.create().sendJsonMsgByDingDing(lcm.toDingDingMarkDown());
 					} catch (Exception ex) {
 						ex.printStackTrace();
 						LOG.error("Topic[" + alertInfo.getTopic() + "] Send alarm wechat or dingding has error,msg is " + ex.getMessage());
