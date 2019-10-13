@@ -49,19 +49,16 @@ public interface AlertDao {
 	public int modifyConsumerAlertSwitchById(AlarmConsumerInfo alarmConsumer);
 	
 	/** Find alarm consumer info by id. */
-	public AlarmConsumerInfo findConsumerAlertById(int id);
+	public AlarmConsumerInfo findAlarmConsumerAlertById(int id);
 
 	/** Find alert by cluster_group_topic from table. */
 	public AlarmConsumerInfo findAlertByCGT(Map<String, Object> params);
 
-	/** Delete alert by id. */
-	public int deleteAlertById(int id);
+	/** Delete alarm consumer by id. */
+	public int deleteAlarmConsumerById(int id);
 
-	/** Find alert info by id. */
-	public AlarmConsumerInfo findAlertById(int id);
-
-	/** Modify alert info by id. */
-	public int modifyAlertById(AlarmConsumerInfo alert);
+	/** Modify alarm consumer info by id. */
+	public int modifyAlarmConsumerById(AlarmConsumerInfo alarmConsumer);
 
 	/** Storage alarm cluster,such as kafka or zookeeper. */
 	public int insertAlarmCluster(AlarmClusterInfo clusterInfo);

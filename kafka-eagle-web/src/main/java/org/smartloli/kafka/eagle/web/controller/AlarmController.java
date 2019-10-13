@@ -26,8 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
@@ -60,8 +58,6 @@ import com.alibaba.fastjson.JSONObject;
  */
 @Controller
 public class AlarmController {
-
-	private final static Logger LOG = LoggerFactory.getLogger(AlarmController.class);
 
 	/** Alert Service interface to operate this method. */
 	@Autowired
@@ -348,7 +344,7 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/list/modify/switch/{id}/ajax", method = RequestMethod.GET)
 	public void modifyConsumerAlertSwitchByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
 		try {
-			AlarmConsumerInfo alarmConsumer = alertService.findConsumerAlertById(id);
+			AlarmConsumerInfo alarmConsumer = alertService.findAlarmConsumerAlertById(id);
 			if (alarmConsumer.getIsEnable().equals("Y")) {
 				alarmConsumer.setIsEnable("N");
 			} else {
@@ -371,21 +367,32 @@ public class AlarmController {
 		}
 	}
 
-	/** Delete alarmer. */
-	@RequestMapping(value = "/alarm/{id}/del", method = RequestMethod.GET)
-	public ModelAndView alarmDelete(@PathVariable("id") int id, HttpServletRequest request) {
-		int code = alertService.deleteAlertById(id);
-		if (code > 0) {
-			return new ModelAndView("redirect:/alarm/modify");
-		} else {
-			return new ModelAndView("redirect:/errors/500");
+	/**
+	 * Get alarm consumer detail, such consumer group(cgroup) or topic, and
+	 * alarm group(agroup).
+	 */
+	@RequestMapping(value = "/alarm/consumer/detail/{type}/{id}/ajax", method = RequestMethod.GET)
+	public void getAlarmConsumerDetailByIdAjax(@PathVariable("id") int id, @PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			JSONObject object = new JSONObject();
+			if ("cgroup".equals(type)) {
+				object.put("result", alertService.findAlarmConsumerAlertById(id).getGroup());
+			} else if ("topic".equals(type)) {
+				object.put("result", alertService.findAlarmConsumerAlertById(id).getTopic());
+			} else if ("agroup".equals(type)) {
+				object.put("result", alertService.findAlarmConsumerAlertById(id).getAlarmGroup());
+			}
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 
-	/** Modify alarmer. */
-	@RequestMapping(value = "/alarm/{id}/modify", method = RequestMethod.GET)
-	public ModelAndView alarmModify(@PathVariable("id") int id, HttpServletRequest request) {
-		int code = alertService.deleteAlertById(id);
+	/** Delete alarmer. */
+	@RequestMapping(value = "/alarm/consumer/{id}/del", method = RequestMethod.GET)
+	public ModelAndView alarmConsumerDelete(@PathVariable("id") int id, HttpServletRequest request) {
+		int code = alertService.deleteAlarmConsumerById(id);
 		if (code > 0) {
 			return new ModelAndView("redirect:/alarm/modify");
 		} else {
@@ -395,9 +402,9 @@ public class AlarmController {
 
 	/** Get alert info. */
 	@RequestMapping(value = "/alarm/consumer/modify/{id}/ajax", method = RequestMethod.GET)
-	public void findAlertByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
+	public void findAlarmConsumerByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
 		try {
-			byte[] output = alertService.findAlertById(id).getBytes();
+			byte[] output = alertService.findAlarmConsumerAlertById(id).toString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -406,18 +413,23 @@ public class AlarmController {
 
 	/** Modify consumer topic alert info. */
 	@RequestMapping(value = "/alarm/consumer/modify/", method = RequestMethod.POST)
-	public String modifyAlertInfo(HttpSession session, HttpServletRequest request) {
+	public String modifyAlarmConsumerInfo(HttpSession session, HttpServletRequest request) {
 		String id = request.getParameter("ke_consumer_id_lag");
 		String lag = request.getParameter("ke_consumer_name_lag");
-		String owners = request.getParameter("ke_owners_modify");
+		String agroup = request.getParameter("ke_alarm_consumer_group");
+		String maxtimes = request.getParameter("ke_alarm_consumer_maxtimes");
+		String level = request.getParameter("ke_alarm_consumer_level");
 
-		AlarmConsumerInfo alert = new AlarmConsumerInfo();
+		AlarmConsumerInfo alertConsumer = new AlarmConsumerInfo();
 		// JavaScript has already judged.
-		alert.setId(Integer.parseInt(id));
-		alert.setLag(Long.parseLong(lag));
-		alert.setModify(CalendarUtils.getDate());
+		alertConsumer.setId(Integer.parseInt(id));
+		alertConsumer.setLag(Long.parseLong(lag));
+		alertConsumer.setAlarmGroup(agroup);
+		alertConsumer.setAlarmMaxTimes(Integer.parseInt(maxtimes));
+		alertConsumer.setAlarmLevel(level);
+		alertConsumer.setModify(CalendarUtils.getDate());
 
-		if (alertService.modifyAlertById(alert) > 0) {
+		if (alertService.modifyAlarmConsumerById(alertConsumer) > 0) {
 			return "redirect:/alarm/modify";
 		} else {
 			return "redirect:/errors/500";

@@ -200,22 +200,13 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public int deleteAlertById(int id) {
-		return alertDao.deleteAlertById(id);
+	public int deleteAlarmConsumerById(int id) {
+		return alertDao.deleteAlarmConsumerById(id);
 	}
 
 	@Override
-	public String findAlertById(int id) {
-		AlarmConsumerInfo alert = alertDao.findAlertById(id);
-		JSONObject object = new JSONObject();
-		object.put("lag", alert.getLag());
-		// object.put("owners", alert.getOwner());
-		return object.toJSONString();
-	}
-
-	@Override
-	public int modifyAlertById(AlarmConsumerInfo alert) {
-		return alertDao.modifyAlertById(alert);
+	public int modifyAlarmConsumerById(AlarmConsumerInfo alarmConsumer) {
+		return alertDao.modifyAlarmConsumerById(alarmConsumer);
 	}
 
 	@Override
@@ -394,8 +385,8 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public AlarmConsumerInfo findConsumerAlertById(int id) {
-		return alertDao.findConsumerAlertById(id);
+	public AlarmConsumerInfo findAlarmConsumerAlertById(int id) {
+		return alertDao.findAlarmConsumerAlertById(id);
 	}
 
 }

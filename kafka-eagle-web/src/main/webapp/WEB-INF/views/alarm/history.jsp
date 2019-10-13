@@ -84,7 +84,6 @@
 						<i class="fa fa-info-circle"></i> <strong>Manage cluster alarm records .</strong><br/>
 						<i class="fa fa-info-circle"></i> <strong>MaxTime: -1 means no limit.</strong><br/>
 						<i class="fa fa-info-circle"></i> <strong>Level: P0 is the highest level.</strong><br/>
-							
 					</div>
 				</div>
 			</div>
@@ -165,7 +164,7 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="col-sm-2 control-label">Group</label>
+									<label class="col-sm-2 control-label">AGroup</label>
 									<div class="col-sm-9">
 										<select id="select2group" name="select2group" tabindex="-1"
 											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>

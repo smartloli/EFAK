@@ -223,7 +223,6 @@ $(document).ready(function() {
 						select2object.append(option).trigger('change');
 					}
 				}
-
 			}
 		});
 	});

@@ -114,7 +114,7 @@
 		update ke_alarm_consumer set `is_enable`=#{isEnable},`modify`=#{modify} where `id`=#{id}
 	</update>
 	
-	<select id="findConsumerAlertById" parameterType="Integer" resultMap="alarmConsumer">
+	<select id="findAlarmConsumerAlertById" parameterType="Integer" resultMap="alarmConsumer">
 		select * from ke_alarm_consumer where `id`=#{id}
 	</select>
 
@@ -125,16 +125,12 @@
 		</where>
 	</select>
 
-	<delete id="deleteAlertById" parameterType="Integer">
-		delete from ke_alarm where `id`=#{id}
+	<delete id="deleteAlarmConsumerById" parameterType="Integer">
+		delete from ke_alarm_consumer where `id`=#{id}
 	</delete>
 
-	<select id="findAlertById" parameterType="Integer" resultMap="alarmConsumer">
-		select * from ke_alarm where `id`=#{id}
-	</select>
-
-	<update id="modifyAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
-		update ke_alarm set `lag`=#{lag},`owner`=#{owner},`modify`=#{modify} where `id`=#{id}
+	<update id="modifyAlarmConsumerById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
+		update ke_alarm_consumer set `lag`=#{lag},`alarm_group`=#{alarmGroup},`alarm_max_times`=#{alarmMaxTimes},`alarm_level`=#{alarmLevel},`modify`=#{modify} where `id`=#{id}
 	</update>
 	
 	<insert id="insertAlarmCluster" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
