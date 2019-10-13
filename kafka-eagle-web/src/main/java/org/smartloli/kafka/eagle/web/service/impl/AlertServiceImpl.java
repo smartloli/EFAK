@@ -388,4 +388,14 @@ public class AlertServiceImpl implements AlertService {
 		return alertDao.modifyClusterAlertSwitchById(clusterInfo);
 	}
 
+	@Override
+	public int modifyConsumerAlertSwitchById(AlarmConsumerInfo alarmConsumer) {
+		return alertDao.modifyConsumerAlertSwitchById(alarmConsumer);
+	}
+
+	@Override
+	public AlarmConsumerInfo findConsumerAlertById(int id) {
+		return alertDao.findConsumerAlertById(id);
+	}
+
 }

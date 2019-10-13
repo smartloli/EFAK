@@ -45,6 +45,12 @@ public interface AlertDao {
 	/** Exist alert by cluster_group_topic from table. */
 	public int isExistAlertByCGT(Map<String, Object> params);
 
+	/** Modify consumer alarm switch. */
+	public int modifyConsumerAlertSwitchById(AlarmConsumerInfo alarmConsumer);
+	
+	/** Find alarm consumer info by id. */
+	public AlarmConsumerInfo findConsumerAlertById(int id);
+
 	/** Find alert by cluster_group_topic from table. */
 	public AlarmConsumerInfo findAlertByCGT(Map<String, Object> params);
 

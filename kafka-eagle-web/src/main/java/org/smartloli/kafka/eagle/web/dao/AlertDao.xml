@@ -109,6 +109,14 @@
 			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
 		</where>
 	</select>
+	
+	<update id="modifyConsumerAlertSwitchById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
+		update ke_alarm_consumer set `is_enable`=#{isEnable},`modify`=#{modify} where `id`=#{id}
+	</update>
+	
+	<select id="findConsumerAlertById" parameterType="Integer" resultMap="alarmConsumer">
+		select * from ke_alarm_consumer where `id`=#{id}
+	</select>
 
 	<select id="findAlertByCGT" parameterType="map" resultMap="alarmConsumer">
 		select * from ke_alarm
@@ -128,7 +136,7 @@
 	<update id="modifyAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
 		update ke_alarm set `lag`=#{lag},`owner`=#{owner},`modify`=#{modify} where `id`=#{id}
 	</update>
-
+	
 	<insert id="insertAlarmCluster" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
 		insert into ke_alarm_clusters(`type`,`cluster`,`server`,`alarm_group`,`alarm_times`,`alarm_max_times`,`alarm_level`,`is_normal`,`is_enable`,`created`,`modify`)
 		values(#{type},#{cluster},#{server},#{alarmGroup},#{alarmTimes},#{alarmMaxTimes},#{alarmLevel},#{isNormal},#{isEnable},#{created},#{modify})

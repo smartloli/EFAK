@@ -50,6 +50,18 @@ $(document).ready(function() {
 		});
 	}
 
+	// Alarm is enable
+	$(document).on('click', 'label[name=is_enable_label]', function() {
+		var id = $(this).attr("val");
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/alarm/list/modify/switch/' + id + '/ajax',
+			success : function(datas) {
+			}
+		});
+	});
+	
 	$(document).on('click', 'a[name=remove]', function() {
 		var href = $(this).attr("href");
 		var id = href.split("#")[1].split("/")[0];

@@ -39,10 +39,10 @@ public interface AlertService {
 	public int insertAlarmConsumer(AlarmConsumerInfo alarmConsumer);
 
 	/** Get consumer group alarm. */
-	public String getAlarmConsumerGroup(String clusterAlias, String formatter,String search);
-	
+	public String getAlarmConsumerGroup(String clusterAlias, String formatter, String search);
+
 	/** Get consumer topic alarm. */
-	public String getAlarmConsumerTopic(String clusterAlias, String formatter,String group,String search);
+	public String getAlarmConsumerTopic(String clusterAlias, String formatter, String group, String search);
 
 	/** List alarmer information. */
 	public List<AlarmConsumerInfo> getAlarmConsumerAppList(Map<String, Object> params);
@@ -52,6 +52,12 @@ public interface AlertService {
 
 	/** Exist alert by cluster_group_topic from table. */
 	public int isExistAlertByCGT(Map<String, Object> params);
+
+	/** Modify consumer alarm switch. */
+	public int modifyConsumerAlertSwitchById(AlarmConsumerInfo alarmConsumer);
+
+	/** Find alarm consumer info by id. */
+	public AlarmConsumerInfo findConsumerAlertById(int id);
 
 	/** Find alert by cluster_group_topic from table. */
 	public AlarmConsumerInfo findAlertByCGT(Map<String, Object> params);
@@ -70,7 +76,7 @@ public interface AlertService {
 
 	/** List cluster information from alert. */
 	public List<AlarmClusterInfo> getAlarmClusterList(Map<String, Object> params);
-	
+
 	/** Get all alarm tasks. */
 	public List<AlarmClusterInfo> getAllAlarmTasks();
 
@@ -84,15 +90,15 @@ public interface AlertService {
 
 	/** Modify alarm cluster switch by id. */
 	public int modifyClusterAlertSwitchById(AlarmClusterInfo clusterInfo);
-	
+
 	/** Modify alert cluster(server,alarm group,alarm level) info by id. */
 	public int modifyClusterAlertById(AlarmClusterInfo cluster);
 
 	/** Get alert type list. */
 	public String getAlertTypeList();
-	
+
 	/** Get alert cluster type list. */
-	public String getAlertClusterTypeList(String type,Map<String, Object> params);
+	public String getAlertClusterTypeList(String type, Map<String, Object> params);
 
 	/** Storage or update alarm config info. */
 	public int insertOrUpdateAlarmConfig(AlarmConfigInfo alarmConfig);
@@ -108,7 +114,7 @@ public interface AlertService {
 
 	/** Delete alarm config by group name. */
 	public int deleteAlertByGroupName(Map<String, Object> params);
-	
+
 	/** Get alarm config by group name. */
 	public AlarmConfigInfo getAlarmConfigByGroupName(Map<String, Object> params);
 }

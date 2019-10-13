@@ -292,9 +292,9 @@ public class AlarmController {
 		for (AlarmConsumerInfo alertConsumer : alarmConsumers) {
 			JSONObject obj = new JSONObject();
 			int id = alertConsumer.getId();
-			String group  = alertConsumer.getGroup();
-			String topic  = alertConsumer.getTopic();
-			String alarmGroup  = alertConsumer.getAlarmGroup();
+			String group = alertConsumer.getGroup();
+			String topic = alertConsumer.getTopic();
+			String alarmGroup = alertConsumer.getAlarmGroup();
 			obj.put("id", id);
 			obj.put("group", "<a href='#" + id + "/cgroup' name='ke_alarm_consumer_detail'>" + (group.length() > 8 ? group.substring(0, 8) + "..." : group) + "</a>");
 			obj.put("topic", "<a href='#" + id + "/topic' name='ke_alarm_consumer_detail'>" + (topic.length() > 8 ? topic.substring(0, 8) + "..." : topic) + "</a>");
@@ -338,6 +338,33 @@ public class AlarmController {
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Switch cluster alert info. */
+	@RequestMapping(value = "/alarm/list/modify/switch/{id}/ajax", method = RequestMethod.GET)
+	public void modifyConsumerAlertSwitchByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			AlarmConsumerInfo alarmConsumer = alertService.findConsumerAlertById(id);
+			if (alarmConsumer.getIsEnable().equals("Y")) {
+				alarmConsumer.setIsEnable("N");
+			} else {
+				alarmConsumer.setIsEnable("Y");
+			}
+			alarmConsumer.setModify(CalendarUtils.getDate());
+			int code = alertService.modifyConsumerAlertSwitchById(alarmConsumer);
+			JSONObject object = new JSONObject();
+			if (code > 0) {
+				object.put("code", code);
+				object.put("status", "Success");
+			} else {
+				object.put("code", code);
+				object.put("status", "Failed");
+			}
+			byte[] output = object.toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -523,7 +550,7 @@ public class AlarmController {
 		}
 	}
 
-	/** Get alarm config by group name. */
+	/** Get alarm cluster detail, such server or alarm group. */
 	@RequestMapping(value = "/alarm/cluster/detail/{type}/{id}/ajax", method = RequestMethod.GET)
 	public void getAlarmClusterDetailByIdAjax(@PathVariable("id") int id, @PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
 		try {
@@ -562,9 +589,9 @@ public class AlarmController {
 		}
 	}
 
-	/** Get alert info. */
+	/** Switch cluster alert info. */
 	@RequestMapping(value = "/alarm/history/modify/switch/{id}/ajax", method = RequestMethod.GET)
-	public ModelAndView modifyClusterAlertSwitchByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
+	public void modifyClusterAlertSwitchByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			AlarmClusterInfo alarmCluster = alertService.findAlarmClusterAlertById(id);
 			if (alarmCluster.getIsEnable().equals("Y")) {
@@ -574,14 +601,18 @@ public class AlarmController {
 			}
 			alarmCluster.setModify(CalendarUtils.getDate());
 			int code = alertService.modifyClusterAlertSwitchById(alarmCluster);
+			JSONObject object = new JSONObject();
 			if (code > 0) {
-				return new ModelAndView("redirect:/alarm/history");
+				object.put("code", code);
+				object.put("status", "Success");
 			} else {
-				return new ModelAndView("redirect:/errors/500");
+				object.put("code", code);
+				object.put("status", "Failed");
 			}
+			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			return new ModelAndView("redirect:/errors/500");
 		}
 	}
 
