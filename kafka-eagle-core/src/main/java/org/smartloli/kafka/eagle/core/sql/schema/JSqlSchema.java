@@ -29,9 +29,9 @@ import org.apache.calcite.schema.Table;
 import org.apache.calcite.schema.impl.AbstractSchema;
 import org.apache.calcite.schema.impl.ScalarFunctionImpl;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData;
+import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData.Database;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlTable;
 import org.smartloli.kafka.eagle.core.sql.function.JSONFunction;
-import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData.Database;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
@@ -57,10 +57,10 @@ public class JSqlSchema extends AbstractSchema {
 		return super.isMutable();
 	}
 
-	@Override
-	public boolean contentsHaveChangedSince(long lastCheck, long now) {
-		return super.contentsHaveChangedSince(lastCheck, now);
-	}
+//	@Override
+//	public boolean contentsHaveChangedSince(long lastCheck, long now) {
+//		return super.contentsHaveChangedSince(lastCheck, now);
+//	}
 
 	@Override
 	public Expression getExpression(SchemaPlus parentSchema, String name) {
