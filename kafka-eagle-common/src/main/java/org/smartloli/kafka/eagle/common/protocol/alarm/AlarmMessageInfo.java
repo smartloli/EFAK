@@ -43,6 +43,7 @@ public class AlarmMessageInfo extends BaseProtocol {
 	 * 
 	 */
 
+	private String title;
 	private String alarmStatus;
 	private String alarmProject;
 	private String alarmLevel;
@@ -51,8 +52,21 @@ public class AlarmMessageInfo extends BaseProtocol {
 	private String alarmDate;
 
 	public String toDingDingMarkDown() {
-		return ">#### AlarmStatus     : [ **" + alarmStatus + "** ]\n" + "> #### AlarmLevel       : [ " + alarmLevel + " ]\n" + "> #### AlarmProject    : [ " + alarmProject + " ]\n" + "> #### AlarmTimes 	    : [ " + alarmTimes + " ]\n"
-				+ "> #### AlarmDate        : [ " + alarmDate + " ]\n" + "> #### AlarmContent  : [ " + alarmContent + " ]";
+		return title + " \n\n>#### AlarmStatus : [ **" + alarmStatus + "** ]\n" + "> #### AlarmLevel : [ " + alarmLevel + " ]\n" + "> #### AlarmProject : [ " + alarmProject + " ]\n" + "> #### AlarmTimes : [ " + alarmTimes + " ]\n"
+				+ "> #### AlarmDate : [ " + alarmDate + " ]\n" + "> #### AlarmContent : [ " + alarmContent + " ]";
+	}
+	
+	public String toWeChatMarkDown() {
+		return title + " \n\n>AlarmStatus : [ **" + alarmStatus + "** ]\n" + "> AlarmLevel : [ " + alarmLevel + " ]\n" + "> AlarmProject : [ " + alarmProject + " ]\n" + "> AlarmTimes : [ " + alarmTimes + " ]\n"
+				+ "> AlarmDate : [ " + alarmDate + " ]\n" + "> AlarmContent : [ " + alarmContent + " ]";
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getAlarmStatus() {

@@ -59,14 +59,17 @@ public interface AlertService {
 	/** Find alarm consumer info by id. */
 	public AlarmConsumerInfo findAlarmConsumerAlertById(int id);
 
-	/** Find alert by cluster_group_topic from table. */
-	public AlarmConsumerInfo findAlertByCGT(Map<String, Object> params);
-
+	/** Get all alarm consumer tasks. */
+	public List<AlarmConsumerInfo> getAllAlarmConsumerTasks();
+	
 	/** Delete alarm consumer by id. */
 	public int deleteAlarmConsumerById(int id);
 
 	/** Modify alarm consumer info by id. */
 	public int modifyAlarmConsumerById(AlarmConsumerInfo alarmConsumer);
+	
+	/** Modify alert consumer(alarmtimes,isnormal) info by id. */
+	public int modifyConsumerStatusAlertById(AlarmConsumerInfo alarmConsumer);
 
 	/** Storage or update alarm cluster,such as kafka or zookeeper. */
 	public int create(AlarmClusterInfo clusterInfo);
@@ -90,6 +93,9 @@ public interface AlertService {
 
 	/** Modify alert cluster(server,alarm group,alarm level) info by id. */
 	public int modifyClusterAlertById(AlarmClusterInfo cluster);
+	
+	/** Modify alert cluster(alarmtimes,isnormal) info by id. */
+	public int modifyClusterStatusAlertById(AlarmClusterInfo cluster);
 
 	/** Get alert type list. */
 	public String getAlertTypeList();
@@ -114,4 +120,7 @@ public interface AlertService {
 
 	/** Get alarm config by group name. */
 	public AlarmConfigInfo getAlarmConfigByGroupName(Map<String, Object> params);
+	
+	/** Get lastest lag used to alarm consumer. */
+	public long queryLastestLag(Map<String, Object> params);
 }

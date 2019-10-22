@@ -152,6 +152,8 @@ public class KConstants {
 
 	public interface IM {
 		public static String TITLE = "Kafka Eagle Alert";
+		public static String MARKDOWN = "markdown";
+		public static String STRING = "string";
 	}
 
 	public interface WeChat {
@@ -209,6 +211,7 @@ public class KConstants {
 		public static String WebHook = "WebHook";
 		public static String HTTP_GET = "get";
 		public static String HTTP_POST = "post";
+		public static String DISABLE = "N";
 	}
 
 }

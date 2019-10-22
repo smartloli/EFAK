@@ -51,14 +51,17 @@ public interface AlertDao {
 	/** Find alarm consumer info by id. */
 	public AlarmConsumerInfo findAlarmConsumerAlertById(int id);
 
-	/** Find alert by cluster_group_topic from table. */
-	public AlarmConsumerInfo findAlertByCGT(Map<String, Object> params);
-
 	/** Delete alarm consumer by id. */
 	public int deleteAlarmConsumerById(int id);
 
 	/** Modify alarm consumer info by id. */
 	public int modifyAlarmConsumerById(AlarmConsumerInfo alarmConsumer);
+	
+	/** Modify alert consumer(alarmtimes,isnormal) info by id. */
+	public int modifyConsumerStatusAlertById(AlarmConsumerInfo alarmConsumer);
+	
+	/** Get all alarm consumer tasks. */
+	public List<AlarmConsumerInfo> getAllAlarmConsumerTasks();
 
 	/** Storage alarm cluster,such as kafka or zookeeper. */
 	public int insertAlarmCluster(AlarmClusterInfo clusterInfo);
@@ -80,6 +83,9 @@ public interface AlertDao {
 
 	/** Modify alert cluster(server,alarm group,alarm level) info by id. */
 	public int modifyClusterAlertById(AlarmClusterInfo cluster);
+	
+	/** Modify alert cluster(alarmtimes,isnormal) info by id. */
+	public int modifyClusterStatusAlertById(AlarmClusterInfo cluster);
 
 	/** Get all alarm cluster tasks. */
 	public List<AlarmClusterInfo> getAllAlarmClusterTasks();

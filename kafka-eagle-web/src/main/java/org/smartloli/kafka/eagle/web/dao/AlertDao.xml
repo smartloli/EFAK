@@ -118,19 +118,20 @@
 		select * from ke_alarm_consumer where `id`=#{id}
 	</select>
 
-	<select id="findAlertByCGT" parameterType="map" resultMap="alarmConsumer">
-		select * from ke_alarm
-		<where>
-			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
-		</where>
-	</select>
-
 	<delete id="deleteAlarmConsumerById" parameterType="Integer">
 		delete from ke_alarm_consumer where `id`=#{id}
 	</delete>
+	
+	<select id="getAllAlarmConsumerTasks" resultMap="alarmConsumer">
+		select * from ke_alarm_consumer where `is_enable`='Y'
+	</select>
 
 	<update id="modifyAlarmConsumerById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
 		update ke_alarm_consumer set `lag`=#{lag},`alarm_group`=#{alarmGroup},`alarm_max_times`=#{alarmMaxTimes},`alarm_level`=#{alarmLevel},`modify`=#{modify} where `id`=#{id}
+	</update>
+	
+	<update id="modifyConsumerStatusAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
+		update ke_alarm_consumer set `alarm_times`=#{alarmTimes},`is_normal`=#{isNormal},`modify`=#{modify} where `id`=#{id}
 	</update>
 	
 	<insert id="insertAlarmCluster" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
@@ -166,6 +167,10 @@
 
 	<update id="modifyClusterAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
 		update ke_alarm_clusters set `server`=#{server},`alarm_group`=#{alarmGroup},`alarm_max_times`=#{alarmMaxTimes},`alarm_level`=#{alarmLevel},`modify`=#{modify} where `id`=#{id}
+	</update>
+	
+	<update id="modifyClusterStatusAlertById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
+		update ke_alarm_clusters set `alarm_times`=#{alarmTimes},`is_normal`=#{isNormal},`modify`=#{modify} where `id`=#{id}
 	</update>
 
 	<select id="getAllAlarmClusterTasks" resultMap="clustersInfo">

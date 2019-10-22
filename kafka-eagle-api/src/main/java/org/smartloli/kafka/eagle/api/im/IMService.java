@@ -33,9 +33,11 @@ public interface IMService {
 	public void sendGetMsgByDingDing(String data, String url);
 
 	/** Send alert message by wechat. */
-	public void sendJsonMsgByWeChat(String data);
+	public void sendJsonMsgByWeChat(String data,String url);
 
 	/** Send alert message by webhook. */
-	public void sendJsonMsgByWebhook(String data, String maillist);
+	public void sendPostMsgByWebhook(String data, String url);
+	
+	public void sendGetMsgByWebhook(String data, String url);
 
 }

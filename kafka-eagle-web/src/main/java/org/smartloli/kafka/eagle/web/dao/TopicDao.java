@@ -93,4 +93,7 @@ public interface TopicDao {
 	/** Get bscreen consumer by today, such logsize offset and lag diff. */
 	public List<BScreenConsumerInfo> queryTodayBScreenConsumer(Map<String, Object> params);
 
+	/** Get lastest lag used to alarm consumer. */
+	public long queryLastestLag(Map<String, Object> params);
+
 }

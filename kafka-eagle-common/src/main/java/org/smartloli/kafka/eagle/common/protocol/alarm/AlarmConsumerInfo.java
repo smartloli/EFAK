@@ -30,12 +30,13 @@ public class AlarmConsumerInfo extends BaseProtocol {
 
 	private int id;
 	private String cluster = "";
+	/** Consumer group name. */
 	private String group = "";
 	private String topic = "";
 	private long lag = 0L;
 	private String alarmGroup = "";
 	private int alarmTimes;
-	private int alarmMaxTimes ;
+	private int alarmMaxTimes;
 	private String alarmLevel = "";
 	private String isNormal = "";
 	private String isEnable = "";
@@ -50,6 +51,7 @@ public class AlarmConsumerInfo extends BaseProtocol {
 		this.id = id;
 	}
 
+	/** Consumer group name. */
 	public String getGroup() {
 		return group;
 	}
@@ -81,8 +83,6 @@ public class AlarmConsumerInfo extends BaseProtocol {
 	public void setLag(long lag) {
 		this.lag = lag;
 	}
-
-	
 
 	public String getAlarmGroup() {
 		return alarmGroup;

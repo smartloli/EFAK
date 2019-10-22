@@ -30,6 +30,7 @@ import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.dao.AlertDao;
+import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,9 @@ public class AlertServiceImpl implements AlertService {
 
 	@Autowired
 	private AlertDao alertDao;
+	
+	@Autowired
+	private TopicDao topicDao;
 
 	@Override
 	public int insertAlarmConsumer(AlarmConsumerInfo alarmConsumer) {
@@ -207,11 +211,6 @@ public class AlertServiceImpl implements AlertService {
 	@Override
 	public int modifyAlarmConsumerById(AlarmConsumerInfo alarmConsumer) {
 		return alertDao.modifyAlarmConsumerById(alarmConsumer);
-	}
-
-	@Override
-	public AlarmConsumerInfo findAlertByCGT(Map<String, Object> params) {
-		return alertDao.findAlertByCGT(params);
 	}
 
 	@Override
@@ -387,6 +386,26 @@ public class AlertServiceImpl implements AlertService {
 	@Override
 	public AlarmConsumerInfo findAlarmConsumerAlertById(int id) {
 		return alertDao.findAlarmConsumerAlertById(id);
+	}
+
+	@Override
+	public int modifyClusterStatusAlertById(AlarmClusterInfo cluster) {
+		return alertDao.modifyClusterStatusAlertById(cluster);
+	}
+
+	@Override
+	public List<AlarmConsumerInfo> getAllAlarmConsumerTasks() {
+		return alertDao.getAllAlarmConsumerTasks();
+	}
+
+	@Override
+	public long queryLastestLag(Map<String, Object> params) {
+		return topicDao.queryLastestLag(params);
+	}
+
+	@Override
+	public int modifyConsumerStatusAlertById(AlarmConsumerInfo alarmConsumer) {
+		return alertDao.modifyConsumerStatusAlertById(alarmConsumer);
 	}
 
 }
