@@ -62,7 +62,7 @@ $(document).ready(function() {
 		} else if (text.indexOf("WeChat") > -1) {
 			$("#div_alarm_http").show();
 			$("#div_alarm_address").hide();
-			$("#ke_alarm_url").attr('placeholder', "http://127.0.0.1:10086/wechat");
+			$("#ke_alarm_url").attr('placeholder', "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=");
 		}
 	});
 

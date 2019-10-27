@@ -202,7 +202,7 @@ public class KConstants {
 
 	public interface AlarmType {
 		//public static String[] TYPE = new String[] { "Email", "DingDing", "WeChat", "WebHook" };
-		public static String[] TYPE = new String[] { "DingDing" };
+		public static String[] TYPE = new String[] { "DingDing","WeChat" };
 		public static String[] CLUSTER = new String[] { "Kafka", "Zookeeper" };
 		public static String[] LEVEL = new String[] { "P0", "P1", "P2", "P3" };
 		public static int[] MAXTIMES = new int[] { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };

@@ -80,7 +80,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_KE_TOPIC_RANK = "CREATE TABLE IF NOT EXISTS `ke_topic_rank` (`cluster` varchar(64) NOT NULL,`topic` varchar(64) NOT NULL,`tkey` varchar(64) NOT NULL,`tvalue` bigint(20) DEFAULT NULL,PRIMARY KEY (`cluster`,`topic`,`tkey`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_SQL_HISTORY = "CREATE TABLE IF NOT EXISTS `ke_sql_history` (`cluster` varchar(64) DEFAULT NULL,`username` varchar(64) DEFAULT NULL,`ksql` text DEFAULT NULL,`status` varchar(16) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_SQL_HISTORY = "CREATE TABLE IF NOT EXISTS `ke_sql_history` (`id` int(11) NOT NULL AUTO_INCREMENT, `cluster` varchar(64) DEFAULT NULL,`username` varchar(64) DEFAULT NULL,`host` varchar(128) DEFAULT NULL,`ksql` text DEFAULT NULL,`status` varchar(16) DEFAULT NULL,`spend_time` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_LOGSIZE = "CREATE TABLE IF NOT EXISTS `ke_logsize` (`cluster` varchar(64) DEFAULT NULL,`topic` varchar(64) DEFAULT NULL,`logsize` bigint(20) DEFAULT NULL,`diffval` bigint(20) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -114,7 +114,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_SQLITE_KE_TOPIC_RANK = "CREATE TABLE IF NOT EXISTS `ke_topic_rank` (`cluster` varchar(64) ,`topic` varchar(128) ,`tkey` varchar(128) ,`tvalue` bigint(20),primary key (`cluster`,`topic`,`tkey`))";
 
-	static String CREATE_TABLE_SQLITE_KE_SQL_HISTORY = "CREATE TABLE IF NOT EXISTS `ke_sql_history` (`cluster` varchar(64) ,`username` varchar(64) ,`ksql` text ,`status` varchar(16) ,`timespan` bigint(20) ,`tm` varchar(16))";
+	static String CREATE_TABLE_SQLITE_KE_SQL_HISTORY = "CREATE TABLE IF NOT EXISTS `ke_sql_history` (`id` integer primary key autoincrement,`cluster` varchar(64) ,`username` varchar(64),`host` varchar(128) ,`ksql` text ,`status` varchar(16) ,`spend_time` bigint(20) ,`tm` varchar(16))";
 
 	static String CREATE_TABLE_SQLITE_KE_LOGSIZE = "CREATE TABLE IF NOT EXISTS `ke_logsize` (`cluster` varchar(64) ,`topic` varchar(64) ,`logsize` bigint(20) ,`diffval` bigint(20) ,`timespan` bigint(20) ,`tm` varchar(16))";
 
