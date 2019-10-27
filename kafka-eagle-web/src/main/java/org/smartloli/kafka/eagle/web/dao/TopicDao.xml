@@ -3,11 +3,14 @@
 <mapper namespace="org.smartloli.kafka.eagle.web.dao.TopicDao">
 
 	<resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory" id="tsql">
+		<result property="id" column="id" />
 		<result property="cluster" column="cluster" />
 		<result property="username" column="username" />
+		<result property="host" column="host" />
 		<result property="ksql" column="ksql" />
 		<result property="status" column="status" />
-		<result property="timespan" column="timespan" />
+		<result property="spendTime" column="spend_time" />
+		<result property="created" column="created" />
 		<result property="tm" column="tm" />
 	</resultMap>
 
@@ -97,16 +100,20 @@
 
 	<!-- TopicSqlHistory -->
 	<select id="readTopicSqlHistory" parameterType="map" resultMap="tsql">
-		select `ksql`,`status`,`timespan` from ke_sql_history
-		where `cluster`=#{cluster} and `username`=#{username} limit #{start},#{size}
+		select * from ke_sql_history
+		where `cluster`=#{cluster} and `username`=#{username} 
+		<if test="search != '' and search != null">
+			`username` like #{search} or `host` like #{search}
+		</if>
+		limit #{start},#{size}
 	</select>
 
 	<insert id="writeTopicSqlHistory" parameterType="java.util.List">
 		insert into
-		ke_sql_history(`cluster`,`username`,`ksql`,`status`,`timespan`,`tm`)
+		ke_sql_history(`cluster`,`username`,`host`,`ksql`,`status`,`spend_time`,`created`,`tm`)
 		values
 		<foreach collection="list" item="item" index="index" separator=",">
-			(#{item.cluster},#{item.username},#{item.ksql},#{item.status},#{item.timespan},#{item.tm})
+			(#{item.cluster},#{item.username},#{item.host},#{item.ksql},#{item.status},#{item.spendTime},#{item.created},#{item.tm})
 		</foreach>
 	</insert>
 

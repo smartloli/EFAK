@@ -295,4 +295,9 @@ public class MetricsServiceImpl implements MetricsService {
 		return topicDao.readBScreenLastTopic(params);
 	}
 
+	@Override
+	public void cleanTopicSqlHistory(int tm) {
+		topicDao.cleanTopicSqlHistory(tm);
+	}
+
 }

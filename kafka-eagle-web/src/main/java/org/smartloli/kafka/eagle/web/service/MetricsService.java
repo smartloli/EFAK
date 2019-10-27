@@ -57,6 +57,9 @@ public interface MetricsService {
 
 	/** Crontab clean topic rank history data. */
 	public void cleanTopicRank(int tm);
+	
+	/** Crontab clean topic sql history data. */
+	public void cleanTopicSqlHistory(int tm);
 
 	/** Crontab clean big screen topic history data. */
 	public void cleanBScreenConsumerTopic(int tm);

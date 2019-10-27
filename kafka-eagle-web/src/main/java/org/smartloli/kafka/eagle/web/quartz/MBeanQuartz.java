@@ -74,6 +74,7 @@ public class MBeanQuartz {
 			metrics.cleanConsumerTopic(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
 			metrics.cleanTopicLogSize(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
 			metrics.cleanBScreenConsumerTopic(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
+			metrics.cleanTopicSqlHistory(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 7 : retain)));
 		}
 	}
 
