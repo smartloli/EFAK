@@ -41,13 +41,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
 
 import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.ConsumerGroupListing;
-import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
-import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsOptions;
-import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
-import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
-import org.apache.kafka.clients.admin.MemberDescription;
+import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -517,14 +511,24 @@ public class KafkaServiceImpl implements KafkaService {
 			targets.put("status", "error");
 			targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
 			return targets;
+		}        
+        Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, clusterAlias);
 		}
-		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		AdminZkClient adminZkCli = new AdminZkClient(zkc);
-		adminZkCli.createTopic(topicName, Integer.parseInt(partitions), Integer.parseInt(replic), new Properties(), RackAwareMode.Enforced$.MODULE$);
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
-			adminZkCli = null;
+
+		AdminClient adminClient = null;
+		try {
+			adminClient = AdminClient.create(prop);
+            NewTopic newTopic = new NewTopic(topicName, Integer.valueOf(partitions), Short.valueOf(replic));
+            adminClient.createTopics(Collections.singleton(newTopic)).all().get();
+		} catch (Exception e) {
+			LOG.info("Create kafka topic has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			adminClient.close();
 		}
 
 		targets.put("status", "success");
@@ -535,20 +539,25 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Delete topic to kafka cluster. */
 	public Map<String, Object> delete(String clusterAlias, String topicName) {
 		Map<String, Object> targets = new HashMap<String, Object>();
-		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		AdminZkClient adminZkCli = new AdminZkClient(zkc);
-		adminZkCli.deleteTopic(topicName);
-		boolean dt = zkc.deleteRecursive(DELETE_TOPICS_PATH + "/" + topicName);
-		boolean bt = zkc.deleteRecursive(BROKER_TOPICS_PATH + "/" + topicName);
-		if (dt && bt) {
-			targets.put("status", "success");
-		} else {
-			targets.put("status", "failed");
+        Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			sasl(prop, clusterAlias);
 		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
-		}
+
+		AdminClient adminClient = null;
+		try {
+			adminClient = AdminClient.create(prop);
+            adminClient.deleteTopics(Collections.singleton(topicName)).all().get();
+            targets.put("status", "success");
+		} catch (Exception e) {
+			LOG.info("Delete kafka topic has error, msg is " + e.getMessage());
+			e.printStackTrace();
+            targets.put("status", "failed");
+		} finally {
+			adminClient.close();
+		}        
 		return targets;
 	}
 
