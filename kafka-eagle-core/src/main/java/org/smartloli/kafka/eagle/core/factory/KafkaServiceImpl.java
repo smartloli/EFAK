@@ -512,7 +512,7 @@ public class KafkaServiceImpl implements KafkaService {
 			targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
 			return targets;
 		}        
-        Properties prop = new Properties();
+		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
@@ -522,8 +522,8 @@ public class KafkaServiceImpl implements KafkaService {
 		AdminClient adminClient = null;
 		try {
 			adminClient = AdminClient.create(prop);
-            NewTopic newTopic = new NewTopic(topicName, Integer.valueOf(partitions), Short.valueOf(replic));
-            adminClient.createTopics(Collections.singleton(newTopic)).all().get();
+			NewTopic newTopic = new NewTopic(topicName, Integer.valueOf(partitions), Short.valueOf(replic));
+			adminClient.createTopics(Collections.singleton(newTopic)).all().get();
 		} catch (Exception e) {
 			LOG.info("Create kafka topic has error, msg is " + e.getMessage());
 			e.printStackTrace();
@@ -539,7 +539,7 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Delete topic to kafka cluster. */
 	public Map<String, Object> delete(String clusterAlias, String topicName) {
 		Map<String, Object> targets = new HashMap<String, Object>();
-        Properties prop = new Properties();
+		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
@@ -549,8 +549,8 @@ public class KafkaServiceImpl implements KafkaService {
 		AdminClient adminClient = null;
 		try {
 			adminClient = AdminClient.create(prop);
-            adminClient.deleteTopics(Collections.singleton(topicName)).all().get();
-            targets.put("status", "success");
+			adminClient.deleteTopics(Collections.singleton(topicName)).all().get();
+			targets.put("status", "success");
 		} catch (Exception e) {
 			LOG.info("Delete kafka topic has error, msg is " + e.getMessage());
 			e.printStackTrace();
