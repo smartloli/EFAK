@@ -101,3 +101,4 @@ Thanks to the following members for maintaining the project.
 |hexiang|[hexian55](https://github.com/hexian55)|hexiang55@gmail.com|
 |cocodroid|[cocodroid](https://github.com/cocodroid)|sujunguang@gmail.com|
 |alisa|[alisa](https://github.com/zoumm)|alisazou1211@gmail.com|
+|iamwzt|[iamwzt](https://github.com/iamwzt)|981911861@qq.com|
