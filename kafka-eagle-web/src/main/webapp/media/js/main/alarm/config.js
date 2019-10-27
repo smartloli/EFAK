@@ -82,7 +82,7 @@ $(document).ready(function() {
 				dataType : 'json',
 				url : '/ke/alarm/config/test/send/ajax?type=' + type + '&url=' + url + '&http=' + http + '&msg=' + msg,
 				success : function(datas) {
-					if (type.indexOf("DingDing") > -1) {
+					if (type.indexOf("DingDing") > -1 || type.indexOf("WeChat") > -1) {
 						if (datas.errcode == 0) {
 							$("#success_mssage_alarm_config").show();
 							setTimeout(function() {

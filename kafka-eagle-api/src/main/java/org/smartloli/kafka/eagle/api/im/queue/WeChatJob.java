@@ -15,29 +15,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.util;
+package org.smartloli.kafka.eagle.api.im.queue;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.util.KConstants.IM;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
+import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
 import org.smartloli.kafka.eagle.common.util.KConstants.WeChat;
 
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * Send alert util.
+ * Add alarm message to wechat job queue.
  * 
  * @author smartloli.
  *
- *         Created by Oct 6, 2019
+ *         Created by Oct 27, 2019
  */
-public class AlertUtils {
+public class WeChatJob implements Job {
 
-	/** Send Json msg by wechat. */
-	public static String sendTestMsgByWeChat(String url, String data) {
-		Map<String, Object> wechatMarkdownMessage = getWeChatMarkdownMessage(data);
-		return HttpClientUtils.doPostJson(url, JSONObject.toJSONString(wechatMarkdownMessage));
+	@Override
+	public void execute(JobExecutionContext jobContext) throws JobExecutionException {
+		BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
+		sendMsg(bjc.getData(), bjc.getUrl());
+	}
+
+	private int sendMsg(String data, String url) {
+		try {
+			Map<String, Object> wechatMarkdownMessage = getWeChatMarkdownMessage(data);
+			HttpClientUtils.doPostJson(url, JSONObject.toJSONString(wechatMarkdownMessage));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+		return 1;
 	}
 
 	private static Map<String, Object> getWeChatMarkdownMessage(String text) {
@@ -52,35 +68,6 @@ public class AlertUtils {
 		map.put("toparty", WeChat.TOPARTY);
 		map.put("totag", WeChat.TOTAG);
 		map.put("agentid", WeChat.AGENTID);
-
-		return map;
-	}
-	
-	/** Send Json msg by dingding. */
-	public static String sendTestMsgByDingDing(String uri, String data) {
-		Map<String, Object> dingDingMarkdownMessage = getDingDingMarkdownMessage(IM.TITLE, data, true);
-		return HttpClientUtils.doPostJson(uri, JSONObject.toJSONString(dingDingMarkdownMessage));
-	}
-
-	/**
-	 * create markdown format map, do not point @user, option @all.
-	 * 
-	 * @param title
-	 * @param text
-	 * @param isAtAll
-	 */
-	private static Map<String, Object> getDingDingMarkdownMessage(String title, String text, boolean isAtAll) {
-		Map<String, Object> map = new HashMap<>();
-		map.put("msgtype", "markdown");
-
-		Map<String, Object> markdown = new HashMap<>();
-		markdown.put("title", title);
-		markdown.put("text", text);
-		map.put("markdown", markdown);
-
-		Map<String, Object> at = new HashMap<>();
-		at.put("isAtAll", false);
-		map.put("at", at);
 
 		return map;
 	}

@@ -28,12 +28,15 @@ import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
  */
 public class TopicSqlHistory extends BaseProtocol {
 
-	private String cluster = "";
-	private String username = "";
-	private String ksql = "";
-	private String status = "";
-	private long timespan = 0L;
-	private String tm = "";
+	private int id;
+	private String cluster;
+	private String username;
+	private String host;
+	private String ksql;
+	private String status;
+	private String spendTime;
+	private String created;
+	private String tm;
 
 	public String getCluster() {
 		return cluster;
@@ -67,12 +70,36 @@ public class TopicSqlHistory extends BaseProtocol {
 		this.status = status;
 	}
 
-	public long getTimespan() {
-		return timespan;
+	public int getId() {
+		return id;
 	}
 
-	public void setTimespan(long timespan) {
-		this.timespan = timespan;
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public String getSpendTime() {
+		return spendTime;
+	}
+
+	public void setSpendTime(String spendTime) {
+		this.spendTime = spendTime;
+	}
+
+	public String getCreated() {
+		return created;
+	}
+
+	public void setCreated(String created) {
+		this.created = created;
 	}
 
 	public String getTm() {

@@ -29,11 +29,8 @@ public interface IMService {
 	/** Send post request alert message by dingding. */
 	public void sendPostMsgByDingDing(String data, String url);
 
-	/** Send get request alert message by dingding. */
-	public void sendGetMsgByDingDing(String data, String url);
-
 	/** Send alert message by wechat. */
-	public void sendJsonMsgByWeChat(String data,String url);
+	public void sendPostMsgByWeChat(String data,String url);
 
 	/** Send alert message by webhook. */
 	public void sendPostMsgByWebhook(String data, String url);

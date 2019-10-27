@@ -901,11 +901,7 @@ public class AlarmController {
 			String msg = request.getParameter("msg");
 			String result = "";
 			if (AlarmType.EMAIL.equals(type)) {
-				if (AlarmType.HTTP_GET.equals(http)) {
-					// send get request
-				} else if (AlarmType.HTTP_POST.equals(http)) {
-					// send post request
-				}
+				
 			} else if (AlarmType.DingDing.equals(type)) {
 				result = AlertUtils.sendTestMsgByDingDing(url, msg);
 			} else if (AlarmType.WebHook.equals(type)) {
@@ -915,7 +911,7 @@ public class AlarmController {
 					// send post request
 				}
 			} else if (AlarmType.WeChat.equals(type)) {
-				// default post request
+				result = AlertUtils.sendTestMsgByWeChat(url, msg);
 			}
 			byte[] output = result.getBytes();
 			BaseController.response(output, response);

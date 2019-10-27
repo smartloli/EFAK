@@ -15,27 +15,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.util;
+package org.smartloli.kafka.eagle.common.protocol.alarm.queue;
 
-import java.util.Date;
-
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
-import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * TODO
+ * Defind quartz job context schema.
  * 
  * @author smartloli.
  *
- *         Created by Oct 25, 2019
+ *         Created by Oct 27, 2019
  */
-public class TestJob implements Job {
-	@Override
-	public void execute(JobExecutionContext arg0) throws JobExecutionException {
-		BaseJobContext bjc = (BaseJobContext) arg0.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
-		System.out.println("kafka eagle quartz job, date : [" + new Date().toString() + "],[" + bjc + "]");
+public class BaseJobContext extends BaseProtocol {
+
+	private String data;
+	private String url;
+
+	public String getData() {
+		return data;
 	}
+
+	public void setData(String data) {
+		this.data = data;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 }

@@ -29,6 +29,8 @@ import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 public class AlarmMessageInfo extends BaseProtocol {
 
 	/**
+	 * AlarmID : [ 1 ]
+	 * 
 	 * AlarmStatus : [ PROBLEM ]
 	 * 
 	 * AlarmLevel : [ P0 ]
@@ -50,15 +52,16 @@ public class AlarmMessageInfo extends BaseProtocol {
 	private String alarmTimes;
 	private String alarmContent;
 	private String alarmDate;
+	private int alarmId;
 
 	public String toDingDingMarkDown() {
-		return title + " \n\n>#### AlarmStatus : [ **" + alarmStatus + "** ]\n" + "> #### AlarmLevel : [ " + alarmLevel + " ]\n" + "> #### AlarmProject : [ " + alarmProject + " ]\n" + "> #### AlarmTimes : [ " + alarmTimes + " ]\n"
-				+ "> #### AlarmDate : [ " + alarmDate + " ]\n" + "> #### AlarmContent : [ " + alarmContent + " ]";
+		return title + " \n\n>#### AlarmID : [ **" + alarmId + "** ]\n> #### AlarmStatus : [ **" + alarmStatus + "** ]\n> #### AlarmLevel : [ " + alarmLevel + " ]\n" + "> #### AlarmProject : [ " + alarmProject + " ]\n"
+				+ "> #### AlarmTimes : [ " + alarmTimes + " ]\n" + "> #### AlarmDate : [ " + alarmDate + " ]\n" + "> #### AlarmContent : [ " + alarmContent + " ]";
 	}
-	
+
 	public String toWeChatMarkDown() {
-		return title + " \n\n>AlarmStatus : [ **" + alarmStatus + "** ]\n" + "> AlarmLevel : [ " + alarmLevel + " ]\n" + "> AlarmProject : [ " + alarmProject + " ]\n" + "> AlarmTimes : [ " + alarmTimes + " ]\n"
-				+ "> AlarmDate : [ " + alarmDate + " ]\n" + "> AlarmContent : [ " + alarmContent + " ]";
+		return title + " \n\n>AlarmID : [ **" + alarmId + "** ]\n> AlarmStatus : [ **" + alarmStatus + "** ]\n" + "> AlarmLevel : [ " + alarmLevel + " ]\n" + "> AlarmProject : [ " + alarmProject + " ]\n" + "> AlarmTimes : [ " + alarmTimes
+				+ " ]\n" + "> AlarmDate : [ " + alarmDate + " ]\n" + "> AlarmContent : [ " + alarmContent + " ]";
 	}
 
 	public String getTitle() {
@@ -115,6 +118,14 @@ public class AlarmMessageInfo extends BaseProtocol {
 
 	public void setAlarmDate(String alarmDate) {
 		this.alarmDate = alarmDate;
+	}
+
+	public int getAlarmId() {
+		return alarmId;
+	}
+
+	public void setAlarmId(int alarmId) {
+		this.alarmId = alarmId;
 	}
 
 }

@@ -32,6 +32,8 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
+import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
+import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
 
 /**
  * Used to schedule and send different types of alarm queue information. Such as
@@ -47,10 +49,11 @@ public class QuartzManagerUtils {
 	private static SchedulerFactory schedulerFactory = new StdSchedulerFactory();
 
 	/** Add new job. */
-	public static void addJob(String jobName, Class<? extends Job> jobClass, String cron) {
+	public static void addJob(BaseJobContext jobContext,String jobName, Class<? extends Job> jobClass, String cron) {
 		try {
 			Scheduler sched = schedulerFactory.getScheduler();
 			JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, KE_JOB_GROUP_NAME).build();
+			jobDetail.getJobDataMap().put(AlarmQueue.JOB_PARAMS, jobContext);
 			TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
 			triggerBuilder.withIdentity("ke_trigger_name_" + new Date().getTime(), "ke_trigger_group_" + new Date().getTime());
 			triggerBuilder.startNow();

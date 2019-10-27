@@ -17,13 +17,10 @@
  */
 package org.smartloli.kafka.eagle.api.sms;
 
-import org.smartloli.kafka.eagle.api.email.module.ClusterContentModule;
-import org.smartloli.kafka.eagle.api.email.module.LagContentModule;
 import org.smartloli.kafka.eagle.api.im.IMFactory;
 import org.smartloli.kafka.eagle.api.im.IMService;
 import org.smartloli.kafka.eagle.api.im.IMServiceImpl;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 
 /**
  * TODO
@@ -34,9 +31,8 @@ import org.smartloli.kafka.eagle.common.util.CalendarUtils;
  */
 public class TestIM {
 	public static void main(String[] args) {
-		testAlarmClusterByDingDingMarkDown();
-		//testAlarmClusterByWeChatMarkDown();
-		//testConsumerHeathyByWeChat();
+//		testAlarmClusterByDingDingMarkDown();
+		testAlarmClusterByWeChatMarkDown();
 		
 	}
 	
@@ -56,7 +52,7 @@ public class TestIM {
 		alarmMsg.setAlarmTimes("current(1), max(7)");
 
 		 IMServiceImpl im = new IMServiceImpl();
-		 im.sendJsonMsgByWeChat(alarmMsg.toWeChatMarkDown(),"https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=maMN2krp0GwiyxoA6JCULLk8oLHwfnjnojeYGma_5KG5J_JHqTledeY6AHWE2rwLTF6I5yqu5LJUmUpSn7feXauFySZtnOGlAvRACz33V2UegR596xuyOT4fZIfNzB1cqJi3A-Eahbw7UVG2a8AaHvN0ZrSRPkQiqWola5p71FfCpnuDEAw63THmURdfMIcF3QB5KFzl-qHblqXfQLtpeA");
+		 im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(),"https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=7F6VllJEZg3vmJMpUby7EODzLIYO7enPM63upDItIPKj2HQ5scEDtbHX6-Fb2Ruz87qjuiMpTLT0l9gfllXwhN_7gG_4QIhXBsvAx2A9zNwWmGz_v_8VoTHxEM8GK7LMn2_AZValKjB-U7XxIfwrcMXx1Im9wX8rw72gLU_9onCAVKNJVvP5DTDyIPCXAR6B7KuBnaI86mqS8mg3KTT5ug");
 	}
 
 	/** New alarm im api. */
@@ -80,49 +76,4 @@ public class TestIM {
 		//im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(),"https://oapi.dingtalk.com/robot/send?access_token=3b7b59d17db0145549b1f65f62921b44bacd1701e635e797da45318a94339060");
 	}
 
-	private static void testConsumerHeathyByWeChat() {
-		ClusterContentModule ccm = new ClusterContentModule();
-		ccm.setCluster("cluster2");
-		ccm.setServer("kafka-node-01:9093");
-		ccm.setTime(CalendarUtils.getDate());
-		ccm.setType("Kafka");
-		ccm.setUser("smartloli.org@gmail.com");
-
-		LagContentModule lcm = new LagContentModule();
-		lcm.setCluster("cluster2");
-		lcm.setConsumerLag("50000");
-		lcm.setGroup("ke-storm-group");
-		lcm.setLagThreshold("2000");
-		lcm.setTime(CalendarUtils.getDate());
-		lcm.setTopic("ke-t-storm-money");
-		lcm.setType("Consumer");
-		lcm.setUser("smartloli.org@gmail.com");
-
-		IMServiceImpl im = new IMServiceImpl();
-		im.sendJsonMsgByWeChat(ccm.toWeChatMarkDown(),"https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=maMN2krp0GwiyxoA6JCULLk8oLHwfnjnojeYGma_5KG5J_JHqTledeY6AHWE2rwLTF6I5yqu5LJUmUpSn7feXauFySZtnOGlAvRACz33V2UegR596xuyOT4fZIfNzB1cqJi3A-Eahbw7UVG2a8AaHvN0ZrSRPkQiqWola5p71FfCpnuDEAw63THmURdfMIcF3QB5KFzl-qHblqXfQLtpeA");
-		im.sendJsonMsgByWeChat(lcm.toWeChatMarkDown(),"https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=maMN2krp0GwiyxoA6JCULLk8oLHwfnjnojeYGma_5KG5J_JHqTledeY6AHWE2rwLTF6I5yqu5LJUmUpSn7feXauFySZtnOGlAvRACz33V2UegR596xuyOT4fZIfNzB1cqJi3A-Eahbw7UVG2a8AaHvN0ZrSRPkQiqWola5p71FfCpnuDEAw63THmURdfMIcF3QB5KFzl-qHblqXfQLtpeA");
-	}
-
-	private static void testClusterHeathyByDingDing() {
-		ClusterContentModule ccm = new ClusterContentModule();
-		ccm.setCluster("cluster2");
-		ccm.setServer("zookeeper-node-01:2183");
-		ccm.setTime(CalendarUtils.getDate());
-		ccm.setType("Zookeeper");
-		ccm.setUser("smartloli.org@gmail.com");
-
-		LagContentModule lcm = new LagContentModule();
-		lcm.setCluster("cluster2");
-		lcm.setConsumerLag("50000");
-		lcm.setGroup("ke-storm-group");
-		lcm.setLagThreshold("2000");
-		lcm.setTime(CalendarUtils.getDate());
-		lcm.setTopic("ke-t-storm-money");
-		lcm.setType("Consumer");
-		lcm.setUser("smartloli.org@gmail.com");
-
-		IMServiceImpl im = new IMServiceImpl();
-		// im.sendJsonMsgByDingDing(ccm.toDingDingMarkDown());
-		// im.sendJsonMsgByDingDing(lcm.toDingDingMarkDown());
-	}
 }

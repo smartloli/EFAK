@@ -19,6 +19,8 @@ package org.smartloli.kafka.eagle.common.util;
 
 import java.util.Date;
 
+import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
+
 /**
  * TODO
  * 
@@ -32,8 +34,11 @@ public class TestQuartzManagerUtils {
 		System.out.println("Send msg, date : [" + new Date().toString() + "]");
 		String jobName = "ke_job_id_" + new Date().getTime();
 		String jobName2 = "ke_job2_id_" + new Date().getTime();
-		QuartzManagerUtils.addJob(jobName, TestJob.class, QuartzManagerUtils.getCron(new Date(), 5));
-		QuartzManagerUtils.addJob(jobName2, TestJob.class, QuartzManagerUtils.getCron(new Date(), 10));
+		BaseJobContext bjc = new BaseJobContext();
+		bjc.setData("test");
+		bjc.setUrl("http://www.kafka-eagle.org");
+		QuartzManagerUtils.addJob(bjc,jobName, TestJob.class, QuartzManagerUtils.getCron(new Date(), 5));
+		QuartzManagerUtils.addJob(bjc,jobName2, TestJob.class, QuartzManagerUtils.getCron(new Date(), 10));
 		// QuartzManagerUtils.addJob("ke_job_id_" + new Date().getTime(),
 		// TestJob.class, QuartzManagerUtils.getCron(new Date(), 10));
 	}
