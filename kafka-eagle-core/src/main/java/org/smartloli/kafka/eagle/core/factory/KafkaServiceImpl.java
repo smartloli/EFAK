@@ -554,7 +554,7 @@ public class KafkaServiceImpl implements KafkaService {
 		} catch (Exception e) {
 			LOG.info("Delete kafka topic has error, msg is " + e.getMessage());
 			e.printStackTrace();
-            targets.put("status", "failed");
+			targets.put("status", "failed");
 		} finally {
 			adminClient.close();
 		}        
