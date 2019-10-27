@@ -41,7 +41,14 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
 
 import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.ConsumerGroupListing;
+import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
+import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsOptions;
+import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
+import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
+import org.apache.kafka.clients.admin.MemberDescription;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -80,8 +87,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import kafka.admin.RackAwareMode;
-import kafka.zk.AdminZkClient;
 import kafka.zk.KafkaZkClient;
 import scala.Option;
 import scala.Tuple2;
@@ -103,7 +108,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	private final String BROKER_IDS_PATH = "/brokers/ids";
 	private final String BROKER_TOPICS_PATH = "/brokers/topics";
-	private final String DELETE_TOPICS_PATH = "/admin/delete_topics";
+	// private final String DELETE_TOPICS_PATH = "/admin/delete_topics";
 	private final String CONSUMERS_PATH = "/consumers";
 	private final String OWNERS = "/owners";
 	private final String TOPIC_ISR = "/brokers/topics/%s/partitions/%s/state";
