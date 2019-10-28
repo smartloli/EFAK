@@ -67,8 +67,17 @@ public interface TopicDao {
 	/** Read topic sql history data. */
 	public List<TopicSqlHistory> readTopicSqlHistory(Map<String, Object> params);
 
+	/** Read topic sql history data by admin. */
+	public List<TopicSqlHistory> readTopicSqlHistoryByAdmin(Map<String, Object> params);
+
 	/** Count topic sql history. */
-	public long countTopicSqlHistory();
+	public long countTopicSqlHistory(Map<String, Object> params);
+
+	/** Count topic sql history by admin. */
+	public long countTopicSqlHistoryByAdmin(Map<String, Object> params);
+
+	/** Find topic sql history by id. */
+	public TopicSqlHistory findTopicSqlByID(Map<String, Object> params);
 
 	/** Crontab clean topic sql history data. */
 	public void cleanTopicSqlHistory(int tm);

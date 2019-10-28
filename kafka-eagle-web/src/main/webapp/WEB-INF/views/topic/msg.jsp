@@ -43,8 +43,10 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> Sample SQL query: <strong>select * from "ke_topic" where "partition" in (0,1,2) limit 10</strong><br/> 
-						<i class="fa fa-info-circle"></i> AutoComplete: Press <strong>Alt and /</strong>. 
+						<i class="fa fa-info-circle"></i> Sample SQL query: <strong>select
+							* from "ke_topic" where "partition" in (0,1,2) limit 10</strong><br /> <i
+							class="fa fa-info-circle"></i> AutoComplete: Press <strong>Alt
+							and /</strong>.
 					</div>
 				</div>
 			</div>
@@ -86,6 +88,7 @@
 									<li class="active"><a href="#log_textarea"
 										data-toggle="tab">Logs</a></li>
 									<li><a href="#result_textarea" data-toggle="tab">Result</a></li>
+									<li><a href="#ksql_history_textarea" data-toggle="tab">History</a></li>
 								</ul>
 							</div>
 							<div class="tab-content">
@@ -95,12 +98,57 @@
 									</form>
 								</div>
 								<div id="result_textarea" class="tab-pane fade"></div>
+								<div id="ksql_history_textarea" class="tab-pane fade">
+									<table id="ksql_history_result" class="table table-bordered table-condensed"
+										width="100%">
+										<thead>
+											<tr>
+												<th>ID</th>
+												<th>User</th>
+												<th>Host</th>
+												<th>KSQL</th>
+												<th>Status</th>
+												<th>Spent</th>
+												<th>Created</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
 							</div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
 				</div>
 				<!-- /.col-lg-4 -->
+			</div>
+			<!-- More then detail -->
+			<div class="modal fade" aria-labelledby="keModalLabelModify"
+				aria-hidden="true" id="ke_sql_query_detail" tabindex="-1"
+				role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabelModify">Detail</h4>
+						</div>
+						<!-- /.row -->
+						<fieldset class="form-horizontal">
+							<div class="form-group">
+								<label for="path" class="col-sm-2 control-label">Content</label>
+								<div class="col-sm-9">
+									<textarea id="ke_sql_query_content"
+										name="ke_sql_query_content" class="form-control"
+										readonly="readonly" rows="3"></textarea>
+								</div>
+							</div>
+						</fieldset>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">Cancle</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<!-- /#page-wrapper -->
@@ -115,6 +163,7 @@
 	<jsp:param value="plugins/codemirror/show-hint.js" name="loader" />
 	<jsp:param value="plugins/codemirror/sql-hint.js" name="loader" />
 	<jsp:param value="main/topic/msg.js" name="loader" />
+	<jsp:param value="main/topic/ksql.history.js" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
 </html>

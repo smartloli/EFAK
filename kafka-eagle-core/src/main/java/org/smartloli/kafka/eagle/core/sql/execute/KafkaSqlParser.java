@@ -75,6 +75,7 @@ public class KafkaSqlParser {
 					status.put("error", false);
 					status.put("msg", results);
 					status.put("status", "Finished by [" + (end - start) / 1000.0 + "s].");
+					status.put("spent", end - start);
 				}
 			} else {
 				status.put("error", true);

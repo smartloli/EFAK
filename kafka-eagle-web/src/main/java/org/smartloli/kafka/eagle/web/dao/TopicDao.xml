@@ -101,11 +101,28 @@
 	<!-- TopicSqlHistory -->
 	<select id="readTopicSqlHistory" parameterType="map" resultMap="tsql">
 		select * from ke_sql_history
-		where `cluster`=#{cluster} and `username`=#{username} 
-		<if test="search != '' and search != null">
-			`username` like #{search} or `host` like #{search}
-		</if>
+		<where>
+			`cluster`=#{cluster} and `username`=#{username}
+			<if test="search!=null and search!=''">
+				and `id`=#{search}
+			</if>
+		</where>
 		limit #{start},#{size}
+	</select>
+
+	<select id="readTopicSqlHistoryByAdmin" parameterType="map" resultMap="tsql">
+		select * from ke_sql_history
+		<where>
+			`cluster`=#{cluster}
+			<if test="search!=null and search!=''">
+				and (`id`=#{search} or `username`=#{search} or `host`=#{search})
+			</if>
+		</where>
+		limit #{start},#{size}
+	</select>
+
+	<select id="findTopicSqlByID" parameterType="map" resultMap="tsql">
+		select * from ke_sql_history where `id`=#{id}
 	</select>
 
 	<insert id="writeTopicSqlHistory" parameterType="java.util.List">
@@ -117,8 +134,24 @@
 		</foreach>
 	</insert>
 
-	<select id="countTopicSqlHistory" resultType="int">
+	<select id="countTopicSqlHistory" parameterType="map" resultType="long">
 		select count(*) from ke_sql_history
+		<where>
+			`cluster`=#{cluster} and `username`=#{username}
+			<if test="search!=null and search!=''">
+				and `id`=#{search}
+			</if>
+		</where>
+	</select>
+
+	<select id="countTopicSqlHistoryByAdmin" parameterType="map" resultType="long">
+		select count(*) from ke_sql_history
+		<where>
+			`cluster`=#{cluster}
+			<if test="search!=null and search!=''">
+				and (`id`=#{search} or `username`=#{search} or `host`=#{search})
+			</if>
+		</where>
 	</select>
 
 	<!-- Clean -->
@@ -177,10 +210,10 @@
 		select `difflogsize`,`diffoffsets`,`lag`,`timespan` from ke_consumer_bscreen
 		where `cluster`=#{cluster} and tm=#{tday}
 	</select>
-	
+
 	<select id="queryLastestLag" parameterType="map" resultType="long">
 		select ifnull(`lag`,0) from ke_consumer_bscreen
-		where `cluster`=#{cluster} and tm=#{tday} and `group`=#{group} and `topic`=#{topic} order by `timespan` desc limit 1 
+		where `cluster`=#{cluster} and tm=#{tday} and `group`=#{group} and `topic`=#{topic} order by `timespan` desc limit 1
 	</select>
 
 </mapper>

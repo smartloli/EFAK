@@ -34,7 +34,7 @@ public class TopicSqlHistory extends BaseProtocol {
 	private String host;
 	private String ksql;
 	private String status;
-	private String spendTime;
+	private long spendTime;
 	private String created;
 	private String tm;
 
@@ -86,11 +86,11 @@ public class TopicSqlHistory extends BaseProtocol {
 		this.host = host;
 	}
 
-	public String getSpendTime() {
+	public long getSpendTime() {
 		return spendTime;
 	}
 
-	public void setSpendTime(String spendTime) {
+	public void setSpendTime(long spendTime) {
 		this.spendTime = spendTime;
 	}
 

@@ -29,6 +29,7 @@ import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
@@ -302,6 +303,36 @@ public class TopicServiceImpl implements TopicService {
 			}
 		}
 		return array.toJSONString();
+	}
+
+	@Override
+	public int writeTopicSqlHistory(List<TopicSqlHistory> topicSqlHistorys) {
+		return topicDao.writeTopicSqlHistory(topicSqlHistorys);
+	}
+
+	@Override
+	public List<TopicSqlHistory> readTopicSqlHistory(Map<String, Object> params) {
+		return topicDao.readTopicSqlHistory(params);
+	}
+
+	@Override
+	public List<TopicSqlHistory> readTopicSqlHistoryByAdmin(Map<String, Object> params) {
+		return topicDao.readTopicSqlHistoryByAdmin(params);
+	}
+
+	@Override
+	public long countTopicSqlHistory(Map<String, Object> params) {
+		return topicDao.countTopicSqlHistory(params);
+	}
+
+	@Override
+	public long countTopicSqlHistoryByAdmin(Map<String, Object> params) {
+		return topicDao.countTopicSqlHistoryByAdmin(params);
+	}
+
+	@Override
+	public TopicSqlHistory findTopicSqlByID(Map<String, Object> params) {
+		return topicDao.findTopicSqlByID(params);
 	}
 
 }
