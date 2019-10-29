@@ -125,6 +125,10 @@
 									class="alert alert-success">
 									<label>Message sent success .</label>
 								</div>
+								<div id="failed_mssage_alarm_config" style="display: none"
+									class="alert alert-danger">
+									<label>Message sent failed .</label>
+								</div>
 							</form>
 						</div>
 					</div>

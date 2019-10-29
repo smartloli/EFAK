@@ -98,4 +98,54 @@ $(document).ready(function() {
 		});
 	});
 	
+	var historyOffset = 0;
+	function viewerTopicSqlHistory() {
+		var ret = JSON.parse(dataSets);
+		var tabHeader = "<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
+		var mData = [];
+		var i = 0;
+		for ( var key in ret[0]) {
+			tabHeader += "<th>" + key + "</th>";
+			var obj = {
+				mData : key
+			};
+			mData.push(obj);
+		}
+
+		tabHeader += "</tr></thead></table></div>";
+		$("#result_textarea").append(tabHeader);
+		if (historyOffset > 0) {
+			$("#div_children" + (historyOffset - 1)).remove();
+		}
+
+		$("#result_children" + historyOffset).dataTable({
+			"searching" : false,
+			"bSort" : false,
+			"retrieve" : true,
+			"bLengthChange" : false,
+			"bProcessing" : true,
+			"bServerSide" : true,
+			"fnServerData" : retrieveData,
+			"sAjaxSource" : '/ke/topic/physics/commit/?sql=' + sql,
+			"aoColumns" : mData
+		});
+
+		function retrieveData(sSource, aoData, fnCallback) {
+			$.ajax({
+				"type" : "get",
+				"contentType" : "application/json",
+				"url" : sSource,
+				"dataType" : "json",
+				"data" : {
+					aoData : JSON.stringify(aoData)
+				},
+				"success" : function(data) {
+					fnCallback(data)
+				}
+			});
+		}
+
+		historyOffset++;
+	}
+	
 });

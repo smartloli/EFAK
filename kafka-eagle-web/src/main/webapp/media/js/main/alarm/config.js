@@ -88,6 +88,11 @@ $(document).ready(function() {
 							setTimeout(function() {
 								$("#success_mssage_alarm_config").hide()
 							}, 5000);
+						}else{
+							$("#failed_mssage_alarm_config").show();
+							setTimeout(function() {
+								$("#failed_mssage_alarm_config").hide()
+							}, 5000);
 						}
 					}
 
