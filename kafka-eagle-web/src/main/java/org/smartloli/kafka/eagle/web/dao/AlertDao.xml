@@ -93,7 +93,7 @@
 		<where>
 			`cluster`=#{cluster}
 			<if test="search!=null and search!=''">
-				and (`group`=#{search} or `topic`=#{search})
+				and (`id`=#{search} or `group`=#{search} or `topic`=#{search})
 			</if>
 		</where>
 		limit #{start},#{size}
