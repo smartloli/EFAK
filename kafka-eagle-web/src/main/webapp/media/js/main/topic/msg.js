@@ -93,41 +93,64 @@ $(document).ready(function() {
 						logEditor.setValue(datas.status);
 						viewerTopics(sql, datas.msg);
 					}
+					viewerTopicSqlHistory();
 				}
 			}
 		});
 	});
-	
+
 	var historyOffset = 0;
 	function viewerTopicSqlHistory() {
-		var ret = JSON.parse(dataSets);
-		var tabHeader = "<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
-		var mData = [];
+		var thList = [ {
+			th : "ID",
+			column : "id"
+		}, {
+			th : "User",
+			column : "username"
+		}, {
+			th : "Host",
+			column : "host"
+		}, {
+			th : "KSQL",
+			column : "ksql"
+		}, {
+			th : "Status",
+			column : "status"
+		}, {
+			th : "Spent",
+			column : "spendTime"
+		}, {
+			th : "Created",
+			column : "created"
+		} ];
+		var ksqlTabHeader = "<div class='panel-body' id='div_ksql_children" + historyOffset + "'><table id='result_ksql_children" + historyOffset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
+		var ksqlMData = [];
 		var i = 0;
-		for ( var key in ret[0]) {
-			tabHeader += "<th>" + key + "</th>";
+		for (var i = 0; i < thList.length; i++) {
+			ksqlTabHeader += "<th>" + thList[i].th + "</th>";
 			var obj = {
-				mData : key
+				mData : thList[i].column
 			};
-			mData.push(obj);
+			ksqlMData.push(obj);
 		}
 
-		tabHeader += "</tr></thead></table></div>";
-		$("#result_textarea").append(tabHeader);
+		ksqlTabHeader += "</tr></thead></table></div>";
+		$("#ksql_history_result_div").append(ksqlTabHeader);
 		if (historyOffset > 0) {
-			$("#div_children" + (historyOffset - 1)).remove();
+			$("#div_ksql_children" + (historyOffset - 1)).remove();
+		} else {
+			$("#ksql_history_result0").remove("");
 		}
 
-		$("#result_children" + historyOffset).dataTable({
-			"searching" : false,
+		$("#result_ksql_children" + historyOffset).dataTable({
 			"bSort" : false,
 			"retrieve" : true,
 			"bLengthChange" : false,
 			"bProcessing" : true,
 			"bServerSide" : true,
 			"fnServerData" : retrieveData,
-			"sAjaxSource" : '/ke/topic/physics/commit/?sql=' + sql,
-			"aoColumns" : mData
+			"sAjaxSource" : '/ke/topic/sql/history/ajax',
+			"aoColumns" : ksqlMData
 		});
 
 		function retrieveData(sSource, aoData, fnCallback) {
@@ -147,5 +170,5 @@ $(document).ready(function() {
 
 		historyOffset++;
 	}
-	
+
 });

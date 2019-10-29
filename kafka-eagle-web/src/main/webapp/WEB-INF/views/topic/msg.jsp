@@ -99,20 +99,24 @@
 								</div>
 								<div id="result_textarea" class="tab-pane fade"></div>
 								<div id="ksql_history_textarea" class="tab-pane fade">
-									<table id="ksql_history_result" class="table table-bordered table-condensed"
-										width="100%">
-										<thead>
-											<tr>
-												<th>ID</th>
-												<th>User</th>
-												<th>Host</th>
-												<th>KSQL</th>
-												<th>Status</th>
-												<th>Spent</th>
-												<th>Created</th>
-											</tr>
-										</thead>
-									</table>
+									<div id="ksql_history_result_div">
+										<div id="ksql_history_result0">
+											<table id="ksql_history_result"
+												class="table table-bordered table-condensed" width="100%">
+												<thead>
+													<tr>
+														<th>ID</th>
+														<th>User</th>
+														<th>Host</th>
+														<th>KSQL</th>
+														<th>Status</th>
+														<th>Spent</th>
+														<th>Created</th>
+													</tr>
+												</thead>
+											</table>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -136,9 +140,8 @@
 							<div class="form-group">
 								<label for="path" class="col-sm-2 control-label">Content</label>
 								<div class="col-sm-9">
-									<textarea id="ke_sql_query_content"
-										name="ke_sql_query_content" class="form-control"
-										readonly="readonly" rows="3"></textarea>
+									<textarea id="ke_sql_query_content" name="ke_sql_query_content"
+										class="form-control" readonly="readonly" rows="3"></textarea>
 								</div>
 							</div>
 						</fieldset>
