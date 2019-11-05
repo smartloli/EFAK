@@ -229,6 +229,7 @@ gc()
    fi
   fi
 }
+
 jdk()
 {
   for f in $KE_HOME/kms/webapps/ke/WEB-INF/lib/*.jar; do
@@ -237,6 +238,23 @@ jdk()
   
   CLASS_JDK_ENV=org.smartloli.kafka.eagle.plugin.net.KafkaEagleJDK
   ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS_JDK_ENV 2>&1
+}
+
+version()
+{
+ if [ -f $KE_HOME/bin/ke.pid ];then
+  SPID=`cat $KE_HOME/bin/ke.pid`
+  if [ "$SPID" != "" ];then
+    cd ${KE_HOME}
+    for f in $KE_HOME/kms/webapps/ke/WEB-INF/lib/*.jar; do
+     JCLASSPATH=${JCLASSPATH}:$f;
+    done
+    JCLASS=org.smartloli.kafka.eagle.plugin.font.KafkaEagleVersion
+    ${JAVA_HOME}/bin/java -classpath "$JCLASSPATH" $JCLASS 2>&1
+  else
+    echo "[$stime] ERROR: Kafka Eagle has stopped."
+  fi
+ fi
 }
 
 case "$1" in
@@ -264,8 +282,11 @@ case "$1" in
   jdk)
       jdk
       ;;	
+  version)
+      version
+      ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk}"
+      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version}"
       RETVAL=1
 esac
 exit $RETVAL
