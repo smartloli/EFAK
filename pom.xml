@@ -1,25 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.smartloli.kafka.eagle</groupId>
-	<artifactId>kafka-eagle</artifactId>
-	<packaging>pom</packaging>
-	<version>1.2.3</version>
-	<name>ke</name>
-	<url>http://central.maven.org/maven2/</url>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.smartloli.kafka.eagle</groupId>
+    <artifactId>kafka-eagle</artifactId>
+    <packaging>pom</packaging>
+    <version>1.2.3</version>
+    <name>ke</name>
+    <url>http://central.maven.org/maven2/</url>
 
-	<properties>
-		<project.version>1.2.3</project.version>
-		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <properties>
+        <project.version>1.2.3</project.version>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-	<modules>
-		<module>kafka-eagle-common</module>
-		<module>kafka-eagle-api</module>
-		<module>kafka-eagle-web</module>
-		<module>kafka-eagle-core</module>
-		<module>kafka-eagle-plugin</module>
-	</modules>
+    <modules>
+        <module>kafka-eagle-common</module>
+        <module>kafka-eagle-api</module>
+        <module>kafka-eagle-web</module>
+        <module>kafka-eagle-core</module>
+        <module>kafka-eagle-plugin</module>
+    </modules>
+    <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
