@@ -95,7 +95,7 @@ public class StrUtils {
     /** Formmatter number. */
     public static double numberic(String number) {
         DecimalFormat formatter = new DecimalFormat("###.##");
-        if (number.equals("?")) {
+        if (number.equals("NaN")) {
             return 0.0;
         }
         return Double.valueOf(formatter.format(Double.valueOf(number)));
@@ -104,7 +104,7 @@ public class StrUtils {
     /** Formmatter number. */
     public static double numberic(String number, String format) {
         DecimalFormat formatter = new DecimalFormat(format);
-        if (number.equals("?")) {
+        if (number.equals("NaN")) {
             return 0.0;
         }
         return Double.valueOf(formatter.format(Double.valueOf(number)));
