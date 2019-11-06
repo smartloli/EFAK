@@ -21,6 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.web.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,18 +37,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.web.service.ConsumerService;
-
 /**
  * Kafka consumer controller to viewer data.
  * 
  * @author smartloli.
  *
  *         Created by Sep 6, 2016.
- *         
+ * 
  *         Update by hexiang 20170216
  */
 @Controller
@@ -66,10 +66,10 @@ public class ConsumersController {
 	public void consumersGraphAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		
+
 		try {
-			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-			byte[] output = consumerService.getActiveTopic(clusterAlias,formatter).getBytes();
+			String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+			byte[] output = consumerService.getActiveTopic(clusterAlias, formatter).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -103,10 +103,10 @@ public class ConsumersController {
 
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		int count = consumerService.getConsumerCount(clusterAlias,formatter);
-		JSONArray consumers = JSON.parseArray(consumerService.getConsumer(clusterAlias,formatter, page));
+
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+		int count = consumerService.getConsumerCount(clusterAlias, formatter);
+		JSONArray consumers = JSON.parseArray(consumerService.getConsumer(clusterAlias, formatter, page));
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : consumers) {
 			JSONObject consumer = (JSONObject) object;
@@ -115,12 +115,19 @@ public class ConsumersController {
 			obj.put("group", "<a class='link' href='#" + consumer.getString("group") + "'>" + consumer.getString("group") + "</a>");
 			obj.put("topics", consumer.getInteger("topics"));
 			obj.put("node", consumer.getString("node"));
-			int activerNumber = consumer.getInteger("activeNumber");
-			if (activerNumber > 0) {
-				obj.put("activeNumber", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeNumber") + "</a>");
+			int activeTopics = consumer.getInteger("activeTopics");
+			int activeThreads = consumer.getInteger("activeThreads");
+			if (activeTopics > 0) {
+				obj.put("activeTopics", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
 			} else {
-				obj.put("activeNumber", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeNumber") + "</a>");
+				obj.put("activeTopics", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
 			}
+			if (activeThreads > 0) {
+				obj.put("activeThreads", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+			} else {
+				obj.put("activeThreads", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+			}
+
 			aaDatas.add(obj);
 		}
 
@@ -156,9 +163,9 @@ public class ConsumersController {
 
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		
-		String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-		JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(clusterAlias,formatter, group));
+
+		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+		JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(clusterAlias, formatter, group));
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : consumerDetails) {
@@ -168,10 +175,12 @@ public class ConsumersController {
 				String topic = consumerDetail.getString("topic");
 				obj.put("id", consumerDetail.getInteger("id"));
 				obj.put("topic", topic);
-				if (consumerDetail.getBoolean("isConsumering")) {
+				if (consumerDetail.getInteger("isConsumering") == Topic.RUNNING) {
 					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-success btn-xs'>Running</a>");
+				} else if (consumerDetail.getInteger("isConsumering") == Topic.SHUTDOWN) {
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-danger btn-xs'>Shutdown</a>");
 				} else {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-danger btn-xs'>Pending</a>");
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-warning btn-xs'>Pending</a>");
 				}
 				aaDatas.add(obj);
 			}

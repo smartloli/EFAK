@@ -18,23 +18,30 @@
 package org.smartloli.kafka.eagle.web.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
+
+import org.smartloli.kafka.eagle.common.protocol.ConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
+import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.web.dao.MBeanDao;
+import org.smartloli.kafka.eagle.web.service.ConsumerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.smartloli.kafka.eagle.common.protocol.ConsumerInfo;
-import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
-import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
-import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.web.service.ConsumerService;
-import org.springframework.stereotype.Service;
 
 /**
  * Kafka consumer data interface, and set up the return data set.
@@ -47,6 +54,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ConsumerServiceImpl implements ConsumerService {
+
+	@Autowired
+	private MBeanDao mbeanDao;
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
@@ -124,7 +134,8 @@ public class ConsumerServiceImpl implements ConsumerService {
 			consumer.setNode("");
 			consumer.setTopics(entry.getValue().size());
 			consumer.setId(++id);
-			consumer.setActiveNumber(getActiveNumber(clusterAlias, entry.getKey(), entry.getValue()));
+			consumer.setActiveThreads(getActiveNumber(clusterAlias, entry.getKey(), entry.getValue()));
+			consumer.setActiveTopics(getActiveNumber(clusterAlias, entry.getKey(), entry.getValue()));
 			consumerPages.add(consumer);
 		}
 		return consumerPages.toString();
@@ -159,9 +170,9 @@ public class ConsumerServiceImpl implements ConsumerService {
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
 			if (actvTopics.containsKey(group + "_" + topic)) {
-				consumerDetail.setConsumering(true);
+				consumerDetail.setConsumering(Topic.RUNNING);
 			} else {
-				consumerDetail.setConsumering(false);
+				consumerDetail.setConsumering(Topic.SHUTDOWN);
 			}
 			kafkaConsumerDetails.add(consumerDetail);
 		}
@@ -198,7 +209,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 				break;
 			} else {
 				subTarget.put("name", consumerGroup.getString("group"));
-				for (String str : kafkaService.getKafkaActiverTopics(clusterAlias, consumerGroup.getString("group"))) {
+				for (String str : getKafkaTopicSets(clusterAlias, consumerGroup.getString("group"))) {
 					JSONObject subInSubTarget = new JSONObject();
 					subInSubTarget.put("name", str);
 					subTargets.add(subInSubTarget);
@@ -222,41 +233,78 @@ public class ConsumerServiceImpl implements ConsumerService {
 	/** Get kafka consumer & storage offset in kafka topic. */
 	private String getKafkaConsumer(DisplayInfo page, String clusterAlias) {
 		List<ConsumerInfo> kafkaConsumerPages = new ArrayList<ConsumerInfo>();
-		JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
-		int offset = 0;
-		int id = 0;
+		JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias, page));
+		int id = page.getiDisplayStart();
 		for (Object object : consumerGroups) {
 			JSONObject consumerGroup = (JSONObject) object;
 			String group = consumerGroup.getString("group");
-			if (page.getSearch().length() > 0 && page.getSearch().equals(group)) {
-				ConsumerInfo consumer = new ConsumerInfo();
-				consumer.setGroup(group);
-				consumer.setId(++id);
-				consumer.setNode(consumerGroup.getString("node"));
-				consumer.setActiveNumber(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("activers"));
-				consumer.setTopics(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("topics"));
-				kafkaConsumerPages.add(consumer);
-				break;
-			} else if (page.getSearch().length() == 0) {
-				if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
-					ConsumerInfo consumer = new ConsumerInfo();
-					consumer.setGroup(group);
-					consumer.setId(++id);
-					consumer.setNode(consumerGroup.getString("node"));
-					consumer.setActiveNumber(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("activers"));
-					consumer.setTopics(JSON.parseObject(kafkaService.getKafkaActiverSize(clusterAlias, group)).getInteger("topics"));
-					kafkaConsumerPages.add(consumer);
-				}
-				offset++;
-			}
+			ConsumerInfo consumer = new ConsumerInfo();
+			consumer.setGroup(group);
+			consumer.setId(++id);
+			consumer.setNode(consumerGroup.getString("node"));
+			OwnerInfo ownerInfo = kafkaService.getKafkaActiverNotOwners(clusterAlias, group);
+			consumer.setTopics(ownerInfo.getTopicSets().size());
+			consumer.setActiveTopics(getKafkaActiveTopicNumbers(clusterAlias, group));
+			consumer.setActiveThreads(ownerInfo.getActiveSize());
+			kafkaConsumerPages.add(consumer);
 		}
 		return kafkaConsumerPages.toString();
+
+	}
+
+	/** Get kafka active topic by active graph. */
+	private Set<String> getKafkaTopicSets(String clusterAlias, String group) {
+		Set<String> consumerTopics = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
+		Set<String> activerTopics = kafkaService.getKafkaActiverTopics(clusterAlias, group);
+		for (String topic : consumerTopics) {
+			if (isConsumering(clusterAlias, group, topic) == Topic.RUNNING) {
+				activerTopics.add(topic);
+			}
+		}
+		Set<String> activeTopicSets = new HashSet<>();
+		for (String topic : consumerTopics) {
+			if (activerTopics.contains(topic)) {
+				activeTopicSets.add(topic);
+			} else {
+				if (isConsumering(clusterAlias, group, topic) == Topic.RUNNING) {
+					activeTopicSets.add(topic);
+				}
+			}
+		}
+		return activeTopicSets;
+	}
+
+	/** Get kafka active topic total. */
+	private int getKafkaActiveTopicNumbers(String clusterAlias, String group) {
+		Set<String> consumerTopics = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
+		Set<String> activerTopics = kafkaService.getKafkaActiverTopics(clusterAlias, group);
+		for (String topic : consumerTopics) {
+			if (isConsumering(clusterAlias, group, topic) == Topic.RUNNING) {
+				activerTopics.add(topic);
+			}
+		}
+		int active = 0;
+		for (String topic : consumerTopics) {
+			if (activerTopics.contains(topic)) {
+				active++;
+			} else {
+				if (isConsumering(clusterAlias, group, topic) == Topic.RUNNING) {
+					active++;
+				}
+			}
+		}
+		return active;
 	}
 
 	/** Get consumer detail from kafka topic. */
 	private String getKafkaConsumerDetail(String clusterAlias, String group) {
 		Set<String> consumerTopics = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
 		Set<String> activerTopics = kafkaService.getKafkaActiverTopics(clusterAlias, group);
+		for (String topic : consumerTopics) {
+			if (isConsumering(clusterAlias, group, topic) == Topic.RUNNING) {
+				activerTopics.add(topic);
+			}
+		}
 		List<TopicConsumerInfo> kafkaConsumerPages = new ArrayList<TopicConsumerInfo>();
 		int id = 0;
 		for (String topic : consumerTopics) {
@@ -264,13 +312,57 @@ public class ConsumerServiceImpl implements ConsumerService {
 			consumerDetail.setId(++id);
 			consumerDetail.setTopic(topic);
 			if (activerTopics.contains(topic)) {
-				consumerDetail.setConsumering(true);
+				consumerDetail.setConsumering(Topic.RUNNING);
 			} else {
-				consumerDetail.setConsumering(false);
+				consumerDetail.setConsumering(isConsumering(clusterAlias, group, topic));
 			}
 			kafkaConsumerPages.add(consumerDetail);
 		}
 		return kafkaConsumerPages.toString();
+	}
+
+	/** Check if the application is consuming. */
+	public int isConsumering(String clusterAlias, String group, String topic) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("cluster", clusterAlias);
+		params.put("group", group);
+		params.put("topic", topic);
+		List<TopicOffsetsInfo> topicOffsets = mbeanDao.getConsumerRateTopic(params);
+		if (topicOffsets.size() == 2) {
+			try {
+				long resultOffsets = Math.abs(Long.parseLong(topicOffsets.get(0).getOffsets()) - Long.parseLong(topicOffsets.get(1).getOffsets()));
+				long resultLogSize = Math.abs(Long.parseLong(topicOffsets.get(0).getLogsize()) - Long.parseLong(topicOffsets.get(0).getOffsets()));
+
+				/**
+				 * offset equal offset,maybe producer rate equal consumer rate.
+				 */
+				if (resultOffsets == 0) {
+					/**
+					 * logsize equal offsets,follow two states.<br>
+					 * 1. maybe application shutdown.<br>
+					 * 2. maybe application run, but producer rate equal
+					 * consumer rate.<br>
+					 */
+					if (resultLogSize == 0) {
+						return Topic.PENDING;
+					} else {
+						return Topic.SHUTDOWN;
+					}
+				} else {
+					return Topic.RUNNING;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (topicOffsets.size() == 1) {
+			long resultLogSize = Math.abs(Long.parseLong(topicOffsets.get(0).getLogsize()) - Long.parseLong(topicOffsets.get(0).getOffsets()));
+			if (resultLogSize == 0) {
+				return Topic.PENDING;
+			} else {
+				return Topic.SHUTDOWN;
+			}
+		}
+		return Topic.SHUTDOWN;
 	}
 
 }

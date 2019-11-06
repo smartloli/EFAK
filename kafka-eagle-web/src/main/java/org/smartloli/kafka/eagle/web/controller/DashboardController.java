@@ -17,17 +17,21 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.web.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.web.service.DashboardService;
 
 /**
  * Dashboard controller to viewer data.
@@ -61,6 +65,38 @@ public class DashboardController {
 
 		try {
 			byte[] output = dashboradService.getDashboard(clusterAlias).getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	/** Get data from Kafka in dashboard by ajax. */
+	@RequestMapping(value = "/dash/{tkey}/table/ajax", method = RequestMethod.GET)
+	public void dashTopicRankAjax(@PathVariable("tkey") String tkey,HttpServletResponse response, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		Map<String, Object> params = new HashMap<String, Object>();
+		try {
+			params.put("cluster", clusterAlias);
+			params.put("tkey", tkey);
+			byte[] output = dashboradService.getTopicRank(params).toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	/** Get data from Kafka in dashboard by ajax. */
+	@RequestMapping(value = "/dash/os/mem/ajax", method = RequestMethod.GET)
+	public void dashOSMemAjax(HttpServletResponse response, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		Map<String, Object> params = new HashMap<String, Object>();
+		try {
+			params.put("cluster", clusterAlias);
+			params.put("key", "os%");
+			byte[] output = dashboradService.getOSMem(params).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

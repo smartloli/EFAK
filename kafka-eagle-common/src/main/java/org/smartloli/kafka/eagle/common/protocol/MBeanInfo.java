@@ -24,7 +24,7 @@ package org.smartloli.kafka.eagle.common.protocol;
  *
  *         Created by Jul 14, 2017
  */
-public class MBeanInfo extends BaseProtocol{
+public class MBeanInfo extends BaseProtocol {
 
 	private String fifteenMinute;
 	private String fiveMinute;

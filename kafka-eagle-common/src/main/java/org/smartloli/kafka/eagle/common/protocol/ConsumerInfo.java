@@ -24,20 +24,29 @@ package org.smartloli.kafka.eagle.common.protocol;
  *
  *         Created by Aug 16, 2016
  */
-public class ConsumerInfo extends BaseProtocol{
+public class ConsumerInfo extends BaseProtocol {
 
 	private int id;
 	private String group;
 	private int topics;
 	private String node;
-	private int activeNumber;
+	private int activeTopics;
+	private int activeThreads;
 
-	public int getActiveNumber() {
-		return activeNumber;
+	public int getActiveThreads() {
+		return activeThreads;
 	}
 
-	public void setActiveNumber(int activeNumber) {
-		this.activeNumber = activeNumber;
+	public void setActiveThreads(int activeThreads) {
+		this.activeThreads = activeThreads;
+	}
+
+	public int getActiveTopics() {
+		return activeTopics;
+	}
+
+	public void setActiveTopics(int activeTopics) {
+		this.activeTopics = activeTopics;
 	}
 
 	public int getId() {

@@ -56,7 +56,7 @@
 								onsubmit="return contextFormValid();return false;">
 								<div class="form-group">
 									<label>Content</label>
-									<textarea id="mf_notice_content" name="mf_notice_content"
+									<textarea id="ke_notice_content" name="ke_notice_content"
 										class="form-control" placeholder="Max length is 120 words" rows="3"
 										maxlength="120"></textarea>
 								</div>

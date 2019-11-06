@@ -51,6 +51,7 @@ $(document).ready(function() {
 		$("#result_children" + offset).dataTable({
 			"searching" : false,
 			"bSort" : false,
+			"retrieve" : true,
 			"bLengthChange" : false,
 			"bProcessing" : true,
 			"bServerSide" : true,
@@ -92,8 +93,82 @@ $(document).ready(function() {
 						logEditor.setValue(datas.status);
 						viewerTopics(sql, datas.msg);
 					}
+					viewerTopicSqlHistory();
 				}
 			}
 		});
 	});
+
+	var historyOffset = 0;
+	function viewerTopicSqlHistory() {
+		var thList = [ {
+			th : "ID",
+			column : "id"
+		}, {
+			th : "User",
+			column : "username"
+		}, {
+			th : "Host",
+			column : "host"
+		}, {
+			th : "KSQL",
+			column : "ksql"
+		}, {
+			th : "Status",
+			column : "status"
+		}, {
+			th : "Spent",
+			column : "spendTime"
+		}, {
+			th : "Created",
+			column : "created"
+		} ];
+		var ksqlTabHeader = "<div class='panel-body' id='div_ksql_children" + historyOffset + "'><table id='result_ksql_children" + historyOffset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
+		var ksqlMData = [];
+		var i = 0;
+		for (var i = 0; i < thList.length; i++) {
+			ksqlTabHeader += "<th>" + thList[i].th + "</th>";
+			var obj = {
+				mData : thList[i].column
+			};
+			ksqlMData.push(obj);
+		}
+
+		ksqlTabHeader += "</tr></thead></table></div>";
+		$("#ksql_history_result_div").append(ksqlTabHeader);
+		if (historyOffset > 0) {
+			$("#div_ksql_children" + (historyOffset - 1)).remove();
+		} else {
+			$("#ksql_history_result0").remove("");
+		}
+
+		$("#result_ksql_children" + historyOffset).dataTable({
+			"bSort" : false,
+			"retrieve" : true,
+			"bLengthChange" : false,
+			"bProcessing" : true,
+			"bServerSide" : true,
+			"fnServerData" : retrieveData,
+			"sAjaxSource" : '/ke/topic/sql/history/ajax',
+			"aoColumns" : ksqlMData
+		});
+
+		function retrieveData(sSource, aoData, fnCallback) {
+			$.ajax({
+				"type" : "get",
+				"contentType" : "application/json",
+				"url" : sSource,
+				"dataType" : "json",
+				"data" : {
+					aoData : JSON.stringify(aoData)
+				},
+				"success" : function(data) {
+					fnCallback(data)
+				}
+			});
+		}
+
+		historyOffset++;
+	}
+
 });

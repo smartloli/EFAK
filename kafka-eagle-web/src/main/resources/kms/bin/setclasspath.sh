@@ -16,12 +16,13 @@
 # limitations under the License.
 
 # -----------------------------------------------------------------------------
-#  Set JAVA_HOME or JRE_HOME if not already set and ensure any provided
-#  settings are valid and consistent with the selected start-up options.
+#  Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
+#  are valid and consistent with the selected start-up options and set up the
+#  endorsed directory.
 # -----------------------------------------------------------------------------
 
 # Make sure prerequisite environment variables are set
-if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
+if [ -z "$JAVA_HOME" ] && [ -z "$JRE_HOME" ]; then
   if $darwin; then
     # Bugzilla 54390
     if [ -x '/usr/libexec/java_home' ] ; then
@@ -33,8 +34,8 @@ if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
   else
     JAVA_PATH=`which java 2>/dev/null`
     if [ "x$JAVA_PATH" != "x" ]; then
-      JAVA_PATH=`dirname $JAVA_PATH 2>/dev/null`
-      JRE_HOME=`dirname $JAVA_PATH 2>/dev/null`
+      JAVA_PATH=`dirname "$JAVA_PATH" 2>/dev/null`
+      JRE_HOME=`dirname "$JAVA_PATH" 2>/dev/null`
     fi
     if [ "x$JRE_HOME" = "x" ]; then
       # XXX: Should we try other locations?
@@ -43,13 +44,13 @@ if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
       fi
     fi
   fi
-  if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
+  if [ -z "$JAVA_HOME" ] && [ -z "$JRE_HOME" ]; then
     echo "Neither the JAVA_HOME nor the JRE_HOME environment variable is defined"
     echo "At least one of these environment variable is needed to run this program"
     exit 1
   fi
 fi
-if [ -z "$JAVA_HOME" -a "$1" = "debug" ]; then
+if [ -z "$JAVA_HOME" ] && [ "$1" = "debug" ]; then
   echo "JAVA_HOME should point to a JDK in order to run in debug mode."
   exit 1
 fi
@@ -60,19 +61,29 @@ fi
 # If we're running under jdb, we need a full jdk.
 if [ "$1" = "debug" ] ; then
   if [ "$os400" = "true" ]; then
-    if [ ! -x "$JAVA_HOME"/bin/java -o ! -x "$JAVA_HOME"/bin/javac ]; then
+    if [ ! -x "$JAVA_HOME"/bin/java ] || [ ! -x "$JAVA_HOME"/bin/javac ]; then
       echo "The JAVA_HOME environment variable is not defined correctly"
       echo "This environment variable is needed to run this program"
       echo "NB: JAVA_HOME should point to a JDK not a JRE"
       exit 1
     fi
   else
-    if [ ! -x "$JAVA_HOME"/bin/java -o ! -x "$JAVA_HOME"/bin/jdb -o ! -x "$JAVA_HOME"/bin/javac ]; then
+    if [ ! -x "$JAVA_HOME"/bin/java ] || [ ! -x "$JAVA_HOME"/bin/jdb ] || [ ! -x "$JAVA_HOME"/bin/javac ]; then
       echo "The JAVA_HOME environment variable is not defined correctly"
       echo "This environment variable is needed to run this program"
       echo "NB: JAVA_HOME should point to a JDK not a JRE"
       exit 1
     fi
+  fi
+fi
+
+# Don't override the endorsed dir if the user has set it previously
+if [ -z "$JAVA_ENDORSED_DIRS" ]; then
+  # Java 9 no longer supports the java.endorsed.dirs
+  # system property. Only try to use it if
+  # CATALINA_HOME/endorsed exists.
+  if [ -d "$CATALINA_HOME"/endorsed ]; then
+    JAVA_ENDORSED_DIRS="$CATALINA_HOME"/endorsed
   fi
 fi
 

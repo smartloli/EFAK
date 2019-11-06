@@ -78,7 +78,8 @@ path.link {
 											<th>Group</th>
 											<th>Topics</th>
 											<th>Node</th>
-											<th>Active Numbers</th>
+											<th>Active Topics</th>
+											<th>Active Threads</th>
 										</tr>
 									</thead>
 								</table>

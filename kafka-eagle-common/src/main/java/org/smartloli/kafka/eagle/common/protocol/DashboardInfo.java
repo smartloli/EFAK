@@ -26,40 +26,40 @@ package org.smartloli.kafka.eagle.common.protocol;
  */
 public class DashboardInfo extends BaseProtocol{
 
-	private int brokers = 0;
-	private int topics = 0;
-	private int zks = 0;
-	private int consumers = 0;
+	private long brokers = 0;
+	private long topics = 0;
+	private long zks = 0;
+	private long consumers = 0;
 
-	public int getBrokers() {
+	public long getBrokers() {
 		return brokers;
 	}
 
-	public void setBrokers(int brokers) {
+	public void setBrokers(long brokers) {
 		this.brokers = brokers;
 	}
 
-	public int getTopics() {
+	public long getTopics() {
 		return topics;
 	}
 
-	public void setTopics(int topics) {
+	public void setTopics(long topics) {
 		this.topics = topics;
 	}
 
-	public int getZks() {
+	public long getZks() {
 		return zks;
 	}
 
-	public void setZks(int zks) {
+	public void setZks(long zks) {
 		this.zks = zks;
 	}
 
-	public int getConsumers() {
+	public long getConsumers() {
 		return consumers;
 	}
 
-	public void setConsumers(int consumers) {
+	public void setConsumers(long consumers) {
 		this.consumers = consumers;
 	}
 
