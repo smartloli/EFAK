@@ -17,7 +17,6 @@
  */
 package org.smartloli.kafka.eagle.plugin.mysql;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -57,7 +56,7 @@ public class MySqlRecordSchema {
 	}
 
 	private static void tables(String username, String password, String host, String port, String db) {
-		Connection connection = MySqlStoragePlugin.getInstance(host + ":" + port + File.separator + db, username, password);
+		Connection connection = MySqlStoragePlugin.getInstance(host + ":" + port + "/" + db, username, password);
 		ResultSet rs = null;
 		Statement stmt = null;
 		List<String> tbls = new ArrayList<>();

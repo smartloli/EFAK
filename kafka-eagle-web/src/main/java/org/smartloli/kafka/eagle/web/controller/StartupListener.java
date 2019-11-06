@@ -20,7 +20,6 @@ package org.smartloli.kafka.eagle.web.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.core.ipc.KafkaOffsetGetter;
 import org.smartloli.kafka.eagle.plugin.mysql.MySqlRecordSchema;
 import org.smartloli.kafka.eagle.plugin.sqlite.SqliteRecordSchema;
 import org.smartloli.kafka.eagle.plugin.util.JConstants;
@@ -66,12 +65,15 @@ public class StartupListener implements ApplicationContextAware {
 
 	class RunTask extends Thread {
 		public void run() {
-			String formatter = SystemConfigUtils.getProperty("kafka.eagle.offset.storage");
-			if ("kafka".equals(formatter)) {
-				try {
-					KafkaOffsetGetter.getInstance();
-				} catch (Exception ex) {
-					LOG.error("Initialize KafkaOffsetGetter thread has error,msg is " + ex.getMessage());
+			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+			for (String clusterAlias : clusterAliass) {
+				String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+				if ("kafka".equals(formatter)) {
+					try {
+						//KafkaOffsetGetter.getInstance();
+					} catch (Exception ex) {
+						LOG.error("Initialize KafkaOffsetGetter thread has error,msg is " + ex.getMessage());
+					}
 				}
 			}
 		}

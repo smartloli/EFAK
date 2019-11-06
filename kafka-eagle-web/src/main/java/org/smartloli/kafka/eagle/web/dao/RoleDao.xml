@@ -19,25 +19,19 @@
 	</resultMap>
 
 	<select id="getRoles" resultMap="role">
-		select `id`,`name`,description
-		from ke_p_role
+		select `id`,`name`,description from ke_p_role
 	</select>
 
-	<select id="findRoleResourcesByRoleId" parameterType="int"
-		resultMap="roleResource">
-		select role_id,resource_id
-		from ke_role_resource where
-		role_id=#{roleId}
+	<select id="findRoleResourcesByRoleId" parameterType="int" resultMap="roleResource">
+		select role_id,resource_id from ke_role_resource where role_id=#{roleId}
 	</select>
 
 	<insert id="insertRoleResource" parameterType="org.smartloli.kafka.eagle.web.pojo.RoleResource">
-		insert into
-		ke_role_resource(role_id,resource_id) values(#{roleId},#{resourceId})
+		insert into ke_role_resource(role_id,resource_id) values(#{roleId},#{resourceId})
 	</insert>
 
 	<delete id="deleteRoleResource" parameterType="org.smartloli.kafka.eagle.web.pojo.RoleResource">
-		delete from
-		ke_role_resource where role_id=#{roleId} and resource_id=#{resourceId}
+		delete from ke_role_resource where role_id=#{roleId} and resource_id=#{resourceId}
 	</delete>
 
 	<select id="findRoleByUserId" parameterType="int" resultMap="userRole">
@@ -45,12 +39,10 @@
 	</select>
 
 	<insert id="insertUserRole" parameterType="org.smartloli.kafka.eagle.web.pojo.UserRole">
-		insert into
-		ke_user_role(user_id,role_id) values(#{userId},#{roleId})
+		insert into ke_user_role(user_id,role_id) values(#{userId},#{roleId})
 	</insert>
 
 	<delete id="deleteUserRole" parameterType="org.smartloli.kafka.eagle.web.pojo.UserRole">
-		delete from
-		ke_user_role where user_id=#{userId} and role_id=#{roleId}
+		delete from ke_user_role where user_id=#{userId} and role_id=#{roleId}
 	</delete>
 </mapper>

@@ -17,10 +17,9 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import java.util.List;
 
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -28,6 +27,10 @@ import org.smartloli.kafka.eagle.core.factory.ZkFactory;
 import org.smartloli.kafka.eagle.core.factory.ZkService;
 import org.smartloli.kafka.eagle.web.service.ClusterService;
 import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Kafka & Zookeeper implements service to oprate related cluster.
@@ -99,8 +102,12 @@ public class ClusterServiceImpl implements ClusterService {
 			String zkCluster = zkService.zkCluster(clusterAlias);
 			target.put("zk", JSON.parseArray(zkCluster));
 		} else if ("kafka".equals(type)) {
-			String kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);
-			target.put("kafka", JSON.parseArray(kafkaBrokers));
+			List<BrokersInfo> kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);
+			for (BrokersInfo broker : kafkaBrokers) {
+				String version = kafkaService.getKafkaVersion(broker.getHost(), broker.getJmxPort(), broker.getIds(), clusterAlias);
+				broker.setVersion(version);
+			}
+			target.put("kafka", JSON.parseArray(kafkaBrokers.toString()));
 		}
 		return target.toJSONString();
 	}
