@@ -43,7 +43,7 @@ public class JMXFactoryUtils {
 	private static final ThreadFactory daemonThreadFactory = new DaemonThreadFactory();
 
 	public static JMXConnector connectWithTimeout(final JMXServiceURL url, long timeout, TimeUnit unit) throws IOException {
-		final BlockingQueue<Object> blockQueue = new ArrayBlockingQueue<Object>(1);
+		/*final BlockingQueue<Object> blockQueue = new ArrayBlockingQueue<Object>(1);
 		ExecutorService executor = Executors.newSingleThreadExecutor(daemonThreadFactory);
 		executor.submit(new Runnable() {
 			public void run() {
@@ -82,7 +82,7 @@ public class JMXFactoryUtils {
 			throw e;
 		} catch (Throwable e) {
 			throw new IOException(e.toString(), e);
-		}
+		}*/
 	}
 
 	private static <T extends Throwable> T initCause(T wrapper, Throwable wrapped) {

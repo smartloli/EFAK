@@ -12,7 +12,7 @@
 		<property name="targetMethod" value="metricsConsumerTopicQuartz" />
 		<property name="concurrent" value="false" />
 	</bean>
-	
+
 	<!-- Configure the trigger time for scheduling execution. -->
 	<bean id="metricsTrigger"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -22,13 +22,13 @@
 			<value>0 0/1 * * * ?</value>
 		</property>
 	</bean>
-	<!-- Quartz scheduling factory scheduling plant can only have one, multiple 
+	<!-- Quartz scheduling factory scheduling plant can only have one, multiple
 		scheduling tasks added in list. -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
 				<!-- All scheduling lists. -->
-				<ref local="metricsTrigger" />
+				<ref bean="metricsTrigger" />
 			</list>
 		</property>
 	</bean>
