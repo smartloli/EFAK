@@ -5,12 +5,12 @@
 	<groupId>org.smartloli.kafka.eagle</groupId>
 	<artifactId>kafka-eagle</artifactId>
 	<packaging>pom</packaging>
-	<version>1.4.0</version>
+	<version>1.4.1</version>
 	<name>ke</name>
 	<url>http://central.maven.org/maven2/</url>
 
 	<properties>
-		<project.version>1.4.0</project.version>
+		<project.version>1.4.1</project.version>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
