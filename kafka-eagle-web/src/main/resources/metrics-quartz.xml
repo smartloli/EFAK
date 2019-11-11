@@ -28,7 +28,7 @@
 		<property name="triggers">
 			<list>
 				<!-- All scheduling lists. -->
-				<ref local="metricsTrigger" />
+				<ref bean="metricsTrigger" />
 			</list>
 		</property>
 	</bean>
