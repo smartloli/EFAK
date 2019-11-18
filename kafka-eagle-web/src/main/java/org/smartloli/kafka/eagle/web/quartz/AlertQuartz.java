@@ -37,6 +37,8 @@ import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.AlertServiceImpl;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * Alert consumer topic & cluster heathy.
  * 
@@ -123,7 +125,10 @@ public class AlertQuartz {
 				alarmMsg.setAlarmStatus("PROBLEM");
 				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
 				IMService im = new IMFactory().create();
-				im.sendPostMsgByMail(alarmMsg.toMail(), alarmConfing.getAlarmUrl());
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
@@ -165,7 +170,10 @@ public class AlertQuartz {
 				alarmMsg.setAlarmStatus("NORMAL");
 				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
 				IMService im = new IMFactory().create();
-				im.sendPostMsgByMail(alarmMsg.toMail(), alarmConfing.getAlarmUrl());
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
@@ -267,7 +275,10 @@ public class AlertQuartz {
 				alarmMsg.setAlarmStatus("PROBLEM");
 				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
 				IMService im = new IMFactory().create();
-				im.sendPostMsgByMail(alarmMsg.toMail(), alarmConfing.getAlarmUrl());
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
@@ -309,7 +320,10 @@ public class AlertQuartz {
 				alarmMsg.setAlarmStatus("NORMAL");
 				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
 				IMService im = new IMFactory().create();
-				im.sendPostMsgByMail(alarmMsg.toMail(), alarmConfing.getAlarmUrl());
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
