@@ -65,7 +65,7 @@ public class AlarmMessageInfo extends BaseProtocol {
 	}
 	
 	public String toMail() {
-		return title + " \n\n AlarmID : [ " + alarmId + " ]\n AlarmStatus : [ " + alarmStatus + " ]\n" + " AlarmLevel : [ " + alarmLevel + " ]\n" + " AlarmProject : [ " + alarmProject + " ]\n" + " AlarmTimes : [ " + alarmTimes
+		return title + " \n AlarmID : [ " + alarmId + " ]\n AlarmStatus : [ " + alarmStatus + " ]\n" + " AlarmLevel : [ " + alarmLevel + " ]\n" + " AlarmProject : [ " + alarmProject + " ]\n" + " AlarmTimes : [ " + alarmTimes
 				+ " ]\n AlarmDate : [ " + alarmDate + " ]\n" + " AlarmContent : [ " + alarmContent + " ]"; 
 	}
 

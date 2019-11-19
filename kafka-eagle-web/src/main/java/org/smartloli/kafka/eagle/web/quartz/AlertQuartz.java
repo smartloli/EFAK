@@ -117,7 +117,7 @@ public class AlertQuartz {
 			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
-				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Notice \n\n");
+				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Notice");
 				alarmMsg.setAlarmContent("lag.overflow [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
@@ -162,7 +162,7 @@ public class AlertQuartz {
 			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
-				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Cancel \n\n");
+				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Cancel");
 				alarmMsg.setAlarmContent("lag.normal [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
@@ -267,7 +267,7 @@ public class AlertQuartz {
 			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
-				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Notice \n\n");
+				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Notice");
 				alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
@@ -312,7 +312,7 @@ public class AlertQuartz {
 			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
-				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Cancel \n\n");
+				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Cancel");
 				alarmMsg.setAlarmContent("node.alive [ " + server + " ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
