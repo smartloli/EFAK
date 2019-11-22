@@ -66,8 +66,7 @@
 							<div class="form-group">
 								<label>Message (*)</label>
 								<textarea id="ke_mock_content" name="ke_mock_content"
-									class="form-control" placeholder="Limit 120 words." rows="3"
-									maxlength="120"></textarea>
+									class="form-control" placeholder="Send mock data" rows="10"></textarea>
 								<label for="inputError" class="control-label text-danger"><i
 									class="fa fa-info-circle"></i> Write something and send message
 									to topic .</label>

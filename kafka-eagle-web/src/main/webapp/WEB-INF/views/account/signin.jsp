@@ -12,6 +12,22 @@
 <title>Login - KafkaEagle</title>
 <meta name="description" content="">
 <link rel="shortcut icon" href="/ke/media/img/favicon.ico" />
+<style type="text/css">
+/** start: Add author by alisa. */
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill
+	{
+	-webkit-text-fill-color: #ededed !important;
+	-webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+	background-color: transparent;
+	background-image: none;
+	transition: background-color 50000s ease-in-out 0s;
+}
+
+input {
+	background-color: transparent;
+}
+/** end*/
+</style>
 <link rel="stylesheet" href="/ke/media/css/public/account/main.css">
 </head>
 
@@ -34,8 +50,9 @@
 						</div>
 						<div class="form-group">
 							<input class="form-control input-underline input-lg" id="pwd"
-								name="password" placeholder="Password" name="pwd" type="text">
-							<input type="hidden" id="ref_url" name="ref_url" type="text">
+								name="password" placeholder="Password" autocomplete="off"
+								name="pwd" type="password"> <input type="hidden"
+								id="ref_url" name="ref_url" type="text">
 						</div>
 						<div class="form-group">
 							<div id="alert_mssage" style="display: none"

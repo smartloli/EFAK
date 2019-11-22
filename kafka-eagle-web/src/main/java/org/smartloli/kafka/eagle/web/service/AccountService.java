@@ -48,4 +48,6 @@ public interface AccountService {
 	public int delete(Signiner signin);
 	
 	public String findUserById(int id);
+	
+	public String getAutoUserRtxNo();
 }

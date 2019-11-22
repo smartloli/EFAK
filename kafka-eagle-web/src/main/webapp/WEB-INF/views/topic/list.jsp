@@ -13,8 +13,45 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
+<style>
+.box {
+	border-bottom: 1px solid #eee;
+	margin-bottom: 20px;
+	margin-top: 30px;
+	overflow: hidden;
+}
+
+.box .left {
+	font-size: 36px;
+	float: left
+}
+
+.box .left small {
+	font-size: 24px;
+	color: #777
+}
+
+.box  .right {
+	float: right;
+	width: 230px;
+	margin-top: 20px;
+	background: #fff;
+	cursor: pointer;
+	padding: 5px 10px;
+	border: 1px solid #ccc;
+}
+
+.charttopicdiv {
+	width: 100%;
+	height: 400px;
+}
+</style>
 <title>Topic List - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/css.jsp">
+	<jsp:param value="plugins/datatimepicker/daterangepicker.css"
+		name="css" />
+	<jsp:param value="plugins/select2/select2.min.css" name="css" />
+</jsp:include>
 <jsp:include page="../public/tcss.jsp"></jsp:include>
 </head>
 
@@ -24,9 +61,15 @@
 		<div id="page-wrapper">
 			<div class="row">
 				<div class="col-lg-12">
-					<h1 class="page-header">
-						Topic <small>list</small>
-					</h1>
+					<div class="box">
+						<p class="left">
+							Topic <small>list</small>
+						</p>
+						<div id="reportrange" class="right">
+							<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+							<span></span> <b class="caret"></b>
+						</div>
+					</div>
 				</div>
 				<!-- /.col-lg-12 -->
 			</div>
@@ -71,6 +114,54 @@
 				</div>
 				<!-- /.col-lg-4 -->
 			</div>
+			<!-- filter topic -->
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<i class="fa fa-filter fa-fw"></i> Topic Filter
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label>Topic Name (*)</label> <select multiple="multiple" id="select2val"
+											name="select2val" tabindex="-1"
+											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+										<input id="ke_topic_aggrate" name="ke_topic_aggrate" type="hidden" />
+										<label for="inputError" class="control-label text-danger"><i
+											class="fa fa-info-circle"></i> Select the topic you need to
+											alarm .</label>
+									</div>
+									<button id="ke_topic_select_query" class="btn btn-success">Query</button>
+								</div>
+							</div>
+							<!-- /.panel-body -->
+						</div>
+					</div>
+					<!-- /.col-lg-4 -->
+				</div>
+				<!-- /.row -->
+			</div>
+			<!-- producer history -->
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>
+								Producer Message Aggregate</strong>
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div id="topic_producer_agg" class="charttopicdiv"></div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+			</div>
 			<!-- /.row -->
 			<div class="modal fade" aria-labelledby="keModalLabel"
 				aria-hidden="true" id="doc_info" tabindex="-1" role="dialog">
@@ -82,7 +173,11 @@
 						</div>
 						<!-- /.row -->
 						<div class="modal-body">
-							<p>Are you sure you want to delete it? Admin Token : <input id="ke_admin_token" name="ke_admin_token" style="width: 100px;float: right;margin-right:150px;margin-top:-5px" class="form-control" placeholder="Enter Token" />
+							<p>
+								Are you sure you want to delete it? Admin Token : <input
+									id="ke_admin_token" name="ke_admin_token"
+									style="width: 100px; float: right; margin-right: 150px; margin-top: -5px"
+									class="form-control" placeholder="Enter Token" />
 							<p>
 						</div>
 						<div id="remove_div" class="modal-footer"></div>
@@ -95,6 +190,13 @@
 </body>
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="main/topic/list.js" name="loader" />
+	<jsp:param value="plugins/echart/echarts.min.js" name="loader" />
+	<jsp:param value="plugins/echart/macarons.js" name="loader" />
+	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />
+	<jsp:param value="plugins/datatimepicker/daterangepicker.js"
+		name="loader" />
+	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
+	<jsp:param value="plugins/magicsuggest/magicsuggest.js" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
 </html>

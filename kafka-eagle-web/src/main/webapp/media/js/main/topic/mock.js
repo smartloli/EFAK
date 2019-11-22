@@ -17,12 +17,25 @@ $(document).ready(function() {
 			},
 			cache : true,
 			processResults : function(data, params) {
-				return {
-					results : data.items,
-					pagination : {
-						more : (params.page * params.offset) < data.total
+				if (data.items.length > 0) {
+					var datas = new Array();
+					$.each(data.items, function(index, e) {
+						var s = {};
+						s.id = index + 1;
+						s.text = e.text;
+						datas[index] = s;
+					});
+					return {
+						results : datas,
+						pagination : {
+							more : (params.page * params.offset) < data.total
+						}
+					};
+				} else {
+					return {
+						results : []
 					}
-				};
+				}
 			},
 			escapeMarkup : function(markup) {
 				return markup;

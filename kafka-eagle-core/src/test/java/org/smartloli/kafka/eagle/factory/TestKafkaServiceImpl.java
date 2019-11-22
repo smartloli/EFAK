@@ -20,16 +20,26 @@
  */
 package org.smartloli.kafka.eagle.factory;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
-import org.I0Itec.zkclient.ZkClient;
-import org.smartloli.kafka.eagle.common.util.ZKPoolUtils;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.ZkFactory;
 import org.smartloli.kafka.eagle.core.factory.ZkService;
 
-import kafka.utils.ZkUtils;
+import kafka.zk.KafkaZkClient;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 
@@ -42,7 +52,7 @@ import scala.collection.Seq;
  */
 public class TestKafkaServiceImpl {
 
-	private ZKPoolUtils zkPool = ZKPoolUtils.getInstance();
+	private KafkaZKPoolUtils zkPool = KafkaZKPoolUtils.getInstance();
 
 	private final String BROKER_TOPICS_PATH = "/brokers/topics";
 
@@ -51,14 +61,44 @@ public class TestKafkaServiceImpl {
 	private static ZkService zkService = new ZkFactory().create();
 
 	public static void main(String[] args) {
-		System.out.println(kafkaService.getAllBrokersInfo("cluster1"));
-		String status = zkService.status("dn3", "2181");
-		System.out.println("status : " + status);
+		
+		String res = kafkaService.getKafkaOffset("cluster1");
+		System.out.println(res);
+		
+		Set<Integer> partitionids = new HashSet<>();
+		for (int i = 0; i < 10; i++) {
+			partitionids.add(i);
+		}
+		Map<Integer, Long> offsets = kafkaService.getKafkaOffset("cluster1","kafka_app0", "test_16", partitionids);
+		System.out.println("offsets: " + offsets);
+	}
+	
+	public Map<TopicPartition, Long> getKafkaLogSize( String topic, Set<Integer> partitionids) {
+		Properties props = new Properties();
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		Set<TopicPartition> tps = new HashSet<>();
+		Map<Integer, Long> partitionOffset = new HashMap<Integer, Long>();
+		for (int partitionid : partitionids) {
+			TopicPartition tp = new TopicPartition(topic, partitionid);
+			long offset= consumer.position(tp);
+			partitionOffset.put(partitionid, offset);
+		}
+
+		System.out.println(partitionOffset.toString());
+		
+		if (consumer != null) {
+			consumer.close();
+		}
+		return null;
 	}
 
 	public List<String> findTopicPartition(String clusterAlias, String topic) {
-		ZkClient zkc = zkPool.getZkClient(clusterAlias);
-		Seq<String> brokerTopicsPaths = ZkUtils.apply(zkc, false).getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
+		KafkaZkClient zkc = zkPool.getZkClient(clusterAlias);
+		Seq<String> brokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
 		List<String> topicAndPartitions = JavaConversions.seqAsJavaList(brokerTopicsPaths);
 		if (zkc != null) {
 			zkPool.release(clusterAlias, zkc);

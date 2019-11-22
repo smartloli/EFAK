@@ -19,7 +19,7 @@ $(document).ready(function() {
 		$("#topics_count").text(dashboard.topics);
 		$("#zks_count").text(dashboard.zks);
 		$("#consumers_count").text(dashboard.consumers);
-		
+
 		function toggleAll(d) {
 			if (d.children) {
 				d.children.forEach(toggleAll);
@@ -138,5 +138,88 @@ $(document).ready(function() {
 			d._children = null;
 		}
 	}
+
+	function fillgaugeGrahpPie(datas, id) {
+		var config = liquidFillGaugeDefaultSettings();
+		config.circleThickness = 0.1;
+		config.circleFillGap = 0.2;
+		config.textVertPosition = 0.8;
+		config.waveAnimateTime = 2000;
+		config.waveHeight = 0.3;
+		config.waveCount = 1;
+		if (datas > 65 && datas < 80) {
+			config.circleColor = "#D4AB6A";
+			config.textColor = "#553300";
+			config.waveTextColor = "#805615";
+			config.waveColor = "#AA7D39";
+		} else if (datas >= 80) {
+			config.circleColor = "#d9534f";
+			config.textColor = "#d9534f";
+			config.waveTextColor = "#d9534f";
+			config.waveColor = "#FFDDDD";
+		}
+		loadLiquidFillGauge(id, datas, config);
+	}
+
+	try {
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/dash/os/mem/ajax',
+			success : function(datas) {
+				if (datas != null) {
+					fillgaugeGrahpPie(datas.mem, "fillgauge_kafka_memory");
+				}
+			}
+		});
+	} catch (e) {
+		console.log(e);
+	}
+
+	$.ajax({
+		type : 'get',
+		dataType : 'json',
+		url : '/ke/dash/logsize/table/ajax',
+		success : function(datas) {
+			if (datas != null) {
+				$("#topic_logsize").html("")
+				var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>LogSize</th></tr></thead>";
+				$("#topic_logsize").append(thead);
+				var tbody = "<tbody>";
+				var tr = '';
+				for (var i = 0; i < datas.length; i++) {
+					var id = datas[i].id;
+					var topic = datas[i].topic;
+					var logsize = datas[i].logsize;
+					tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + logsize + "</td></tr>"
+				}
+				tbody += tr + "</tbody>"
+				$("#topic_logsize").append(tbody);
+			}
+		}
+	});
+
+	$.ajax({
+		type : 'get',
+		dataType : 'json',
+		url : '/ke/dash/capacity/table/ajax',
+		success : function(datas) {
+			if (datas != null) {
+				$("#topic_capacity").html("")
+				var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>Capacity</th></tr></thead>";
+				$("#topic_capacity").append(thead);
+				var tbody = "<tbody>";
+				var tr = '';
+				for (var i = 0; i < datas.length; i++) {
+					var id = datas[i].id;
+					var topic = datas[i].topic;
+					var capacity = datas[i].capacity;
+					tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + capacity + "</td></tr>"
+				}
+				tbody += tr + "</tbody>"
+				$("#topic_capacity").append(tbody);
+			}
+		}
+	});
 
 });

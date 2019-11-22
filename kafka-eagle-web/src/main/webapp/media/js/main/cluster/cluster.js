@@ -14,9 +14,13 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'port'
 		}, {
+			"mData" : 'jmxPort'
+		}, {
 			"mData" : 'created'
 		}, {
 			"mData" : 'modify'
+		}, {
+			"mData" : 'version'
 		} ]
 	});
 

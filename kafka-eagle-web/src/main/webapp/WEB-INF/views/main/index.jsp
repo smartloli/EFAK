@@ -33,6 +33,11 @@ path.link {
 	stroke: #ccc;
 	stroke-width: 1.5px;
 }
+
+.liquidFillGaugeText {
+	font-family: Helvetica;
+	font-weight: bold;
+}
 </style>
 <body>
 	<jsp:include page="../public/navbar.jsp"></jsp:include>
@@ -156,10 +161,69 @@ path.link {
 			</div>
 			<!-- /.row -->
 			<div class="row">
+				<div class="col-lg-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<i class="fa fa-hdd-o fa-fw"></i> Kafka OS Used Memory (%)
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div>
+								<svg id="fillgauge_kafka_memory" width="97%" height="424"></svg>
+							</div>
+							<div class="text-right">
+								<a href="/ke/metrics/kafka#os_free_memory">View Details <i
+									class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<i class="fa fa-file-text-o fa-fw"></i> Topic LogSize Top10
+							</h3>
+						</div>
+						<div class="panel-body">
+							<table id="topic_logsize"
+								class="table table-bordered table-hover table-striped">
+							</table>
+							<div class="text-right">
+								<a href="/ke/topic/list">View Details <i
+									class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<i class="fa fa-database fa-fw"></i> Topic Capacity Top10
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div class="table-responsive">
+								<table id="topic_capacity"
+									class="table table-bordered table-hover table-striped">
+								</table>
+							</div>
+							<div class="text-right">
+								<a href="/ke/topic/list">View Details <i
+									class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.row -->
+			<div class="row">
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-tasks fa-fw"></i> Kafka Brokers
+							<i class="fa fa-tasks fa-fw"></i> Kafka Active Brokers
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
@@ -177,8 +241,8 @@ path.link {
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="plugins/d3/d3.js" name="loader" />
-	<jsp:param value="plugins/d3/d3.layout.js" name="loader" />
+	<jsp:param value="plugins/d3/d3.v3.min.js" name="loader" />
+	<jsp:param value="plugins/d3/liquidFillGauge.js" name="loader" />
 	<jsp:param value="main/index.js" name="loader" />
 </jsp:include>
 </html>

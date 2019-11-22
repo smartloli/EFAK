@@ -10,15 +10,11 @@
 	</resultMap>
 
 	<select id="findRoleIdByUserId" parameterType="int" resultType="Integer">
-		select role_id
-		from ke_user_role where user_id=#{userId}
+		select role_id from ke_user_role where user_id=#{userId}
 	</select>
 
-	<select id="findResourceIdByRole" parameterType="int"
-		resultType="Integer">
-		select resource_id
-		from ke_role_resource where
-		role_id=#{roleId}
+	<select id="findResourceIdByRole" parameterType="int" resultType="Integer">
+		select resource_id from ke_role_resource where role_id=#{roleId}
 	</select>
 
 	<select id="getUserResources" parameterType="int" resultMap="resources">
@@ -26,24 +22,19 @@
 	</select>
 
 	<select id="getResourcesTree" resultMap="resources">
-		select * from
-		ke_resources
+		select * from ke_resources
 	</select>
 
 	<insert id="insertResource" parameterType="map">
-		insert into
-		ke_resources(name,url,parent_id) values(#{name},#{url},#{parentId})
+		insert into ke_resources(name,url,parent_id) values(#{name},#{url},#{parentId})
 	</insert>
 
 	<select id="getResourceParent" resultMap="resources">
-		select * from
-		ke_resources where parent_id=-1
+		select * from ke_resources where parent_id=-1
 	</select>
 
-	<select id="findResourceByParentId" parameterType="int"
-		resultMap="resources">
-		select * from
-		ke_resources where parent_id=#{parentId}
+	<select id="findResourceByParentId" parameterType="int" resultMap="resources">
+		select * from ke_resources where parent_id=#{parentId}
 	</select>
 
 	<delete id="deleteParentOrChildByResId" parameterType="map">

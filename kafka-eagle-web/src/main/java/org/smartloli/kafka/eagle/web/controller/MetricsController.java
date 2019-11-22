@@ -17,21 +17,21 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import org.apache.commons.lang.StringUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.web.service.MetricsService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Metrics mbean controller to viewer data.
@@ -95,8 +95,14 @@ public class MetricsController {
 			param.put("stime", request.getParameter("stime"));
 			param.put("etime", request.getParameter("etime"));
 			param.put("type", request.getParameter("type"));
-			
-			String target = metricsService.query(param) == null ? "" : metricsService.query(param);
+            String modules = request.getParameter("modules");
+            if (StringUtils.isNotBlank(modules)) {
+                param.put("modules", Arrays.asList(modules.split(",")));
+            }
+			String target = metricsService.query(param);
+			if (StringUtils.isEmpty(target)) {
+			    target = "";
+            }
 			byte[] output = target.getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {

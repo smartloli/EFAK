@@ -78,7 +78,7 @@
 												must be numeric . Pay attention to available brokers must be larger than replication factor .</label>
 										</div>
 										<button type="submit" class="btn btn-success">Create</button>
-										<div id="alert_mssage" style="display: none"
+										<div id="create_alert_msg" style="display: none"
 											class="alert alert-danger">
 											<label>Error! Please make some changes . (*) is
 												required .</label>
@@ -100,24 +100,23 @@
 	<jsp:param value="main/topic/create.js" name="loader" />
 </jsp:include>
 <script type="text/javascript">
-	//验证提交表单内容
 	function contextFormValid() {
 		var ke_topic_name = $("#ke_topic_name").val();
 		var ke_topic_partition = $("#ke_topic_partition").val();
 		var ke_topic_repli = $("#ke_topic_repli").val();
-		var reg = /^[A-Za-z0-9_]+$/;
+		var reg = /^[A-Za-z0-9_-]+$/;
 		var digit = /^[0-9]+$/;
 		if (ke_topic_name.length == 0 || !reg.test(ke_topic_name)) {
-			$("#alert_mssage").show();
+			$("#create_alert_msg").show();
 			setTimeout(function() {
-				$("#alert_mssage").hide()
+				$("#create_alert_msg").hide()
 			}, 3000);
 			return false;
 		}
 		if (isNaN(ke_topic_partition) || isNaN(ke_topic_repli)) {
-			$("#alert_mssage").show();
+			$("#create_alert_msg").show();
 			setTimeout(function() {
-				$("#alert_mssage").hide()
+				$("#create_alert_msg").hide()
 			}, 3000);
 			return false;
 		}
