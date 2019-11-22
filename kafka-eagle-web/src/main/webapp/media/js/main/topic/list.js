@@ -40,7 +40,7 @@ $(document).ready(function() {
 	}
 
 	var topic = "";
-	$(document).on('click', 'a[name=remove]', function() {
+	$(document).on('click', 'a[name=topic_remove]', function() {
 		var href = $(this).attr("href");
 		topic = href.split("#")[1];
 		var token = $("#ke_admin_token").val();

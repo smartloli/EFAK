@@ -39,6 +39,7 @@ import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.common.util.KConstants.Role;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -328,6 +329,7 @@ public class TopicController {
 
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		Signiner signiner = (Signiner) session.getAttribute(KConstants.Login.SESSION_USER);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("search", search);
@@ -349,11 +351,19 @@ public class TopicController {
 			object.put("partitionNumbers", partition.getPartitionNumbers());
 			object.put("created", partition.getCreated());
 			object.put("modify", partition.getModify());
-			if (Kafka.CONSUMER_OFFSET_TOPIC.equals(partition.getTopic())) {
-				object.put("operate", "");
+			if (Role.ADMIN.equals(signiner.getUsername())) {
+				object.put("operate",
+						"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#"
+								+ partition.getTopic() + "'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Clean</a></li><li><a href='#"
+								+ partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Remove</a></li></ul></div>");
 			} else {
-				object.put("operate", "<a name='remove' href='#" + partition.getTopic() + "' class='btn btn-danger btn-xs'>Remove</a>");
+				object.put("operate", "");
 			}
+//			if (Kafka.CONSUMER_OFFSET_TOPIC.equals(partition.getTopic())) {
+//				object.put("operate", "");
+//			} else {
+//				object.put("operate", "<a name='remove' href='#" + partition.getTopic() + "' class='btn btn-danger btn-xs'>Remove</a>");
+//			}
 			aaDatas.add(object);
 		}
 

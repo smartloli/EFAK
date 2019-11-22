@@ -69,7 +69,7 @@ public class JMXFactoryUtils {
 			executor.shutdown();
 		}
 		if (result == null)
-			//throw new SocketTimeoutException("Kafka JMX Connect timed out: " + url);
+			throw new SocketTimeoutException("Kafka JMX Connect timed out: " + url);
 		if (result instanceof JMXConnector)
 			return (JMXConnector) result;
 		try {

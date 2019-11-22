@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.common.util;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +56,7 @@ public class AlertUtils {
 
 		return map;
 	}
-	
+
 	/** Send Json msg by dingding. */
 	public static String sendTestMsgByDingDing(String uri, String data) {
 		Map<String, Object> dingDingMarkdownMessage = getDingDingMarkdownMessage(IM.TITLE, data, true);
@@ -83,6 +84,18 @@ public class AlertUtils {
 		map.put("at", at);
 
 		return map;
+	}
+
+	public static String sendTestMsgByEmail(String url) {
+		URI uri = URI.create(url);
+		boolean status = NetUtils.telnet(uri.getHost(), uri.getPort());
+		JSONObject object = new JSONObject();
+		if (status) {
+			object.put("errcode", 0);
+		} else {
+			object.put("errcode", 1);
+		}
+		return object.toJSONString();
 	}
 
 }
