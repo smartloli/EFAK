@@ -18,11 +18,16 @@
 package org.smartloli.kafka.eagle.core.factory.v2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.NewPartitions;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -512,6 +517,35 @@ public class BrokerServiceImpl implements BrokerService {
 			zkc = null;
 		}
 		return logSize;
+	}
+
+	/** Add topic partitions. */
+	public Map<String, Object> createTopicPartitions(String clusterAlias, String topic, int totalCount) {
+		Map<String, Object> targets = new HashMap<String, Object>();
+		int existPartitions = (int) partitionNumbers(clusterAlias, topic);
+		Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(clusterAlias));
+
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+			kafkaService.sasl(prop, clusterAlias);
+		}
+
+		AdminClient adminClient = null;
+		try {
+			adminClient = AdminClient.create(prop);
+			Map<String, NewPartitions> newPartitions = new HashMap<String, NewPartitions>();
+			newPartitions.put(topic, NewPartitions.increaseTo(existPartitions + totalCount));
+			adminClient.createPartitions(newPartitions);
+		} catch (Exception e) {
+			LOG.info("Add kafka topic partitions has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			adminClient.close();
+		}
+
+		targets.put("status", "success");
+		targets.put("info", "Add topic[" + topic + "], before partition[" + existPartitions + "], after partition[" + (existPartitions + totalCount) + "] has successed.");
+		return targets;
 	}
 
 }

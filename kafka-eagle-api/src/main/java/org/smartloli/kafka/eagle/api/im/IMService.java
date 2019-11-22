@@ -35,6 +35,7 @@ public interface IMService {
 	/** Send alert message by webhook. */
 	public void sendPostMsgByWebhook(String data, String url);
 	
-	public void sendGetMsgByWebhook(String data, String url);
+	/** Send alert message by mail. */
+	public void sendPostMsgByMail(String data, String url);
 
 }

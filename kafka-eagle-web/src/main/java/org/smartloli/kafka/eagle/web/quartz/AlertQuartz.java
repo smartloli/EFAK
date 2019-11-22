@@ -37,6 +37,8 @@ import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.AlertServiceImpl;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * Alert consumer topic & cluster heathy.
  * 
@@ -113,11 +115,20 @@ public class AlertQuartz {
 
 		private void sendAlarmConsumerError(AlarmConfigInfo alarmConfing, AlarmConsumerInfo alarmConsumer, long lag) {
 			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
-				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
-
-				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
-
-				}
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(alarmConsumer.getId());
+				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Notice");
+				alarmMsg.setAlarmContent("lag.overflow [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
+				alarmMsg.setAlarmProject("Consumer");
+				alarmMsg.setAlarmStatus("PROBLEM");
+				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
@@ -143,21 +154,26 @@ public class AlertQuartz {
 				IMServiceImpl im = new IMServiceImpl();
 				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
-				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
 
-				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
-
-				}
 			}
 		}
 
 		private void sendAlarmConsumerNormal(AlarmConfigInfo alarmConfing, AlarmConsumerInfo alarmConsumer, long lag) {
 			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
-				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
-
-				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
-
-				}
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(alarmConsumer.getId());
+				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Cancel");
+				alarmMsg.setAlarmContent("lag.normal [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
+				alarmMsg.setAlarmProject("Consumer");
+				alarmMsg.setAlarmStatus("NORMAL");
+				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
@@ -183,11 +199,7 @@ public class AlertQuartz {
 				IMServiceImpl im = new IMServiceImpl();
 				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
-				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
 
-				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
-
-				}
 			}
 		}
 
@@ -253,11 +265,20 @@ public class AlertQuartz {
 
 		private void sendAlarmClusterError(AlarmConfigInfo alarmConfing, AlarmClusterInfo cluster, String server) {
 			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
-				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
-
-				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
-
-				}
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(cluster.getId());
+				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Notice");
+				alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+				alarmMsg.setAlarmProject(cluster.getType());
+				alarmMsg.setAlarmStatus("PROBLEM");
+				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
@@ -283,21 +304,26 @@ public class AlertQuartz {
 				IMServiceImpl im = new IMServiceImpl();
 				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
-				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
 
-				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
-
-				}
 			}
 		}
 
 		private void sendAlarmClusterNormal(AlarmConfigInfo alarmConfing, AlarmClusterInfo cluster, String server) {
 			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
-				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
-
-				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
-
-				}
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(cluster.getId());
+				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Cancel");
+				alarmMsg.setAlarmContent("node.alive [ " + server + " ]");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+				alarmMsg.setAlarmProject(cluster.getType());
+				alarmMsg.setAlarmStatus("NORMAL");
+				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
@@ -323,11 +349,7 @@ public class AlertQuartz {
 				IMServiceImpl im = new IMServiceImpl();
 				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
 			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
-				if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_GET)) {
 
-				} else if (alarmConfing.getHttpMethod().equals(AlarmType.HTTP_POST)) {
-
-				}
 			}
 		}
 

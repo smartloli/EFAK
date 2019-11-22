@@ -84,9 +84,9 @@
 									class="form-group">
 									<label>Http Method</label> <br /> <label class="radio-inline">
 										<input type="radio" name="ke_alarm_http"
-										id="ke_alarm_http_get" value="get" checked="">GET
+										id="ke_alarm_http_get" value="get">GET
 									</label><label class="radio-inline"> <input type="radio"
-										name="ke_alarm_http" id="ke_alarm_http_post" value="post">POST
+										name="ke_alarm_http" id="ke_alarm_http_post" value="post" checked="">POST
 									</label> <br /> <label for="inputError"
 										class="control-label text-danger"><i
 										class="fa fa-info-circle"></i> Select the alarm http method .</label>

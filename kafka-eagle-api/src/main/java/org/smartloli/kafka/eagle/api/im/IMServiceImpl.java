@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.api.im;
 import java.util.Date;
 
 import org.smartloli.kafka.eagle.api.im.queue.DingDingJob;
+import org.smartloli.kafka.eagle.api.im.queue.MailJob;
 import org.smartloli.kafka.eagle.api.im.queue.WeChatJob;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
 import org.smartloli.kafka.eagle.common.util.QuartzManagerUtils;
@@ -56,8 +57,11 @@ public class IMServiceImpl implements IMService {
 	}
 
 	@Override
-	public void sendGetMsgByWebhook(String data, String url) {
-
+	public void sendPostMsgByMail(String data, String url) {
+		BaseJobContext jobContext = new BaseJobContext();
+		jobContext.setData(data);
+		jobContext.setUrl(url);
+		QuartzManagerUtils.addJob(jobContext, "ke_job_id_" + new Date().getTime(), MailJob.class, QuartzManagerUtils.getCron(new Date(), 5));
 	}
 
 
