@@ -82,7 +82,7 @@ public class AlertQuartz {
 					params.put("topic", alarmConsumer.getTopic());
 					// real consumer lag
 					long lag = alertService.queryLastestLag(params);
-					if (lag > alarmConsumer.getLag() && alarmConsumer.getAlarmTimes() <= alarmConsumer.getAlarmMaxTimes()) {
+					if (lag > alarmConsumer.getLag() && alarmConsumer.getAlarmTimes() < alarmConsumer.getAlarmMaxTimes()) {
 						// alarm consumer
 						alarmConsumer.setAlarmTimes(alarmConsumer.getAlarmTimes() + 1);
 						alarmConsumer.setIsNormal("N");
@@ -92,7 +92,7 @@ public class AlertQuartz {
 						} catch (Exception e) {
 							LOG.error("Send alarm consumer exception has error, msg is " + e.getCause().getMessage());
 						}
-					} else {
+					} else if (lag <= alarmConsumer.getLag()) {
 						if (alarmConsumer.getIsNormal().equals("N")) {
 							alarmConsumer.setIsNormal("Y");
 							// clear error alarm and reset
@@ -237,7 +237,7 @@ public class AlertQuartz {
 						e.printStackTrace();
 					}
 				}
-				if (errorServers.size() > 0 && cluster.getAlarmTimes() <= cluster.getAlarmMaxTimes()) {
+				if (errorServers.size() > 0 && cluster.getAlarmTimes() < cluster.getAlarmMaxTimes()) {
 					cluster.setAlarmTimes(cluster.getAlarmTimes() + 1);
 					cluster.setIsNormal("N");
 					alertService.modifyClusterStatusAlertById(cluster);
@@ -246,7 +246,7 @@ public class AlertQuartz {
 					} catch (Exception e) {
 						LOG.error("Send alarm cluser exception has error, msg is " + e.getCause().getMessage());
 					}
-				} else {
+				} else if (errorServers.size() == 0) {
 					if (cluster.getIsNormal().equals("N")) {
 						cluster.setIsNormal("Y");
 						// clear error alarm and reset
