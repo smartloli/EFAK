@@ -44,6 +44,8 @@ import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +79,9 @@ public class TopicController {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
+
+	/** BrokerService interface. */
+	private BrokerService brokerService = new BrokerFactory().create();
 
 	/** Topic create viewer. */
 	@RequiresPermissions("/topic/create")
@@ -359,11 +364,6 @@ public class TopicController {
 			} else {
 				object.put("operate", "");
 			}
-//			if (Kafka.CONSUMER_OFFSET_TOPIC.equals(partition.getTopic())) {
-//				object.put("operate", "");
-//			} else {
-//				object.put("operate", "<a name='remove' href='#" + partition.getTopic() + "' class='btn btn-danger btn-xs'>Remove</a>");
-//			}
 			aaDatas.add(object);
 		}
 
@@ -457,6 +457,20 @@ public class TopicController {
 			} else {
 				mav.setViewName("redirect:/errors/500");
 			}
+		} else {
+			mav.setViewName("redirect:/errors/403");
+		}
+		return mav;
+	}
+
+	/** Modify topic partitions. */
+	@RequestMapping(value = "/topic/{topicName}/{partitions}/modify", method = RequestMethod.GET)
+	public ModelAndView topicModifyPartitions(@PathVariable("topicName") String topicName, @PathVariable("partitions") int token, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		Map<String, Object> respons = brokerService.createTopicPartitions(clusterAlias, topicName, token);
+		if ("success".equals(respons.get("status"))) {
+			mav.setViewName("redirect:/topic/list");
 		} else {
 			mav.setViewName("redirect:/errors/500");
 		}

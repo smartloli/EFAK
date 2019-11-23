@@ -46,11 +46,11 @@ $(document).ready(function() {
 		var token = $("#ke_admin_token").val();
 		$("#remove_div").html("");
 		$("#remove_div").append("<a id='ke_del_topic' href='#' class='btn btn-danger'>Remove</a>");
-		$('#doc_info').modal({
+		$('#ke_topic_delete').modal({
 			backdrop : 'static',
 			keyboard : false
 		});
-		$('#doc_info').modal('show').css({
+		$('#ke_topic_delete').modal('show').css({
 			position : 'fixed',
 			left : '50%',
 			top : '50%',
@@ -60,11 +60,9 @@ $(document).ready(function() {
 		if (token.length == 0) {
 			$("#ke_del_topic").attr("disabled", true);
 			$("#ke_del_topic").attr("href", "#");
-		} else {
-			$("#ke_del_topic").attr("href", "/ke/topic/" + topic + "/" + token + "/delete");
-		}
+		} 
 	});
-
+	
 	$("#ke_admin_token").on('input', function(e) {
 		var token = $("#ke_admin_token").val();
 		if (token.length == 0) {
@@ -73,6 +71,41 @@ $(document).ready(function() {
 		} else {
 			$("#ke_del_topic").attr("disabled", false);
 			$("#ke_del_topic").attr("href", "/ke/topic/" + topic + "/" + token + "/delete");
+		}
+	});
+	
+	$(document).on('click', 'a[name=topic_modify]', function() {
+		var href = $(this).attr("href");
+		topic = href.split("#")[1];
+		var partitions = $("#ke_modify_topic_partition").val();
+		$("#ke_topic_submit_div").html("");
+		$("#ke_topic_submit_div").append("<a id='ke_modify_topic_btn' href='#' class='btn btn-primary'>Modify</a>");
+		$('#ke_topic_modify').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+		$('#ke_topic_modify').modal('show').css({
+			position : 'fixed',
+			left : '50%',
+			top : '50%',
+			transform : 'translateX(-50%) translateY(-50%)'
+		});
+
+		if (partitions.length == 0) {
+			$("#ke_modify_topic_btn").attr("disabled", true);
+			$("#ke_modify_topic_btn").attr("href", "#");
+		} 
+	});
+
+	$("#ke_modify_topic_partition").on('input', function(e) {
+		var partitions = $("#ke_modify_topic_partition").val();
+		var reg = /^[1-9]\d*$/;
+		if (!reg.test(partitions)) {
+			$("#ke_modify_topic_btn").attr("disabled", true);
+			$("#ke_modify_topic_btn").attr("href", "#");
+		} else {
+			$("#ke_modify_topic_btn").attr("disabled", false);
+			$("#ke_modify_topic_btn").attr("href", "/ke/topic/" + topic + "/" + partitions + "/modify");
 		}
 	});
 

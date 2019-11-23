@@ -536,15 +536,16 @@ public class BrokerServiceImpl implements BrokerService {
 			Map<String, NewPartitions> newPartitions = new HashMap<String, NewPartitions>();
 			newPartitions.put(topic, NewPartitions.increaseTo(existPartitions + totalCount));
 			adminClient.createPartitions(newPartitions);
+			targets.put("status", "success");
+			targets.put("info", "Add topic[" + topic + "], before partition[" + existPartitions + "], after partition[" + (existPartitions + totalCount) + "] has successed.");
 		} catch (Exception e) {
 			LOG.info("Add kafka topic partitions has error, msg is " + e.getMessage());
 			e.printStackTrace();
+			targets.put("status", "failed");
+			targets.put("info", "Add kafka topic partitions has error, msg is " + e.getMessage());
 		} finally {
 			adminClient.close();
 		}
-
-		targets.put("status", "success");
-		targets.put("info", "Add topic[" + topic + "], before partition[" + existPartitions + "], after partition[" + (existPartitions + totalCount) + "] has successed.");
 		return targets;
 	}
 

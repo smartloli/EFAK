@@ -127,11 +127,12 @@
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label>Topic Name (*)</label> <select multiple="multiple" id="select2val"
-											name="select2val" tabindex="-1"
+										<label>Topic Name (*)</label> <select multiple="multiple"
+											id="select2val" name="select2val" tabindex="-1"
 											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
-										<input id="ke_topic_aggrate" name="ke_topic_aggrate" type="hidden" />
-										<label for="inputError" class="control-label text-danger"><i
+										<input id="ke_topic_aggrate" name="ke_topic_aggrate"
+											type="hidden" /> <label for="inputError"
+											class="control-label text-danger"><i
 											class="fa fa-info-circle"></i> Select the topic you need to
 											alarm .</label>
 									</div>
@@ -164,7 +165,7 @@
 			</div>
 			<!-- /.row -->
 			<div class="modal fade" aria-labelledby="keModalLabel"
-				aria-hidden="true" id="doc_info" tabindex="-1" role="dialog">
+				aria-hidden="true" id="ke_topic_delete" tabindex="-1" role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -181,6 +182,29 @@
 							<p>
 						</div>
 						<div id="remove_div" class="modal-footer"></div>
+					</div>
+				</div>
+			</div>
+			<!-- modify topic partitions -->
+			<div class="modal fade" aria-labelledby="keModalLabel"
+				aria-hidden="true" id="ke_topic_modify" tabindex="-1" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabel">Modify</h4>
+						</div>
+						<!-- /.row -->
+						<div class="modal-body">
+							<p>
+								Add Partitions : <input id="ke_modify_topic_partition"
+									name="ke_admin_token" style="width: 100%;" class="form-control"
+									placeholder="Partition Numbers" /> <label for="inputError"
+									class="control-label text-danger"><i
+									class="fa fa-info-circle"></i> Please enter a positive integer greater than 1 .</label>
+							<p>
+						</div>
+						<div id="ke_topic_submit_div" class="modal-footer"></div>
 					</div>
 				</div>
 			</div>
