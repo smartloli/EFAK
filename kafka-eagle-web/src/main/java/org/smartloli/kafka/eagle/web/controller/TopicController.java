@@ -357,10 +357,10 @@ public class TopicController {
 			object.put("created", partition.getCreated());
 			object.put("modify", partition.getModify());
 			if (Role.ADMIN.equals(signiner.getUsername())) {
+				// <li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Clean</a></li>
 				object.put("operate",
 						"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#"
-								+ partition.getTopic() + "'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Clean</a></li><li><a href='#"
-								+ partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Remove</a></li></ul></div>");
+								+ partition.getTopic() + "'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Remove</a></li></ul></div>");
 			} else {
 				object.put("operate", "");
 			}

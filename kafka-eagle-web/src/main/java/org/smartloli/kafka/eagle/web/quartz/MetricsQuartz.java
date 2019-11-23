@@ -65,6 +65,17 @@ public class MetricsQuartz {
 			LOG.error("Collector consumer topic data has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		}
+
+		try {
+			checkCleanTopicTaskProcess();
+		} catch (Exception e) {
+			LOG.error("Check clean topic task whether is finished has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private void checkCleanTopicTaskProcess() {
+		// TODO
 	}
 
 	private void consumerTopicQuartz() {
