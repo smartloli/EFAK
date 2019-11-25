@@ -19,7 +19,7 @@
 		<property name="jobDetail" ref="metricsDetail" />
 		<property name="cronExpression">
 			<!-- Perform task scheduling per 1min. -->
-			<value>0 0/1 * * * ?</value>
+			<value>0 0 0 * * ?</value>
 		</property>
 	</bean>
 	<!-- Quartz scheduling factory scheduling plant can only have one, multiple 
