@@ -35,6 +35,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicMockMessage;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
@@ -51,6 +52,7 @@ import org.smartloli.kafka.eagle.web.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -297,14 +299,14 @@ public class TopicController {
 		}
 	}
 
-	/***/
-	@RequestMapping(value = "/topic/mock/send/message/{topic}/ajax", method = RequestMethod.GET)
-	public void topicMockSend(@PathVariable("topic") String topic, @RequestParam("message") String message, HttpServletResponse response, HttpServletRequest request) {
+	/** Send mock data to topic. */
+	@RequestMapping(value = "/topic/mock/send/message/topic/ajax", method = RequestMethod.POST)
+	public void topicMockSend(@RequestBody TopicMockMessage topicMockMessage, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			JSONObject object = new JSONObject();
-			object.put("status", topicService.mockSendMsg(clusterAlias, topic, message));
+			object.put("status", topicService.mockSendMsg(clusterAlias, topicMockMessage.getTopic(), topicMockMessage.getMessage()));
 			byte[] output = object.toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
@@ -357,7 +359,9 @@ public class TopicController {
 			object.put("created", partition.getCreated());
 			object.put("modify", partition.getModify());
 			if (Role.ADMIN.equals(signiner.getUsername())) {
-				// <li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Clean</a></li>
+				// <li><a href='#" + partition.getTopic() + "'
+				// name='topic_clean'><i class='fa fa-fw
+				// fa-trash-o'></i>Clean</a></li>
 				object.put("operate",
 						"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#"
 								+ partition.getTopic() + "'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Remove</a></li></ul></div>");

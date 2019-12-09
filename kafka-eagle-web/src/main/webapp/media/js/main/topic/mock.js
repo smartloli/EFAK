@@ -60,12 +60,16 @@ $(document).ready(function() {
 			}, 3000);
 		} else {
 			$.ajax({
-				type : 'get',
+				type : 'post',
 				dataType : 'json',
-				url : '/ke/topic/mock/send/message/' + topic + '/ajax?message=' + message,
+				contentType : 'application/json;charset=UTF-8',
+				data : JSON.stringify({
+					"topic" : topic,
+					"message" : message
+				}),
+				url : '/ke/topic/mock/send/message/topic/ajax',
 				success : function(datas) {
 					if (datas != null) {
-						console.log(datas)
 						if (datas.status) {
 							$("#success_mssage_mock").show();
 							setTimeout(function() {
