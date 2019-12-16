@@ -118,7 +118,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Notice");
-				alarmMsg.setAlarmContent("lag.overflow [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmContent("lag.overflow [ group(" + alarmConsumer.getAlarmGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -163,7 +163,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Cancel");
-				alarmMsg.setAlarmContent("lag.normal [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmContent("lag.normal [ group(" + alarmConsumer.getAlarmGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");

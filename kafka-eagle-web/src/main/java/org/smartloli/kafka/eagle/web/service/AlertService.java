@@ -50,9 +50,6 @@ public interface AlertService {
 	/** Count alarm consumer application size. */
 	public int alertConsumerAppCount(Map<String, Object> params);
 
-	/** Exist alert by cluster_group_topic from table. */
-	public int isExistAlertByCGT(Map<String, Object> params);
-
 	/** Modify consumer alarm switch. */
 	public int modifyConsumerAlertSwitchById(AlarmConsumerInfo alarmConsumer);
 

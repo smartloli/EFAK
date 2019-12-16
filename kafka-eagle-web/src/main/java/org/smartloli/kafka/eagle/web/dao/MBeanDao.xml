@@ -43,7 +43,7 @@
 	<select id="query" parameterType="map" resultMap="kpi">
 		select `broker`,`key`,`value`,`timespan` from ke_metrics
 		where `cluster`=#{cluster} and `type` =#{type}
-		<if test="modules != '' and modules != null">
+		<if test="modules != null and modules.size > 0">
 			and `key` in (
 			<foreach collection="modules" item="item" index="index" separator=",">
 				#{item}

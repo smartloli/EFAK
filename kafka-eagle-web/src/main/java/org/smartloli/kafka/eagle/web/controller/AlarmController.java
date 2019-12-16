@@ -228,27 +228,15 @@ public class AlarmController {
 		alarmConsumer.setModify(CalendarUtils.getDate());
 		alarmConsumer.setTopic(topic);
 
-		Map<String, Object> map = new HashMap<>();
-		map.put("cluster", clusterAlias);
-		map.put("group", group);
-		map.put("topic", topic);
-		int findCode = alertService.isExistAlertByCGT(map);
-
-		if (findCode > 0) {
+		int code = alertService.insertAlarmConsumer(alarmConsumer);
+		if (code > 0) {
 			session.removeAttribute("Alarm_Submit_Status");
-			session.setAttribute("Alarm_Submit_Status", "Insert failed,msg is alarm group[" + group + "] and topic[" + topic + "] has exist.");
-			mav.setViewName("redirect:/alarm/add/failed");
+			session.setAttribute("Alarm_Submit_Status", "Insert success.");
+			mav.setViewName("redirect:/alarm/add/success");
 		} else {
-			int code = alertService.insertAlarmConsumer(alarmConsumer);
-			if (code > 0) {
-				session.removeAttribute("Alarm_Submit_Status");
-				session.setAttribute("Alarm_Submit_Status", "Insert success.");
-				mav.setViewName("redirect:/alarm/add/success");
-			} else {
-				session.removeAttribute("Alarm_Submit_Status");
-				session.setAttribute("Alarm_Submit_Status", "Insert failed.");
-				mav.setViewName("redirect:/alarm/add/failed");
-			}
+			session.removeAttribute("Alarm_Submit_Status");
+			session.setAttribute("Alarm_Submit_Status", "Insert failed.");
+			mav.setViewName("redirect:/alarm/add/failed");
 		}
 
 		return mav;
@@ -905,7 +893,7 @@ public class AlarmController {
 			} else if (AlarmType.DingDing.equals(type)) {
 				result = AlertUtils.sendTestMsgByDingDing(url, msg);
 			} else if (AlarmType.WebHook.equals(type)) {
-				
+
 			} else if (AlarmType.WeChat.equals(type)) {
 				result = AlertUtils.sendTestMsgByWeChat(url, msg);
 			}

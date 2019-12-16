@@ -103,13 +103,6 @@
 		select count(*) from ke_alarm_consumer where `cluster`=#{cluster}
 	</select>
 
-	<select id="isExistAlertByCGT" parameterType="map" resultType="Integer">
-		select count(*) from ke_alarm_consumer
-		<where>
-			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
-		</where>
-	</select>
-	
 	<update id="modifyConsumerAlertSwitchById" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
 		update ke_alarm_consumer set `is_enable`=#{isEnable},`modify`=#{modify} where `id`=#{id}
 	</update>

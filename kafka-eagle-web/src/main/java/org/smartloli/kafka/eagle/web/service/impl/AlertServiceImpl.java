@@ -199,11 +199,6 @@ public class AlertServiceImpl implements AlertService {
 	}
 
 	@Override
-	public int isExistAlertByCGT(Map<String, Object> params) {
-		return alertDao.isExistAlertByCGT(params);
-	}
-
-	@Override
 	public int deleteAlarmConsumerById(int id) {
 		return alertDao.deleteAlarmConsumerById(id);
 	}

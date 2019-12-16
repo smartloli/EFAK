@@ -88,7 +88,7 @@
 
 	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
 		select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster}
-		<if test="topics != '' and topics != null">
+		<if test="topics != null and topics.size > 0">
 			and `topic` in (
 			<foreach collection="topics" item="item" index="index" separator=",">
 				#{item}
@@ -174,7 +174,7 @@
 	<select id="getBScreenTotalRecords" parameterType="map" resultType="long">
 		select ifnull(sum(a.logsize),0) from (select `logsize` from ke_logsize
 		where `cluster`=#{cluster}
-		<if test="topics != '' and topics != null">
+		<if test="topics != null and topics.size > 0">
 			and `topic` in (
 			<foreach collection="topics" item="item" index="index" separator=",">
 				#{item}
