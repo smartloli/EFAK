@@ -118,7 +118,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Notice");
-				alarmMsg.setAlarmContent("lag.overflow [ group(" + alarmConsumer.getAlarmGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmContent("lag.overflow [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -133,7 +133,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("**<font color=\"#FF0000\">Kafka Eagle Alarm Consumer Notice</font>** \n\n");
-				alarmMsg.setAlarmContent("<font color=\"#FF0000\">lag.overflow [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmContent("<font color=\"#FF0000\">lag.overflow [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -145,7 +145,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("`Kafka Eagle Alarm Consumer Notice`\n");
-				alarmMsg.setAlarmContent("<font color=\"warning\">lag.overflow [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmContent("<font color=\"warning\">lag.overflow [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -163,7 +163,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Cancel");
-				alarmMsg.setAlarmContent("lag.normal [ group(" + alarmConsumer.getAlarmGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmContent("lag.normal [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -178,7 +178,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("**<font color=\"#008000\">Kafka Eagle Alarm Consumer Cancel</font>** \n\n");
-				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -190,7 +190,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("`Kafka Eagle Alarm Consumer Cancel`\n");
-				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
