@@ -62,6 +62,10 @@ cluster2.kafka.eagle.offset.storage=zookeeper
 # Kafka SQL
 
 Use the SQL statement to query the topic message log, and visualize the results, you can read [Kafka SQL](https://docs.kafka-eagle.org/3.Manuals/9.KafkaSQL.html) to view the syntax.
+For example, if you kafka has a topic with three partitions, the ksql query statement is as follows.
+```
+select * from "kafka_topic_name" where "partition" in (0,1,2) limit 10
+```
 
 # Quickstart
 
