@@ -21,6 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.web.service.ClusterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,11 +36,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
-import org.smartloli.kafka.eagle.web.service.ClusterService;
 
 /**
  * Kafka & Zookeeper controller to viewer data.
@@ -128,6 +128,12 @@ public class ClusterController {
 					} else {
 						obj.put("mode", "<a class='btn btn-success btn-xs'>" + mode + "</a>");
 					}
+					String version = cluster.getString("version");
+					if (StrUtils.isNull(version)) {
+						obj.put("version", "<a class='btn btn-danger btn-xs'>unkown</a>");
+					} else {
+						obj.put("version", "<a class='btn btn-success btn-xs'>" + version + "</a>");
+					}
 				}
 				aaDatas.add(obj);
 			} else if (search.length() == 0) {
@@ -152,6 +158,12 @@ public class ClusterController {
 							obj.put("mode", "<a class='btn btn-danger btn-xs'>" + mode + "</a>");
 						} else {
 							obj.put("mode", "<a class='btn btn-success btn-xs'>" + mode + "</a>");
+						}
+						String version = cluster.getString("version");
+						if (StrUtils.isNull(version)) {
+							obj.put("version", "<a class='btn btn-danger btn-xs'>unkown</a>");
+						} else {
+							obj.put("version", "<a class='btn btn-success btn-xs'>" + version + "</a>");
 						}
 					}
 					aaDatas.add(obj);

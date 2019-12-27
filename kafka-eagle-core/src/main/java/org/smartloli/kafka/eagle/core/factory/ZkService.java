@@ -45,6 +45,9 @@ public interface ZkService {
 	/** Get zookeeper health status. */
 	public String status(String host, String port);
 
+	/** Get zookeeper version. */
+	public String version(String host, String port);
+
 	/** Get zookeeper cluster information. */
 	public String zkCluster(String clusterAlias);
 
