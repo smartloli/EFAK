@@ -212,8 +212,12 @@
 	</select>
 
 	<select id="queryLastestLag" parameterType="map" resultType="long">
-		select ifnull(`lag`,0) from ke_consumer_bscreen
-		where `cluster`=#{cluster} and tm=#{tday} and `group`=#{group} and `topic`=#{topic} order by `timespan` desc limit 1
+		select ifnull((
+                   select ifnull(`lag`,0) from ke_consumer_bscreen
+		   where `cluster`=#{cluster} and tm=#{tday}
+		   and `group`=#{group} and `topic`=#{topic}
+		   order by `timespan` desc limit 1)
+		,0)
 	</select>
 
 </mapper>
