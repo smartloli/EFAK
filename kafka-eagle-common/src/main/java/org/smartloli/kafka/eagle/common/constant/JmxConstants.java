@@ -90,16 +90,4 @@ public class JmxConstants {
 		public static final String value = "Version";
 	}
 
-	public interface Hosts {
-		public static String load = "load";
-		public static String cpu = "cpu";
-		public static String free = "free";
-		public static String used = "used";
-		public static String disk = "disk";
-		public static String network = "network";
-		public static String tcp = "tcp";
-		public static String openfile = "openfile";
-		public static String inode = "inode";
-	}
-
 }
