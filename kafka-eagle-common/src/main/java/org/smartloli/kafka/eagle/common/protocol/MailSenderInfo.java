@@ -19,7 +19,9 @@ package org.smartloli.kafka.eagle.common.protocol;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -41,6 +43,15 @@ public class MailSenderInfo {
 	private String content;
 	private String[] attachFileNames;
 	private List<File> fileList;
+	private Map<String, String> imagesMap = new HashMap<>();
+
+	public Map<String, String> getImagesMap() {
+		return imagesMap;
+	}
+
+	public void setImagesMap(Map<String, String> imagesMap) {
+		this.imagesMap = imagesMap;
+	}
 
 	public List<File> getFileList() {
 		return fileList;
@@ -55,6 +66,7 @@ public class MailSenderInfo {
 		p.put("mail.smtp.host", this.mailServerHost);
 		p.put("mail.smtp.port", this.mailServerPort);
 		p.put("mail.smtp.auth", validate ? "true" : "false");
+		// p.setProperty("mail.smtp.starttls.enable", "true"); 
 		return p;
 	}
 

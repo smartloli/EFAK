@@ -43,7 +43,8 @@
 						website of <a href="http://kafka.apache.org/" target="_blank"
 							class="alert-link">Kafka</a> and <a
 							href="http://zookeeper.apache.org/" target="_blank"
-							class="alert-link">Zookeeper</a> to view the relevant usage.
+							class="alert-link">Zookeeper</a> to view the relevant usage.<br/>
+						<i class="fa fa-info-circle"> <strong>Note</strong>:&nbsp;</i>Kafka version is <strong>"-"</strong> or JMX Port is <strong>"-1"</strong> maybe kafka broker jmxport disable.<br/>							
 					</div>
 				</div>
 			</div>
@@ -64,8 +65,10 @@
 											<th>ID</th>
 											<th>IP</th>
 											<th>Port</th>
+											<th>JMX Port</th>
 											<th>Created</th>
 											<th>Modify</th>
+											<th>Version</th>
 										</tr>
 									</thead>
 								</table>
@@ -94,6 +97,7 @@
 											<th>IP</th>
 											<th>Port</th>
 											<th>Mode</th>
+											<th>Version</th>
 										</tr>
 									</thead>
 								</table>

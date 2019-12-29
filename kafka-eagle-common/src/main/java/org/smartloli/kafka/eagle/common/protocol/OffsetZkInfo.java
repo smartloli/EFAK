@@ -17,6 +17,9 @@
  */
 package org.smartloli.kafka.eagle.common.protocol;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Definition Kafka offset in zookeeper information.
  * 
@@ -24,12 +27,21 @@ package org.smartloli.kafka.eagle.common.protocol;
  *
  *         Created by Aug 16, 2016
  */
-public class OffsetZkInfo extends BaseProtocol{
+public class OffsetZkInfo extends BaseProtocol {
 
 	private long offset = -1L;
 	private String create = "";
 	private String modify = "";
 	private String owners = "";
+	private Set<Integer> partitions = new HashSet<>();
+
+	public Set<Integer> getPartitions() {
+		return partitions;
+	}
+
+	public void setPartitions(Set<Integer> partitions) {
+		this.partitions = partitions;
+	}
 
 	public String getOwners() {
 		return owners;

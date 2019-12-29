@@ -10,7 +10,7 @@
 			style="border: 3px solid #fff; border-radius: 50%; margin-top: 6px; margin-left: 10px; float: left;"
 			src="/ke/media/img/ke_login.png" width="40px"> <a
 			class="navbar-brand" href="/ke"> Kafka Eagle</a>
-		<div class="modal fade" aria-labelledby="mfModalLabel"
+		<div class="modal fade" aria-labelledby="keModalLabel"
 			aria-hidden="true" id="ke_account_reset_dialog" tabindex="-1"
 			role="dialog">
 			<div class="modal-dialog">
@@ -21,20 +21,20 @@
 					</div>
 					<!-- /.row -->
 					<form role="form" action="/ke/account/reset/" method="post"
-						onsubmit="return contextFormValid();return false;">
+						onsubmit="return contextPasswdFormValid();return false;">
 						<div class="modal-body">
 							<fieldset class="form-horizontal">
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">New</label>
 									<div class="col-sm-10">
-										<input id="mf_new_password_name" name="ke_new_password_name"
+										<input id="ke_new_password_name" name="ke_new_password_name"
 											type="password" class="form-control" maxlength="16"
 											placeholder="New Password">
 									</div>
 								</div>
 								<div id="alert_mssage" style="display: none"
 									class="alert alert-danger">
-									<label> Passwords can only be data and letters or
+									<label> Passwords can only be number and letters or
 										special symbols .</label>
 								</div>
 							</fieldset>
@@ -56,7 +56,7 @@
 			data-toggle="dropdown"><i class="fa fa-sitemap"></i>
 				${clusterAlias} </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
-			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.2.5 </a></li>
+			data-toggle="dropdown"><i class="fa fa-bookmark"></i> V1.4.3 </a></li>
 		<li class="dropdown"><a href="#" class="dropdown-toggle"
 			data-toggle="dropdown" aria-expanded="false"><i
 				class="fa fa-user"></i> ${LOGIN_USER_SESSION.realname} <b
@@ -81,12 +81,12 @@
 							class="fa fa-edit fa-fw"></i> Create</a></li>
 					<li id="navbar_list"><a href="/ke/topic/list"><i
 							class="fa fa-table fa-fw"></i> List</a></li>
-					<%-- <li id="navbar_list"><a href="/ke/topic/export"><i
-							class="fa fa-download fa-fw"></i> Export</a></li> --%>
 					<li id="navbar_list"><a href="/ke/topic/message"><i
-							class="fa fa-file-text fa-fw"></i> Message</a></li>
+							class="fa fa-file-text fa-fw"></i> KSQL</a></li>
 					<li id="navbar_list"><a href="/ke/topic/mock"><i
 							class="fa fa-maxcdn fa-fw"></i> Mock</a></li>
+					<li id="navbar_list"><a href="/ke/topic/manager"><i
+							class="fa fa-tasks fa-fw"></i> Manager</a></li>
 				</ul></li>
 			<li id="navbar_consumers"><a href="/ke/consumers"><i
 					class="fa fa-fw fa-users"></i> Consumers</a></li>
@@ -112,19 +112,22 @@
 					<li id="navbar_cli"><a href="/ke/metrics/zk"><i
 							class="fa fa-area-chart fa-fw"></i> Zookeeper</a></li>
 				</ul></li>
-			<!-- <li><a href="#" data-toggle="collapse" data-target="#demo1"><i
-					class="fa fa-fw fa-bell"></i> Alarm <i
-					class="fa fa-fw fa-caret-down"></i></a>
-				<ul id="demo1" class="collapse">
-					<li id="navbar_add"><a href="/ke/alarm/add"><i
-							class="fa fa-info-circle fa-fw"></i> Add</a></li>
-					<li id="navbar_modify"><a href="/ke/alarm/modify"><i
-							class="fa fa-edit fa-fw"></i> Modify</a></li>
-				</ul></li> -->
 			<li><a href="#" data-toggle="collapse" data-target="#demo1"><i
 					class="fa fa-fw fa-bell"></i> Alarm <i
 					class="fa fa-fw fa-caret-down"></i></a>
 				<ul id="demo1" class="collapse">
+					<li><a href="#" data-toggle="collapse" data-target="#demo1_3"><i
+							class="fa fa-fw fa-bullhorn"></i> Channel <i
+							class="fa fa-fw fa-caret-down"></i></a>
+						<ul id="demo1_3" class="collapse"
+							style="list-style: none; margin-left: -40px">
+							<li id="navbar_config"><a href="/ke/alarm/config"
+								style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;"><i
+									class="fa fa-info-circle fa-fw"></i> Config</a></li>
+							<li id="navbar_list"><a href="/ke/alarm/list"
+								style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;"><i
+									class="fa fa-edit fa-fw"></i> List</a></li>
+						</ul></li>
 					<li><a href="#" data-toggle="collapse" data-target="#demo1_1"><i
 							class="fa fa-fw fa-users"></i> Consumer <i
 							class="fa fa-fw fa-caret-down"></i></a>
@@ -166,15 +169,17 @@
 							class="fa fa-bullhorn fa-fw"></i> Notice</a></li> -->
 					</ul></li>
 			</c:if>
+			<li><a href="/ke/bs" target="_blank"><i
+					class="fa fa-fw fa-desktop"></i> BScreen</a></li>
 		</ul>
 	</div>
 	<!-- /.navbar-collapse -->
 </nav>
 <script type="text/javascript">
-	function contextFormValid() {
+	function contextPasswdFormValid() {
 		var ke_new_password_name = $("#ke_new_password_name").val();
-		var reg = /^[u4E00-u9FA5]+$/;
-		if (ke_new_password_name.length == 0 || !reg.test(ke_new_password_name)) {
+		var resetRegular = /[\u4E00-\u9FA5]/;
+		if (ke_new_password_name.length == 0 || resetRegular.test(ke_new_password_name)) {
 			$("#alert_mssage").show();
 			setTimeout(function() {
 				$("#alert_mssage").hide()

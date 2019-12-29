@@ -27,7 +27,7 @@
 		<property name="triggers">
 			<list>
 				<!-- All scheduling lists. -->
-				<ref local="alertTrigger" />
+				<ref bean="alertTrigger" />
 			</list>
 		</property>
 	</bean>

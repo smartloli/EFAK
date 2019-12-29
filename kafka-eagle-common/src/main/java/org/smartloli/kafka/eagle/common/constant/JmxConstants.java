@@ -35,6 +35,13 @@ public class JmxConstants {
 		// TODO
 	}
 
+	public interface KafkaServer8 {
+		public static final String version = "kafka.common:type=AppInfo,name=Version";
+		public static final String value = "Value";
+		public static final String endLogSize = "kafka.log:type=Log,name=LogEndOffset,topic=%s,partition=%s";
+		public static final String startLogSize = "kafka.log:type=Log,name=LogStartOffset,topic=%s,partition=%s";
+	}
+
 	public interface KafkaServer {
 		class BrokerTopicMetrics {
 			public static String bytesInPerSec = "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec";
@@ -48,6 +55,11 @@ public class JmxConstants {
 			public static String replicationBytesOutPerSec = "kafka.server:type=BrokerTopicMetrics,name=ReplicationBytesOutPerSec";
 			public static String totalFetchRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec";
 			public static String totalProduceRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=TotalProduceRequestsPerSec";
+		}
+
+		class Topic {
+			public static String bytesInPerSecTopic = "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic=%s";
+			public static String bytesOutPerSecTopic = "kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=%s";
 		}
 
 		class ClusterBusyMetrics {
@@ -66,22 +78,16 @@ public class JmxConstants {
 		class ZookeeperClientMetrics {
 			public static String zooKeeperRequestLatencyMs = "kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs";
 		}
-	}
 
-	public interface Hosts {
-		public static String load = "load";
-		public static String cpu = "cpu";
-		public static String free = "free";
-		public static String used = "used";
-		public static String disk = "disk";
-		public static String network = "network";
-		public static String tcp = "tcp";
-		public static String openfile = "openfile";
-		public static String inode = "inode";
-	}
+		
+		class OS{
+			public static String type = "java.lang:type=OperatingSystem";
+			public static String totalPhysicalMemorySize = "TotalPhysicalMemorySize";
+			public static String freePhysicalMemorySize = "FreePhysicalMemorySize";
+		}
 
-	public static void main(String[] args) {
-		System.out.println(KafkaServer.BrokerTopicMetrics.bytesInPerSec);
+		public static final String version = "kafka.server:type=app-info,id=%s";
+		public static final String value = "Version";
 	}
 
 }

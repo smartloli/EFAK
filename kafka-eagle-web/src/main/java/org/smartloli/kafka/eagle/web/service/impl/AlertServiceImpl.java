@@ -20,12 +20,17 @@ package org.smartloli.kafka.eagle.web.service.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Pattern;
 
-import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
-import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
+import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.dao.AlertDao;
+import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,122 +55,352 @@ public class AlertServiceImpl implements AlertService {
 
 	@Autowired
 	private AlertDao alertDao;
+	
+	@Autowired
+	private TopicDao topicDao;
 
 	@Override
-	public int add(AlertInfo alert) {
-		return alertDao.insertAlert(alert);
+	public int insertAlarmConsumer(AlarmConsumerInfo alarmConsumer) {
+		return alertDao.insertAlarmConsumer(alarmConsumer);
 	}
 
-	public String get(String clusterAlias, String formatter) {
+	/** Get consumer group to alert. */
+	public String getAlarmConsumerGroup(String clusterAlias, String formatter, String search) {
 		if ("kafka".equals(formatter)) {
-			return getKafka(clusterAlias);
+			return getAlarmConsumerGroupKafka(clusterAlias, search);
 		} else {
-			return get(clusterAlias);
+			return getAlarmConsumerGroup(clusterAlias, search);
 		}
 	}
 
-	/** Get consumer topics to alert. */
-	private String get(String clusterAlias) {
+	/** Get consumer topic to alert. */
+	public String getAlarmConsumerTopic(String clusterAlias, String formatter, String group, String search) {
+		if ("kafka".equals(formatter)) {
+			return getAlarmConsumerTopicKafka(clusterAlias, group, search);
+		} else {
+			return getAlarmConsumerTopic(clusterAlias, group, search);
+		}
+	}
+
+	private String getAlarmConsumerGroup(String clusterAlias, String search) {
+		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
+		JSONArray groups = new JSONArray();
+		int offset = 0;
+		if (search.length() > 0) {
+			for (Entry<String, List<String>> entry : consumers.entrySet()) {
+				if (entry.getKey().contains(search)) {
+					JSONObject object = new JSONObject();
+					object.put("text", entry.getKey());
+					object.put("id", offset);
+					groups.add(object);
+					offset++;
+				}
+			}
+		} else {
+			for (Entry<String, List<String>> entry : consumers.entrySet()) {
+				JSONObject object = new JSONObject();
+				object.put("text", entry.getKey());
+				object.put("id", offset);
+				groups.add(object);
+				offset++;
+			}
+		}
+		return groups.toJSONString();
+	}
+
+	private String getAlarmConsumerGroupKafka(String clusterAlias, String search) {
+		int offset = 0;
+		JSONArray groups = new JSONArray();
+		JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+		if (search.length() > 0) {
+			for (Object object : consumerGroups) {
+				JSONObject consumerGroup = (JSONObject) object;
+				if (consumerGroup.getString("group").contains(search)) {
+					JSONObject group = new JSONObject();
+					group.put("text", consumerGroup.getString("group"));
+					group.put("id", offset);
+					groups.add(group);
+					offset++;
+				}
+			}
+		} else {
+			for (Object object : consumerGroups) {
+				JSONObject consumerGroup = (JSONObject) object;
+				JSONObject group = new JSONObject();
+				group.put("text", consumerGroup.getString("group"));
+				group.put("id", offset);
+				groups.add(group);
+				offset++;
+			}
+		}
+		return groups.toJSONString();
+	}
+
+	private String getAlarmConsumerTopic(String clusterAlias, String group, String search) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
 		JSONArray topics = new JSONArray();
-		for (Entry<String, List<String>> entry : consumers.entrySet()) {
-			JSONObject groupAndTopics = new JSONObject();
-			groupAndTopics.put("group", entry.getKey());
-			groupAndTopics.put("topics", entry.getValue());
-			topics.add(groupAndTopics);
+		int offset = 0;
+		if (search.length() > 0) {
+			for (Entry<String, List<String>> entry : consumers.entrySet()) {
+				if (entry.getKey().contains(search) && entry.getKey().equals(group)) {
+					JSONObject object = new JSONObject();
+					object.put("text", entry.getValue());
+					object.put("id", offset);
+					topics.add(object);
+					offset++;
+				}
+			}
+		} else {
+			for (Entry<String, List<String>> entry : consumers.entrySet()) {
+				JSONObject object = new JSONObject();
+				object.put("text", entry.getValue());
+				object.put("id", offset);
+				topics.add(object);
+				offset++;
+			}
 		}
 		return topics.toJSONString();
 	}
 
-	private String getKafka(String clusterAlias) {
+	private String getAlarmConsumerTopicKafka(String clusterAlias, String group, String search) {
+		int offset = 0;
 		JSONArray topics = new JSONArray();
-		JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
-		for (Object object : consumerGroups) {
-			JSONObject consumerGroup = (JSONObject) object;
-			JSONObject groupAndTopics = new JSONObject();
-			groupAndTopics.put("group", consumerGroup.getString("group"));
-			groupAndTopics.put("topics", kafkaService.getKafkaConsumerTopic(clusterAlias, consumerGroup.getString("group")));
-			topics.add(groupAndTopics);
+		Set<String> topicSets = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
+		if (search.length() > 0) {
+			for (String topic : topicSets) {
+				if (topic.contains(search)) {
+					JSONObject object = new JSONObject();
+					object.put("text", topic);
+					object.put("id", offset);
+					topics.add(object);
+					offset++;
+				}
+			}
+		} else {
+			for (String topic : topicSets) {
+				JSONObject object = new JSONObject();
+				object.put("text", topic);
+				object.put("id", offset);
+				topics.add(object);
+				offset++;
+			}
 		}
 		return topics.toJSONString();
 	}
 
 	@Override
-	public List<AlertInfo> list(Map<String, Object> params) {
-		return alertDao.query(params);
+	public List<AlarmConsumerInfo> getAlarmConsumerAppList(Map<String, Object> params) {
+		return alertDao.getAlarmConsumerAppList(params);
 	}
 
 	@Override
-	public int alertCount(Map<String, Object> params) {
-		return alertDao.alertCount(params);
+	public int alertConsumerAppCount(Map<String, Object> params) {
+		return alertDao.alertConsumerAppCount(params);
 	}
 
 	@Override
-	public int isExistAlertByCGT(Map<String, Object> params) {
-		return alertDao.isExistAlertByCGT(params);
+	public int deleteAlarmConsumerById(int id) {
+		return alertDao.deleteAlarmConsumerById(id);
 	}
 
 	@Override
-	public int deleteAlertById(int id) {
-		return alertDao.deleteAlertById(id);
+	public int modifyAlarmConsumerById(AlarmConsumerInfo alarmConsumer) {
+		return alertDao.modifyAlarmConsumerById(alarmConsumer);
 	}
 
 	@Override
-	public String findAlertById(int id) {
-		AlertInfo alert = alertDao.findAlertById(id);
-		JSONObject object = new JSONObject();
-		object.put("lag", alert.getLag());
-		object.put("owners", alert.getOwner());
-		return object.toJSONString();
+	public int create(AlarmClusterInfo clusterInfo) {
+		return alertDao.insertAlarmCluster(clusterInfo);
 	}
 
 	@Override
-	public int modifyAlertById(AlertInfo alert) {
-		return alertDao.modifyAlertById(alert);
+	public List<AlarmClusterInfo> getAlarmClusterList(Map<String, Object> params) {
+		return alertDao.getAlarmClusterList(params);
 	}
 
 	@Override
-	public AlertInfo findAlertByCGT(Map<String, Object> params) {
-		return alertDao.findAlertByCGT(params);
+	public int getAlarmClusterCount(Map<String, Object> params) {
+		return alertDao.getAlarmClusterCount(params);
 	}
 
 	@Override
-	public int create(ClustersInfo clusterInfo) {
-		return alertDao.insertKafkaOrZK(clusterInfo);
+	public int deleteAlarmClusterAlertById(int id) {
+		return alertDao.deleteAlarmClusterAlertById(id);
 	}
 
 	@Override
-	public List<ClustersInfo> history(Map<String, Object> params) {
-		return alertDao.history(params);
+	public AlarmClusterInfo findAlarmClusterAlertById(int id) {
+		return alertDao.findAlarmClusterAlertById(id);
 	}
 
 	@Override
-	public int alertHistoryCount(Map<String, Object> params) {
-		return alertDao.alertHistoryCount(params);
-	}
-
-	@Override
-	public int deleteClusterAlertById(int id) {
-		return alertDao.deleteClusterAlertById(id);
-	}
-
-	@Override
-	public String findClusterAlertById(int id) {
-		ClustersInfo cluster = alertDao.findClusterAlertById(id);
-		JSONObject object = new JSONObject();
-		object.put("server", cluster.getServer());
-		object.put("owners", cluster.getOwner());
-		return object.toJSONString();
-	}
-
-	@Override
-	public int modifyClusterAlertById(ClustersInfo cluster) {
+	public int modifyClusterAlertById(AlarmClusterInfo cluster) {
 		return alertDao.modifyClusterAlertById(cluster);
 	}
 
 	@Override
-	public List<ClustersInfo> historys() {
-		return alertDao.historys();
+	public List<AlarmClusterInfo> getAllAlarmClusterTasks() {
+		return alertDao.getAllAlarmClusterTasks();
+	}
+
+	/** Get alert type list. */
+	public String getAlertTypeList() {
+		int offset = 0;
+		JSONArray typeList = new JSONArray();
+		for (String type : AlarmType.TYPE) {
+			JSONObject object = new JSONObject();
+			object.put("text", type);
+			object.put("id", offset);
+			typeList.add(object);
+			offset++;
+		}
+		return typeList.toJSONString();
+	}
+
+	@Override
+	public int insertOrUpdateAlarmConfig(AlarmConfigInfo alarmConfig) {
+		return alertDao.insertOrUpdateAlarmConfig(alarmConfig);
+	}
+
+	@Override
+	public boolean findAlarmConfigByGroupName(Map<String, Object> params) {
+		return alertDao.findAlarmConfigByGroupName(params) > 0 ? true : false;
+	}
+
+	@Override
+	public List<AlarmConfigInfo> getAlarmConfigList(Map<String, Object> params) {
+		return alertDao.getAlarmConfigList(params);
+	}
+
+	@Override
+	public int alarmConfigCount(Map<String, Object> params) {
+		return alertDao.alarmConfigCount(params);
+	}
+
+	@Override
+	public int deleteAlertByGroupName(Map<String, Object> params) {
+		return alertDao.deleteAlertByGroupName(params);
+	}
+
+	@Override
+	public AlarmConfigInfo getAlarmConfigByGroupName(Map<String, Object> params) {
+		return alertDao.getAlarmConfigByGroupName(params);
+	}
+
+	@Override
+	public String getAlertClusterTypeList(String type, Map<String, Object> params) {
+		int offset = 0;
+		JSONArray typeList = new JSONArray();
+		if ("type".equals(type)) {
+			if (params.get("search").toString().length() > 0) {
+				for (String cluster : AlarmType.CLUSTER) {
+					if (cluster.contains(params.get("search").toString())) {
+						JSONObject object = new JSONObject();
+						object.put("text", cluster);
+						object.put("id", offset);
+						typeList.add(object);
+						offset++;
+					}
+				}
+			} else {
+				for (String cluster : AlarmType.CLUSTER) {
+					JSONObject object = new JSONObject();
+					object.put("text", cluster);
+					object.put("id", offset);
+					typeList.add(object);
+					offset++;
+				}
+			}
+		} else if ("level".equals(type)) {
+			if (params.get("search").toString().length() > 0) {
+				for (String level : AlarmType.LEVEL) {
+					if (level.contains(params.get("search").toString())) {
+						JSONObject object = new JSONObject();
+						object.put("text", level);
+						object.put("id", offset);
+						typeList.add(object);
+						offset++;
+					}
+				}
+			} else {
+				for (String level : AlarmType.LEVEL) {
+					JSONObject object = new JSONObject();
+					object.put("text", level);
+					object.put("id", offset);
+					typeList.add(object);
+					offset++;
+				}
+			}
+		} else if ("group".equals(type)) {
+			List<AlarmConfigInfo> alarmGroups = alertDao.getAlarmConfigList(params);
+			if (alarmGroups != null) {
+				for (AlarmConfigInfo alarmGroup : alarmGroups) {
+					JSONObject object = new JSONObject();
+					object.put("text", alarmGroup.getAlarmGroup());
+					object.put("id", offset);
+					typeList.add(object);
+					offset++;
+				}
+			}
+		} else if ("maxtimes".equals(type)) {
+			if (params.get("search").toString().length() > 0) {
+				for (int maxtimes : AlarmType.MAXTIMES) {
+					Pattern pattern = Pattern.compile("^[+-]?\\d");
+					if (pattern.matcher(params.get("search").toString()).matches() && maxtimes == Integer.parseInt(params.get("search").toString())) {
+						JSONObject object = new JSONObject();
+						object.put("text", maxtimes);
+						object.put("id", offset);
+						typeList.add(object);
+						offset++;
+					}
+				}
+			} else {
+				for (int maxtimes : AlarmType.MAXTIMES) {
+					JSONObject object = new JSONObject();
+					object.put("text", maxtimes);
+					object.put("id", offset);
+					typeList.add(object);
+					offset++;
+				}
+			}
+		}
+
+		return typeList.toJSONString();
+	}
+
+	@Override
+	public int modifyClusterAlertSwitchById(AlarmClusterInfo clusterInfo) {
+		return alertDao.modifyClusterAlertSwitchById(clusterInfo);
+	}
+
+	@Override
+	public int modifyConsumerAlertSwitchById(AlarmConsumerInfo alarmConsumer) {
+		return alertDao.modifyConsumerAlertSwitchById(alarmConsumer);
+	}
+
+	@Override
+	public AlarmConsumerInfo findAlarmConsumerAlertById(int id) {
+		return alertDao.findAlarmConsumerAlertById(id);
+	}
+
+	@Override
+	public int modifyClusterStatusAlertById(AlarmClusterInfo cluster) {
+		return alertDao.modifyClusterStatusAlertById(cluster);
+	}
+
+	@Override
+	public List<AlarmConsumerInfo> getAllAlarmConsumerTasks() {
+		return alertDao.getAllAlarmConsumerTasks();
+	}
+
+	@Override
+	public long queryLastestLag(Map<String, Object> params) {
+		return topicDao.queryLastestLag(params);
+	}
+
+	@Override
+	public int modifyConsumerStatusAlertById(AlarmConsumerInfo alarmConsumer) {
+		return alertDao.modifyConsumerStatusAlertById(alarmConsumer);
 	}
 
 }

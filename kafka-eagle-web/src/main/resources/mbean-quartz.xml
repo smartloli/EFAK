@@ -12,6 +12,7 @@
 		<property name="targetMethod" value="mbeanQuartz" />
 		<property name="concurrent" value="false" />
 	</bean>
+	<!-- task2 -->
 	<bean id="mbeanCleanDetail"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject" ref="mbeanSchedule" />
@@ -24,7 +25,7 @@
 		<property name="jobDetail" ref="mbeanDetail" />
 		<property name="cronExpression">
 			<!-- Perform task scheduling per 5min. -->
-			<value>0 0/5 * * * ?</value>
+			<value>0 0/1 * * * ?</value>
 		</property>
 	</bean>
 	<bean id="mbeanCleanTrigger"
@@ -41,8 +42,8 @@
 		<property name="triggers">
 			<list>
 				<!-- All scheduling lists. -->
-				<ref local="mbeanTrigger" />
-				<ref local="mbeanCleanTrigger" />
+				<ref bean="mbeanTrigger" />
+				<ref bean="mbeanCleanTrigger" />
 			</list>
 		</property>
 	</bean>

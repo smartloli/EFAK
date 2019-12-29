@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.core.sql.execute;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +30,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
+import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -38,9 +40,6 @@ import org.smartloli.kafka.eagle.core.sql.schema.TopicSchema;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
-import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 
 /**
  * Parse the sql statement, and execute the sql content, get the message record
@@ -54,6 +53,7 @@ public class KafkaConsumerAdapter {
 
 	private static KafkaService kafkaService = new KafkaFactory().create();
 
+	/** Executor ksql query topic data. */
 	public static List<JSONArray> executor(KafkaSqlInfo kafkaSql) {
 		List<JSONArray> messages = new ArrayList<>();
 		Properties props = new Properties();
@@ -64,9 +64,8 @@ public class KafkaConsumerAdapter {
 		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sql.fix.error")) {
 			props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, Kafka.EARLIEST);
 		}
-		if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-			props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty("kafka.eagle.sasl.protocol"));
-			props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty("kafka.eagle.sasl.mechanism"));
+		if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.enable")) {
+			kafkaService.sasl(props, kafkaSql.getClusterAlias());
 		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		List<TopicPartition> topics = new ArrayList<>();
@@ -87,7 +86,7 @@ public class KafkaConsumerAdapter {
 		JSONArray datasets = new JSONArray();
 		boolean flag = true;
 		while (flag) {
-			ConsumerRecords<String, String> records = consumer.poll(Kafka.TIME_OUT);
+			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Kafka.TIME_OUT));
 			for (ConsumerRecord<String, String> record : records) {
 				JSONObject object = new JSONObject();
 				object.put(TopicSchema.MSG, record.value());

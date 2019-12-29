@@ -17,12 +17,18 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
@@ -31,15 +37,14 @@ import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
 import org.smartloli.kafka.eagle.core.factory.Mx4jService;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
+import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 
 /**
  * Achieve access to the kafka monitoring data interface through jmx.
@@ -54,6 +59,9 @@ public class MetricsServiceImpl implements MetricsService {
 	@Autowired
 	private MBeanDao mbeanDao;
 
+	@Autowired
+	private TopicDao topicDao;
+
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
 
@@ -62,11 +70,10 @@ public class MetricsServiceImpl implements MetricsService {
 
 	/** Gets summary monitoring data for all broker. */
 	public String getAllBrokersMBean(String clusterAlias) {
-		JSONArray brokers = JSON.parseArray(kafkaService.getAllBrokersInfo(clusterAlias));
+		List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
 		Map<String, MBeanInfo> mbeans = new HashMap<>();
-		for (Object object : brokers) {
-			JSONObject broker = (JSONObject) object;
-			String uri = broker.getString("host") + ":" + broker.getInteger("jmxPort");
+		for (BrokersInfo broker : brokers) {
+			String uri = broker.getHost() + ":" + broker.getJmxPort();
 			MBeanInfo bytesIn = mx4jService.bytesInPerSec(uri);
 			MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri);
 			MBeanInfo bytesRejected = mx4jService.bytesRejectedPerSec(uri);
@@ -115,14 +122,20 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	private void assembleMBeanInfo(Map<String, MBeanInfo> mbeans, String mBeanInfoKey, MBeanInfo mBeanInfo) {
-		if (mbeans.containsKey(mBeanInfoKey)) {
-			// MBeanInfo replicationBytesOut =
-			// mbeans.get(MBean.REPLICATIONBYTESOUTPERSEC);
+		if (mbeans.containsKey(mBeanInfoKey) && mBeanInfo != null) {
 			MBeanInfo mbeanInfo = mbeans.get(mBeanInfoKey);
-			long fifteenMinute = Math.round(StrUtils.numberic(mbeanInfo.getFifteenMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFifteenMinute()));
-			long fiveMinute = Math.round(StrUtils.numberic(mbeanInfo.getFiveMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getFiveMinute()));
-			long meanRate = Math.round(StrUtils.numberic(mbeanInfo.getMeanRate())) + Math.round(StrUtils.numberic(mBeanInfo.getMeanRate()));
-			long oneMinute = Math.round(StrUtils.numberic(mbeanInfo.getOneMinute())) + Math.round(StrUtils.numberic(mBeanInfo.getOneMinute()));
+			String fifteenMinuteOld = mbeanInfo.getFifteenMinute() == null ? "0.0" : mbeanInfo.getFifteenMinute();
+			String fifteenMinuteLastest = mBeanInfo.getFifteenMinute() == null ? "0.0" : mBeanInfo.getFifteenMinute();
+			String fiveMinuteOld = mbeanInfo.getFiveMinute() == null ? "0.0" : mbeanInfo.getFiveMinute();
+			String fiveMinuteLastest = mBeanInfo.getFiveMinute() == null ? "0.0" : mBeanInfo.getFiveMinute();
+			String meanRateOld = mbeanInfo.getMeanRate() == null ? "0.0" : mbeanInfo.getMeanRate();
+			String meanRateLastest = mBeanInfo.getMeanRate() == null ? "0.0" : mBeanInfo.getMeanRate();
+			String oneMinuteOld = mbeanInfo.getOneMinute() == null ? "0.0" : mbeanInfo.getOneMinute();
+			String oneMinuteLastest = mBeanInfo.getOneMinute() == null ? "0.0" : mBeanInfo.getOneMinute();
+			long fifteenMinute = Math.round(StrUtils.numberic(fifteenMinuteOld)) + Math.round(StrUtils.numberic(fifteenMinuteLastest));
+			long fiveMinute = Math.round(StrUtils.numberic(fiveMinuteOld)) + Math.round(StrUtils.numberic(fiveMinuteLastest));
+			long meanRate = Math.round(StrUtils.numberic(meanRateOld)) + Math.round(StrUtils.numberic(meanRateLastest));
+			long oneMinute = Math.round(StrUtils.numberic(oneMinuteOld)) + Math.round(StrUtils.numberic(oneMinuteLastest));
 			mbeanInfo.setFifteenMinute(String.valueOf(fifteenMinute));
 			mbeanInfo.setFiveMinute(String.valueOf(fiveMinute));
 			mbeanInfo.setMeanRate(String.valueOf(meanRate));
@@ -145,16 +158,22 @@ public class MetricsServiceImpl implements MetricsService {
 		JSONArray messageIns = new JSONArray();
 		JSONArray byteIns = new JSONArray();
 		JSONArray byteOuts = new JSONArray();
+		JSONArray byteRejected = new JSONArray();
+		JSONArray failedFetchRequest = new JSONArray();
+		JSONArray failedProduceRequest = new JSONArray();
+		JSONArray produceMessageConversions = new JSONArray();
+		JSONArray totalFetchRequests = new JSONArray();
+		JSONArray totalProduceRequests = new JSONArray();
+		JSONArray replicationBytesOuts = new JSONArray();
+		JSONArray replicationBytesIns = new JSONArray();
+
+		JSONArray osFreeMems = new JSONArray();
 
 		JSONArray zkSendPackets = new JSONArray();
 		JSONArray zkReceivedPackets = new JSONArray();
 		JSONArray zkNumAliveConnections = new JSONArray();
 		JSONArray zkOutstandingRequests = new JSONArray();
-		String zks = "";
 		for (KpiInfo kpi : kpis) {
-			if ("".equals(zks) || zks == null) {
-				zks = kpi.getBroker();
-			}
 			switch (kpi.getKey()) {
 			case ZK.ZK_SEND_PACKETS:
 				assembly(zkSendPackets, kpi);
@@ -177,6 +196,33 @@ public class MetricsServiceImpl implements MetricsService {
 			case MBean.BYTEOUT:
 				assembly(byteOuts, kpi);
 				break;
+			case MBean.BYTESREJECTED:
+				assembly(byteRejected, kpi);
+				break;
+			case MBean.FAILEDFETCHREQUEST:
+				assembly(failedFetchRequest, kpi);
+				break;
+			case MBean.FAILEDPRODUCEREQUEST:
+				assembly(failedProduceRequest, kpi);
+				break;
+			case MBean.PRODUCEMESSAGECONVERSIONS:
+				assembly(produceMessageConversions, kpi);
+				break;
+			case MBean.TOTALFETCHREQUESTSPERSEC:
+				assembly(totalFetchRequests, kpi);
+				break;
+			case MBean.TOTALPRODUCEREQUESTSPERSEC:
+				assembly(totalProduceRequests, kpi);
+				break;
+			case MBean.REPLICATIONBYTESINPERSEC:
+				assembly(replicationBytesOuts, kpi);
+				break;
+			case MBean.REPLICATIONBYTESOUTPERSEC:
+				assembly(replicationBytesIns, kpi);
+				break;
+			case MBean.OSFREEMEMORY:
+				assembly(osFreeMems, kpi);
+				break;
 			default:
 				break;
 			}
@@ -186,24 +232,72 @@ public class MetricsServiceImpl implements MetricsService {
 		target.put("received", zkReceivedPackets);
 		target.put("queue", zkOutstandingRequests);
 		target.put("alive", zkNumAliveConnections);
-		target.put("msg", messageIns);
-		target.put("ins", byteIns);
-		target.put("outs", byteOuts);
-
-		target.put("zks", zks.split(","));
+		target.put("messageIns", messageIns);
+		target.put("byteIns", byteIns);
+		target.put("byteOuts", byteOuts);
+		target.put("byteRejected", byteRejected);
+		target.put("failedFetchRequest", failedFetchRequest);
+		target.put("failedProduceRequest", failedProduceRequest);
+		target.put("produceMessageConversions", produceMessageConversions);
+		target.put("totalFetchRequests", totalFetchRequests);
+		target.put("totalProduceRequests", totalProduceRequests);
+		target.put("replicationBytesIns", replicationBytesIns);
+		target.put("replicationBytesOuts", replicationBytesOuts);
+		target.put("osFreeMems", osFreeMems);
 
 		return target.toJSONString();
 	}
 
 	private void assembly(JSONArray assemblys, KpiInfo kpi) throws ParseException {
 		JSONObject object = new JSONObject();
-		object.put(kpi.getKey(), kpi.getValue());
+		object.put("x", CalendarUtils.convertUnixTime(kpi.getTimespan(), "yyyy-MM-dd HH:mm"));
+		object.put("y", kpi.getValue());
 		assemblys.add(object);
 	}
 
 	/** Crontab clean data. */
 	public void remove(int tm) {
 		mbeanDao.remove(tm);
+	}
+
+	@Override
+	public int setConsumerTopic(List<TopicOffsetsInfo> topicOffsets) {
+		return mbeanDao.setConsumerTopic(topicOffsets);
+	}
+
+	@Override
+	public void cleanConsumerTopic(int tm) {
+		mbeanDao.cleanConsumerTopic(tm);
+	}
+
+	@Override
+	public void cleanTopicLogSize(int tm) {
+		topicDao.cleanTopicLogSize(tm);
+	}
+
+	@Override
+	public void cleanTopicRank(int tm) {
+		topicDao.cleanTopicRank(tm);
+	}
+
+	@Override
+	public void cleanBScreenConsumerTopic(int tm) {
+		topicDao.cleanBScreenConsumerTopic(tm);
+	}
+
+	@Override
+	public int writeBSreenConsumerTopic(List<BScreenConsumerInfo> bscreenConsumers) {
+		return topicDao.writeBSreenConsumerTopic(bscreenConsumers);
+	}
+
+	@Override
+	public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params) {
+		return topicDao.readBScreenLastTopic(params);
+	}
+
+	@Override
+	public void cleanTopicSqlHistory(int tm) {
+		topicDao.cleanTopicSqlHistory(tm);
 	}
 
 }

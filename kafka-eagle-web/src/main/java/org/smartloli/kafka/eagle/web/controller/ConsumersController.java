@@ -21,6 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.web.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,11 +36,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.web.service.ConsumerService;
 
 /**
  * Kafka consumer controller to viewer data.
@@ -115,12 +115,19 @@ public class ConsumersController {
 			obj.put("group", "<a class='link' href='#" + consumer.getString("group") + "'>" + consumer.getString("group") + "</a>");
 			obj.put("topics", consumer.getInteger("topics"));
 			obj.put("node", consumer.getString("node"));
-			int activerNumber = consumer.getInteger("activeNumber");
-			if (activerNumber > 0) {
-				obj.put("activeNumber", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeNumber") + "</a>");
+			int activeTopics = consumer.getInteger("activeTopics");
+			int activeThreads = consumer.getInteger("activeThreads");
+			if (activeTopics > 0) {
+				obj.put("activeTopics", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
 			} else {
-				obj.put("activeNumber", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeNumber") + "</a>");
+				obj.put("activeTopics", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
 			}
+			if (activeThreads > 0) {
+				obj.put("activeThreads", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+			} else {
+				obj.put("activeThreads", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+			}
+
 			aaDatas.add(obj);
 		}
 
@@ -168,10 +175,12 @@ public class ConsumersController {
 				String topic = consumerDetail.getString("topic");
 				obj.put("id", consumerDetail.getInteger("id"));
 				obj.put("topic", topic);
-				if (consumerDetail.getBoolean("isConsumering")) {
+				if (consumerDetail.getInteger("isConsumering") == Topic.RUNNING) {
 					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-success btn-xs'>Running</a>");
+				} else if (consumerDetail.getInteger("isConsumering") == Topic.SHUTDOWN) {
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-danger btn-xs'>Shutdown</a>");
 				} else {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-danger btn-xs'>Pending</a>");
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-warning btn-xs'>Pending</a>");
 				}
 				aaDatas.add(obj);
 			}

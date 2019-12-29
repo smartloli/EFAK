@@ -17,21 +17,31 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DashboardInfo;
+import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
+import org.smartloli.kafka.eagle.web.dao.MBeanDao;
+import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Kafka Eagle dashboard data generator.
@@ -47,6 +57,15 @@ public class DashboardServiceImpl implements DashboardService {
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
+
+	/** Broker service interface. */
+	private static BrokerService brokerService = new BrokerFactory().create();
+
+	@Autowired
+	private TopicDao topicDao;
+
+	@Autowired
+	private MBeanDao mbeanDao;
 
 	/** Get consumer number from zookeeper. */
 	private int getConsumerNumbers(String clusterAlias) {
@@ -68,40 +87,34 @@ public class DashboardServiceImpl implements DashboardService {
 
 	/** Get kafka data. */
 	private String kafkaBrokersGraph(String clusterAlias) {
-		String kafka = kafkaService.getAllBrokersInfo(clusterAlias);
+		List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
 		JSONObject target = new JSONObject();
 		target.put("name", "Kafka Brokers");
-		JSONArray targets1 = JSON.parseArray(kafka);
-		JSONArray targets2 = new JSONArray();
+		JSONArray targets = new JSONArray();
 		int count = 0;
-		for (Object object : targets1) {
-			JSONObject subTarget = (JSONObject) object;
+		for (BrokersInfo broker : brokers) {
 			if (count > KConstants.D3.SIZE) {
-				JSONObject subTarget2 = new JSONObject();
-				subTarget2.put("name", "...");
-				targets2.add(subTarget2);
+				JSONObject subTarget = new JSONObject();
+				subTarget.put("name", "...");
+				targets.add(subTarget);
 				break;
 			} else {
-				JSONObject subTarget2 = new JSONObject();
-				subTarget2.put("name", subTarget.getString("host") + ":" + subTarget.getInteger("port"));
-				targets2.add(subTarget2);
+				JSONObject subTarget = new JSONObject();
+				subTarget.put("name", broker.getHost() + ":" + broker.getPort());
+				targets.add(subTarget);
 			}
 			count++;
 		}
-		target.put("children", targets2);
+		target.put("children", targets);
 		return target.toJSONString();
 	}
 
 	/** Get dashboard data. */
 	private String panel(String clusterAlias) {
 		int zks = SystemConfigUtils.getPropertyArray(clusterAlias + ".zk.list", ",").length;
-		String topciAndPartitions = kafkaService.getAllPartitions(clusterAlias);
-		int topicSize = JSON.parseArray(topciAndPartitions).size();
-		String kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);
-		int brokerSize = JSON.parseArray(kafkaBrokers).size();
 		DashboardInfo dashboard = new DashboardInfo();
-		dashboard.setBrokers(brokerSize);
-		dashboard.setTopics(topicSize);
+		dashboard.setBrokers(brokerService.brokerNumbers(clusterAlias));
+		dashboard.setTopics(brokerService.topicNumbers(clusterAlias));
 		dashboard.setZks(zks);
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		if ("kafka".equals(formatter)) {
@@ -110,6 +123,79 @@ public class DashboardServiceImpl implements DashboardService {
 			dashboard.setConsumers(getConsumerNumbers(clusterAlias));
 		}
 		return dashboard.toString();
+	}
+
+	/** Get topic rank data,such as logsize and topic capacity. */
+	public JSONArray getTopicRank(Map<String, Object> params) {
+		List<TopicRank> topicRank = topicDao.readTopicRank(params);
+		JSONArray array = new JSONArray();
+		if (Topic.LOGSIZE.equals(params.get("tkey"))) {
+			int index = 1;
+			for (int i = 0; i < 10; i++) {
+				JSONObject object = new JSONObject();
+				if (i < topicRank.size()) {
+					object.put("id", index);
+					object.put("topic", "<a href='/ke/topic/meta/" + topicRank.get(i).getTopic() + "/'>" + topicRank.get(i).getTopic() + "</a>");
+					object.put("logsize", topicRank.get(i).getTvalue());
+				} else {
+					object.put("id", index);
+					object.put("topic", "");
+					object.put("logsize", "");
+				}
+				index++;
+				array.add(object);
+			}
+		} else if (Topic.CAPACITY.equals(params.get("tkey"))) {
+			int index = 1;
+			for (int i = 0; i < 10; i++) {
+				JSONObject object = new JSONObject();
+				if (i < topicRank.size()) {
+					object.put("id", index);
+					object.put("topic", "<a href='/ke/topic/meta/" + topicRank.get(i).getTopic() + "/'>" + topicRank.get(i).getTopic() + "</a>");
+					object.put("capacity", StrUtils.stringify(topicRank.get(i).getTvalue()));
+				} else {
+					object.put("id", index);
+					object.put("topic", "");
+					object.put("capacity", "");
+				}
+				index++;
+				array.add(object);
+			}
+		}
+		return array;
+	}
+
+	/** Write statistics topic rank data from kafka jmx & insert into table. */
+	public int writeTopicRank(List<TopicRank> topicRanks) {
+		return topicDao.writeTopicRank(topicRanks);
+	}
+	
+	/** Write statistics topic logsize data from kafka jmx & insert into table. */
+	public int writeTopicLogSize(List<TopicLogSize> topicLogSize) {
+		return topicDao.writeTopicLogSize(topicLogSize);
+	}
+
+	/** Get os memory data. */
+	public String getOSMem(Map<String, Object> params) {
+		List<KpiInfo> kpis = mbeanDao.getOsMem(params);
+		JSONObject object = new JSONObject();
+		if (kpis.size() == 2) {
+			long valueFirst = Long.parseLong(kpis.get(0).getValue());
+			long valueSecond = Long.parseLong(kpis.get(1).getValue());
+			if (valueFirst >= valueSecond) {
+				object.put("mem", 100 * StrUtils.numberic(((valueFirst - valueSecond) * 1.0 / valueFirst) + "", "###.###"));
+			} else {
+				object.put("mem", 100 * StrUtils.numberic(((valueSecond - valueFirst) * 1.0 / valueSecond) + "", "###.###"));
+			}
+		} else {
+			object.put("mem", "0.0");
+		}
+		return object.toJSONString();
+	}
+
+	/** Read topic lastest logsize diffval data. */
+	public TopicLogSize readLastTopicLogSize(Map<String, Object> params) {
+		return topicDao.readLastTopicLogSize(params);
 	}
 
 }

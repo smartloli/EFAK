@@ -20,8 +20,9 @@ package org.smartloli.kafka.eagle.web.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
-import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 
 /**
  * Store kafka alert data & metrics data into database.
@@ -32,47 +33,75 @@ import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
  */
 public interface AlertDao {
 
-	/** Insert alert data into db. */
-	public int insertAlert(AlertInfo alert);
+	/** Insert alarm consumer application. */
+	public int insertAlarmConsumer(AlarmConsumerInfo alarmConsumer);
 
-	/** Query collector data. */
-	public List<AlertInfo> query(Map<String, Object> params);
+	/** Get alarm consumer application list. */
+	public List<AlarmConsumerInfo> getAlarmConsumerAppList(Map<String, Object> params);
 
-	public int alertCount(Map<String, Object> params);
+	/** Count alarm consumer application size. */
+	public int alertConsumerAppCount(Map<String, Object> params);
 
-	/** Exist alert by cluster_group_topic from table. */
-	public int isExistAlertByCGT(Map<String, Object> params);
-
-	/** Find alert by cluster_group_topic from table. */
-	public AlertInfo findAlertByCGT(Map<String, Object> params);
-
-	/** Delete alert by id. */
-	public int deleteAlertById(int id);
-
-	/** Find alert info by id. */
-	public AlertInfo findAlertById(int id);
-
-	/** Modify alert info by id. */
-	public int modifyAlertById(AlertInfo alert);
-
-	/** Insert alert data into db. */
-	public int insertKafkaOrZK(ClustersInfo clusterInfo);
+	/** Modify consumer alarm switch. */
+	public int modifyConsumerAlertSwitchById(AlarmConsumerInfo alarmConsumer);
 	
-	/** Query cluster collector data. */
-	public List<ClustersInfo> history(Map<String, Object> params);
+	/** Find alarm consumer info by id. */
+	public AlarmConsumerInfo findAlarmConsumerAlertById(int id);
+
+	/** Delete alarm consumer by id. */
+	public int deleteAlarmConsumerById(int id);
+
+	/** Modify alarm consumer info by id. */
+	public int modifyAlarmConsumerById(AlarmConsumerInfo alarmConsumer);
 	
-	public int alertHistoryCount(Map<String, Object> params);
+	/** Modify alert consumer(alarmtimes,isnormal) info by id. */
+	public int modifyConsumerStatusAlertById(AlarmConsumerInfo alarmConsumer);
 	
-	/** Delete alert by id. */
-	public int deleteClusterAlertById(int id);
+	/** Get all alarm consumer tasks. */
+	public List<AlarmConsumerInfo> getAllAlarmConsumerTasks();
+
+	/** Storage alarm cluster,such as kafka or zookeeper. */
+	public int insertAlarmCluster(AlarmClusterInfo clusterInfo);
+
+	/** Get alarm cluster list. */
+	public List<AlarmClusterInfo> getAlarmClusterList(Map<String, Object> params);
+
+	/** Get alarm cluster count. */
+	public int getAlarmClusterCount(Map<String, Object> params);
+
+	/** Delete alert cluster by id. */
+	public int deleteAlarmClusterAlertById(int id);
+
+	/** Find alert cluster info by id. */
+	public AlarmClusterInfo findAlarmClusterAlertById(int id);
+
+	/** Modify alarm cluster switch by id. */
+	public int modifyClusterAlertSwitchById(AlarmClusterInfo clusterInfo);
+
+	/** Modify alert cluster(server,alarm group,alarm level) info by id. */
+	public int modifyClusterAlertById(AlarmClusterInfo cluster);
 	
-	/** Find alert info by id. */
-	public ClustersInfo findClusterAlertById(int id);
-	
-	/** Modify alert info by id. */
-	public int modifyClusterAlertById(ClustersInfo cluster);
-	
-	/** Query clusters collector data. */
-	public List<ClustersInfo> historys();
-	
+	/** Modify alert cluster(alarmtimes,isnormal) info by id. */
+	public int modifyClusterStatusAlertById(AlarmClusterInfo cluster);
+
+	/** Get all alarm cluster tasks. */
+	public List<AlarmClusterInfo> getAllAlarmClusterTasks();
+
+	/** Storage or update alarm config info. */
+	public int insertOrUpdateAlarmConfig(AlarmConfigInfo alarmConfig);
+
+	/** Find alarm config by group name. */
+	public int findAlarmConfigByGroupName(Map<String, Object> params);
+
+	/** Get alarm config list. */
+	public List<AlarmConfigInfo> getAlarmConfigList(Map<String, Object> params);
+
+	/** Get alarm config count. */
+	public int alarmConfigCount(Map<String, Object> params);
+
+	/** Delete alarm config by group name. */
+	public int deleteAlertByGroupName(Map<String, Object> params);
+
+	/** Get alarm config by group name. */
+	public AlarmConfigInfo getAlarmConfigByGroupName(Map<String, Object> params);
 }

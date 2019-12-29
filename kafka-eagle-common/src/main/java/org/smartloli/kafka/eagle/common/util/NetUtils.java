@@ -76,4 +76,16 @@ public class NetUtils {
 		}
 	}
 
+	/** Get server ip. */
+	public static String ip() {
+		String ip = "";
+		try {
+			ip = InetAddress.getLocalHost().getHostAddress();
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("Get local server ip has error, msg is " + e.getMessage());
+		}
+		return ip;
+	}
+	
 }

@@ -14,7 +14,9 @@
 <meta name="author" content="">
 
 <title>Alarm - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/css.jsp">
+	<jsp:param value="plugins/select2/select2.min.css" name="css" />
+</jsp:include>
 <jsp:include page="../public/tagcss.jsp"></jsp:include>
 </head>
 
@@ -46,7 +48,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-tasks fa-fw"></i> Topic Setting
+							<i class="fa fa-tasks fa-fw"></i> Consumer Setting
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
@@ -54,43 +56,67 @@
 							<div class="row">
 								<div class="col-lg-12">
 									<form role="form" action="/ke/alarm/add/form" method="post"
-										onsubmit="return contextFormValid();return false;">
+										onsubmit="return contextConsumerFormValid();return false;">
 										<div class="form-group">
-											<label>Topic Group (*)</label> <input id="ke_group_alarm"
-												name="ke_group_alarm" class="form-control" maxlength=50
-												value="1"><input id="ke_group_alarms"
-												name="ke_group_alarms" type="hidden"> <label
+											<label>Consumer Group (*)</label> <select
+												id="select2consumergroup" name="select2consumergroup"
+												tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_consumer_group"
+												name="ke_alarm_consumer_group" type="hidden" /><label
 												for="inputError" class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Select the group you need to
-												alarm .</label>
+												class="fa fa-info-circle"></i> Select the consumer group you
+												need to alarm .</label>
 										</div>
 										<div class="form-group">
-											<label>Topic Name (*)</label> <input id="ke_topic_alarm"
-												name="ke_topic_alarm" class="form-control" maxlength=50
-												value="1"><input id="ke_topic_alarms"
-												name="ke_topic_alarms" type="hidden"> <label
+											<label>Consumer Topic (*)</label>
+											<div id="div_select_consumer_topic"></div>
+											<input id="ke_alarm_consumer_topic"
+												name="ke_alarm_consumer_topic" type="hidden" /><label
 												for="inputError" class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Select the topic you need to
-												alarm .</label>
+												class="fa fa-info-circle"></i> Select the consumer topic you
+												need to alarm .</label>
 										</div>
 										<div class="form-group">
 											<label>Lag Threshold (*)</label> <input id="ke_topic_lag"
 												name="ke_topic_lag" class="form-control" maxlength=50
 												value="1"> <label for="inputError"
 												class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Setting the blocking
-												threshold, Parameters must be numeric .</label>
+												class="fa fa-info-circle"></i> Setting the lag threshold,
+												input must be numeric .</label>
 										</div>
 										<div class="form-group">
-											<label>Owner Email (*)</label> <input id="ke_topic_email"
-												name="ke_topic_email" class="form-control" maxlength=50
-												value="example1@email.com"><label for="inputError"
-												class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> To whom the alarm topic
-												information, Such as 'example@email.com' .</label>
+											<label>Alarm Level (*)</label> <select id="select2level"
+												name="select2level" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_level"
+												name="ke_alarm_cluster_level" type="hidden" /> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the cluster level you
+												need to alarm .</label>
+										</div>
+										<div class="form-group">
+											<label>Alarm Max Times (*)</label> <select
+												id="select2maxtimes" name="select2maxtimes" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_maxtimes"
+												name="ke_alarm_cluster_maxtimes" type="hidden" /> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the cluster alarm max
+												times you need to alarm .</label>
+										</div>
+										<div class="form-group">
+											<label>Alarm Group (*)</label> <select id="select2group"
+												name="select2group" tabindex="-1"
+												style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+											<input id="ke_alarm_cluster_group"
+												name="ke_alarm_cluster_group" type="hidden" /> <label
+												for="inputError" class="control-label text-danger"><i
+												class="fa fa-info-circle"></i> Select the cluster alarm
+												group you need to alarm .</label>
 										</div>
 										<button type="submit" class="btn btn-success">Add</button>
-										<div id="alert_mssage" style="display: none"
+										<div id="alert_consumer_message" style="display: none"
 											class="alert alert-danger">
 											<label>Oops! Please make some changes . (*) is
 												required .</label>
@@ -110,50 +136,34 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="plugins/magicsuggest/magicsuggest.js" name="loader" />
-	<jsp:param value="plugins/tokenfield/bootstrap-tokenfield.js"
-		name="loader" />
 	<jsp:param value="main/alarm/add.js" name="loader" />
+	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
 </jsp:include>
 <script type="text/javascript">
-	function contextFormValid() {
+	function contextConsumerFormValid() {
+		var ke_alarm_consumer_group = $("#ke_alarm_consumer_group").val();
+		var ke_alarm_consumer_topic = $("#ke_alarm_consumer_topic").val();
 		var ke_topic_lag = $("#ke_topic_lag").val();
-		var ke_topic_email = $("#ke_topic_email").val();
-		var ke_topic_alarms = JSON.stringify($('#ke_topic_alarm').magicSuggest().getSelection());
-		var ke_group_alarms = JSON.stringify($('#ke_group_alarm').magicSuggest().getSelection());
+		var ke_alarm_cluster_level = $("#ke_alarm_cluster_level").val();
+		var ke_alarm_cluster_maxtimes = $("#ke_alarm_cluster_maxtimes").val();
+		var ke_alarm_cluster_group = $("#ke_alarm_cluster_group").val();
 
-		if (ke_group_alarms.length == 2) {
-			$("#alert_mssage").show();
+		if (ke_alarm_consumer_group.length == 0 || ke_alarm_consumer_topic.length == 0 || ke_topic_lag.length == 0 || ke_alarm_cluster_level.length == 0 || ke_alarm_cluster_maxtimes.length == 0 || ke_alarm_cluster_group.length == 0) {
+			$("#alert_consumer_message").show();
 			setTimeout(function() {
-				$("#alert_mssage").hide()
+				$("#alert_consumer_message").hide()
 			}, 3000);
 			return false;
 		}
-		if (ke_topic_alarms.length == 2) {
-			$("#alert_mssage").show();
-			setTimeout(function() {
-				$("#alert_mssage").hide()
-			}, 3000);
-			return false;
-		}
+		
 		if (isNaN(ke_topic_lag)) {
-			$("#alert_mssage").show();
+			$("#alert_consumer_message").show();
 			setTimeout(function() {
-				$("#alert_mssage").hide()
-			}, 3000);
-			return false;
-		}
-		var reg = /^((([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6}\, ))*(([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})))$/;
-		if (!reg.test(ke_topic_email)) {
-			$("#alert_mssage").show();
-			setTimeout(function() {
-				$("#alert_mssage").hide()
+				$("#alert_consumer_message").hide()
 			}, 3000);
 			return false;
 		}
 
-		$('#ke_topic_alarms').val(ke_topic_alarms);
-		$('#ke_group_alarms').val(ke_group_alarms);
 		return true;
 	}
 </script>

@@ -15,6 +15,8 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'email'
 		}, {
+			"mData" : 'password'
+		}, {
 			"mData" : 'operate'
 		} ]
 	});
@@ -65,6 +67,20 @@ $(document).ready(function() {
 		});
 
 	});
+	
+	$(document).on('click', 'a[name=operater_reset_modal]', function() {
+		$('#ke_user_reset_dialog').modal('show');
+		var href = $(this).attr("href");
+		var id = href.split("#")[1];
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/system/user/signin/' + id + '/ajax',
+			success : function(datas) {
+				$("#ke_user_rtxno_reset").val(datas.rtxno);
+			}
+		});
+	});
 
 	var id = "";
 	$(document).on('click', 'a[name=operater_modal]', function() {
@@ -77,7 +93,6 @@ $(document).ready(function() {
 			url : '/ke/system/user/role/' + id + '/ajax',
 			success : function(datas) {
 				$("#ke_role_list").html("");
-				console.log(datas);
 				var chk = "";
 				for (var i = 0; i < datas.role.length; i++) {
 					chk += "<input class='actionRole' type='checkbox' value='" + datas.role[i].id + "'>" + datas.role[i].roleName + "&nbsp;&nbsp;";

@@ -14,8 +14,53 @@
 <meta name="author" content="">
 
 <title>Alarm - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/css.jsp">
+	<jsp:param value="plugins/select2/select2.min.css" name="css" />
+</jsp:include>
 <jsp:include page="../public/tcss.jsp"></jsp:include>
+<!-- switch css -->
+<style type="text/css">
+.chooseBtn {
+	display: none;
+}
+
+.choose-label:hover {
+	cursor: pointer
+}
+
+.choose-label {
+	box-shadow: #ccc 0px 0px 0px 1px;
+	width: 40px;
+	height: 20px;
+	display: inline-block;
+	border-radius: 20px;
+	position: relative;
+	background-color: #bdbdbd;
+	overflow: hidden;
+}
+
+.choose-label:before {
+	content: '';
+	position: absolute;
+	left: 0;
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	border-radius: 20px;
+	background-color: #fff;
+	z-index: 20;
+	-webkit-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+.chooseBtn:checked+label.choose-label:before {
+	left: 20px;
+}
+
+.chooseBtn:checked+label.choose-label {
+	background-color: #2196F3;
+}
+</style>
 </head>
 
 <body>
@@ -36,8 +81,11 @@
 					<div class="alert alert-info alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Manage alarm
-							records .</strong>
+						<i class="fa fa-info-circle"></i> <strong>Manage consumer
+							application alarm records .</strong><br /> <i class="fa fa-info-circle"></i>
+						<strong>MaxTime: -1 means no limit.</strong><br /> <i
+							class="fa fa-info-circle"></i> <strong>Level: P0 is the
+							highest level.</strong><br />
 					</div>
 				</div>
 			</div>
@@ -55,10 +103,16 @@
 								width="100%">
 								<thead>
 									<tr>
+										<th>ID</th>
 										<th>Group</th>
 										<th>Topic</th>
 										<th>Lag</th>
-										<th>Owner</th>
+										<th>Name</th>
+										<th>Times</th>
+										<th>MaxTimes</th>
+										<th>Level</th>
+										<th>IsNormal</th>
+										<th>IsEnable</th>
 										<th>Created</th>
 										<th>Modify</th>
 										<th>Operate</th>
@@ -72,8 +126,10 @@
 				<!-- /.col-lg-4 -->
 			</div>
 			<!-- /.row -->
+			<!-- Remove -->
 			<div class="modal fade" aria-labelledby="keModalLabel"
-				aria-hidden="true" id="doc_info" tabindex="-1" role="dialog">
+				aria-hidden="true" id="alarm_consumer_remove" tabindex="-1"
+				role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -81,17 +137,15 @@
 							<h4 class="modal-title" id="keModalLabel">Notify</h4>
 						</div>
 						<!-- /.row -->
-						<div class="modal-body">
-							<p>Are you sure you want to delete it?
-							<p>
-						</div>
+						<div id="alarm_consumer_remove_content" class="modal-body"></div>
 						<div id="remove_div" class="modal-footer"></div>
 					</div>
 				</div>
 			</div>
 			<!-- modify -->
 			<div class="modal fade" aria-labelledby="keModalLabelModify"
-				aria-hidden="true" id="modfiy_info" tabindex="-1" role="dialog">
+				aria-hidden="true" id="alarm_consumer_modify" tabindex="-1"
+				role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -101,7 +155,7 @@
 						<!-- /.row -->
 						<form role="form" action="/ke/alarm/consumer/modify/"
 							method="post"
-							onsubmit="return contextModifyFormValid();return false;">
+							onsubmit="return contextConsumerModifyFormValid();return false;">
 							<fieldset class="form-horizontal">
 								<div class="form-group">
 									<label for="path" class="col-sm-2 control-label">Lag</label>
@@ -113,13 +167,34 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">Owners</label>
+									<label class="col-sm-2 control-label">AGroup</label>
 									<div class="col-sm-9">
-										<textarea id="ke_owners_modify" name="ke_owners_modify"
-											class="form-control" rows="3"></textarea>
+										<select id="select2group" name="select2group" tabindex="-1"
+											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+										<input id="ke_alarm_consumer_group"
+											name="ke_alarm_consumer_group" type="hidden" />
 									</div>
 								</div>
-								<div id="alert_message_modify" style="display: none"
+								<div class="form-group">
+									<label class="col-sm-2 control-label">MaxTimes</label>
+									<div class="col-sm-9">
+										<select id="select2maxtimes" name="select2maxtimes"
+											tabindex="-1"
+											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+										<input id="ke_alarm_consumer_maxtimes"
+											name="ke_alarm_consumer_maxtimes" type="hidden" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">Level</label>
+									<div class="col-sm-9">
+										<select id="select2level" name="select2level" tabindex="-1"
+											style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+										<input id="ke_alarm_consumer_level"
+											name="ke_alarm_consumer_level" type="hidden" />
+									</div>
+								</div>
+								<div id="alert_consumer_message_modify" style="display: none"
 									class="alert alert-danger">
 									<label> Oops! Please make some changes .</label>
 								</div>
@@ -135,31 +210,63 @@
 					</div>
 				</div>
 			</div>
+			<!-- Moren then detail content -->
+			<div class="modal fade" aria-labelledby="keModalLabelModify"
+				aria-hidden="true" id="ke_alarm_consumer_detail" tabindex="-1"
+				role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabelModify">Detail</h4>
+						</div>
+						<!-- /.row -->
+						<fieldset class="form-horizontal">
+							<div class="form-group">
+								<label for="path" class="col-sm-2 control-label">Content</label>
+								<div class="col-sm-9">
+									<textarea id="ke_alarm_consumer_property"
+										name="ke_alarm_consumer_property" class="form-control"
+										readonly="readonly" rows="3"></textarea>
+								</div>
+							</div>
+						</fieldset>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">Cancle</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<!-- /#page-wrapper -->
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="main/alarm/modify.js" name="loader" />
+	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
 <script type="text/javascript">
-	function contextModifyFormValid() {
+	function contextConsumerModifyFormValid() {
 		var ke_consumer_name_lag = $("#ke_consumer_name_lag").val();
-		var ke_owners_modify = $("#ke_owners_modify").val();
-		
+		var ke_alarm_consumer_group = $("#ke_alarm_consumer_group").val();
+		var ke_alarm_consumer_maxtimes = $("#ke_alarm_consumer_maxtimes").val();
+		var ke_alarm_consumer_level = $("#ke_alarm_consumer_level").val();
+
 		if (isNaN(ke_consumer_name_lag)) {
-			$("#alert_message_modify").show();
+			$("#alert_consumer_message_modify").show();
 			setTimeout(function() {
-				$("#alert_message_modify").hide()
+				$("#alert_consumer_message_modify").hide()
 			}, 3000);
 			return false;
 		}
-		
-		if (ke_consumer_name_lag.length == 0 || ke_owners_modify.length == 0) {
-			$("#alert_message_modify").show();
+
+		if (ke_consumer_name_lag.length == 0 || ke_alarm_consumer_group.length == 0 || ke_alarm_consumer_maxtimes.length == 0 || ke_alarm_consumer_level.length == 0) {
+			$("#alert_consumer_message_modify").show();
 			setTimeout(function() {
-				$("#alert_message_modify").hide()
+				$("#alert_consumer_message_modify").hide()
 			}, 3000);
 			return false;
 		}

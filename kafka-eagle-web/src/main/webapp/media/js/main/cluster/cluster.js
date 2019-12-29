@@ -14,9 +14,13 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'port'
 		}, {
+			"mData" : 'jmxPort'
+		}, {
 			"mData" : 'created'
 		}, {
 			"mData" : 'modify'
+		}, {
+			"mData" : 'version'
 		} ]
 	});
 
@@ -36,6 +40,8 @@ $(document).ready(function() {
 			"mData" : 'port'
 		}, {
 			"mData" : 'mode'
+		}, {
+			"mData" : 'version'
 		} ]
 	});
 

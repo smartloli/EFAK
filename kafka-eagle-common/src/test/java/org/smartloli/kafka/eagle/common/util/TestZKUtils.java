@@ -17,7 +17,7 @@
  */
 package org.smartloli.kafka.eagle.common.util;
 
-import org.I0Itec.zkclient.ZkClient;
+import kafka.zk.KafkaZkClient;
 
 /**
 * TODO
@@ -29,9 +29,8 @@ import org.I0Itec.zkclient.ZkClient;
 public class TestZKUtils {
 
 	public static void main(String[] args) {
-		
-		ZkClient zkCli = ZKPoolUtils.getInstance().getZkClient("cluster2");
-		ZKPoolUtils.getInstance().release("cluster2", zkCli);
+		KafkaZkClient zkCli = KafkaZKPoolUtils.getInstance().getZkClient("cluster2");
+		KafkaZKPoolUtils.getInstance().release("cluster2", zkCli);
 		System.out.println(zkCli);
 	}
 	

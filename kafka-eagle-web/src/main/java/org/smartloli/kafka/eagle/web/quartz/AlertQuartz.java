@@ -17,36 +17,26 @@
  */
 package org.smartloli.kafka.eagle.web.quartz;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.api.email.MailFactory;
-import org.smartloli.kafka.eagle.api.email.MailProvider;
-import org.smartloli.kafka.eagle.api.email.module.ClusterContentModule;
-import org.smartloli.kafka.eagle.api.email.module.LagContentModule;
-import org.smartloli.kafka.eagle.common.protocol.AlertInfo;
-import org.smartloli.kafka.eagle.common.protocol.ClustersInfo;
-import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
-import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
+import org.smartloli.kafka.eagle.api.im.IMFactory;
+import org.smartloli.kafka.eagle.api.im.IMService;
+import org.smartloli.kafka.eagle.api.im.IMServiceImpl;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.common.util.NetUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
-import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.factory.ZkFactory;
-import org.smartloli.kafka.eagle.core.factory.ZkService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.AlertServiceImpl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -60,227 +50,309 @@ public class AlertQuartz {
 
 	private Logger LOG = LoggerFactory.getLogger(AlertQuartz.class);
 
-	/** Kafka service interface. */
-	private KafkaService kafkaService = new KafkaFactory().create();
-
-	/** Zookeeper service interface. */
-	private ZkService zkService = new ZkFactory().create();
-
 	public void alertJobQuartz() {
-		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
-		for (String clusterAlias : clusterAliass) {
-			// Run consumer job
-			Consumer consumer = new Consumer();
-			consumer.consumer(clusterAlias);
+		// Run consumer job
+		Consumer consumer = new Consumer();
+		consumer.consumer();
 
-			// Run cluster job
-			Cluster cluster = new Cluster();
-			cluster.cluster();
-
-		}
+		// Run cluster job
+		Cluster cluster = new Cluster();
+		cluster.cluster();
 	}
 
 	class Consumer {
-		public void consumer(String clusterAlias) {
+		public void consumer() {
 			try {
-				List<String> hosts = getBrokers(clusterAlias);
-				List<OffsetsLiteInfo> offsetLites = new ArrayList<OffsetsLiteInfo>();
-				String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
-				Map<String, List<String>> consumers = null;
-				if ("kafka".equals(formatter)) {
-					Map<String, List<String>> consumerGroupMap = new HashMap<String, List<String>>();
-					try {
-						JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
-						for (Object object : consumerGroups) {
-							JSONObject consumerGroup = (JSONObject) object;
-							String group = consumerGroup.getString("group");
-							List<String> topics = new ArrayList<>();
-							for (String topic : kafkaService.getKafkaConsumerTopic(clusterAlias, group)) {
-								topics.add(topic);
-							}
-							consumerGroupMap.put(group, topics);
-						}
-						consumers = consumerGroupMap;
-					} catch (Exception e) {
-						LOG.error("Get consumer info from [kafkaService.getKafkaConsumer] has error,msg is " + e.getMessage());
-						e.printStackTrace();
+				AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
+				List<AlarmConsumerInfo> alarmConsumers = alertService.getAllAlarmConsumerTasks();
+				for (AlarmConsumerInfo alarmConsumer : alarmConsumers) {
+					if (AlarmType.DISABLE.equals(alarmConsumer.getIsEnable())) {
+						break;
 					}
-				} else {
-					consumers = kafkaService.getConsumers(clusterAlias);
-				}
-				String statsPerDate = getStatsPerDate();
-				for (Entry<String, List<String>> entry : consumers.entrySet()) {
-					String group = entry.getKey();
-					for (String topic : entry.getValue()) {
-						OffsetsLiteInfo offsetSQLite = new OffsetsLiteInfo();
-						for (String partitionStr : kafkaService.findTopicPartition(clusterAlias, topic)) {
-							int partition = Integer.parseInt(partitionStr);
-							long logSize = 0L;
-							if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sasl.enable")) {
-								logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partition);
-							} else {
-								logSize = kafkaService.getLogSize(hosts, topic, partition);
-							}
-							OffsetZkInfo offsetZk = null;
-							if ("kafka".equals(formatter)) {
-								String bootstrapServers = "";
-								for (String host : hosts) {
-									bootstrapServers += host + ",";
-								}
-								bootstrapServers = bootstrapServers.substring(0, bootstrapServers.length() - 1);
-								offsetZk = getKafkaOffset(clusterAlias, bootstrapServers, topic, group, partition);
-							} else {
-								offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partition);
-							}
-							offsetSQLite.setGroup(group);
-							offsetSQLite.setCreated(statsPerDate);
-							offsetSQLite.setTopic(topic);
-							if (logSize == 0) {
-								offsetSQLite.setLag(0L + offsetSQLite.getLag());
-							} else {
-								long lag = offsetSQLite.getLag() + (offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
-								offsetSQLite.setLag(lag);
-							}
-							offsetSQLite.setLogSize(logSize + offsetSQLite.getLogSize());
-							offsetSQLite.setOffsets(offsetZk.getOffset() + offsetSQLite.getOffsets());
+
+					Map<String, Object> map = new HashMap<>();
+					map.put("cluster", alarmConsumer.getCluster());
+					map.put("alarmGroup", alarmConsumer.getAlarmGroup());
+					AlarmConfigInfo alarmConfing = alertService.getAlarmConfigByGroupName(map);
+
+					Map<String, Object> params = new HashMap<>();
+					params.put("cluster", alarmConsumer.getCluster());
+					params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
+					params.put("group", alarmConsumer.getGroup());
+					params.put("topic", alarmConsumer.getTopic());
+					// real consumer lag
+					long lag = alertService.queryLastestLag(params);
+					if (lag > alarmConsumer.getLag() && alarmConsumer.getAlarmTimes() < alarmConsumer.getAlarmMaxTimes()) {
+						// alarm consumer
+						alarmConsumer.setAlarmTimes(alarmConsumer.getAlarmTimes() + 1);
+						alarmConsumer.setIsNormal("N");
+						alertService.modifyConsumerStatusAlertById(alarmConsumer);
+						try {
+							sendAlarmConsumerError(alarmConfing, alarmConsumer, lag);
+						} catch (Exception e) {
+							LOG.error("Send alarm consumer exception has error, msg is " + e.getCause().getMessage());
 						}
-						offsetLites.add(offsetSQLite);
+					} else if (lag <= alarmConsumer.getLag()) {
+						if (alarmConsumer.getIsNormal().equals("N")) {
+							alarmConsumer.setIsNormal("Y");
+							// clear error alarm and reset
+							alarmConsumer.setAlarmTimes(0);
+							// notify the cancel of the alarm
+							alertService.modifyConsumerStatusAlertById(alarmConsumer);
+							try {
+								sendAlarmConsumerNormal(alarmConfing, alarmConsumer, lag);
+							} catch (Exception e) {
+								LOG.error("Send alarm consumer normal has error, msg is " + e.getCause().getMessage());
+							}
+						}
 					}
 				}
-
-				// Monitor consumer topic rate min/per
-				zkService.insert(clusterAlias, offsetLites);
-
-				alert(clusterAlias, offsetLites);
 			} catch (Exception ex) {
-				LOG.error("Quartz statistics offset has error,msg is " + ex.getMessage());
+				LOG.error("Alarm consumer lag has error, msg is " + ex.getCause().getMessage());
 				ex.printStackTrace();
 			}
 		}
 
-		private void alert(String clusterAlias, List<OffsetsLiteInfo> offsetLites) {
-			boolean enableAlert = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.enable");
-			if (enableAlert) {
-				for (OffsetsLiteInfo offset : offsetLites) {
-					Map<String, Object> params = new HashMap<>();
-					params.put("cluster", clusterAlias);
-					params.put("group", offset.getGroup());
-					params.put("topic", offset.getTopic());
+		private void sendAlarmConsumerError(AlarmConfigInfo alarmConfing, AlarmConsumerInfo alarmConsumer, long lag) {
+			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(alarmConsumer.getId());
+				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Notice");
+				alarmMsg.setAlarmContent("lag.overflow [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
+				alarmMsg.setAlarmProject("Consumer");
+				alarmMsg.setAlarmStatus("PROBLEM");
+				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(alarmConsumer.getId());
+				alarmMsg.setTitle("**<font color=\"#FF0000\">Kafka Eagle Alarm Consumer Notice</font>** \n\n");
+				alarmMsg.setAlarmContent("<font color=\"#FF0000\">lag.overflow [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
+				alarmMsg.setAlarmProject("Consumer");
+				alarmMsg.setAlarmStatus("<font color=\"#FF0000\">PROBLEM</font>");
+				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(alarmConsumer.getId());
+				alarmMsg.setTitle("`Kafka Eagle Alarm Consumer Notice`\n");
+				alarmMsg.setAlarmContent("<font color=\"warning\">lag.overflow [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
+				alarmMsg.setAlarmProject("Consumer");
+				alarmMsg.setAlarmStatus("<font color=\"warning\">PROBLEM</font>");
+				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
+				IMServiceImpl im = new IMServiceImpl();
+				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
 
-					AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
-					AlertInfo alertInfo = alertService.findAlertByCGT(params);
-
-					if (offset.getLag() > alertInfo.getLag()) {
-						try {
-							MailProvider provider = new MailFactory();
-							String subject = "Kafka Eagle Consumer Alert";
-							String address = alertInfo.getOwner();
-							// String content = "Group is [" +
-							// alertInfo.getGroup() + "],Topic is [" +
-							// alertInfo.getTopic() + "],current lag is [" +
-							// offset.getLag() + "],expired lag is [" +
-							// alertInfo.getLag() + "].";
-							LagContentModule lcm = new LagContentModule();
-							lcm.setCluster(clusterAlias);
-							lcm.setConsumerLag(offset.getLag() + "");
-							lcm.setGroup(alertInfo.getGroup());
-							lcm.setLagThreshold(alertInfo.getLag() + "");
-							lcm.setTime(CalendarUtils.getDate());
-							lcm.setTopic(alertInfo.getTopic());
-							lcm.setType("Consumer");
-							lcm.setUser(alertInfo.getOwner());
-							provider.create().send(subject, address, lcm.toString(), "");
-						} catch (Exception ex) {
-							LOG.error("Topic[" + alertInfo.getTopic() + "] Send alarm mail has error,msg is " + ex.getMessage());
-						}
-					}
-				}
 			}
 		}
 
-		/** Get kafka brokers. */
-		private List<String> getBrokers(String clusterAlias) {
-			String brokers = kafkaService.getAllBrokersInfo(clusterAlias);
-			JSONArray kafkaBrokers = JSON.parseArray(brokers);
-			List<String> targets = new ArrayList<String>();
-			for (Object object : kafkaBrokers) {
-				JSONObject kafkaBroker = (JSONObject) object;
-				String host = kafkaBroker.getString("host");
-				int port = kafkaBroker.getInteger("port");
-				targets.add(host + ":" + port);
+		private void sendAlarmConsumerNormal(AlarmConfigInfo alarmConfing, AlarmConsumerInfo alarmConsumer, long lag) {
+			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(alarmConsumer.getId());
+				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Cancel");
+				alarmMsg.setAlarmContent("lag.normal [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
+				alarmMsg.setAlarmProject("Consumer");
+				alarmMsg.setAlarmStatus("NORMAL");
+				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(alarmConsumer.getId());
+				alarmMsg.setTitle("**<font color=\"#008000\">Kafka Eagle Alarm Consumer Cancel</font>** \n\n");
+				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
+				alarmMsg.setAlarmProject("Consumer");
+				alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
+				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(alarmConsumer.getId());
+				alarmMsg.setTitle("`Kafka Eagle Alarm Consumer Cancel`\n");
+				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
+				alarmMsg.setAlarmProject("Consumer");
+				alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
+				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
+				IMServiceImpl im = new IMServiceImpl();
+				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
+
 			}
-			return targets;
 		}
 
-		private OffsetZkInfo getKafkaOffset(String clusterAlias, String bootstrapServers, String topic, String group, int partition) {
-			JSONArray kafkaOffsets = JSON.parseArray(kafkaService.getKafkaOffset(clusterAlias));
-			OffsetZkInfo targets = new OffsetZkInfo();
-			for (Object object : kafkaOffsets) {
-				JSONObject kafkaOffset = (JSONObject) object;
-				String _topic = kafkaOffset.getString("topic");
-				String _group = kafkaOffset.getString("group");
-				int _partition = kafkaOffset.getInteger("partition");
-				long timestamp = kafkaOffset.getLong("timestamp");
-				long offset = kafkaOffset.getLong("offset");
-				if (topic.equals(_topic) && group.equals(_group) && partition == _partition) {
-					targets.setOffset(offset);
-					targets.setCreate(CalendarUtils.convertUnixTime2Date(timestamp));
-					targets.setModify(CalendarUtils.convertUnixTime2Date(timestamp));
-				}
-			}
-			return targets;
-		}
-
-		/** Get the corresponding string per minute. */
-		private String getStatsPerDate() {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-			return df.format(new Date());
-		}
 	}
 
 	class Cluster {
 
 		public void cluster() {
-			boolean enableAlert = SystemConfigUtils.getBooleanProperty("kafka.eagle.mail.enable");
-			if (enableAlert) {
-				AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
-				for (ClustersInfo cluster : alertService.historys()) {
-					String[] servers = cluster.getServer().split(",");
-					for (String server : servers) {
-						String host = server.split(":")[0];
-						int port = 0;
+			AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
+			for (AlarmClusterInfo cluster : alertService.getAllAlarmClusterTasks()) {
+				if (AlarmType.DISABLE.equals(cluster.getIsEnable())) {
+					break;
+				}
+				String[] servers = cluster.getServer().split(",");
+				String alarmGroup = cluster.getAlarmGroup();
+				Map<String, Object> params = new HashMap<>();
+				params.put("cluster", cluster.getCluster());
+				params.put("alarmGroup", alarmGroup);
+				AlarmConfigInfo alarmConfing = alertService.getAlarmConfigByGroupName(params);
+				List<String> errorServers = new ArrayList<String>();
+				List<String> normalServers = new ArrayList<String>();
+				for (String server : servers) {
+					String host = server.split(":")[0];
+					int port = 0;
+					try {
+						port = Integer.parseInt(server.split(":")[1]);
+						boolean status = NetUtils.telnet(host, port);
+						if (!status) {
+							errorServers.add(server);
+						} else {
+							normalServers.add(server);
+						}
+					} catch (Exception e) {
+						LOG.error("Alarm cluster has error, msg is " + e.getCause().getMessage());
+						e.printStackTrace();
+					}
+				}
+				if (errorServers.size() > 0 && cluster.getAlarmTimes() < cluster.getAlarmMaxTimes()) {
+					cluster.setAlarmTimes(cluster.getAlarmTimes() + 1);
+					cluster.setIsNormal("N");
+					alertService.modifyClusterStatusAlertById(cluster);
+					try {
+						sendAlarmClusterError(alarmConfing, cluster, errorServers.toString());
+					} catch (Exception e) {
+						LOG.error("Send alarm cluser exception has error, msg is " + e.getCause().getMessage());
+					}
+				} else if (errorServers.size() == 0) {
+					if (cluster.getIsNormal().equals("N")) {
+						cluster.setIsNormal("Y");
+						// clear error alarm and reset
+						cluster.setAlarmTimes(0);
+						// notify the cancel of the alarm
+						alertService.modifyClusterStatusAlertById(cluster);
 						try {
-							port = Integer.parseInt(server.split(":")[1]);
-							boolean status = NetUtils.telnet(host, port);
-							if (!status) {
-								String address = SystemConfigUtils.getProperty("kafka.eagle.alert.users");
-								try {
-									MailProvider provider = new MailFactory();
-									String subject = "Kafka Eagle On-Site Inspection Alert";
-									// String content = "Thread Service [" +
-									// host + ":" + port + "] has crashed,please
-									// check it.";
-									ClusterContentModule ccm = new ClusterContentModule();
-									ccm.setCluster(cluster.getCluster());
-									ccm.setServer(cluster.getServer());
-									ccm.setTime(CalendarUtils.getDate());
-									ccm.setType(cluster.getType());
-									ccm.setUser(cluster.getOwner());
-									provider.create().send(subject, cluster.getOwner(), ccm.toString(), "");
-								} catch (Exception ex) {
-									LOG.error("Alertor[" + address + "] Send alarm mail has error,msg is " + ex.getMessage());
-								}
-							}
-
+							sendAlarmClusterNormal(alarmConfing, cluster, normalServers.toString());
 						} catch (Exception e) {
-							LOG.error("Parse port[" + server.split(":")[1] + "] has error, msg is " + e.getMessage());
+							LOG.error("Send alarm cluser normal has error, msg is " + e.getCause().getMessage());
 						}
 					}
 				}
+			}
+		}
+
+		private void sendAlarmClusterError(AlarmConfigInfo alarmConfing, AlarmClusterInfo cluster, String server) {
+			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(cluster.getId());
+				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Notice");
+				alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+				alarmMsg.setAlarmProject(cluster.getType());
+				alarmMsg.setAlarmStatus("PROBLEM");
+				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(cluster.getId());
+				alarmMsg.setTitle("**<font color=\"#FF0000\">Kafka Eagle Alarm Cluster Notice</font>** \n\n");
+				alarmMsg.setAlarmContent("<font color=\"#FF0000\">node.shutdown [ " + server + " ]</font>");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+				alarmMsg.setAlarmProject(cluster.getType());
+				alarmMsg.setAlarmStatus("<font color=\"#FF0000\">PROBLEM</font>");
+				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(cluster.getId());
+				alarmMsg.setTitle("`Kafka Eagle Alarm Cluster Notice`\n");
+				alarmMsg.setAlarmContent("<font color=\"warning\">node.shutdown [ " + server + " ]</font>");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+				alarmMsg.setAlarmProject(cluster.getType());
+				alarmMsg.setAlarmStatus("<font color=\"warning\">PROBLEM</font>");
+				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
+				IMServiceImpl im = new IMServiceImpl();
+				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
 
 			}
-
 		}
+
+		private void sendAlarmClusterNormal(AlarmConfigInfo alarmConfing, AlarmClusterInfo cluster, String server) {
+			if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(cluster.getId());
+				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Cancel");
+				alarmMsg.setAlarmContent("node.alive [ " + server + " ]");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+				alarmMsg.setAlarmProject(cluster.getType());
+				alarmMsg.setAlarmStatus("NORMAL");
+				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				JSONObject object = new JSONObject();
+				object.put("address", alarmConfing.getAlarmAddress());
+				object.put("msg", alarmMsg.toMail());
+				im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(cluster.getId());
+				alarmMsg.setTitle("**<font color=\"#008000\">Kafka Eagle Alarm Cluster Cancel</font>** \n\n");
+				alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+				alarmMsg.setAlarmProject(cluster.getType());
+				alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
+				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
+				IMService im = new IMFactory().create();
+				im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
+				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+				alarmMsg.setAlarmId(cluster.getId());
+				alarmMsg.setTitle("`Kafka Eagle Alarm Cluster Cancel`\n");
+				alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
+				alarmMsg.setAlarmDate(CalendarUtils.getDate());
+				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+				alarmMsg.setAlarmProject(cluster.getType());
+				alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
+				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
+				IMServiceImpl im = new IMServiceImpl();
+				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
+
+			}
+		}
+
 	}
 
 }

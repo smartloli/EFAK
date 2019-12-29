@@ -17,11 +17,6 @@
  */
 package org.smartloli.kafka.eagle.core.factory;
 
-import java.util.List;
-
-import org.smartloli.kafka.eagle.common.protocol.AlarmInfo;
-import org.smartloli.kafka.eagle.common.protocol.OffsetsLiteInfo;
-
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -44,29 +39,14 @@ public interface ZkService {
 	/** Zookeeper get command. */
 	public String get(String clusterAlias, String cmd);
 
-	/** Get alarmer information. */
-	public String getAlarm(String clusterAlias);
-
-	/** Get consumer data that has group and topic as the only sign. */
-	public String getOffsets(String clusterAlias, String group, String topic);
-
-	/** Insert new datasets. */
-	public void insert(String clusterAlias, List<OffsetsLiteInfo> list);
-
-	/** Insert new alarmer configure information. */
-	public int insertAlarmConfigure(String clusterAlias, AlarmInfo alarm);
-
 	/** Zookeeper ls command. */
 	public String ls(String clusterAlias, String cmd);
 
-	/**
-	 * Remove the metadata information in the Ke root directory in
-	 * zookeeper,with group and topic as the only sign.
-	 */
-	public void remove(String clusterAlias, String group, String topic, String theme);
-
 	/** Get zookeeper health status. */
 	public String status(String host, String port);
+
+	/** Get zookeeper version. */
+	public String version(String host, String port);
 
 	/** Get zookeeper cluster information. */
 	public String zkCluster(String clusterAlias);

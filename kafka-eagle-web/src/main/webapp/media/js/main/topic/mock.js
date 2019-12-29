@@ -17,12 +17,25 @@ $(document).ready(function() {
 			},
 			cache : true,
 			processResults : function(data, params) {
-				return {
-					results : data.items,
-					pagination : {
-						more : (params.page * params.offset) < data.total
+				if (data.items.length > 0) {
+					var datas = new Array();
+					$.each(data.items, function(index, e) {
+						var s = {};
+						s.id = index + 1;
+						s.text = e.text;
+						datas[index] = s;
+					});
+					return {
+						results : datas,
+						pagination : {
+							more : (params.page * params.offset) < data.total
+						}
+					};
+				} else {
+					return {
+						results : []
 					}
-				};
+				}
 			},
 			escapeMarkup : function(markup) {
 				return markup;
@@ -47,12 +60,16 @@ $(document).ready(function() {
 			}, 3000);
 		} else {
 			$.ajax({
-				type : 'get',
+				type : 'post',
 				dataType : 'json',
-				url : '/ke/topic/mock/send/message/' + topic + '/ajax?message=' + message,
+				contentType : 'application/json;charset=UTF-8',
+				data : JSON.stringify({
+					"topic" : topic,
+					"message" : message
+				}),
+				url : '/ke/topic/mock/send/message/topic/ajax',
 				success : function(datas) {
 					if (datas != null) {
-						console.log(datas)
 						if (datas.status) {
 							$("#success_mssage_mock").show();
 							setTimeout(function() {

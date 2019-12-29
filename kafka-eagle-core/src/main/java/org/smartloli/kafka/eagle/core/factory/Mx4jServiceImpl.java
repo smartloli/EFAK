@@ -20,21 +20,22 @@
  */
 package org.smartloli.kafka.eagle.core.factory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXServiceURL;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
+import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
-
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Implements Mx4jService all method.
@@ -49,13 +50,13 @@ public class Mx4jServiceImpl implements Mx4jService {
 	private String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
 
 	/** Get brokers all topics bytes in per sec. */
-    @Override
+	@Override
 	public MBeanInfo bytesInPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.bytesInPerSec);
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.bytesInPerSec);
 	}
 
 	/** Get brokers bytes in per sec by topic. */
-    @Override
+	@Override
 	public MBeanInfo bytesInPerSec(String uri, String topic) {
 		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.bytesInPerSec + ",topic=" + topic;
 		return common(uri, mbean);
@@ -63,65 +64,65 @@ public class Mx4jServiceImpl implements Mx4jService {
 
 	/** Get brokers all topics bytes out per sec. */
 	@Override
-    public MBeanInfo bytesOutPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.bytesOutPerSec);
-    }
+	public MBeanInfo bytesOutPerSec(String uri) {
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.bytesOutPerSec);
+	}
 
 	/** Get brokers bytes out per sec by topic. */
 	@Override
-    public MBeanInfo bytesOutPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.bytesOutPerSec + ",topic=" + topic;
+	public MBeanInfo bytesOutPerSec(String uri, String topic) {
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.bytesOutPerSec + ",topic=" + topic;
 		return common(uri, mbean);
 	}
 
 	/** Get brokers all topics byte rejected per sec. */
-    @Override
+	@Override
 	public MBeanInfo bytesRejectedPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.bytesRejectedPerSec);
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.bytesRejectedPerSec);
 	}
 
 	/** Get brokers byte rejected per sec by topic. */
-    @Override
+	@Override
 	public MBeanInfo bytesRejectedPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.bytesRejectedPerSec + ",topic=" + topic;
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.bytesRejectedPerSec + ",topic=" + topic;
 		return common(uri, mbean);
 	}
 
 	/** Get brokers all topic failed fetch request per sec. */
-    @Override
+	@Override
 	public MBeanInfo failedFetchRequestsPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.failedFetchRequestsPerSec);
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.failedFetchRequestsPerSec);
 	}
 
 	/** Get brokers failed fetch request per sec by topic. */
-    @Override
+	@Override
 	public MBeanInfo failedFetchRequestsPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.failedFetchRequestsPerSec + ",topic=" + topic;
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.failedFetchRequestsPerSec + ",topic=" + topic;
 		return common(uri, mbean);
 	}
 
 	/** Get brokers all topics failed fetch produce request per sec. */
-    @Override
+	@Override
 	public MBeanInfo failedProduceRequestsPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.failedProduceRequestsPerSec);
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.failedProduceRequestsPerSec);
 	}
 
 	/** Get brokers failed fetch produce request per sec by topic. */
-    @Override
+	@Override
 	public MBeanInfo failedProduceRequestsPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.failedProduceRequestsPerSec + ",topic=" + topic;
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.failedProduceRequestsPerSec + ",topic=" + topic;
 		return common(uri, mbean);
 	}
 
 	/** Get brokers topic all partitions log end offset. */
-    @Override
+	@Override
 	public Map<Integer, Long> logEndOffset(String uri, String topic) {
 		String mbean = "kafka.log:type=Log,name=LogEndOffset,topic=" + topic + ",partition=*";
 		JMXConnector connector = null;
 		Map<Integer, Long> endOffsets = new HashMap<>();
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, uri));
-			connector = JMXConnectorFactory.connect(jmxSeriverUrl);
+			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
 			Set<ObjectName> objectNames = mbeanConnection.queryNames(new ObjectName(mbean), null);
 			for (ObjectName objectName : objectNames) {
@@ -134,105 +135,6 @@ public class Mx4jServiceImpl implements Mx4jService {
 		} catch (Exception e) {
 			LOG.error("JMX service url[" + uri + "] create has error,msg is " + e.getMessage());
 		} finally {
-			try {
-				if (connector != null) {
-					connector.close();
-				}
-			} catch (Exception e) {
-				LOG.error("Close JMXConnector[" + uri + "] has error,msg is " + e.getMessage());
-			}
-		}
-		return endOffsets;
-	}
-
-	/** Get brokers all topics message in per sec. */
-    @Override
-	public MBeanInfo messagesInPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.messagesInPerSec);
-	}
-
-	/** Get brokers message in per sec by topic. */
-    @Override
-	public MBeanInfo messagesInPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.messagesInPerSec + ",topic=" + topic;
-		return common(uri, mbean);
-	}
-
-    @Override
-	public MBeanInfo produceMessageConversionsPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.produceMessageConversionsPerSec);
-    }
-
-    @Override
-    public MBeanInfo produceMessageConversionsPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.produceMessageConversionsPerSec + ",topic=" + topic;
-        return common(uri, mbean);
-    }
-
-    @Override
-    public MBeanInfo totalFetchRequestsPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.totalFetchRequestsPerSec);
-    }
-
-    @Override
-    public MBeanInfo totalFetchRequestsPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.totalFetchRequestsPerSec + ",topic=" + topic;
-        return common(uri, mbean);
-    }
-
-    @Override
-    public MBeanInfo totalProduceRequestsPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.totalProduceRequestsPerSec);
-    }
-
-    @Override
-    public MBeanInfo totalProduceRequestsPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.totalProduceRequestsPerSec + ",topic=" + topic;
-        return common(uri, mbean);
-    }
-
-    @Override
-    public MBeanInfo replicationBytesInPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesInPerSec);
-    }
-
-    @Override
-    public MBeanInfo replicationBytesInPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesInPerSec + ",topic=" + topic;
-        return common(uri, mbean);
-    }
-
-    @Override
-    public MBeanInfo replicationBytesOutPerSec(String uri) {
-        return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesOutPerSec);
-    }
-
-    @Override
-    public MBeanInfo replicationBytesOutPerSec(String uri, String topic) {
-        String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesOutPerSec + ",topic=" + topic;
-        return common(uri, mbean);
-    }
-
-    private MBeanInfo common(String uri, String mbean) {
-		JMXConnector connector = null;
-		MBeanInfo MBeanInfo = new MBeanInfo();
-		try {
-			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, uri));
-			connector = JMXConnectorFactory.connect(jmxSeriverUrl);
-			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			Object fifteenMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIFTEEN_MINUTE_RATE);
-			Object fiveMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIVE_MINUTE_RATE);
-			Object meanRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.MEAN_RATE);
-			Object oneMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.ONE_MINUTE_RATE);
-			MBeanInfo.setFifteenMinute(fifteenMinuteRate.toString());
-			MBeanInfo.setFiveMinute(fiveMinuteRate.toString());
-			MBeanInfo.setMeanRate(meanRate.toString());
-			MBeanInfo.setOneMinute(oneMinuteRate.toString());
-		} catch (InstanceNotFoundException instanceException) {
-		    return null;
-        } catch (Exception e) {
-			LOG.error("JMX service url[" + uri + "] create has error,msg is " + e.getMessage());
-		} finally {
 			if (connector != null) {
 				try {
 					connector.close();
@@ -241,7 +143,121 @@ public class Mx4jServiceImpl implements Mx4jService {
 				}
 			}
 		}
-		return MBeanInfo;
+		return endOffsets;
+	}
+
+	/** Get brokers all topics message in per sec. */
+	@Override
+	public MBeanInfo messagesInPerSec(String uri) {
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.messagesInPerSec);
+	}
+
+	/** Get brokers message in per sec by topic. */
+	@Override
+	public MBeanInfo messagesInPerSec(String uri, String topic) {
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.messagesInPerSec + ",topic=" + topic;
+		return common(uri, mbean);
+	}
+
+	@Override
+	public MBeanInfo produceMessageConversionsPerSec(String uri) {
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.produceMessageConversionsPerSec);
+	}
+
+	@Override
+	public MBeanInfo produceMessageConversionsPerSec(String uri, String topic) {
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.produceMessageConversionsPerSec + ",topic=" + topic;
+		return common(uri, mbean);
+	}
+
+	@Override
+	public MBeanInfo totalFetchRequestsPerSec(String uri) {
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.totalFetchRequestsPerSec);
+	}
+
+	@Override
+	public MBeanInfo totalFetchRequestsPerSec(String uri, String topic) {
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.totalFetchRequestsPerSec + ",topic=" + topic;
+		return common(uri, mbean);
+	}
+
+	@Override
+	public MBeanInfo totalProduceRequestsPerSec(String uri) {
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.totalProduceRequestsPerSec);
+	}
+
+	@Override
+	public MBeanInfo totalProduceRequestsPerSec(String uri, String topic) {
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.totalProduceRequestsPerSec + ",topic=" + topic;
+		return common(uri, mbean);
+	}
+
+	@Override
+	public MBeanInfo replicationBytesInPerSec(String uri) {
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesInPerSec);
+	}
+
+	@Override
+	public MBeanInfo replicationBytesInPerSec(String uri, String topic) {
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesInPerSec + ",topic=" + topic;
+		return common(uri, mbean);
+	}
+
+	@Override
+	public MBeanInfo replicationBytesOutPerSec(String uri) {
+		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesOutPerSec);
+	}
+
+	@Override
+	public MBeanInfo replicationBytesOutPerSec(String uri, String topic) {
+		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesOutPerSec + ",topic=" + topic;
+		return common(uri, mbean);
+	}
+
+	/**
+	 * Before Kafka 0.11.x, some exceptions are thrown, such as
+	 * {@link ReplicationBytesOutPerSec} Exception.
+	 */
+	private MBeanInfo common(String uri, String mbean) {
+		JMXConnector connector = null;
+		MBeanInfo mbeanInfo = new MBeanInfo();
+		try {
+			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, uri));
+			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			if (mbeanConnection.isRegistered(new ObjectName(mbean))) {
+				Object fifteenMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIFTEEN_MINUTE_RATE);
+				Object fiveMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.FIVE_MINUTE_RATE);
+				Object meanRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.MEAN_RATE);
+				Object oneMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean), MBean.ONE_MINUTE_RATE);
+				mbeanInfo.setFifteenMinute(fifteenMinuteRate.toString());
+				mbeanInfo.setFiveMinute(fiveMinuteRate.toString());
+				mbeanInfo.setMeanRate(meanRate.toString());
+				mbeanInfo.setOneMinute(oneMinuteRate.toString());
+			} else {
+				mbeanInfo.setFifteenMinute("0.0");
+				mbeanInfo.setFiveMinute("0.0");
+				mbeanInfo.setMeanRate("0.0");
+				mbeanInfo.setOneMinute("0.0");
+			}
+		} catch (Exception e) {
+			LOG.error("JMX service url[" + uri + "] create has error,msg is " + e.getMessage());
+			e.printStackTrace();
+			mbeanInfo.setFifteenMinute("0.0");
+			mbeanInfo.setFiveMinute("0.0");
+			mbeanInfo.setMeanRate("0.0");
+			mbeanInfo.setOneMinute("0.0");
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (Exception e) {
+					LOG.error("Close JMXConnector[" + uri + "] has error,msg is " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+		return mbeanInfo;
 	}
 
 }
