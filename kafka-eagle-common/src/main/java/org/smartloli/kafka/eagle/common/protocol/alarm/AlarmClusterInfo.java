@@ -20,7 +20,7 @@ package org.smartloli.kafka.eagle.common.protocol.alarm;
 import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * Alarm kafka or zookeeper cluster info.
+ * Alarm kafka or zookeeper cluster info and topic capacity.
  * 
  * @author smartloli.
  *
@@ -31,7 +31,7 @@ public class AlarmClusterInfo extends BaseProtocol {
 	private int id;
 	private String type;
 	private String cluster;
-	private String server;
+	private String server; // cluster server address and topic capacity
 	private String alarmGroup;
 	private int alarmTimes;
 	private int alarmMaxTimes;

@@ -429,7 +429,12 @@ public class AlarmController {
 	public ModelAndView alarmCreateForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		String type = request.getParameter("ke_alarm_cluster_type");
-		String servers = request.getParameter("ke_server_alarm");
+		String value = "";
+		if (AlarmType.TOPIC.equals(type)) {
+			value = request.getParameter("ke_topic_alarm");
+		} else {
+			value = request.getParameter("ke_server_alarm");
+		}
 		String level = request.getParameter("ke_alarm_cluster_level");
 		String alarmGroup = request.getParameter("ke_alarm_cluster_group");
 		int maxTimes = 10;
@@ -449,7 +454,7 @@ public class AlarmController {
 		alarmClusterInfo.setIsEnable("Y");
 		alarmClusterInfo.setIsNormal("Y");
 		alarmClusterInfo.setModify(CalendarUtils.getDate());
-		alarmClusterInfo.setServer(servers);
+		alarmClusterInfo.setServer(value);
 		alarmClusterInfo.setType(type);
 
 		int code = alertService.create(alarmClusterInfo);
@@ -504,7 +509,7 @@ public class AlarmController {
 			String group = StrUtils.convertNull(clustersInfo.getAlarmGroup());
 			obj.put("id", id);
 			obj.put("type", clustersInfo.getType());
-			obj.put("server", "<a href='#" + id + "/server' name='ke_alarm_cluster_detail'>" + (server.length() > 8 ? server.substring(0, 8) + "..." : server) + "</a>");
+			obj.put("value", "<a href='#" + id + "/server' name='ke_alarm_cluster_detail'>" + (server.length() > 8 ? server.substring(0, 8) + "..." : server) + "</a>");
 			obj.put("alarmGroup", "<a href='#" + id + "/group' name='ke_alarm_cluster_detail'>" + (group.length() > 8 ? group.substring(0, 8) + "..." : group) + "</a>");
 			obj.put("alarmTimes", clustersInfo.getAlarmTimes());
 			obj.put("alarmMaxTimes", clustersInfo.getAlarmMaxTimes());

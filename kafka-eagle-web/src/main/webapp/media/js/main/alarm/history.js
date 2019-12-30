@@ -11,7 +11,7 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'type'
 		}, {
-			"mData" : 'server'
+			"mData" : 'value'
 		}, {
 			"mData" : 'alarmGroup'
 		}, {

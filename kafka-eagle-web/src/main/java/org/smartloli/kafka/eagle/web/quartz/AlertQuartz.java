@@ -34,9 +34,12 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.common.util.NetUtils;
+import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
+import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.AlertServiceImpl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -49,6 +52,9 @@ import com.alibaba.fastjson.JSONObject;
 public class AlertQuartz {
 
 	private Logger LOG = LoggerFactory.getLogger(AlertQuartz.class);
+
+	/** Kafka topic config service interface. */
+	private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
 
 	public void alertJobQuartz() {
 		// Run consumer job
@@ -213,50 +219,84 @@ public class AlertQuartz {
 				if (AlarmType.DISABLE.equals(cluster.getIsEnable())) {
 					break;
 				}
-				String[] servers = cluster.getServer().split(",");
 				String alarmGroup = cluster.getAlarmGroup();
 				Map<String, Object> params = new HashMap<>();
 				params.put("cluster", cluster.getCluster());
 				params.put("alarmGroup", alarmGroup);
-				AlarmConfigInfo alarmConfing = alertService.getAlarmConfigByGroupName(params);
-				List<String> errorServers = new ArrayList<String>();
-				List<String> normalServers = new ArrayList<String>();
-				for (String server : servers) {
-					String host = server.split(":")[0];
-					int port = 0;
-					try {
-						port = Integer.parseInt(server.split(":")[1]);
-						boolean status = NetUtils.telnet(host, port);
-						if (!status) {
-							errorServers.add(server);
-						} else {
-							normalServers.add(server);
-						}
-					} catch (Exception e) {
-						LOG.error("Alarm cluster has error, msg is " + e.getCause().getMessage());
-						e.printStackTrace();
-					}
-				}
-				if (errorServers.size() > 0 && (cluster.getAlarmTimes() < cluster.getAlarmMaxTimes() || cluster.getAlarmMaxTimes() == -1)) {
-					cluster.setAlarmTimes(cluster.getAlarmTimes() + 1);
-					cluster.setIsNormal("N");
-					alertService.modifyClusterStatusAlertById(cluster);
-					try {
-						sendAlarmClusterError(alarmConfing, cluster, errorServers.toString());
-					} catch (Exception e) {
-						LOG.error("Send alarm cluser exception has error, msg is " + e.getCause().getMessage());
-					}
-				} else if (errorServers.size() == 0) {
-					if (cluster.getIsNormal().equals("N")) {
-						cluster.setIsNormal("Y");
-						// clear error alarm and reset
-						cluster.setAlarmTimes(0);
-						// notify the cancel of the alarm
+				AlarmConfigInfo alarmConfig = alertService.getAlarmConfigByGroupName(params);
+				if (AlarmType.TOPIC.equals(cluster.getType())) {
+					JSONObject topicAlarmJson = JSON.parseObject(cluster.getServer());
+					String topic = topicAlarmJson.getString("topic");
+					long alarmCapacity = topicAlarmJson.getLong("capacity");
+					long realCapacity = kafkaMetricsService.topicCapacity(cluster.getCluster(), topic);
+					JSONObject alarmTopicMsg = new JSONObject();
+					alarmTopicMsg.put("topic", topic);
+					alarmTopicMsg.put("alarmCapacity", alarmCapacity);
+					alarmTopicMsg.put("realCapacity", realCapacity);
+					if (realCapacity > alarmCapacity && (cluster.getAlarmTimes() < cluster.getAlarmMaxTimes() || cluster.getAlarmMaxTimes() == -1)) {
+						cluster.setAlarmTimes(cluster.getAlarmTimes() + 1);
+						cluster.setIsNormal("N");
 						alertService.modifyClusterStatusAlertById(cluster);
 						try {
-							sendAlarmClusterNormal(alarmConfing, cluster, normalServers.toString());
+							sendAlarmClusterError(alarmConfig, cluster, alarmTopicMsg.toJSONString());
 						} catch (Exception e) {
-							LOG.error("Send alarm cluser normal has error, msg is " + e.getCause().getMessage());
+							LOG.error("Send alarm cluser exception has error, msg is " + e.getCause().getMessage());
+						}
+					} else {
+						if (cluster.getIsNormal().equals("N")) {
+							cluster.setIsNormal("Y");
+							// clear error alarm and reset
+							cluster.setAlarmTimes(0);
+							// notify the cancel of the alarm
+							alertService.modifyClusterStatusAlertById(cluster);
+							try {
+								sendAlarmClusterNormal(alarmConfig, cluster, alarmTopicMsg.toJSONString());
+							} catch (Exception e) {
+								LOG.error("Send alarm cluser normal has error, msg is " + e.getCause().getMessage());
+							}
+						}
+					}
+				} else {
+					String[] servers = cluster.getServer().split(",");
+					List<String> errorServers = new ArrayList<String>();
+					List<String> normalServers = new ArrayList<String>();
+					for (String server : servers) {
+						String host = server.split(":")[0];
+						int port = 0;
+						try {
+							port = Integer.parseInt(server.split(":")[1]);
+							boolean status = NetUtils.telnet(host, port);
+							if (!status) {
+								errorServers.add(server);
+							} else {
+								normalServers.add(server);
+							}
+						} catch (Exception e) {
+							LOG.error("Alarm cluster has error, msg is " + e.getCause().getMessage());
+							e.printStackTrace();
+						}
+					}
+					if (errorServers.size() > 0 && (cluster.getAlarmTimes() < cluster.getAlarmMaxTimes() || cluster.getAlarmMaxTimes() == -1)) {
+						cluster.setAlarmTimes(cluster.getAlarmTimes() + 1);
+						cluster.setIsNormal("N");
+						alertService.modifyClusterStatusAlertById(cluster);
+						try {
+							sendAlarmClusterError(alarmConfig, cluster, errorServers.toString());
+						} catch (Exception e) {
+							LOG.error("Send alarm cluser exception has error, msg is " + e.getCause().getMessage());
+						}
+					} else if (errorServers.size() == 0) {
+						if (cluster.getIsNormal().equals("N")) {
+							cluster.setIsNormal("Y");
+							// clear error alarm and reset
+							cluster.setAlarmTimes(0);
+							// notify the cancel of the alarm
+							alertService.modifyClusterStatusAlertById(cluster);
+							try {
+								sendAlarmClusterNormal(alarmConfig, cluster, normalServers.toString());
+							} catch (Exception e) {
+								LOG.error("Send alarm cluser normal has error, msg is " + e.getCause().getMessage());
+							}
 						}
 					}
 				}
@@ -268,7 +308,15 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
 				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Notice");
-				alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
+				if (AlarmType.TOPIC.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
+					long realCapacity = alarmTopicMsg.getLong("realCapacity");
+					alarmMsg.setAlarmContent("topic.capacity.overflow [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]");
+				} else {
+					alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
+				}
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
 				alarmMsg.setAlarmProject(cluster.getType());
@@ -283,7 +331,15 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
 				alarmMsg.setTitle("**<font color=\"#FF0000\">Kafka Eagle Alarm Cluster Notice</font>** \n\n");
-				alarmMsg.setAlarmContent("<font color=\"#FF0000\">node.shutdown [ " + server + " ]</font>");
+				if (AlarmType.TOPIC.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
+					long realCapacity = alarmTopicMsg.getLong("realCapacity");
+					alarmMsg.setAlarmContent("<font color=\"#FF0000\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]</font>");
+				} else {
+					alarmMsg.setAlarmContent("<font color=\"#FF0000\">node.shutdown [ " + server + " ]</font>");
+				}
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
 				alarmMsg.setAlarmProject(cluster.getType());
@@ -295,7 +351,15 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
 				alarmMsg.setTitle("`Kafka Eagle Alarm Cluster Notice`\n");
-				alarmMsg.setAlarmContent("<font color=\"warning\">node.shutdown [ " + server + " ]</font>");
+				if (AlarmType.TOPIC.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
+					long realCapacity = alarmTopicMsg.getLong("realCapacity");
+					alarmMsg.setAlarmContent("<font color=\"warning\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]</font>");
+				} else {
+					alarmMsg.setAlarmContent("<font color=\"warning\">node.shutdown [ " + server + " ]</font>");
+				}
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
 				alarmMsg.setAlarmProject(cluster.getType());
@@ -313,7 +377,15 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
 				alarmMsg.setTitle("Kafka Eagle Alarm Cluster Cancel");
-				alarmMsg.setAlarmContent("node.alive [ " + server + " ]");
+				if (AlarmType.TOPIC.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
+					long realCapacity = alarmTopicMsg.getLong("realCapacity");
+					alarmMsg.setAlarmContent("topic.capacity.normal [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]");
+				} else {
+					alarmMsg.setAlarmContent("node.alive [ " + server + " ]");
+				}
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
 				alarmMsg.setAlarmProject(cluster.getType());
@@ -328,7 +400,16 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
 				alarmMsg.setTitle("**<font color=\"#008000\">Kafka Eagle Alarm Cluster Cancel</font>** \n\n");
-				alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
+				if (AlarmType.TOPIC.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
+					long realCapacity = alarmTopicMsg.getLong("realCapacity");
+					alarmMsg.setAlarmContent("");
+					alarmMsg.setAlarmContent("<font color=\"#008000\">topic.capacity.normal [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]</font>");
+				} else {
+					alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
+				}
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
 				alarmMsg.setAlarmProject(cluster.getType());
@@ -340,7 +421,16 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(cluster.getId());
 				alarmMsg.setTitle("`Kafka Eagle Alarm Cluster Cancel`\n");
-				alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
+				if (AlarmType.TOPIC.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
+					long realCapacity = alarmTopicMsg.getLong("realCapacity");
+					alarmMsg.setAlarmContent("");
+					alarmMsg.setAlarmContent("<font color=\"#008000\">topic.capacity.normal [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]</font>");
+				} else {
+					alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
+				}
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
 				alarmMsg.setAlarmProject(cluster.getType());
