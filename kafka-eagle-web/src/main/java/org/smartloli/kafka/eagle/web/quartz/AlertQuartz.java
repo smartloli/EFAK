@@ -82,7 +82,7 @@ public class AlertQuartz {
 					params.put("topic", alarmConsumer.getTopic());
 					// real consumer lag
 					long lag = alertService.queryLastestLag(params);
-					if (lag > alarmConsumer.getLag() && alarmConsumer.getAlarmTimes() < alarmConsumer.getAlarmMaxTimes()) {
+					if (lag > alarmConsumer.getLag() && (alarmConsumer.getAlarmTimes() < alarmConsumer.getAlarmMaxTimes() || alarmConsumer.getAlarmMaxTimes() == -1)) {
 						// alarm consumer
 						alarmConsumer.setAlarmTimes(alarmConsumer.getAlarmTimes() + 1);
 						alarmConsumer.setIsNormal("N");
@@ -237,7 +237,7 @@ public class AlertQuartz {
 						e.printStackTrace();
 					}
 				}
-				if (errorServers.size() > 0 && cluster.getAlarmTimes() < cluster.getAlarmMaxTimes()) {
+				if (errorServers.size() > 0 && (cluster.getAlarmTimes() < cluster.getAlarmMaxTimes() || cluster.getAlarmMaxTimes() == -1)) {
 					cluster.setAlarmTimes(cluster.getAlarmTimes() + 1);
 					cluster.setIsNormal("N");
 					alertService.modifyClusterStatusAlertById(cluster);
