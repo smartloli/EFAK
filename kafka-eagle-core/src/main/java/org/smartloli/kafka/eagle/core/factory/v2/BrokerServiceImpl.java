@@ -355,7 +355,7 @@ public class BrokerServiceImpl implements BrokerService {
 		return targets.toJSONString();
 	}
 
-	/** Scan topic meta page display from zookeeper. */
+	/** Scan topic meta page display from zookeeper and kafka. */
 	public List<MetadataInfo> topicMetadataRecords(String clusterAlias, String topic, Map<String, Object> params) {
 		List<MetadataInfo> targets = new ArrayList<>();
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);

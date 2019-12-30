@@ -18,7 +18,7 @@
 package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Definition Kafka metadata information.
+ * Schema topic metadata information.
  * 
  * @author smartloli.
  *

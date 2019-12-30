@@ -81,9 +81,11 @@
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 						<i class="fa fa-info-circle"></i>
 						<strong>List all topic meta information. Leader -1 indicates that the partition is not available or is empty.</strong>
-						The topic capacity does not include the replica capacity.<br/>
+						The topic capacity does not include the replica capacity.
+						<br />
 						<i class="fa fa-info-circle"></i>
-						<strong>Preferred Leader: true is preferred leader, false is risked leader.</strong><br/>
+						<strong>Preferred Leader: true is preferred leader, false is risked leader.</strong>
+						<br />
 						<i class="fa fa-info-circle"></i>
 						<strong>Under Replicated: false is normal, true is lost replicas.</strong>
 					</div>

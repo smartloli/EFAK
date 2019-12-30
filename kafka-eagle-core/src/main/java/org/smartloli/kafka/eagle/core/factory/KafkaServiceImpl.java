@@ -516,7 +516,7 @@ public class KafkaServiceImpl implements KafkaService {
 			targets.put("status", "error");
 			targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
 			return targets;
-		}        
+		}
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
@@ -562,7 +562,7 @@ public class KafkaServiceImpl implements KafkaService {
 			targets.put("status", "failed");
 		} finally {
 			adminClient.close();
-		}        
+		}
 		return targets;
 	}
 
@@ -1115,7 +1115,7 @@ public class KafkaServiceImpl implements KafkaService {
 		}
 		return realLogSize;
 	}
-	
+
 	/** Get kafka 0.10.x topic real logsize by partitionid set. */
 	public long getKafkaRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
 		long realLogSize = 0L;
