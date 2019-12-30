@@ -23,6 +23,10 @@ $(document).ready(
 					"mData" : 'replicas'
 				}, {
 					"mData" : 'isr'
+				}, {
+					"mData" : 'preferred_leader'
+				}, {
+					"mData" : 'under_replicated'
 				} ]
 			});
 

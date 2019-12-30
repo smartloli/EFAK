@@ -43,6 +43,7 @@ import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.google.common.base.Strings;
 
 import kafka.zk.KafkaZkClient;
@@ -386,6 +387,31 @@ public class BrokerServiceImpl implements BrokerService {
 								logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
 							} else {
 								logSize = kafkaService.getRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
+							}
+							List<Integer> isrIntegers = new ArrayList<>();
+							List<Integer> replicasIntegers = new ArrayList<>();
+							try {
+								isrIntegers = JSON.parseObject(metadate.getIsr(), new TypeReference<ArrayList<Integer>>() {
+								});
+								replicasIntegers = JSON.parseObject(metadate.getReplicas(), new TypeReference<ArrayList<Integer>>() {
+								});
+							} catch (Exception e) {
+								e.printStackTrace();
+								LOG.error("Parse string to int list has error, msg is " + e.getCause().getMessage());
+							}
+							if (isrIntegers.size() != replicasIntegers.size()) {
+								// replicas lost
+								metadate.setUnderReplicated(true);
+							} else {
+								// replicas normal
+								metadate.setUnderReplicated(false);
+							}
+							if (replicasIntegers != null && replicasIntegers.size() > 0 && replicasIntegers.get(0) == metadate.getLeader()) {
+								// partition preferred leader
+								metadate.setPreferredLeader(true);
+							} else {
+								// partition occurs preferred leader exception
+								metadate.setPreferredLeader(false);
 							}
 							metadate.setLogSize(logSize);
 							targets.add(metadate);

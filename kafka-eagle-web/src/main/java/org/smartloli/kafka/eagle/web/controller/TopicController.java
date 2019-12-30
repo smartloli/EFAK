@@ -194,6 +194,16 @@ public class TopicController {
 			object.put("leader", metadata.getLeader());
 			object.put("replicas", metadata.getReplicas());
 			object.put("isr", metadata.getIsr());
+			if(metadata.isPreferredLeader()) {
+				object.put("preferred_leader", "<a class='btn btn-success btn-xs'>true</a>");
+			}else {
+				object.put("preferred_leader", "<a class='btn btn-danger btn-xs'>false</a>");
+			}
+			if(metadata.isUnderReplicated()) {
+				object.put("under_replicated", "<a class='btn btn-danger btn-xs'>true</a>");
+			}else {
+				object.put("under_replicated", "<a class='btn btn-success btn-xs'>false</a>");
+			}
 			aaDatas.add(object);
 		}
 
