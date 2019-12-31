@@ -34,6 +34,7 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.common.util.NetUtils;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
@@ -242,7 +243,7 @@ public class AlertQuartz {
 						} catch (Exception e) {
 							LOG.error("Send alarm cluser exception has error, msg is " + e.getCause().getMessage());
 						}
-					} else {
+					} else if (realCapacity < alarmCapacity) {
 						if (cluster.getIsNormal().equals("N")) {
 							cluster.setIsNormal("Y");
 							// clear error alarm and reset
@@ -313,7 +314,7 @@ public class AlertQuartz {
 					String topic = alarmTopicMsg.getString("topic");
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
-					alarmMsg.setAlarmContent("topic.capacity.overflow [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]");
+					alarmMsg.setAlarmContent("topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]");
 				} else {
 					alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
 				}
@@ -336,7 +337,8 @@ public class AlertQuartz {
 					String topic = alarmTopicMsg.getString("topic");
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
-					alarmMsg.setAlarmContent("<font color=\"#FF0000\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]</font>");
+					alarmMsg.setAlarmContent(
+							"<font color=\"#FF0000\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#FF0000\">node.shutdown [ " + server + " ]</font>");
 				}
@@ -356,7 +358,8 @@ public class AlertQuartz {
 					String topic = alarmTopicMsg.getString("topic");
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
-					alarmMsg.setAlarmContent("<font color=\"warning\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]</font>");
+					alarmMsg.setAlarmContent(
+							"<font color=\"warning\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"warning\">node.shutdown [ " + server + " ]</font>");
 				}
@@ -382,7 +385,7 @@ public class AlertQuartz {
 					String topic = alarmTopicMsg.getString("topic");
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
-					alarmMsg.setAlarmContent("topic.capacity.normal [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]");
+					alarmMsg.setAlarmContent("topic.capacity.normal [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]");
 				} else {
 					alarmMsg.setAlarmContent("node.alive [ " + server + " ]");
 				}
@@ -406,7 +409,7 @@ public class AlertQuartz {
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
 					alarmMsg.setAlarmContent("");
-					alarmMsg.setAlarmContent("<font color=\"#008000\">topic.capacity.normal [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]</font>");
+					alarmMsg.setAlarmContent("<font color=\"#008000\">topic.capacity.normal [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
 				}
@@ -427,7 +430,7 @@ public class AlertQuartz {
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
 					alarmMsg.setAlarmContent("");
-					alarmMsg.setAlarmContent("<font color=\"#008000\">topic.capacity.normal [topic(" + topic + "), real.capacity(" + realCapacity + "), alarm.capacity(" + alarmCapacity + ")]</font>");
+					alarmMsg.setAlarmContent("<font color=\"#008000\">topic.capacity.normal [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
 				}
