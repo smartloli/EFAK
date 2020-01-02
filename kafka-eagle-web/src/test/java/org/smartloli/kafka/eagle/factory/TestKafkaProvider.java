@@ -17,9 +17,6 @@
  */
 package org.smartloli.kafka.eagle.factory;
 
-import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
-import org.smartloli.kafka.eagle.core.factory.KafkaService;
-
 import kafka.admin.TopicCommand;
 
 /**
@@ -31,13 +28,8 @@ import kafka.admin.TopicCommand;
  */
 public class TestKafkaProvider {
 	public static void main(String[] args) {
-		testGetAllPartitions();
 		String[] options = new String[] { "--alter", "--zookeeper", "slave01:2181","--partitions","6",  "--topic", "KE_TTT_1200" };
 		TopicCommand.main(options);
 	}
 
-	private static void testGetAllPartitions() {
-		KafkaService kafkaService = new KafkaFactory().create();
-		System.out.println(kafkaService.getAllPartitions("cluster1"));
-	}
 }

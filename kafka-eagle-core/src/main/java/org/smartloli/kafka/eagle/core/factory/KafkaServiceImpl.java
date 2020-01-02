@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,7 +72,6 @@ import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
-import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
@@ -81,7 +79,6 @@ import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaPartitioner;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -263,63 +260,6 @@ public class KafkaServiceImpl implements KafkaService {
 			zkc = null;
 		}
 		return targets;
-	}
-
-	/**
-	 * Get all topic info from zookeeper, Deprecated this method in the v1.3.4
-	 * and replace {@link BrokerService.topicRecords} method.
-	 */
-	@Deprecated
-	public String getAllPartitions(String clusterAlias) {
-		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		List<PartitionsInfo> targets = new ArrayList<PartitionsInfo>();
-		if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-			Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-			List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-			int id = 0;
-			for (String topic : topics) {
-				try {
-					Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
-					PartitionsInfo partition = new PartitionsInfo();
-					partition.setId(++id);
-					partition.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
-					partition.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
-					partition.setTopic(topic);
-					String tupleString = new String(tuple._1.get());
-					JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
-					partition.setPartitionNumbers(partitionObject.size());
-					partition.setPartitions(partitionObject.keySet());
-					targets.add(partition);
-				} catch (Exception ex) {
-					LOG.error(ex.getMessage());
-				}
-			}
-		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
-		}
-		// Sort topic by create time.
-		Collections.sort(targets, new Comparator<PartitionsInfo>() {
-			public int compare(PartitionsInfo arg0, PartitionsInfo arg1) {
-				try {
-					long hits0 = CalendarUtils.convertDate2UnixTime(arg0.getCreated());
-					long hits1 = CalendarUtils.convertDate2UnixTime(arg1.getCreated());
-
-					if (hits1 > hits0) {
-						return 1;
-					} else if (hits1 == hits0) {
-						return 0;
-					} else {
-						return -1;
-					}
-				} catch (Exception e) {
-					LOG.error("Convert date to unix time has error,msg is " + e.getMessage());
-					return 0;
-				}
-			}
-		});
-		return targets.toString();
 	}
 
 	/** Obtaining kafka consumer information from zookeeper. */

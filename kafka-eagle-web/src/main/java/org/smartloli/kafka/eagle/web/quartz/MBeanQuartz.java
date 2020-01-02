@@ -108,12 +108,10 @@ public class MBeanQuartz {
 			kpiInfo.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
 			kpiInfo.setTimespan(CalendarUtils.getTimeSpan());
 			kpiInfo.setKey(kpi);
-			String broker = "";
 			for (BrokersInfo kafka : brokers) {
-				broker += kafka.getHost() + ",";
 				kafkaAssembly(mx4jService, kpi, kpiInfo, kafka);
 			}
-			kpiInfo.setBroker(broker.length() == 0 ? "unkowns" : broker.substring(0, broker.length() - 1));
+			kpiInfo.setBroker(clusterAlias);
 			kpiInfo.setType(CollectorType.KAFKA);
 			list.add(kpiInfo);
 		}

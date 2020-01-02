@@ -74,24 +74,7 @@ public class BrokerServiceImpl implements BrokerService {
 
 	/** Statistics topic total used as page. */
 	public long topicNumbers(String clusterAlias) {
-		long count = 0L;
-		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		try {
-			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-				excludeTopic(topics);
-				count = topics.size();
-			}
-		} catch (Exception e) {
-			LOG.error("Get topic numbers has error, msg is " + e.getCause().getMessage());
-			e.printStackTrace();
-		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
-		}
-		return count;
+		return topicList(clusterAlias).size();
 	}
 
 	/** Exclude kafka topic(__consumer_offsets). */
@@ -104,25 +87,11 @@ public class BrokerServiceImpl implements BrokerService {
 	/** Get search topic list numbers. */
 	public long topicNumbers(String clusterAlias, String topic) {
 		long count = 0L;
-		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		try {
-			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-				excludeTopic(topics);
-				for (String name : topics) {
-					if (topic != null && name.contains(topic)) {
-						count++;
-					}
-				}
+		List<String> topics = topicList(clusterAlias);
+		for (String name : topics) {
+			if (topic != null && name.contains(topic)) {
+				count++;
 			}
-		} catch (Exception e) {
-			LOG.error("Get search topic list numbers has error, msg is " + e.getCause().getMessage());
-			e.printStackTrace();
-		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
 		}
 		return count;
 	}
@@ -154,21 +123,20 @@ public class BrokerServiceImpl implements BrokerService {
 	public List<PartitionsInfo> topicRecords(String clusterAlias, Map<String, Object> params) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		List<PartitionsInfo> targets = new ArrayList<PartitionsInfo>();
+		List<String> topics = topicList(clusterAlias);
 		try {
 			int start = Integer.parseInt(params.get("start").toString());
 			int length = Integer.parseInt(params.get("length").toString());
 			if (params.containsKey("search") && params.get("search").toString().length() > 0) {
-				if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-					Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-					List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-					excludeTopic(topics);
-					String search = params.get("search").toString();
-					int offset = 0;
-					int id = 1;
-					for (String topic : topics) {
-						if (search != null && topic.contains(search)) {
-							if (offset < (start + length) && offset >= start) {
-								try {
+
+				String search = params.get("search").toString();
+				int offset = 0;
+				int id = 1;
+				for (String topic : topics) {
+					if (search != null && topic.contains(search)) {
+						if (offset < (start + length) && offset >= start) {
+							try {
+								if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
 									Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
 									PartitionsInfo partition = new PartitionsInfo();
 									partition.setId(id++);
@@ -180,25 +148,22 @@ public class BrokerServiceImpl implements BrokerService {
 									partition.setPartitionNumbers(partitionObject.size());
 									partition.setPartitions(partitionObject.keySet());
 									targets.add(partition);
-								} catch (Exception ex) {
-									ex.printStackTrace();
-									LOG.error("Scan topic search from zookeeper has error, msg is " + ex.getMessage());
 								}
+							} catch (Exception ex) {
+								ex.printStackTrace();
+								LOG.error("Scan topic search from zookeeper has error, msg is " + ex.getMessage());
 							}
-							offset++;
 						}
+						offset++;
 					}
 				}
 			} else {
-				if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-					Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-					List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-					excludeTopic(topics);
-					int offset = 0;
-					int id = 1;
-					for (String topic : topics) {
-						if (offset < (start + length) && offset >= start) {
-							try {
+				int offset = 0;
+				int id = 1;
+				for (String topic : topics) {
+					if (offset < (start + length) && offset >= start) {
+						try {
+							if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
 								Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
 								PartitionsInfo partition = new PartitionsInfo();
 								partition.setId(id++);
@@ -210,13 +175,13 @@ public class BrokerServiceImpl implements BrokerService {
 								partition.setPartitionNumbers(partitionObject.size());
 								partition.setPartitions(partitionObject.keySet());
 								targets.add(partition);
-							} catch (Exception ex) {
-								ex.printStackTrace();
-								LOG.error("Scan topic page from zookeeper has error, msg is " + ex.getMessage());
 							}
+						} catch (Exception ex) {
+							ex.printStackTrace();
+							LOG.error("Scan topic page from zookeeper has error, msg is " + ex.getMessage());
 						}
-						offset++;
 					}
+					offset++;
 				}
 			}
 		} catch (Exception e) {
@@ -230,39 +195,9 @@ public class BrokerServiceImpl implements BrokerService {
 		return targets;
 	}
 
-	@Override
-	public String partitionRecords(String clusterAlias, String topic, Map<String, Object> params) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String consumerTPNumbers(String clusterAlias, String group, String topic) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String consumerTPRecords(String clusterAlias, String group, String topic, Map<String, Object> params) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	/** Check topic from zookeeper metadata. */
 	public boolean findKafkaTopic(String clusterAlias, String topic) {
-		boolean status = false;
-		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		try {
-			status = zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic);
-		} catch (Exception e) {
-			LOG.error("Find kafka topic has error, msg is " + e.getCause().getMessage());
-			e.printStackTrace();
-		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
-		}
-		return status;
+		return topicList(clusterAlias).contains(topic);
 	}
 
 	/** Get kafka broker numbers from zookeeper. */
@@ -288,20 +223,24 @@ public class BrokerServiceImpl implements BrokerService {
 	/** Get topic list from zookeeper. */
 	public List<String> topicList(String clusterAlias) {
 		List<String> topics = new ArrayList<>();
-		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		try {
-			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-				topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-				excludeTopic(topics);
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.cgroup.enable")) {
+			topics = SystemConfigUtils.getPropertyArrayList(clusterAlias + ".kafka.eagle.sasl.cgroup.topics", ",");
+		} else {
+			KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+			try {
+				if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+					Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+					topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+					excludeTopic(topics);
+				}
+			} catch (Exception e) {
+				LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
-			e.printStackTrace();
-		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
+			if (zkc != null) {
+				kafkaZKPool.release(clusterAlias, zkc);
+				zkc = null;
+			}
 		}
 		return topics;
 	}
@@ -311,16 +250,23 @@ public class BrokerServiceImpl implements BrokerService {
 		JSONArray targets = new JSONArray();
 		int limit = 15;
 
-		List<String> topics = new ArrayList<>();
-		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		List<String> topics = topicList(clusterAlias);
 		try {
-			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-				topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-				excludeTopic(topics);
-				if (Strings.isNullOrEmpty(search)) {
-					int id = 1;
-					for (String topic : topics) {
+			if (Strings.isNullOrEmpty(search)) {
+				int id = 1;
+				for (String topic : topics) {
+					if (id <= limit) {
+						JSONObject object = new JSONObject();
+						object.put("id", id);
+						object.put("name", topic);
+						targets.add(object);
+						id++;
+					}
+				}
+			} else {
+				int id = 1;
+				for (String topic : topics) {
+					if (topic.contains(search)) {
 						if (id <= limit) {
 							JSONObject object = new JSONObject();
 							object.put("id", id);
@@ -329,28 +275,11 @@ public class BrokerServiceImpl implements BrokerService {
 							id++;
 						}
 					}
-				} else {
-					int id = 1;
-					for (String topic : topics) {
-						if (topic.contains(search)) {
-							if (id <= limit) {
-								JSONObject object = new JSONObject();
-								object.put("id", id);
-								object.put("name", topic);
-								targets.add(object);
-								id++;
-							}
-						}
-					}
 				}
 			}
 		} catch (Exception e) {
 			LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();
-		}
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
 		}
 		return targets.toJSONString();
 	}
@@ -361,9 +290,7 @@ public class BrokerServiceImpl implements BrokerService {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		try {
 			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-				Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-				List<String> topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-				excludeTopic(topics);
+				List<String> topics = topicList(clusterAlias);
 				if (topics.contains(topic)) {
 					int start = Integer.parseInt(params.get("start").toString());
 					int length = Integer.parseInt(params.get("length").toString());

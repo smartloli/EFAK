@@ -57,15 +57,6 @@ public interface BrokerService {
 	/** Scan topic page display. */
 	public List<PartitionsInfo> topicRecords(String clusterAlias, Map<String, Object> params);
 
-	/** Scan partition page display. */
-	public String partitionRecords(String clusterAlias, String topic, Map<String, Object> params);
-
-	/** Get consumer topic under partition numbers. */
-	public String consumerTPNumbers(String clusterAlias, String group, String topic);
-
-	/** Scan consumer topic under partition page display. */
-	public String consumerTPRecords(String clusterAlias, String group, String topic, Map<String, Object> params);
-
 	/** Scan topic meta page display. */
 	public List<MetadataInfo> topicMetadataRecords(String clusterAlias, String topic, Map<String, Object> params);
 
