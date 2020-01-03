@@ -55,6 +55,8 @@ public class KConstants {
 	/** Zookeeper session. */
 	public interface SessionAlias {
 		public final static String CLUSTER_ALIAS = "clusterAlias";
+		public final static String CLUSTER_ALIAS_LIST = "clusterAliasList";
+		public final static int CLUSTER_ALIAS_LIST_LIMIT = 5;
 	}
 
 	/** Login session. */

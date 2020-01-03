@@ -25,6 +25,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.ClusterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -193,6 +194,18 @@ public class ClusterController {
 		} else {
 			session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS);
 			session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, clusterAlias);
+			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+			String dropList = "<ul class='dropdown-menu'>";
+			int i = 0;
+			for (String clusterAliasStr : clusterAliass) {
+				if (!clusterAliasStr.equals(clusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT) {
+					dropList += "<li><a href='/ke/cluster/info/" + clusterAliasStr + "/change'><i class='fa fa-fw fa-sitemap'></i>" + clusterAliasStr + "</a></li>";
+					i++;
+				}
+			}
+			dropList += "<li><a href='/ke/cluster/multi'><i class='fa fa-fw fa-tasks'></i>More...</a></li></ul>";
+			session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST);
+			session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST, dropList);
 			return new ModelAndView("redirect:/");
 		}
 	}
