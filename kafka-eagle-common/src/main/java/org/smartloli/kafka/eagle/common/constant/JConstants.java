@@ -24,8 +24,12 @@ package org.smartloli.kafka.eagle.common.constant;
  *
  *         Created by Jul 7, 2017
  */
-public interface JConstants {
+public final class JConstants {
 
+	private JConstants() {
+		
+	}
+	
 	/** Get databases. */
 	public static final String SHOW_DATABASES = "SHOW DATABASES";
 

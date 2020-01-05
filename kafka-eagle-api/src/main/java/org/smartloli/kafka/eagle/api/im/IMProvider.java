@@ -18,7 +18,7 @@
 package org.smartloli.kafka.eagle.api.im;
 
 /**
- * TODO
+ * Provide im tool to send alarm information.
  * 
  * @author smartloli.
  *

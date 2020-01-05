@@ -147,8 +147,8 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
 				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 				MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-				String objectName = String.format(KafkaLog.size, topic, leader.getPartitionId());
-				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.value);
+				String objectName = String.format(KafkaLog.SIZE.getValue(), topic, leader.getPartitionId());
+				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.VALUE.getValue());
 				tpSize += Long.parseLong(size.toString());
 			} catch (Exception ex) {
 				LOG.error("Get topic size from jmx has error, msg is " + ex.getMessage());
@@ -304,8 +304,8 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
 				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 				MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-				String objectName = String.format(KafkaLog.size, topic, leader.getPartitionId());
-				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.value);
+				String objectName = String.format(KafkaLog.SIZE.getValue(), topic, leader.getPartitionId());
+				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.VALUE.getValue());
 				tpSize += Long.parseLong(size.toString());
 			} catch (Exception ex) {
 				LOG.error("Get topic size from jmx has error, msg is " + ex.getMessage());

@@ -20,9 +20,7 @@ package org.smartloli.kafka.eagle.web.quartz;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer;
+import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
@@ -32,6 +30,7 @@ import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.common.util.ThrowExceptionUtils;
 import org.smartloli.kafka.eagle.common.util.ZKMetricsUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -48,8 +47,6 @@ import org.smartloli.kafka.eagle.web.service.impl.MetricsServiceImpl;
  *         Created by Jul 19, 2017
  */
 public class MBeanQuartz {
-
-	private Logger LOG = LoggerFactory.getLogger(MBeanQuartz.class);
 
 	private static final String zk_packets_received = "zk_packets_received";
 	private static final String zk_packets_sent = "zk_packets_sent";
@@ -85,14 +82,12 @@ public class MBeanQuartz {
 				try {
 					kafkaCluster(clusterAlias);
 				} catch (Exception e) {
-					LOG.error("Get kafka cluster metrics has error, msg is " + e.getCause().getMessage());
-					e.printStackTrace();
+					ThrowExceptionUtils.print(this.getClass()).error("Get kafka cluster metrics has error, msg is ", e);
 				}
 				try {
 					zkCluster(clusterAlias);
 				} catch (Exception e) {
-					LOG.error("Get zookeeper cluster metrics has error, msg is " + e.getCause().getMessage());
-					e.printStackTrace();
+					ThrowExceptionUtils.print(this.getClass()).error("Get zookeeper cluster metrics has error, msg is ", e);
 				}
 			}
 		}
@@ -120,7 +115,7 @@ public class MBeanQuartz {
 		try {
 			metrics.insert(list);
 		} catch (Exception e) {
-			LOG.error("Collector mbean data has error,msg is " + e.getMessage());
+			ThrowExceptionUtils.print(this.getClass()).error("Collector mbean data has error, msg is ", e);
 		}
 	}
 
@@ -194,11 +189,11 @@ public class MBeanQuartz {
 			}
 			break;
 		case MBean.OSTOTALMEMORY:
-			long totalMemory = kafkaService.getOSMemory(kafka.getHost(), kafka.getJmxPort(), KafkaServer.OS.totalPhysicalMemorySize);
+			long totalMemory = kafkaService.getOSMemory(kafka.getHost(), kafka.getJmxPort(), BrokerServer.TOTAL_PHYSICAL_MEMORY_SIZE.getValue());
 			kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + totalMemory + "");
 			break;
 		case MBean.OSFREEMEMORY:
-			long freeMemory = kafkaService.getOSMemory(kafka.getHost(), kafka.getJmxPort(), KafkaServer.OS.freePhysicalMemorySize);
+			long freeMemory = kafkaService.getOSMemory(kafka.getHost(), kafka.getJmxPort(), BrokerServer.FREE_PHYSICAL_MEMORY_SIZE.getValue());
 			kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + freeMemory + "");
 			break;
 		default:
@@ -228,8 +223,7 @@ public class MBeanQuartz {
 					ZkClusterInfo zkInfo = ZKMetricsUtils.zkClusterMntrInfo(ip, Integer.parseInt(port));
 					zkAssembly(zkInfo, kpi, kpiInfo);
 				} catch (Exception ex) {
-					ex.printStackTrace();
-					LOG.error("Transcation string[" + port + "] to int has error,msg is " + ex.getCause().getMessage());
+					ThrowExceptionUtils.print(this.getClass()).error("Transcation string[" + port + "] to int has error, msg is ", ex);
 				}
 			}
 			kpiInfo.setBroker(broker.length() == 0 ? "unkowns" : broker.substring(0, broker.length() - 1));
@@ -241,7 +235,7 @@ public class MBeanQuartz {
 		try {
 			metrics.insert(list);
 		} catch (Exception e) {
-			LOG.error("Collector zookeeper data has error,msg is " + e.getMessage());
+			ThrowExceptionUtils.print(this.getClass()).error("Collector zookeeper data has error, msg is ", e);
 		}
 	}
 

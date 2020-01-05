@@ -15,21 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.factory;
+package org.smartloli.kafka.eagle.common.util;
 
-import org.smartloli.kafka.eagle.api.email.MailFactory;
-import org.smartloli.kafka.eagle.api.email.MailProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Test Provider clazz.
+ * Defined print throw exception message.
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
+ *         Created by Jan 5, 2020
  */
-public class TestMailProvider {
-	public static void main(String[] args) {
-		MailProvider provider = new MailFactory();
-		provider.create().send("test alarm", "810371213@qq.com,  1164907115@qq.com", "server is aaaaaa", "");
+public class ThrowExceptionUtils {
+
+	/** Print error message. */
+	public static Logger print(Class<?> clazz) {
+		return LoggerFactory.getLogger(clazz);
 	}
+
+	private ThrowExceptionUtils() {
+
+	}
+
 }

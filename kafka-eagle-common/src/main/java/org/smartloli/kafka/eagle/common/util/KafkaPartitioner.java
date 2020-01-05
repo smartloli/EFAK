@@ -34,26 +34,28 @@ public class KafkaPartitioner implements Partitioner {
 	public int partition(Object key, int numPartitions) {
 		int partition = 0;
 		String k = (String) key;
-		partition = Math.abs(k.hashCode()) % numPartitions;
+		int hashCode = k.hashCode();
+		partition = Math.abs(hashCode) % numPartitions;
 		return partition;
 	}
 
 	@Override
 	public void configure(Map<String, ?> configs) {
-
+		// Do nothing
 	}
 
 	@Override
 	public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
 		int partition = 0;
 		String k = (String) key;
-		partition = Math.abs(k.hashCode()) % cluster.partitionCountForTopic(topic);
+		int hashCode = k.hashCode();
+		partition = Math.abs(hashCode) % cluster.partitionCountForTopic(topic);
 		return partition;
 	}
 
 	@Override
 	public void close() {
-
+		// Do nothing
 	}
 
 }

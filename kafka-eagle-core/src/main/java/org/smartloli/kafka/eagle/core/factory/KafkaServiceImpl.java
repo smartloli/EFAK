@@ -62,7 +62,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer;
+import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer8;
 import org.smartloli.kafka.eagle.common.constant.OdpsSqlParser;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
@@ -1141,9 +1141,9 @@ public class KafkaServiceImpl implements KafkaService {
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
 			if (CollectorType.KAFKA.equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-				version = mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer.version, ids)), KafkaServer.value).toString();
+				version = mbeanConnection.getAttribute(new ObjectName(String.format(BrokerServer.BROKER_VERSION.getValue(), ids)), BrokerServer.BROKER_VERSION_VALUE.getValue()).toString();
 			} else {
-				version = mbeanConnection.getAttribute(new ObjectName(KafkaServer8.version), KafkaServer8.value).toString();
+				version = mbeanConnection.getAttribute(new ObjectName(KafkaServer8.VERSION.getValue()), KafkaServer8.VALUE.getValue()).toString();
 			}
 		} catch (Exception ex) {
 			LOG.error("Get kafka version from jmx has error, msg is " + ex.getMessage());
@@ -1276,7 +1276,7 @@ public class KafkaServiceImpl implements KafkaService {
 		long logSize = 0L;
 		try {
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			logSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.endLogSize, topic, partitionid)), KafkaServer8.value).toString());
+			logSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.END_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
 		} catch (Exception ex) {
 			LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
 			ex.printStackTrace();
@@ -1314,7 +1314,7 @@ public class KafkaServiceImpl implements KafkaService {
 		try {
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
 			for (int partitionid : partitionids) {
-				logSize += Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.endLogSize, topic, partitionid)), KafkaServer8.value).toString());
+				logSize += Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.END_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
 			}
 		} catch (Exception ex) {
 			LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
@@ -1352,8 +1352,8 @@ public class KafkaServiceImpl implements KafkaService {
 		long logSize = 0L;
 		try {
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			long endLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.endLogSize, topic, partitionid)), KafkaServer8.value).toString());
-			long startLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.startLogSize, topic, partitionid)), KafkaServer8.value).toString());
+			long endLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.END_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
+			long startLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.START_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
 			logSize = endLogSize - startLogSize;
 		} catch (Exception ex) {
 			LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
@@ -1410,7 +1410,7 @@ public class KafkaServiceImpl implements KafkaService {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			String memorySize = mbeanConnection.getAttribute(new ObjectName(KafkaServer.OS.type), property).toString();
+			String memorySize = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), property).toString();
 			memory = Long.parseLong(memorySize);
 		} catch (Exception ex) {
 			LOG.error("Get kafka os memory from jmx has error, msg is " + ex.getMessage());

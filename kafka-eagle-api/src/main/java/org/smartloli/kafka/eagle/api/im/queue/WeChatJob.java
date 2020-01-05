@@ -27,6 +27,7 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
 import org.smartloli.kafka.eagle.common.util.KConstants.WeChat;
+import org.smartloli.kafka.eagle.common.util.ThrowExceptionUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -39,7 +40,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class WeChatJob implements Job {
 
-	@Override
+	/** Send alarm information by wechat. */
 	public void execute(JobExecutionContext jobContext) throws JobExecutionException {
 		BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
 		sendMsg(bjc.getData(), bjc.getUrl());
@@ -50,7 +51,7 @@ public class WeChatJob implements Job {
 			Map<String, Object> wechatMarkdownMessage = getWeChatMarkdownMessage(data);
 			HttpClientUtils.doPostJson(url, JSONObject.toJSONString(wechatMarkdownMessage));
 		} catch (Exception e) {
-			e.printStackTrace();
+			ThrowExceptionUtils.print(this.getClass()).error("Send alarm message has error by wechat, msg is ",e);
 			return 0;
 		}
 		return 1;

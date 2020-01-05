@@ -93,7 +93,7 @@ public class DashboardServiceImpl implements DashboardService {
 		JSONArray targets = new JSONArray();
 		int count = 0;
 		for (BrokersInfo broker : brokers) {
-			if (count > KConstants.D3.SIZE) {
+			if (count > KConstants.D3.SIZE.getValue()) {
 				JSONObject subTarget = new JSONObject();
 				subTarget.put("name", "...");
 				targets.add(subTarget);
