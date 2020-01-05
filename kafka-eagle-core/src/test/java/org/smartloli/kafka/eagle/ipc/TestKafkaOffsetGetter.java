@@ -65,7 +65,7 @@ public class TestKafkaOffsetGetter extends Thread {
 	private final static Logger LOG = LoggerFactory.getLogger(TestKafkaOffsetGetter.class);
 
 	/** Consumer offsets in kafka topic. */
-	private final static String CONSUMER_OFFSET_TOPIC = KConstants.Kafka.CONSUMER_OFFSET_TOPIC;
+	private final static String CONSUMER_OFFSET_TOPIC = KConstants.Kafka.CONSUMER_OFFSET_TOPIC.getValue();
 
 	/** Add LRCCache. */
 	public static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new LRUCacheUtils<>();

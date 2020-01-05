@@ -17,6 +17,14 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.service.MetricsService;
@@ -25,13 +33,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Metrics mbean controller to viewer data.
@@ -74,7 +75,7 @@ public class MetricsController {
 	@RequestMapping(value = "/metrics/brokers/mbean/ajax", method = RequestMethod.GET)
 	public void clusterAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
 		try {
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			String target = metricsService.getAllBrokersMBean(clusterAlias);
 
 			byte[] output = target.getBytes();
@@ -88,7 +89,7 @@ public class MetricsController {
 	@RequestMapping(value = "/metrics/trend/mbean/ajax", method = RequestMethod.GET)
 	public void trendAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
 		try {
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 			Map<String, Object> param = new HashMap<>();
 			param.put("cluster", clusterAlias);

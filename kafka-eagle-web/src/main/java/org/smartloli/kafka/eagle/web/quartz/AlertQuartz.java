@@ -125,7 +125,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Notice");
-				alarmMsg.setAlarmContent("lag.overflow [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmContent("lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -140,7 +140,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("**<font color=\"#FF0000\">Kafka Eagle Alarm Consumer Notice</font>** \n\n");
-				alarmMsg.setAlarmContent("<font color=\"#FF0000\">lag.overflow [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmContent("<font color=\"#FF0000\">lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -152,7 +152,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("`Kafka Eagle Alarm Consumer Notice`\n");
-				alarmMsg.setAlarmContent("<font color=\"warning\">lag.overflow [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmContent("<font color=\"warning\">lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -337,8 +337,7 @@ public class AlertQuartz {
 					String topic = alarmTopicMsg.getString("topic");
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
-					alarmMsg.setAlarmContent(
-							"<font color=\"#FF0000\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
+					alarmMsg.setAlarmContent("<font color=\"#FF0000\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#FF0000\">node.shutdown [ " + server + " ]</font>");
 				}
@@ -358,8 +357,7 @@ public class AlertQuartz {
 					String topic = alarmTopicMsg.getString("topic");
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
-					alarmMsg.setAlarmContent(
-							"<font color=\"warning\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
+					alarmMsg.setAlarmContent("<font color=\"warning\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"warning\">node.shutdown [ " + server + " ]</font>");
 				}

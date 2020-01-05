@@ -65,7 +65,7 @@ public class ConsumersController {
 	@RequestMapping(value = "/consumers/info/ajax", method = RequestMethod.GET)
 	public void consumersGraphAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		try {
 			String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
@@ -102,7 +102,7 @@ public class ConsumersController {
 		page.setiDisplayStart(iDisplayStart);
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		int count = consumerService.getConsumerCount(clusterAlias, formatter);
@@ -162,7 +162,7 @@ public class ConsumersController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(clusterAlias, formatter, group));

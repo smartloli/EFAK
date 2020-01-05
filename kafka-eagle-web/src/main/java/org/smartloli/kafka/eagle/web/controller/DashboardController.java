@@ -61,7 +61,7 @@ public class DashboardController {
 	@RequestMapping(value = "/dash/kafka/ajax", method = RequestMethod.GET)
 	public void dashboardAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		try {
 			byte[] output = dashboradService.getDashboard(clusterAlias).getBytes();
@@ -75,7 +75,7 @@ public class DashboardController {
 	@RequestMapping(value = "/dash/{tkey}/table/ajax", method = RequestMethod.GET)
 	public void dashTopicRankAjax(@PathVariable("tkey") String tkey,HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 		Map<String, Object> params = new HashMap<String, Object>();
 		try {
 			params.put("cluster", clusterAlias);
@@ -91,8 +91,8 @@ public class DashboardController {
 	@RequestMapping(value = "/dash/os/mem/ajax", method = RequestMethod.GET)
 	public void dashOSMemAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		Map<String, Object> params = new HashMap<String, Object>();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		Map<String, Object> params = new HashMap<>();
 		try {
 			params.put("cluster", clusterAlias);
 			params.put("key", "os%");

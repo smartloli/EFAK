@@ -169,7 +169,7 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/consumer/group/ajax", method = RequestMethod.GET)
 	public void alarmConsumerGroupAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 		String search = StrUtils.convertNull(request.getParameter("name"));
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
@@ -188,7 +188,7 @@ public class AlarmController {
 	public void alarmConsumerTopicAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 		String search = StrUtils.convertNull(request.getParameter("name"));
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
@@ -205,7 +205,7 @@ public class AlarmController {
 	/** Add alarmer form. */
 	@RequestMapping(value = "/alarm/add/form", method = RequestMethod.POST)
 	public ModelAndView alarmAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		ModelAndView mav = new ModelAndView();
 		String group = request.getParameter("ke_alarm_consumer_group");
@@ -263,7 +263,7 @@ public class AlarmController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("cluster", clusterAlias);
@@ -443,7 +443,7 @@ public class AlarmController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 		AlarmClusterInfo alarmClusterInfo = new AlarmClusterInfo();
 		alarmClusterInfo.setAlarmGroup(alarmGroup);
 		alarmClusterInfo.setAlarmLevel(level);
@@ -492,7 +492,7 @@ public class AlarmController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("cluster", clusterAlias);
@@ -666,7 +666,7 @@ public class AlarmController {
 			Map<String, Object> map = new HashMap<>();
 			if ("group".equals(type)) {
 				HttpSession session = request.getSession();
-				String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+				String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 				search = StrUtils.convertNull(request.getParameter("name"));
 				map.put("search", "%" + search + "%");
 				map.put("start", 0);
@@ -689,7 +689,7 @@ public class AlarmController {
 	public void alarmGroupCheckAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			Map<String, Object> params = new HashMap<>();
 			params.put("cluster", clusterAlias);
 			params.put("alarmGroup", group);
@@ -711,7 +711,7 @@ public class AlarmController {
 		String url = request.getParameter("ke_alarm_url");
 		String http = request.getParameter("ke_alarm_http");
 		String address = request.getParameter("ke_alarm_address");
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		AlarmConfigInfo alarmConfig = new AlarmConfigInfo();
 		alarmConfig.setCluster(clusterAlias);
@@ -769,7 +769,7 @@ public class AlarmController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("search", "%" + search + "%");
@@ -818,7 +818,7 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/config/{group}/del", method = RequestMethod.GET)
 	public ModelAndView alarmConfigDelete(@PathVariable("group") String group, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 		Map<String, Object> map = new HashMap<>();
 		map.put("cluster", clusterAlias);
 		map.put("alarmGroup", group);
@@ -836,7 +836,7 @@ public class AlarmController {
 	public void getAlarmConfigDetailByGroupAjax(@PathVariable("type") String type, @PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			Map<String, Object> params = new HashMap<>();
 			params.put("cluster", clusterAlias);
 			params.put("alarmGroup", group);
@@ -863,7 +863,7 @@ public class AlarmController {
 		String group = request.getParameter("ke_alarm_group_m_name");
 		String url = request.getParameter("ke_alarm_config_m_url");
 		String address = request.getParameter("ke_alarm_config_m_address");
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("cluster", clusterAlias);

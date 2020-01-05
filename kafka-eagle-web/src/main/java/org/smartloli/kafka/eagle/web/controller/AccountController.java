@@ -84,7 +84,7 @@ public class AccountController {
 			String dropList = "<ul class='dropdown-menu'>";
 			int i = 0;
 			for (String clusterAlias : clusterAliass) {
-				if (!clusterAlias.equals(defaultClusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT) {
+				if (!clusterAlias.equals(defaultClusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT.getLongValue()) {
 					dropList += "<li><a href='/ke/cluster/info/" + clusterAlias + "/change'><i class='fa fa-fw fa-sitemap'></i>" + clusterAlias + "</a></li>";
 					i++;
 				}

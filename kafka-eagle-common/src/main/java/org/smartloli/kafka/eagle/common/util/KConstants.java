@@ -29,9 +29,9 @@ public class KConstants {
 	/** D3 data plugin size. */
 	public enum D3 {
 		SIZE(40);
-		
+
 		private int value;
-		
+
 		public int getValue() {
 			return value;
 		}
@@ -58,31 +58,55 @@ public class KConstants {
 	}
 
 	/** Kafka parameter setting. */
-	public interface Kafka {
-		public final static String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
-		public final static String KAFKA_EAGLE_SYSTEM_GROUP = "kafka.eagle.system.group";
-		public final static String AUTO_COMMIT = "true";
-		public final static String AUTO_COMMIT_MS = "1000";
-		public final static String EARLIEST = "earliest";
-		public final static String JAVA_SECURITY = "java.security.auth.login.config";
-		public final static int TIME_OUT = 100;
-		public final static long POSITION = SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max") == 0 ? 5000 : SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max");
-		public final static String PARTITION_CLASS = "partitioner.class";
-		public final static String KEY_SERIALIZER = "key.serializer";
-		public final static String VALUE_SERIALIZER = "value.serializer";
-		public final static String UNKOWN = "Unknown";
-	}
+	public enum Kafka {
+		CONSUMER_OFFSET_TOPIC("__consumer_offsets"),
+		KAFKA_EAGLE_SYSTEM_GROUP("kafka.eagle.system.group"),
+		AUTO_COMMIT("true"),
 
-	/** Mail args setting. */
-	public interface Mail {
-		public final static String[] ARGS = new String[] { "toAddress", "subject", "content" };
+		AUTO_COMMIT_MS("1000"),
+		EARLIEST("earliest"),
+		JAVA_SECURITY("java.security.auth.login.config"),
+		TIME_OUT("100"),
+		POSITION(SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max") == 0 ? "5000" : SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max") + ""),
+		PARTITION_CLASS("partitioner.class"),
+		KEY_SERIALIZER("key.serializer"),
+		VALUE_SERIALIZER("value.serializer"),
+		UNKOWN("Unknown");
+
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		public long getLongValue() {
+			return Long.parseLong(value);
+		}
+
+		private Kafka(String value) {
+			this.value = value;
+		}
 	}
 
 	/** Zookeeper session. */
-	public interface SessionAlias {
-		public final static String CLUSTER_ALIAS = "clusterAlias";
-		public final static String CLUSTER_ALIAS_LIST = "clusterAliasList";
-		public final static int CLUSTER_ALIAS_LIST_LIMIT = 5;
+	public enum SessionAlias {
+		CLUSTER_ALIAS("clusterAlias"),
+		CLUSTER_ALIAS_LIST("clusterAliasList"),
+		CLUSTER_ALIAS_LIST_LIMIT("5");
+
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		public long getLongValue() {
+			return Long.parseLong(value);
+		}
+
+		private SessionAlias(String value) {
+			this.value = value;
+		}
 	}
 
 	/** Login session. */
@@ -229,8 +253,6 @@ public class KConstants {
 	}
 
 	public interface AlarmType {
-		// public static String[] TYPE = new String[] { "Email", "DingDing",
-		// "WeChat", "WebHook" };
 		public static String[] TYPE = new String[] { "DingDing", "WeChat", "Email" };
 		public static String[] CLUSTER = new String[] { "Kafka", "Zookeeper", "Topic" };
 		public static String[] LEVEL = new String[] { "P0", "P1", "P2", "P3" };

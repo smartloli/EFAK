@@ -134,7 +134,7 @@ public class TopicController {
 	public ModelAndView topicMetaView(@PathVariable("tname") String tname, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 		if (topicService.hasTopic(clusterAlias, tname)) {
 			mav.setViewName("/topic/topic_meta");
 		} else {
@@ -178,7 +178,7 @@ public class TopicController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("start", iDisplayStart);
@@ -224,7 +224,7 @@ public class TopicController {
 	@RequestMapping(value = "/topic/meta/mbean/{tname}/ajax", method = RequestMethod.GET)
 	public void topicMetaMetricsAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
 		try {
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			String target = topicService.getTopicMBean(clusterAlias, tname);
 
 			byte[] output = target.getBytes();
@@ -238,7 +238,7 @@ public class TopicController {
 	@RequestMapping(value = "/topic/meta/jmx/{tname}/ajax", method = RequestMethod.GET)
 	public void topicMsgByJmxAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
 		try {
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			String target = topicService.getTopicSizeAndCapacity(clusterAlias, tname);
 
 			byte[] output = target.getBytes();
@@ -253,7 +253,7 @@ public class TopicController {
 	public void topicMockAjax(HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			String name = request.getParameter("name");
 			JSONObject object = new JSONObject();
 			object.put("items", JSON.parseArray(topicService.mockTopics(clusterAlias, name)));
@@ -269,7 +269,7 @@ public class TopicController {
 	public void getTopicProperties(HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			String name = request.getParameter("name");
 			JSONObject object = new JSONObject();
 			object.put("items", JSON.parseArray(topicService.getTopicProperties(clusterAlias, name)));
@@ -285,7 +285,7 @@ public class TopicController {
 	public void alterTopicConfigAjax(@PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			String topic = request.getParameter("topic");
 			TopicConfig topicConfig = new TopicConfig();
 			topicConfig.setName(topic);
@@ -314,7 +314,7 @@ public class TopicController {
 	public void topicMockSend(@RequestBody TopicMockMessage topicMockMessage, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			JSONObject object = new JSONObject();
 			object.put("status", topicService.mockSendMsg(clusterAlias, topicMockMessage.getTopic(), topicMockMessage.getMessage()));
 			byte[] output = object.toJSONString().getBytes();
@@ -345,7 +345,7 @@ public class TopicController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 		Signiner signiner = (Signiner) session.getAttribute(KConstants.Login.SESSION_USER);
 
 		Map<String, Object> map = new HashMap<>();
@@ -400,7 +400,7 @@ public class TopicController {
 		try {
 			String topic = request.getParameter("topic");
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			byte[] output = topicService.getSelectTopics(clusterAlias, topic).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
@@ -416,7 +416,7 @@ public class TopicController {
 			String stime = request.getParameter("stime");
 			String etime = request.getParameter("etime");
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 			Map<String, Object> params = new HashMap<>();
 			params.put("cluster", clusterAlias);
@@ -445,7 +445,7 @@ public class TopicController {
 		String ke_topic_name = request.getParameter("ke_topic_name");
 		String ke_topic_partition = request.getParameter("ke_topic_partition");
 		String ke_topic_repli = request.getParameter("ke_topic_repli");
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 		Map<String, Object> respons = kafkaService.create(clusterAlias, ke_topic_name, ke_topic_partition, ke_topic_repli);
 		if ("success".equals(respons.get("status"))) {
 			session.removeAttribute("Submit_Status");
@@ -464,7 +464,7 @@ public class TopicController {
 	public ModelAndView topicDelete(@PathVariable("topicName") String topicName, @PathVariable("token") String token, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		if (SystemConfigUtils.getProperty("kafka.eagle.topic.token").equals(token) && !Kafka.CONSUMER_OFFSET_TOPIC.equals(topicName)) {
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			Map<String, Object> respons = kafkaService.delete(clusterAlias, topicName);
 			if ("success".equals(respons.get("status"))) {
 				mav.setViewName("redirect:/topic/list");
@@ -481,7 +481,7 @@ public class TopicController {
 	@RequestMapping(value = "/topic/{topicName}/{partitions}/modify", method = RequestMethod.GET)
 	public ModelAndView topicModifyPartitions(@PathVariable("topicName") String topicName, @PathVariable("partitions") int token, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 		Map<String, Object> respons = brokerService.createTopicPartitions(clusterAlias, topicName, token);
 		if ("success".equals(respons.get("status"))) {
 			mav.setViewName("redirect:/topic/list");
@@ -496,7 +496,7 @@ public class TopicController {
 	public void topicSqlLogicalAjax(@RequestParam String sql, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		TopicSqlHistory topicSql = new TopicSqlHistory();
 		try {
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 			String target = topicService.execute(clusterAlias, sql);
 			JSONObject result = JSON.parseObject(target);
 			try {
@@ -542,7 +542,7 @@ public class TopicController {
 			}
 		}
 
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		String text = topicService.execute(clusterAlias, sql);
 		JSONObject result = JSON.parseObject(text);
@@ -598,7 +598,7 @@ public class TopicController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 		Signiner signin = (Signiner) SecurityUtils.getSubject().getSession().getAttribute(KConstants.Login.SESSION_USER);
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -674,7 +674,7 @@ public class TopicController {
 	@RequestMapping(value = "/topic/producer/chart/ajax", method = RequestMethod.GET)
 	public void topicProducerChartAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
 		try {
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
 
 			Map<String, Object> param = new HashMap<>();
 			param.put("cluster", clusterAlias);
