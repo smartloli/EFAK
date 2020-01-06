@@ -27,18 +27,11 @@ package org.smartloli.kafka.eagle.common.util;
 public class KConstants {
 
 	/** D3 data plugin size. */
-	public enum D3 {
-		SIZE(40);
-
-		private int value;
-
-		public int getValue() {
-			return value;
+	public final class D3 {
+		private D3() {
 		}
 
-		private D3(int value) {
-			this.value = value;
-		}
+		public static final int SIZE = 40;
 	}
 
 	public enum OperateSystem {

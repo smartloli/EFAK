@@ -78,7 +78,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 		for (Entry<String, List<String>> entry : activeTopics.entrySet()) {
 			JSONObject subTarget = new JSONObject();
 			JSONArray subTargets = new JSONArray();
-			if (count > KConstants.D3.SIZE.getValue()) {
+			if (count > KConstants.D3.SIZE) {
 				subTarget.put("name", "...");
 				JSONObject subInSubTarget = new JSONObject();
 				subInSubTarget.put("name", "...");
@@ -199,7 +199,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 			JSONObject consumerGroup = (JSONObject) object;
 			JSONObject subTarget = new JSONObject();
 			JSONArray subTargets = new JSONArray();
-			if (count > KConstants.D3.SIZE.getValue()) {
+			if (count > KConstants.D3.SIZE) {
 				subTarget.put("name", "...");
 				JSONObject subInSubTarget = new JSONObject();
 				subInSubTarget.put("name", "...");

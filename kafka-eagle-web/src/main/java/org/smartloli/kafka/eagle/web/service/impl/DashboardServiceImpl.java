@@ -93,7 +93,7 @@ public class DashboardServiceImpl implements DashboardService {
 		JSONArray targets = new JSONArray();
 		int count = 0;
 		for (BrokersInfo broker : brokers) {
-			if (count > KConstants.D3.SIZE.getValue()) {
+			if (count > KConstants.D3.SIZE) {
 				JSONObject subTarget = new JSONObject();
 				subTarget.put("name", "...");
 				targets.add(subTarget);
@@ -169,8 +169,10 @@ public class DashboardServiceImpl implements DashboardService {
 	public int writeTopicRank(List<TopicRank> topicRanks) {
 		return topicDao.writeTopicRank(topicRanks);
 	}
-	
-	/** Write statistics topic logsize data from kafka jmx & insert into table. */
+
+	/**
+	 * Write statistics topic logsize data from kafka jmx & insert into table.
+	 */
 	public int writeTopicLogSize(List<TopicLogSize> topicLogSize) {
 		return topicDao.writeTopicLogSize(topicLogSize);
 	}
