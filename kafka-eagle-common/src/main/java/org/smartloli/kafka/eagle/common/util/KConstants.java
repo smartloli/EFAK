@@ -89,31 +89,23 @@ public class KConstants {
 	}
 
 	/** Zookeeper session. */
-	public enum SessionAlias {
-		CLUSTER_ALIAS("clusterAlias"),
-		CLUSTER_ALIAS_LIST("clusterAliasList"),
-		CLUSTER_ALIAS_LIST_LIMIT("5");
-
-		private String value;
-
-		public String getValue() {
-			return value;
+	public final class SessionAlias {
+		private SessionAlias() {
 		}
 
-		public long getLongValue() {
-			return Long.parseLong(value);
-		}
-
-		private SessionAlias(String value) {
-			this.value = value;
-		}
+		public static final String CLUSTER_ALIAS = "clusterAlias";
+		public static final String CLUSTER_ALIAS_LIST = "clusterAliasList";
+		public static final int CLUSTER_ALIAS_LIST_LIMIT = 5;
 	}
 
 	/** Login session. */
-	public interface Login {
-		public final static String SESSION_USER = "LOGIN_USER_SESSION";
-		public final static String UNKNOW_USER = "__unknow__";
-		public final static String ERROR_LOGIN = "error_msg";
+	public final class Login {
+		private Login() {
+		}
+
+		public static final String SESSION_USER = "LOGIN_USER_SESSION";
+		public static final String UNKNOW_USER = "__unknow__";
+		public static final String ERROR_LOGIN = "error_msg";
 	}
 
 	/** Role Administrator. */
@@ -217,9 +209,8 @@ public class KConstants {
 
 	public interface Topic {
 		public static int PARTITION_LENGTH = 10;
-		public final static String[] KEYS = new String[] { "cleanup.policy", "compression.type", "delete.retention.ms", "file.delete.delay.ms", "flush.messages", "flush.ms", "follower.replication.throttled", "index.interval.bytes",
-				"leader.replication.throttled.replicas", "max.message.bytes", "message.downconversion.enable", "message.format.version", "message.timestamp.difference.max.ms", "message.timestamp.type", "min.cleanable.dirty.ratio",
-				"min.compaction.lag.ms", "min.insync.replicas", "preallocate", "retention.bytes", "retention.ms", "segment.bytes", "segment.index.bytes", "segment.jitter.ms", "segment.ms", "unclean.leader.election.enable" };
+		public final static String[] KEYS = new String[] { "cleanup.policy", "compression.type", "delete.retention.ms", "file.delete.delay.ms", "flush.messages", "flush.ms", "follower.replication.throttled", "index.interval.bytes", "leader.replication.throttled.replicas", "max.message.bytes", "message.downconversion.enable", "message.format.version",
+				"message.timestamp.difference.max.ms", "message.timestamp.type", "min.cleanable.dirty.ratio", "min.compaction.lag.ms", "min.insync.replicas", "preallocate", "retention.bytes", "retention.ms", "segment.bytes", "segment.index.bytes", "segment.jitter.ms", "segment.ms", "unclean.leader.election.enable" };
 
 		public final static String ADD = "ADD";
 		public final static String DELETE = "DELETE";

@@ -169,7 +169,7 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/consumer/group/ajax", method = RequestMethod.GET)
 	public void alarmConsumerGroupAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		String search = StrUtils.convertNull(request.getParameter("name"));
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
@@ -188,7 +188,7 @@ public class AlarmController {
 	public void alarmConsumerTopicAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		String search = StrUtils.convertNull(request.getParameter("name"));
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
@@ -205,7 +205,7 @@ public class AlarmController {
 	/** Add alarmer form. */
 	@RequestMapping(value = "/alarm/add/form", method = RequestMethod.POST)
 	public ModelAndView alarmAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		ModelAndView mav = new ModelAndView();
 		String group = request.getParameter("ke_alarm_consumer_group");
@@ -263,7 +263,7 @@ public class AlarmController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("cluster", clusterAlias);
@@ -301,17 +301,14 @@ public class AlarmController {
 				obj.put("alarmIsNormal", "<a class='btn btn-danger btn-xs'>N</a>");
 			}
 			if (alertConsumer.getIsEnable().equals("Y")) {
-				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id
-						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			} else {
-				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id
-						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			}
 			obj.put("created", alertConsumer.getCreated());
 			obj.put("modify", alertConsumer.getModify());
-			obj.put("operate",
-					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_consumer_modify' href='#"
-							+ id + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_consumer_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			obj.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_consumer_modify' href='#" + id
+					+ "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_consumer_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 
@@ -443,7 +440,7 @@ public class AlarmController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		AlarmClusterInfo alarmClusterInfo = new AlarmClusterInfo();
 		alarmClusterInfo.setAlarmGroup(alarmGroup);
 		alarmClusterInfo.setAlarmLevel(level);
@@ -492,7 +489,7 @@ public class AlarmController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("cluster", clusterAlias);
@@ -528,17 +525,14 @@ public class AlarmController {
 				obj.put("alarmIsNormal", "<a class='btn btn-danger btn-xs'>N</a>");
 			}
 			if (clustersInfo.getIsEnable().equals("Y")) {
-				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id
-						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			} else {
-				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id
-						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			}
 			obj.put("created", clustersInfo.getCreated());
 			obj.put("modify", clustersInfo.getModify());
-			obj.put("operate",
-					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_cluster_modify' href='#"
-							+ id + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_cluster_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			obj.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_cluster_modify' href='#" + id
+					+ "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_cluster_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 
@@ -666,7 +660,7 @@ public class AlarmController {
 			Map<String, Object> map = new HashMap<>();
 			if ("group".equals(type)) {
 				HttpSession session = request.getSession();
-				String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+				String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 				search = StrUtils.convertNull(request.getParameter("name"));
 				map.put("search", "%" + search + "%");
 				map.put("start", 0);
@@ -689,7 +683,7 @@ public class AlarmController {
 	public void alarmGroupCheckAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			Map<String, Object> params = new HashMap<>();
 			params.put("cluster", clusterAlias);
 			params.put("alarmGroup", group);
@@ -711,7 +705,7 @@ public class AlarmController {
 		String url = request.getParameter("ke_alarm_url");
 		String http = request.getParameter("ke_alarm_http");
 		String address = request.getParameter("ke_alarm_address");
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		AlarmConfigInfo alarmConfig = new AlarmConfigInfo();
 		alarmConfig.setCluster(clusterAlias);
@@ -769,7 +763,7 @@ public class AlarmController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("search", "%" + search + "%");
@@ -794,9 +788,8 @@ public class AlarmController {
 			obj.put("alarmAddress", "<a name='ke_alarm_config_detail' href='#" + alarmGroup + "/address'>" + (address.length() > 16 ? address.substring(0, 16) + "..." : address) + "</a>");
 			obj.put("created", config.getString("created"));
 			obj.put("modify", config.getString("modify"));
-			obj.put("operate",
-					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='ke_alarm_config_modify' href='#"
-							+ alarmGroup + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='ke_alarm_config_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			obj.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='ke_alarm_config_modify' href='#" + alarmGroup
+					+ "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='ke_alarm_config_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 
@@ -818,7 +811,7 @@ public class AlarmController {
 	@RequestMapping(value = "/alarm/config/{group}/del", method = RequestMethod.GET)
 	public ModelAndView alarmConfigDelete(@PathVariable("group") String group, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		Map<String, Object> map = new HashMap<>();
 		map.put("cluster", clusterAlias);
 		map.put("alarmGroup", group);
@@ -836,7 +829,7 @@ public class AlarmController {
 	public void getAlarmConfigDetailByGroupAjax(@PathVariable("type") String type, @PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			Map<String, Object> params = new HashMap<>();
 			params.put("cluster", clusterAlias);
 			params.put("alarmGroup", group);
@@ -863,7 +856,7 @@ public class AlarmController {
 		String group = request.getParameter("ke_alarm_group_m_name");
 		String url = request.getParameter("ke_alarm_config_m_url");
 		String address = request.getParameter("ke_alarm_config_m_address");
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("cluster", clusterAlias);

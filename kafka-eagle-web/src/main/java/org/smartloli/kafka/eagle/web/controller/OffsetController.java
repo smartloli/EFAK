@@ -67,7 +67,7 @@ public class OffsetController {
 	public ModelAndView consumersActiveView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_consumers");
@@ -82,7 +82,7 @@ public class OffsetController {
 	public ModelAndView offsetRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_realtime");
@@ -110,7 +110,7 @@ public class OffsetController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 
@@ -162,7 +162,7 @@ public class OffsetController {
 	@RequestMapping(value = "/consumer/offset/{group}/{topic}/realtime/ajax", method = RequestMethod.GET)
 	public void offsetGraphAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
 			Map<String, Object> param = new HashMap<>();
@@ -183,7 +183,7 @@ public class OffsetController {
 	@RequestMapping(value = "/consumer/offset/rate/{group}/{topic}/realtime/ajax", method = RequestMethod.GET)
 	public void offsetRateGraphAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("cluster", clusterAlias);

@@ -99,7 +99,7 @@ public class ClusterController {
 		}
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		JSONObject deserializeClusters = JSON.parseObject(clusterService.get(clusterAlias, type));
 		JSONArray clusters = deserializeClusters.getJSONArray(type);
@@ -192,20 +192,20 @@ public class ClusterController {
 		if (!clusterService.hasClusterAlias(clusterAlias)) {
 			return new ModelAndView("redirect:/error/404");
 		} else {
-			session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue());
-			session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue(), clusterAlias);
+			session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS);
+			session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, clusterAlias);
 			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 			String dropList = "<ul class='dropdown-menu'>";
 			int i = 0;
 			for (String clusterAliasStr : clusterAliass) {
-				if (!clusterAliasStr.equals(clusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT.getLongValue()) {
+				if (!clusterAliasStr.equals(clusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT) {
 					dropList += "<li><a href='/ke/cluster/info/" + clusterAliasStr + "/change'><i class='fa fa-fw fa-sitemap'></i>" + clusterAliasStr + "</a></li>";
 					i++;
 				}
 			}
 			dropList += "<li><a href='/ke/cluster/multi'><i class='fa fa-fw fa-tasks'></i>More...</a></li></ul>";
-			session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST.getValue());
-			session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST.getValue(), dropList);
+			session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST);
+			session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST, dropList);
 			return new ModelAndView("redirect:/");
 		}
 	}
@@ -272,7 +272,7 @@ public class ClusterController {
 	@RequestMapping(value = "/cluster/zk/islive/ajax", method = RequestMethod.GET)
 	public void zkCliLiveAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
 			byte[] output = clusterService.status(clusterAlias).toJSONString().getBytes();
@@ -289,7 +289,7 @@ public class ClusterController {
 		String type = request.getParameter("type");
 
 		HttpSession session = request.getSession();
-		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
 			byte[] output = clusterService.execute(clusterAlias, cmd, type).getBytes();

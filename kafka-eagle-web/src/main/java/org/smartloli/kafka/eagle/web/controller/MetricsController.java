@@ -62,7 +62,7 @@ public class MetricsController {
 		mav.setViewName("/metrics/kafka");
 		return mav;
 	}
-	
+
 	/** Trend viewer. */
 	@RequestMapping(value = "/metrics/zk", method = RequestMethod.GET)
 	public ModelAndView zkView(HttpSession session) {
@@ -75,7 +75,7 @@ public class MetricsController {
 	@RequestMapping(value = "/metrics/brokers/mbean/ajax", method = RequestMethod.GET)
 	public void clusterAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
 		try {
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			String target = metricsService.getAllBrokersMBean(clusterAlias);
 
 			byte[] output = target.getBytes();
@@ -89,21 +89,21 @@ public class MetricsController {
 	@RequestMapping(value = "/metrics/trend/mbean/ajax", method = RequestMethod.GET)
 	public void trendAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
 		try {
-			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS.getValue()).toString();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 			Map<String, Object> param = new HashMap<>();
 			param.put("cluster", clusterAlias);
 			param.put("stime", request.getParameter("stime"));
 			param.put("etime", request.getParameter("etime"));
 			param.put("type", request.getParameter("type"));
-            String modules = request.getParameter("modules");
-            if (StringUtils.isNotBlank(modules)) {
-                param.put("modules", Arrays.asList(modules.split(",")));
-            }
+			String modules = request.getParameter("modules");
+			if (StringUtils.isNotBlank(modules)) {
+				param.put("modules", Arrays.asList(modules.split(",")));
+			}
 			String target = metricsService.query(param);
 			if (StringUtils.isEmpty(target)) {
-			    target = "";
-            }
+				target = "";
+			}
 			byte[] output = target.getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
