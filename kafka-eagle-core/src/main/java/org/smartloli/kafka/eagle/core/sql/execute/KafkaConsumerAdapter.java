@@ -52,9 +52,9 @@ import com.alibaba.fastjson.JSONObject;
 public class KafkaConsumerAdapter {
 
 	private static KafkaService kafkaService = new KafkaFactory().create();
-	
+
 	private KafkaConsumerAdapter() {
-		
+
 	}
 
 	/** Executor ksql query topic data. */
@@ -81,8 +81,8 @@ public class KafkaConsumerAdapter {
 
 		for (TopicPartition tp : topics) {
 			Map<TopicPartition, Long> offsets = consumer.endOffsets(Collections.singleton(tp));
-			if (offsets.get(tp).longValue() > Kafka.POSITION.getLongValue()) {
-				consumer.seek(tp, offsets.get(tp).longValue() - Kafka.POSITION.getLongValue());
+			if (offsets.get(tp).longValue() > Kafka.POSITION) {
+				consumer.seek(tp, offsets.get(tp).longValue() - Kafka.POSITION);
 			} else {
 				consumer.seek(tp, 0);
 			}
@@ -90,7 +90,7 @@ public class KafkaConsumerAdapter {
 		JSONArray datasets = new JSONArray();
 		boolean flag = true;
 		while (flag) {
-			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Kafka.TIME_OUT.getLongValue()));
+			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Kafka.TIME_OUT));
 			for (ConsumerRecord<String, String> record : records) {
 				JSONObject object = new JSONObject();
 				object.put(TopicSchema.MSG, record.value());

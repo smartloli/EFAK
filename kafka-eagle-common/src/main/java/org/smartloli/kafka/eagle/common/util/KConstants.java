@@ -51,34 +51,23 @@ public class KConstants {
 	}
 
 	/** Kafka parameter setting. */
-	public enum Kafka {
-		CONSUMER_OFFSET_TOPIC("__consumer_offsets"),
-		KAFKA_EAGLE_SYSTEM_GROUP("kafka.eagle.system.group"),
-		AUTO_COMMIT("true"),
-
-		AUTO_COMMIT_MS("1000"),
-		EARLIEST("earliest"),
-		JAVA_SECURITY("java.security.auth.login.config"),
-		TIME_OUT("100"),
-		POSITION(SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max") == 0 ? "5000" : SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max") + ""),
-		PARTITION_CLASS("partitioner.class"),
-		KEY_SERIALIZER("key.serializer"),
-		VALUE_SERIALIZER("value.serializer"),
-		UNKOWN("Unknown");
-
-		private String value;
-
-		public String getValue() {
-			return value;
+	public static final class Kafka {
+		private Kafka() {
 		}
 
-		public long getLongValue() {
-			return Long.parseLong(value);
-		}
+		public static final String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
+		public static final String KAFKA_EAGLE_SYSTEM_GROUP = "kafka.eagle.system.group";
+		public static final String AUTO_COMMIT = "true";
+		public static final String AUTO_COMMIT_MS = "1000";
+		public static final String EARLIEST = "earliest";
+		public static final String JAVA_SECURITY = "java.security.auth.login.config";
+		public static final int TIME_OUT = 100;
+		public static final long POSITION = SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max") == 0 ? 5000 : SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max");
+		public static final String PARTITION_CLASS = "partitioner.class";
+		public static final String KEY_SERIALIZER = "key.serializer";
+		public static final String VALUE_SERIALIZER = "value.serializer";
+		public static final String UNKOWN = "Unknown";
 
-		private Kafka(String value) {
-			this.value = value;
-		}
 	}
 
 	/** Zookeeper session. */

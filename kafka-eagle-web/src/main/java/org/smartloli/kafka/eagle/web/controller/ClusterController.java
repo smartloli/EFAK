@@ -116,7 +116,7 @@ public class ClusterController {
 					obj.put("jmxPort", cluster.getInteger("jmxPort"));
 					obj.put("created", cluster.getString("created"));
 					obj.put("modify", cluster.getString("modify"));
-					String version = cluster.getString("version") == "" ? Kafka.UNKOWN.getValue() : cluster.getString("version");
+					String version = cluster.getString("version") == "" ? Kafka.UNKOWN : cluster.getString("version");
 					if (Kafka.UNKOWN.equals(version)) {
 						obj.put("version", "<a class='btn btn-danger btn-xs'>" + version + "</a>");
 					} else {
@@ -147,7 +147,7 @@ public class ClusterController {
 						obj.put("jmxPort", cluster.getInteger("jmxPort"));
 						obj.put("created", cluster.getString("created"));
 						obj.put("modify", cluster.getString("modify"));
-						String version = cluster.getString("version") == "" ? Kafka.UNKOWN.getValue() : cluster.getString("version");
+						String version = cluster.getString("version") == "" ? Kafka.UNKOWN : cluster.getString("version");
 						if (Kafka.UNKOWN.equals(version)) {
 							obj.put("version", "<a class='btn btn-danger btn-xs'>" + version + "</a>");
 						} else {
