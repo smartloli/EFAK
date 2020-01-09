@@ -17,6 +17,9 @@
  */
 package org.smartloli.kafka.eagle.common.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Define constants in the system.
  * 
@@ -91,66 +94,63 @@ public class KConstants {
 	}
 
 	/** Role Administrator. */
-	public interface Role {
-		public final static String ADMIN = "admin";
-		public final static int ADMINISRATOR = 1;
-		public final static int ANONYMOUS = 0;
-		public final static String WHETHER_SYSTEM_ADMIN = "WHETHER_SYSTEM_ADMIN";
+	public final class Role {
+		private Role() {
+		}
+
+		public static final String ADMIN = "admin";
+		public static final int ADMINISRATOR = 1;
+		public static final int ANONYMOUS = 0;
+		public static final String WHETHER_SYSTEM_ADMIN = "WHETHER_SYSTEM_ADMIN";
 	}
 
 	/** Kafka jmx mbean. */
-	public interface MBean {
-		public final static String COUNT = "Count";
-		public final static String EVENT_TYPE = "EventType";
-		public final static String FIFTEEN_MINUTE_RATE = "FifteenMinuteRate";
-		public final static String FIVE_MINUTE_RATE = "FiveMinuteRate";
-		public final static String MEAN_RATE = "MeanRate";
-		public final static String ONE_MINUTE_RATE = "OneMinuteRate";
-		public final static String RATE_UNIT = "RateUnit";
-		public final static String VALUE = "Value";
+	public final class MBean {
+		private MBean() {
+		}
+
+		public static final String COUNT = "Count";
+		public static final String EVENT_TYPE = "EventType";
+		public static final String FIFTEEN_MINUTE_RATE = "FifteenMinuteRate";
+		public static final String FIVE_MINUTE_RATE = "FiveMinuteRate";
+		public static final String MEAN_RATE = "MeanRate";
+		public static final String ONE_MINUTE_RATE = "OneMinuteRate";
+		public static final String RATE_UNIT = "RateUnit";
+		public static final String VALUE = "Value";
 
 		/** Messages in /sec. */
-		public final static String MESSAGES_IN = "msg";
+		public static final String MESSAGES_IN = "msg";
 		/** Bytes in /sec. */
-		public final static String BYTES_IN = "ins";
+		public static final String BYTES_IN = "ins";
 		/** Bytes out /sec. */
-		public final static String BYTES_OUT = "out";
+		public static final String BYTES_OUT = "out";
 		/** Bytes rejected /sec. */
-		public final static String BYTES_REJECTED = "rejected";
+		public static final String BYTES_REJECTED = "rejected";
 		/** Failed fetch request /sec. */
-		public final static String FAILED_FETCH_REQUEST = "fetch";
+		public static final String FAILED_FETCH_REQUEST = "fetch";
 		/** Failed produce request /sec. */
-		public final static String FAILED_PRODUCE_REQUEST = "produce";
+		public static final String FAILED_PRODUCE_REQUEST = "produce";
 
 		/** MBean keys. */
-		public final static String MESSAGEIN = "message_in";
-		public final static String BYTEIN = "byte_in";
-		public final static String BYTEOUT = "byte_out";
-		public final static String BYTESREJECTED = "byte_rejected";
-		public final static String FAILEDFETCHREQUEST = "failed_fetch_request";
-		public final static String FAILEDPRODUCEREQUEST = "failed_produce_request";
-		public final static String PRODUCEMESSAGECONVERSIONS = "produce_message_conversions";
-		public final static String TOTALFETCHREQUESTSPERSEC = "total_fetch_requests";
-		public final static String TOTALPRODUCEREQUESTSPERSEC = "total_produce_requests";
-		public final static String REPLICATIONBYTESINPERSEC = "replication_bytes_out";
-		public final static String REPLICATIONBYTESOUTPERSEC = "replication_bytes_in";
-		public final static String OSTOTALMEMORY = "os_total_memory";
-		public final static String OSFREEMEMORY = "os_free_memory";
+		public static final String MESSAGEIN = "message_in";
+		public static final String BYTEIN = "byte_in";
+		public static final String BYTEOUT = "byte_out";
+		public static final String BYTESREJECTED = "byte_rejected";
+		public static final String FAILEDFETCHREQUEST = "failed_fetch_request";
+		public static final String FAILEDPRODUCEREQUEST = "failed_produce_request";
+		public static final String PRODUCEMESSAGECONVERSIONS = "produce_message_conversions";
+		public static final String TOTALFETCHREQUESTSPERSEC = "total_fetch_requests";
+		public static final String TOTALPRODUCEREQUESTSPERSEC = "total_produce_requests";
+		public static final String REPLICATIONBYTESINPERSEC = "replication_bytes_out";
+		public static final String REPLICATIONBYTESOUTPERSEC = "replication_bytes_in";
+		public static final String OSTOTALMEMORY = "os_total_memory";
+		public static final String OSFREEMEMORY = "os_free_memory";
 	}
 
-	public interface Linux {
-		public static final String DEVICE = "sd";
-		public static final String LO = "lo";
-		public static final String CPU = "cpu";
-		public static final String IO = "io";
-		public static final String MemTotal = "MemTotal";
-		public static final String MemFree = "MemFree";
-		public static final String TCP = "Tcp";
-		public static final String CurrEstab = "CurrEstab";
-		public static final int SLEEP = 3000;
-	}
+	public final class ZK {
+		private ZK() {
+		}
 
-	public interface ZK {
 		public static final String ZK_SEND_PACKETS = "zk_packets_sent";
 		public static final String ZK_RECEIVEDPACKETS = "zk_packets_received";
 		public static final String ZK_NUM_ALIVECONNRCTIONS = "zk_num_alive_connections";
@@ -158,70 +158,88 @@ public class KConstants {
 
 	}
 
-	public interface TopicCache {
-		public static final String NAME = "TopicCacheData";
-	}
+	public final class ServerDevice {
+		private ServerDevice() {
+		}
 
-	public interface ServerDevice {
 		public static final int TIME_OUT = 3000;
 		public static final int BUFFER_SIZE = 8049;
 	}
 
-	public interface CollectorType {
+	public final class CollectorType {
+		private CollectorType() {
+		}
+
 		public static final String ZK = "zookeeper";
 		public static final String KAFKA = "kafka";
 	}
 
-	public interface Zookeeper {
+	public final class IM {
+		private IM() {
+		}
+
+		public static final String TITLE = "Kafka Eagle Alert";
+	}
+
+	public final class WeChat {
+		private WeChat() {
+		}
+
+		public static final String TOUSER = "@all";
+		public static final String TOPARTY = "PartyID1|PartyID2";
+		public static final String TOTAG = "TagID1 | TagID2";
+		public static final long AGENTID = 1;
+	}
+
+	public final class Zookeeper {
+		private Zookeeper() {
+		}
+
 		public static final String LEADER = "leader";
 	}
 
-	public interface IM {
-		public static String TITLE = "Kafka Eagle Alert";
-		public static String MARKDOWN = "markdown";
-		public static String STRING = "string";
+	public static final class Topic {
+		private Topic() {
+		}
+
+		public static final int PARTITION_LENGTH = 10;
+
+		public static List<String> getTopicConfigKeys() {
+			return Arrays.asList("cleanup.policy", "compression.type", "delete.retention.ms", "file.delete.delay.ms", "flush.messages", "flush.ms", "follower.replication.throttled", "index.interval.bytes", "leader.replication.throttled.replicas", "max.message.bytes", "message.downconversion.enable", "message.format.version",
+					"message.timestamp.difference.max.ms", "message.timestamp.type", "min.cleanable.dirty.ratio", "min.compaction.lag.ms", "min.insync.replicas", "preallocate", "retention.bytes", "retention.ms", "segment.bytes", "segment.index.bytes", "segment.jitter.ms", "segment.ms", "unclean.leader.election.enable");
+		}
+
+		public static final String ADD = "ADD";
+		public static final String DELETE = "DELETE";
+		public static final String DESCRIBE = "DESCRIBE";
+
+		public static final String SUCCESS = "SUCCESS";
+		public static final String FAILED = "FAILED";
+
+		public static final String LOGSIZE = "logsize";
+		public static final String CAPACITY = "capacity";
+
+		public static final int BATCH_SIZE = 500;
+
+		public static final int RUNNING = 0;
+		public static final int SHUTDOWN = 1;
+		public static final int PENDING = 2;
+
+		public static final String RUNNING_STRING = "Running";
+		public static final String SHUTDOWN_STRING = "Shutdown";
+		public static final String PENDING_STRING = "Pending";
+
+		public static final String PRODUCERS = "producers";
+		public static final String CONSUMERS = "consumers";
+		public static final String LAG = "lag";
 	}
 
-	public interface WeChat {
-		public static String TOUSER = "@all";
-		public static String TOPARTY = "PartyID1|PartyID2";
-		public static String TOTAG = "TagID1 | TagID2";
-		public static long AGENTID = 1;
-	}
+	public final class Component {
+		private Component() {
+		}
 
-	public interface Topic {
-		public static int PARTITION_LENGTH = 10;
-		public final static String[] KEYS = new String[] { "cleanup.policy", "compression.type", "delete.retention.ms", "file.delete.delay.ms", "flush.messages", "flush.ms", "follower.replication.throttled", "index.interval.bytes", "leader.replication.throttled.replicas", "max.message.bytes", "message.downconversion.enable", "message.format.version",
-				"message.timestamp.difference.max.ms", "message.timestamp.type", "min.cleanable.dirty.ratio", "min.compaction.lag.ms", "min.insync.replicas", "preallocate", "retention.bytes", "retention.ms", "segment.bytes", "segment.index.bytes", "segment.jitter.ms", "segment.ms", "unclean.leader.election.enable" };
-
-		public final static String ADD = "ADD";
-		public final static String DELETE = "DELETE";
-		public final static String DESCRIBE = "DESCRIBE";
-
-		public final static String SUCCESS = "SUCCESS";
-		public final static String FAILED = "FAILED";
-
-		public final static String LOGSIZE = "logsize";
-		public final static String CAPACITY = "capacity";
-
-		public final static int BATCH_SIZE = 500;
-
-		public final static int RUNNING = 0;
-		public final static int SHUTDOWN = 1;
-		public final static int PENDING = 2;
-
-		public final static String RUNNING_STRING = "Running";
-		public final static String SHUTDOWN_STRING = "Shutdown";
-		public final static String PENDING_STRING = "Pending";
-
-		public final static String PRODUCERS = "producers";
-		public final static String CONSUMERS = "consumers";
-		public final static String LAG = "lag";
-	}
-
-	public interface Component {
 		/** Flink app consumer don't commit consumer info into kafka. */
-		public static String UNKNOW = "unknow-host";
+		public static final String UNKNOW = "unknow-host";
 
 	}
 
@@ -240,8 +258,11 @@ public class KConstants {
 		public static String TOPIC = "Topic";
 	}
 
-	public interface AlarmQueue {
-		public static String JOB_PARAMS = "job_params";
+	public final class AlarmQueue {
+		private AlarmQueue() {
+		}
+
+		public static final String JOB_PARAMS = "job_params";
 	}
 
 }

@@ -45,11 +45,11 @@ import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
  */
 public class QuartzManagerUtils {
 
-	public static String KE_JOB_GROUP_NAME = "KE_JOB_GROUP_NAME";
+	public static final String KE_JOB_GROUP_NAME = "KE_JOB_GROUP_NAME";
 	private static SchedulerFactory schedulerFactory = new StdSchedulerFactory();
 
 	/** Add new job. */
-	public static void addJob(BaseJobContext jobContext,String jobName, Class<? extends Job> jobClass, String cron) {
+	public static void addJob(BaseJobContext jobContext, String jobName, Class<? extends Job> jobClass, String cron) {
 		try {
 			Scheduler sched = schedulerFactory.getScheduler();
 			JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, KE_JOB_GROUP_NAME).build();

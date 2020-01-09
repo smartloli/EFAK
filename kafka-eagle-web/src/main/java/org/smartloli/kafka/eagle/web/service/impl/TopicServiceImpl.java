@@ -132,7 +132,7 @@ public class TopicServiceImpl implements TopicService {
 	public String getTopicProperties(String clusterAlias, String name) {
 		JSONArray topics = new JSONArray();
 		int offset = 0;
-		for (String key : Topic.KEYS) {
+		for (String key : Topic.getTopicConfigKeys()) {
 			if (name != null) {
 				JSONObject topic = new JSONObject();
 				if (key.contains(name)) {
@@ -285,7 +285,7 @@ public class TopicServiceImpl implements TopicService {
 		int index = 0;
 		try {
 			index = CalendarUtils.getDiffDay(params.get("stime").toString(), params.get("etime").toString());
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		for (int i = index; i >= 0; i--) {
