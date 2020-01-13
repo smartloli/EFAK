@@ -12,6 +12,15 @@
 		<result property="tm" column="tm" />
 	</resultMap>
 
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo" id="kpiOffline">
+		<result property="cluster" column="cluster" />
+		<result property="key" column="key" />
+		<result property="oneMinute" column="one" />
+		<result property="meanRate" column="mean" />
+		<result property="fiveMinute" column="five" />
+		<result property="fifteenMinute" column="fifteen" />
+	</resultMap>
+
 	<resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo" id="topicOffsets">
 		<result property="cluster" column="cluster" />
 		<result property="group" column="group" />
@@ -29,6 +38,15 @@
 		values
 		<foreach collection="list" item="item" index="index" separator=",">
 			(#{item.cluster},#{item.broker},#{item.type},#{item.key},#{item.value},#{item.timespan},#{item.tm})
+		</foreach>
+	</insert>
+
+	<insert id="mbeanOfflineInsert" parameterType="java.util.List">
+		replace into
+		ke_metrics_offline(`cluster`,`key`,`one`,`mean`,`five`,`fifteen`)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.cluster},#{item.key},#{item.oneMinute},#{item.meanRate},#{item.fiveMinute},#{item.fifteenMinute})
 		</foreach>
 	</insert>
 
@@ -51,6 +69,10 @@
 			)
 		</if>
 		and tm between #{stime} and #{etime}
+	</select>
+
+	<select id="getMBeanOffline" parameterType="map" resultMap="kpiOffline">
+		select `cluster`,`key`,`one`,`mean`,`five`,`fifteen` from ke_metrics_offline where `cluster`=#{cluster}
 	</select>
 
 	<select id="getBrokersKpi" parameterType="map" resultMap="kpi">

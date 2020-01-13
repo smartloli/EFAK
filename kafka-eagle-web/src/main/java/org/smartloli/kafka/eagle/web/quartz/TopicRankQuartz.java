@@ -96,6 +96,7 @@ public class TopicRankQuartz {
 			LOG.error("Collector bscreen consumer topic has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		}
+
 	}
 
 	private void topicCapacityStats() {
@@ -381,5 +382,4 @@ public class TopicRankQuartz {
 			e.printStackTrace();
 		}
 	}
-
 }

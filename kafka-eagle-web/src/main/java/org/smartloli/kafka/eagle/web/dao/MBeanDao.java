@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 
 /**
@@ -35,8 +36,16 @@ public interface MBeanDao {
 	/** Collection statistics data from kafka jmx & insert into table. */
 	public int insert(List<KpiInfo> kpi);
 
+	/**
+	 * Collection statistics offline data from kafka jmx & insert into table.
+	 */
+	public int mbeanOfflineInsert(List<MBeanOfflineInfo> kpi);
+
 	/** Query collector data. */
 	public List<KpiInfo> query(Map<String, Object> params);
+
+	/** Query collector data. */
+	public List<MBeanOfflineInfo> getMBeanOffline(Map<String, Object> params);
 
 	/** Get broker kpi, such bytein or byteout etc. */
 	public KpiInfo getBrokersKpi(Map<String, Object> params);
