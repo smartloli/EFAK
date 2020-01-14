@@ -31,6 +31,26 @@
 			console.log(e.message);
 		}
 	}
+	
+	// Get topic total capacity
+	getTopicTotalCapacity();
+	
+	function getTopicTotalCapacity() {
+		try {
+			$.ajax({
+				type : 'get',
+				dataType : 'json',
+				url : '/ke/bs/topic/total/capacity/ajax',
+				success : function(datas) {
+					if (datas != null) {
+						$("#ke_topics_total_capacity").text(datas.capacity);
+					}
+				}
+			});
+		} catch (e) {
+			console.log(e.message);
+		}
+	}
 
 	// formatter byte to kb,mb or gb etc.
 	function stringify(byteNumber) {

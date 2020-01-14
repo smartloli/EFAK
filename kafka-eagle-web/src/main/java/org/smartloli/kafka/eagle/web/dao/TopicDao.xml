@@ -54,6 +54,12 @@
 		where `cluster` =#{cluster} and `tkey`=#{tkey}
 		order by `tvalue` desc limit 10
 	</select>
+	
+	<!-- TopicCapacity -->
+	<select id="getTopicCapacity" parameterType="map" resultType="long">
+		select sum(`tvalue`) from ke_topic_rank
+		where `cluster` =#{cluster} and `tkey`=#{tkey}
+	</select>
 
 	<insert id="writeTopicRank" parameterType="java.util.List">
 		replace into

@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
+import java.util.Map;
+
 /**
  * Big screen service interface.
  * 
@@ -33,9 +35,12 @@ public interface BScreenService {
 	public String getTopicTotalLogSize(String clusterAlias);
 
 	/** Get producer history data. */
-	public String getProducerOrConsumerHistory(String clusterAlias,String type);
-	
+	public String getProducerOrConsumerHistory(String clusterAlias, String type);
+
 	/** Get today or last 7 day consumer and producer data . */
-	public String getTodayOrHistoryConsumerProducer(String clusterAlias,String type);
+	public String getTodayOrHistoryConsumerProducer(String clusterAlias, String type);
+
+	/** Get topic total capacity. */
+	public String getTopicCapacity(Map<String, Object> params);
 
 }

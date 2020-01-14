@@ -61,6 +61,7 @@ a:hover{ color:#06c; text-decoration: none!important}
 .boxall:before,.boxfoot:before{border-left: 2px solid #02a6b5;left: 0;}
 .boxall:after,.boxfoot:after{border-right: 2px solid #02a6b5; right: 0;}
 .alltitle{ font-size:.2rem; color:#fff; text-align: center; line-height: .5rem;}
+.alltitleball{ font-size:.2rem; color:rgba(255,255,255,.7); text-align: center; line-height: .5rem;}
 
 .boxfoot{ position:absolute; bottom: 0; width: 100%; left: 0;}
 .boxfoot:before,
@@ -80,7 +81,7 @@ a:hover{ color:#06c; text-decoration: none!important}
 .barbox2 li{ font-size: .19rem; color:rgba(255,255,255,.7); padding-top: .1rem;}
 
 .map{  position:relative; height: 7.2rem; z-index: 9;}
-.map4{ width: 200%; height:7rem;  position: relative; left: -50%; top: 4%; margin-top: .2rem; z-index: 5;}
+.map4{ width: 200%; height:7rem;  position: relative; left: -50%; top: 35%; margin-top: .2rem; z-index: 5;}
 .map1,.map2,.map3{ position:absolute; opacity: .5}
 .map1{ width:6.43rem; z-index: 2;top:.45rem; left: .7rem;  animation: myfirst2 15s infinite linear;}
 .map2{ width:5.66rem; top:.85rem; left:1.2rem; z-index: 3; opacity: 0.2; animation: myfirst 10s infinite linear;}
