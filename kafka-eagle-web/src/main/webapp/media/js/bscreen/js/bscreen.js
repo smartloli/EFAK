@@ -31,10 +31,10 @@
 			console.log(e.message);
 		}
 	}
-	
+
 	// Get topic total capacity
 	getTopicTotalCapacity();
-	
+
 	function getTopicTotalCapacity() {
 		try {
 			$.ajax({
@@ -43,7 +43,8 @@
 				url : '/ke/bs/topic/total/capacity/ajax',
 				success : function(datas) {
 					if (datas != null) {
-						$("#ke_topics_total_capacity").text(datas.capacity);
+						$("#ke_topics_total_capacity_unit").text("Topic Total Capacity (" + datas.type + ")");
+						$("#ke_topics_total_capacity").text(datas.size);
 					}
 				}
 			});

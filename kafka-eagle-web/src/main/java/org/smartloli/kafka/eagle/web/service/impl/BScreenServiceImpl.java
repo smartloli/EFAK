@@ -213,9 +213,7 @@ public class BScreenServiceImpl implements BScreenService {
 
 	@Override
 	public String getTopicCapacity(Map<String, Object> params) {
-		JSONObject object = new JSONObject();
-		object.put("capacity", StrUtils.stringify(topicDao.getTopicCapacity(params)));
-		return object.toJSONString();
+		return StrUtils.stringifyByObject(topicDao.getTopicCapacity(params)).toJSONString();
 	}
 
 }

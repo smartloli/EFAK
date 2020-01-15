@@ -116,7 +116,7 @@
 					</div>
 					<div class="map4">
 						<div style="height: 100%; width: 100%;">
-							<div class="alltitleball">Topic Total Capacity</div>
+							<div id="ke_topics_total_capacity_unit" class="alltitleball">Topic Total Capacity</div>
 							<div id="ke_topics_total_capacity" style="width: 100%; height: 100%; text-align: center; color: #fff; font-size: .7rem; font-family: electronicFont; font-weight: bold">0</div>
 						</div>
 					</div>
