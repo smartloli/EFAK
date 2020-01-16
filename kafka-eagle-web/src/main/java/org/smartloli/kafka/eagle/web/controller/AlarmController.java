@@ -883,15 +883,12 @@ public class AlarmController {
 		try {
 			String type = request.getParameter("type");
 			String url = request.getParameter("url");
-			// String http = request.getParameter("http");
 			String msg = request.getParameter("msg");
 			String result = "";
 			if (AlarmType.EMAIL.equals(type)) {
 				result = AlertUtils.sendTestMsgByEmail(url);
 			} else if (AlarmType.DingDing.equals(type)) {
 				result = AlertUtils.sendTestMsgByDingDing(url, msg);
-			} else if (AlarmType.WebHook.equals(type)) {
-
 			} else if (AlarmType.WeChat.equals(type)) {
 				result = AlertUtils.sendTestMsgByWeChat(url, msg);
 			}

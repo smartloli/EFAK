@@ -160,8 +160,6 @@ public class AlertQuartz {
 				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
 				IMServiceImpl im = new IMServiceImpl();
 				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
-			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
-
 			}
 		}
 
@@ -170,7 +168,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("Kafka Eagle Alarm Consumer Cancel");
-				alarmMsg.setAlarmContent("lag.normal [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+				alarmMsg.setAlarmContent("lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -185,7 +183,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("**<font color=\"#008000\">Kafka Eagle Alarm Consumer Cancel</font>** \n\n");
-				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -197,7 +195,7 @@ public class AlertQuartz {
 				AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
 				alarmMsg.setAlarmId(alarmConsumer.getId());
 				alarmMsg.setTitle("`Kafka Eagle Alarm Consumer Cancel`\n");
-				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
+				alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
 				alarmMsg.setAlarmDate(CalendarUtils.getDate());
 				alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
 				alarmMsg.setAlarmProject("Consumer");
@@ -205,11 +203,8 @@ public class AlertQuartz {
 				alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
 				IMServiceImpl im = new IMServiceImpl();
 				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
-			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
-
 			}
 		}
-
 	}
 
 	class Cluster {
@@ -368,8 +363,6 @@ public class AlertQuartz {
 				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
 				IMServiceImpl im = new IMServiceImpl();
 				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
-			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
-
 			}
 		}
 
@@ -439,8 +432,6 @@ public class AlertQuartz {
 				alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
 				IMServiceImpl im = new IMServiceImpl();
 				im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
-			} else if (alarmConfing.getAlarmType().equals(AlarmType.WebHook)) {
-
 			}
 		}
 
