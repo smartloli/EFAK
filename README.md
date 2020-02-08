@@ -24,8 +24,8 @@ Here are a few Kafka Eagle system screenshots:
 
 # Alert Support
 In addition to supporting ```email``` alerts, Kafka Eagle also supports im alerts, such as ```DingDing``` and ```WeChat```.
-![DingDing Alert](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-LjfrvZnr8VnQqA2gTze%2F-LjfrxNuwgVVmrqxlCS8%2Fdingding@2x.png?generation=1563030450835342&alt=media)
-![WeChat Alert](https://docs.kafka-eagle.org/res/wechat@2x.png)
+![DingDing Alert](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-YCJshnbZ9rWX7eOMA%2F-M-YCKhrhv8_KksGY2vY%2Fdingding_alert@2x.png?generation=1581138667614351&alt=media)
+![WeChat Alert](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-YCJshnbZ9rWX7eOMA%2F-M-YCKhthAB9NHKTUcZG%2Fwechat_alert@2x.png?generation=1581138665418224&alt=media)
 
 # List of Consumer Groups & Active Group Graph
 ![Consumer & Active Graph](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-LjfrvZnr8VnQqA2gTze%2F-LjfrwYhk2GyuRfT-Keh%2Fconsumer@2x.png?generation=1563030447787989&alt=media)
