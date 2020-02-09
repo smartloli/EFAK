@@ -100,8 +100,8 @@
 									<tr>
 										<th>ID</th>
 										<th>Topic Name</th>
-										<th>Partition Indexes</th>
-										<th>Partition Numbers</th>
+										<th>Partitions</th>
+										<th>Broker Spread (%)</th>
 										<th>Created</th>
 										<th>Modify</th>
 										<th>Operate</th>

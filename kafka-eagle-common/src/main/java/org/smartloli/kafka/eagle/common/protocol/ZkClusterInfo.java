@@ -33,7 +33,7 @@ public class ZkClusterInfo {
 	private String zkAvgLatency;// response client request avg time
 	private String zkNumAliveConnections;// has connected client numbers
 	/** waiting deal with client request numbers in queue. */
-	private String zkOutstandingRequests;
+	private String zkOutstandingRequests = "";
 	/** server mode,like standalone|cluster[leader,follower]. */
 	private String zkOpenFileDescriptorCount;
 	private String zkMaxFileDescriptorCount;

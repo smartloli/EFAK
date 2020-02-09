@@ -128,10 +128,9 @@ public class BrokerServiceImpl implements BrokerService {
 			int start = Integer.parseInt(params.get("start").toString());
 			int length = Integer.parseInt(params.get("length").toString());
 			if (params.containsKey("search") && params.get("search").toString().length() > 0) {
-
 				String search = params.get("search").toString();
 				int offset = 0;
-				int id = 1;
+				int id = start + 1;
 				for (String topic : topics) {
 					if (search != null && topic.contains(search)) {
 						if (offset < (start + length) && offset >= start) {
@@ -147,6 +146,7 @@ public class BrokerServiceImpl implements BrokerService {
 									JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 									partition.setPartitionNumbers(partitionObject.size());
 									partition.setPartitions(partitionObject.keySet());
+									getBrokerSpreadByTopic(clusterAlias, topic, partition, partitionObject);
 									targets.add(partition);
 								}
 							} catch (Exception ex) {
@@ -159,7 +159,7 @@ public class BrokerServiceImpl implements BrokerService {
 				}
 			} else {
 				int offset = 0;
-				int id = 1;
+				int id = start + 1;
 				for (String topic : topics) {
 					if (offset < (start + length) && offset >= start) {
 						try {
@@ -174,6 +174,7 @@ public class BrokerServiceImpl implements BrokerService {
 								JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 								partition.setPartitionNumbers(partitionObject.size());
 								partition.setPartitions(partitionObject.keySet());
+								getBrokerSpreadByTopic(clusterAlias, topic, partition, partitionObject);
 								targets.add(partition);
 							}
 						} catch (Exception ex) {
@@ -193,6 +194,33 @@ public class BrokerServiceImpl implements BrokerService {
 			zkc = null;
 		}
 		return targets;
+	}
+
+	private void getBrokerSpreadByTopic(String clusterAlias, String topic, PartitionsInfo partition, JSONObject partitionObject) {
+		try {
+			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
+			int partitionAndReplicas = 0;
+			int topicSpreadBrokers = 0;
+			for (MetadataInfo meta : topicMetas) {
+				List<Integer> replicasIntegers = new ArrayList<>();
+				List<Integer> isrIntegers = new ArrayList<>();
+				try {
+					replicasIntegers = JSON.parseObject(meta.getReplicas(), new TypeReference<ArrayList<Integer>>() {
+					});
+					isrIntegers = JSON.parseObject(meta.getIsr(), new TypeReference<ArrayList<Integer>>() {
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("Parse string to int list has error, msg is " + e.getCause().getMessage());
+				}
+				partitionAndReplicas += replicasIntegers.size();
+				topicSpreadBrokers += isrIntegers.size();
+			}
+			partition.setBrokersSpread(String.format("%.2f", (partitionAndReplicas * 100.0 / topicSpreadBrokers)));
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("Get topic skewed info has error, msg is ", e);
+		}
 	}
 
 	/** Check topic from zookeeper metadata. */
@@ -344,6 +372,41 @@ public class BrokerServiceImpl implements BrokerService {
 							targets.add(metadate);
 						}
 						offset++;
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Get topic metadata records has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return targets;
+	}
+
+	private List<MetadataInfo> topicMetadata(String clusterAlias, String topic) {
+		List<MetadataInfo> targets = new ArrayList<>();
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		try {
+			if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+				List<String> topics = topicList(clusterAlias);
+				if (topics.contains(topic)) {
+					Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+					String tupleString = new String(tuple._1.get());
+					JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+					for (String partition : partitionObject.keySet()) {
+						String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
+						Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
+						String tupleString2 = new String(tuple2._1.get());
+						JSONObject topicMetadata = JSON.parseObject(tupleString2);
+						MetadataInfo metadate = new MetadataInfo();
+						metadate.setIsr(topicMetadata.getString("isr"));
+						metadate.setLeader(topicMetadata.getInteger("leader"));
+						metadate.setPartitionId(Integer.valueOf(partition));
+						metadate.setReplicas(kafkaService.getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
+						targets.add(metadate);
 					}
 				}
 			}

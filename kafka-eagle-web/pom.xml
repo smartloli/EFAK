@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.smartloli.kafka.eagle</groupId>
 		<artifactId>kafka-eagle</artifactId>
-		<version>1.4.3</version>
+		<version>1.4.4</version>
 	</parent>
 	<artifactId>kafka-eagle-web</artifactId>
 	<packaging>war</packaging>

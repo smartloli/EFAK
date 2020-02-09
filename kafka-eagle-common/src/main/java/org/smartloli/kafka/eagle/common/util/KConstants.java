@@ -220,6 +220,9 @@ public class KConstants {
 
 		public static final int BATCH_SIZE = 500;
 
+		public static final double TOPIC_BROKER_SKEW_ERROR = 60.00;
+		public static final double TOPIC_BROKER_SKEW_NORMAL = 80.00;
+
 		public static final int RUNNING = 0;
 		public static final int SHUTDOWN = 1;
 		public static final int PENDING = 2;
