@@ -199,24 +199,12 @@ public class BrokerServiceImpl implements BrokerService {
 	private void getBrokerSpreadByTopic(String clusterAlias, String topic, PartitionsInfo partition, JSONObject partitionObject) {
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
-			int partitionAndReplicas = 0;
-			int topicSpreadBrokers = 0;
+			Set<Integer> brokerLeaders = new HashSet<>();
 			for (MetadataInfo meta : topicMetas) {
-				List<Integer> replicasIntegers = new ArrayList<>();
-				List<Integer> isrIntegers = new ArrayList<>();
-				try {
-					replicasIntegers = JSON.parseObject(meta.getReplicas(), new TypeReference<ArrayList<Integer>>() {
-					});
-					isrIntegers = JSON.parseObject(meta.getIsr(), new TypeReference<ArrayList<Integer>>() {
-					});
-				} catch (Exception e) {
-					e.printStackTrace();
-					LOG.error("Parse string to int list has error, msg is " + e.getCause().getMessage());
-				}
-				partitionAndReplicas += replicasIntegers.size();
-				topicSpreadBrokers += isrIntegers.size();
+				brokerLeaders.add(meta.getLeader());
 			}
-			partition.setBrokersSpread(String.format("%.2f", (partitionAndReplicas * 100.0 / topicSpreadBrokers)));
+			int brokerSize = kafkaService.getAllBrokersInfo(clusterAlias).size();
+			partition.setBrokersSpread(String.format("%.2f", (brokerLeaders.size() * 100.0 / brokerSize)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("Get topic skewed info has error, msg is ", e);
