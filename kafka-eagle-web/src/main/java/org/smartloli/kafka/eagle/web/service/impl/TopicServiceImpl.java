@@ -174,11 +174,11 @@ public class TopicServiceImpl implements TopicService {
 			spread.put("cluster", clusterAlias);
 			spread.put("topic", partitionInfo.getTopic());
 			spread.put("tkey", Topic.BROKER_SPREAD);
-			partitionInfo.setBrokersSpread(topicDao.readBrokerPerformance(spread).getTvalue());
+			partitionInfo.setBrokersSpread(topicDao.readBrokerPerformance(spread) == null ? 0 : topicDao.readBrokerPerformance(spread).getTvalue());
 			spread.put("tkey", Topic.BROKER_SKEWED);
-			partitionInfo.setBrokersSkewed(topicDao.readBrokerPerformance(spread).getTvalue());
+			partitionInfo.setBrokersSkewed(topicDao.readBrokerPerformance(spread) == null ? 0 : topicDao.readBrokerPerformance(spread).getTvalue());
 			spread.put("tkey", Topic.BROKER_LEADER_SKEWED);
-			partitionInfo.setBrokersLeaderSkewed(topicDao.readBrokerPerformance(spread).getTvalue());
+			partitionInfo.setBrokersLeaderSkewed(topicDao.readBrokerPerformance(spread) == null ? 0 : topicDao.readBrokerPerformance(spread).getTvalue());
 		}
 		return topicRecords;
 	}
