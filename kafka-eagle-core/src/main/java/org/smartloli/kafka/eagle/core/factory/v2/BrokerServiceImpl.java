@@ -207,10 +207,20 @@ public class BrokerServiceImpl implements BrokerService {
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
 			Set<Integer> brokerLeaders = new HashSet<>();
+			Set<Integer> brokerSizes = new HashSet<>();
 			for (MetadataInfo meta : topicMetas) {
 				brokerLeaders.add(meta.getLeader());
+				List<Integer> replicasIntegers = new ArrayList<>();
+				try {
+					replicasIntegers = JSON.parseObject(meta.getReplicas(), new TypeReference<ArrayList<Integer>>() {
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("Parse string to int list has error, msg is " + e.getCause().getMessage());
+				}
+				brokerSizes.addAll(replicasIntegers);
 			}
-			int brokerSize = kafkaService.getAllBrokersInfo(clusterAlias).size();
+			int brokerSize = brokerSizes.size();
 			partition.setBrokersSpread(String.format("%.2f", (brokerLeaders.size() * 100.0 / brokerSize)));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -223,6 +233,7 @@ public class BrokerServiceImpl implements BrokerService {
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
 			int partitionAndReplicaTopics = 0;
+			Set<Integer> brokerSizes = new HashSet<>();
 			Map<Integer, Integer> brokers = new HashMap<>();
 			for (MetadataInfo meta : topicMetas) {
 				List<Integer> replicasIntegers = new ArrayList<>();
@@ -233,6 +244,7 @@ public class BrokerServiceImpl implements BrokerService {
 					e.printStackTrace();
 					LOG.error("Parse string to int list has error, msg is " + e.getCause().getMessage());
 				}
+				brokerSizes.addAll(replicasIntegers);
 				partitionAndReplicaTopics += replicasIntegers.size();
 				for (Integer brokerId : replicasIntegers) {
 					if (brokers.containsKey(brokerId)) {
@@ -243,7 +255,7 @@ public class BrokerServiceImpl implements BrokerService {
 					}
 				}
 			}
-			int brokerSize = kafkaService.getAllBrokersInfo(clusterAlias).size();
+			int brokerSize = brokerSizes.size();
 			int normalSkewedValue = MathUtils.ceil(brokerSize, partitionAndReplicaTopics);
 			int brokerSkewSize = 0;
 			for (Entry<Integer, Integer> entry : brokers.entrySet()) {
@@ -263,7 +275,17 @@ public class BrokerServiceImpl implements BrokerService {
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
 			Map<Integer, Integer> brokerLeaders = new HashMap<>();
+			Set<Integer> brokerSizes = new HashSet<>();
 			for (MetadataInfo meta : topicMetas) {
+				List<Integer> replicasIntegers = new ArrayList<>();
+				try {
+					replicasIntegers = JSON.parseObject(meta.getReplicas(), new TypeReference<ArrayList<Integer>>() {
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("Parse string to int list has error, msg is " + e.getCause().getMessage());
+				}
+				brokerSizes.addAll(replicasIntegers);
 				if (brokerLeaders.containsKey(meta.getLeader())) {
 					int value = brokerLeaders.get(meta.getLeader());
 					brokerLeaders.put(meta.getLeader(), value + 1);
@@ -271,7 +293,7 @@ public class BrokerServiceImpl implements BrokerService {
 					brokerLeaders.put(meta.getLeader(), 1);
 				}
 			}
-			int brokerSize = kafkaService.getAllBrokersInfo(clusterAlias).size();
+			int brokerSize = brokerSizes.size();
 			int brokerSkewLeaderNormal = MathUtils.ceil(brokerSize, partition.getPartitionNumbers());
 			int brokerSkewLeaderSize = 0;
 			for (Entry<Integer, Integer> entry : brokerLeaders.entrySet()) {
