@@ -217,15 +217,19 @@ public class KConstants {
 
 		public static final String LOGSIZE = "logsize";
 		public static final String CAPACITY = "capacity";
+		public static final String BROKER_SPREAD = "spread";
+		public static final String BROKER_SKEWED = "skewed";
+		public static final String BROKER_LEADER_SKEWED = "leader_skewed";
+		public static final String[] BROKER_PERFORMANCE_LIST = new String[] { BROKER_SPREAD, BROKER_SKEWED, BROKER_LEADER_SKEWED };
 
 		public static final int BATCH_SIZE = 500;
 
-		public static final double TOPIC_BROKER_SPREAD_ERROR = 60.00;
-		public static final double TOPIC_BROKER_SPREAD_NORMAL = 80.00;
-		public static final double TOPIC_BROKER_SKEW_ERROR = 80.00;
-		public static final double TOPIC_BROKER_SKEW_NORMAL = 30.00;
-		public static final double TOPIC_BROKER_LEADER_SKEW_ERROR = 80.00;
-		public static final double TOPIC_BROKER_LEADER_SKEW_NORMAL = 30.00;
+		public static final long TOPIC_BROKER_SPREAD_ERROR = 60;
+		public static final long TOPIC_BROKER_SPREAD_NORMAL = 80;
+		public static final long TOPIC_BROKER_SKEW_ERROR = 80;
+		public static final long TOPIC_BROKER_SKEW_NORMAL = 30;
+		public static final long TOPIC_BROKER_LEADER_SKEW_ERROR = 80;
+		public static final long TOPIC_BROKER_LEADER_SKEW_NORMAL = 30;
 
 		public static final int RUNNING = 0;
 		public static final int SHUTDOWN = 1;

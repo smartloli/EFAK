@@ -148,9 +148,6 @@ public class BrokerServiceImpl implements BrokerService {
 									JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 									partition.setPartitionNumbers(partitionObject.size());
 									partition.setPartitions(partitionObject.keySet());
-									getBrokerSpreadByTopic(clusterAlias, topic, partition);
-									getBrokerSkewedByTopic(clusterAlias, topic, partition);
-									getBrokerSkewedLeaderByTopic(clusterAlias, topic, partition);
 									targets.add(partition);
 								}
 							} catch (Exception ex) {
@@ -178,9 +175,6 @@ public class BrokerServiceImpl implements BrokerService {
 								JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 								partition.setPartitionNumbers(partitionObject.size());
 								partition.setPartitions(partitionObject.keySet());
-								getBrokerSpreadByTopic(clusterAlias, topic, partition);
-								getBrokerSkewedByTopic(clusterAlias, topic, partition);
-								getBrokerSkewedLeaderByTopic(clusterAlias, topic, partition);
 								targets.add(partition);
 							}
 						} catch (Exception ex) {
@@ -203,7 +197,8 @@ public class BrokerServiceImpl implements BrokerService {
 	}
 
 	/** Get broker spread by topic. */
-	private void getBrokerSpreadByTopic(String clusterAlias, String topic, PartitionsInfo partition) {
+	public int getBrokerSpreadByTopic(String clusterAlias, String topic) {
+		int spread = 0;
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
 			Set<Integer> brokerSizes = new HashSet<>();
@@ -219,15 +214,17 @@ public class BrokerServiceImpl implements BrokerService {
 				brokerSizes.addAll(replicasIntegers);
 			}
 			int brokerSize = kafkaService.getAllBrokersInfo(clusterAlias).size();
-			partition.setBrokersSpread(String.format("%.2f", (brokerSizes.size() * 100.0 / brokerSize)));
+			spread = brokerSizes.size() * 100 / brokerSize;
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("Get topic skewed info has error, msg is ", e);
 		}
+		return spread;
 	}
 
 	/** Get broker skewed by topic. */
-	private void getBrokerSkewedByTopic(String clusterAlias, String topic, PartitionsInfo partition) {
+	public int getBrokerSkewedByTopic(String clusterAlias, String topic) {
+		int skewed = 0;
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
 			int partitionAndReplicaTopics = 0;
@@ -261,15 +258,17 @@ public class BrokerServiceImpl implements BrokerService {
 					brokerSkewSize++;
 				}
 			}
-			partition.setBrokersSkewed(String.format("%.2f", (brokerSkewSize * 100.0 / brokerSize)));
+			skewed = brokerSkewSize * 100 / brokerSize;
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("Get topic skewed info has error, msg is ", e);
 		}
+		return skewed;
 	}
 
 	/** Get broker skewed leader by topic. */
-	private void getBrokerSkewedLeaderByTopic(String clusterAlias, String topic, PartitionsInfo partition) {
+	public int getBrokerLeaderSkewedByTopic(String clusterAlias, String topic) {
+		int leaderSkewed = 0;
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
 			Map<Integer, Integer> brokerLeaders = new HashMap<>();
@@ -292,18 +291,19 @@ public class BrokerServiceImpl implements BrokerService {
 				}
 			}
 			int brokerSize = brokerSizes.size();
-			int brokerSkewLeaderNormal = MathUtils.ceil(brokerSize, partition.getPartitionNumbers());
+			int brokerSkewLeaderNormal = MathUtils.ceil(brokerSize, topicMetas.size());
 			int brokerSkewLeaderSize = 0;
 			for (Entry<Integer, Integer> entry : brokerLeaders.entrySet()) {
 				if (entry.getValue() > brokerSkewLeaderNormal) {
 					brokerSkewLeaderSize++;
 				}
 			}
-			partition.setBrokersLeaderSkewed(String.format("%.2f", (brokerSkewLeaderSize * 100.0 / brokerSize)));
+			leaderSkewed = brokerSkewLeaderSize * 100 / brokerSize;
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("Get topic skewed info has error, msg is ", e);
 		}
+		return leaderSkewed;
 	}
 
 	/** Check topic from zookeeper metadata. */

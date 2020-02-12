@@ -97,6 +97,63 @@ public class TopicRankQuartz {
 			e.printStackTrace();
 		}
 
+		try {
+			for (String bType : Topic.BROKER_PERFORMANCE_LIST) {
+				brokerPerformanceByTopicStats(bType);
+			}
+		} catch (Exception e) {
+			LOG.error("Collector broker spread by topic has error, msg is ", e);
+		}
+
+	}
+
+	private void brokerPerformanceByTopicStats(String bType) {
+		DashboardServiceImpl dashboardServiceImpl = null;
+		try {
+			dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
+		} catch (Exception e) {
+			LOG.error("Create topic spread, skewed, leader skewed object has error,msg is ", e);
+		}
+
+		List<TopicRank> topicRanks = new ArrayList<>();
+		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+		for (String clusterAlias : clusterAliass) {
+			List<String> topics = brokerService.topicList(clusterAlias);
+			for (String topic : topics) {
+				int tValue = 0;
+				if (bType.equals(Topic.BROKER_SPREAD)) {
+					tValue = brokerService.getBrokerSpreadByTopic(clusterAlias, topic);
+				} else if (bType.equals(Topic.BROKER_SKEWED)) {
+					tValue = brokerService.getBrokerSkewedByTopic(clusterAlias, topic);
+				} else if (bType.equals(Topic.BROKER_LEADER_SKEWED)) {
+					tValue = brokerService.getBrokerLeaderSkewedByTopic(clusterAlias, topic);
+				}
+				TopicRank topicRank = new TopicRank();
+				topicRank.setCluster(clusterAlias);
+				topicRank.setTopic(topic);
+				topicRank.setTkey(bType);
+				topicRank.setTvalue(tValue);
+				topicRanks.add(topicRank);
+				if (topicRanks.size() > Topic.BATCH_SIZE) {
+					try {
+						dashboardServiceImpl.writeTopicRank(topicRanks);
+						topicRanks.clear();
+					} catch (Exception e) {
+						e.printStackTrace();
+						LOG.error("Write topic [" + bType + "] has error, msg is " + e.getMessage());
+					}
+				}
+			}
+		}
+		try {
+			if (topicRanks.size() > 0) {
+				dashboardServiceImpl.writeTopicRank(topicRanks);
+				topicRanks.clear();
+			}
+		} catch (Exception e) {
+			LOG.error("Write topic [" + bType + "] end data has error,msg is " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	private void topicCapacityStats() {

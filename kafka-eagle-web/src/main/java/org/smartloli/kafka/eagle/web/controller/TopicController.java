@@ -366,7 +366,7 @@ public class TopicController {
 			object.put("topic", "<a href='/ke/topic/meta/" + partition.getTopic() + "/' target='_blank'>" + partition.getTopic() + "</a>");
 			object.put("partitions", partition.getPartitionNumbers());
 			try {
-				double brokerSpread = Double.parseDouble(partition.getBrokersSpread());
+				long brokerSpread = partition.getBrokersSpread();
 				if (brokerSpread < Topic.TOPIC_BROKER_SPREAD_ERROR) {
 					object.put("brokerSpread", "<a class='btn btn-danger btn-xs'>" + brokerSpread + "%</a>");
 				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_ERROR && brokerSpread < Topic.TOPIC_BROKER_SPREAD_NORMAL) {
@@ -377,7 +377,7 @@ public class TopicController {
 					object.put("brokerSpread", "<a class='btn btn-primary btn-xs'>" + brokerSpread + "%</a>");
 				}
 
-				double brokerSkewed = Double.parseDouble(partition.getBrokersSkewed());
+				long brokerSkewed = partition.getBrokersSkewed();
 				if (brokerSkewed >= Topic.TOPIC_BROKER_SKEW_ERROR) {
 					object.put("brokerSkewed", "<a class='btn btn-danger btn-xs'>" + brokerSkewed + "%</a>");
 				} else if (brokerSkewed > Topic.TOPIC_BROKER_SKEW_NORMAL && brokerSkewed < Topic.TOPIC_BROKER_SKEW_ERROR) {
@@ -388,7 +388,7 @@ public class TopicController {
 					object.put("brokerSkewed", "<a class='btn btn-primary btn-xs'>" + brokerSkewed + "%</a>");
 				}
 
-				double brokerLeaderSkewed = Double.parseDouble(partition.getBrokersLeaderSkewed());
+				long brokerLeaderSkewed = partition.getBrokersLeaderSkewed();
 				if (brokerLeaderSkewed >= Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
 					object.put("brokerLeaderSkewed", "<a class='btn btn-danger btn-xs'>" + brokerLeaderSkewed + "%</a>");
 				} else if (brokerSkewed > Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL && brokerLeaderSkewed < Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
@@ -401,7 +401,6 @@ public class TopicController {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 			object.put("created", partition.getCreated());
 			object.put("modify", partition.getModify());
 			if (Role.ADMIN.equals(signiner.getUsername())) {

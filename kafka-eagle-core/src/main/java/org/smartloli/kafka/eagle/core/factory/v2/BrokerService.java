@@ -68,8 +68,17 @@ public interface BrokerService {
 
 	/** Get topic producer send logsize records. */
 	public long getTopicProducerLogSize(String clusterAlias, String topic);
-	
+
 	/** Add topic partitions. */
 	public Map<String, Object> createTopicPartitions(String clusterAlias, String topic, int totalCount);
+
+	/** Get broker spread by topic. */
+	public int getBrokerSpreadByTopic(String clusterAlias, String topic);
+
+	/** Get broker skewed by topic. */
+	public int getBrokerSkewedByTopic(String clusterAlias, String topic);
+
+	/** Get broker leader skewed by topic. */
+	public int getBrokerLeaderSkewedByTopic(String clusterAlias, String topic);
 
 }

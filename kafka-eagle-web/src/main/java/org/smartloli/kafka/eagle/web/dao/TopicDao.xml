@@ -55,6 +55,11 @@
 		order by `tvalue` desc limit 10
 	</select>
 	
+	<!-- Topic broker spread, skew, leader skewed -->
+	<select id="readBrokerPerformance" parameterType="map" resultMap="trank">
+		select `topic`,`tvalue` from ke_topic_rank where cluster=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
+	</select>
+	
 	<!-- TopicCapacity -->
 	<select id="getTopicCapacity" parameterType="map" resultType="long">
 		select sum(`tvalue`) from ke_topic_rank
