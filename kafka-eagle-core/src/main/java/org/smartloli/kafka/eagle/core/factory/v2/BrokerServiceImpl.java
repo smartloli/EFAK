@@ -206,10 +206,8 @@ public class BrokerServiceImpl implements BrokerService {
 	private void getBrokerSpreadByTopic(String clusterAlias, String topic, PartitionsInfo partition) {
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
-			Set<Integer> brokerLeaders = new HashSet<>();
 			Set<Integer> brokerSizes = new HashSet<>();
 			for (MetadataInfo meta : topicMetas) {
-				brokerLeaders.add(meta.getLeader());
 				List<Integer> replicasIntegers = new ArrayList<>();
 				try {
 					replicasIntegers = JSON.parseObject(meta.getReplicas(), new TypeReference<ArrayList<Integer>>() {
@@ -220,8 +218,8 @@ public class BrokerServiceImpl implements BrokerService {
 				}
 				brokerSizes.addAll(replicasIntegers);
 			}
-			int brokerSize = brokerSizes.size();
-			partition.setBrokersSpread(String.format("%.2f", (brokerLeaders.size() * 100.0 / brokerSize)));
+			int brokerSize = kafkaService.getAllBrokersInfo(clusterAlias).size();
+			partition.setBrokersSpread(String.format("%.2f", (brokerSizes.size() * 100.0 / brokerSize)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("Get topic skewed info has error, msg is ", e);
