@@ -16,6 +16,8 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'brokerSpread'
 		}, {
+			"mData" : 'brokerSkewed'
+		}, {
 			"mData" : 'created'
 		}, {
 			"mData" : 'modify'

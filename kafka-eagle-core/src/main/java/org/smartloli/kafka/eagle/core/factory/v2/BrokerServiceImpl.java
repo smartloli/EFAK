@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -36,6 +37,7 @@ import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
+import org.smartloli.kafka.eagle.common.util.MathUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -147,6 +149,7 @@ public class BrokerServiceImpl implements BrokerService {
 									partition.setPartitionNumbers(partitionObject.size());
 									partition.setPartitions(partitionObject.keySet());
 									getBrokerSpreadByTopic(clusterAlias, topic, partition, partitionObject);
+									getBrokerSkewedByTopic(clusterAlias, topic, partition, partitionObject);
 									targets.add(partition);
 								}
 							} catch (Exception ex) {
@@ -175,6 +178,7 @@ public class BrokerServiceImpl implements BrokerService {
 								partition.setPartitionNumbers(partitionObject.size());
 								partition.setPartitions(partitionObject.keySet());
 								getBrokerSpreadByTopic(clusterAlias, topic, partition, partitionObject);
+								getBrokerSkewedByTopic(clusterAlias, topic, partition, partitionObject);
 								targets.add(partition);
 							}
 						} catch (Exception ex) {
@@ -196,6 +200,7 @@ public class BrokerServiceImpl implements BrokerService {
 		return targets;
 	}
 
+	/** Get broker spread by topic. */
 	private void getBrokerSpreadByTopic(String clusterAlias, String topic, PartitionsInfo partition, JSONObject partitionObject) {
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
@@ -205,6 +210,46 @@ public class BrokerServiceImpl implements BrokerService {
 			}
 			int brokerSize = kafkaService.getAllBrokersInfo(clusterAlias).size();
 			partition.setBrokersSpread(String.format("%.2f", (brokerLeaders.size() * 100.0 / brokerSize)));
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("Get topic skewed info has error, msg is ", e);
+		}
+	}
+
+	/** Get broker skewed by topic. */
+	private void getBrokerSkewedByTopic(String clusterAlias, String topic, PartitionsInfo partition, JSONObject partitionObject) {
+		try {
+			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
+			int partitionAndReplicaTopics = 0;
+			Map<Integer, Integer> brokers = new HashMap<>();
+			for (MetadataInfo meta : topicMetas) {
+				List<Integer> replicasIntegers = new ArrayList<>();
+				try {
+					replicasIntegers = JSON.parseObject(meta.getReplicas(), new TypeReference<ArrayList<Integer>>() {
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("Parse string to int list has error, msg is " + e.getCause().getMessage());
+				}
+				partitionAndReplicaTopics += replicasIntegers.size();
+				for (Integer brokerId : replicasIntegers) {
+					if (brokers.containsKey(brokerId)) {
+						int value = brokers.get(brokerId);
+						brokers.put(brokerId, value + 1);
+					} else {
+						brokers.put(brokerId, 1);
+					}
+				}
+			}
+			int brokerSize = kafkaService.getAllBrokersInfo(clusterAlias).size();
+			int normalSkewedValue = MathUtils.ceil(brokerSize, partitionAndReplicaTopics);
+			int brokerSkewSize = 0;
+			for (Entry<Integer, Integer> entry : brokers.entrySet()) {
+				if (entry.getValue() > normalSkewedValue) {
+					brokerSkewSize++;
+				}
+			}
+			partition.setBrokersSkewed(String.format("%.2f", (brokerSkewSize * 100.0 / brokerSize)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("Get topic skewed info has error, msg is ", e);

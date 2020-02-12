@@ -367,14 +367,25 @@ public class TopicController {
 			object.put("partitions", partition.getPartitionNumbers());
 			try {
 				double brokerSpread = Double.parseDouble(partition.getBrokersSpread());
-				if (brokerSpread < Topic.TOPIC_BROKER_SKEW_ERROR) {
+				if (brokerSpread < Topic.TOPIC_BROKER_SPREAD_ERROR) {
 					object.put("brokerSpread", "<a class='btn btn-danger btn-xs'>" + brokerSpread + "</a>");
-				} else if (brokerSpread >= Topic.TOPIC_BROKER_SKEW_ERROR && brokerSpread < Topic.TOPIC_BROKER_SKEW_NORMAL) {
+				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_ERROR && brokerSpread < Topic.TOPIC_BROKER_SPREAD_NORMAL) {
 					object.put("brokerSpread", "<a class='btn btn-warning btn-xs'>" + brokerSpread + "</a>");
-				} else if (brokerSpread >= Topic.TOPIC_BROKER_SKEW_NORMAL) {
+				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_NORMAL) {
 					object.put("brokerSpread", "<a class='btn btn-success btn-xs'>" + brokerSpread + "</a>");
 				} else {
 					object.put("brokerSpread", "<a class='btn btn-primary btn-xs'>" + brokerSpread + "</a>");
+				}
+
+				double brokerSkewed = Double.parseDouble(partition.getBrokersSkewed());
+				if (brokerSkewed >= Topic.TOPIC_BROKER_SKEW_ERROR) {
+					object.put("brokerSkewed", "<a class='btn btn-danger btn-xs'>" + brokerSkewed + "</a>");
+				} else if (brokerSkewed > Topic.TOPIC_BROKER_SKEW_NORMAL && brokerSkewed < Topic.TOPIC_BROKER_SKEW_ERROR) {
+					object.put("brokerSkewed", "<a class='btn btn-warning btn-xs'>" + brokerSkewed + "</a>");
+				} else if (brokerSkewed <= Topic.TOPIC_BROKER_SKEW_NORMAL) {
+					object.put("brokerSkewed", "<a class='btn btn-success btn-xs'>" + brokerSkewed + "</a>");
+				} else {
+					object.put("brokerSkewed", "<a class='btn btn-primary btn-xs'>" + brokerSkewed + "</a>");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
