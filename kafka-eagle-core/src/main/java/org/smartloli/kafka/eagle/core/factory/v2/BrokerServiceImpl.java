@@ -148,8 +148,9 @@ public class BrokerServiceImpl implements BrokerService {
 									JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 									partition.setPartitionNumbers(partitionObject.size());
 									partition.setPartitions(partitionObject.keySet());
-									getBrokerSpreadByTopic(clusterAlias, topic, partition, partitionObject);
-									getBrokerSkewedByTopic(clusterAlias, topic, partition, partitionObject);
+									getBrokerSpreadByTopic(clusterAlias, topic, partition);
+									getBrokerSkewedByTopic(clusterAlias, topic, partition);
+									getBrokerSkewedLeaderByTopic(clusterAlias, topic, partition);
 									targets.add(partition);
 								}
 							} catch (Exception ex) {
@@ -177,8 +178,9 @@ public class BrokerServiceImpl implements BrokerService {
 								JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
 								partition.setPartitionNumbers(partitionObject.size());
 								partition.setPartitions(partitionObject.keySet());
-								getBrokerSpreadByTopic(clusterAlias, topic, partition, partitionObject);
-								getBrokerSkewedByTopic(clusterAlias, topic, partition, partitionObject);
+								getBrokerSpreadByTopic(clusterAlias, topic, partition);
+								getBrokerSkewedByTopic(clusterAlias, topic, partition);
+								getBrokerSkewedLeaderByTopic(clusterAlias, topic, partition);
 								targets.add(partition);
 							}
 						} catch (Exception ex) {
@@ -201,7 +203,7 @@ public class BrokerServiceImpl implements BrokerService {
 	}
 
 	/** Get broker spread by topic. */
-	private void getBrokerSpreadByTopic(String clusterAlias, String topic, PartitionsInfo partition, JSONObject partitionObject) {
+	private void getBrokerSpreadByTopic(String clusterAlias, String topic, PartitionsInfo partition) {
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
 			Set<Integer> brokerLeaders = new HashSet<>();
@@ -217,7 +219,7 @@ public class BrokerServiceImpl implements BrokerService {
 	}
 
 	/** Get broker skewed by topic. */
-	private void getBrokerSkewedByTopic(String clusterAlias, String topic, PartitionsInfo partition, JSONObject partitionObject) {
+	private void getBrokerSkewedByTopic(String clusterAlias, String topic, PartitionsInfo partition) {
 		try {
 			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
 			int partitionAndReplicaTopics = 0;
@@ -250,6 +252,34 @@ public class BrokerServiceImpl implements BrokerService {
 				}
 			}
 			partition.setBrokersSkewed(String.format("%.2f", (brokerSkewSize * 100.0 / brokerSize)));
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("Get topic skewed info has error, msg is ", e);
+		}
+	}
+
+	/** Get broker skewed leader by topic. */
+	private void getBrokerSkewedLeaderByTopic(String clusterAlias, String topic, PartitionsInfo partition) {
+		try {
+			List<MetadataInfo> topicMetas = topicMetadata(clusterAlias, topic);
+			Map<Integer, Integer> brokerLeaders = new HashMap<>();
+			for (MetadataInfo meta : topicMetas) {
+				if (brokerLeaders.containsKey(meta.getLeader())) {
+					int value = brokerLeaders.get(meta.getLeader());
+					brokerLeaders.put(meta.getLeader(), value + 1);
+				} else {
+					brokerLeaders.put(meta.getLeader(), 1);
+				}
+			}
+			int brokerSize = kafkaService.getAllBrokersInfo(clusterAlias).size();
+			int brokerSkewLeaderNormal = MathUtils.ceil(brokerSize, partition.getPartitionNumbers());
+			int brokerSkewLeaderSize = 0;
+			for (Entry<Integer, Integer> entry : brokerLeaders.entrySet()) {
+				if (entry.getValue() > brokerSkewLeaderNormal) {
+					brokerSkewLeaderSize++;
+				}
+			}
+			partition.setBrokersLeaderSkewed(String.format("%.2f", (brokerSkewLeaderSize * 100.0 / brokerSize)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("Get topic skewed info has error, msg is ", e);

@@ -89,7 +89,7 @@
 						<strong>Broker Skewed: the larger the skewed, the higher the pressure on the broker node of kafka.</strong>
 						<br />
 						<i class="fa fa-info-circle"></i>
-						<strong>Broker Leader Skewed: the higher the skewed, the higher the pressure on the kafka broker leader node.</strong>
+						<strong>Broker Leader Skewed: the higher the leader skewed, the higher the pressure on the kafka broker leader node.</strong>
 					</div>
 				</div>
 			</div>
@@ -110,8 +110,9 @@
 										<th>ID</th>
 										<th>Topic Name</th>
 										<th>Partitions</th>
-										<th>Broker Spread (%)</th>
-										<th>Broker Skewed (%)</th>
+										<th>Broker Spread</th>
+										<th>Broker Skewed</th>
+										<th>Broker Leader Skewed</th>
 										<th>Created</th>
 										<th>Modify</th>
 										<th>Operate</th>

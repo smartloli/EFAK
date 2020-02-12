@@ -368,24 +368,35 @@ public class TopicController {
 			try {
 				double brokerSpread = Double.parseDouble(partition.getBrokersSpread());
 				if (brokerSpread < Topic.TOPIC_BROKER_SPREAD_ERROR) {
-					object.put("brokerSpread", "<a class='btn btn-danger btn-xs'>" + brokerSpread + "</a>");
+					object.put("brokerSpread", "<a class='btn btn-danger btn-xs'>" + brokerSpread + "%</a>");
 				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_ERROR && brokerSpread < Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-					object.put("brokerSpread", "<a class='btn btn-warning btn-xs'>" + brokerSpread + "</a>");
+					object.put("brokerSpread", "<a class='btn btn-warning btn-xs'>" + brokerSpread + "%</a>");
 				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-					object.put("brokerSpread", "<a class='btn btn-success btn-xs'>" + brokerSpread + "</a>");
+					object.put("brokerSpread", "<a class='btn btn-success btn-xs'>" + brokerSpread + "%</a>");
 				} else {
-					object.put("brokerSpread", "<a class='btn btn-primary btn-xs'>" + brokerSpread + "</a>");
+					object.put("brokerSpread", "<a class='btn btn-primary btn-xs'>" + brokerSpread + "%</a>");
 				}
 
 				double brokerSkewed = Double.parseDouble(partition.getBrokersSkewed());
 				if (brokerSkewed >= Topic.TOPIC_BROKER_SKEW_ERROR) {
-					object.put("brokerSkewed", "<a class='btn btn-danger btn-xs'>" + brokerSkewed + "</a>");
+					object.put("brokerSkewed", "<a class='btn btn-danger btn-xs'>" + brokerSkewed + "%</a>");
 				} else if (brokerSkewed > Topic.TOPIC_BROKER_SKEW_NORMAL && brokerSkewed < Topic.TOPIC_BROKER_SKEW_ERROR) {
-					object.put("brokerSkewed", "<a class='btn btn-warning btn-xs'>" + brokerSkewed + "</a>");
+					object.put("brokerSkewed", "<a class='btn btn-warning btn-xs'>" + brokerSkewed + "%</a>");
 				} else if (brokerSkewed <= Topic.TOPIC_BROKER_SKEW_NORMAL) {
-					object.put("brokerSkewed", "<a class='btn btn-success btn-xs'>" + brokerSkewed + "</a>");
+					object.put("brokerSkewed", "<a class='btn btn-success btn-xs'>" + brokerSkewed + "%</a>");
 				} else {
-					object.put("brokerSkewed", "<a class='btn btn-primary btn-xs'>" + brokerSkewed + "</a>");
+					object.put("brokerSkewed", "<a class='btn btn-primary btn-xs'>" + brokerSkewed + "%</a>");
+				}
+
+				double brokerLeaderSkewed = Double.parseDouble(partition.getBrokersLeaderSkewed());
+				if (brokerLeaderSkewed >= Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
+					object.put("brokerLeaderSkewed", "<a class='btn btn-danger btn-xs'>" + brokerLeaderSkewed + "%</a>");
+				} else if (brokerSkewed > Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL && brokerLeaderSkewed < Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
+					object.put("brokerLeaderSkewed", "<a class='btn btn-warning btn-xs'>" + brokerLeaderSkewed + "%</a>");
+				} else if (brokerSkewed <= Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL) {
+					object.put("brokerLeaderSkewed", "<a class='btn btn-success btn-xs'>" + brokerLeaderSkewed + "%</a>");
+				} else {
+					object.put("brokerLeaderSkewed", "<a class='btn btn-primary btn-xs'>" + brokerLeaderSkewed + "%</a>");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

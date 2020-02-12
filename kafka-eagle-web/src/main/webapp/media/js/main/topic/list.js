@@ -18,6 +18,8 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'brokerSkewed'
 		}, {
+			"mData" : 'brokerLeaderSkewed'
+		}, {
 			"mData" : 'created'
 		}, {
 			"mData" : 'modify'
