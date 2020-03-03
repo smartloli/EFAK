@@ -429,6 +429,9 @@ public class AlarmController {
 		String value = "";
 		if (AlarmType.TOPIC.equals(type)) {
 			value = request.getParameter("ke_topic_alarm");
+		}
+		if (AlarmType.PRODUCER.equals(type)) {
+			value = request.getParameter("ke_producer_alarm");
 		} else {
 			value = request.getParameter("ke_server_alarm");
 		}

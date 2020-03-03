@@ -50,9 +50,15 @@ $(document).ready(function() {
 		$("#ke_alarm_cluster_type").val(text);
 		if (text.indexOf("Topic") > -1) {
 			$("#ke_alarm_topic_div").show();
+			$("#ke_alarm_producer_div").hide();
+			$("#ke_alarm_server_div").hide();
+		} else if (text.indexOf("Producer") > -1) {
+			$("#ke_alarm_topic_div").hide();
+			$("#ke_alarm_producer_div").show();
 			$("#ke_alarm_server_div").hide();
 		} else {
 			$("#ke_alarm_topic_div").hide();
+			$("#ke_alarm_producer_div").hide();
 			$("#ke_alarm_server_div").show();
 		}
 	});

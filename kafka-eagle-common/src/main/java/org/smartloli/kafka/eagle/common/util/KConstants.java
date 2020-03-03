@@ -255,7 +255,7 @@ public class KConstants {
 
 	public interface AlarmType {
 		public static String[] TYPE = new String[] { "DingDing", "WeChat", "Email" };
-		public static String[] CLUSTER = new String[] { "Kafka", "Zookeeper", "Topic" };
+		public static String[] CLUSTER = new String[] { "Kafka", "Zookeeper", "Topic", "Producer" };
 		public static String[] LEVEL = new String[] { "P0", "P1", "P2", "P3" };
 		public static int[] MAXTIMES = new int[] { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 		public static String EMAIL = "Email";
@@ -265,6 +265,7 @@ public class KConstants {
 		public static String HTTP_POST = "post";
 		public static String DISABLE = "N";
 		public static String TOPIC = "Topic";
+		public static String PRODUCER = "Producer";
 	}
 
 	public final class AlarmQueue {
