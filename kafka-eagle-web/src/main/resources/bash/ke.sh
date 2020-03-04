@@ -92,16 +92,17 @@ start()
  cd ${KE_HOME}
  CLASS=org.smartloli.kafka.eagle.plugin.server.TomcatServerListen
  ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/ke.out 2>&1
- echo "*******************************************************************"
- echo "* Kafka Eagle system monitor port successful... "
- echo "*******************************************************************"
- sleep 3
+ 
+ CLASS=org.smartloli.kafka.eagle.plugin.progress.KafkaEagleProgress
+ ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS port 2>&1
  rm -rf ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/*.properties
  cp ${KE_HOME}/conf/*.properties ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/
- sleep 3
+ 
+ ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS config 2>&1
  rm -rf ${KE_HOME}/kms/logs/*
  chmod +x ${KE_HOME}/kms/bin/*.sh
- sleep 2
+ 
+ ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS startup 2>&1
  nohup ${KE_HOME}/kms/bin/startup.sh >> ${LOG_DIR}/ke.out 2>&1
  ret=$?
  echo "[$stime] INFO: Status Code["$ret"]"
