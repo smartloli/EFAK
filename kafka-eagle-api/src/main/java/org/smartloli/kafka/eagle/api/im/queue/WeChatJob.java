@@ -23,11 +23,12 @@ import java.util.Map;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
 import org.smartloli.kafka.eagle.common.util.KConstants.WeChat;
-import org.smartloli.kafka.eagle.common.util.ThrowExceptionUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -40,6 +41,8 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class WeChatJob implements Job {
 
+	private Logger LOG = LoggerFactory.getLogger(WeChatJob.class);
+
 	/** Send alarm information by wechat. */
 	public void execute(JobExecutionContext jobContext) throws JobExecutionException {
 		BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
@@ -49,9 +52,11 @@ public class WeChatJob implements Job {
 	private int sendMsg(String data, String url) {
 		try {
 			Map<String, Object> wechatMarkdownMessage = getWeChatMarkdownMessage(data);
-			HttpClientUtils.doPostJson(url, JSONObject.toJSONString(wechatMarkdownMessage));
+			String result = HttpClientUtils.doPostJson(url, JSONObject.toJSONString(wechatMarkdownMessage));
+			LOG.info("DingDing SendMsg Result: " + result);
 		} catch (Exception e) {
-			ThrowExceptionUtils.print(this.getClass()).error("Send alarm message has error by wechat, msg is ",e);
+			LOG.error("Send alarm message has error by wechat, msg is ", e);
+			e.printStackTrace();
 			return 0;
 		}
 		return 1;

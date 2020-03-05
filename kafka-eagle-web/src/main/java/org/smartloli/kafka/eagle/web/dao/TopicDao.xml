@@ -100,7 +100,7 @@
 	<select id="queryTopicProducerByAlarm" parameterType="map" resultMap="tlogsize">
 		select `cluster`,`topic`,`logsize`,`diffval`,`timespan` from ke_logsize
 		where `cluster`=#{cluster} and `topic`=#{topic}
-		and tm=#{stime} order by `timespan` desc limit 5
+		and tm=#{stime} order by `timespan` desc limit 1
 	</select>
 
 	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">

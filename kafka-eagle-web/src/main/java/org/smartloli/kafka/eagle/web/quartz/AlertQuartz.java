@@ -268,11 +268,10 @@ public class AlertQuartz {
 					producerSpeedParams.put("topic", topic);
 					producerSpeedParams.put("stime", CalendarUtils.getCustomDate("yyyyMMdd"));
 					List<TopicLogSize> topicLogSizes = alertService.queryTopicProducerByAlarm(producerSpeedParams);
-					long realSpeedTotal = 0;
-					for (TopicLogSize topicLogSize : topicLogSizes) {
-						realSpeedTotal += topicLogSize.getDiffval();
+					long realSpeed = 0;
+					if (topicLogSizes != null && topicLogSizes.size() > 0) {
+						realSpeed = topicLogSizes.get(0).getDiffval();
 					}
-					long realSpeed = realSpeedTotal / topicLogSizes.size();
 
 					JSONObject alarmTopicMsg = new JSONObject();
 					alarmTopicMsg.put("topic", topic);
@@ -362,9 +361,9 @@ public class AlertQuartz {
 				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
 					JSONObject alarmTopicMsg = JSON.parseObject(server);
 					String topic = alarmTopicMsg.getString("topic");
-					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
 					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
-					alarmMsg.setAlarmContent("producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]");
+					alarmMsg.setAlarmContent("producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]");
 				} else {
 					alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
 				}
@@ -391,9 +390,9 @@ public class AlertQuartz {
 				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
 					JSONObject alarmTopicMsg = JSON.parseObject(server);
 					String topic = alarmTopicMsg.getString("topic");
-					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
 					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
-					alarmMsg.setAlarmContent("<font color=\"#FF0000\">producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]</font>");
+					alarmMsg.setAlarmContent("<font color=\"#FF0000\">producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#FF0000\">node.shutdown [ " + server + " ]</font>");
 				}
@@ -417,9 +416,9 @@ public class AlertQuartz {
 				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
 					JSONObject alarmTopicMsg = JSON.parseObject(server);
 					String topic = alarmTopicMsg.getString("topic");
-					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
 					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
-					alarmMsg.setAlarmContent("<font color=\"warning\">producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]</font>");
+					alarmMsg.setAlarmContent("<font color=\"warning\">producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"warning\">node.shutdown [ " + server + " ]</font>");
 				}
@@ -447,9 +446,9 @@ public class AlertQuartz {
 				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
 					JSONObject alarmTopicMsg = JSON.parseObject(server);
 					String topic = alarmTopicMsg.getString("topic");
-					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
 					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
-					alarmMsg.setAlarmContent("producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]");
+					alarmMsg.setAlarmContent("producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]");
 				} else {
 					alarmMsg.setAlarmContent("node.alive [ " + server + " ]");
 				}
@@ -476,9 +475,9 @@ public class AlertQuartz {
 				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
 					JSONObject alarmTopicMsg = JSON.parseObject(server);
 					String topic = alarmTopicMsg.getString("topic");
-					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
 					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
-					alarmMsg.setAlarmContent("<font color=\"#008000\">producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]</font>");
+					alarmMsg.setAlarmContent("<font color=\"#008000\">producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
 				}
@@ -502,9 +501,9 @@ public class AlertQuartz {
 				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
 					JSONObject alarmTopicMsg = JSON.parseObject(server);
 					String topic = alarmTopicMsg.getString("topic");
-					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
 					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
-					alarmMsg.setAlarmContent("<font color=\"#008000\">producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]</font>");
+					alarmMsg.setAlarmContent("<font color=\"#008000\">producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
 				}
