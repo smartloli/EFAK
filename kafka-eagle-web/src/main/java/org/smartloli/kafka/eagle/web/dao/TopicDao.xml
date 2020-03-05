@@ -96,6 +96,12 @@
 		where `cluster`=#{cluster} and `topic`=#{topic}
 		and tm between #{stime} and #{etime}
 	</select>
+	
+	<select id="queryTopicProducerByAlarm" parameterType="map" resultMap="tlogsize">
+		select `cluster`,`topic`,`logsize`,`diffval`,`timespan` from ke_logsize
+		where `cluster`=#{cluster} and `topic`=#{topic}
+		and tm=#{stime} order by `timespan` desc limit 5
+	</select>
 
 	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
 		select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster}

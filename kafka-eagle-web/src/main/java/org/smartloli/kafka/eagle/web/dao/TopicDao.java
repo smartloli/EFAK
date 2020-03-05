@@ -64,6 +64,9 @@ public interface TopicDao {
 	/** Get topic producer logsize chart datasets. */
 	public List<TopicLogSize> queryTopicProducerChart(Map<String, Object> params);
 
+	/** Get topic producer logsize by alarm. */
+	public List<TopicLogSize> queryTopicProducerByAlarm(Map<String, Object> params);
+
 	/** Get producer history bar data. */
 	public List<BScreenBarInfo> queryProducerHistoryBar(Map<String, Object> params);
 

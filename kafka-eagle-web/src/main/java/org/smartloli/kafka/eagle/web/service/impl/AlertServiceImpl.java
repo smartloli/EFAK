@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -55,7 +56,7 @@ public class AlertServiceImpl implements AlertService {
 
 	@Autowired
 	private AlertDao alertDao;
-	
+
 	@Autowired
 	private TopicDao topicDao;
 
@@ -401,6 +402,11 @@ public class AlertServiceImpl implements AlertService {
 	@Override
 	public int modifyConsumerStatusAlertById(AlarmConsumerInfo alarmConsumer) {
 		return alertDao.modifyConsumerStatusAlertById(alarmConsumer);
+	}
+
+	@Override
+	public List<TopicLogSize> queryTopicProducerByAlarm(Map<String, Object> params) {
+		return topicDao.queryTopicProducerByAlarm(params);
 	}
 
 }

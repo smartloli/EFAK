@@ -31,6 +31,7 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
 import org.smartloli.kafka.eagle.common.util.NetUtils;
@@ -252,6 +253,54 @@ public class AlertQuartz {
 							}
 						}
 					}
+				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
+					JSONObject producerAlarmJson = JSON.parseObject(cluster.getServer());
+					String topic = producerAlarmJson.getString("topic");
+					String[] speeds = producerAlarmJson.getString("speed").split(",");
+					long startSpeed = 0L;
+					long endSpeed = 0L;
+					if (speeds.length == 2) {
+						startSpeed = Long.parseLong(speeds[0]);
+						endSpeed = Long.parseLong(speeds[1]);
+					}
+					Map<String, Object> producerSpeedParams = new HashMap<>();
+					producerSpeedParams.put("cluster", cluster.getCluster());
+					producerSpeedParams.put("topic", topic);
+					producerSpeedParams.put("stime", CalendarUtils.getCustomDate("yyyyMMdd"));
+					List<TopicLogSize> topicLogSizes = alertService.queryTopicProducerByAlarm(producerSpeedParams);
+					long realSpeedTotal = 0;
+					for (TopicLogSize topicLogSize : topicLogSizes) {
+						realSpeedTotal += topicLogSize.getDiffval();
+					}
+					long realSpeed = realSpeedTotal / topicLogSizes.size();
+
+					JSONObject alarmTopicMsg = new JSONObject();
+					alarmTopicMsg.put("topic", topic);
+					alarmTopicMsg.put("alarmSpeeds", startSpeed + "," + endSpeed);
+					alarmTopicMsg.put("realSpeeds", realSpeed);
+					if ((realSpeed < startSpeed || realSpeed > endSpeed) && (cluster.getAlarmTimes() < cluster.getAlarmMaxTimes() || cluster.getAlarmMaxTimes() == -1)) {
+						cluster.setAlarmTimes(cluster.getAlarmTimes() + 1);
+						cluster.setIsNormal("N");
+						alertService.modifyClusterStatusAlertById(cluster);
+						try {
+							sendAlarmClusterError(alarmConfig, cluster, alarmTopicMsg.toJSONString());
+						} catch (Exception e) {
+							LOG.error("Send alarm cluser exception has error, msg is " + e.getCause().getMessage());
+						}
+					} else if (realSpeed >= startSpeed && realSpeed <= endSpeed) {
+						if (cluster.getIsNormal().equals("N")) {
+							cluster.setIsNormal("Y");
+							// clear error alarm and reset
+							cluster.setAlarmTimes(0);
+							// notify the cancel of the alarm
+							alertService.modifyClusterStatusAlertById(cluster);
+							try {
+								sendAlarmClusterNormal(alarmConfig, cluster, alarmTopicMsg.toJSONString());
+							} catch (Exception e) {
+								LOG.error("Send alarm cluser normal has error, msg is " + e.getCause().getMessage());
+							}
+						}
+					}
 				} else {
 					String[] servers = cluster.getServer().split(",");
 					List<String> errorServers = new ArrayList<String>();
@@ -310,6 +359,12 @@ public class AlertQuartz {
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
 					alarmMsg.setAlarmContent("topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]");
+				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
+					alarmMsg.setAlarmContent("producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]");
 				} else {
 					alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
 				}
@@ -333,6 +388,12 @@ public class AlertQuartz {
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
 					alarmMsg.setAlarmContent("<font color=\"#FF0000\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
+				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
+					alarmMsg.setAlarmContent("<font color=\"#FF0000\">producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#FF0000\">node.shutdown [ " + server + " ]</font>");
 				}
@@ -353,6 +414,12 @@ public class AlertQuartz {
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
 					alarmMsg.setAlarmContent("<font color=\"warning\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
+				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
+					alarmMsg.setAlarmContent("<font color=\"warning\">producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"warning\">node.shutdown [ " + server + " ]</font>");
 				}
@@ -377,6 +444,12 @@ public class AlertQuartz {
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
 					alarmMsg.setAlarmContent("topic.capacity.normal [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]");
+				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
+					alarmMsg.setAlarmContent("producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]");
 				} else {
 					alarmMsg.setAlarmContent("node.alive [ " + server + " ]");
 				}
@@ -399,8 +472,13 @@ public class AlertQuartz {
 					String topic = alarmTopicMsg.getString("topic");
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
-					alarmMsg.setAlarmContent("");
 					alarmMsg.setAlarmContent("<font color=\"#008000\">topic.capacity.normal [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
+				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
+					alarmMsg.setAlarmContent("<font color=\"#008000\">producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
 				}
@@ -420,8 +498,13 @@ public class AlertQuartz {
 					String topic = alarmTopicMsg.getString("topic");
 					long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
 					long realCapacity = alarmTopicMsg.getLong("realCapacity");
-					alarmMsg.setAlarmContent("");
 					alarmMsg.setAlarmContent("<font color=\"#008000\">topic.capacity.normal [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
+				} else if (AlarmType.PRODUCER.equals(cluster.getType())) {
+					JSONObject alarmTopicMsg = JSON.parseObject(server);
+					String topic = alarmTopicMsg.getString("topic");
+					long alarmSpeeds = alarmTopicMsg.getLong("alarmSpeeds");
+					long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
+					alarmMsg.setAlarmContent("<font color=\"#008000\">producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds(" + alarmSpeeds + ")]</font>");
 				} else {
 					alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
 				}
