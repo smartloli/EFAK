@@ -91,7 +91,8 @@ public class TopicRankQuartz {
 		}
 
 		try {
-			bscreenConsumerTopicStats();
+			// move to @{MetricsQuartz}
+			// bscreenConsumerTopicStats();
 		} catch (Exception e) {
 			LOG.error("Collector bscreen consumer topic has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();

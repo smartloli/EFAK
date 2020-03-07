@@ -133,16 +133,51 @@
 				</div>
 			</div>
 			<!-- /.row -->
+			<!-- Lag -->
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="panel panel-default">
-						<div id="topic_name_header" class="panel-heading">
+						<div id="topic_lag_name_header" class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>{TopicName}</strong>
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
 							<div id="lag_chart" class="chartdiv"></div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+			</div>
+			<!-- Producer -->
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div id="topic_producer_name_header" class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>{TopicName}</strong>
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div id="producer_chart" class="chartdiv"></div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+			</div>
+			<!-- Consumer -->
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div id="topic_consumer_name_header" class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>{TopicName}</strong>
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div id="consumer_chart" class="chartdiv"></div>
 						</div>
 						<!-- /.panel-body -->
 					</div>

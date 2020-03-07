@@ -31,6 +31,19 @@
 		<result property="timespan" column="timespan" />
 		<result property="tm" column="tm" />
 	</resultMap>
+	
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo" id="topicConsumerOffsets">
+		<result property="cluster" column="cluster" />
+		<result property="group" column="group" />
+		<result property="topic" column="topic" />
+		<result property="logsize" column="logsize" />
+		<result property="difflogsize" column="difflogsize" />
+		<result property="offsets" column="offsets" />
+		<result property="diffoffsets" column="diffoffsets" />
+		<result property="lag" column="lag" />
+		<result property="timespan" column="timespan" />
+		<result property="tm" column="tm" />
+	</resultMap>
 
 	<insert id="insert" parameterType="java.util.List">
 		insert into
@@ -95,21 +108,15 @@
 		</foreach>
 	</insert>
 
-	<select id="getConsumerTopic" parameterType="map" resultMap="topicOffsets">
-		select `logsize`,`offsets`,`lag`,`timespan` from ke_consumer
-		where `cluster` =#{cluster} and `group`=#{group} and `topic` =#{topic}
-		and tm between #{stime} and #{etime}
-	</select>
-
 	<select id="getConsumerRateTopic" parameterType="map" resultMap="topicOffsets">
-		select logsize,offsets,timespan from ke_consumer
+		select logsize,offsets,timespan from ke_consumer_bscreen
 		where `cluster`=#{cluster} and `group`=#{group}
 		and `topic`=#{topic} order by `timespan` desc limit 2
 	</select>
 
-	<select id="getConsumerLagTopic" parameterType="map" resultMap="topicOffsets">
-		select `lag`,`timespan`
-		from ke_consumer
+	<select id="getConsumerOffsetsTopic" parameterType="map" resultMap="topicConsumerOffsets">
+		select `difflogsize`,`diffoffsets`,`lag`,`timespan`
+		from ke_consumer_bscreen
 		where `cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
 		and tm between #{stime} and #{etime}
 	</select>

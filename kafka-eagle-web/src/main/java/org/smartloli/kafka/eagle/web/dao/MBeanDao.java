@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 
 /**
@@ -53,11 +54,8 @@ public interface MBeanDao {
 	/** Crontab clean data. */
 	public void remove(int tm);
 
-	/** @deprecated Get consumer topic metrics. */
-	public List<TopicOffsetsInfo> getConsumerTopic(Map<String, Object> params);
-
-	/** Get consumer lag topic metrics. */
-	public List<TopicOffsetsInfo> getConsumerLagTopic(Map<String, Object> params);
+	/** Get consumer offset topic metrics. */
+	public List<BScreenConsumerInfo> getConsumerOffsetsTopic(Map<String, Object> params);
 
 	/** Get consumer rate topic metrics. */
 	public List<TopicOffsetsInfo> getConsumerRateTopic(Map<String, Object> params);

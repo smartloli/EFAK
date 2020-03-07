@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.kafka.common.TopicPartition;
 import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.offsets.TopicOffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
@@ -104,18 +105,36 @@ public class OffsetServiceImpl implements OffsetService {
 
 	/** Get kafka offset graph data. */
 	public String getOffsetsGraph(Map<String, Object> params) {
-		List<String> x = new ArrayList<>();
-		List<String> y = new ArrayList<>();
-		List<TopicOffsetsInfo> topicOffsets = mbeanDao.getConsumerLagTopic(params);
+		List<String> lagX = new ArrayList<>();
+		List<Long> lagY = new ArrayList<>();
+		List<String> producerX = new ArrayList<>();
+		List<Long> producerY = new ArrayList<>();
+		List<String> consumerX = new ArrayList<>();
+		List<Long> consumerY = new ArrayList<>();
+		List<BScreenConsumerInfo> topicOffsets = mbeanDao.getConsumerOffsetsTopic(params);
 		if (topicOffsets.size() > 0) {
-			for (TopicOffsetsInfo topicOffset : topicOffsets) {
-				x.add(CalendarUtils.convertUnixTime(topicOffset.getTimespan(), "yyyy-MM-dd HH:mm"));
-				y.add(topicOffset.getLag());
+			for (BScreenConsumerInfo topicOffset : topicOffsets) {
+				lagX.add(CalendarUtils.convertUnixTime(topicOffset.getTimespan(), "yyyy-MM-dd HH:mm"));
+				lagY.add(topicOffset.getLag());
+				producerX.add(CalendarUtils.convertUnixTime(topicOffset.getTimespan(), "yyyy-MM-dd HH:mm"));
+				producerY.add(topicOffset.getDifflogsize());
+				consumerX.add(CalendarUtils.convertUnixTime(topicOffset.getTimespan(), "yyyy-MM-dd HH:mm"));
+				consumerY.add(topicOffset.getDiffoffsets());
 			}
 		}
+		JSONObject lag = new JSONObject();
+		lag.put("x", lagX);
+		lag.put("y", lagY);
+		JSONObject producer = new JSONObject();
+		producer.put("x", producerX);
+		producer.put("y", producerY);
+		JSONObject consumer = new JSONObject();
+		consumer.put("x", consumerX);
+		consumer.put("y", consumerY);
 		JSONObject value = new JSONObject();
-		value.put("x", x);
-		value.put("y", y);
+		value.put("lag", lag);
+		value.put("producer", producer);
+		value.put("consumer", consumer);
 		return value.toJSONString();
 	}
 
