@@ -533,7 +533,7 @@ public class TopicController {
 			try {
 				topicSql.setCluster(clusterAlias);
 				topicSql.setCreated(CalendarUtils.getDate());
-				topicSql.setHost(request.getRemoteAddr());
+				topicSql.setHost(request.getRemoteHost());
 				topicSql.setKsql(sql);
 				if (result.getBoolean("error")) {
 					topicSql.setStatus("FAILED");
