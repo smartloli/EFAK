@@ -90,6 +90,9 @@ public class KConstants {
 		public static final String SESSION_USER = "LOGIN_USER_SESSION";
 		public static final String UNKNOW_USER = "__unknow__";
 		public static final String ERROR_LOGIN = "error_msg";
+
+		public static final String RESET_CONSUMER_URI = "/ke/consumers/offset/";
+		public static final String NORMAL_CONSUMER_URI = "/ke/consumers/";
 	}
 
 	/** Role Administrator. */

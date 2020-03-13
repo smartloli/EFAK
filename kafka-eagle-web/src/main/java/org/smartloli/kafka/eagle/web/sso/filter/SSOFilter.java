@@ -32,6 +32,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Login;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.AccountService;
 import org.smartloli.kafka.eagle.web.sso.pojo.SSOAuthenticationToken;
@@ -74,6 +75,9 @@ public class SSOFilter implements Filter {
 				if (req.getHeader("x-requested-with") != null && req.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {
 					resp.setHeader("sessionstatus", "timeout");
 					return;
+				}
+				if (requestUri.contains(Login.RESET_CONSUMER_URI)) {
+					requestUri = Login.NORMAL_CONSUMER_URI;
 				}
 				resp.sendRedirect("/ke/account/signin?" + requestUri);
 				return;
