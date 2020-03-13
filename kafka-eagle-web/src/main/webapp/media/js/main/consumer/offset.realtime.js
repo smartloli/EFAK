@@ -1,8 +1,19 @@
 $(document).ready(function() {
-	var url = window.location.href;
-	var tmp = url.split("offset/")[1];
-	var group = tmp.split("/")[0];
-	var topic = tmp.split("/")[1];
+
+	function getQueryString(name) {
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+		var r = window.location.search.substr(1).match(reg);
+		var context = "";
+		if (r != null)
+			context = r[2];
+		reg = null;
+		r = null;
+		return context == null || context == "" || context == "undefined" ? "" : context;
+	}
+
+	var group = getQueryString("group");
+	var topic = getQueryString("topic");
+
 	$("#topic_lag_name_header").find("strong").text("Consumer Blocking Metrics (" + topic + ")");
 	$("#topic_producer_name_header").find("strong").text("Producer Performance Metrics (" + topic + ")");
 	$("#topic_consumer_name_header").find("strong").text("Consumer Performance Metrics (" + topic + ")");
@@ -169,7 +180,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/consumer/offset/' + group + '/' + topic + '/realtime/ajax?stime=' + stime + '&etime=' + etime,
+			url : '/ke/consumer/offset/group/topic/realtime/ajax?group=' + group + '&topic=' + topic + '&stime=' + stime + '&etime=' + etime,
 			success : function(datas) {
 				if (datas != null) {
 					// Area Chart
@@ -193,7 +204,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/consumer/offset/rate/' + group + '/' + topic + '/realtime/ajax',
+			url : '/ke/consumer/offset/rate/group/topic/realtime/ajax?group=' + group + '&topic=' + topic,
 			success : function(datas) {
 				if (datas != null) {
 					// Consumer & Producer Rate

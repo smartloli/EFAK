@@ -17,6 +17,9 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -28,7 +31,6 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -112,7 +114,13 @@ public class ConsumersController {
 			JSONObject consumer = (JSONObject) object;
 			JSONObject obj = new JSONObject();
 			obj.put("id", consumer.getInteger("id"));
-			obj.put("group", "<a class='link' href='#" + consumer.getString("group") + "'>" + consumer.getString("group") + "</a>");
+			String group = "";
+			try {
+				group = URLEncoder.encode(consumer.getString("group"), "UTF-8");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			obj.put("group", "<a class='link' group='" + group + "' href='#'>" + consumer.getString("group") + "</a>");
 			obj.put("topics", consumer.getInteger("topics"));
 			obj.put("node", consumer.getString("node"));
 			int activeTopics = consumer.getInteger("activeTopics");
@@ -145,9 +153,15 @@ public class ConsumersController {
 	}
 
 	/** Get consumer data through group by ajax. */
-	@RequestMapping(value = "/consumer/{group}/table/ajax", method = RequestMethod.GET)
-	public void consumerTableListAjax(@PathVariable("group") String group, HttpServletResponse response, HttpServletRequest request) {
+	@RequestMapping(value = "/consumer/group/table/ajax", method = RequestMethod.GET)
+	public void consumerTableListAjax(HttpServletResponse response, HttpServletRequest request) {
 		String aoData = request.getParameter("aoData");
+		String group = "";
+		try {
+			group = URLDecoder.decode(request.getParameter("group"), "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
 		for (Object object : params) {
@@ -175,12 +189,20 @@ public class ConsumersController {
 				String topic = consumerDetail.getString("topic");
 				obj.put("id", consumerDetail.getInteger("id"));
 				obj.put("topic", topic);
+
+				try {
+					group = URLEncoder.encode(group, "UTF-8");
+					topic = URLEncoder.encode(topic, "UTF-8");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 				if (consumerDetail.getInteger("isConsumering") == Topic.RUNNING) {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-success btn-xs'>Running</a>");
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-success btn-xs'>Running</a>");
 				} else if (consumerDetail.getInteger("isConsumering") == Topic.SHUTDOWN) {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-danger btn-xs'>Shutdown</a>");
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-danger btn-xs'>Shutdown</a>");
 				} else {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/" + group + "/" + topic + "/' target='_blank' class='btn btn-warning btn-xs'>Pending</a>");
+					obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-warning btn-xs'>Pending</a>");
 				}
 				aaDatas.add(obj);
 			}

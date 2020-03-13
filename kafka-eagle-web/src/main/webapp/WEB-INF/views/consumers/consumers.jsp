@@ -142,7 +142,7 @@ path.link {
 <jsp:include page="../public/script.jsp">
 	<jsp:param value="plugins/d3/d3.js" name="loader" />
 	<jsp:param value="plugins/d3/d3.layout.js" name="loader" />
-	<jsp:param value="main/consumer/consumers.js" name="loader" />
+	<jsp:param value="main/consumer/consumers.js?v=1.4.5" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
 </html>

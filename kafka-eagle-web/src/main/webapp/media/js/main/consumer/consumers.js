@@ -182,7 +182,7 @@ $(document).ready(function() {
 	// Children div show details of the consumer group
 	var offset = 0;
 	$(document).on('click', 'a[class=link]', function() {
-		var group = $(this).html();
+		var group = $(this).attr("group");
 		$('#doc_info').modal('show');
 
 		$("#consumer_detail_children").append("<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr><th>ID</th><th>Topic</th><th>Consumer Status</th></tr></thead></table></div>");
@@ -198,7 +198,7 @@ $(document).ready(function() {
 			"bProcessing" : true,
 			"bServerSide" : true,
 			"fnServerData" : retrieveData,
-			"sAjaxSource" : "/ke/consumer/" + group + "/table/ajax",
+			"sAjaxSource" : "/ke/consumer/group/table/ajax",
 			"aoColumns" : [ {
 				"mData" : 'id'
 			}, {
@@ -215,7 +215,8 @@ $(document).ready(function() {
 				"url" : sSource,
 				"dataType" : "json",
 				"data" : {
-					aoData : JSON.stringify(aoData)
+					aoData : JSON.stringify(aoData),
+					group : group
 				},
 				"success" : function(data) {
 					fnCallback(data)

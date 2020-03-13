@@ -78,7 +78,7 @@
 											<label>Producer (*)</label>
 											<textarea id="ke_producer_alarm" name="ke_producer_alarm" class="form-control" rows="3"></textarea>
 											<label for="inputError" class="control-label text-danger">
-												<i class="fa fa-info-circle"></i> Write topic and speed(it represents a normal range [<a href="https://github.com/smartloli/kafka-eagle/issues/309" target="_blank">#309</a>]) alarm value(unit is msg/min), such as {"topic":"ke_alarm_topic","speed":"10000,20000"}.
+												<i class="fa fa-info-circle"></i> Write topic and speed alarm value(unit is msg/min), such as {"topic":"ke_alarm_topic","speed":"10000,20000"}.
 											</label>
 										</div>
 										<div class="form-group">
