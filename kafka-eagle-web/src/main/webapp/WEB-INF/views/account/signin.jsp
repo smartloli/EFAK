@@ -76,8 +76,8 @@ input {
 		var ref_url = "";
 		var username = $("#usr").val();
 		var password = $("#pwd").val();
-		if (url.indexOf("?") > -1) {
-			ref_url = url.split("?")[1];
+		if (url.indexOf("/signin?") > -1) {
+			ref_url = url.split("/signin?")[1];
 		}
 		if (ref_url.length == 0) {
 			ref_url = "/";
