@@ -54,12 +54,12 @@
 		where `cluster` =#{cluster} and `tkey`=#{tkey}
 		order by `tvalue` desc limit 10
 	</select>
-	
+
 	<!-- Topic broker spread, skew, leader skewed -->
 	<select id="readBrokerPerformance" parameterType="map" resultMap="trank">
 		select `topic`,`tvalue` from ke_topic_rank where cluster=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
 	</select>
-	
+
 	<!-- TopicCapacity -->
 	<select id="getTopicCapacity" parameterType="map" resultType="long">
 		select sum(`tvalue`) from ke_topic_rank
@@ -96,11 +96,12 @@
 		where `cluster`=#{cluster} and `topic`=#{topic}
 		and tm between #{stime} and #{etime}
 	</select>
-	
+
 	<select id="queryTopicProducerByAlarm" parameterType="map" resultMap="tlogsize">
 		select `cluster`,`topic`,`logsize`,`diffval`,`timespan` from ke_logsize
 		where `cluster`=#{cluster} and `topic`=#{topic}
-		and tm=#{stime} order by `timespan` desc limit 1
+		and tm=#{stime} order by `timespan` desc
+		limit 1
 	</select>
 
 	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
@@ -124,7 +125,7 @@
 				and `id`=#{search}
 			</if>
 		</where>
-		limit #{start},#{size}
+		order by created desc limit #{start},#{size}
 	</select>
 
 	<select id="readTopicSqlHistoryByAdmin" parameterType="map" resultMap="tsql">
@@ -135,7 +136,7 @@
 				and (`id`=#{search} or `username`=#{search} or `host`=#{search})
 			</if>
 		</where>
-		limit #{start},#{size}
+		order by created desc limit #{start},#{size}
 	</select>
 
 	<select id="findTopicSqlByID" parameterType="map" resultMap="tsql">
@@ -230,10 +231,10 @@
 
 	<select id="queryLastestLag" parameterType="map" resultType="long">
 		select ifnull((
-                   select ifnull(`lag`,0) from ke_consumer_bscreen
-		   where `cluster`=#{cluster} and tm=#{tday}
-		   and `group`=#{group} and `topic`=#{topic}
-		   order by `timespan` desc limit 1)
+		select ifnull(`lag`,0) from ke_consumer_bscreen
+		where `cluster`=#{cluster} and tm=#{tday}
+		and `group`=#{group} and `topic`=#{topic}
+		order by `timespan` desc limit 1)
 		,0)
 	</select>
 

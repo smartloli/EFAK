@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.core.factory.v2;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -409,22 +411,39 @@ public class BrokerServiceImpl implements BrokerService {
 					Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
 					String tupleString = new String(tuple._1.get());
 					JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
-					for (String partition : partitionObject.keySet()) {
+					Set<Integer> partitionSet = new TreeSet<>();
+					for (String partitionId : partitionObject.keySet()) {
+						partitionSet.add(Integer.valueOf(partitionId));
+					}
+					Set<Integer> partitionSortSet = new TreeSet<>(new Comparator<Integer>() {
+						@Override
+						public int compare(Integer o1, Integer o2) {
+							int diff = o1 - o2;// asc
+							if (diff > 0) {
+								return 1;
+							} else if (diff < 0) {
+								return -1;
+							}
+							return 0;
+						}
+					});
+					partitionSortSet.addAll(partitionSet);
+					for (int partition : partitionSortSet) {
 						if (offset < (start + length) && offset >= start) {
-							String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
+							String path = String.format(TOPIC_ISR, topic, partition);
 							Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
 							String tupleString2 = new String(tuple2._1.get());
 							JSONObject topicMetadata = JSON.parseObject(tupleString2);
 							MetadataInfo metadate = new MetadataInfo();
 							metadate.setIsr(topicMetadata.getString("isr"));
 							metadate.setLeader(topicMetadata.getInteger("leader"));
-							metadate.setPartitionId(Integer.valueOf(partition));
-							metadate.setReplicas(kafkaService.getReplicasIsr(clusterAlias, topic, Integer.valueOf(partition)));
+							metadate.setPartitionId(partition);
+							metadate.setReplicas(kafkaService.getReplicasIsr(clusterAlias, topic, partition));
 							long logSize = 0L;
 							if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-								logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
+								logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partition);
 							} else {
-								logSize = kafkaService.getRealLogSize(clusterAlias, topic, Integer.valueOf(partition));
+								logSize = kafkaService.getRealLogSize(clusterAlias, topic, partition);
 							}
 							List<Integer> isrIntegers = new ArrayList<>();
 							List<Integer> replicasIntegers = new ArrayList<>();
