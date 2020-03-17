@@ -454,7 +454,7 @@ public class BrokerServiceImpl implements BrokerService {
 								});
 							} catch (Exception e) {
 								e.printStackTrace();
-								LOG.error("Parse string to int list has error, msg is " + e.getCause().getMessage());
+								LOG.error("Parse string to int list has error, msg is ", e);
 							}
 							if (isrIntegers.size() != replicasIntegers.size()) {
 								// replicas lost

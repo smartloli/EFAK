@@ -29,7 +29,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
-import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -63,10 +63,16 @@ public class MetricsQuartz {
 
 	public void metricsConsumerTopicQuartz() {
 		try {
-			// consumerTopicQuartz();
 			bscreenConsumerTopicStats();
 		} catch (Exception e) {
 			LOG.error("Collector consumer topic data has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+
+		try {
+			consumerGroupsTopicStats();
+		} catch (Exception e) {
+			LOG.error("Collector consumer groups topic data has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		}
 
@@ -216,9 +222,17 @@ public class MetricsQuartz {
 		}
 	}
 
-	@Deprecated
-	private void consumerTopicQuartz() {
-		List<TopicOffsetsInfo> topicOffsets = new ArrayList<>();
+	private void consumerGroupsTopicStats() {
+		MetricsServiceImpl metricsServiceImpl = null;
+		try {
+			metricsServiceImpl = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
+		} catch (Exception e) {
+			LOG.error("Get metricsServiceImpl bean has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+			return;
+		}
+
+		List<ConsumerGroupsInfo> consumerGroupTopics = new ArrayList<>();
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
 			if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
@@ -227,43 +241,21 @@ public class MetricsQuartz {
 					JSONObject consumerGroup = (JSONObject) object;
 					String group = consumerGroup.getString("group");
 					for (String topic : kafkaService.getKafkaConsumerTopics(clusterAlias, group)) {
-						TopicOffsetsInfo topicOffset = new TopicOffsetsInfo();
-						topicOffset.setCluster(clusterAlias);
-						topicOffset.setGroup(group);
-						topicOffset.setTopic(topic);
+						ConsumerGroupsInfo consumerGroupTopic = new ConsumerGroupsInfo();
+						consumerGroupTopic.setCluster(clusterAlias);
+						consumerGroupTopic.setGroup(group);
+						consumerGroupTopic.setTopic(topic);
 
-						List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
-						Set<Integer> partitionsInts = new HashSet<>();
-						for (String partition : partitions) {
+						consumerGroupTopics.add(consumerGroupTopic);
+						if (consumerGroupTopics.size() > Topic.BATCH_SIZE) {
 							try {
-								partitionsInts.add(Integer.parseInt(partition));
+								metricsServiceImpl.writeConsumerGroupTopics(consumerGroupTopics);
+								consumerGroupTopics.clear();
 							} catch (Exception e) {
 								e.printStackTrace();
+								LOG.error("Write kafka consumer group topic has error, msg is " + e.getCause().getMessage());
 							}
 						}
-
-						Map<Integer, Long> partitionOffset = kafkaService.getKafkaOffset(topicOffset.getCluster(), topicOffset.getGroup(), topicOffset.getTopic(), partitionsInts);
-						Map<TopicPartition, Long> tps = kafkaService.getKafkaLogSize(topicOffset.getCluster(), topicOffset.getTopic(), partitionsInts);
-						long logsize = 0L;
-						long offsets = 0L;
-						if (tps != null && partitionOffset != null) {
-							for (Entry<TopicPartition, Long> entrySet : tps.entrySet()) {
-								try {
-									logsize += entrySet.getValue();
-									offsets += partitionOffset.get(entrySet.getKey().partition());
-								} catch (Exception e) {
-									LOG.error("Get logsize and offsets has error, msg is " + e.getCause().getMessage());
-									e.printStackTrace();
-								}
-							}
-						}
-
-						topicOffset.setLogsize(String.valueOf(logsize));
-						topicOffset.setLag(String.valueOf(logsize - offsets));
-						topicOffset.setOffsets(String.valueOf(offsets));
-						topicOffset.setTimespan(CalendarUtils.getTimeSpan());
-						topicOffset.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-						topicOffsets.add(topicOffset);
 					}
 				}
 			} else {
@@ -271,26 +263,34 @@ public class MetricsQuartz {
 				for (Entry<String, List<String>> entry : consumerGroups.entrySet()) {
 					String group = entry.getKey();
 					for (String topic : kafkaService.getActiveTopic(clusterAlias, group)) {
-						TopicOffsetsInfo topicOffset = new TopicOffsetsInfo();
-						topicOffset.setCluster(clusterAlias);
-						topicOffset.setGroup(group);
-						topicOffset.setTopic(topic);
-						long logsize = brokerService.getTopicLogSizeTotal(clusterAlias, topic);
-						topicOffset.setLogsize(String.valueOf(logsize));
-						long lag = kafkaService.getLag(clusterAlias, group, topic);
-						topicOffset.setLag(String.valueOf(lag));
-						topicOffset.setOffsets(String.valueOf(logsize - lag));
-						topicOffset.setTimespan(CalendarUtils.getTimeSpan());
-						topicOffset.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-						topicOffsets.add(topicOffset);
+						ConsumerGroupsInfo consumerGroupTopic = new ConsumerGroupsInfo();
+						consumerGroupTopic.setCluster(clusterAlias);
+						consumerGroupTopic.setGroup(group);
+						consumerGroupTopic.setTopic(topic);
+
+						consumerGroupTopics.add(consumerGroupTopic);
+						if (consumerGroupTopics.size() > Topic.BATCH_SIZE) {
+							try {
+								metricsServiceImpl.writeConsumerGroupTopics(consumerGroupTopics);
+								consumerGroupTopics.clear();
+							} catch (Exception e) {
+								e.printStackTrace();
+								LOG.error("Write kafka consumer group topic has error, msg is " + e.getCause().getMessage());
+							}
+						}
 					}
 				}
 			}
 		}
 		try {
-			MetricsServiceImpl metricsServiceImpl = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
-			if (topicOffsets.size() > 0) {
-				metricsServiceImpl.setConsumerTopic(topicOffsets);
+			if (consumerGroupTopics.size() > 0) {
+				try {
+					metricsServiceImpl.writeConsumerGroupTopics(consumerGroupTopics);
+					consumerGroupTopics.clear();
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("Write final consumer group topic has error, msg is " + e.getCause().getMessage());
+				}
 			}
 		} catch (Exception e) {
 			LOG.error("Collector consumer lag data has error,msg is " + e.getCause().getMessage());

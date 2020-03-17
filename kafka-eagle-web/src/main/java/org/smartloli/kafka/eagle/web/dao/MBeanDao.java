@@ -60,12 +60,6 @@ public interface MBeanDao {
 	/** Get consumer rate topic metrics. */
 	public List<TopicOffsetsInfo> getConsumerRateTopic(Map<String, Object> params);
 
-	/** Set consumer topic metrics. */
-	public int setConsumerTopic(List<TopicOffsetsInfo> consumerTopic);
-
-	/** Clean consumer topic data. */
-	public void cleanConsumerTopic(int tm);
-
 	/** Query os memory data. */
 	public List<KpiInfo> getOsMem(Map<String, Object> params);
 

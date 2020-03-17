@@ -24,7 +24,7 @@ import java.util.Map;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
-import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 
 /**
  * Define access to the kafka monitoring data interface via jmx.
@@ -50,12 +50,6 @@ public interface MetricsService {
 	/** Crontab clean data. */
 	public void remove(int tm);
 
-	/** Set consumer topic metrics. */
-	public int setConsumerTopic(List<TopicOffsetsInfo> topicLag);
-
-	/** Clean consumer topic data. */
-	public void cleanConsumerTopic(int tm);
-
 	/** Crontab clean topic logsize history data. */
 	public void cleanTopicLogSize(int tm);
 
@@ -73,4 +67,7 @@ public interface MetricsService {
 
 	/** Read big screen topic lastest diffval data. */
 	public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params);
+
+	/** Write consumer group topics. */
+	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups);
 }

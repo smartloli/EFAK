@@ -28,7 +28,7 @@ import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
-import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
@@ -329,16 +329,6 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	@Override
-	public int setConsumerTopic(List<TopicOffsetsInfo> topicOffsets) {
-		return mbeanDao.setConsumerTopic(topicOffsets);
-	}
-
-	@Override
-	public void cleanConsumerTopic(int tm) {
-		mbeanDao.cleanConsumerTopic(tm);
-	}
-
-	@Override
 	public void cleanTopicLogSize(int tm) {
 		topicDao.cleanTopicLogSize(tm);
 	}
@@ -371,6 +361,11 @@ public class MetricsServiceImpl implements MetricsService {
 	@Override
 	public int mbeanOfflineInsert(List<MBeanOfflineInfo> kpis) {
 		return mbeanDao.mbeanOfflineInsert(kpis);
+	}
+
+	@Override
+	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups) {
+		return topicDao.writeConsumerGroupTopics(consumerGroups);
 	}
 
 }

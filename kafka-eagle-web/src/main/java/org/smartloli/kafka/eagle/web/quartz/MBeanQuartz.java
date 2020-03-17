@@ -70,7 +70,6 @@ public class MBeanQuartz {
 			MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
 			int retain = SystemConfigUtils.getIntProperty("kafka.eagle.metrics.retain");
 			metrics.remove(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
-			metrics.cleanConsumerTopic(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
 			metrics.cleanTopicLogSize(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
 			metrics.cleanBScreenConsumerTopic(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
 			metrics.cleanTopicSqlHistory(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));

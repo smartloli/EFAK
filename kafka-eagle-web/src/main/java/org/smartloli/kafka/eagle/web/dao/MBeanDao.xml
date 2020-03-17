@@ -67,10 +67,6 @@
 		delete from ke_metrics where tm&lt;=#{tm}
 	</delete>
 
-	<delete id="cleanConsumerTopic" parameterType="int">
-		delete from ke_consumer where tm&lt;=#{tm}
-	</delete>
-
 	<select id="query" parameterType="map" resultMap="kpi">
 		select `broker`,`key`,`value`,`timespan` from ke_metrics
 		where `cluster`=#{cluster} and `type` =#{type}
@@ -98,15 +94,6 @@
 	<select id="getOsMem" parameterType="map" resultMap="kpi">
 		select `value` from ke_metrics where `cluster`=#{cluster} and `key` like #{key} order by `timespan` desc limit 2
 	</select>
-
-	<insert id="setConsumerTopic" parameterType="java.util.List">
-		insert into
-		ke_consumer(`cluster`,`group`,`topic`,`logsize`,`offsets`,`lag`,`timespan`,`tm`)
-		values
-		<foreach collection="list" item="item" index="index" separator=",">
-			(#{item.cluster},#{item.group},#{item.topic},#{item.logsize},#{item.offsets},#{item.lag},#{item.timespan},#{item.tm})
-		</foreach>
-	</insert>
 
 	<select id="getConsumerRateTopic" parameterType="map" resultMap="topicOffsets">
 		select logsize,offsets,timespan from ke_consumer_bscreen

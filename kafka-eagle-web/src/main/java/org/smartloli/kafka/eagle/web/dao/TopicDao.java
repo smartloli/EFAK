@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
@@ -113,5 +114,14 @@ public interface TopicDao {
 
 	/** Get lastest lag used to alarm consumer. */
 	public long queryLastestLag(Map<String, Object> params);
+
+	/** Write consumer group topic. */
+	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups);
+
+	/** Find consumer group topics. */
+	public int findConsumerGroupTopic(Map<String, Object> params);
+
+	/** Clean consumer group topics. */
+	public int cleanConsumerGroupTopic(Map<String, Object> params);
 
 }

@@ -15,23 +15,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.web.dao;
+package org.smartloli.kafka.eagle.common.protocol.consumer;
 
-import java.util.Map;
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * ConsumerDao interface definition for processing consumer information offline.
+ * Stats consumer groups and topic.
  * 
  * @author smartloli.
  *
- *         Created by Mar 16, 2020
+ *         Created by Mar 17, 2020
  */
-public interface ConsumerDao {
+public class ConsumerGroupsInfo extends BaseProtocol {
+	private String cluster;
+	private String group;
+	private String topic;
 
-	/** Count consumer groups total. */
-	public long countConsumerGroups(Map<String, Object> params);
+	public String getCluster() {
+		return cluster;
+	}
 
-	/** Count consumer topic total. */
-	public long countConsumerTopicsStatus(Map<String, Object> params);
+	public void setCluster(String cluster) {
+		this.cluster = cluster;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
 
 }

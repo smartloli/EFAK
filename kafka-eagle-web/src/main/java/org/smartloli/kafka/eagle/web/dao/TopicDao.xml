@@ -48,6 +48,12 @@
 		<result property="tm" column="tm" />
 	</resultMap>
 
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo" id="cgi">
+		<result property="cluster" column="cluster" />
+		<result property="group" column="group" />
+		<result property="topic" column="topic" />
+	</resultMap>
+
 	<!-- TopicRank -->
 	<select id="readTopicRank" parameterType="map" resultMap="trank">
 		select `topic`,`tvalue` from ke_topic_rank
@@ -234,8 +240,29 @@
 		select ifnull(`lag`,0) from ke_consumer_bscreen
 		where `cluster`=#{cluster} and tm=#{tday}
 		and `group`=#{group} and `topic`=#{topic}
-		order by `timespan` desc limit 1)
+		order by `timespan` desc
+		limit 1)
 		,0)
 	</select>
+
+	<insert id="writeConsumerGroupTopics" parameterType="java.util.List">
+		replace into
+		ke_consumer_group(`cluster`,`group`,`topic`)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.cluster},#{item.group},#{item.topic})
+		</foreach>
+	</insert>
+
+	<select id="findConsumerGroupTopic" parameterType="map" resultType="long">
+		select count(*) from ke_consumer_group
+		<where>
+			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
+		</where>
+	</select>
+	
+	<delete id="cleanConsumerGroupTopic" parameterType="int">
+		delete from ke_consumer_group where `cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
+	</delete>
 
 </mapper>
