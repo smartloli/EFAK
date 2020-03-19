@@ -22,8 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
-import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 
 /**
  * Define access to the kafka monitoring data interface via jmx.
@@ -40,24 +41,21 @@ public interface MetricsService {
 	/** Collection statistics data from kafka jmx & insert into table. */
 	public int insert(List<KpiInfo> kpi);
 
+	/** Collection statistics data from kafka jmx & insert into table. */
+	public int mbeanOfflineInsert(List<MBeanOfflineInfo> kpis);
+
 	/** Query MBean data in different dimensions. */
 	public String query(Map<String, Object> params) throws ParseException;
 
 	/** Crontab clean data. */
 	public void remove(int tm);
 
-	/** Set consumer topic metrics. */
-	public int setConsumerTopic(List<TopicOffsetsInfo> topicLag);
-
-	/** Clean consumer topic data. */
-	public void cleanConsumerTopic(int tm);
-
 	/** Crontab clean topic logsize history data. */
 	public void cleanTopicLogSize(int tm);
 
 	/** Crontab clean topic rank history data. */
 	public void cleanTopicRank(int tm);
-	
+
 	/** Crontab clean topic sql history data. */
 	public void cleanTopicSqlHistory(int tm);
 
@@ -66,7 +64,10 @@ public interface MetricsService {
 
 	/** Write statistics big screen consumer topic. */
 	public int writeBSreenConsumerTopic(List<BScreenConsumerInfo> bscreenConsumers);
-	
+
 	/** Read big screen topic lastest diffval data. */
 	public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params);
+
+	/** Write consumer group topics. */
+	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups);
 }

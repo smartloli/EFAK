@@ -81,6 +81,15 @@
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 						<i class="fa fa-info-circle"></i>
 						<strong>List all topic information.</strong>
+						<br />
+						<i class="fa fa-info-circle"></i>
+						<strong>Broker Spread: the higher the coverage, the higher the resource usage of kafka broker nodes.</strong>
+						<br />
+						<i class="fa fa-info-circle"></i>
+						<strong>Broker Skewed: the larger the skewed, the higher the pressure on the broker node of kafka.</strong>
+						<br />
+						<i class="fa fa-info-circle"></i>
+						<strong>Broker Leader Skewed: the higher the leader skewed, the higher the pressure on the kafka broker leader node.</strong>
 					</div>
 				</div>
 			</div>
@@ -100,8 +109,10 @@
 									<tr>
 										<th>ID</th>
 										<th>Topic Name</th>
-										<th>Partition Indexes</th>
-										<th>Partition Numbers</th>
+										<th>Partitions</th>
+										<th>Broker Spread</th>
+										<th>Broker Skewed</th>
+										<th>Broker Leader Skewed</th>
 										<th>Created</th>
 										<th>Modify</th>
 										<th>Operate</th>

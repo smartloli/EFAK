@@ -15,22 +15,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.api.email;
+package org.smartloli.kafka.eagle.common.protocol.consumer;
+
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * Mail factory implements MailProvider service.
+ * Stats consumer groups and topic.
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
- * 
- * @see org.smartloli.kafka.eagle.factory.MailProvider
+ *         Created by Mar 17, 2020
  */
-public class MailFactory implements MailProvider {
+public class ConsumerGroupsInfo extends BaseProtocol {
+	private String cluster;
+	private String group;
+	private String topic;
 
-	@Override
-	public MailService create() {
-		return new MailServiceImpl();
+	public String getCluster() {
+		return cluster;
+	}
+
+	public void setCluster(String cluster) {
+		this.cluster = cluster;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
 }

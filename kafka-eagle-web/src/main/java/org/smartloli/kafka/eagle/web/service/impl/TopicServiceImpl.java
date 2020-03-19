@@ -132,7 +132,7 @@ public class TopicServiceImpl implements TopicService {
 	public String getTopicProperties(String clusterAlias, String name) {
 		JSONArray topics = new JSONArray();
 		int offset = 0;
-		for (String key : Topic.KEYS) {
+		for (String key : Topic.getTopicConfigKeys()) {
 			if (name != null) {
 				JSONObject topic = new JSONObject();
 				if (key.contains(name)) {
@@ -168,7 +168,19 @@ public class TopicServiceImpl implements TopicService {
 
 	/** Get topic list. */
 	public List<PartitionsInfo> list(String clusterAlias, Map<String, Object> params) {
-		return brokerService.topicRecords(clusterAlias, params);
+		List<PartitionsInfo> topicRecords = brokerService.topicRecords(clusterAlias, params);
+		for (PartitionsInfo partitionInfo : topicRecords) {
+			Map<String, Object> spread = new HashMap<>();
+			spread.put("cluster", clusterAlias);
+			spread.put("topic", partitionInfo.getTopic());
+			spread.put("tkey", Topic.BROKER_SPREAD);
+			partitionInfo.setBrokersSpread(topicDao.readBrokerPerformance(spread) == null ? 0 : topicDao.readBrokerPerformance(spread).getTvalue());
+			spread.put("tkey", Topic.BROKER_SKEWED);
+			partitionInfo.setBrokersSkewed(topicDao.readBrokerPerformance(spread) == null ? 0 : topicDao.readBrokerPerformance(spread).getTvalue());
+			spread.put("tkey", Topic.BROKER_LEADER_SKEWED);
+			partitionInfo.setBrokersLeaderSkewed(topicDao.readBrokerPerformance(spread) == null ? 0 : topicDao.readBrokerPerformance(spread).getTvalue());
+		}
+		return topicRecords;
 	}
 
 	/** Get topic partition numbers. */
@@ -285,7 +297,7 @@ public class TopicServiceImpl implements TopicService {
 		int index = 0;
 		try {
 			index = CalendarUtils.getDiffDay(params.get("stime").toString(), params.get("etime").toString());
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		for (int i = index; i >= 0; i--) {

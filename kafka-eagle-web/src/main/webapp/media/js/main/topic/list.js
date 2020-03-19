@@ -14,7 +14,11 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'partitions'
 		}, {
-			"mData" : 'partitionNumbers'
+			"mData" : 'brokerSpread'
+		}, {
+			"mData" : 'brokerSkewed'
+		}, {
+			"mData" : 'brokerLeaderSkewed'
 		}, {
 			"mData" : 'created'
 		}, {

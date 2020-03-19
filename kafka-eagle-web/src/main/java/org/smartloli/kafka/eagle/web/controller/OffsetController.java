@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +29,12 @@ import javax.servlet.http.HttpSession;
 import org.smartloli.kafka.eagle.common.protocol.OffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.offsets.TopicOffsetInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.OffsetService;
 import org.smartloli.kafka.eagle.web.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -63,12 +64,22 @@ public class OffsetController {
 	private TopicService topicService;
 
 	/** Consumer viewer. */
-	@RequestMapping(value = "/consumers/offset/{group}/{topic}/", method = RequestMethod.GET)
-	public ModelAndView consumersActiveView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
+	@RequestMapping(value = "/consumers/offset/", method = RequestMethod.GET)
+	public ModelAndView consumersActiveView(HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+		String group = StrUtils.convertNull(request.getParameter("group"));
+		String topic = StrUtils.convertNull(request.getParameter("topic"));
+
+		try {
+			group = URLDecoder.decode(group, "UTF-8");
+			topic = URLDecoder.decode(topic, "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_consumers");
 		} else {
@@ -78,12 +89,22 @@ public class OffsetController {
 	}
 
 	/** Get real-time offset data from Kafka by ajax. */
-	@RequestMapping(value = "/consumers/offset/{group}/{topic}/realtime", method = RequestMethod.GET)
-	public ModelAndView offsetRealtimeView(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletRequest request) {
+	@RequestMapping(value = "/consumers/offset/realtime/", method = RequestMethod.GET)
+	public ModelAndView offsetRealtimeView(HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+		String group = StrUtils.convertNull(request.getParameter("group"));
+		String topic = StrUtils.convertNull(request.getParameter("topic"));
+
+		try {
+			group = URLDecoder.decode(group, "UTF-8");
+			topic = URLDecoder.decode(topic, "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		if (offsetService.hasGroupTopic(clusterAlias, formatter, group, topic)) {
 			mav.setViewName("/consumers/offset_realtime");
 		} else {
@@ -93,9 +114,17 @@ public class OffsetController {
 	}
 
 	/** Get detail offset from Kafka by ajax. */
-	@RequestMapping(value = "/consumer/offset/{group}/{topic}/ajax", method = RequestMethod.GET)
-	public void offsetDetailAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
+	@RequestMapping(value = "/consumer/offset/group/topic/ajax", method = RequestMethod.GET)
+	public void offsetDetailAjax(HttpServletResponse response, HttpServletRequest request) {
 		String aoData = request.getParameter("aoData");
+		String group = StrUtils.convertNull(request.getParameter("group"));
+		String topic = StrUtils.convertNull(request.getParameter("topic"));
+		try {
+			group = URLDecoder.decode(group, "UTF-8");
+			topic = URLDecoder.decode(topic, "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		JSONArray params = JSON.parseArray(aoData);
 		int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
 		for (Object object : params) {
@@ -159,12 +188,20 @@ public class OffsetController {
 	}
 
 	/** Get real-time offset graph data from Kafka by ajax. */
-	@RequestMapping(value = "/consumer/offset/{group}/{topic}/realtime/ajax", method = RequestMethod.GET)
-	public void offsetGraphAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
+	@RequestMapping(value = "/consumer/offset/group/topic/realtime/ajax", method = RequestMethod.GET)
+	public void offsetGraphAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		try {
+			String group = StrUtils.convertNull(request.getParameter("group"));
+			String topic = StrUtils.convertNull(request.getParameter("topic"));
+			try {
+				group = URLDecoder.decode(group, "UTF-8");
+				topic = URLDecoder.decode(topic, "UTF-8");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			Map<String, Object> param = new HashMap<>();
 			param.put("cluster", clusterAlias);
 			param.put("group", group);
@@ -180,17 +217,25 @@ public class OffsetController {
 	}
 
 	/** Get real-time offset graph data from Kafka by ajax. */
-	@RequestMapping(value = "/consumer/offset/rate/{group}/{topic}/realtime/ajax", method = RequestMethod.GET)
-	public void offsetRateGraphAjax(@PathVariable("group") String group, @PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
+	@RequestMapping(value = "/consumer/offset/rate/group/topic/realtime/ajax", method = RequestMethod.GET)
+	public void offsetRateGraphAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
-		Map<String, Object> params = new HashMap<>();
-		params.put("cluster", clusterAlias);
-		params.put("group", group);
-		params.put("topic", topic);
-
 		try {
+			String group = StrUtils.convertNull(request.getParameter("group"));
+			String topic = StrUtils.convertNull(request.getParameter("topic"));
+			try {
+				group = URLDecoder.decode(group, "UTF-8");
+				topic = URLDecoder.decode(topic, "UTF-8");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("group", group);
+			params.put("topic", topic);
+
 			byte[] output = offsetService.getOffsetRate(params).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {

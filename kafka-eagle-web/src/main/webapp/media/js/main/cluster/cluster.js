@@ -40,6 +40,8 @@ $(document).ready(function() {
 			"mData" : 'port'
 		}, {
 			"mData" : 'mode'
+		}, {
+			"mData" : 'version'
 		} ]
 	});
 

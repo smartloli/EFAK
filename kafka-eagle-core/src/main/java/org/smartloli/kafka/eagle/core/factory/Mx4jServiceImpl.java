@@ -32,7 +32,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.constant.JmxConstants;
+import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
@@ -47,70 +47,71 @@ import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 public class Mx4jServiceImpl implements Mx4jService {
 
 	private Logger LOG = LoggerFactory.getLogger(Mx4jServiceImpl.class);
-	private String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+	private static final String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+	private static final String TOPIC_CONCAT_CHARACTER = ",topic=";
 
 	/** Get brokers all topics bytes in per sec. */
 	@Override
 	public MBeanInfo bytesInPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.bytesInPerSec);
+		return common(uri, BrokerServer.BYTES_IN_PER_SEC.getValue());
 	}
 
 	/** Get brokers bytes in per sec by topic. */
 	@Override
 	public MBeanInfo bytesInPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.bytesInPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.BYTES_IN_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
 	/** Get brokers all topics bytes out per sec. */
 	@Override
 	public MBeanInfo bytesOutPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.bytesOutPerSec);
+		return common(uri, BrokerServer.BYTES_OUT_PER_SEC.getValue());
 	}
 
 	/** Get brokers bytes out per sec by topic. */
 	@Override
 	public MBeanInfo bytesOutPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.bytesOutPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.BYTES_OUT_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
 	/** Get brokers all topics byte rejected per sec. */
 	@Override
 	public MBeanInfo bytesRejectedPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.bytesRejectedPerSec);
+		return common(uri, BrokerServer.BYTES_REJECTED_PER_SEC.getValue());
 	}
 
 	/** Get brokers byte rejected per sec by topic. */
 	@Override
 	public MBeanInfo bytesRejectedPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.bytesRejectedPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.BYTES_REJECTED_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
 	/** Get brokers all topic failed fetch request per sec. */
 	@Override
 	public MBeanInfo failedFetchRequestsPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.failedFetchRequestsPerSec);
+		return common(uri, BrokerServer.FAILED_FETCH_REQUESTS_PER_SEC.getValue());
 	}
 
 	/** Get brokers failed fetch request per sec by topic. */
 	@Override
 	public MBeanInfo failedFetchRequestsPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.failedFetchRequestsPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.FAILED_FETCH_REQUESTS_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
 	/** Get brokers all topics failed fetch produce request per sec. */
 	@Override
 	public MBeanInfo failedProduceRequestsPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.failedProduceRequestsPerSec);
+		return common(uri, BrokerServer.FAILED_PRODUCE_REQUESTS_PER_SEC.getValue());
 	}
 
 	/** Get brokers failed fetch produce request per sec by topic. */
 	@Override
 	public MBeanInfo failedProduceRequestsPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.failedProduceRequestsPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.FAILED_PRODUCE_REQUESTS_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
@@ -149,68 +150,68 @@ public class Mx4jServiceImpl implements Mx4jService {
 	/** Get brokers all topics message in per sec. */
 	@Override
 	public MBeanInfo messagesInPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.messagesInPerSec);
+		return common(uri, BrokerServer.MESSAGES_IN_PER_SEC.getValue());
 	}
 
 	/** Get brokers message in per sec by topic. */
 	@Override
 	public MBeanInfo messagesInPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.messagesInPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.MESSAGES_IN_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
 	@Override
 	public MBeanInfo produceMessageConversionsPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.produceMessageConversionsPerSec);
+		return common(uri, BrokerServer.PRODUCE_MESSAGE_CONVERSIONS_PER_SEC.getValue());
 	}
 
 	@Override
 	public MBeanInfo produceMessageConversionsPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.produceMessageConversionsPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.PRODUCE_MESSAGE_CONVERSIONS_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
 	@Override
 	public MBeanInfo totalFetchRequestsPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.totalFetchRequestsPerSec);
+		return common(uri, BrokerServer.TOTAL_FETCH_REQUESTS_PER_SEC.getValue());
 	}
 
 	@Override
 	public MBeanInfo totalFetchRequestsPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.totalFetchRequestsPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.TOTAL_FETCH_REQUESTS_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
 	@Override
 	public MBeanInfo totalProduceRequestsPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.totalProduceRequestsPerSec);
+		return common(uri, BrokerServer.TOTAL_PRODUCE_REQUESTS_PER_SEC.getValue());
 	}
 
 	@Override
 	public MBeanInfo totalProduceRequestsPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.totalProduceRequestsPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.TOTAL_PRODUCE_REQUESTS_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
 	@Override
 	public MBeanInfo replicationBytesInPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesInPerSec);
+		return common(uri, BrokerServer.REPLICATION_BYTES_IN_PER_SEC.getValue());
 	}
 
 	@Override
 	public MBeanInfo replicationBytesInPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesInPerSec + ",topic=" + topic;
+		String mbean =  BrokerServer.REPLICATION_BYTES_IN_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 
 	@Override
 	public MBeanInfo replicationBytesOutPerSec(String uri) {
-		return common(uri, JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesOutPerSec);
+		return common(uri, BrokerServer.REPLICATION_BYTES_OUT_PER_SEC.getValue());
 	}
 
 	@Override
 	public MBeanInfo replicationBytesOutPerSec(String uri, String topic) {
-		String mbean = JmxConstants.KafkaServer.BrokerTopicMetrics.replicationBytesOutPerSec + ",topic=" + topic;
+		String mbean = BrokerServer.REPLICATION_BYTES_OUT_PER_SEC.getValue() + TOPIC_CONCAT_CHARACTER + topic;
 		return common(uri, mbean);
 	}
 

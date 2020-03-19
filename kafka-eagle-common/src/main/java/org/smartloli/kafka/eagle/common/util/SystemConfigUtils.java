@@ -18,8 +18,10 @@
 package org.smartloli.kafka.eagle.common.util;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -214,6 +216,24 @@ public final class SystemConfigUtils {
 		} catch (NumberFormatException e) {
 			return null;
 		}
+	}
+
+	/** Retrieve a property as a array,no default value. */
+	public static List<String> getPropertyArrayList(String name, String splitStr) {
+		String value = SystemConfigUtils.getProperty(name);
+		List<String> list = new ArrayList<String>();
+		if (value == null) {
+			return list;
+		}
+		try {
+			String[] propertyArray = value.split(splitStr);
+			for (String property : propertyArray) {
+				list.add(property);
+			}
+		} catch (NumberFormatException e) {
+			LOG.error("Split string to list has error, msg is " + e.getCause().getMessage());
+		}
+		return list;
 	}
 
 	/** Retrieve map property keys. */

@@ -23,6 +23,7 @@ import java.util.Map;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 
 /**
  * Alarm service interface.
@@ -58,13 +59,13 @@ public interface AlertService {
 
 	/** Get all alarm consumer tasks. */
 	public List<AlarmConsumerInfo> getAllAlarmConsumerTasks();
-	
+
 	/** Delete alarm consumer by id. */
 	public int deleteAlarmConsumerById(int id);
 
 	/** Modify alarm consumer info by id. */
 	public int modifyAlarmConsumerById(AlarmConsumerInfo alarmConsumer);
-	
+
 	/** Modify alert consumer(alarmtimes,isnormal) info by id. */
 	public int modifyConsumerStatusAlertById(AlarmConsumerInfo alarmConsumer);
 
@@ -90,7 +91,7 @@ public interface AlertService {
 
 	/** Modify alert cluster(server,alarm group,alarm level) info by id. */
 	public int modifyClusterAlertById(AlarmClusterInfo cluster);
-	
+
 	/** Modify alert cluster(alarmtimes,isnormal) info by id. */
 	public int modifyClusterStatusAlertById(AlarmClusterInfo cluster);
 
@@ -117,7 +118,10 @@ public interface AlertService {
 
 	/** Get alarm config by group name. */
 	public AlarmConfigInfo getAlarmConfigByGroupName(Map<String, Object> params);
-	
+
 	/** Get lastest lag used to alarm consumer. */
 	public long queryLastestLag(Map<String, Object> params);
+
+	/** Get topic producer logsize by alarm. */
+	public List<TopicLogSize> queryTopicProducerByAlarm(Map<String, Object> params);
 }

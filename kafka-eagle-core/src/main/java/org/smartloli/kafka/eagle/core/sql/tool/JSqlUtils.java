@@ -117,7 +117,7 @@ public class JSqlUtils {
 
 	private static File createTempJson() throws IOException {
 		JSONObject object = new JSONObject();
-		object.put("version", "1.6.0");
+		object.put("version", "1.21.0");
 		object.put("defaultSchema", "db");
 		JSONArray array = new JSONArray();
 		JSONObject tmp = new JSONObject();

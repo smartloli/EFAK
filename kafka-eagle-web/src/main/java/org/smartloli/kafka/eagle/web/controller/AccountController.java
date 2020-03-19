@@ -81,6 +81,16 @@ public class AccountController {
 			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 			String defaultClusterAlias = clusterAliass[0];
 			subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
+			String dropList = "<ul class='dropdown-menu'>";
+			int i = 0;
+			for (String clusterAlias : clusterAliass) {
+				if (!clusterAlias.equals(defaultClusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT) {
+					dropList += "<li><a href='/ke/cluster/info/" + clusterAlias + "/change'><i class='fa fa-fw fa-sitemap'></i>" + clusterAlias + "</a></li>";
+					i++;
+				}
+			}
+			dropList += "<li><a href='/ke/cluster/multi'><i class='fa fa-fw fa-tasks'></i>More...</a></li></ul>";
+			subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST, dropList);
 		}
 	}
 

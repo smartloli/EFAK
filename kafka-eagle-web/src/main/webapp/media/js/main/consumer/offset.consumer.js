@@ -1,9 +1,19 @@
 $(document).ready(function() {
-	var url = window.location.href;
-	var tmp = url.split("offset/")[1];
-	var group = tmp.split("/")[0];
-	var topic = tmp.split("/")[1];
-	$("#topic_name_header").find("strong").html("<a href='/ke/consumers/offset/" + group + "/" + topic + "/realtime'>" + topic + "</a>");
+
+	function getQueryString(name) {
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+		var r = window.location.search.substr(1).match(reg);
+		var context = "";
+		if (r != null)
+			context = r[2];
+		reg = null;
+		r = null;
+		return context == null || context == "" || context == "undefined" ? "" : context;
+	}
+
+	var group = getQueryString("group");
+	var topic = getQueryString("topic");
+	$("#topic_name_header").find("strong").html("<a href='/ke/consumers/offset/realtime/?group=" + group + "&topic=" + topic + "'>" + topic + "</a>");
 
 	var offset = 0;
 
@@ -19,7 +29,7 @@ $(document).ready(function() {
 			"bProcessing" : true,
 			"bServerSide" : true,
 			"fnServerData" : retrieveData,
-			"sAjaxSource" : "/ke/consumer/offset/" + group + "/" + topic + "/ajax",
+			"sAjaxSource" : "/ke/consumer/offset/group/topic/ajax",
 			"aoColumns" : [ {
 				"mData" : 'partition'
 			}, {
@@ -47,7 +57,9 @@ $(document).ready(function() {
 			"url" : sSource,
 			"dataType" : "json",
 			"data" : {
-				aoData : JSON.stringify(aoData)
+				aoData : JSON.stringify(aoData),
+				group : group,
+				topic : topic
 			},
 			"success" : function(data) {
 				fnCallback(data)

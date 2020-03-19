@@ -175,6 +175,64 @@ public class ZkServiceImpl implements ZkService {
 		return target;
 	}
 
+	/**
+	 * Get zookeeper health status.
+	 * 
+	 * @param host
+	 *            Zookeeper host
+	 * @param port
+	 *            Zookeeper port
+	 * @return String.
+	 */
+	public String version(String host, String port) {
+		String target = "";
+		Socket sock = null;
+		try {
+			String tmp = "";
+			if (port.contains("/")) {
+				tmp = port.split("/")[0];
+			} else {
+				tmp = port;
+			}
+			sock = new Socket(host, Integer.parseInt(tmp));
+		} catch (Exception e) {
+			LOG.error("Socket[" + host + ":" + port + "] connect refused");
+			return "unkown";
+		}
+		BufferedReader reader = null;
+		OutputStream outstream = null;
+		try {
+			outstream = sock.getOutputStream();
+			outstream.write("stat".getBytes());
+			outstream.flush();
+			sock.shutdownOutput();
+
+			reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (line.indexOf("version: ") != -1) {
+					target = line.split("version: ")[1].split("-")[0];
+				}
+			}
+		} catch (Exception ex) {
+			LOG.error("Read ZK buffer has error,msg is " + ex.getMessage());
+			return "unkown";
+		} finally {
+			try {
+				sock.close();
+				if (reader != null) {
+					reader.close();
+				}
+				if (outstream != null) {
+					outstream.close();
+				}
+			} catch (Exception ex) {
+				LOG.error("Close read has error,msg is " + ex.getMessage());
+			}
+		}
+		return target;
+	}
+
 	/** Get zookeeper cluster information. */
 	public String zkCluster(String clusterAlias) {
 		String[] zks = SystemConfigUtils.getPropertyArray(clusterAlias + ".zk.list", ",");
@@ -186,6 +244,7 @@ public class ZkServiceImpl implements ZkService {
 			object.put("host", zk.split(":")[0]);
 			object.put("port", zk.split(":")[1].split("/")[0]);
 			object.put("mode", status(zk.split(":")[0], zk.split(":")[1]));
+			object.put("version", version(zk.split(":")[0], zk.split(":")[1]));
 			targets.add(object);
 		}
 		return targets.toJSONString();

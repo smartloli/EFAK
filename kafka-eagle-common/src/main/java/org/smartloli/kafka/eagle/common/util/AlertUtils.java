@@ -35,6 +35,12 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class AlertUtils {
 
+	private static final String MARKDOWN = "markdown";
+
+	private AlertUtils() {
+
+	}
+
 	/** Send Json msg by wechat. */
 	public static String sendTestMsgByWeChat(String url, String data) {
 		Map<String, Object> wechatMarkdownMessage = getWeChatMarkdownMessage(data);
@@ -43,11 +49,11 @@ public class AlertUtils {
 
 	private static Map<String, Object> getWeChatMarkdownMessage(String text) {
 		Map<String, Object> map = new HashMap<>();
-		map.put("msgtype", "markdown");
+		map.put("msgtype", MARKDOWN);
 
 		Map<String, Object> markdown = new HashMap<>();
 		markdown.put("content", text);
-		map.put("markdown", markdown);
+		map.put(MARKDOWN, markdown);
 
 		map.put("touser", WeChat.TOUSER);
 		map.put("toparty", WeChat.TOPARTY);
@@ -72,15 +78,15 @@ public class AlertUtils {
 	 */
 	private static Map<String, Object> getDingDingMarkdownMessage(String title, String text, boolean isAtAll) {
 		Map<String, Object> map = new HashMap<>();
-		map.put("msgtype", "markdown");
+		map.put("msgtype", MARKDOWN);
 
 		Map<String, Object> markdown = new HashMap<>();
 		markdown.put("title", title);
 		markdown.put("text", text);
-		map.put("markdown", markdown);
+		map.put(MARKDOWN, markdown);
 
 		Map<String, Object> at = new HashMap<>();
-		at.put("isAtAll", false);
+		at.put("isAtAll", isAtAll);
 		map.put("at", at);
 
 		return map;

@@ -194,6 +194,16 @@ public class TopicController {
 			object.put("leader", metadata.getLeader());
 			object.put("replicas", metadata.getReplicas());
 			object.put("isr", metadata.getIsr());
+			if (metadata.isPreferredLeader()) {
+				object.put("preferred_leader", "<a class='btn btn-success btn-xs'>true</a>");
+			} else {
+				object.put("preferred_leader", "<a class='btn btn-danger btn-xs'>false</a>");
+			}
+			if (metadata.isUnderReplicated()) {
+				object.put("under_replicated", "<a class='btn btn-danger btn-xs'>true</a>");
+			} else {
+				object.put("under_replicated", "<a class='btn btn-success btn-xs'>false</a>");
+			}
 			aaDatas.add(object);
 		}
 
@@ -354,17 +364,48 @@ public class TopicController {
 			JSONObject object = new JSONObject();
 			object.put("id", partition.getId());
 			object.put("topic", "<a href='/ke/topic/meta/" + partition.getTopic() + "/' target='_blank'>" + partition.getTopic() + "</a>");
-			object.put("partitions", partition.getPartitions().size() > Topic.PARTITION_LENGTH ? partition.getPartitions().toString().substring(0, Topic.PARTITION_LENGTH) + "..." : partition.getPartitions().toString());
-			object.put("partitionNumbers", partition.getPartitionNumbers());
+			object.put("partitions", partition.getPartitionNumbers());
+			try {
+				long brokerSpread = partition.getBrokersSpread();
+				if (brokerSpread < Topic.TOPIC_BROKER_SPREAD_ERROR) {
+					object.put("brokerSpread", "<a class='btn btn-danger btn-xs'>" + brokerSpread + "%</a>");
+				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_ERROR && brokerSpread < Topic.TOPIC_BROKER_SPREAD_NORMAL) {
+					object.put("brokerSpread", "<a class='btn btn-warning btn-xs'>" + brokerSpread + "%</a>");
+				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_NORMAL) {
+					object.put("brokerSpread", "<a class='btn btn-success btn-xs'>" + brokerSpread + "%</a>");
+				} else {
+					object.put("brokerSpread", "<a class='btn btn-primary btn-xs'>" + brokerSpread + "%</a>");
+				}
+
+				long brokerSkewed = partition.getBrokersSkewed();
+				if (brokerSkewed >= Topic.TOPIC_BROKER_SKEW_ERROR) {
+					object.put("brokerSkewed", "<a class='btn btn-danger btn-xs'>" + brokerSkewed + "%</a>");
+				} else if (brokerSkewed > Topic.TOPIC_BROKER_SKEW_NORMAL && brokerSkewed < Topic.TOPIC_BROKER_SKEW_ERROR) {
+					object.put("brokerSkewed", "<a class='btn btn-warning btn-xs'>" + brokerSkewed + "%</a>");
+				} else if (brokerSkewed <= Topic.TOPIC_BROKER_SKEW_NORMAL) {
+					object.put("brokerSkewed", "<a class='btn btn-success btn-xs'>" + brokerSkewed + "%</a>");
+				} else {
+					object.put("brokerSkewed", "<a class='btn btn-primary btn-xs'>" + brokerSkewed + "%</a>");
+				}
+
+				long brokerLeaderSkewed = partition.getBrokersLeaderSkewed();
+				if (brokerLeaderSkewed >= Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
+					object.put("brokerLeaderSkewed", "<a class='btn btn-danger btn-xs'>" + brokerLeaderSkewed + "%</a>");
+				} else if (brokerSkewed > Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL && brokerLeaderSkewed < Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
+					object.put("brokerLeaderSkewed", "<a class='btn btn-warning btn-xs'>" + brokerLeaderSkewed + "%</a>");
+				} else if (brokerSkewed <= Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL) {
+					object.put("brokerLeaderSkewed", "<a class='btn btn-success btn-xs'>" + brokerLeaderSkewed + "%</a>");
+				} else {
+					object.put("brokerLeaderSkewed", "<a class='btn btn-primary btn-xs'>" + brokerLeaderSkewed + "%</a>");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			object.put("created", partition.getCreated());
 			object.put("modify", partition.getModify());
 			if (Role.ADMIN.equals(signiner.getUsername())) {
-				// <li><a href='#" + partition.getTopic() + "'
-				// name='topic_clean'><i class='fa fa-fw
-				// fa-trash-o'></i>Clean</a></li>
-				object.put("operate",
-						"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#"
-								+ partition.getTopic() + "'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Remove</a></li></ul></div>");
+				object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
+						+ "'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Remove</a></li></ul></div>");
 			} else {
 				object.put("operate", "");
 			}
@@ -492,7 +533,7 @@ public class TopicController {
 			try {
 				topicSql.setCluster(clusterAlias);
 				topicSql.setCreated(CalendarUtils.getDate());
-				topicSql.setHost(request.getRemoteAddr());
+				topicSql.setHost(request.getRemoteHost());
 				topicSql.setKsql(sql);
 				if (result.getBoolean("error")) {
 					topicSql.setStatus("FAILED");

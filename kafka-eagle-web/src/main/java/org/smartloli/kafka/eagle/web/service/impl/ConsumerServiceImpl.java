@@ -31,6 +31,7 @@ import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
 import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.D3;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -90,8 +91,14 @@ public class ConsumerServiceImpl implements ConsumerService {
 				subTarget.put("name", entry.getKey());
 				for (String str : entry.getValue()) {
 					JSONObject subInSubTarget = new JSONObject();
-					subInSubTarget.put("name", str);
-					subTargets.add(subInSubTarget);
+					if (subTargets.size() > D3.CHILD_SIZE) {
+						subInSubTarget.put("name", "...");
+						subTargets.add(subInSubTarget);
+						break;
+					} else {
+						subInSubTarget.put("name", str);
+						subTargets.add(subInSubTarget);
+					}
 				}
 			}
 			count++;
@@ -211,8 +218,14 @@ public class ConsumerServiceImpl implements ConsumerService {
 				subTarget.put("name", consumerGroup.getString("group"));
 				for (String str : getKafkaTopicSets(clusterAlias, consumerGroup.getString("group"))) {
 					JSONObject subInSubTarget = new JSONObject();
-					subInSubTarget.put("name", str);
-					subTargets.add(subInSubTarget);
+					if (subTargets.size() > D3.CHILD_SIZE) {
+						subInSubTarget.put("name", "...");
+						subTargets.add(subInSubTarget);
+						break;
+					} else {
+						subInSubTarget.put("name", str);
+						subTargets.add(subInSubTarget);
+					}
 				}
 			}
 			count++;

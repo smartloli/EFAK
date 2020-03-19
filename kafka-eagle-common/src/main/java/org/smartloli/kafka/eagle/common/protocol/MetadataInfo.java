@@ -18,7 +18,7 @@
 package org.smartloli.kafka.eagle.common.protocol;
 
 /**
- * Definition Kafka metadata information.
+ * Schema topic metadata information.
  * 
  * @author smartloli.
  *
@@ -31,6 +31,24 @@ public class MetadataInfo extends BaseProtocol {
 	private int leader;
 	private String isr;
 	private String replicas;
+	private boolean preferredLeader;
+	private boolean underReplicated;
+
+	public boolean isPreferredLeader() {
+		return preferredLeader;
+	}
+
+	public void setPreferredLeader(boolean preferredLeader) {
+		this.preferredLeader = preferredLeader;
+	}
+
+	public boolean isUnderReplicated() {
+		return underReplicated;
+	}
+
+	public void setUnderReplicated(boolean underReplicated) {
+		this.underReplicated = underReplicated;
+	}
 
 	public long getLogSize() {
 		return logSize;

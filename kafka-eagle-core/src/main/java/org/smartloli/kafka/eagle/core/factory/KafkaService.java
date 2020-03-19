@@ -29,7 +29,6 @@ import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
-import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 
 /**
  * Kafka group,topic and partition interface.
@@ -56,13 +55,6 @@ public interface KafkaService {
 
 	/** Get all broker list from zookeeper. */
 	public List<BrokersInfo> getAllBrokersInfo(String clusterAlias);
-
-	/**
-	 * Get all topic info from zookeeper. Deprecated this method in the v1.3.4
-	 * and replace {@link BrokerService.topicRecords} method.
-	 */
-	@Deprecated
-	public String getAllPartitions(String clusterAlias);
 
 	/** Get broker host info from ids. */
 	public String getBrokerJMXFromIds(String clusterAlias, int ids);

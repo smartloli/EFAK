@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html>
@@ -31,8 +30,7 @@
 	});
 </script>
 
-<script type="text/javascript"
-	src="/ke/media/js/bscreen/js/echarts.min.js"></script>
+<script type="text/javascript" src="/ke/media/js/bscreen/js/echarts.min.js"></script>
 <script type="text/javascript" src="/ke/media/js/bscreen/js/bscreen.js"></script>
 <body>
 	<div class="head">
@@ -75,22 +73,19 @@
 		<ul class="clearfix">
 			<li>
 				<div class="boxall" style="height: 3.2rem">
-					<div class="alltitle">Producer Records For The Last 7 Days
-						(msg)</div>
+					<div class="alltitle">Producer Records For The Last 7 Days (msg)</div>
 					<div class="allnav" id="ke_bs_producer_history"></div>
 					<div class="boxfoot"></div>
 				</div>
 				<div class="boxall" style="height: 3.2rem">
-					<div class="alltitle">Consumer Records For The Last 7 Days
-						(msg)</div>
+					<div class="alltitle">Consumer Records For The Last 7 Days (msg)</div>
 					<div class="allnav" id="ke_bs_consumer_history"></div>
 					<div class="boxfoot"></div>
 				</div>
 				<div class="boxall" style="height: 3.2rem">
 					<div style="height: 100%; width: 100%;">
 						<div class="alltitle">Topic History Total Records (msg)</div>
-						<div id="ke_topics_total_logsize"
-							style="width: 100%; height: 100%; margin-top: 10%; text-align: center; color: #fff; font-size: .7rem; font-family: electronicFont; font-weight: bold">0</div>
+						<div id="ke_topics_total_logsize" style="width: 100%; height: 100%; margin-top: 10%; text-align: center; color: #fff; font-size: .7rem; font-family: electronicFont; font-weight: bold">0</div>
 					</div>
 				</div>
 			</li>
@@ -118,6 +113,12 @@
 					</div>
 					<div class="map3">
 						<img src="/ke/media/js/bscreen/picture/map.png">
+					</div>
+					<div class="map4">
+						<div style="height: 100%; width: 100%;">
+							<div id="ke_topics_total_capacity_unit" class="alltitleball">Topic Total Capacity</div>
+							<div id="ke_topics_total_capacity" style="width: 100%; height: 100%; text-align: center; color: #fff; font-size: .7rem; font-family: electronicFont; font-weight: bold">0</div>
+						</div>
 					</div>
 				</div>
 			</li>

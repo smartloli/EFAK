@@ -29,6 +29,7 @@ import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
@@ -208,6 +209,11 @@ public class BScreenServiceImpl implements BScreenService {
 			targets.add(object);
 		}
 		return targets.toJSONString();
+	}
+
+	@Override
+	public String getTopicCapacity(Map<String, Object> params) {
+		return StrUtils.stringifyByObject(topicDao.getTopicCapacity(params)).toJSONString();
 	}
 
 }

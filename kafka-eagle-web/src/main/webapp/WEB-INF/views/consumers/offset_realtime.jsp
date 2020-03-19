@@ -133,10 +133,11 @@
 				</div>
 			</div>
 			<!-- /.row -->
+			<!-- Lag -->
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="panel panel-default">
-						<div id="topic_name_header" class="panel-heading">
+						<div id="topic_lag_name_header" class="panel-heading">
 							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>{TopicName}</strong>
 							<div class="pull-right"></div>
 						</div>
@@ -149,12 +150,46 @@
 				</div>
 				<!-- /.col-lg-4 -->
 			</div>
+			<!-- Producer -->
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div id="topic_producer_name_header" class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>{TopicName}</strong>
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div id="producer_chart" class="chartdiv"></div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+			</div>
+			<!-- Consumer -->
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div id="topic_consumer_name_header" class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> <strong>{TopicName}</strong>
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div id="consumer_chart" class="chartdiv"></div>
+						</div>
+						<!-- /.panel-body -->
+					</div>
+				</div>
+				<!-- /.col-lg-4 -->
+			</div>
 		</div>
 		<!-- /#page-wrapper -->
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/consumer/offset.realtime.js" name="loader" />
+	<jsp:param value="main/consumer/offset.realtime.js?v=1.4.5" name="loader" />
 	<jsp:param value="plugins/echart/echarts.min.js" name="loader" />
 	<jsp:param value="plugins/echart/macarons.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />

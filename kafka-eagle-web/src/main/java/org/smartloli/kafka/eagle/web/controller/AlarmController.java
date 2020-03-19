@@ -301,17 +301,14 @@ public class AlarmController {
 				obj.put("alarmIsNormal", "<a class='btn btn-danger btn-xs'>N</a>");
 			}
 			if (alertConsumer.getIsEnable().equals("Y")) {
-				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id
-						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			} else {
-				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id
-						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			}
 			obj.put("created", alertConsumer.getCreated());
 			obj.put("modify", alertConsumer.getModify());
-			obj.put("operate",
-					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_consumer_modify' href='#"
-							+ id + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_consumer_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			obj.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_consumer_modify' href='#" + id
+					+ "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_consumer_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 
@@ -429,7 +426,15 @@ public class AlarmController {
 	public ModelAndView alarmCreateForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		String type = request.getParameter("ke_alarm_cluster_type");
-		String servers = request.getParameter("ke_server_alarm");
+		String value = "";
+		if (AlarmType.TOPIC.equals(type)) {
+			value = request.getParameter("ke_topic_alarm");
+		}
+		if (AlarmType.PRODUCER.equals(type)) {
+			value = request.getParameter("ke_producer_alarm");
+		} else {
+			value = request.getParameter("ke_server_alarm");
+		}
 		String level = request.getParameter("ke_alarm_cluster_level");
 		String alarmGroup = request.getParameter("ke_alarm_cluster_group");
 		int maxTimes = 10;
@@ -449,7 +454,7 @@ public class AlarmController {
 		alarmClusterInfo.setIsEnable("Y");
 		alarmClusterInfo.setIsNormal("Y");
 		alarmClusterInfo.setModify(CalendarUtils.getDate());
-		alarmClusterInfo.setServer(servers);
+		alarmClusterInfo.setServer(value);
 		alarmClusterInfo.setType(type);
 
 		int code = alertService.create(alarmClusterInfo);
@@ -504,7 +509,7 @@ public class AlarmController {
 			String group = StrUtils.convertNull(clustersInfo.getAlarmGroup());
 			obj.put("id", id);
 			obj.put("type", clustersInfo.getType());
-			obj.put("server", "<a href='#" + id + "/server' name='ke_alarm_cluster_detail'>" + (server.length() > 8 ? server.substring(0, 8) + "..." : server) + "</a>");
+			obj.put("value", "<a href='#" + id + "/server' name='ke_alarm_cluster_detail'>" + (server.length() > 8 ? server.substring(0, 8) + "..." : server) + "</a>");
 			obj.put("alarmGroup", "<a href='#" + id + "/group' name='ke_alarm_cluster_detail'>" + (group.length() > 8 ? group.substring(0, 8) + "..." : group) + "</a>");
 			obj.put("alarmTimes", clustersInfo.getAlarmTimes());
 			obj.put("alarmMaxTimes", clustersInfo.getAlarmMaxTimes());
@@ -523,17 +528,14 @@ public class AlarmController {
 				obj.put("alarmIsNormal", "<a class='btn btn-danger btn-xs'>N</a>");
 			}
 			if (clustersInfo.getIsEnable().equals("Y")) {
-				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id
-						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			} else {
-				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id
-						+ " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
 			}
 			obj.put("created", clustersInfo.getCreated());
 			obj.put("modify", clustersInfo.getModify());
-			obj.put("operate",
-					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_cluster_modify' href='#"
-							+ id + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_cluster_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			obj.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_cluster_modify' href='#" + id
+					+ "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_cluster_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 
@@ -789,9 +791,8 @@ public class AlarmController {
 			obj.put("alarmAddress", "<a name='ke_alarm_config_detail' href='#" + alarmGroup + "/address'>" + (address.length() > 16 ? address.substring(0, 16) + "..." : address) + "</a>");
 			obj.put("created", config.getString("created"));
 			obj.put("modify", config.getString("modify"));
-			obj.put("operate",
-					"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='ke_alarm_config_modify' href='#"
-							+ alarmGroup + "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='ke_alarm_config_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			obj.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='ke_alarm_config_modify' href='#" + alarmGroup
+					+ "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='ke_alarm_config_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
 			aaDatas.add(obj);
 		}
 
@@ -885,15 +886,12 @@ public class AlarmController {
 		try {
 			String type = request.getParameter("type");
 			String url = request.getParameter("url");
-			// String http = request.getParameter("http");
 			String msg = request.getParameter("msg");
 			String result = "";
 			if (AlarmType.EMAIL.equals(type)) {
 				result = AlertUtils.sendTestMsgByEmail(url);
 			} else if (AlarmType.DingDing.equals(type)) {
 				result = AlertUtils.sendTestMsgByDingDing(url, msg);
-			} else if (AlarmType.WebHook.equals(type)) {
-
 			} else if (AlarmType.WeChat.equals(type)) {
 				result = AlertUtils.sendTestMsgByWeChat(url, msg);
 			}

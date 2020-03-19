@@ -18,7 +18,7 @@
 package org.smartloli.kafka.eagle.common.constant;
 
 /**
- * Collector kafka jmx constants vars.
+ * Get the performance index of broker server.
  * 
  * @author smartloli.
  *
@@ -26,80 +26,67 @@ package org.smartloli.kafka.eagle.common.constant;
  */
 public class JmxConstants {
 
-	public interface KafkaLog {
-		public static String size = "kafka.log:type=Log,name=Size,topic=%s,partition=%s";
-		public static String value = "Value";
+	private static final String KAFKA_COMMON_VALUE = "Value";
+
+	public enum KafkaLog {
+		SIZE("kafka.log:type=Log,name=Size,topic=%s,partition=%s"),
+		VALUE(KAFKA_COMMON_VALUE);
+		private String value;
+
+		private KafkaLog(String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return value;
+		}
 	}
 
-	public interface KafkaNetWork {
-		// TODO
+	public enum KafkaServer8 {
+		VERSION("kafka.common:type=AppInfo,name=Version"),
+		VALUE(KAFKA_COMMON_VALUE),
+		END_LOG_SIZE("kafka.log:type=Log,name=LogEndOffset,topic=%s,partition=%s"),
+		START_LOG_SIZE("kafka.log:type=Log,name=LogStartOffset,topic=%s,partition=%s");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		private KafkaServer8(String value) {
+			this.value = value;
+		}
 	}
 
-	public interface KafkaServer8 {
-		public static final String version = "kafka.common:type=AppInfo,name=Version";
-		public static final String value = "Value";
-		public static final String endLogSize = "kafka.log:type=Log,name=LogEndOffset,topic=%s,partition=%s";
-		public static final String startLogSize = "kafka.log:type=Log,name=LogStartOffset,topic=%s,partition=%s";
-	}
+	public enum BrokerServer {
+		BYTES_IN_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec"),
+		BYTES_OUT_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec"),
+		BYTES_REJECTED_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec"),
+		FAILED_FETCH_REQUESTS_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=FailedFetchRequestsPerSec"),
+		FAILED_PRODUCE_REQUESTS_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec"),
+		MESSAGES_IN_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec"),
+		PRODUCE_MESSAGE_CONVERSIONS_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=ProduceMessageConversionsPerSec"),
+		REPLICATION_BYTES_IN_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=ReplicationBytesInPerSec"),
+		REPLICATION_BYTES_OUT_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=ReplicationBytesOutPerSec"),
+		TOTAL_FETCH_REQUESTS_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec"),
+		TOTAL_PRODUCE_REQUESTS_PER_SEC("kafka.server:type=BrokerTopicMetrics,name=TotalProduceRequestsPerSec"),
+		BYTES_IN_PER_SEC_TOPIC("kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic=%s"),
+		BYTES_OUT_PER_SEC_TOPIC("kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=%s"),
+		JMX_PERFORMANCE_TYPE("java.lang:type=OperatingSystem"),
+		TOTAL_PHYSICAL_MEMORY_SIZE("TotalPhysicalMemorySize"),
+		FREE_PHYSICAL_MEMORY_SIZE("FreePhysicalMemorySize"),
+		BROKER_VERSION("kafka.server:type=app-info,id=%s"),
+		BROKER_VERSION_VALUE("Version");
 
-	public interface KafkaServer {
-		class BrokerTopicMetrics {
-			public static String bytesInPerSec = "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec";
-			public static String bytesOutPerSec = "kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec";
-			public static String bytesRejectedPerSec = "kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec";
-			public static String failedFetchRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=FailedFetchRequestsPerSec";
-			public static String failedProduceRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec";
-			public static String messagesInPerSec = "kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec";
-			public static String produceMessageConversionsPerSec = "kafka.server:type=BrokerTopicMetrics,name=ProduceMessageConversionsPerSec";
-			public static String replicationBytesInPerSec = "kafka.server:type=BrokerTopicMetrics,name=ReplicationBytesInPerSec";
-			public static String replicationBytesOutPerSec = "kafka.server:type=BrokerTopicMetrics,name=ReplicationBytesOutPerSec";
-			public static String totalFetchRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec";
-			public static String totalProduceRequestsPerSec = "kafka.server:type=BrokerTopicMetrics,name=TotalProduceRequestsPerSec";
+		private String value;
+
+		public String getValue() {
+			return value;
 		}
 
-		class Topic {
-			public static String bytesInPerSecTopic = "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic=%s";
-			public static String bytesOutPerSecTopic = "kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=%s";
+		private BrokerServer(String value) {
+			this.value = value;
 		}
-
-		class ClusterBusyMetrics {
-			// if value < 0.3, we need alert
-			public static String requestHandlerAvgIdlePercent = "kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent";
-			// if value < 0.3, we need alert
-			public static String networkProcessorAvgIdlePercent = "kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent";
-			// if value > 0, we need alert
-			public static String underReplicatedPartitions = "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions";
-			// if value > 0, we need alert
-			public static String offlinePartitionsCount = "kafka.controller:type=KafkaController,name=OfflinePartitionsCount";
-			// if value != 1,we need alert
-			public static String activeControllerCount = "kafka.controller:type=KafkaController,name=ActiveControllerCount";
-		}
-
-		class ZookeeperClientMetrics {
-			public static String zooKeeperRequestLatencyMs = "kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs";
-		}
-
-		
-		class OS{
-			public static String type = "java.lang:type=OperatingSystem";
-			public static String totalPhysicalMemorySize = "TotalPhysicalMemorySize";
-			public static String freePhysicalMemorySize = "FreePhysicalMemorySize";
-		}
-
-		public static final String version = "kafka.server:type=app-info,id=%s";
-		public static final String value = "Version";
-	}
-
-	public interface Hosts {
-		public static String load = "load";
-		public static String cpu = "cpu";
-		public static String free = "free";
-		public static String used = "used";
-		public static String disk = "disk";
-		public static String network = "network";
-		public static String tcp = "tcp";
-		public static String openfile = "openfile";
-		public static String inode = "inode";
 	}
 
 }

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
@@ -44,6 +45,12 @@ public interface TopicDao {
 	/** Read topic rank data. */
 	public List<TopicRank> readTopicRank(Map<String, Object> params);
 
+	/** Read topic spread, skewed, leader skewed data. */
+	public TopicRank readBrokerPerformance(Map<String, Object> params);
+
+	/** Get topic total capacity. */
+	public long getTopicCapacity(Map<String, Object> params);
+
 	/**
 	 * Write statistics topic logsize data from kafka jmx & insert into table.
 	 */
@@ -57,6 +64,9 @@ public interface TopicDao {
 
 	/** Get topic producer logsize chart datasets. */
 	public List<TopicLogSize> queryTopicProducerChart(Map<String, Object> params);
+
+	/** Get topic producer logsize by alarm. */
+	public List<TopicLogSize> queryTopicProducerByAlarm(Map<String, Object> params);
 
 	/** Get producer history bar data. */
 	public List<BScreenBarInfo> queryProducerHistoryBar(Map<String, Object> params);
@@ -104,5 +114,14 @@ public interface TopicDao {
 
 	/** Get lastest lag used to alarm consumer. */
 	public long queryLastestLag(Map<String, Object> params);
+
+	/** Write consumer group topic. */
+	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups);
+
+	/** Find consumer group topics. */
+	public int findConsumerGroupTopic(Map<String, Object> params);
+
+	/** Clean consumer group topics. */
+	public int cleanConsumerGroupTopic(Map<String, Object> params);
 
 }

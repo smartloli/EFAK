@@ -17,13 +17,11 @@
  */
 package org.smartloli.kafka.eagle.factory;
 
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.kafka.common.security.JaasUtils;
-
-import kafka.admin.AdminUtils;
-import kafka.admin.RackAwareMode;
-import kafka.utils.ZkUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 
 /**
  * Test clazz.
@@ -34,19 +32,9 @@ import kafka.utils.ZkUtils;
  */
 public class TestZkTopic {
 	public static void main(String[] args) {
-//		create();
-		delete();
+		String isr = "[0,1,2]";
+		List<Integer> isrInts = JSON.parseObject(isr, new TypeReference<ArrayList<Integer>>(){});
+		System.out.println(isrInts.toString());
 	}
-
-	public static void delete() {
-		ZkUtils zkUtils = ZkUtils.apply("localhost:2181", 30000, 30000, JaasUtils.isZkSecurityEnabled());
-		AdminUtils.deleteTopic(zkUtils, "tt1");
-		zkUtils.close();
-	}
-
-	public static void create() {
-		ZkUtils zkUtils = ZkUtils.apply("localhost:2181", 30000, 30000, JaasUtils.isZkSecurityEnabled());
-		AdminUtils.createTopic(zkUtils, "tt1", 1, 1, new Properties(), RackAwareMode.Enforced$.MODULE$);
-		zkUtils.close();
-	}
+	
 }

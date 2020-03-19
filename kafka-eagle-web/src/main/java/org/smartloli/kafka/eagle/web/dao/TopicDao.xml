@@ -48,11 +48,28 @@
 		<result property="tm" column="tm" />
 	</resultMap>
 
+	<resultMap type="org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo" id="cgi">
+		<result property="cluster" column="cluster" />
+		<result property="group" column="group" />
+		<result property="topic" column="topic" />
+	</resultMap>
+
 	<!-- TopicRank -->
 	<select id="readTopicRank" parameterType="map" resultMap="trank">
 		select `topic`,`tvalue` from ke_topic_rank
 		where `cluster` =#{cluster} and `tkey`=#{tkey}
 		order by `tvalue` desc limit 10
+	</select>
+
+	<!-- Topic broker spread, skew, leader skewed -->
+	<select id="readBrokerPerformance" parameterType="map" resultMap="trank">
+		select `topic`,`tvalue` from ke_topic_rank where cluster=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
+	</select>
+
+	<!-- TopicCapacity -->
+	<select id="getTopicCapacity" parameterType="map" resultType="long">
+		select sum(`tvalue`) from ke_topic_rank
+		where `cluster` =#{cluster} and `tkey`=#{tkey}
 	</select>
 
 	<insert id="writeTopicRank" parameterType="java.util.List">
@@ -86,6 +103,13 @@
 		and tm between #{stime} and #{etime}
 	</select>
 
+	<select id="queryTopicProducerByAlarm" parameterType="map" resultMap="tlogsize">
+		select `cluster`,`topic`,`logsize`,`diffval`,`timespan` from ke_logsize
+		where `cluster`=#{cluster} and `topic`=#{topic}
+		and tm=#{stime} order by `timespan` desc
+		limit 1
+	</select>
+
 	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
 		select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster}
 		<if test="topics != null and topics.size > 0">
@@ -107,7 +131,7 @@
 				and `id`=#{search}
 			</if>
 		</where>
-		limit #{start},#{size}
+		order by created desc limit #{start},#{size}
 	</select>
 
 	<select id="readTopicSqlHistoryByAdmin" parameterType="map" resultMap="tsql">
@@ -118,7 +142,7 @@
 				and (`id`=#{search} or `username`=#{search} or `host`=#{search})
 			</if>
 		</where>
-		limit #{start},#{size}
+		order by created desc limit #{start},#{size}
 	</select>
 
 	<select id="findTopicSqlByID" parameterType="map" resultMap="tsql">
@@ -212,8 +236,33 @@
 	</select>
 
 	<select id="queryLastestLag" parameterType="map" resultType="long">
+		select ifnull((
 		select ifnull(`lag`,0) from ke_consumer_bscreen
-		where `cluster`=#{cluster} and tm=#{tday} and `group`=#{group} and `topic`=#{topic} order by `timespan` desc limit 1
+		where `cluster`=#{cluster} and tm=#{tday}
+		and `group`=#{group} and `topic`=#{topic}
+		order by `timespan` desc
+		limit 1)
+		,0)
 	</select>
+
+	<insert id="writeConsumerGroupTopics" parameterType="java.util.List">
+		replace into
+		ke_consumer_group(`cluster`,`group`,`topic`)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.cluster},#{item.group},#{item.topic})
+		</foreach>
+	</insert>
+
+	<select id="findConsumerGroupTopic" parameterType="map" resultType="long">
+		select count(*) from ke_consumer_group
+		<where>
+			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
+		</where>
+	</select>
+	
+	<delete id="cleanConsumerGroupTopic" parameterType="int">
+		delete from ke_consumer_group where `cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
+	</delete>
 
 </mapper>

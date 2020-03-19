@@ -33,17 +33,35 @@ public class PartitionsInfo extends BaseProtocol {
 	private String topic = "";
 	private Set<String> partitions = new HashSet<String>();
 	private int partitionNumbers = 0;
+	private long brokersSkewed;
+	private long brokersSpread;
+	private long brokersLeaderSkewed;
 	private String created = "";
 	private String modify = "";
-//	private long logSize = 0L;
-//
-//	public long getLogSize() {
-//		return logSize;
-//	}
-//
-//	public void setLogSize(long logSize) {
-//		this.logSize = logSize;
-//	}
+
+	public long getBrokersSkewed() {
+		return brokersSkewed;
+	}
+
+	public void setBrokersSkewed(long brokersSkewed) {
+		this.brokersSkewed = brokersSkewed;
+	}
+
+	public long getBrokersSpread() {
+		return brokersSpread;
+	}
+
+	public void setBrokersSpread(long brokersSpread) {
+		this.brokersSpread = brokersSpread;
+	}
+
+	public long getBrokersLeaderSkewed() {
+		return brokersLeaderSkewed;
+	}
+
+	public void setBrokersLeaderSkewed(long brokersLeaderSkewed) {
+		this.brokersLeaderSkewed = brokersLeaderSkewed;
+	}
 
 	public String getCreated() {
 		return created;

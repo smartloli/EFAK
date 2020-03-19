@@ -61,19 +61,22 @@ public class TestKafkaServiceImpl {
 	private static ZkService zkService = new ZkFactory().create();
 
 	public static void main(String[] args) {
-		
+
+		long logsize = kafkaService.getKafkaLogSize("cluster1", "kafka20191217", 0);
+		System.out.println(logsize);
+
 		String res = kafkaService.getKafkaOffset("cluster1");
 		System.out.println(res);
-		
+
 		Set<Integer> partitionids = new HashSet<>();
 		for (int i = 0; i < 10; i++) {
 			partitionids.add(i);
 		}
-		Map<Integer, Long> offsets = kafkaService.getKafkaOffset("cluster1","kafka_app0", "test_16", partitionids);
+		Map<Integer, Long> offsets = kafkaService.getKafkaOffset("cluster1", "kafka_app0", "test_16", partitionids);
 		System.out.println("offsets: " + offsets);
 	}
-	
-	public Map<TopicPartition, Long> getKafkaLogSize( String topic, Set<Integer> partitionids) {
+
+	public Map<TopicPartition, Long> getKafkaLogSize(String topic, Set<Integer> partitionids) {
 		Properties props = new Properties();
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
 		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
@@ -84,12 +87,12 @@ public class TestKafkaServiceImpl {
 		Map<Integer, Long> partitionOffset = new HashMap<Integer, Long>();
 		for (int partitionid : partitionids) {
 			TopicPartition tp = new TopicPartition(topic, partitionid);
-			long offset= consumer.position(tp);
+			long offset = consumer.position(tp);
 			partitionOffset.put(partitionid, offset);
 		}
 
 		System.out.println(partitionOffset.toString());
-		
+
 		if (consumer != null) {
 			consumer.close();
 		}

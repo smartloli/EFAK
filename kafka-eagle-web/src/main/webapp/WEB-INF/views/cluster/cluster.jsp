@@ -97,6 +97,7 @@
 											<th>IP</th>
 											<th>Port</th>
 											<th>Mode</th>
+											<th>Version</th>
 										</tr>
 									</thead>
 								</table>

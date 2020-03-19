@@ -23,6 +23,8 @@ import java.util.Map;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
@@ -39,7 +41,9 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class DingDingJob implements Job {
 
-	@Override
+	private Logger LOG = LoggerFactory.getLogger(DingDingJob.class);
+
+	/** Send alarm information by dingding. */
 	public void execute(JobExecutionContext jobContext) throws JobExecutionException {
 		BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
 		sendMsg(bjc.getData(), bjc.getUrl());
@@ -48,8 +52,10 @@ public class DingDingJob implements Job {
 	private int sendMsg(String data, String url) {
 		try {
 			Map<String, Object> dingDingMarkdownMessage = getDingDingMarkdownMessage(IM.TITLE, data, true);
-			HttpClientUtils.doPostJson(url, JSONObject.toJSONString(dingDingMarkdownMessage));
+			String result = HttpClientUtils.doPostJson(url, JSONObject.toJSONString(dingDingMarkdownMessage));
+			LOG.info("DingDing SendMsg Result: " + result);
 		} catch (Exception e) {
+			LOG.error("Send alarm message has error by dingding, msg is ", e);
 			e.printStackTrace();
 			return 0;
 		}
@@ -73,7 +79,7 @@ public class DingDingJob implements Job {
 		map.put("markdown", markdown);
 
 		Map<String, Object> at = new HashMap<>();
-		at.put("isAtAll", false);
+		at.put("isAtAll", isAtAll);
 		map.put("at", at);
 
 		return map;

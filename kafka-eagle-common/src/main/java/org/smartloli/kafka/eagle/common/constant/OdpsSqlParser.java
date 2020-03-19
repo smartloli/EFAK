@@ -21,8 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.util.ThrowExceptionUtils;
 
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
@@ -41,7 +40,8 @@ import com.alibaba.druid.util.JdbcConstants;
  */
 public class OdpsSqlParser {
 
-	private static Logger LOG = LoggerFactory.getLogger(OdpsSqlParser.class);
+	private OdpsSqlParser() {
+	}
 
 	/** Parser sql mapper kafka tree. */
 	public static String parserTopic(String sql) {
@@ -53,14 +53,14 @@ public class OdpsSqlParser {
 			stmt.accept(visitor);
 			Map<Name, TableStat> tabmap = visitor.getTables();
 			String tableName = "";
-			for (Iterator<Name> iterator = tabmap.keySet().iterator(); iterator.hasNext();) {
-				Name name = (Name) iterator.next();
+			Iterator<Name> iterator = tabmap.keySet().iterator();
+			while (iterator.hasNext()) {
+				Name name = iterator.next();
 				tableName = name.toString();
 			}
 			return tableName.trim();
 		} catch (Exception e) {
-			LOG.error("Parser kafka sql has error, msg is " + e.getMessage());
-			e.printStackTrace();
+			ThrowExceptionUtils.print(OdpsSqlParser.class).error("Parser kafka sql has error, msg is ", e);
 			return "";
 		}
 	}

@@ -34,26 +34,23 @@ import org.smartloli.kafka.eagle.common.util.QuartzManagerUtils;
  */
 public class IMServiceImpl implements IMService {
 
+	private static final String KE_JOB_ID = "ke_job_id_";
+
 	/** Send Json msg by dingding. */
 	@Override
 	public void sendPostMsgByDingDing(String data, String url) {
 		BaseJobContext jobContext = new BaseJobContext();
 		jobContext.setData(data);
 		jobContext.setUrl(url);
-		QuartzManagerUtils.addJob(jobContext, "ke_job_id_" + new Date().getTime(), DingDingJob.class, QuartzManagerUtils.getCron(new Date(), 5));
+		QuartzManagerUtils.addJob(jobContext, KE_JOB_ID + new Date().getTime(), DingDingJob.class, QuartzManagerUtils.getCron(new Date(), 5));
 	}
-	
+
 	@Override
 	public void sendPostMsgByWeChat(String data, String url) {
 		BaseJobContext jobContext = new BaseJobContext();
 		jobContext.setData(data);
 		jobContext.setUrl(url);
-		QuartzManagerUtils.addJob(jobContext, "ke_job_id_" + new Date().getTime(), WeChatJob.class, QuartzManagerUtils.getCron(new Date(), 5));
-	}
-
-	@Override
-	public void sendPostMsgByWebhook(String data, String url) {
-
+		QuartzManagerUtils.addJob(jobContext, KE_JOB_ID + new Date().getTime(), WeChatJob.class, QuartzManagerUtils.getCron(new Date(), 5));
 	}
 
 	@Override
@@ -61,8 +58,7 @@ public class IMServiceImpl implements IMService {
 		BaseJobContext jobContext = new BaseJobContext();
 		jobContext.setData(data);
 		jobContext.setUrl(url);
-		QuartzManagerUtils.addJob(jobContext, "ke_job_id_" + new Date().getTime(), MailJob.class, QuartzManagerUtils.getCron(new Date(), 5));
+		QuartzManagerUtils.addJob(jobContext, KE_JOB_ID + new Date().getTime(), MailJob.class, QuartzManagerUtils.getCron(new Date(), 5));
 	}
-
 
 }

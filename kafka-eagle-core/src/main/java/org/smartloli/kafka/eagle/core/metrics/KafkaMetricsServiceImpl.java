@@ -88,7 +88,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 	private final String CONFIG_TOPIC_PATH = "/config/topics/";
 
 	public JSONObject topicKafkaCapacity(String clusterAlias, String topic) {
-		if(Kafka.CONSUMER_OFFSET_TOPIC.equals(topic)) {
+		if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic)) {
 			return new JSONObject();
 		}
 		Properties prop = new Properties();
@@ -147,8 +147,8 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
 				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 				MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-				String objectName = String.format(KafkaLog.size, topic, leader.getPartitionId());
-				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.value);
+				String objectName = String.format(KafkaLog.SIZE.getValue(), topic, leader.getPartitionId());
+				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.VALUE.getValue());
 				tpSize += Long.parseLong(size.toString());
 			} catch (Exception ex) {
 				LOG.error("Get topic size from jmx has error, msg is " + ex.getMessage());
@@ -212,7 +212,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 				object.remove(configEntry.name());
 			}
 			List<ConfigEntry> configEntrys = new ArrayList<>();
-			for (String key : KConstants.Topic.KEYS) {
+			for (String key : KConstants.Topic.getTopicConfigKeys()) {
 				if (object.containsKey(key)) {
 					configEntrys.add(new ConfigEntry(key, object.getString(key)));
 				}
@@ -238,7 +238,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 			JSONObject object = JSON.parseObject(describeTopicConfigs).getJSONObject("config");
 			object.remove(configEntry.name());
 			List<ConfigEntry> configEntrys = new ArrayList<>();
-			for (String key : KConstants.Topic.KEYS) {
+			for (String key : KConstants.Topic.getTopicConfigKeys()) {
 				if (object.containsKey(key)) {
 					configEntrys.add(new ConfigEntry(key, object.getString(key)));
 				}
@@ -304,8 +304,8 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 				JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
 				connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 				MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-				String objectName = String.format(KafkaLog.size, topic, leader.getPartitionId());
-				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.value);
+				String objectName = String.format(KafkaLog.SIZE.getValue(), topic, leader.getPartitionId());
+				Object size = mbeanConnection.getAttribute(new ObjectName(objectName), KafkaLog.VALUE.getValue());
 				tpSize += Long.parseLong(size.toString());
 			} catch (Exception ex) {
 				LOG.error("Get topic size from jmx has error, msg is " + ex.getMessage());

@@ -70,13 +70,13 @@ public class DashboardController {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/** Get data from Kafka in dashboard by ajax. */
 	@RequestMapping(value = "/dash/{tkey}/table/ajax", method = RequestMethod.GET)
-	public void dashTopicRankAjax(@PathVariable("tkey") String tkey,HttpServletResponse response, HttpServletRequest request) {
+	public void dashTopicRankAjax(@PathVariable("tkey") String tkey, HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		try {
 			params.put("cluster", clusterAlias);
 			params.put("tkey", tkey);
@@ -86,13 +86,13 @@ public class DashboardController {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/** Get data from Kafka in dashboard by ajax. */
 	@RequestMapping(value = "/dash/os/mem/ajax", method = RequestMethod.GET)
 	public void dashOSMemAjax(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		try {
 			params.put("cluster", clusterAlias);
 			params.put("key", "os%");

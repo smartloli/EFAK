@@ -26,8 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.smartloli.kafka.eagle.api.email.MailFactory;
-import org.smartloli.kafka.eagle.api.email.MailService;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.pojo.RoleResource;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
@@ -108,10 +106,6 @@ public class RoleController {
 		signin.setUsername(username);
 		try {
 			if (accountService.insertUser(signin) > 0) {
-				MailService mail = new MailFactory().create();
-				String content = "You can use account(" + signin.getUsername() + ") or rtxno(" + signin.getRtxno() + ") signin, and you password is : [" + signin.getPassword()
-						+ "], you can change the password in the system personal settings. Hope you have a nice day.";
-				mail.send("*** Password ***", signin.getEmail(), content, null);
 				return "redirect:/system/user";
 			} else {
 				return "redirect:/errors/500";

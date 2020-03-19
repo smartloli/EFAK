@@ -33,6 +33,10 @@ import javax.servlet.http.HttpServletResponse;
  *         Created by Jun 2, 2017
  */
 public class BaseController {
+	
+	private BaseController() {
+		
+	}
 
 	/** Response data to request url. */
 	public static void response(byte[] output, HttpServletResponse response) throws IOException {

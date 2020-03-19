@@ -26,12 +26,14 @@ import java.util.Map.Entry;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
+import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
-import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
@@ -70,7 +72,73 @@ public class MetricsServiceImpl implements MetricsService {
 
 	/** Gets summary monitoring data for all broker. */
 	public String getAllBrokersMBean(String clusterAlias) {
+		String result = "";
 		List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+		int brokerSize = SystemConfigUtils.getIntProperty(clusterAlias + ".kafka.eagle.broker.size");
+		if (brokers.size() <= brokerSize) {
+			result = getOnlineAllBrokersMBean(clusterAlias, brokers);
+		} else {
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			result = getOfflineAllBrokersMBean(params);
+		}
+		return result;
+	}
+
+	/** Gets summary offline monitoring data for all broker. */
+	private String getOfflineAllBrokersMBean(Map<String, Object> params) {
+		Map<String, MBeanInfo> mbeans = new HashMap<>();
+		List<MBeanOfflineInfo> mbeanOfflines = mbeanDao.getMBeanOffline(params);
+		for (MBeanOfflineInfo mbeanOffline : mbeanOfflines) {
+			MBeanInfo mbeanInfo = new MBeanInfo();
+			mbeanInfo.setOneMinute(mbeanOffline.getOneMinute());
+			mbeanInfo.setMeanRate(mbeanOffline.getMeanRate());
+			mbeanInfo.setFiveMinute(mbeanOffline.getFiveMinute());
+			mbeanInfo.setFifteenMinute(mbeanOffline.getFifteenMinute());
+			switch (mbeanOffline.getKey()) {
+			case MBean.MESSAGEIN:
+				mbeans.put(MBean.MESSAGES_IN, mbeanInfo);
+				break;
+			case MBean.BYTEIN:
+				mbeans.put(MBean.BYTES_IN, mbeanInfo);
+				break;
+			case MBean.BYTEOUT:
+				mbeans.put(MBean.BYTES_OUT, mbeanInfo);
+				break;
+			case MBean.BYTESREJECTED:
+				mbeans.put(MBean.BYTES_REJECTED, mbeanInfo);
+				break;
+			case MBean.FAILEDFETCHREQUEST:
+				mbeans.put(MBean.FAILED_FETCH_REQUEST, mbeanInfo);
+				break;
+			case MBean.FAILEDPRODUCEREQUEST:
+				mbeans.put(MBean.FAILED_PRODUCE_REQUEST, mbeanInfo);
+				break;
+			case MBean.TOTALFETCHREQUESTSPERSEC:
+				mbeans.put(MBean.TOTALFETCHREQUESTSPERSEC, mbeanInfo);
+				break;
+			case MBean.TOTALPRODUCEREQUESTSPERSEC:
+				mbeans.put(MBean.TOTALPRODUCEREQUESTSPERSEC, mbeanInfo);
+				break;
+			case MBean.REPLICATIONBYTESINPERSEC:
+				mbeans.put(MBean.REPLICATIONBYTESINPERSEC, mbeanInfo);
+				break;
+			case MBean.REPLICATIONBYTESOUTPERSEC:
+				mbeans.put(MBean.REPLICATIONBYTESOUTPERSEC, mbeanInfo);
+				break;
+			case MBean.PRODUCEMESSAGECONVERSIONS:
+				mbeans.put(MBean.PRODUCEMESSAGECONVERSIONS, mbeanInfo);
+				break;
+			default:
+				break;
+			}
+		}
+
+		return new Gson().toJson(mbeans);
+	}
+
+	/** Gets summary online monitoring data for all broker. */
+	private String getOnlineAllBrokersMBean(String clusterAlias, List<BrokersInfo> brokers) {
 		Map<String, MBeanInfo> mbeans = new HashMap<>();
 		for (BrokersInfo broker : brokers) {
 			String uri = broker.getHost() + ":" + broker.getJmxPort();
@@ -261,16 +329,6 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	@Override
-	public int setConsumerTopic(List<TopicOffsetsInfo> topicOffsets) {
-		return mbeanDao.setConsumerTopic(topicOffsets);
-	}
-
-	@Override
-	public void cleanConsumerTopic(int tm) {
-		mbeanDao.cleanConsumerTopic(tm);
-	}
-
-	@Override
 	public void cleanTopicLogSize(int tm) {
 		topicDao.cleanTopicLogSize(tm);
 	}
@@ -298,6 +356,16 @@ public class MetricsServiceImpl implements MetricsService {
 	@Override
 	public void cleanTopicSqlHistory(int tm) {
 		topicDao.cleanTopicSqlHistory(tm);
+	}
+
+	@Override
+	public int mbeanOfflineInsert(List<MBeanOfflineInfo> kpis) {
+		return mbeanDao.mbeanOfflineInsert(kpis);
+	}
+
+	@Override
+	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups) {
+		return topicDao.writeConsumerGroupTopics(consumerGroups);
 	}
 
 }

@@ -31,8 +31,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Request http client,such as get or post etc.
@@ -43,7 +41,9 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpClientUtils {
 
-	private static final Logger LOG = LoggerFactory.getLogger(HttpClientUtils.class);
+	private HttpClientUtils() {
+
+	}
 
 	/**
 	 * Send request by get method.
@@ -53,27 +53,27 @@ public class HttpClientUtils {
 	 */
 	public static String doGet(String uri) {
 		String result = "";
+		CloseableHttpClient client = null;
+		CloseableHttpResponse response = null;
 		try {
-			CloseableHttpClient client = null;
-			CloseableHttpResponse response = null;
+			HttpGet httpGet = new HttpGet(uri);
+			client = HttpClients.createDefault();
+			response = client.execute(httpGet);
+			HttpEntity entity = response.getEntity();
+			result = EntityUtils.toString(entity);
+		} catch (Exception e) {
+			ThrowExceptionUtils.print(HttpClientUtils.class).error("Do get request has error, msg is ", e);
+		} finally {
 			try {
-				HttpGet httpGet = new HttpGet(uri);
-
-				client = HttpClients.createDefault();
-				response = client.execute(httpGet);
-				HttpEntity entity = response.getEntity();
-				result = EntityUtils.toString(entity);
-			} finally {
 				if (response != null) {
 					response.close();
 				}
 				if (client != null) {
 					client.close();
 				}
+			} catch (Exception e) {
+				ThrowExceptionUtils.print(HttpClientUtils.class).error("Release get httpclient request has error, msg is ", e);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOG.error("Do get request has error, msg is " + e.getMessage());
 		}
 		return result;
 	}
@@ -90,28 +90,28 @@ public class HttpClientUtils {
 	 */
 	public static String doPostForm(String uri, List<BasicNameValuePair> parames) {
 		String result = "";
+		CloseableHttpClient client = null;
+		CloseableHttpResponse response = null;
 		try {
-			CloseableHttpClient client = null;
-			CloseableHttpResponse response = null;
+			HttpPost httpPost = new HttpPost(uri);
+			httpPost.setEntity(new UrlEncodedFormEntity(parames, "UTF-8"));
+			client = HttpClients.createDefault();
+			response = client.execute(httpPost);
+			HttpEntity entity = response.getEntity();
+			result = EntityUtils.toString(entity);
+		} catch (Exception e) {
+			ThrowExceptionUtils.print(HttpClientUtils.class).error("Do post form request has error, msg is ", e);
+		} finally {
 			try {
-
-				HttpPost httpPost = new HttpPost(uri);
-				httpPost.setEntity(new UrlEncodedFormEntity(parames, "UTF-8"));
-				client = HttpClients.createDefault();
-				response = client.execute(httpPost);
-				HttpEntity entity = response.getEntity();
-				result = EntityUtils.toString(entity);
-			} finally {
 				if (response != null) {
 					response.close();
 				}
 				if (client != null) {
 					client.close();
 				}
+			} catch (Exception e) {
+				ThrowExceptionUtils.print(HttpClientUtils.class).error("Release post httpclient request has error, msg is ", e);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOG.error("Do post form request has error, msg is " + e.getMessage());
 		}
 		return result;
 	}
@@ -124,31 +124,31 @@ public class HttpClientUtils {
 	 */
 	public static String doPostJson(String uri, String data) {
 		String result = "";
+		CloseableHttpClient client = null;
+		CloseableHttpResponse response = null;
 		try {
-			CloseableHttpClient client = null;
-			CloseableHttpResponse response = null;
+			HttpPost httpPost = new HttpPost(uri);
+			httpPost.setHeader(HTTP.CONTENT_TYPE, "application/json");
+			httpPost.setEntity(new StringEntity(data, ContentType.create("text/json", "UTF-8")));
+			client = HttpClients.createDefault();
+			response = client.execute(httpPost);
+			HttpEntity entity = response.getEntity();
+			result = EntityUtils.toString(entity);
+		} catch (Exception e) {
+			ThrowExceptionUtils.print(HttpClientUtils.class).error("Do post json request has error, msg is ", e);
+		} finally {
 			try {
-				HttpPost httpPost = new HttpPost(uri);
-				httpPost.setHeader(HTTP.CONTENT_TYPE, "application/json");
-				httpPost.setEntity(new StringEntity(data, ContentType.create("text/json", "UTF-8")));
-				client = HttpClients.createDefault();
-				response = client.execute(httpPost);
-				HttpEntity entity = response.getEntity();
-				result = EntityUtils.toString(entity);
-			} finally {
 				if (response != null) {
 					response.close();
 				}
 				if (client != null) {
 					client.close();
 				}
+			} catch (Exception e) {
+				ThrowExceptionUtils.print(HttpClientUtils.class).error("Release post json request has error, msg is ", e);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOG.error("Do post json request has error, msg is " + e.getMessage());
 		}
-
 		return result;
 	}
-	
+
 }

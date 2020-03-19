@@ -24,20 +24,20 @@ Here are a few Kafka Eagle system screenshots:
 
 # Alert Support
 In addition to supporting ```email``` alerts, Kafka Eagle also supports im alerts, such as ```DingDing``` and ```WeChat```.
-![DingDing Alert](https://docs.kafka-eagle.org/res/dingding@2x.png)
-![WeChat Alert](https://docs.kafka-eagle.org/res/wechat@2x.png)
+![DingDing Alert](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-YCJshnbZ9rWX7eOMA%2F-M-YCKhrhv8_KksGY2vY%2Fdingding_alert@2x.png?generation=1581138667614351&alt=media)
+![WeChat Alert](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-YCJshnbZ9rWX7eOMA%2F-M-YCKhthAB9NHKTUcZG%2Fwechat_alert@2x.png?generation=1581138665418224&alt=media)
 
 # List of Consumer Groups & Active Group Graph
-![Consumer & Active Graph](https://docs.kafka-eagle.org/res/consumer@2x.png)
+![Consumer & Active Graph](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-LjfrvZnr8VnQqA2gTze%2F-LjfrwYhk2GyuRfT-Keh%2Fconsumer@2x.png?generation=1563030447787989&alt=media)
 
 # List of Topics Detail
-![Topics](https://docs.kafka-eagle.org/res/list@2x.png)
+![Topics](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-LjfrvZnr8VnQqA2gTze%2F-LjfrwfE8uFt6dAdw0kU%2Flist@2x.png?generation=1563030448602231&alt=media)
 
 # Consumer & Producer Rate Chart
-![Rate Chart](https://docs.kafka-eagle.org/res/consumer_producer_rate@2x.png)
+![Rate Chart](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-TYOxvLPc3po_hZb0J%2F-M-TYPrf-qd3i1TjJ5NS%2Fconsumer_rate_graph@2x.png?generation=1581060568671558&alt=media)
 
 # Start Kafka Eagle
-![KE Script](https://docs.kafka-eagle.org/res/ke_script@2x.png?q=20190530)
+![KE Script](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-TbAtsxTA91c-ii-mY%2F-M-TYPcgh7KPMYNerWJD%2Fke_bash@2x.png?generation=1581061556694462&alt=media)
 
 # Kafka Offset Types
 
@@ -62,6 +62,10 @@ cluster2.kafka.eagle.offset.storage=zookeeper
 # Kafka SQL
 
 Use the SQL statement to query the topic message log, and visualize the results, you can read [Kafka SQL](https://docs.kafka-eagle.org/3.Manuals/9.KafkaSQL.html) to view the syntax.
+For example, if you kafka has a topic with three partitions, the ksql query statement is as follows.
+```
+select * from "kafka_topic_name" where "partition" in (0,1,2) limit 10
+```
 
 # Quickstart
 

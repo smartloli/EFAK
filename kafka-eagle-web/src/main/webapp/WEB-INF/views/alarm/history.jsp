@@ -103,7 +103,7 @@
 									<tr>
 										<th>ID</th>
 										<th>Type</th>
-										<th>Server</th>
+										<th>Value</th>
 										<th>Name</th>
 										<th>Times</th>
 										<th>MaxTimes</th>

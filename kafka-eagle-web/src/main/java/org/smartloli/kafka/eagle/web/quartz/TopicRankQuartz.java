@@ -19,34 +19,22 @@ package org.smartloli.kafka.eagle.web.quartz;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
-import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
-import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.DashboardServiceImpl;
-import org.smartloli.kafka.eagle.web.service.impl.MetricsServiceImpl;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * Collector topic logsize, capacity etc.
@@ -61,9 +49,6 @@ public class TopicRankQuartz {
 
 	/** Kafka service interface. */
 	private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
-
-	/** Kafka service interface. */
-	private KafkaService kafkaService = new KafkaFactory().create();
 
 	/** Broker service interface. */
 	private static BrokerService brokerService = new BrokerFactory().create();
@@ -91,9 +76,60 @@ public class TopicRankQuartz {
 		}
 
 		try {
-			bscreenConsumerTopicStats();
+			for (String bType : Topic.BROKER_PERFORMANCE_LIST) {
+				brokerPerformanceByTopicStats(bType);
+			}
 		} catch (Exception e) {
-			LOG.error("Collector bscreen consumer topic has error, msg is " + e.getCause().getMessage());
+			LOG.error("Collector broker spread by topic has error, msg is ", e);
+			e.printStackTrace();
+		}
+	}
+
+	private void brokerPerformanceByTopicStats(String bType) {
+		DashboardServiceImpl dashboardServiceImpl = null;
+		try {
+			dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
+		} catch (Exception e) {
+			LOG.error("Create topic spread, skewed, leader skewed object has error,msg is ", e);
+		}
+
+		List<TopicRank> topicRanks = new ArrayList<>();
+		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+		for (String clusterAlias : clusterAliass) {
+			List<String> topics = brokerService.topicList(clusterAlias);
+			for (String topic : topics) {
+				int tValue = 0;
+				if (bType.equals(Topic.BROKER_SPREAD)) {
+					tValue = brokerService.getBrokerSpreadByTopic(clusterAlias, topic);
+				} else if (bType.equals(Topic.BROKER_SKEWED)) {
+					tValue = brokerService.getBrokerSkewedByTopic(clusterAlias, topic);
+				} else if (bType.equals(Topic.BROKER_LEADER_SKEWED)) {
+					tValue = brokerService.getBrokerLeaderSkewedByTopic(clusterAlias, topic);
+				}
+				TopicRank topicRank = new TopicRank();
+				topicRank.setCluster(clusterAlias);
+				topicRank.setTopic(topic);
+				topicRank.setTkey(bType);
+				topicRank.setTvalue(tValue);
+				topicRanks.add(topicRank);
+				if (topicRanks.size() > Topic.BATCH_SIZE) {
+					try {
+						dashboardServiceImpl.writeTopicRank(topicRanks);
+						topicRanks.clear();
+					} catch (Exception e) {
+						e.printStackTrace();
+						LOG.error("Write topic [" + bType + "] has error, msg is " + e.getMessage());
+					}
+				}
+			}
+		}
+		try {
+			if (topicRanks.size() > 0) {
+				dashboardServiceImpl.writeTopicRank(topicRanks);
+				topicRanks.clear();
+			}
+		} catch (Exception e) {
+			LOG.error("Write topic [" + bType + "] end data has error,msg is " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -234,150 +270,6 @@ public class TopicRankQuartz {
 			}
 		} catch (Exception e) {
 			LOG.error("Write topic producer logsize end data has error,msg is " + e.getCause().getMessage());
-			e.printStackTrace();
-		}
-	}
-
-	private void bscreenConsumerTopicStats() {
-		MetricsServiceImpl metricsServiceImpl = null;
-		try {
-			metricsServiceImpl = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
-		} catch (Exception e) {
-			LOG.error("Get metricsServiceImpl bean has error, msg is " + e.getCause().getMessage());
-			e.printStackTrace();
-			return;
-		}
-
-		List<BScreenConsumerInfo> bscreenConsumers = new ArrayList<>();
-		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
-		for (String clusterAlias : clusterAliass) {
-			if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
-				JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
-				for (Object object : consumerGroups) {
-					JSONObject consumerGroup = (JSONObject) object;
-					String group = consumerGroup.getString("group");
-					for (String topic : kafkaService.getKafkaConsumerTopics(clusterAlias, group)) {
-						BScreenConsumerInfo bscreenConsumer = new BScreenConsumerInfo();
-						bscreenConsumer.setCluster(clusterAlias);
-						bscreenConsumer.setGroup(group);
-						bscreenConsumer.setTopic(topic);
-
-						List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
-						Set<Integer> partitionsInts = new HashSet<>();
-						for (String partition : partitions) {
-							try {
-								partitionsInts.add(Integer.parseInt(partition));
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-
-						Map<Integer, Long> partitionOffset = kafkaService.getKafkaOffset(bscreenConsumer.getCluster(), bscreenConsumer.getGroup(), bscreenConsumer.getTopic(), partitionsInts);
-						Map<TopicPartition, Long> tps = kafkaService.getKafkaLogSize(bscreenConsumer.getCluster(), bscreenConsumer.getTopic(), partitionsInts);
-						long logsize = 0L;
-						long offsets = 0L;
-						if (tps != null && partitionOffset != null) {
-							for (Entry<TopicPartition, Long> entrySet : tps.entrySet()) {
-								try {
-									logsize += entrySet.getValue();
-									offsets += partitionOffset.get(entrySet.getKey().partition());
-								} catch (Exception e) {
-									LOG.error("Get logsize and offsets has error, msg is " + e.getCause().getMessage());
-									e.printStackTrace();
-								}
-							}
-						}
-
-						Map<String, Object> params = new HashMap<String, Object>();
-						params.put("cluster", clusterAlias);
-						params.put("group", group);
-						params.put("topic", topic);
-						BScreenConsumerInfo lastBScreenConsumerTopic = metricsServiceImpl.readBScreenLastTopic(params);
-						if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getLogsize() == 0) {
-							bscreenConsumer.setDifflogsize(0);
-						} else {
-							bscreenConsumer.setDifflogsize(logsize - lastBScreenConsumerTopic.getLogsize());
-						}
-						if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getOffsets() == 0) {
-							bscreenConsumer.setDiffoffsets(0);
-						} else {
-							bscreenConsumer.setDiffoffsets(offsets - lastBScreenConsumerTopic.getOffsets());
-						}
-						bscreenConsumer.setLogsize(logsize);
-						bscreenConsumer.setOffsets(offsets);
-						bscreenConsumer.setLag(logsize - offsets);
-						bscreenConsumer.setTimespan(CalendarUtils.getTimeSpan());
-						bscreenConsumer.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-						bscreenConsumers.add(bscreenConsumer);
-						if (bscreenConsumers.size() > Topic.BATCH_SIZE) {
-							try {
-								metricsServiceImpl.writeBSreenConsumerTopic(bscreenConsumers);
-								bscreenConsumers.clear();
-							} catch (Exception e) {
-								e.printStackTrace();
-								LOG.error("Write bsreen kafka topic consumer has error, msg is " + e.getCause().getMessage());
-							}
-						}
-					}
-				}
-			} else {
-				Map<String, List<String>> consumerGroups = kafkaService.getConsumers(clusterAlias);
-				for (Entry<String, List<String>> entry : consumerGroups.entrySet()) {
-					String group = entry.getKey();
-					for (String topic : kafkaService.getActiveTopic(clusterAlias, group)) {
-						BScreenConsumerInfo bscreenConsumer = new BScreenConsumerInfo();
-						bscreenConsumer.setCluster(clusterAlias);
-						bscreenConsumer.setGroup(group);
-						bscreenConsumer.setTopic(topic);
-						long logsize = brokerService.getTopicLogSizeTotal(clusterAlias, topic);
-						bscreenConsumer.setLogsize(logsize);
-						long lag = kafkaService.getLag(clusterAlias, group, topic);
-
-						Map<String, Object> params = new HashMap<String, Object>();
-						params.put("cluster", clusterAlias);
-						params.put("group", group);
-						params.put("topic", topic);
-						BScreenConsumerInfo lastBScreenConsumerTopic = metricsServiceImpl.readBScreenLastTopic(params);
-						if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getLogsize() == 0) {
-							bscreenConsumer.setDifflogsize(0);
-						} else {
-							bscreenConsumer.setDifflogsize(logsize - lastBScreenConsumerTopic.getLogsize());
-						}
-						if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getOffsets() == 0) {
-							bscreenConsumer.setDiffoffsets(0);
-						} else {
-							bscreenConsumer.setDiffoffsets((logsize - lag) - lastBScreenConsumerTopic.getOffsets());
-						}
-						bscreenConsumer.setLag(lag);
-						bscreenConsumer.setOffsets(logsize - lag);
-						bscreenConsumer.setTimespan(CalendarUtils.getTimeSpan());
-						bscreenConsumer.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-						bscreenConsumers.add(bscreenConsumer);
-						if (bscreenConsumers.size() > Topic.BATCH_SIZE) {
-							try {
-								metricsServiceImpl.writeBSreenConsumerTopic(bscreenConsumers);
-								bscreenConsumers.clear();
-							} catch (Exception e) {
-								e.printStackTrace();
-								LOG.error("Write bsreen topic consumer has error, msg is " + e.getCause().getMessage());
-							}
-						}
-					}
-				}
-			}
-		}
-		try {
-			if (bscreenConsumers.size() > 0) {
-				try {
-					metricsServiceImpl.writeBSreenConsumerTopic(bscreenConsumers);
-					bscreenConsumers.clear();
-				} catch (Exception e) {
-					e.printStackTrace();
-					LOG.error("Write bsreen final topic consumer has error, msg is " + e.getCause().getMessage());
-				}
-			}
-		} catch (Exception e) {
-			LOG.error("Collector consumer lag data has error,msg is " + e.getCause().getMessage());
 			e.printStackTrace();
 		}
 	}

@@ -169,8 +169,10 @@ public class DashboardServiceImpl implements DashboardService {
 	public int writeTopicRank(List<TopicRank> topicRanks) {
 		return topicDao.writeTopicRank(topicRanks);
 	}
-	
-	/** Write statistics topic logsize data from kafka jmx & insert into table. */
+
+	/**
+	 * Write statistics topic logsize data from kafka jmx & insert into table.
+	 */
 	public int writeTopicLogSize(List<TopicLogSize> topicLogSize) {
 		return topicDao.writeTopicLogSize(topicLogSize);
 	}

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 
 /**
@@ -35,8 +37,16 @@ public interface MBeanDao {
 	/** Collection statistics data from kafka jmx & insert into table. */
 	public int insert(List<KpiInfo> kpi);
 
+	/**
+	 * Collection statistics offline data from kafka jmx & insert into table.
+	 */
+	public int mbeanOfflineInsert(List<MBeanOfflineInfo> kpi);
+
 	/** Query collector data. */
 	public List<KpiInfo> query(Map<String, Object> params);
+
+	/** Query collector data. */
+	public List<MBeanOfflineInfo> getMBeanOffline(Map<String, Object> params);
 
 	/** Get broker kpi, such bytein or byteout etc. */
 	public KpiInfo getBrokersKpi(Map<String, Object> params);
@@ -44,20 +54,11 @@ public interface MBeanDao {
 	/** Crontab clean data. */
 	public void remove(int tm);
 
-	/** @deprecated Get consumer topic metrics. */
-	public List<TopicOffsetsInfo> getConsumerTopic(Map<String, Object> params);
-
-	/** Get consumer lag topic metrics. */
-	public List<TopicOffsetsInfo> getConsumerLagTopic(Map<String, Object> params);
+	/** Get consumer offset topic metrics. */
+	public List<BScreenConsumerInfo> getConsumerOffsetsTopic(Map<String, Object> params);
 
 	/** Get consumer rate topic metrics. */
 	public List<TopicOffsetsInfo> getConsumerRateTopic(Map<String, Object> params);
-
-	/** Set consumer topic metrics. */
-	public int setConsumerTopic(List<TopicOffsetsInfo> consumerTopic);
-
-	/** Clean consumer topic data. */
-	public void cleanConsumerTopic(int tm);
 
 	/** Query os memory data. */
 	public List<KpiInfo> getOsMem(Map<String, Object> params);

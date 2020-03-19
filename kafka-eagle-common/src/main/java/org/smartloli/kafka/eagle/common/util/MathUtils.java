@@ -15,17 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.api.email;
+package org.smartloli.kafka.eagle.common.util;
 
 /**
- * Mail provider MailService visitor enter.
+ * Math util tools.
  * 
  * @author smartloli.
  *
- *         Created by Jan 17, 2017
- * 
- * @see org.smartloli.kafka.eagle.api.email.MailService
+ *         Created by Feb 12, 2020
  */
-public interface MailProvider {
-	public MailService create();
+public class MathUtils {
+
+	/** Round up by numerator and denominator. */
+	public static int ceil(int numerator, int denominator) {
+		return (denominator % numerator == 0) ? (denominator / numerator) : (denominator / numerator + 1);
+	}
+
 }

@@ -17,11 +17,15 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.web.service.BScreenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -98,6 +102,22 @@ public class BScreenController {
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		try {
 			byte[] output = bscreen.getTodayOrHistoryConsumerProducer(clusterAlias, dtype).getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Get today consumer and producer data and lag data by ajax. */
+	@RequestMapping(value = "/bs/topic/total/capacity/ajax", method = RequestMethod.GET)
+	public void getTopicTotalCapacityAjax(HttpServletResponse response, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		try {
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("tkey", Topic.CAPACITY);
+			byte[] output = bscreen.getTopicCapacity(params).getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

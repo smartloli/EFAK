@@ -26,6 +26,7 @@ import org.quartz.JobExecutionException;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
+import org.smartloli.kafka.eagle.common.util.ThrowExceptionUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -39,7 +40,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class MailJob implements Job {
 
-	@Override
+	/** Send alarm information by mail. */
 	public void execute(JobExecutionContext jobContext) throws JobExecutionException {
 		BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
 		sendMsg(bjc.getData(), bjc.getUrl());
@@ -52,7 +53,7 @@ public class MailJob implements Job {
 			BasicNameValuePair msg = new BasicNameValuePair("msg", object.getString("msg"));
 			HttpClientUtils.doPostForm(url, Arrays.asList(address,msg));
 		} catch (Exception e) {
-			e.printStackTrace();
+			ThrowExceptionUtils.print(this.getClass()).error("Send alarm message has error by mail, msg is ",e);
 			return 0;
 		}
 		return 1;

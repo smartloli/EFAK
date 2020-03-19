@@ -53,6 +53,10 @@ public class KafkaConsumerAdapter {
 
 	private static KafkaService kafkaService = new KafkaFactory().create();
 
+	private KafkaConsumerAdapter() {
+
+	}
+
 	/** Executor ksql query topic data. */
 	public static List<JSONArray> executor(KafkaSqlInfo kafkaSql) {
 		List<JSONArray> messages = new ArrayList<>();

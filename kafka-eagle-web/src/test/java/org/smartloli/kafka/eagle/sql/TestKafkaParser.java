@@ -29,10 +29,12 @@ import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
 public class TestKafkaParser {
 
 	public static void main(String[] args) {
-		//String sql = "SELECT \"partition\",  \"offset\",\"msg\" from \"kv-test2019\" where \"partition\" in (0) and \"offset\"=37445 group by \"partition\" limit 10";
+		// String sql = "SELECT \"partition\", \"offset\",\"msg\" from
+		// \"kv-test2019\" where \"partition\" in (0) and \"offset\"=37445 group
+		// by \"partition\" limit 10";
 		String sql = "select * from \"kv-test2019\" where \"partition\" in (0) limit 10";
 		String result = KafkaSqlParser.execute("cluster1", sql);
-		System.out.println("result: "+result);
+		System.out.println("result: " + result);
 	}
 
 }
