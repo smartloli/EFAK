@@ -368,4 +368,14 @@ public class MetricsServiceImpl implements MetricsService {
 		return topicDao.writeConsumerGroupTopics(consumerGroups);
 	}
 
+	@Override
+	public List<ConsumerGroupsInfo> getAllConsumerGroups(Map<String, Object> params) {
+		return topicDao.getAllConsumerGroups(params);
+	}
+
+	@Override
+	public int cleanConsumerGroupTopic(Map<String, Object> params) {
+		return topicDao.cleanConsumerGroupTopic(params);
+	}
+
 }

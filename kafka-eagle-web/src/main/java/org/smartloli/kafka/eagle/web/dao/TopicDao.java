@@ -118,10 +118,10 @@ public interface TopicDao {
 	/** Write consumer group topic. */
 	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups);
 
-	/** Find consumer group topics. */
-	public int findConsumerGroupTopic(Map<String, Object> params);
-
 	/** Clean consumer group topics. */
 	public int cleanConsumerGroupTopic(Map<String, Object> params);
+
+	/** Get all consumer groups. */
+	public List<ConsumerGroupsInfo> getAllConsumerGroups(Map<String, Object> params);
 
 }

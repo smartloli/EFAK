@@ -70,4 +70,10 @@ public interface MetricsService {
 
 	/** Write consumer group topics. */
 	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups);
+
+	/** Clean consumer group topics. */
+	public int cleanConsumerGroupTopic(Map<String, Object> params);
+
+	/** Get all consumer groups. */
+	public List<ConsumerGroupsInfo> getAllConsumerGroups(Map<String, Object> params);
 }

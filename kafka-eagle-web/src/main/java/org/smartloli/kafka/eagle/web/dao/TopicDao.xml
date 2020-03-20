@@ -254,15 +254,18 @@
 		</foreach>
 	</insert>
 
-	<select id="findConsumerGroupTopic" parameterType="map" resultType="long">
-		select count(*) from ke_consumer_group
+	<delete id="cleanConsumerGroupTopic" parameterType="int">
+		delete from ke_consumer_group where `cluster`=#{cluster} and `group`=#{group}
+		<if test="topic != null and topic != ''">
+			and `topic`=#{topic}
+		</if> 
+	</delete>
+	
+	<select id="getAllConsumerGroups" parameterType="map" resultMap="cgi">
+		select * from ke_consumer_group
 		<where>
-			`cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
+			`cluster`=#{cluster}
 		</where>
 	</select>
-	
-	<delete id="cleanConsumerGroupTopic" parameterType="int">
-		delete from ke_consumer_group where `cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
-	</delete>
 
 </mapper>

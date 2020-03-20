@@ -235,8 +235,12 @@ public class MetricsQuartz {
 		List<ConsumerGroupsInfo> consumerGroupTopics = new ArrayList<>();
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			List<ConsumerGroupsInfo> allConsumerGroups = metricsServiceImpl.getAllConsumerGroups(params);
 			if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
 				JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+				cleanUnExistKafkaConsumerGroup(clusterAlias, allConsumerGroups, consumerGroups, metricsServiceImpl);
 				for (Object object : consumerGroups) {
 					JSONObject consumerGroup = (JSONObject) object;
 					String group = consumerGroup.getString("group");
@@ -260,6 +264,7 @@ public class MetricsQuartz {
 				}
 			} else {
 				Map<String, List<String>> consumerGroups = kafkaService.getConsumers(clusterAlias);
+				cleanUnExistConsumerGroup(clusterAlias, allConsumerGroups, consumerGroups, metricsServiceImpl);
 				for (Entry<String, List<String>> entry : consumerGroups.entrySet()) {
 					String group = entry.getKey();
 					for (String topic : kafkaService.getActiveTopic(clusterAlias, group)) {
@@ -298,4 +303,106 @@ public class MetricsQuartz {
 		}
 	}
 
+	private void cleanUnExistKafkaConsumerGroup(String cluster, List<ConsumerGroupsInfo> allConsumerGroups, JSONArray consumerGroups, MetricsServiceImpl metricsServiceImpl) {
+		if (allConsumerGroups != null && consumerGroups != null) {
+			Map<String, Set<String>> allConsumerGroupMap = new HashMap<>();
+			for (ConsumerGroupsInfo allConsumerGroup : allConsumerGroups) {
+				if (allConsumerGroupMap.containsKey(allConsumerGroup.getGroup())) {
+					allConsumerGroupMap.get(allConsumerGroup.getGroup()).add(allConsumerGroup.getTopic());
+				} else {
+					Set<String> topics = new HashSet<>();
+					topics.add(allConsumerGroup.getTopic());
+					allConsumerGroupMap.put(allConsumerGroup.getGroup(), topics);
+				}
+			}
+			try {
+				List<String> realGroups = new ArrayList<>();
+				for (Object object : consumerGroups) {
+					JSONObject consumerGroup = (JSONObject) object;
+					realGroups.add(consumerGroup.getString("group"));
+				}
+				for (Entry<String, Set<String>> group : allConsumerGroupMap.entrySet()) {
+					if (realGroups.contains(group.getKey())) {
+						for (String topic : allConsumerGroupMap.get(group.getKey())) {
+							if (!kafkaService.getKafkaConsumerTopics(cluster, group.getKey()).contains(topic)) {
+								Map<String, Object> cleanParams = new HashMap<>();
+								cleanParams.put("cluster", cluster);
+								cleanParams.put("group", group);
+								cleanParams.put("topic", topic);
+								try {
+									metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
+								} catch (Exception e) {
+									e.printStackTrace();
+									LOG.error("Clean kafka consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
+								}
+							}
+						}
+					} else {
+						Map<String, Object> cleanParams = new HashMap<>();
+						cleanParams.put("cluster", cluster);
+						cleanParams.put("group", group.getKey());
+						try {
+							metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
+						} catch (Exception e) {
+							e.printStackTrace();
+							LOG.error("Clean kafka consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void cleanUnExistConsumerGroup(String cluster, List<ConsumerGroupsInfo> allConsumerGroups, Map<String, List<String>> consumerGroups, MetricsServiceImpl metricsServiceImpl) {
+		if (allConsumerGroups != null && consumerGroups != null) {
+			Map<String, Set<String>> allConsumerGroupMap = new HashMap<>();
+			for (ConsumerGroupsInfo allConsumerGroup : allConsumerGroups) {
+				if (allConsumerGroupMap.containsKey(allConsumerGroup.getGroup())) {
+					allConsumerGroupMap.get(allConsumerGroup.getGroup()).add(allConsumerGroup.getTopic());
+				} else {
+					Set<String> topics = new HashSet<>();
+					topics.add(allConsumerGroup.getTopic());
+					allConsumerGroupMap.put(allConsumerGroup.getGroup(), topics);
+				}
+			}
+			try {
+				List<String> realGroups = new ArrayList<>();
+				for (Entry<String, List<String>> entry : consumerGroups.entrySet()) {
+					realGroups.add(entry.getKey());
+				}
+				for (Entry<String, Set<String>> group : allConsumerGroupMap.entrySet()) {
+					if (realGroups.contains(group.getKey())) {
+						for (String topic : allConsumerGroupMap.get(group.getKey())) {
+							if (!kafkaService.getActiveTopic(cluster, group.getKey()).contains(topic)) {
+								Map<String, Object> cleanParams = new HashMap<>();
+								cleanParams.put("cluster", cluster);
+								cleanParams.put("group", group);
+								cleanParams.put("topic", topic);
+								try {
+									metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
+								} catch (Exception e) {
+									e.printStackTrace();
+									LOG.error("Clean consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
+								}
+							}
+						}
+					} else {
+						Map<String, Object> cleanParams = new HashMap<>();
+						cleanParams.put("cluster", cluster);
+						cleanParams.put("group", group.getKey());
+						try {
+							metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
+						} catch (Exception e) {
+							e.printStackTrace();
+							LOG.error("Clean consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
