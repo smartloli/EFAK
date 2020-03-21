@@ -36,6 +36,7 @@ import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
+import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,9 @@ public class ConsumerServiceImpl implements ConsumerService {
 
 	@Autowired
 	private MBeanDao mbeanDao;
+
+	@Autowired
+	private TopicDao topicDao;
 
 	/** Kafka service interface. */
 	private KafkaService kafkaService = new KafkaFactory().create();
@@ -376,6 +380,19 @@ public class ConsumerServiceImpl implements ConsumerService {
 			}
 		}
 		return Topic.SHUTDOWN;
+	}
+
+	@Override
+	public long getConsumerCountByDB(String clusterAlias) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("cluster", clusterAlias);
+		return topicDao.countConsumerGroupPages(params);
+	}
+
+	@Override
+	public String getConsumerByDB(String clusterAlias, DisplayInfo page) {
+		// Map<String, Object>
+		return null;
 	}
 
 }

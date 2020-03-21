@@ -52,6 +52,9 @@
 		<result property="cluster" column="cluster" />
 		<result property="group" column="group" />
 		<result property="topic" column="topic" />
+		<result property="coordinator" column="coordinator" />
+		<result property="activeTopic" column="active_topic" />
+		<result property="activeThread" column="active_thread" />
 	</resultMap>
 
 	<!-- TopicRank -->
@@ -247,10 +250,10 @@
 
 	<insert id="writeConsumerGroupTopics" parameterType="java.util.List">
 		replace into
-		ke_consumer_group(`cluster`,`group`,`topic`)
+		ke_consumer_group(`cluster`,`group`,`topic`,`coordinator`,`active_topic`,`active_thread`)
 		values
 		<foreach collection="list" item="item" index="index" separator=",">
-			(#{item.cluster},#{item.group},#{item.topic})
+			(#{item.cluster},#{item.group},#{item.topic},#{item.coordinator},#{item.activeTopic},#{item.activeThread})
 		</foreach>
 	</insert>
 
@@ -263,6 +266,21 @@
 	
 	<select id="getAllConsumerGroups" parameterType="map" resultMap="cgi">
 		select * from ke_consumer_group
+		<where>
+			`cluster`=#{cluster}
+		</where>
+	</select>
+	
+	<select id="getConsumerGroupPages" parameterType="map" resultMap="cgi">
+		select `group` from ke_consumer_group
+		<where>
+			`cluster`=#{cluster}
+		</where>
+		group by `group` limit #{start},#{size}
+	</select>
+	
+	<select id="countConsumerGroupPages" parameterType="map" resultType="long">
+		select count(distinct `group`) from ke_consumer_group
 		<where>
 			`cluster`=#{cluster}
 		</where>

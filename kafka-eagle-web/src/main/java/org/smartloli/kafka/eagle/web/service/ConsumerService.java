@@ -45,10 +45,17 @@ public interface ConsumerService {
 	/** Judge consumers storage offset in kafka or zookeeper interface. */
 	public String getConsumer(String clusterAlias, String formatter, DisplayInfo page);
 
+	/** Judge consumers storage offset in kafka or zookeeper interface by db. */
+	public String getConsumerByDB(String clusterAlias, DisplayInfo page);
+
 	/** Get consumer size from kafka topic interface. */
 	public int getConsumerCount(String clusterAlias, String formatter);
 
 	/** Check if the application is consuming. */
 	public int isConsumering(String clusterAlias, String group, String topic);
+
+	/** DB storage */
+	/** Get consumer group count by db. */
+	public long getConsumerCountByDB(String clusterAlias);
 
 }

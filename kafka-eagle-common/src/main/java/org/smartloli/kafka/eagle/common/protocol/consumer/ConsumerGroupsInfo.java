@@ -30,6 +30,33 @@ public class ConsumerGroupsInfo extends BaseProtocol {
 	private String cluster;
 	private String group;
 	private String topic;
+	private String coordinator;
+	private String activeTopic;
+	private String activeThread;
+
+	public String getCoordinator() {
+		return coordinator;
+	}
+
+	public void setCoordinator(String coordinator) {
+		this.coordinator = coordinator;
+	}
+
+	public String getActiveTopic() {
+		return activeTopic;
+	}
+
+	public void setActiveTopic(String activeTopic) {
+		this.activeTopic = activeTopic;
+	}
+
+	public String getActiveThread() {
+		return activeThread;
+	}
+
+	public void setActiveThread(String activeThread) {
+		this.activeThread = activeThread;
+	}
 
 	public String getCluster() {
 		return cluster;

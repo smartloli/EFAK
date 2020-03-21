@@ -70,7 +70,8 @@ public class MetricsQuartz {
 		}
 
 		try {
-			consumerGroupsTopicStats();
+			// fixed by v1.4.6
+			// consumerGroupsTopicStats();
 		} catch (Exception e) {
 			LOG.error("Collector consumer groups topic data has error, msg is " + e.getCause().getMessage());
 			e.printStackTrace();

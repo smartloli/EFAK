@@ -124,4 +124,10 @@ public interface TopicDao {
 	/** Get all consumer groups. */
 	public List<ConsumerGroupsInfo> getAllConsumerGroups(Map<String, Object> params);
 
+	/** Get consumer group pages. */
+	public List<ConsumerGroupsInfo> getConsumerGroupPages(Map<String, Object> params);
+
+	/** Count consumer group pages. */
+	public long countConsumerGroupPages(Map<String, Object> params);
+
 }

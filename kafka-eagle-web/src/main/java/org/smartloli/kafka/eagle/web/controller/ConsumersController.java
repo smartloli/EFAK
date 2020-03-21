@@ -107,7 +107,12 @@ public class ConsumersController {
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
-		int count = consumerService.getConsumerCount(clusterAlias, formatter);
+		long count = consumerService.getConsumerCount(clusterAlias, formatter);
+		// if (consumerService.getConsumerCountByDB(clusterAlias) <= 0) {
+		// count = consumerService.getConsumerCount(clusterAlias, formatter);
+		// } else {
+		// count = consumerService.getConsumerCountByDB(clusterAlias);
+		// }
 		JSONArray consumers = JSON.parseArray(consumerService.getConsumer(clusterAlias, formatter, page));
 		JSONArray aaDatas = new JSONArray();
 		for (Object object : consumers) {
