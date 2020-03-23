@@ -56,7 +56,7 @@ public interface JConstants {
 	public static String CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS %s";
 
 	/** Automatically create databases and tables. */
-	public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen", "ke_alarm_config");
+	public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen", "ke_alarm_config", "ke_consumer_group");
 
 	static String CREATE_TABLE_KE_P_ROLE = "CREATE TABLE IF NOT EXISTS `ke_p_role` (`id` tinyint(4) NOT NULL AUTO_INCREMENT,`name` varchar(64) CHARACTER SET utf8 NOT NULL COMMENT 'role name',`seq` tinyint(4) NOT NULL COMMENT 'rank',`description` varchar(128) CHARACTER SET utf8 NOT NULL COMMENT 'role describe',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_P_ROLE_INSERT = "INSERT INTO `ke_p_role` VALUES ('1', 'Administrator', '1', 'Have all permissions'), ('2', 'Devs', '2', 'Own add or delete'), ('3', 'Tourist', '3', 'Only viewer')";
@@ -85,12 +85,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_KE_CONSUMER_BSCREEN = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen` (`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(64) DEFAULT NULL,`logsize` bigint(20) DEFAULT NULL,`difflogsize` bigint(20) DEFAULT NULL,`offsets` bigint(20) DEFAULT NULL,`diffoffsets` bigint(20) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	// static String CREATE_TABLE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT
-	// EXISTS `ke_consumer_group` (`cluster` varchar(64) NOT NULL,`group`
-	// varchar(128) NOT NULL,`topic` varchar(128) NOT
-	// NULL,`coordinator`varchar(128) DEFAULT NULL,`active_topic` varchar(2)
-	// DEFAULT NULL,`active_thread` varchar(2) DEFAULT NULL, PRIMARY KEY
-	// (`cluster`,`group`,`topic`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic` varchar(128) NOT NULL,`coordinator`varchar(128) DEFAULT NULL,`active_topic` varchar(2) DEFAULT NULL,`active_thread` varchar(2) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`,`topic`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` int(11) NOT NULL AUTO_INCREMENT,`user_id` int(11) NOT NULL,`role_id` tinyint(4) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1');";
@@ -126,12 +121,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(64) ,`logsize` bigint(20) ,`difflogsize` bigint(20) ,`offsets` bigint(20) ,`diffoffsets` bigint(20) ,`lag` bigint(20) ,`timespan` bigint(20) ,`tm` varchar(16))";
 
-	// static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP = "CREATE TABLE IF
-	// NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) ,`group`
-	// varchar(128) ,`topic`
-	// varchar(128),`coordinator`varchar(128),`active_topic`
-	// varchar(2),`active_thread` varchar(2), primary key
-	// (`cluster`,`group`,`topic`))";
+	static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(128),`coordinator`varchar(128),`active_topic` varchar(2),`active_thread` varchar(2), primary key (`cluster`,`group`,`topic`))";
 
 	static String CREATE_TABLE_SQLITE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` integer primary key autoincrement,`user_id` int(11),`role_id` tinyint(4))";
 	static String CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1')";
@@ -157,7 +147,7 @@ public interface JConstants {
 			put("CREATE_TABLE_KE_ALARM_CONSUMER", CREATE_TABLE_KE_ALARM_CONSUMER);
 			put("CREATE_TABLE_KE_ALARM_CONFIG", CREATE_TABLE_KE_ALARM_CONFIG);
 			put("CREATE_TABLE_KE_ALARM_CLUSTERS", CREATE_TABLE_KE_ALARM_CLUSTERS);
-			// put("CREATE_TABLE_KE_CONSUMER", CREATE_TABLE_KE_CONSUMER_GROUP);
+			put("CREATE_TABLE_KE_CONSUMER", CREATE_TABLE_KE_CONSUMER_GROUP);
 			put("CREATE_TABLE_KE_TOPIC_RANK", CREATE_TABLE_KE_TOPIC_RANK);
 			put("CREATE_TABLE_KE_SQL_HISTORY", CREATE_TABLE_KE_SQL_HISTORY);
 			put("CREATE_TABLE_KE_LOGSIZE", CREATE_TABLE_KE_LOGSIZE);
@@ -178,8 +168,7 @@ public interface JConstants {
 			put("CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER", CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER);
 			put("CREATE_TABLE_SQLITE_KE_ALARM_CONFIG", CREATE_TABLE_SQLITE_KE_ALARM_CONFIG);
 			put("CREATE_TABLE_SQLITE_KE_ALARM_CLUSTERS", CREATE_TABLE_SQLITE_KE_ALARM_CLUSTERS);
-			// put("CREATE_TABLE_SQLITE_KE_CONSUMER",
-			// CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP);
+			put("CREATE_TABLE_SQLITE_KE_CONSUMER", CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP);
 			put("CREATE_TABLE_SQLITE_KE_TOPIC_RANK", CREATE_TABLE_SQLITE_KE_TOPIC_RANK);
 			put("CREATE_TABLE_SQLITE_KE_SQL_HISTORY", CREATE_TABLE_SQLITE_KE_SQL_HISTORY);
 			put("CREATE_TABLE_SQLITE_KE_LOGSIZE", CREATE_TABLE_SQLITE_KE_LOGSIZE);
