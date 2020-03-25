@@ -23,6 +23,7 @@ import java.util.Map;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 
 /**
@@ -80,25 +81,31 @@ public interface TopicService {
 
 	/** Get select topic list. */
 	public String getSelectTopics(String clusterAlias, String prefixTopic);
-	
-	/** Get select filter topic logsize.*/
+
+	/** Get select filter topic logsize. */
 	public String getSelectTopicsLogSize(String clusterAlias, Map<String, Object> params);
-	
+
 	/** Write topic sql history data into table. */
 	public int writeTopicSqlHistory(List<TopicSqlHistory> topicSqlHistorys);
 
 	/** Read topic sql history data. */
 	public List<TopicSqlHistory> readTopicSqlHistory(Map<String, Object> params);
-	
+
 	/** Read topic sql history data by admin. */
 	public List<TopicSqlHistory> readTopicSqlHistoryByAdmin(Map<String, Object> params);
 
 	/** Count topic sql history. */
 	public long countTopicSqlHistory(Map<String, Object> params);
-	
+
 	/** Count topic sql history by admin. */
 	public long countTopicSqlHistoryByAdmin(Map<String, Object> params);
-	
+
 	/** Find topic sql history by id. */
 	public TopicSqlHistory findTopicSqlByID(Map<String, Object> params);
+
+	/** Add clean topic logsize data. */
+	public int addCleanTopicData(List<TopicRank> topicRanks);
+
+	/** Get clean topic state. */
+	public List<TopicRank> getCleanTopicState(Map<String, Object> params);
 }

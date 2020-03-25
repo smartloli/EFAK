@@ -42,12 +42,17 @@ public interface DashboardService {
 	/** Get topic logsize & capacity. */
 	public JSONArray getTopicRank(Map<String, Object> params);
 
+	/** Get all clean topic list. */
+	public List<TopicRank> getCleanTopicList(Map<String, Object> params);
+
 	/** Write statistics topic rank data from kafka jmx & insert into table. */
 	public int writeTopicRank(List<TopicRank> topicRanks);
-	
-	/** Write statistics topic logsize data from kafka jmx & insert into table. */
+
+	/**
+	 * Write statistics topic logsize data from kafka jmx & insert into table.
+	 */
 	public int writeTopicLogSize(List<TopicLogSize> topicLogSize);
-	
+
 	/** Read topic lastest logsize diffval data. */
 	public TopicLogSize readLastTopicLogSize(Map<String, Object> params);
 

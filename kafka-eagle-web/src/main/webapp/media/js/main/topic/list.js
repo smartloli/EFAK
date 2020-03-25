@@ -64,9 +64,9 @@ $(document).ready(function() {
 		if (token.length == 0) {
 			$("#ke_del_topic").attr("disabled", true);
 			$("#ke_del_topic").attr("href", "#");
-		} 
+		}
 	});
-	
+
 	$("#ke_admin_token").on('input', function(e) {
 		var token = $("#ke_admin_token").val();
 		if (token.length == 0) {
@@ -77,7 +77,7 @@ $(document).ready(function() {
 			$("#ke_del_topic").attr("href", "/ke/topic/" + topic + "/" + token + "/delete");
 		}
 	});
-	
+
 	$(document).on('click', 'a[name=topic_modify]', function() {
 		var href = $(this).attr("href");
 		topic = href.split("#")[1];
@@ -98,7 +98,26 @@ $(document).ready(function() {
 		if (partitions.length == 0) {
 			$("#ke_modify_topic_btn").attr("disabled", true);
 			$("#ke_modify_topic_btn").attr("href", "#");
-		} 
+		}
+	});
+
+	$(document).on('click', 'a[name=topic_clean]', function() {
+		var href = $(this).attr("href");
+		var topic = href.split("#")[1];
+		$("#ke_topic_clean_content").html("");
+		$("#ke_topic_clean_content").append("<p>Are you sure you want to clean topic [<strong>" + topic + "</strong>] data ?</p>");
+		$("#ke_topic_clean_data_div").html("");
+		$("#ke_topic_clean_data_div").append("<a id='ke_del_topic' href='/ke/topic/clean/data/" + topic + "/' class='btn btn-danger'>Submit</a>");
+		$('#ke_topic_clean').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+		$('#ke_topic_clean').modal('show').css({
+			position : 'fixed',
+			left : '50%',
+			top : '50%',
+			transform : 'translateX(-50%) translateY(-50%)'
+		});
 	});
 
 	$("#ke_modify_topic_partition").on('input', function(e) {

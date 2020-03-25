@@ -222,6 +222,11 @@ public class KConstants {
 		public static final String BROKER_SKEWED = "skewed";
 		public static final String BROKER_LEADER_SKEWED = "leader_skewed";
 		public static final String[] BROKER_PERFORMANCE_LIST = new String[] { BROKER_SPREAD, BROKER_SKEWED, BROKER_LEADER_SKEWED };
+		public static final String TRUNCATE = "truncate";// 0:truncating,1:truncated
+		public static final String CLEANUP_POLICY_KEY = "cleanup.policy";
+		public static final String CLEANUP_POLICY_VALUE = "delete";
+		public static final String RETENTION_MS_KEY = "retention.ms";
+		public static final String RETENTION_MS_VALUE = "1000";
 
 		public static final int BATCH_SIZE = 500;
 

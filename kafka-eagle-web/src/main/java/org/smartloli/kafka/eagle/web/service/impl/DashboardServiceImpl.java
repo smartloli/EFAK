@@ -200,4 +200,9 @@ public class DashboardServiceImpl implements DashboardService {
 		return topicDao.readLastTopicLogSize(params);
 	}
 
+	/** Get all clean topic list. */
+	public List<TopicRank> getCleanTopicList(Map<String, Object> params) {
+		return topicDao.getCleanTopicList(params);
+	}
+
 }

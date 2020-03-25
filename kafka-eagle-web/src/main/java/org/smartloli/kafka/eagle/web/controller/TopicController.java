@@ -36,6 +36,7 @@ import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicMockMessage;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
@@ -403,12 +404,36 @@ public class TopicController {
 			}
 			object.put("created", partition.getCreated());
 			object.put("modify", partition.getModify());
-			if (Role.ADMIN.equals(signiner.getUsername())) {
-				object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
-						+ "'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Remove</a></li></ul></div>");
+			Map<String, Object> topicStateParams = new HashMap<>();
+			topicStateParams.put("cluster", clusterAlias);
+			topicStateParams.put("topic", partition.getTopic());
+			topicStateParams.put("tkey", Topic.TRUNCATE);
+			List<TopicRank> topicStates = topicService.getCleanTopicState(topicStateParams);
+			if (topicStates != null && topicStates.size() > 0) {
+				if (topicStates.get(0).getTvalue() == 0) {
+					if (Role.ADMIN.equals(signiner.getUsername())) {
+						object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
+								+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name=''><i class='fa fa-fw fa-trash-o'></i>Truncating</a></li></ul></div>");
+					} else {
+						object.put("operate", "");
+					}
+				} else {
+					if (Role.ADMIN.equals(signiner.getUsername())) {
+						object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
+								+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Truncated</a></li></ul></div>");
+					} else {
+						object.put("operate", "");
+					}
+				}
 			} else {
-				object.put("operate", "");
+				if (Role.ADMIN.equals(signiner.getUsername())) {
+					object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
+							+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Truncate</a></li></ul></div>");
+				} else {
+					object.put("operate", "");
+				}
 			}
+
 			aaDatas.add(object);
 		}
 
@@ -467,6 +492,31 @@ public class TopicController {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	/** Clean topic data by ajax. */
+	@RequestMapping(value = "/topic/clean/data/{topic}/", method = RequestMethod.GET)
+	public ModelAndView cleanTopicDataAjax(@PathVariable("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+			TopicRank tr = new TopicRank();
+			tr.setCluster(clusterAlias);
+			tr.setTopic(topic);
+			tr.setTkey(Topic.TRUNCATE);
+			tr.setTvalue(0);
+			if (topicService.addCleanTopicData(Arrays.asList(tr)) > 0) {
+				mav.setViewName("redirect:/topic/list");
+			} else {
+				mav.setViewName("redirect:/errors/500");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			mav.setViewName("redirect:/errors/500");
+		}
+		return mav;
 	}
 
 	/** Create topic form. */

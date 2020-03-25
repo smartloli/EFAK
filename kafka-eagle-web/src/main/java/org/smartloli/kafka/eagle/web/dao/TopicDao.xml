@@ -60,8 +60,20 @@
 	<!-- TopicRank -->
 	<select id="readTopicRank" parameterType="map" resultMap="trank">
 		select `topic`,`tvalue` from ke_topic_rank
-		where `cluster` =#{cluster} and `tkey`=#{tkey}
+		where `cluster`=#{cluster} and `tkey`=#{tkey}
 		order by `tvalue` desc limit 10
+	</select>
+
+	<!-- Get clean topic state -->
+	<select id="getCleanTopicState" parameterType="map" resultMap="trank">
+		select `tvalue` from ke_topic_rank
+		where `cluster`=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
+	</select>
+	
+	<!-- Get all clean topic list -->
+	<select id="getCleanTopicList" parameterType="map" resultMap="trank">
+		select `cluster`,`topic`,`tkey` from ke_topic_rank
+		where `cluster`=#{cluster} and `tkey`='truncate' and `tvalue`=0
 	</select>
 
 	<!-- Topic broker spread, skew, leader skewed -->
@@ -261,16 +273,16 @@
 		delete from ke_consumer_group where `cluster`=#{cluster} and `group`=#{group}
 		<if test="topic != null and topic != ''">
 			and `topic`=#{topic}
-		</if> 
+		</if>
 	</delete>
-	
+
 	<select id="getAllConsumerGroups" parameterType="map" resultMap="cgi">
 		select * from ke_consumer_group
 		<where>
 			`cluster`=#{cluster}
 		</where>
 	</select>
-	
+
 	<select id="getConsumerGroupPages" parameterType="map" resultMap="cgi">
 		select `group` from ke_consumer_group
 		<where>
@@ -278,7 +290,7 @@
 		</where>
 		group by `group` limit #{start},#{size}
 	</select>
-	
+
 	<select id="countConsumerGroupPages" parameterType="map" resultType="long">
 		select count(distinct `group`) from ke_consumer_group
 		<where>

@@ -29,6 +29,7 @@ import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
@@ -345,6 +346,16 @@ public class TopicServiceImpl implements TopicService {
 	@Override
 	public TopicSqlHistory findTopicSqlByID(Map<String, Object> params) {
 		return topicDao.findTopicSqlByID(params);
+	}
+
+	@Override
+	public int addCleanTopicData(List<TopicRank> topicRanks) {
+		return topicDao.writeTopicRank(topicRanks);
+	}
+
+	@Override
+	public List<TopicRank> getCleanTopicState(Map<String, Object> params) {
+		return topicDao.getCleanTopicState(params);
 	}
 
 }

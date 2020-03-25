@@ -56,7 +56,7 @@ public interface JConstants {
 	public static String CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS %s";
 
 	/** Automatically create databases and tables. */
-	public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen", "ke_alarm_config", "ke_consumer_group");
+	public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen", "ke_alarm_config", "ke_consumer_group");
 
 	static String CREATE_TABLE_KE_P_ROLE = "CREATE TABLE IF NOT EXISTS `ke_p_role` (`id` tinyint(4) NOT NULL AUTO_INCREMENT,`name` varchar(64) CHARACTER SET utf8 NOT NULL COMMENT 'role name',`seq` tinyint(4) NOT NULL COMMENT 'rank',`description` varchar(128) CHARACTER SET utf8 NOT NULL COMMENT 'role describe',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4";
 	static String CREATE_TABLE_KE_P_ROLE_INSERT = "INSERT INTO `ke_p_role` VALUES ('1', 'Administrator', '1', 'Have all permissions'), ('2', 'Devs', '2', 'Own add or delete'), ('3', 'Tourist', '3', 'Only viewer')";
@@ -147,7 +147,7 @@ public interface JConstants {
 			put("CREATE_TABLE_KE_ALARM_CONSUMER", CREATE_TABLE_KE_ALARM_CONSUMER);
 			put("CREATE_TABLE_KE_ALARM_CONFIG", CREATE_TABLE_KE_ALARM_CONFIG);
 			put("CREATE_TABLE_KE_ALARM_CLUSTERS", CREATE_TABLE_KE_ALARM_CLUSTERS);
-			put("CREATE_TABLE_KE_CONSUMER", CREATE_TABLE_KE_CONSUMER_GROUP);
+			put("CREATE_TABLE_KE_CONSUMER_GROUP", CREATE_TABLE_KE_CONSUMER_GROUP);
 			put("CREATE_TABLE_KE_TOPIC_RANK", CREATE_TABLE_KE_TOPIC_RANK);
 			put("CREATE_TABLE_KE_SQL_HISTORY", CREATE_TABLE_KE_SQL_HISTORY);
 			put("CREATE_TABLE_KE_LOGSIZE", CREATE_TABLE_KE_LOGSIZE);
@@ -168,7 +168,7 @@ public interface JConstants {
 			put("CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER", CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER);
 			put("CREATE_TABLE_SQLITE_KE_ALARM_CONFIG", CREATE_TABLE_SQLITE_KE_ALARM_CONFIG);
 			put("CREATE_TABLE_SQLITE_KE_ALARM_CLUSTERS", CREATE_TABLE_SQLITE_KE_ALARM_CLUSTERS);
-			put("CREATE_TABLE_SQLITE_KE_CONSUMER", CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP);
+			put("CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP", CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP);
 			put("CREATE_TABLE_SQLITE_KE_TOPIC_RANK", CREATE_TABLE_SQLITE_KE_TOPIC_RANK);
 			put("CREATE_TABLE_SQLITE_KE_SQL_HISTORY", CREATE_TABLE_SQLITE_KE_SQL_HISTORY);
 			put("CREATE_TABLE_SQLITE_KE_LOGSIZE", CREATE_TABLE_SQLITE_KE_LOGSIZE);

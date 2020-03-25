@@ -216,12 +216,27 @@
 					</div>
 				</div>
 			</div>
+			<!-- clean topic data -->
+			<div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_topic_clean" tabindex="-1" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button class="close" type="button" data-dismiss="modal">×</button>
+							<h4 class="modal-title" id="keModalLabel">Notify</h4>
+						</div>
+						<!-- /.row -->
+						<div id="ke_topic_clean_content" class="modal-body">
+						</div>
+						<div id="ke_topic_clean_data_div" class="modal-footer"></div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<!-- /#page-wrapper -->
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/topic/list.js" name="loader" />
+	<jsp:param value="main/topic/list.js?v=1.4.6" name="loader" />
 	<jsp:param value="plugins/echart/echarts.min.js" name="loader" />
 	<jsp:param value="plugins/echart/macarons.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />

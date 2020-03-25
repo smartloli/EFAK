@@ -45,6 +45,12 @@ public interface TopicDao {
 	/** Read topic rank data. */
 	public List<TopicRank> readTopicRank(Map<String, Object> params);
 
+	/** Get clean topic state. */
+	public List<TopicRank> getCleanTopicState(Map<String, Object> params);
+
+	/** Get all clean topic list. */
+	public List<TopicRank> getCleanTopicList(Map<String, Object> params);
+
 	/** Read topic spread, skewed, leader skewed data. */
 	public TopicRank readBrokerPerformance(Map<String, Object> params);
 

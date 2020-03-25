@@ -18,10 +18,12 @@
 package org.smartloli.kafka.eagle.web.quartz;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.kafka.clients.admin.ConfigEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
@@ -82,6 +84,48 @@ public class TopicRankQuartz {
 		} catch (Exception e) {
 			LOG.error("Collector broker spread by topic has error, msg is ", e);
 			e.printStackTrace();
+		}
+
+		try {
+			topicCleanTask();
+		} catch (Exception e) {
+			LOG.error("Clean topic logsize has error, msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private void topicCleanTask() {
+		DashboardServiceImpl dashboardServiceImpl = null;
+		try {
+			dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
+		} catch (Exception e) {
+			LOG.error("Create clean topic object has error,msg is ", e);
+		}
+		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+		for (String clusterAlias : clusterAliass) {
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			List<TopicRank> allCleanTopics = dashboardServiceImpl.getCleanTopicList(params);
+			if (allCleanTopics != null) {
+				for (TopicRank tr : allCleanTopics) {
+					long logSize = brokerService.getTopicRealLogSize(clusterAlias, tr.getTopic());
+					if (logSize > 0) {
+						String cleanUpPolicyLog = kafkaMetricsService.changeTopicConfig(clusterAlias, tr.getTopic(), Topic.ADD, new ConfigEntry(Topic.CLEANUP_POLICY_KEY, Topic.CLEANUP_POLICY_VALUE));
+						String retentionMsLog = kafkaMetricsService.changeTopicConfig(clusterAlias, tr.getTopic(), Topic.ADD, new ConfigEntry(Topic.RETENTION_MS_KEY, Topic.RETENTION_MS_VALUE));
+						LOG.info("Add [" + Topic.CLEANUP_POLICY_KEY + "] topic[" + tr.getTopic() + "] property result," + cleanUpPolicyLog);
+						LOG.info("Add [" + Topic.RETENTION_MS_KEY + "] topic[" + tr.getTopic() + "] property result," + retentionMsLog);
+					} else {
+						// delete znode
+						String cleanUpPolicyLog = kafkaMetricsService.changeTopicConfig(clusterAlias, tr.getTopic(), Topic.DELETE, new ConfigEntry(Topic.CLEANUP_POLICY_KEY, ""));
+						String retentionMsLog = kafkaMetricsService.changeTopicConfig(clusterAlias, tr.getTopic(), Topic.DELETE, new ConfigEntry(Topic.RETENTION_MS_KEY, ""));
+						LOG.info("Delete [" + Topic.CLEANUP_POLICY_KEY + "] topic[" + tr.getTopic() + "] property result," + cleanUpPolicyLog);
+						LOG.info("Delete [" + Topic.RETENTION_MS_KEY + "] topic[" + tr.getTopic() + "] property result," + retentionMsLog);
+						// update db state
+						tr.setTvalue(1);
+						dashboardServiceImpl.writeTopicRank(Arrays.asList(tr));
+					}
+				}
+			}
 		}
 	}
 
