@@ -79,7 +79,7 @@ $(document).ready(function() {
 	}
 
 	$(document).on('click', 'a[name=run_task]', function() {
-		var sql = sqlEditor.getValue();
+		var sql = encodeURI(sqlEditor.getValue());
 		logEditor.setValue("");
 		$.ajax({
 			type : 'get',
