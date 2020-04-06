@@ -29,6 +29,7 @@ import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
@@ -376,6 +377,21 @@ public class MetricsServiceImpl implements MetricsService {
 	@Override
 	public int cleanConsumerGroupTopic(Map<String, Object> params) {
 		return topicDao.cleanConsumerGroupTopic(params);
+	}
+
+	@Override
+	public int cleanConsumerSummaryTopic(Map<String, Object> params) {
+		return topicDao.cleanConsumerSummaryTopic(params);
+	}
+
+	@Override
+	public int writeConsumerSummaryTopics(List<ConsumerSummaryInfo> consumerSummarys) {
+		return topicDao.writeConsumerSummaryTopics(consumerSummarys);
+	}
+
+	@Override
+	public List<ConsumerSummaryInfo> getAllConsumerSummary(Map<String, Object> params) {
+		return topicDao.getAllConsumerSummary(params);
 	}
 
 }

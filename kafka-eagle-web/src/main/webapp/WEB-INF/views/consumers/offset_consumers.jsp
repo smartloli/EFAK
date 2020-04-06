@@ -60,7 +60,7 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/consumer/offset.consumer.js?v=1.4.5" name="loader" />
+	<jsp:param value="main/consumer/offset.consumer.js?v=1.4.6" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
 </html>

@@ -17,7 +17,12 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 
 /**
  * Kafka consumer data interface.
@@ -40,13 +45,10 @@ public interface ConsumerService {
 	 * Judge consumer detail information storage offset in kafka or zookeeper
 	 * interface.
 	 */
-	public String getConsumerDetail(String clusterAlias, String formatter, String group);
+	public String getConsumerDetail(String clusterAlias, String formatter, String group, String search);
 
 	/** Judge consumers storage offset in kafka or zookeeper interface. */
 	public String getConsumer(String clusterAlias, String formatter, DisplayInfo page);
-
-	/** Judge consumers storage offset in kafka or zookeeper interface by db. */
-	public String getConsumerByDB(String clusterAlias, DisplayInfo page);
 
 	/** Get consumer size from kafka topic interface. */
 	public int getConsumerCount(String clusterAlias, String formatter);
@@ -54,8 +56,20 @@ public interface ConsumerService {
 	/** Check if the application is consuming. */
 	public int isConsumering(String clusterAlias, String group, String topic);
 
-	/** DB storage */
-	/** Get consumer group count by db. */
-	public long getConsumerCountByDB(String clusterAlias);
+	/** Offline consumer group and summary. */
+	/** Count consumer group pages. */
+	public long countConsumerGroupPages(Map<String, Object> params);
+
+	/** Count consumer group summary pages. */
+	public long countConsumerSummaryPages(Map<String, Object> params);
+
+	/** Get consumer group pages. */
+	public List<ConsumerGroupsInfo> getConsumerGroupPages(String clusterAlias, String group, DisplayInfo page);
+
+	/** Get consumer group summary pages. */
+	public List<ConsumerSummaryInfo> getConsumerSummaryPages(String clusterAlias, DisplayInfo page);
+
+	/** Get kafka consumer active graph. */
+	public String getKafkaConsumerGraph(String clusterAlias);
 
 }

@@ -192,7 +192,7 @@ $(document).ready(function() {
 
 		// Initialize consumer table list --start
 		$("#result_children" + offset).dataTable({
-			"searching" : false,
+			// "searching" : false,
 			"bSort" : false,
 			"bLengthChange" : false,
 			"bProcessing" : true,

@@ -29,10 +29,13 @@ import org.smartloli.kafka.eagle.common.protocol.ConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
 import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.D3;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
@@ -171,31 +174,45 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** List the name of the topic in the consumer detail information. */
-	private String getConsumerDetail(String clusterAlias, String group) {
+	private String getConsumerDetail(String clusterAlias, String group, String search) {
 		Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
 		Map<String, List<String>> actvTopics = kafkaService.getActiveTopic(clusterAlias);
 		List<TopicConsumerInfo> kafkaConsumerDetails = new ArrayList<TopicConsumerInfo>();
 		int id = 0;
 		for (String topic : consumers.get(group)) {
-			TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
-			consumerDetail.setId(++id);
-			consumerDetail.setTopic(topic);
-			if (actvTopics.containsKey(group + "_" + topic)) {
-				consumerDetail.setConsumering(Topic.RUNNING);
+			if (StrUtils.isNull(search)) {
+				TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
+				consumerDetail.setId(++id);
+				consumerDetail.setTopic(topic);
+				if (actvTopics.containsKey(group + "_" + topic)) {
+					consumerDetail.setConsumering(Topic.RUNNING);
+				} else {
+					consumerDetail.setConsumering(Topic.SHUTDOWN);
+				}
+				kafkaConsumerDetails.add(consumerDetail);
 			} else {
-				consumerDetail.setConsumering(Topic.SHUTDOWN);
+				if (search.contains(topic) || topic.contains(search)) {
+					TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
+					consumerDetail.setId(++id);
+					consumerDetail.setTopic(topic);
+					if (actvTopics.containsKey(group + "_" + topic)) {
+						consumerDetail.setConsumering(Topic.RUNNING);
+					} else {
+						consumerDetail.setConsumering(Topic.SHUTDOWN);
+					}
+					kafkaConsumerDetails.add(consumerDetail);
+				}
 			}
-			kafkaConsumerDetails.add(consumerDetail);
 		}
 		return kafkaConsumerDetails.toString();
 	}
 
 	/** Judge consumer storage offset in kafka or zookeeper. */
-	public String getConsumerDetail(String clusterAlias, String formatter, String group) {
+	public String getConsumerDetail(String clusterAlias, String formatter, String group, String search) {
 		if ("kafka".equals(formatter)) {
-			return getKafkaConsumerDetail(clusterAlias, group);
+			return getKafkaConsumerDetail(clusterAlias, group, search);
 		} else {
-			return getConsumerDetail(clusterAlias, group);
+			return getConsumerDetail(clusterAlias, group, search);
 		}
 	}
 
@@ -314,7 +331,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	/** Get consumer detail from kafka topic. */
-	private String getKafkaConsumerDetail(String clusterAlias, String group) {
+	private String getKafkaConsumerDetail(String clusterAlias, String group, String search) {
 		Set<String> consumerTopics = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
 		Set<String> activerTopics = kafkaService.getKafkaActiverTopics(clusterAlias, group);
 		for (String topic : consumerTopics) {
@@ -325,15 +342,30 @@ public class ConsumerServiceImpl implements ConsumerService {
 		List<TopicConsumerInfo> kafkaConsumerPages = new ArrayList<TopicConsumerInfo>();
 		int id = 0;
 		for (String topic : consumerTopics) {
-			TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
-			consumerDetail.setId(++id);
-			consumerDetail.setTopic(topic);
-			if (activerTopics.contains(topic)) {
-				consumerDetail.setConsumering(Topic.RUNNING);
+			if (StrUtils.isNull(search)) {
+				TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
+				consumerDetail.setId(++id);
+				consumerDetail.setTopic(topic);
+				if (activerTopics.contains(topic)) {
+					consumerDetail.setConsumering(Topic.RUNNING);
+				} else {
+					consumerDetail.setConsumering(isConsumering(clusterAlias, group, topic));
+				}
+				kafkaConsumerPages.add(consumerDetail);
 			} else {
-				consumerDetail.setConsumering(isConsumering(clusterAlias, group, topic));
+				if (search.contains(topic) || topic.contains(search)) {
+					TopicConsumerInfo consumerDetail = new TopicConsumerInfo();
+					consumerDetail.setId(++id);
+					consumerDetail.setTopic(topic);
+					if (activerTopics.contains(topic)) {
+						consumerDetail.setConsumering(Topic.RUNNING);
+					} else {
+						consumerDetail.setConsumering(isConsumering(clusterAlias, group, topic));
+					}
+					kafkaConsumerPages.add(consumerDetail);
+				}
 			}
-			kafkaConsumerPages.add(consumerDetail);
+
 		}
 		return kafkaConsumerPages.toString();
 	}
@@ -383,16 +415,93 @@ public class ConsumerServiceImpl implements ConsumerService {
 	}
 
 	@Override
-	public long getConsumerCountByDB(String clusterAlias) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("cluster", clusterAlias);
+	public long countConsumerGroupPages(Map<String, Object> params) {
 		return topicDao.countConsumerGroupPages(params);
 	}
 
 	@Override
-	public String getConsumerByDB(String clusterAlias, DisplayInfo page) {
-		// Map<String, Object>
-		return null;
+	public long countConsumerSummaryPages(Map<String, Object> params) {
+		return topicDao.countConsumerSummaryPages(params);
+	}
+
+	@Override
+	public List<ConsumerGroupsInfo> getConsumerGroupPages(String clusterAlias, String group, DisplayInfo page) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("cluster", clusterAlias);
+		params.put("group", group);
+		params.put("start", page.getiDisplayStart());
+		params.put("size", page.getiDisplayLength());
+		params.put("search", page.getSearch());
+		return topicDao.getConsumerGroupPages(params);
+	}
+
+	@Override
+	public List<ConsumerSummaryInfo> getConsumerSummaryPages(String clusterAlias, DisplayInfo page) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("cluster", clusterAlias);
+		params.put("start", page.getiDisplayStart());
+		params.put("size", page.getiDisplayLength());
+		params.put("search", page.getSearch());
+		return topicDao.getConsumerSummaryPages(params);
+	}
+
+	@Override
+	public String getKafkaConsumerGraph(String clusterAlias) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("cluster", clusterAlias);
+		params.put("start", 0);
+		params.put("size", D3.SIZE + 1);
+		List<ConsumerSummaryInfo> consumerSummarys = topicDao.getConsumerSummaryPages(params);
+		if (consumerSummarys != null) {
+			JSONObject target = new JSONObject();
+			JSONArray targets = new JSONArray();
+			target.put("name", "Active Topics");
+			int count = 1;
+			for (ConsumerSummaryInfo consumerSummary : consumerSummarys) {
+				JSONObject subTarget = new JSONObject();
+				JSONArray subTargets = new JSONArray();
+				if (count > KConstants.D3.SIZE) {
+					subTarget.put("name", "...");
+					JSONObject subInSubTarget = new JSONObject();
+					subInSubTarget.put("name", "...");
+					subTargets.add(subInSubTarget);
+					subTarget.put("children", subTargets);
+					targets.add(subTarget);
+					break;
+				} else {
+					subTarget.put("name", consumerSummary.getGroup());
+					Map<String, Object> paramChilds = new HashMap<>();
+					paramChilds.put("cluster", clusterAlias);
+					paramChilds.put("group", consumerSummary.getGroup());
+					paramChilds.put("start", 0);
+					paramChilds.put("size", D3.CHILD_SIZE + 1);
+					paramChilds.put("status", "0");// running
+					List<ConsumerGroupsInfo> consumerGroups = topicDao.getConsumerGroupPages(paramChilds);
+					int child = 1;
+					for (ConsumerGroupsInfo consumerGroup : consumerGroups) {
+						JSONObject subInSubTarget = new JSONObject();
+						if (child > D3.CHILD_SIZE) {
+							subInSubTarget.put("name", "...");
+							subTargets.add(subInSubTarget);
+							break;
+						} else {
+							subInSubTarget.put("name", consumerGroup.getTopic());
+							subTargets.add(subInSubTarget);
+						}
+						child++;
+					}
+				}
+				count++;
+				subTarget.put("children", subTargets);
+				targets.add(subTarget);
+			}
+			target.put("children", targets);
+			JSONObject result = new JSONObject();
+			result.put("active", target.toJSONString());
+			return result.toJSONString();
+		} else {
+			return "";
+		}
 	}
 
 }

@@ -85,7 +85,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_KE_CONSUMER_BSCREEN = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen` (`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(64) DEFAULT NULL,`logsize` bigint(20) DEFAULT NULL,`difflogsize` bigint(20) DEFAULT NULL,`offsets` bigint(20) DEFAULT NULL,`diffoffsets` bigint(20) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-	static String CREATE_TABLE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic` varchar(128) NOT NULL, PRIMARY KEY (`cluster`,`group`,`topic`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+	static String CREATE_TABLE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic` varchar(128) NOT NULL,`status` int(11) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`,`topic`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 	static String CREATE_TABLE_KE_CONSUMER_GROUP_SUMMARY = "CREATE TABLE IF NOT EXISTS `ke_consumer_group_summary` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic_number` varchar(128) NOT NULL,`coordinator`varchar(128) DEFAULT NULL,`active_topic` int(11) DEFAULT NULL,`active_thread_total` int(11) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -123,7 +123,7 @@ public interface JConstants {
 
 	static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(64) ,`logsize` bigint(20) ,`difflogsize` bigint(20) ,`offsets` bigint(20) ,`diffoffsets` bigint(20) ,`lag` bigint(20) ,`timespan` bigint(20) ,`tm` varchar(16))";
 
-	static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(128), primary key (`cluster`,`group`,`topic`))";
+	static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(128) ,`status` int(11), primary key (`cluster`,`group`,`topic`))";
 
 	static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP_SUMMARY = "CREATE TABLE IF NOT EXISTS `ke_consumer_group_summary` (`cluster` varchar(64) ,`group` varchar(128) ,`topic_number` varchar(128),`coordinator`varchar(128),`active_topic` int(11),`active_thread_total` int(11), primary key (`cluster`,`group`))";
 

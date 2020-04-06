@@ -23,6 +23,7 @@ import java.util.Map;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
@@ -124,16 +125,31 @@ public interface TopicDao {
 	/** Write consumer group topic. */
 	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups);
 
+	/** Write consumer group summary topic. */
+	public int writeConsumerSummaryTopics(List<ConsumerSummaryInfo> consumerSummarys);
+
 	/** Clean consumer group topics. */
 	public int cleanConsumerGroupTopic(Map<String, Object> params);
+
+	/** Clean consumer group summary topics. */
+	public int cleanConsumerSummaryTopic(Map<String, Object> params);
 
 	/** Get all consumer groups. */
 	public List<ConsumerGroupsInfo> getAllConsumerGroups(Map<String, Object> params);
 
+	/** Get all consumer groups summary. */
+	public List<ConsumerSummaryInfo> getAllConsumerSummary(Map<String, Object> params);
+
 	/** Get consumer group pages. */
 	public List<ConsumerGroupsInfo> getConsumerGroupPages(Map<String, Object> params);
 
+	/** Get consumer group summary pages. */
+	public List<ConsumerSummaryInfo> getConsumerSummaryPages(Map<String, Object> params);
+
 	/** Count consumer group pages. */
 	public long countConsumerGroupPages(Map<String, Object> params);
+
+	/** Count consumer group summary pages. */
+	public long countConsumerSummaryPages(Map<String, Object> params);
 
 }

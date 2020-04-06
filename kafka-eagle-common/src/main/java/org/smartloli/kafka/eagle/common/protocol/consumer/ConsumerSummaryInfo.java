@@ -26,18 +26,36 @@ import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
  *
  *         Created by Mar 17, 2020
  */
-public class ConsumerGroupsInfo extends BaseProtocol {
+public class ConsumerSummaryInfo extends BaseProtocol {
 	private String cluster;
 	private String group;
-	private String topic;
-	private int status;// running, pending, shutdown
+	private int topicNumbers;
+	private String coordinator;
+	private int activeTopic;
+	private int activeThread;
 
-	public int getStatus() {
-		return status;
+	public String getCoordinator() {
+		return coordinator;
 	}
 
-	public void setStatus(int status) {
-		this.status = status;
+	public void setCoordinator(String coordinator) {
+		this.coordinator = coordinator;
+	}
+
+	public int getActiveTopic() {
+		return activeTopic;
+	}
+
+	public void setActiveTopic(int activeTopic) {
+		this.activeTopic = activeTopic;
+	}
+
+	public int getActiveThread() {
+		return activeThread;
+	}
+
+	public void setActiveThread(int activeThread) {
+		this.activeThread = activeThread;
 	}
 
 	public String getCluster() {
@@ -56,12 +74,12 @@ public class ConsumerGroupsInfo extends BaseProtocol {
 		this.group = group;
 	}
 
-	public String getTopic() {
-		return topic;
+	public int getTopicNumbers() {
+		return topicNumbers;
 	}
 
-	public void setTopic(String topic) {
-		this.topic = topic;
+	public void setTopicNumbers(int topicNumbers) {
+		this.topicNumbers = topicNumbers;
 	}
 
 }

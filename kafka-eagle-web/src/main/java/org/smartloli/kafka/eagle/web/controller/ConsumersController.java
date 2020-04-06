@@ -19,14 +19,20 @@ package org.smartloli.kafka.eagle.web.controller;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +77,11 @@ public class ConsumersController {
 
 		try {
 			String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
-			byte[] output = consumerService.getActiveTopic(clusterAlias, formatter).getBytes();
+			String result = consumerService.getKafkaConsumerGraph(clusterAlias);// offline
+			if (StrUtils.isNull(result)) {
+				result = consumerService.getActiveTopic(clusterAlias, formatter);// online
+			}
+			byte[] output = result.getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -107,41 +117,77 @@ public class ConsumersController {
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
-		long count = consumerService.getConsumerCount(clusterAlias, formatter);
-		// if (consumerService.getConsumerCountByDB(clusterAlias) <= 0) {
-		// count = consumerService.getConsumerCount(clusterAlias, formatter);
-		// } else {
-		// count = consumerService.getConsumerCountByDB(clusterAlias);
-		// }
-		JSONArray consumers = JSON.parseArray(consumerService.getConsumer(clusterAlias, formatter, page));
-		JSONArray aaDatas = new JSONArray();
-		for (Object object : consumers) {
-			JSONObject consumer = (JSONObject) object;
-			JSONObject obj = new JSONObject();
-			obj.put("id", consumer.getInteger("id"));
-			String group = "";
-			try {
-				group = URLEncoder.encode(consumer.getString("group"), "UTF-8");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			obj.put("group", "<a class='link' group='" + group + "' href='#'>" + consumer.getString("group") + "</a>");
-			obj.put("topics", consumer.getInteger("topics"));
-			obj.put("node", consumer.getString("node"));
-			int activeTopics = consumer.getInteger("activeTopics");
-			int activeThreads = consumer.getInteger("activeThreads");
-			if (activeTopics > 0) {
-				obj.put("activeTopics", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
-			} else {
-				obj.put("activeTopics", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
-			}
-			if (activeThreads > 0) {
-				obj.put("activeThreads", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
-			} else {
-				obj.put("activeThreads", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
-			}
 
-			aaDatas.add(obj);
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("cluster", clusterAlias);
+		param.put("search", search);
+
+		long count = consumerService.countConsumerSummaryPages(param);
+		List<ConsumerSummaryInfo> consumerSummarys = consumerService.getConsumerSummaryPages(clusterAlias, page);
+		JSONArray aaDatas = new JSONArray();
+		if (count == 0L && (consumerSummarys == null || consumerSummarys.size() == 0)) {
+			// online
+			count = consumerService.getConsumerCount(clusterAlias, formatter);
+			JSONArray consumers = JSON.parseArray(consumerService.getConsumer(clusterAlias, formatter, page));
+			for (Object object : consumers) {
+				JSONObject consumer = (JSONObject) object;
+				JSONObject obj = new JSONObject();
+				obj.put("id", consumer.getInteger("id"));
+				String group = "";
+				try {
+					group = URLEncoder.encode(consumer.getString("group"), "UTF-8");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				obj.put("group", "<a class='link' group='" + group + "' href='#'>" + consumer.getString("group") + "</a>");
+				obj.put("topics", consumer.getInteger("topics"));
+				obj.put("node", consumer.getString("node"));
+				int activeTopics = consumer.getInteger("activeTopics");
+				int activeThreads = consumer.getInteger("activeThreads");
+				if (activeTopics > 0) {
+					obj.put("activeTopics", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
+				} else {
+					obj.put("activeTopics", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
+				}
+				if (activeThreads > 0) {
+					obj.put("activeThreads", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+				} else {
+					obj.put("activeThreads", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+				}
+
+				aaDatas.add(obj);
+			}
+		} else {
+			// offline
+			int id = iDisplayStart + 1;
+			for (ConsumerSummaryInfo consumerSummary : consumerSummarys) {
+				JSONObject obj = new JSONObject();
+				obj.put("id", id);
+				String group = "";
+				try {
+					group = URLEncoder.encode(consumerSummary.getGroup(), "UTF-8");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				obj.put("group", "<a class='link' group='" + group + "' href='#'>" + group + "</a>");
+				obj.put("topics", consumerSummary.getTopicNumbers());
+				obj.put("node", consumerSummary.getCoordinator());
+				int activeTopics = consumerSummary.getActiveTopic();
+				int activeThreads = consumerSummary.getActiveThread();
+				if (activeTopics > 0) {
+					obj.put("activeTopics", "<a class='btn btn-success btn-xs'>" + activeTopics + "</a>");
+				} else {
+					obj.put("activeTopics", "<a class='btn btn-danger btn-xs'>" + activeTopics + "</a>");
+				}
+				if (activeThreads > 0) {
+					obj.put("activeThreads", "<a class='btn btn-success btn-xs'>" + activeThreads + "</a>");
+				} else {
+					obj.put("activeThreads", "<a class='btn btn-danger btn-xs'>" + activeThreads + "</a>");
+				}
+
+				aaDatas.add(obj);
+				id++;
+			}
 		}
 
 		JSONObject target = new JSONObject();
@@ -162,6 +208,7 @@ public class ConsumersController {
 	public void consumerTableListAjax(HttpServletResponse response, HttpServletRequest request) {
 		String aoData = request.getParameter("aoData");
 		String group = "";
+		String search = "";
 		try {
 			group = URLDecoder.decode(request.getParameter("group"), "UTF-8");
 		} catch (Exception e) {
@@ -177,22 +224,63 @@ public class ConsumersController {
 				iDisplayStart = param.getIntValue("value");
 			} else if ("iDisplayLength".equals(param.getString("name"))) {
 				iDisplayLength = param.getIntValue("value");
+			} else if ("sSearch".equals(param.getString("name"))) {
+				search = param.getString("value");
 			}
 		}
+
+		DisplayInfo page = new DisplayInfo();
+		page.setSearch(search);
+		page.setiDisplayLength(iDisplayLength);
+		page.setiDisplayStart(iDisplayStart);
 
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 
 		String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
-		JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(clusterAlias, formatter, group));
-		int offset = 0;
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("cluster", clusterAlias);
+		param.put("group", group);
+		param.put("search", search);
+		long count = consumerService.countConsumerGroupPages(param);
+		List<ConsumerGroupsInfo> consumerGroups = consumerService.getConsumerGroupPages(clusterAlias, group, page);
 		JSONArray aaDatas = new JSONArray();
-		for (Object object : consumerDetails) {
-			JSONObject consumerDetail = (JSONObject) object;
-			if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+		if (count == 0L && (consumerGroups == null || consumerGroups.size() == 0)) {
+			JSONArray consumerDetails = JSON.parseArray(consumerService.getConsumerDetail(clusterAlias, formatter, group, search));
+			count = consumerDetails.size();
+			int offset = 0;
+			for (Object object : consumerDetails) {
+				JSONObject consumerDetail = (JSONObject) object;
+				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+					JSONObject obj = new JSONObject();
+					String topic = consumerDetail.getString("topic");
+					obj.put("id", consumerDetail.getInteger("id"));
+					obj.put("topic", topic);
+
+					try {
+						group = URLEncoder.encode(group, "UTF-8");
+						topic = URLEncoder.encode(topic, "UTF-8");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					if (consumerDetail.getInteger("isConsumering") == Topic.RUNNING) {
+						obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-success btn-xs'>Running</a>");
+					} else if (consumerDetail.getInteger("isConsumering") == Topic.SHUTDOWN) {
+						obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-danger btn-xs'>Shutdown</a>");
+					} else {
+						obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-warning btn-xs'>Pending</a>");
+					}
+					aaDatas.add(obj);
+				}
+				offset++;
+			}
+		} else {
+			int id = iDisplayStart + 1;
+			for (ConsumerGroupsInfo consumerGroup : consumerGroups) {
 				JSONObject obj = new JSONObject();
-				String topic = consumerDetail.getString("topic");
-				obj.put("id", consumerDetail.getInteger("id"));
+				String topic = consumerGroup.getTopic();
+				obj.put("id", id);
 				obj.put("topic", topic);
 
 				try {
@@ -201,23 +289,23 @@ public class ConsumersController {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
-				if (consumerDetail.getInteger("isConsumering") == Topic.RUNNING) {
+				int isConsumering = consumerGroup.getStatus();
+				if (isConsumering == Topic.RUNNING) {
 					obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-success btn-xs'>Running</a>");
-				} else if (consumerDetail.getInteger("isConsumering") == Topic.SHUTDOWN) {
+				} else if (isConsumering == Topic.SHUTDOWN) {
 					obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-danger btn-xs'>Shutdown</a>");
 				} else {
 					obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-warning btn-xs'>Pending</a>");
 				}
 				aaDatas.add(obj);
+				id++;
 			}
-			offset++;
 		}
 
 		JSONObject target = new JSONObject();
 		target.put("sEcho", sEcho);
-		target.put("iTotalRecords", consumerDetails.size());
-		target.put("iTotalDisplayRecords", consumerDetails.size());
+		target.put("iTotalRecords", count);
+		target.put("iTotalDisplayRecords", count);
 		target.put("aaData", aaDatas);
 		try {
 			byte[] output = target.toJSONString().getBytes();

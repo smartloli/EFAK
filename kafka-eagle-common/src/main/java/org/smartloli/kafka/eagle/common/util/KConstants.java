@@ -34,8 +34,8 @@ public class KConstants {
 		private D3() {
 		}
 
-		public static final int SIZE = 40;
-		public static final int CHILD_SIZE = 20;
+		public static final int SIZE = 10;
+		public static final int CHILD_SIZE = 5;
 	}
 
 	public enum OperateSystem {

@@ -25,6 +25,7 @@ import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 
 /**
  * Define access to the kafka monitoring data interface via jmx.
@@ -71,9 +72,18 @@ public interface MetricsService {
 	/** Write consumer group topics. */
 	public int writeConsumerGroupTopics(List<ConsumerGroupsInfo> consumerGroups);
 
+	/** Write consumer group summary topics. */
+	public int writeConsumerSummaryTopics(List<ConsumerSummaryInfo> consumerSummarys);
+
 	/** Clean consumer group topics. */
 	public int cleanConsumerGroupTopic(Map<String, Object> params);
 
+	/** Clean consumer group topics. */
+	public int cleanConsumerSummaryTopic(Map<String, Object> params);
+
 	/** Get all consumer groups. */
 	public List<ConsumerGroupsInfo> getAllConsumerGroups(Map<String, Object> params);
+
+	/** Get all consumer groups summary. */
+	public List<ConsumerSummaryInfo> getAllConsumerSummary(Map<String, Object> params);
 }
