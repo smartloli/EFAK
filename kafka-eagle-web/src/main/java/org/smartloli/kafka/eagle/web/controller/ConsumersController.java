@@ -78,7 +78,7 @@ public class ConsumersController {
 		try {
 			String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
 			String result = consumerService.getKafkaConsumerGraph(clusterAlias);// offline
-			if (StrUtils.isNull(result)) {
+			if (StrUtils.isListNull(JSON.parseObject(result).getJSONObject("active").getString("children"))) {
 				result = consumerService.getActiveTopic(clusterAlias, formatter);// online
 			}
 			byte[] output = result.getBytes();

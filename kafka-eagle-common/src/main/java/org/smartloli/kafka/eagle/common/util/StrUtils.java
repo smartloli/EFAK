@@ -122,6 +122,14 @@ public class StrUtils {
 		return false;
 	}
 
+	/** whether list is empty. */
+	public static boolean isListNull(String value) {
+		if ("[]".equals(value)) {
+			return true;
+		}
+		return false;
+	}
+
 	/** Convert null to string. */
 	public static String convertNull(String value) {
 		if (isNull(value)) {
