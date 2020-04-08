@@ -23,6 +23,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
@@ -40,6 +42,8 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class MailJob implements Job {
 
+	private Logger LOG = LoggerFactory.getLogger(MailJob.class);
+
 	/** Send alarm information by mail. */
 	public void execute(JobExecutionContext jobContext) throws JobExecutionException {
 		BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
@@ -51,9 +55,10 @@ public class MailJob implements Job {
 			JSONObject object = JSON.parseObject(data);
 			BasicNameValuePair address = new BasicNameValuePair("address", object.getString("address"));
 			BasicNameValuePair msg = new BasicNameValuePair("msg", object.getString("msg"));
-			HttpClientUtils.doPostForm(url, Arrays.asList(address,msg));
+			HttpClientUtils.doPostForm(url, Arrays.asList(address, msg));
 		} catch (Exception e) {
-			ThrowExceptionUtils.print(this.getClass()).error("Send alarm message has error by mail, msg is ",e);
+			ThrowExceptionUtils.print(this.getClass()).error("Send alarm message has error by mail, msg is ", e);
+			LOG.error("Send alarm message has error by mail, msg is ", e);
 			return 0;
 		}
 		return 1;
