@@ -49,7 +49,7 @@
 		<li class="dropdown">
 			<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 				<i class="fa fa-bookmark"></i>
-				V1.4.6
+				V1.4.7
 			</a>
 		</li>
 		<li class="dropdown">
