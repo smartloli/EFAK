@@ -44,7 +44,7 @@ public class MailJob implements Job {
 
 	private Logger LOG = LoggerFactory.getLogger(MailJob.class);
 
-	/** Send alarm information by mail. */
+	/** Send alarm information by mail or webhook. */
 	public void execute(JobExecutionContext jobContext) throws JobExecutionException {
 		BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
 		sendMsg(bjc.getData(), bjc.getUrl());
