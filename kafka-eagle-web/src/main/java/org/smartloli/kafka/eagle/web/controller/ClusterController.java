@@ -17,12 +17,22 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.util.concurrent.TimeUnit;
+
+import javax.management.MBeanServerConnection;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXServiceURL;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -105,6 +115,10 @@ public class ClusterController {
 		JSONArray clusters = deserializeClusters.getJSONArray(type);
 		int offset = 0;
 		JSONArray aaDatas = new JSONArray();
+
+		JMXConnector connector = null;
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		String memory = "<a class='btn btn-danger btn-xs'>NULL</a>";
 		for (Object object : clusters) {
 			JSONObject cluster = (JSONObject) object;
 			if (search.length() > 0 && search.equals(cluster.getString("host"))) {
@@ -114,6 +128,25 @@ public class ClusterController {
 				obj.put("ip", cluster.getString("host"));
 				if ("kafka".equals(type)) {
 					obj.put("jmxPort", cluster.getInteger("jmxPort"));
+					try {
+						JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, cluster.getString("host") + ":" + cluster.getInteger("jmxPort")));
+						connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+						MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+						MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
+						long used = memBean.getHeapMemoryUsage().getUsed();
+						long max = memBean.getHeapMemoryUsage().getMax();
+						String percent = StrUtils.stringify(used) + " (" + StrUtils.numberic((used * 100.0 / max) + "") + "%)";
+						if ((used * 100.0) / max < BrokerSever.MEM_NORMAL) {
+							memory = "<a class='btn btn-success btn-xs'>" + percent + "</a>";
+						} else if ((used * 100.0) / max >= BrokerSever.MEM_NORMAL && (used * 100.0) / max < BrokerSever.MEM_DANGER) {
+							memory = "<a class='btn btn-warning btn-xs'>" + percent + "</a>";
+						} else if ((used * 100.0) / max >= BrokerSever.MEM_DANGER) {
+							memory = "<a class='btn btn-danger btn-xs'>" + percent + "</a>";
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					obj.put("memory", memory);
 					obj.put("created", cluster.getString("created"));
 					obj.put("modify", cluster.getString("modify"));
 					String version = cluster.getString("version") == "" ? Kafka.UNKOWN : cluster.getString("version");
@@ -145,6 +178,25 @@ public class ClusterController {
 					obj.put("ip", cluster.getString("host"));
 					if ("kafka".equals(type)) {
 						obj.put("jmxPort", cluster.getInteger("jmxPort"));
+						try {
+							JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, cluster.getString("host") + ":" + cluster.getInteger("jmxPort")));
+							connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+							MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+							MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
+							long used = memBean.getHeapMemoryUsage().getUsed();
+							long max = memBean.getHeapMemoryUsage().getMax();
+							String percent = StrUtils.stringify(used) + " (" + StrUtils.numberic((used * 100.0 / max) + "") + "%)";
+							if ((used * 100.0) / max < BrokerSever.MEM_NORMAL) {
+								memory = "<a class='btn btn-success btn-xs'>" + percent + "</a>";
+							} else if ((used * 100.0) / max >= BrokerSever.MEM_NORMAL && (used * 100.0) / max < BrokerSever.MEM_DANGER) {
+								memory = "<a class='btn btn-warning btn-xs'>" + percent + "</a>";
+							} else if ((used * 100.0) / max >= BrokerSever.MEM_DANGER) {
+								memory = "<a class='btn btn-danger btn-xs'>" + percent + "</a>";
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						obj.put("memory", memory);
 						obj.put("created", cluster.getString("created"));
 						obj.put("modify", cluster.getString("modify"));
 						String version = cluster.getString("version") == "" ? Kafka.UNKOWN : cluster.getString("version");
@@ -183,6 +235,14 @@ public class ClusterController {
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

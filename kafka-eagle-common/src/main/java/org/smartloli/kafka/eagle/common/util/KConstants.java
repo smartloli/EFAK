@@ -250,6 +250,14 @@ public class KConstants {
 		public static final String LAG = "lag";
 	}
 
+	public final class BrokerSever {
+		private BrokerSever() {
+		}
+
+		public static final int MEM_NORMAL = 60;
+		public static final int MEM_DANGER = 80;
+	}
+
 	public final class Component {
 		private Component() {
 		}

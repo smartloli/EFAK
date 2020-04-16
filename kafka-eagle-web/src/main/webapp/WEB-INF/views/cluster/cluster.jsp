@@ -66,6 +66,7 @@
 											<th>IP</th>
 											<th>Port</th>
 											<th>JMX Port</th>
+											<th>Memory(Used | Percent)</th>
 											<th>Created</th>
 											<th>Modify</th>
 											<th>Version</th>

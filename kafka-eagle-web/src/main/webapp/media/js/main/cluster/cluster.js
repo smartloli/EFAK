@@ -16,6 +16,8 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'jmxPort'
 		}, {
+			"mData" : 'memory'
+		}, {
 			"mData" : 'created'
 		}, {
 			"mData" : 'modify'

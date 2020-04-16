@@ -18,6 +18,8 @@
 package org.smartloli.kafka.eagle.core.factory;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1409,8 +1411,14 @@ public class KafkaServiceImpl implements KafkaService {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			String memorySize = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), property).toString();
-			memory = Long.parseLong(memorySize);
+			MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
+			long max = memBean.getHeapMemoryUsage().getMax();
+			long used = memBean.getHeapMemoryUsage().getUsed();
+			if (BrokerServer.TOTAL_PHYSICAL_MEMORY_SIZE.getValue().equals(property)) {
+				memory = max;
+			} else if (BrokerServer.FREE_PHYSICAL_MEMORY_SIZE.getValue().equals(property)) {
+				memory = max - used;
+			}
 		} catch (Exception ex) {
 			LOG.error("Get kafka os memory from jmx has error, msg is " + ex.getMessage());
 		} finally {

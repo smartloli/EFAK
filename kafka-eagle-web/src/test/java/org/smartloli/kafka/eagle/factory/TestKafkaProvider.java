@@ -28,7 +28,7 @@ import kafka.admin.TopicCommand;
  */
 public class TestKafkaProvider {
 	public static void main(String[] args) {
-		String[] options = new String[] { "--alter", "--zookeeper", "slave01:2181","--partitions","6",  "--topic", "KE_TTT_1200" };
+		String[] options = new String[] { "--alter", "--zookeeper", "slave01:2181", "--partitions", "6", "--topic", "KE_TTT_1200" };
 		TopicCommand.main(options);
 	}
 
