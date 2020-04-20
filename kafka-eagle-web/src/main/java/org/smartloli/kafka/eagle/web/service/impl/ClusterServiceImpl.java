@@ -103,13 +103,14 @@ public class ClusterServiceImpl implements ClusterService {
 			target.put("zk", JSON.parseArray(zkCluster));
 		} else if ("kafka".equals(type)) {
 			List<BrokersInfo> kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);
-			for (BrokersInfo broker : kafkaBrokers) {
-				String version = kafkaService.getKafkaVersion(broker.getHost(), broker.getJmxPort(), broker.getIds(), clusterAlias);
-				broker.setVersion(version);
-			}
 			target.put("kafka", JSON.parseArray(kafkaBrokers.toString()));
 		}
 		return target.toJSONString();
+	}
+
+	@Override
+	public String getKafkaVersion(String host, int jmxPort, String ids, String clusterAlias) {
+		return kafkaService.getKafkaVersion(host, jmxPort, ids, clusterAlias);
 	}
 
 	@Override

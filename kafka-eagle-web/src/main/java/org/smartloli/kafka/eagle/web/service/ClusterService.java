@@ -37,6 +37,9 @@ public interface ClusterService {
 	/** Get Kafka & Zookeeper interface. */
 	public String get(String clusterAlias, String type);
 
+	/** Get kafka version. */
+	public String getKafkaVersion(String host, int jmxPort, String ids, String clusterAlias);
+
 	/** Get Zookkeeper status interface. */
 	public JSONObject status(String clusterAlias);
 
