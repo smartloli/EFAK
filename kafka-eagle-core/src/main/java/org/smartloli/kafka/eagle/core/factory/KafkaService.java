@@ -70,9 +70,9 @@ public interface KafkaService {
 
 	/** Get kafka 0.10.x offset from topic. */
 	public String getKafkaOffset(String clusterAlias);
-	
+
 	/** Get the data for the topic partition in the specified consumer group */
-	public Map<Integer, Long> getKafkaOffset(String clusterAlias,String group,String topic, Set<Integer> partitionids);
+	public Map<Integer, Long> getKafkaOffset(String clusterAlias, String group, String topic, Set<Integer> partitionids);
 
 	/** Use kafka console comand to create topic. */
 	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic);
@@ -91,9 +91,9 @@ public interface KafkaService {
 
 	/** Get kafka 0.10.x consumer group & topic information. */
 	public String getKafkaConsumer(String clusterAlias);
-	
+
 	/** Get kafka 0.10.x consumer group & topic information used for page. */
-	public String getKafkaConsumer(String clusterAlias,DisplayInfo page);
+	public String getKafkaConsumer(String clusterAlias, DisplayInfo page);
 
 	@Deprecated
 	/** Get kafka consumer information pages. */
@@ -125,7 +125,7 @@ public interface KafkaService {
 
 	/** Get kafka topic real logsize by partitionid set. */
 	public long getKafkaRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
-	
+
 	/** Get topic producer send logsize records. */
 	public long getKafkaProducerLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
 
@@ -161,5 +161,8 @@ public interface KafkaService {
 
 	/** Set kafka sasl acl. */
 	public void sasl(Properties props, String clusterAlias);
-	
+
+	/** Set kafka ssl acl. */
+	public void ssl(Properties props, String clusterAlias);
+
 }

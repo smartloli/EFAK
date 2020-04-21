@@ -71,6 +71,9 @@ public class KafkaConsumerAdapter {
 		if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.enable")) {
 			kafkaService.sasl(props, kafkaSql.getClusterAlias());
 		}
+		if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.ssl.enable")) {
+			kafkaService.ssl(props, kafkaSql.getClusterAlias());
+		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		List<TopicPartition> topics = new ArrayList<>();
 		for (Integer partition : kafkaSql.getPartition()) {

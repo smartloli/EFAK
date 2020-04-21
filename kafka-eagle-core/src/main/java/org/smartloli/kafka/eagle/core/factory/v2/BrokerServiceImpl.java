@@ -333,11 +333,13 @@ public class BrokerServiceImpl implements BrokerService {
 		return count;
 	}
 
-	/** Get topic list from zookeeper. */
+	/** Get topic list {@link #topicList()} include cgroups from zookeeper. */
 	public List<String> topicList(String clusterAlias) {
 		List<String> topics = new ArrayList<>();
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.cgroup.enable")) {
 			topics = SystemConfigUtils.getPropertyArrayList(clusterAlias + ".kafka.eagle.sasl.cgroup.topics", ",");
+		} else if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.cgroup.enable")) {
+			topics = SystemConfigUtils.getPropertyArrayList(clusterAlias + ".kafka.eagle.ssl.cgroup.topics", ",");
 		} else {
 			KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 			try {
@@ -646,6 +648,9 @@ public class BrokerServiceImpl implements BrokerService {
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			kafkaService.sasl(prop, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			kafkaService.ssl(prop, clusterAlias);
 		}
 
 		AdminClient adminClient = null;
