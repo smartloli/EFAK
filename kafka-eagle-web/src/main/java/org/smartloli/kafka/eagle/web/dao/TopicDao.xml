@@ -70,6 +70,16 @@
 		where `cluster`=#{cluster} and `tkey`=#{tkey}
 		order by `tvalue` desc limit 10
 	</select>
+	
+	<!-- Get all topic rank -->
+	<select id="getAllTopicRank" parameterType="map" resultMap="trank">
+		select * from ke_topic_rank where `cluster`=#{cluster} and `tkey`=#{tkey}
+	</select>
+	
+	<!-- Remove topic rank -->
+	<delete id="removeTopicRank" parameterType="map">
+		delete from ke_topic_rank where `cluster`=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
+	</delete>
 
 	<!-- Get clean topic state -->
 	<select id="getCleanTopicState" parameterType="map" resultMap="trank">

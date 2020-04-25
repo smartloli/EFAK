@@ -42,7 +42,13 @@ public interface DashboardService {
 	/** Get topic logsize & capacity. */
 	public JSONArray getTopicRank(Map<String, Object> params);
 
-	/** Get all clean topic list. */
+	/** Clean up topic metadata that does not exist in zookeeper. */
+	public List<TopicRank> getAllTopicRank(Map<String, Object> params);
+
+	/** Clean topic rank by logsize or capacity. */
+	public void removeTopicRank(Map<String, Object> params);
+
+	/** Get and clean all topic tasks. */
 	public List<TopicRank> getCleanTopicList(Map<String, Object> params);
 
 	/** Write statistics topic rank data from kafka jmx & insert into table. */
