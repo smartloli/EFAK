@@ -158,4 +158,7 @@ public interface TopicDao {
 	/** Count consumer group summary pages. */
 	public long countConsumerSummaryPages(Map<String, Object> params);
 
+	/** Get producer alive threads. */
+	public List<TopicLogSize> queryProducerAlives(Map<String, Object> params);
+
 }
