@@ -432,13 +432,13 @@ public class MetricsQuartz {
 							if (!kafkaService.getKafkaConsumerTopics(cluster, group.getKey()).contains(topic)) {
 								Map<String, Object> cleanParams = new HashMap<>();
 								cleanParams.put("cluster", cluster);
-								cleanParams.put("group", group);
+								cleanParams.put("group", group.getKey());
 								cleanParams.put("topic", topic);
 								try {
 									metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
 								} catch (Exception e) {
 									e.printStackTrace();
-									LOG.error("Clean kafka consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
+									LOG.error("Clean kafka consumer cluster[" + cluster + "] group[" + group.getKey() + "] has error, msg is ", e);
 								}
 							}
 						}
@@ -506,13 +506,13 @@ public class MetricsQuartz {
 							if (!kafkaService.getActiveTopic(cluster, group.getKey()).contains(topic)) {
 								Map<String, Object> cleanParams = new HashMap<>();
 								cleanParams.put("cluster", cluster);
-								cleanParams.put("group", group);
+								cleanParams.put("group", group.getKey());
 								cleanParams.put("topic", topic);
 								try {
 									metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
 								} catch (Exception e) {
 									e.printStackTrace();
-									LOG.error("Clean consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
+									LOG.error("Clean consumer cluster[" + cluster + "] group[" + group.getKey() + "] has error, msg is ", e);
 								}
 							}
 						}
