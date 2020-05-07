@@ -165,7 +165,7 @@ $(document).ready(
 					endDate : end,
 					ranges : {
 						'Today' : [ moment(), moment() ],
-						'Yesterday' : [ moment().subtract(1, 'days'), moment().subtract(1, 'days') ],
+						'Yesterday' : [ moment().subtract(1, 'days'), moment() ],
 						'Lastest 3 days' : [ moment().subtract(3, 'days'), moment() ],
 						'Lastest 7 days' : [ moment().subtract(6, 'days'), moment() ]
 					}
