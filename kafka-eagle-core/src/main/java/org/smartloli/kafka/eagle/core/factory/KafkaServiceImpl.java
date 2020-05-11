@@ -44,7 +44,6 @@ import javax.management.remote.JMXServiceURL;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
-import org.apache.kafka.clients.admin.CreateAclsResult;
 import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsOptions;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
@@ -59,14 +58,8 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.acl.AccessControlEntry;
-import org.apache.kafka.common.acl.AclBinding;
-import org.apache.kafka.common.acl.AclOperation;
-import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.config.SaslConfigs;
-import org.apache.kafka.common.resource.PatternType;
-import org.apache.kafka.common.resource.ResourcePattern;
-import org.apache.kafka.common.resource.ResourceType;
+import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.zookeeper.data.Stat;
@@ -244,7 +237,7 @@ public class KafkaServiceImpl implements KafkaService {
 					broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
 					broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
 					String tupleString = new String(tuple._1.get());
-					if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+					if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
 						String endpoints = JSON.parseObject(tupleString).getString("endpoints");
 						String tmp = endpoints.split("//")[1];
 						broker.setHost(tmp.substring(0, tmp.length() - 2).split(":")[0]);
@@ -458,7 +451,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 *            Replic numbers.
 	 * @return Map.
 	 */
-	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic, String username) {
+	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic) {
 		Map<String, Object> targets = new HashMap<String, Object>();
 		int brokers = getAllBrokersInfo(clusterAlias).size();
 		if (Integer.parseInt(replic) > brokers) {
@@ -472,17 +465,15 @@ public class KafkaServiceImpl implements KafkaService {
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, clusterAlias);
 		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(prop, clusterAlias);
+		}
 
 		AdminClient adminClient = null;
 		try {
 			adminClient = AdminClient.create(prop);
 			NewTopic newTopic = new NewTopic(topicName, Integer.valueOf(partitions), Short.valueOf(replic));
 			adminClient.createTopics(Collections.singleton(newTopic)).all().get();
-			
-			if (!"".equalsIgnoreCase(username)) {
-				createAclForTopic(adminClient, topicName, username,  "group_" + username);
-			}
-			
 		} catch (Exception e) {
 			LOG.info("Create kafka topic has error, msg is " + e.getMessage());
 			e.printStackTrace();
@@ -494,42 +485,6 @@ public class KafkaServiceImpl implements KafkaService {
 		targets.put("info", "Create topic[" + topicName + "] has successed,partitions numbers is [" + partitions + "],replication-factor numbers is [" + replic + "]");
 		return targets;
 	}
-	
-	/**
-	 * 
-	 * @param client
-	 * @param topicName
-	 * @param username
-	 */
-	private void createAclForTopic(AdminClient client, String topicName, String username, String groupnname) {
-		String principal = "User:" + username;
-		String host = "*";
-		ArrayList<AclBinding> as = new ArrayList<>();
-		
-		ResourcePattern pattern = new ResourcePattern(ResourceType.TOPIC, topicName, PatternType.LITERAL);
-		
-		AclBinding aclBindingW = new AclBinding(pattern, new AccessControlEntry(principal, host, AclOperation.WRITE, AclPermissionType.ALLOW));
-		AclBinding aclBindingR = new AclBinding(pattern, new AccessControlEntry(principal, host, AclOperation.READ, AclPermissionType.ALLOW));
-		AclBinding aclBindingD = new AclBinding(pattern, new AccessControlEntry(principal, host, AclOperation.DESCRIBE, AclPermissionType.ALLOW));
-		as.add(aclBindingW);
-		as.add(aclBindingR);
-		as.add(aclBindingD);
-		
-		//group
-		ResourcePattern resourcePatternGroup = new ResourcePattern(ResourceType.GROUP, groupnname, PatternType.LITERAL);
-		AclBinding aclBindingG = new AclBinding(resourcePatternGroup, new AccessControlEntry(principal, host, AclOperation.READ, AclPermissionType.ALLOW));
-		as.add(aclBindingG);
-		
-		CreateAclsResult result = client.createAcls(as);
-		
-		try {
-			result.values().get(aclBindingW).get(30, TimeUnit.SECONDS);
-		} catch (Exception e) {
-			LOG.info("Error creating acl for topic " + topicName, e);
-			e.printStackTrace();
-		}
-	}
-	
 
 	/** Delete topic to kafka cluster. */
 	public Map<String, Object> delete(String clusterAlias, String topicName) {
@@ -539,6 +494,9 @@ public class KafkaServiceImpl implements KafkaService {
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(prop, clusterAlias);
 		}
 
 		AdminClient adminClient = null;
@@ -594,12 +552,27 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/** Set topic sasl. */
 	public void sasl(Properties props, String clusterAlias) {
+		// configure the following four settings for SSL Encryption
 		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
 		if (!"".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.client.id"))) {
 			props.put(CommonClientConfigs.CLIENT_ID_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.client.id"));
 		}
 		props.put(SaslConfigs.SASL_MECHANISM, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.mechanism"));
 		props.put(SaslConfigs.SASL_JAAS_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.jaas.config"));
+	}
+
+	/** Set topic ssl. */
+	public void ssl(Properties props, String clusterAlias) {
+		// configure the following three settings for SSL Encryption
+		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.protocol"));
+		props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.truststore.location"));
+		props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.truststore.password"));
+
+		// configure the following three settings for SSL Authentication
+		props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.keystore.location"));
+		props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.keystore.password"));
+		props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.key.password"));
+
 	}
 
 	private KafkaSqlInfo segments(String clusterAlias, String sql) {
@@ -682,6 +655,9 @@ public class KafkaServiceImpl implements KafkaService {
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, clusterAlias);
 		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(prop, clusterAlias);
+		}
 
 		AdminClient adminClient = null;
 		try {
@@ -723,6 +699,9 @@ public class KafkaServiceImpl implements KafkaService {
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(prop, clusterAlias);
 		}
 
 		AdminClient adminClient = null;
@@ -803,6 +782,9 @@ public class KafkaServiceImpl implements KafkaService {
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(prop, clusterAlias);
 		}
 
 		JSONArray consumerGroups = new JSONArray();
@@ -905,6 +887,9 @@ public class KafkaServiceImpl implements KafkaService {
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, clusterAlias);
 		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(prop, clusterAlias);
+		}
 
 		AdminClient adminClient = null;
 		try {
@@ -953,6 +938,9 @@ public class KafkaServiceImpl implements KafkaService {
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, clusterAlias);
 		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(prop, clusterAlias);
+		}
 		JSONArray targets = new JSONArray();
 		AdminClient adminClient = null;
 		try {
@@ -991,6 +979,9 @@ public class KafkaServiceImpl implements KafkaService {
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(prop, clusterAlias);
 		}
 		AdminClient adminClient = null;
 		try {
@@ -1035,6 +1026,9 @@ public class KafkaServiceImpl implements KafkaService {
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(props, clusterAlias);
 		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(props, clusterAlias);
+		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		TopicPartition tp = new TopicPartition(topic, partitionid);
 		consumer.assign(Collections.singleton(tp));
@@ -1062,6 +1056,9 @@ public class KafkaServiceImpl implements KafkaService {
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(props, clusterAlias);
 		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(props, clusterAlias);
+		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		Set<TopicPartition> tps = new HashSet<>();
 		for (int partitionid : partitionids) {
@@ -1087,6 +1084,9 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(props, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(props, clusterAlias);
 		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		TopicPartition tp = new TopicPartition(topic, partitionid);
@@ -1116,6 +1116,9 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(props, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(props, clusterAlias);
 		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		Set<TopicPartition> tps = new HashSet<>();
@@ -1157,6 +1160,9 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(props, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(props, clusterAlias);
 		}
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		Set<TopicPartition> tps = new HashSet<>();
@@ -1251,7 +1257,9 @@ public class KafkaServiceImpl implements KafkaService {
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(props, clusterAlias);
 		}
-
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(props, clusterAlias);
+		}
 		Producer<String, String> producer = new KafkaProducer<>(props);
 		producer.send(new ProducerRecord<String, String>(topic, new Date().getTime() + "", message));
 		producer.close();
@@ -1286,6 +1294,9 @@ public class KafkaServiceImpl implements KafkaService {
 
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			sasl(prop, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			ssl(prop, clusterAlias);
 		}
 		AdminClient adminClient = null;
 		try {
@@ -1430,7 +1441,7 @@ public class KafkaServiceImpl implements KafkaService {
 				Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
 				String tupleString = new String(tuple._1.get());
 				String host = "";
-				if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+				if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
 					String endpoints = JSON.parseObject(tupleString).getString("endpoints");
 					String tmp = endpoints.split("//")[1];
 					host = tmp.substring(0, tmp.length() - 2).split(":")[0];

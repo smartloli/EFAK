@@ -15,7 +15,7 @@
 		<repository>
 			<id>nexus</id>
 			<name>nexus</name>
-			<url>https://repo1.maven.org/maven2/</url>
+			<url>https://repo.spring.io/libs-snapshot/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>

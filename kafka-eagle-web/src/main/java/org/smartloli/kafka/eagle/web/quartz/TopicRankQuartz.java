@@ -191,6 +191,27 @@ public class TopicRankQuartz {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
 			List<String> topics = brokerService.topicList(clusterAlias);
+
+			// clean up nonexistent topic
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("tkey", Topic.CAPACITY);
+			List<TopicRank> trs = dashboardServiceImpl.getAllTopicRank(params);
+			for (TopicRank tr : trs) {
+				try {
+					if (!topics.contains(tr.getTopic())) {
+						Map<String, Object> clean = new HashMap<>();
+						clean.put("cluster", clusterAlias);
+						clean.put("topic", tr.getTopic());
+						clean.put("tkey", Topic.CAPACITY);
+						dashboardServiceImpl.removeTopicRank(clean);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("Failed to clean up nonexistent topic, msg is ", e);
+				}
+			}
+
 			for (String topic : topics) {
 				long capacity = kafkaMetricsService.topicCapacity(clusterAlias, topic);
 				TopicRank topicRank = new TopicRank();
@@ -235,6 +256,27 @@ public class TopicRankQuartz {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
 			List<String> topics = brokerService.topicList(clusterAlias);
+
+			// clean up nonexistent topic
+			Map<String, Object> params = new HashMap<>();
+			params.put("cluster", clusterAlias);
+			params.put("tkey", Topic.LOGSIZE);
+			List<TopicRank> trs = dashboardServiceImpl.getAllTopicRank(params);
+			for (TopicRank tr : trs) {
+				try {
+					if (!topics.contains(tr.getTopic())) {
+						Map<String, Object> clean = new HashMap<>();
+						clean.put("cluster", clusterAlias);
+						clean.put("topic", tr.getTopic());
+						clean.put("tkey", Topic.LOGSIZE);
+						dashboardServiceImpl.removeTopicRank(clean);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("Failed to clean up nonexistent topic, msg is ", e);
+				}
+			}
+
 			for (String topic : topics) {
 				long logsize = brokerService.getTopicRealLogSize(clusterAlias, topic);
 				TopicRank topicRank = new TopicRank();

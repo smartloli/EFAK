@@ -97,6 +97,9 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			kafkaService.sasl(prop, clusterAlias);
 		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			kafkaService.ssl(prop, clusterAlias);
+		}
 		long sum = 0L;
 		AdminClient adminClient = null;
 		try {
@@ -174,6 +177,9 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
 			kafkaService.sasl(prop, clusterAlias);
+		}
+		if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+			kafkaService.ssl(prop, clusterAlias);
 		}
 		try {
 			switch (type) {

@@ -46,6 +46,12 @@ public interface TopicDao {
 	/** Read topic rank data. */
 	public List<TopicRank> readTopicRank(Map<String, Object> params);
 
+	/** Read all topic rank data. */
+	public List<TopicRank> getAllTopicRank(Map<String, Object> params);
+
+	/** Clean topic rank by logsize or capacity. */
+	public void removeTopicRank(Map<String, Object> params);
+
 	/** Get clean topic state. */
 	public List<TopicRank> getCleanTopicState(Map<String, Object> params);
 
@@ -151,5 +157,8 @@ public interface TopicDao {
 
 	/** Count consumer group summary pages. */
 	public long countConsumerSummaryPages(Map<String, Object> params);
+
+	/** Get producer alive threads. */
+	public List<TopicLogSize> queryProducerAlives(Map<String, Object> params);
 
 }

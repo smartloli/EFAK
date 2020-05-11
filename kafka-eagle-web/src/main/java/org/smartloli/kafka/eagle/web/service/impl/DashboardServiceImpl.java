@@ -205,4 +205,14 @@ public class DashboardServiceImpl implements DashboardService {
 		return topicDao.getCleanTopicList(params);
 	}
 
+	@Override
+	public List<TopicRank> getAllTopicRank(Map<String, Object> params) {
+		return topicDao.getAllTopicRank(params);
+	}
+
+	@Override
+	public void removeTopicRank(Map<String, Object> params) {
+		topicDao.removeTopicRank(params);
+	}
+
 }
