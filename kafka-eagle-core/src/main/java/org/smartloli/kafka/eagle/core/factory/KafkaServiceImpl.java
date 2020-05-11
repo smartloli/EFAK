@@ -44,6 +44,7 @@ import javax.management.remote.JMXServiceURL;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
+import org.apache.kafka.clients.admin.CreateAclsResult;
 import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsOptions;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
@@ -58,8 +59,15 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.acl.AccessControlEntry;
+import org.apache.kafka.common.acl.AclBinding;
+import org.apache.kafka.common.acl.AclOperation;
+import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
+import org.apache.kafka.common.resource.PatternType;
+import org.apache.kafka.common.resource.ResourcePattern;
+import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.zookeeper.data.Stat;
@@ -451,7 +459,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 *            Replic numbers.
 	 * @return Map.
 	 */
-	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic) {
+	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic, String username) {
 		Map<String, Object> targets = new HashMap<String, Object>();
 		int brokers = getAllBrokersInfo(clusterAlias).size();
 		if (Integer.parseInt(replic) > brokers) {
@@ -474,6 +482,11 @@ public class KafkaServiceImpl implements KafkaService {
 			adminClient = AdminClient.create(prop);
 			NewTopic newTopic = new NewTopic(topicName, Integer.valueOf(partitions), Short.valueOf(replic));
 			adminClient.createTopics(Collections.singleton(newTopic)).all().get();
+			
+			if (!"".equalsIgnoreCase(username)) {
+				createAclForTopic(adminClient, topicName, username,  "group_" + username);
+			}			
+			
 		} catch (Exception e) {
 			LOG.info("Create kafka topic has error, msg is " + e.getMessage());
 			e.printStackTrace();
@@ -485,6 +498,37 @@ public class KafkaServiceImpl implements KafkaService {
 		targets.put("info", "Create topic[" + topicName + "] has successed,partitions numbers is [" + partitions + "],replication-factor numbers is [" + replic + "]");
 		return targets;
 	}
+	
+	
+	private void createAclForTopic(AdminClient client, String topicName, String username, String groupnname) {
+		String principal = "User:" + username;
+		String host = "*";
+		ArrayList<AclBinding> as = new ArrayList<>();
+		
+		ResourcePattern pattern = new ResourcePattern(ResourceType.TOPIC, topicName, PatternType.LITERAL);
+		
+		AclBinding aclBindingW = new AclBinding(pattern, new AccessControlEntry(principal, host, AclOperation.WRITE, AclPermissionType.ALLOW));
+		AclBinding aclBindingR = new AclBinding(pattern, new AccessControlEntry(principal, host, AclOperation.READ, AclPermissionType.ALLOW));
+		AclBinding aclBindingD = new AclBinding(pattern, new AccessControlEntry(principal, host, AclOperation.DESCRIBE, AclPermissionType.ALLOW));
+		as.add(aclBindingW);
+		as.add(aclBindingR);
+		as.add(aclBindingD);
+		
+		//group
+		ResourcePattern resourcePatternGroup = new ResourcePattern(ResourceType.GROUP, groupnname, PatternType.LITERAL);
+		AclBinding aclBindingG = new AclBinding(resourcePatternGroup, new AccessControlEntry(principal, host, AclOperation.READ, AclPermissionType.ALLOW));
+		as.add(aclBindingG);
+		
+		CreateAclsResult result = client.createAcls(as);
+		
+		try {
+			result.values().get(aclBindingW).get(30, TimeUnit.SECONDS);
+		} catch (Exception e) {
+			LOG.info("Error creating acl for topic " + topicName, e);
+			e.printStackTrace();
+		}
+	}	
+	
 
 	/** Delete topic to kafka cluster. */
 	public Map<String, Object> delete(String clusterAlias, String topicName) {
