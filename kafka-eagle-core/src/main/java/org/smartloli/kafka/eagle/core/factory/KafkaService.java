@@ -75,7 +75,7 @@ public interface KafkaService {
 	public Map<Integer, Long> getKafkaOffset(String clusterAlias,String group,String topic, Set<Integer> partitionids);
 
 	/** Use kafka console comand to create topic. */
-	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic);
+	public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic, String username);
 
 	/** Use kafka console command to delete topic. */
 	public Map<String, Object> delete(String clusterAlias, String topicName);

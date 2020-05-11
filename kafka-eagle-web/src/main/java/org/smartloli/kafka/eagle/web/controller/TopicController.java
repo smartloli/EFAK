@@ -526,8 +526,14 @@ public class TopicController {
 		String ke_topic_name = request.getParameter("ke_topic_name");
 		String ke_topic_partition = request.getParameter("ke_topic_partition");
 		String ke_topic_repli = request.getParameter("ke_topic_repli");
+		String ke_topic_username = request.getParameter("ke_topic_username");
+		
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-		Map<String, Object> respons = kafkaService.create(clusterAlias, ke_topic_name, ke_topic_partition, ke_topic_repli);
+		
+		Map<String, Object> respons = kafkaService.create(clusterAlias, ke_topic_name, ke_topic_partition, ke_topic_repli, ke_topic_username);
+		
+		
+		
 		if ("success".equals(respons.get("status"))) {
 			session.removeAttribute("Submit_Status");
 			session.setAttribute("Submit_Status", respons.get("info"));

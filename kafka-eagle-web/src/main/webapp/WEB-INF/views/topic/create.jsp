@@ -77,6 +77,20 @@
 												class="fa fa-info-circle"></i> Replication Factor parameters
 												must be numeric . Pay attention to available brokers must be larger than replication factor .</label>
 										</div>
+										
+										<div class="form-group">
+											<label>授权用户 </label> 
+											<select id="ke_topic_username" name="ke_topic_username"  class="form-control">
+											  <option value="">选择用户</option>
+											  <option value="gs">GS</option>
+											  <option value="cs">CS</option>
+											  <option value="bi">BI</option>
+											</select>
+											<label for="inputError" class="control-label text-danger">
+												<i class="fa fa-info-circle"></i> 授予用户生产者和消费者权限,添加消费者组(group_username).
+											</label>
+										</div>
+										
 										<button type="submit" class="btn btn-success">Create</button>
 										<div id="create_alert_msg" style="display: none"
 											class="alert alert-danger">
