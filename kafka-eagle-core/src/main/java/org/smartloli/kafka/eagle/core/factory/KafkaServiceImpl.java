@@ -484,7 +484,7 @@ public class KafkaServiceImpl implements KafkaService {
 			adminClient.createTopics(Collections.singleton(newTopic)).all().get();
 			
 			if (!"".equalsIgnoreCase(username)) {
-				createAclForTopic(adminClient, topicName, username,  "group_" + username);
+				createAclForTopic(adminClient, topicName, username,  "group_" + username + "_" + topicName);
 			}			
 			
 		} catch (Exception e) {
