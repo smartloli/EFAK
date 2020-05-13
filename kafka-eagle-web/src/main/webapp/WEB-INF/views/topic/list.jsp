@@ -95,6 +95,58 @@
 			</div>
 			<!-- /.row -->
 			<div class="row">
+				<div class="col-lg-3 col-md-6">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-3">
+									<i class="fa fa-adn fa-5x"></i>
+								</div>
+								<div class="col-xs-9 text-right">
+									<div id="producer_number" class="huge">0</div>
+									<div>APP</div>
+								</div>
+							</div>
+						</div>
+						<a>
+							<div class="panel-footer">
+								<span class="pull-left">Producers</span>
+								<span class="pull-right">
+									<i class="fa fa-arrow-circle-right"></i>
+								</span>
+								<div class="clearfix"></div>
+							</div>
+						</a>
+					</div>
+				</div>
+				<!-- row -->
+				<div class="col-lg-3 col-md-6 col-md-offset-6">
+					<div class="panel panel-green">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-3">
+									<i class="fa fa-database fa-5x"></i>
+								</div>
+								<div class="col-xs-9 text-right">
+									<div id="producer_total_capacity" class="huge">0</div>
+									<div id="producer_total_capacity_type">B</div>
+								</div>
+							</div>
+						</div>
+						<a>
+							<div class="panel-footer">
+								<span class="pull-left">TotalCapacity</span>
+								<span class="pull-right">
+									<i class="fa fa-arrow-circle-right"></i>
+								</span>
+								<div class="clearfix"></div>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+			<!-- /.row -->
+			<div class="row">
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">

@@ -358,4 +358,21 @@ public class TopicServiceImpl implements TopicService {
 		return topicDao.getCleanTopicState(params);
 	}
 
+	@Override
+	public String getProducersCapacity(String clusterAlias) {
+		JSONObject object = new JSONObject();
+		Map<String, Object> producerParams = new HashMap<>();
+		producerParams.put("cluster", clusterAlias);
+		producerParams.put("stime", CalendarUtils.getCustomLastHourUnix(-1));
+		producerParams.put("etime", CalendarUtils.getCustomLastHourUnix(0));
+		object.put("producerSize", topicDao.queryProducerAlives(producerParams).size());
+		Map<String, Object> capacityParams = new HashMap<>();
+		capacityParams.put("cluster", clusterAlias);
+		capacityParams.put("tkey", Topic.CAPACITY);
+		JSONObject capacity = StrUtils.stringifyByObject(topicDao.getTopicCapacity(capacityParams));
+		object.put("topicCapacity", capacity.getString("size"));
+		object.put("capacityType", capacity.getString("type"));
+		return object.toJSONString();
+	}
+
 }

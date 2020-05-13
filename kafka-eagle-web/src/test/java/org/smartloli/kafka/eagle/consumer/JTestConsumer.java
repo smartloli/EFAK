@@ -17,13 +17,18 @@
  */
 package org.smartloli.kafka.eagle.consumer;
 
-/**
-* TODO
-* 
-* @author smartloli.
-*
-* Created by Jan 15, 2019
-*/
-public class JTestConsumer {
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 
+/**
+ * TODO
+ * 
+ * @author smartloli.
+ *
+ *         Created by Jan 15, 2019
+ */
+public class JTestConsumer {
+	public static void main(String[] args) {
+		System.out.println(CalendarUtils.getCustomLastHourUnix(0));
+		System.out.println(CalendarUtils.getCustomLastHourUnix(-1));
+	}
 }

@@ -249,6 +249,20 @@ public class TopicController {
 		}
 	}
 
+	/** Get cluster producer and total capacity by ajax. */
+	@RequestMapping(value = "/topic/list/total/jmx/ajax", method = RequestMethod.GET)
+	public void producersCapacityByJmxAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+		try {
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String target = topicService.getProducersCapacity(clusterAlias);
+
+			byte[] output = target.getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	/** Get topic datasets by ajax. */
 	@RequestMapping(value = "/topic/mock/list/ajax", method = RequestMethod.GET)
 	public void topicMockAjax(HttpServletResponse response, HttpServletRequest request) {

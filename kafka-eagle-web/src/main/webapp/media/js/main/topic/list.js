@@ -346,5 +346,22 @@ $(document).ready(function() {
 			}
 		});
 	}
+	
+	try{
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/topic/list/total/jmx/ajax',
+			success : function(datas) {
+				if (datas != null) {
+					$("#producer_number").text(datas.producerSize);
+					$("#producer_total_capacity").text(datas.topicCapacity);
+					$("#producer_total_capacity_type").text(datas.capacityType);
+				}
+			}
+		});
+	}catch (e) {
+		console.log(e.message);
+	}
 
 });
