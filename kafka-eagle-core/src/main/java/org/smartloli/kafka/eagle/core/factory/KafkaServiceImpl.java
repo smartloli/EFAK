@@ -77,10 +77,12 @@ import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaPartitioner;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -1489,6 +1491,57 @@ public class KafkaServiceImpl implements KafkaService {
 					LOG.error("Close kafka os memory jmx connector has error, msg is " + e.getMessage());
 				}
 			}
+		}
+		return memory;
+	}
+
+	/** Get kafka cpu. */
+	public String getUsedCpu(String host, int port) {
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		String cpu = "<a class='btn btn-danger btn-xs'>NULL</a>";
+		try {
+			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
+			JMXConnector connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			String value = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
+			double cpuValue = Double.parseDouble(value);
+			String percent = StrUtils.numberic((cpuValue * 100.0) + "") + "%";
+			if ((cpuValue * 100.0) < BrokerSever.CPU_NORMAL) {
+				cpu = "<a class='btn btn-success btn-xs'>" + percent + "</a>";
+			} else if ((cpuValue * 100.0) >= BrokerSever.CPU_NORMAL && (cpuValue * 100.0) < BrokerSever.CPU_DANGER) {
+				cpu = "<a class='btn btn-warning btn-xs'>" + percent + "</a>";
+			} else if ((cpuValue * 100.0) >= BrokerSever.CPU_DANGER) {
+				cpu = "<a class='btn btn-danger btn-xs'>" + percent + "</a>";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("Get kafka broker used cpu has error, msg is ", e);
+		}
+		return cpu;
+	}
+
+	/** Get kafka used memory. */
+	public String getUsedMemory(String host, int port) {
+		JMXConnector connector = null;
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		String memory = "<a class='btn btn-danger btn-xs'>NULL</a>";
+		try {
+			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
+			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
+			long used = memBean.getHeapMemoryUsage().getUsed();
+			long max = memBean.getHeapMemoryUsage().getMax();
+			String percent = StrUtils.stringify(used) + " (" + StrUtils.numberic((used * 100.0 / max) + "") + "%)";
+			if ((used * 100.0) / max < BrokerSever.MEM_NORMAL) {
+				memory = "<a class='btn btn-success btn-xs'>" + percent + "</a>";
+			} else if ((used * 100.0) / max >= BrokerSever.MEM_NORMAL && (used * 100.0) / max < BrokerSever.MEM_DANGER) {
+				memory = "<a class='btn btn-warning btn-xs'>" + percent + "</a>";
+			} else if ((used * 100.0) / max >= BrokerSever.MEM_DANGER) {
+				memory = "<a class='btn btn-danger btn-xs'>" + percent + "</a>";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return memory;
 	}

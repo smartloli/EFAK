@@ -17,8 +17,16 @@
  */
 package org.smartloli.kafka.eagle.factory;
 
-import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
-import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
+import java.util.concurrent.TimeUnit;
+
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXServiceURL;
+
+import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
+import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 
 /**
  * TODO
@@ -29,11 +37,17 @@ import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
  */
 public class TestBrokerServiceImpl {
 
-	private static BrokerService brokerService = new BrokerFactory().create();
-
 	public static void main(String[] args) {
-		long count = brokerService.partitionNumbers("cluster1", "kv-test2");
-		System.out.println("count: " + count);
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		try {
+			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, "127.0.0.1:9999"));
+			JMXConnector connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			String value = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
+			System.out.println(StrUtils.numberic((Double.parseDouble(value) * 100.0) + "") + "%");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -67,6 +67,7 @@
 											<th>Port</th>
 											<th>JMX Port</th>
 											<th>Memory(Used | Percent)</th>
+											<th>CPU</th>
 											<th>Created</th>
 											<th>Modify</th>
 											<th>Version</th>
@@ -115,7 +116,7 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/cluster/cluster.js" name="loader" />
+	<jsp:param value="main/cluster/cluster.js?v1.4.8" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
 </html>

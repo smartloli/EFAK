@@ -49,4 +49,10 @@ public interface ClusterService {
 	/** Checked cluster alias is exist interface. */
 	public boolean hasClusterAlias(String clusterAlias);
 
+	/** Get kafka used memory. */
+	public String getUsedMemory(String host, int jmxPort);
+
+	/** Get kafka used cpu. */
+	public String getUsedCpu(String host, int jmxPort);
+
 }

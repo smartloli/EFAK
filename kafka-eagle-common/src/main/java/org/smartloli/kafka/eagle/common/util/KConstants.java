@@ -258,6 +258,9 @@ public class KConstants {
 
 		public static final int MEM_NORMAL = 60;
 		public static final int MEM_DANGER = 80;
+
+		public static final int CPU_NORMAL = 60;
+		public static final int CPU_DANGER = 80;
 	}
 
 	public final class Component {

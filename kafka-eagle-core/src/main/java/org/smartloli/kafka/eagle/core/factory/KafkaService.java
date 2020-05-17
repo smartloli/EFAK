@@ -159,6 +159,12 @@ public interface KafkaService {
 	/** Get kafka os memory. */
 	public long getOSMemory(String host, int port, String property);
 
+	/** Get kafka used cpu. */
+	public String getUsedCpu(String host, int port);
+
+	/** Get kafka used memory. */
+	public String getUsedMemory(String host, int port);
+
 	/** Set kafka sasl acl. */
 	public void sasl(Properties props, String clusterAlias);
 

@@ -129,4 +129,14 @@ public class ClusterServiceImpl implements ClusterService {
 		return zkService.zkCliStatus(clusterAlias);
 	}
 
+	/** Get kafka used memory. */
+	public String getUsedMemory(String host, int jmxPort) {
+		return kafkaService.getUsedMemory(host, jmxPort);
+	}
+
+	/** Get kafka used cpu. */
+	public String getUsedCpu(String host, int jmxPort) {
+		return kafkaService.getUsedCpu(host, jmxPort);
+	}
+
 }

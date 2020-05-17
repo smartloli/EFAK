@@ -18,6 +18,8 @@ $(document).ready(function() {
 		}, {
 			"mData" : 'memory'
 		}, {
+			"mData" : 'cpu'
+		}, {
 			"mData" : 'created'
 		}, {
 			"mData" : 'modify'
