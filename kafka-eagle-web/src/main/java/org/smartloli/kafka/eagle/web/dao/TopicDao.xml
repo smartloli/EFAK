@@ -105,6 +105,11 @@
 	<select id="readBrokerPerformance" parameterType="map" resultMap="trank">
 		select `topic`,`tvalue` from ke_topic_rank where cluster=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
 	</select>
+	
+	<!-- Topic producer threads data -->
+	<select id="readProducerThreads" parameterType="map" resultMap="trank">
+		select `topic`,`tvalue` from ke_topic_rank where cluster=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
+	</select>
 
 	<!-- TopicCapacity -->
 	<select id="getTopicCapacity" parameterType="map" resultType="long">
@@ -148,18 +153,6 @@
 		where `cluster`=#{cluster} and `topic`=#{topic}
 		and tm=#{stime} order by `timespan` desc
 		limit 1
-	</select>
-
-	<!-- get producer alive thread -->
-	<!-- the topic of the last hour, and the diffval is greater than 0. For the same topic, take the latest one of the timestamp. -->
-	<select id="queryProducerAlives" parameterType="map" resultMap="tproducers">
-		select topic,diffval,timespan,rownum,rank from
-		(select topic,diffval,timespan,@rownum:=@rownum+1 rownum,if(@pa=ff.topic,@rank:=@rank+1,@rank:=1) as rank,@pa:=ff.topic
-		FROM
-		(select topic,diffval,timespan from ke_logsize where cluster=#{cluster} and (timespan between #{stime} and #{etime}) group by topic,diffval,timespan order by topic asc, timespan desc) ff,
-		(select @rank:=0,@rownum:=0,@pa=null) tt)
-		result
-		having rank = 1 and diffval > 0;
 	</select>
 
 	<select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">

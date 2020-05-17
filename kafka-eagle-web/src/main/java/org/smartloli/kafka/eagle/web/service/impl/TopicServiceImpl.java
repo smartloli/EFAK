@@ -363,9 +363,9 @@ public class TopicServiceImpl implements TopicService {
 		JSONObject object = new JSONObject();
 		Map<String, Object> producerParams = new HashMap<>();
 		producerParams.put("cluster", clusterAlias);
-		producerParams.put("stime", CalendarUtils.getCustomLastHourUnix(-1));
-		producerParams.put("etime", CalendarUtils.getCustomLastHourUnix(0));
-		object.put("producerSize", topicDao.queryProducerAlives(producerParams).size());
+		producerParams.put("topic", Topic.PRODUCER_THREADS_KEY);
+		producerParams.put("tkey", Topic.PRODUCER_THREADS);
+		object.put("producerSize", topicDao.readProducerThreads(producerParams).getTvalue());
 		Map<String, Object> capacityParams = new HashMap<>();
 		capacityParams.put("cluster", clusterAlias);
 		capacityParams.put("tkey", Topic.CAPACITY);

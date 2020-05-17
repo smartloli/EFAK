@@ -141,6 +141,10 @@ public class TopicRankQuartz {
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
 			List<String> topics = brokerService.topicList(clusterAlias);
+
+			// clean performance topics
+			cleanPerformanceByTopics(clusterAlias, bType, dashboardServiceImpl, topics);
+
 			for (String topic : topics) {
 				int tValue = 0;
 				if (bType.equals(Topic.BROKER_SPREAD)) {
@@ -175,6 +179,28 @@ public class TopicRankQuartz {
 		} catch (Exception e) {
 			LOG.error("Write topic [" + bType + "] end data has error,msg is " + e.getMessage());
 			e.printStackTrace();
+		}
+	}
+
+	private void cleanPerformanceByTopics(String clusterAlias, String type, DashboardServiceImpl dashboardServiceImpl, List<String> topics) {
+		// clean up nonexistent topic
+		Map<String, Object> params = new HashMap<>();
+		params.put("cluster", clusterAlias);
+		params.put("tkey", type);
+		List<TopicRank> trs = dashboardServiceImpl.getAllTopicRank(params);
+		for (TopicRank tr : trs) {
+			try {
+				if (!topics.contains(tr.getTopic())) {
+					Map<String, Object> clean = new HashMap<>();
+					clean.put("cluster", clusterAlias);
+					clean.put("topic", tr.getTopic());
+					clean.put("tkey", type);
+					dashboardServiceImpl.removeTopicRank(clean);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				LOG.error("Failed to clean up nonexistent performance topic, msg is ", e);
+			}
 		}
 	}
 
@@ -316,7 +342,9 @@ public class TopicRankQuartz {
 			e.printStackTrace();
 		}
 
+		List<TopicRank> topicRanks = new ArrayList<>();
 		List<TopicLogSize> topicLogSizes = new ArrayList<>();
+		long producerThreads = 0L;
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
 			List<String> topics = brokerService.topicList(clusterAlias);
@@ -331,6 +359,10 @@ public class TopicRankQuartz {
 					topicLogSize.setDiffval(0);
 				} else {
 					topicLogSize.setDiffval(logsize - lastTopicLogSize.getLogsize());
+				}
+				// stats producer threads
+				if (topicLogSize.getDiffval() > 0) {
+					producerThreads++;
 				}
 				topicLogSize.setCluster(clusterAlias);
 				topicLogSize.setTopic(topic);
@@ -348,6 +380,27 @@ public class TopicRankQuartz {
 					}
 				}
 			}
+			// stats producers thread
+			try {
+				TopicRank topicRank = new TopicRank();
+				topicRank.setCluster(clusterAlias);
+				topicRank.setTopic(Topic.PRODUCER_THREADS_KEY);
+				topicRank.setTkey(Topic.PRODUCER_THREADS);
+				topicRank.setTvalue(producerThreads);
+				topicRanks.add(topicRank);
+				if (topicRanks.size() > Topic.BATCH_SIZE) {
+					try {
+						dashboardServiceImpl.writeTopicRank(topicRanks);
+						topicRanks.clear();
+					} catch (Exception e) {
+						e.printStackTrace();
+						LOG.error("Write topic producers has error, msg is " + e.getMessage());
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				LOG.error("Stats producers thread has error, msg is ", e);
+			}
 		}
 		try {
 			if (topicLogSizes.size() > 0) {
@@ -356,6 +409,15 @@ public class TopicRankQuartz {
 			}
 		} catch (Exception e) {
 			LOG.error("Write topic producer logsize end data has error,msg is " + e.getCause().getMessage());
+			e.printStackTrace();
+		}
+		try {
+			if (topicRanks.size() > 0) {
+				dashboardServiceImpl.writeTopicRank(topicRanks);
+				topicRanks.clear();
+			}
+		} catch (Exception e) {
+			LOG.error("Write topic producer threads end data has error,msg is ", e);
 			e.printStackTrace();
 		}
 	}
