@@ -96,7 +96,7 @@ Since this is an open source tool, please comply with the relevant laws and regu
 
 # Kafka Eagle PDF
 
-[Kafka Eagle Architecture PDF](http://www.kafka-eagle.org/articles/docs/designed/pdf.html)
+[Kafka Eagle Architecture PDF](http://www.kafka-eagle.org/articles/docs/architecture/pdf.html)
 
 # Contributors
 
