@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html>
@@ -48,8 +47,7 @@
 
 <title>Offsets - KafkaEagle</title>
 <jsp:include page="../public/css.jsp">
-	<jsp:param value="plugins/datatimepicker/daterangepicker.css"
-		name="css" />
+	<jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css" />
 </jsp:include>
 </head>
 <body>
@@ -63,8 +61,7 @@
 							Offsets Realtime <small>details</small>
 						</p>
 						<div id="reportrange" class="right">
-							<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
-							<span></span> <b class="caret"></b>
+							<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp; <span></span> <b class="caret"></b>
 						</div>
 					</div>
 
@@ -75,11 +72,8 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="alert alert-info alert-dismissable">
-						<button type="button" class="close" data-dismiss="alert"
-							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>List the
-							current consumers's application realtime offsets of topic.
-							Observe whether there is blocking by the trend of lag value.</strong>
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<i class="fa fa-info-circle"></i> <strong>List the current consumers's application realtime offsets of topic. Observe whether there is blocking by the trend of lag value.</strong>
 					</div>
 				</div>
 			</div>
@@ -101,8 +95,7 @@
 						</div>
 						<a>
 							<div class="panel-footer">
-								<span class="pull-left">Producer Rates</span> <span
-									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">Producer Rates</span> <span class="pull-right"></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
@@ -124,8 +117,7 @@
 						</div>
 						<a>
 							<div class="panel-footer">
-								<span class="pull-left">Consumer Rates</span> <span
-									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">Consumer Rates</span> <span class="pull-right"></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
@@ -193,7 +185,6 @@
 	<jsp:param value="plugins/echart/echarts.min.js" name="loader" />
 	<jsp:param value="plugins/echart/macarons.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />
-	<jsp:param value="plugins/datatimepicker/daterangepicker.js"
-		name="loader" />
+	<jsp:param value="plugins/datatimepicker/daterangepicker.js" name="loader" />
 </jsp:include>
 </html>

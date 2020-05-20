@@ -110,7 +110,6 @@
 							<div class="panel-footer">
 								<span class="pull-left">LogSize</span>
 								<span class="pull-right">
-									<i class="fa fa-arrow-circle-right"></i>
 								</span>
 								<div class="clearfix"></div>
 							</div>
@@ -135,7 +134,6 @@
 							<div class="panel-footer">
 								<span class="pull-left">TopicCapacity</span>
 								<span class="pull-right">
-									<i class="fa fa-arrow-circle-right"></i>
 								</span>
 								<div class="clearfix"></div>
 							</div>
