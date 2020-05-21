@@ -15,38 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.admin;
+package org.smartloli.kafka.eagle.core.factory.hub;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.smartloli.kafka.eagle.core.factory.hub.KafkaHubFactory;
-import org.smartloli.kafka.eagle.core.factory.hub.KafkaHubService;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 /**
- * TODO
+ * Used to realize data migration, capacity expansion, selection and other
+ * central component operations.
  * 
  * @author smartloli.
  *
- *         Created by May 18, 2020
+ *         Created by May 21, 2020
  */
-public class TestKafkaAdminServer {
+public interface KafkaHubService {
 
-	private static KafkaHubService khb = new KafkaHubFactory().create();
-
-	public static void main(String[] args) {
-		JSONObject topics = new JSONObject();
-		JSONArray values = new JSONArray();
-		JSONObject topic01 = new JSONObject();
-		topic01.put("topic", "k20200326");
-		values.add(topic01);
-		topics.put("topics", values);
-		topics.put("version", 1);
-		List<Object> ids = new ArrayList<Object>();
-		ids.add(0);
-		khb.reassignPartitions("cluster1", topics.toJSONString(), ids);
-	}
+	/** Reassign partitions. */
+	public void reassignPartitions(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList);
 }
