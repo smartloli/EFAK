@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html>
@@ -55,16 +54,8 @@ path.link {
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="alert alert-info alert-dismissable">
-						<button type="button" class="close" data-dismiss="alert"
-							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Dashboard
-							display topic Kafka related information and Kafka cluster
-							information as well as Zookeeper cluster information</strong> If you don't
-						know the usage of Kafka and Zookeeper, you can visit the website
-						of <a href="http://kafka.apache.org/" target="_blank"
-							class="alert-link">Kafka</a> and <a
-							href="http://zookeeper.apache.org/" target="_blank"
-							class="alert-link">Zookeeper</a> to view the relevant usage.
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<i class="fa fa-info-circle"></i> <strong>Dashboard display topic Kafka related information and Kafka cluster information as well as Zookeeper cluster information</strong> If you don't know the usage of Kafka and Zookeeper, you can visit the website of <a href="http://kafka.apache.org/" target="_blank" class="alert-link">Kafka</a> and <a href="http://zookeeper.apache.org/" target="_blank" class="alert-link">Zookeeper</a> to view the relevant usage.
 					</div>
 				</div>
 			</div>
@@ -85,8 +76,7 @@ path.link {
 						</div>
 						<a href="/ke/cluster/info">
 							<div class="panel-footer">
-								<span class="pull-left">View Details</span> <span
-									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">View Details</span> <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
@@ -107,8 +97,7 @@ path.link {
 						</div>
 						<a href="/ke/topic/list">
 							<div class="panel-footer">
-								<span class="pull-left">View Details</span> <span
-									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">View Details</span> <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
@@ -129,8 +118,7 @@ path.link {
 						</div>
 						<a href="/ke/cluster/info">
 							<div class="panel-footer">
-								<span class="pull-left">View Details</span> <span
-									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">View Details</span> <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
@@ -151,8 +139,7 @@ path.link {
 						</div>
 						<a href="/ke/consumers">
 							<div class="panel-footer">
-								<span class="pull-left">View Details</span> <span
-									class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+								<span class="pull-left">View Details</span> <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 								<div class="clearfix"></div>
 							</div>
 						</a>
@@ -173,8 +160,7 @@ path.link {
 								<svg id="fillgauge_kafka_memory" width="97%" height="424"></svg>
 							</div>
 							<div class="text-right">
-								<a href="/ke/metrics/kafka#os_free_memory">View Details <i
-									class="fa fa-arrow-circle-right"></i></a>
+								<a href="/ke/metrics/kafka#os_free_memory">View Details <i class="fa fa-arrow-circle-right"></i></a>
 							</div>
 						</div>
 					</div>
@@ -187,12 +173,12 @@ path.link {
 							</h3>
 						</div>
 						<div class="panel-body">
-							<table id="topic_logsize"
-								class="table table-bordered table-hover table-striped">
-							</table>
+							<div class="table-responsive">
+								<table id="topic_logsize" class="table table-bordered table-hover table-striped">
+								</table>
+							</div>
 							<div class="text-right">
-								<a href="/ke/topic/list">View Details <i
-									class="fa fa-arrow-circle-right"></i></a>
+								<a href="/ke/topic/list">View Details <i class="fa fa-arrow-circle-right"></i></a>
 							</div>
 						</div>
 					</div>
@@ -206,13 +192,11 @@ path.link {
 						</div>
 						<div class="panel-body">
 							<div class="table-responsive">
-								<table id="topic_capacity"
-									class="table table-bordered table-hover table-striped">
+								<table id="topic_capacity" class="table table-bordered table-hover table-striped">
 								</table>
 							</div>
 							<div class="text-right">
-								<a href="/ke/topic/list">View Details <i
-									class="fa fa-arrow-circle-right"></i></a>
+								<a href="/ke/topic/list">View Details <i class="fa fa-arrow-circle-right"></i></a>
 							</div>
 						</div>
 					</div>

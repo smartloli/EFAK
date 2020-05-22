@@ -100,7 +100,7 @@ public class TopicController {
 	@RequestMapping(value = "/topic/message", method = RequestMethod.GET)
 	public ModelAndView topicMessageView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/topic/msg");
+		mav.setViewName("/topic/ksql");
 		return mav;
 	}
 
@@ -119,6 +119,15 @@ public class TopicController {
 	public ModelAndView topicMockView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/topic/mock");
+		return mav;
+	}
+
+	/** Topic mock viewer. */
+	@RequiresPermissions("/topic/hub")
+	@RequestMapping(value = "/topic/hub", method = RequestMethod.GET)
+	public ModelAndView topicHubView(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/topic/hub");
 		return mav;
 	}
 

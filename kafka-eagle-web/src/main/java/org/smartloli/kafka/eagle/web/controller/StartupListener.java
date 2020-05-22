@@ -17,8 +17,6 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.plugin.mysql.MySqlRecordSchema;
 import org.smartloli.kafka.eagle.plugin.sqlite.SqliteRecordSchema;
@@ -39,17 +37,12 @@ import org.springframework.web.context.ContextLoader;
 @Component
 public class StartupListener implements ApplicationContextAware {
 
-	private Logger LOG = LoggerFactory.getLogger(StartupListener.class);
-
 	private static ApplicationContext applicationContext;
 
 	@Override
 	public void setApplicationContext(ApplicationContext arg0) throws BeansException {
 		ContextSchema context = new ContextSchema();
 		context.start();
-
-		RunTask task = new RunTask();
-		task.start();
 	}
 
 	public static Object getBean(String beanName) {
@@ -61,22 +54,6 @@ public class StartupListener implements ApplicationContextAware {
 
 	public static <T> T getBean(String beanName, Class<T> clazz) {
 		return clazz.cast(getBean(beanName));
-	}
-
-	class RunTask extends Thread {
-		public void run() {
-			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
-			for (String clusterAlias : clusterAliass) {
-				String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
-				if ("kafka".equals(formatter)) {
-					try {
-						//KafkaOffsetGetter.getInstance();
-					} catch (Exception ex) {
-						LOG.error("Initialize KafkaOffsetGetter thread has error,msg is " + ex.getMessage());
-					}
-				}
-			}
-		}
 	}
 
 	class ContextSchema extends Thread {

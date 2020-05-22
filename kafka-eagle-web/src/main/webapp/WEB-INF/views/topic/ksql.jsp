@@ -165,7 +165,7 @@
 	<jsp:param value="plugins/codemirror/sql.js" name="loader" />
 	<jsp:param value="plugins/codemirror/show-hint.js" name="loader" />
 	<jsp:param value="plugins/codemirror/sql-hint.js" name="loader" />
-	<jsp:param value="main/topic/msg.js" name="loader" />
+	<jsp:param value="main/topic/ksql.js" name="loader" />
 	<jsp:param value="main/topic/ksql.history.js" name="loader" />
 </jsp:include>
 <jsp:include page="../public/tscript.jsp"></jsp:include>
