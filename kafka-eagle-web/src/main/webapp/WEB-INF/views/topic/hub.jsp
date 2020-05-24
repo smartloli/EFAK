@@ -47,6 +47,40 @@
 			</div>
 			<!-- /.row -->
 			<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<i class="fa fa-filter fa-fw"></i>
+							Topic Balance
+							<div class="pull-right"></div>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label>Topic Name (*)</label>
+										<select multiple="multiple" id="select2val" name="select2val" tabindex="-1" style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+										<input id="ke_topic_balance" name="ke_topic_balance" type="hidden" />
+										<label for="inputError" class="control-label text-danger">
+											<i class="fa fa-info-circle"></i>
+											Select the topic you need to balance .
+										</label>
+									</div>
+									<button id="ke_balancer_generate" class="btn btn-success">Generate</button>
+									<button id="ke_balancer_execute" class="btn btn-primary">Execute</button>
+									<button id="ke_balancer_verify" class="btn btn-info">Verify</button>
+								</div>
+							</div>
+							<!-- /.panel-body -->
+						</div>
+					</div>
+					<!-- /.col-lg-4 -->
+				</div>
+				<!-- /.row -->
+			</div>
+			<!-- /.row -->
+			<div class="row">
 				<div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
@@ -83,86 +117,26 @@
 				</div>
 				<!-- /.col-lg-4 -->
 			</div>
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="panel panel-default">
-						<a name="run_task" class="btn btn-success">Execute</a>
-					</div>
-				</div>
-			</div>
 			<!-- /.row -->
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-comments fa-fw"></i> Tasks Job Info
+							<i class="fa fa-comments fa-fw"></i> Result
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
 						<div class="panel-body">
-							<div>
-								<ul id="result_tab" class="nav nav-tabs">
-									<li class="active"><a href="#log_textarea" data-toggle="tab">Logs</a></li>
-									<li><a href="#result_textarea" data-toggle="tab">Result</a></li>
-									<li><a href="#ksql_history_textarea" data-toggle="tab">History</a></li>
-								</ul>
-							</div>
-							<div class="tab-content">
-								<div id="log_textarea" class="tab-pane fade in active">
-									<form>
-										<textarea id="job_info" name="job_info"></textarea>
-									</form>
-								</div>
-								<div id="result_textarea" class="tab-pane fade"></div>
-								<div id="ksql_history_textarea" class="tab-pane fade">
-									<div id="ksql_history_result_div">
-										<div id="ksql_history_result0">
-											<table id="ksql_history_result" class="table table-bordered table-condensed" width="100%">
-												<thead>
-													<tr>
-														<th>ID</th>
-														<th>User</th>
-														<th>Host</th>
-														<th>KSQL</th>
-														<th>Status</th>
-														<th>Spent</th>
-														<th>Created</th>
-													</tr>
-												</thead>
-											</table>
-										</div>
-									</div>
-								</div>
+							<div id="ke_sql_query">
+								<form>
+									<textarea id="code_result" name="code_result"></textarea>
+								</form>
 							</div>
 						</div>
 						<!-- /.panel-body -->
 					</div>
 				</div>
 				<!-- /.col-lg-4 -->
-			</div>
-			<!-- More then detail -->
-			<div class="modal fade" aria-labelledby="keModalLabelModify" aria-hidden="true" id="ke_sql_query_detail" tabindex="-1" role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keModalLabelModify">Detail</h4>
-						</div>
-						<!-- /.row -->
-						<fieldset class="form-horizontal">
-							<div class="form-group">
-								<label for="path" class="col-sm-2 control-label">Content</label>
-								<div class="col-sm-9">
-									<textarea id="ke_sql_query_content" name="ke_sql_query_content" class="form-control" readonly="readonly" rows="3"></textarea>
-								</div>
-							</div>
-						</fieldset>
-
-						<div class="modal-footer">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Cancle</button>
-						</div>
-					</div>
-				</div>
 			</div>
 		</div>
 		<!-- /#page-wrapper -->

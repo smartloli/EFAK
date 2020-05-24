@@ -4,7 +4,7 @@ $(document).ready(function() {
 	if (window.location.href.indexOf('mime=') > -1) {
 		mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
 	}
-	var sqlEditorProposed = CodeMirror.fromTextArea(document.getElementById('code_proposed'), {
+	var topicBalanceProposed = CodeMirror.fromTextArea(document.getElementById('code_proposed'), {
 		mode : mime,
 		indentWithTabs : true,
 		smartIndent : true,
@@ -13,7 +13,7 @@ $(document).ready(function() {
 		autofocus : true		
 	});
 	
-	var sqlEditorCurrent = CodeMirror.fromTextArea(document.getElementById('code_current'), {
+	var topicBalanceCurrent = CodeMirror.fromTextArea(document.getElementById('code_current'), {
 		mode : mime,
 		indentWithTabs : true,
 		smartIndent : true,
@@ -23,7 +23,7 @@ $(document).ready(function() {
 		readOnly : true
 	});
 
-	var logEditor = CodeMirror.fromTextArea(document.getElementById('job_info'), {
+	var topicBalanceResult = CodeMirror.fromTextArea(document.getElementById('code_result'), {
 		mode : mime,
 		indentWithTabs : true,
 		smartIndent : true,
@@ -86,7 +86,7 @@ $(document).ready(function() {
 	}
 
 	$(document).on('click', 'a[name=run_task]', function() {
-		var sql = encodeURI(sqlEditorProposed.getValue());
+		var sql = encodeURI(topicBalanceProposed.getValue());
 		logEditor.setValue("");
 		$.ajax({
 			type : 'get',
