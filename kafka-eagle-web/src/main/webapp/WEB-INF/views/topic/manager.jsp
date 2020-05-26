@@ -65,10 +65,6 @@
 									name="ke_topic_alter" id="ke_topic_describe"
 									value="desc_config">Describe Config
 								</label>
-								<!-- <label class="radio-inline"> <input type="radio"
-									name="ke_topic_alter" id="ke_topic_clean" value="clean_data">Clean
-									Data
-								</label> -->
 								<br /> <label for="inputError"
 									class="control-label text-danger"><i
 									class="fa fa-info-circle"></i> Select operate type when you

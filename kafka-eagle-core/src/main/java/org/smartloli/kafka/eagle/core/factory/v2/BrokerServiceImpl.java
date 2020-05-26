@@ -672,4 +672,26 @@ public class BrokerServiceImpl implements BrokerService {
 		return targets;
 	}
 
+	/** Get broker id list. */
+	public List<Object> getBrokerIdList(String clusterAlias) {
+		List<Object> brokerIds = new ArrayList<>();
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		try {
+			if (zkc.pathExists(BROKER_IDS_PATH)) {
+				Seq<String> subBrokerIdsPaths = zkc.getChildren(BROKER_IDS_PATH);
+				for (String id : JavaConversions.seqAsJavaList(subBrokerIdsPaths)) {
+					brokerIds.add(Integer.parseInt(id));
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Get kafka broker id has error, msg is ", e);
+			e.printStackTrace();
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return brokerIds;
+	}
+
 }

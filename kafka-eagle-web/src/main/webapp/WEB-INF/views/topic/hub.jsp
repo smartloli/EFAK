@@ -13,7 +13,9 @@
 <meta name="author" content="">
 
 <title>Topic Hub - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/css.jsp">
+	<jsp:param value="plugins/select2/select2.min.css" name="css" />
+</jsp:include>
 <jsp:include page="../public/tcss.jsp"></jsp:include>
 </head>
 <style>
@@ -22,6 +24,33 @@
 	border-bottom: 1px solid #ddd;
 	border-right: 1px solid #ddd;
 	border-left: 1px solid #ddd;
+}
+
+.box {
+	border-bottom: 1px solid #eee;
+	margin-bottom: 20px;
+	margin-top: 30px;
+	overflow: hidden;
+}
+
+.box .left {
+	font-size: 36px;
+	float: left
+}
+
+.box .left small {
+	font-size: 24px;
+	color: #777
+}
+
+.box  .right {
+	float: right;
+	width: 230px;
+	margin-top: 20px;
+	background: #fff;
+	cursor: pointer;
+	padding: 5px 10px;
+	border: 1px solid #ccc;
 }
 </style>
 <body>
@@ -50,8 +79,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-filter fa-fw"></i>
-							Topic Balance
+							<i class="fa fa-filter fa-fw"></i> Topic Balance
 							<div class="pull-right"></div>
 						</div>
 						<!-- /.panel-heading -->
@@ -59,17 +87,26 @@
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
+										<label>Balance Type (*)</label>
+										<br />
+										<label class="radio-inline">
+											<input type="radio" name="ke_topic_balance_type" id="ke_topic_balance_type_single" value="balance_single" checked="">Single
+										</label>
+										<label class="radio-inline">
+											<input type="radio" name="ke_topic_balance_type" id="ke_topic_balance_type_all" value="balance_all">All
+										</label>
+										<br />
+										<br />
 										<label>Topic Name (*)</label>
 										<select multiple="multiple" id="select2val" name="select2val" tabindex="-1" style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
 										<input id="ke_topic_balance" name="ke_topic_balance" type="hidden" />
 										<label for="inputError" class="control-label text-danger">
-											<i class="fa fa-info-circle"></i>
-											Select the topic you need to balance .
+											<i class="fa fa-info-circle"></i> Select the topic you need to balance .
 										</label>
 									</div>
 									<button id="ke_balancer_generate" class="btn btn-success">Generate</button>
-									<button id="ke_balancer_execute" class="btn btn-primary">Execute</button>
-									<button id="ke_balancer_verify" class="btn btn-info">Verify</button>
+									<button id="ke_balancer_execute" class="btn btn-primary" style="display: none">Execute</button>
+									<button id="ke_balancer_verify" class="btn btn-info" style="display: none">Verify</button>
 								</div>
 							</div>
 							<!-- /.panel-body -->
@@ -149,6 +186,7 @@
 	<jsp:param value="plugins/codemirror/sql.js" name="loader" />
 	<jsp:param value="plugins/codemirror/show-hint.js" name="loader" />
 	<jsp:param value="plugins/codemirror/sql-hint.js" name="loader" />
+	<jsp:param value="plugins/select2/select2.min.js" name="loader" />
 	<jsp:param value="main/topic/hub.js" name="loader" />
 	<jsp:param value="main/topic/ksql.history.js" name="loader" />
 </jsp:include>

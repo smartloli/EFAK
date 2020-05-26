@@ -81,4 +81,7 @@ public interface BrokerService {
 	/** Get broker leader skewed by topic. */
 	public int getBrokerLeaderSkewedByTopic(String clusterAlias, String topic);
 
+	/** Get broker id list. */
+	public List<Object> getBrokerIdList(String clusterAlias);
+
 }

@@ -47,6 +47,6 @@ public class TestKafkaAdminServer {
 		topics.put("version", 1);
 		List<Object> ids = new ArrayList<Object>();
 		ids.add(0);
-		khb.reassignPartitions("cluster1", topics.toJSONString(), ids);
+		System.out.println(khb.generate("cluster1", topics.toJSONString(), ids));
 	}
 }

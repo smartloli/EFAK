@@ -23,6 +23,7 @@
 # Update by Jul 27, 2019
 
 export MALLOC_ARENA_MAX=1
+export KE_JAVA_OPTS="-server -Xmx2g -Xms2g -XX:MaxGCPauseMillis=20 -XX:+UseG1GC -XX:MetaspaceSize=128m -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80"
 
 stime=`date "+%Y-%m-%d %H:%M:%S"`
 
@@ -258,6 +259,17 @@ version()
  fi
 }
 
+sdate()
+{	
+  if [ -f $KE_HOME/bin/ke.pid ];then
+   SPID=`cat $KE_HOME/bin/ke.pid`
+   if [ "$SPID" != "" ];then
+    echo "[$stime] INFO : Kafka Eagle Process[$SPID] Runtime."
+    ps -eo pid,user,lstart | grep $SPID
+   fi
+  fi
+}
+
 case "$1" in
   start)
       start
@@ -286,8 +298,11 @@ case "$1" in
   version)
       version
       ;;
+  sdate)
+      sdate
+      ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version}"
+      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate}"
       RETVAL=1
 esac
 exit $RETVAL

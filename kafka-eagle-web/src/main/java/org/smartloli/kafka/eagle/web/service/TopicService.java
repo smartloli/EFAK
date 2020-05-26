@@ -26,6 +26,8 @@ import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * Kafka topic service interface.
  * 
@@ -111,4 +113,7 @@ public interface TopicService {
 
 	/** Get clean topic state. */
 	public List<TopicRank> getCleanTopicState(Map<String, Object> params);
+
+	/** Generate topics. */
+	public JSONObject getBalanceGenerate(String clusterAlias, List<String> topics, String type);
 }

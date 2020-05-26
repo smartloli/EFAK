@@ -10,9 +10,9 @@ $(document).ready(function() {
 		smartIndent : true,
 		lineNumbers : true,
 		matchBrackets : true,
-		autofocus : true		
+		autofocus : true
 	});
-	
+
 	var topicBalanceCurrent = CodeMirror.fromTextArea(document.getElementById('code_current'), {
 		mode : mime,
 		indentWithTabs : true,
@@ -33,149 +33,107 @@ $(document).ready(function() {
 		readOnly : true
 	});
 
-	$('#result_tab li:eq(0) a').tab('show');
-
-	var offset = 0;
-	function viewerTopics(sql, dataSets) {
-		var ret = JSON.parse(dataSets);
-		var tabHeader = "<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
-		var mData = [];
-		var i = 0;
-		for ( var key in ret[0]) {
-			tabHeader += "<th>" + key + "</th>";
-			var obj = {
-				mData : key
-			};
-			mData.push(obj);
-		}
-
-		tabHeader += "</tr></thead></table></div>";
-		$("#result_textarea").append(tabHeader);
-		if (offset > 0) {
-			$("#div_children" + (offset - 1)).remove();
-		}
-
-		$("#result_children" + offset).dataTable({
-			"searching" : false,
-			"bSort" : false,
-			"retrieve" : true,
-			"bLengthChange" : false,
-			"bProcessing" : true,
-			"bServerSide" : true,
-			"fnServerData" : retrieveData,
-			"sAjaxSource" : '/ke/topic/physics/commit/?sql=' + sql,
-			"aoColumns" : mData
-		});
-
-		function retrieveData(sSource, aoData, fnCallback) {
-			$.ajax({
-				"type" : "get",
-				"contentType" : "application/json",
-				"url" : sSource,
-				"dataType" : "json",
-				"data" : {
-					aoData : JSON.stringify(aoData)
-				},
-				"success" : function(data) {
-					fnCallback(data)
+	$("#select2val").select2({
+		placeholder : "Topic",
+		ajax : {
+			url : "/ke/topic/mock/list/ajax",
+			dataType : 'json',
+			delay : 250,
+			data : function(params) {
+				params.offset = 10;
+				params.page = params.page || 1;
+				return {
+					name : params.term,
+					page : params.page,
+					offset : params.offset
+				};
+			},
+			cache : true,
+			processResults : function(data, params) {
+				if (data.items.length > 0) {
+					var datas = new Array();
+					$.each(data.items, function(index, e) {
+						var s = {};
+						s.id = index + 1;
+						s.text = e.text;
+						datas[index] = s;
+					});
+					return {
+						results : datas,
+						pagination : {
+							more : (params.page * params.offset) < data.total
+						}
+					};
+				} else {
+					return {
+						results : []
+					}
 				}
-			});
+			},
+			escapeMarkup : function(markup) {
+				return markup;
+			},
+			minimumInputLength : 0,
+			allowClear : true
 		}
+	});
 
-		offset++;
-	}
+	$('#select2val').on('change', function(evt) {
+		var o = document.getElementById('select2val').getElementsByTagName('option');
+		var arrs = [];
+		for (var i = 0; i < o.length; i++) {
+			if (o[i].selected) {
+				arrs.push(o[i].innerText);
+			}
+		}
+		$("#ke_topic_balance").val(arrs);
+	});
 
-	$(document).on('click', 'a[name=run_task]', function() {
-		var sql = encodeURI(topicBalanceProposed.getValue());
-		logEditor.setValue("");
+	$("#ke_balancer_generate").on('click', function() {
+		var radio = $('input:radio[name="ke_topic_balance_type"]:checked').val();
+		if (radio == "balance_single") {
+			if ($("#ke_topic_balance").val().length > 0) {
+				var topics = $("#ke_topic_balance").val().split(",");
+				generate(topics, "SINGLE");
+			} else {
+				topicBalanceResult.setValue("Balance topic can not null.");
+			}
+		} else if (radio == "balance_all") {
+			topicBalanceResult.setValue("Balance all topic task will be running.");
+			// 
+		}
+	});
+
+	function generate(topics, type) {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/logical/commit/?sql=' + sql,
+			url : '/ke/topic/balance/generate/?topics=' + topics + '&type=' + type,
 			success : function(datas) {
 				if (datas != null) {
-					if (datas.error) {
-						logEditor.setValue(datas.msg);
-					} else {
-						logEditor.setValue(datas.status);
-						viewerTopics(sql, datas.msg);
+					var result = "";
+					if (datas.hasOwnProperty("error_result")) {
+						result += datas.error_result;
+					} else if (datas.hasOwnProperty("error_proposed")) {
+						result += "\n" + datas.error_proposed;
+					} else if (datas.hasOwnProperty("error_current")) {
+						result += "\n" + datas.error_current;
 					}
-					viewerTopicSqlHistory();
+					if (result.length > 0) {
+						topicBalanceResult.setValue(result);
+					}
+					if (datas.hasOwnProperty("proposed")) {
+						console.log(datas.proposed);
+						_jsonObj = JSON.stringify(JSON.parse(datas.proposed,null,4));
+						console.log(_jsonObj);
+						topicBalanceProposed.setValue(_jsonObj);
+					}
+					if (datas.hasOwnProperty("current")) {
+						topicBalanceCurrent.setValue(JSON.stringify(datas.current));
+					}
 				}
 			}
 		});
-	});
-
-	var historyOffset = 0;
-	function viewerTopicSqlHistory() {
-		var thList = [ {
-			th : "ID",
-			column : "id"
-		}, {
-			th : "User",
-			column : "username"
-		}, {
-			th : "Host",
-			column : "host"
-		}, {
-			th : "KSQL",
-			column : "ksql"
-		}, {
-			th : "Status",
-			column : "status"
-		}, {
-			th : "Spent",
-			column : "spendTime"
-		}, {
-			th : "Created",
-			column : "created"
-		} ];
-		var ksqlTabHeader = "<div class='panel-body' id='div_ksql_children" + historyOffset + "'><table id='result_ksql_children" + historyOffset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
-		var ksqlMData = [];
-		var i = 0;
-		for (var i = 0; i < thList.length; i++) {
-			ksqlTabHeader += "<th>" + thList[i].th + "</th>";
-			var obj = {
-				mData : thList[i].column
-			};
-			ksqlMData.push(obj);
-		}
-
-		ksqlTabHeader += "</tr></thead></table></div>";
-		$("#ksql_history_result_div").append(ksqlTabHeader);
-		if (historyOffset > 0) {
-			$("#div_ksql_children" + (historyOffset - 1)).remove();
-		} else {
-			$("#ksql_history_result0").remove("");
-		}
-
-		$("#result_ksql_children" + historyOffset).dataTable({
-			"bSort" : false,
-			"retrieve" : true,
-			"bLengthChange" : false,
-			"bProcessing" : true,
-			"bServerSide" : true,
-			"fnServerData" : retrieveData,
-			"sAjaxSource" : '/ke/topic/sql/history/ajax',
-			"aoColumns" : ksqlMData
-		});
-
-		function retrieveData(sSource, aoData, fnCallback) {
-			$.ajax({
-				"type" : "get",
-				"contentType" : "application/json",
-				"url" : sSource,
-				"dataType" : "json",
-				"data" : {
-					aoData : JSON.stringify(aoData)
-				},
-				"success" : function(data) {
-					fnCallback(data)
-				}
-			});
-		}
-
-		historyOffset++;
 	}
 
 });

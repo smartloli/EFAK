@@ -37,6 +37,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 import kafka.admin.ReassignPartitionsCommand;
+import kafka.zk.KafkaZkClient;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
 import scala.collection.JavaConverters;
@@ -70,7 +71,8 @@ public class KafkaHubServiceImpl implements KafkaHubService {
 	 */
 	public void reassignPartitions(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList) {
 		Seq<Object> seq = JavaConverters.asScalaIteratorConverter(brokerIdList.iterator()).asScala().toSeq();
-		Tuple2<Map<TopicPartition, Seq<Object>>, Map<TopicPartition, Seq<Object>>> tuple = ReassignPartitionsCommand.generateAssignment(kafkaZKPool.getZkClient(clusterAlias), seq, reassignTopicsJson, true);
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		Tuple2<Map<TopicPartition, Seq<Object>>, Map<TopicPartition, Seq<Object>>> tuple = ReassignPartitionsCommand.generateAssignment(zkc, seq, reassignTopicsJson, true);
 		LOG.info("Proposed partition reassignment configuartion");
 		try {
 			LOG.info(Files.readLines(createKafkaTempJson(tuple._1).getAbsoluteFile(), Charsets.UTF_8).toString());
@@ -96,6 +98,10 @@ public class KafkaHubServiceImpl implements KafkaHubService {
 		System.out.flush();
 		System.setOut(oldPStream);
 		LOG.info("Result:\n" + baos.toString());
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
 	}
 
 	private File createKafkaTempJson(Map<TopicPartition, Seq<Object>> tuple) throws IOException {
@@ -117,6 +123,38 @@ public class KafkaHubServiceImpl implements KafkaHubService {
 		out.close();
 		f.deleteOnExit();
 		return f;
+	}
+
+	public JSONObject generate(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList) {
+		JSONObject object = new JSONObject();
+		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+		Seq<Object> seq = JavaConverters.asScalaIteratorConverter(brokerIdList.iterator()).asScala().toSeq();
+		Tuple2<Map<TopicPartition, Seq<Object>>, Map<TopicPartition, Seq<Object>>> tuple = null;
+		try {
+			tuple = ReassignPartitionsCommand.generateAssignment(zkc, seq, reassignTopicsJson, true);
+		} catch (Exception e) {
+			LOG.error("Execute command has error, msg is ", e);
+			object.put("error_result", "Execute command has error, msg is " + e);
+		}
+		if (tuple != null) {
+			try {
+				object.put("proposed", Files.readLines(createKafkaTempJson(tuple._1).getAbsoluteFile(), Charsets.UTF_8).toString());
+			} catch (Exception e) {
+				LOG.error("Read proposed partition reassignment configuartion has error,msg is ", e);
+				object.put("error_proposed", "Read proposed partition reassignment configuartion has error,msg is " + e.getCause().getMessage());
+			}
+			try {
+				object.put("current", Files.readLines(createKafkaTempJson(tuple._2).getAbsoluteFile(), Charsets.UTF_8).toString());
+			} catch (Exception e) {
+				LOG.error("Read current partition replica assignment has error,msg is ", e);
+				object.put("error_current", "Read current partition replica assignment has error,msg is " + e.getCause().getMessage());
+			}
+		}
+		if (zkc != null) {
+			kafkaZKPool.release(clusterAlias, zkc);
+			zkc = null;
+		}
+		return object;
 	}
 
 }

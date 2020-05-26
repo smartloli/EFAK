@@ -261,6 +261,9 @@ public class KConstants {
 
 		public static final int CPU_NORMAL = 60;
 		public static final int CPU_DANGER = 80;
+
+		public static final String BALANCE_SINGLE = "SINGLE";
+		public static final String BALANCE_ALL = "ALL";
 	}
 
 	public final class Component {

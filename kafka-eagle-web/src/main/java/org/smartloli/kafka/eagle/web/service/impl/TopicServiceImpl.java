@@ -32,6 +32,7 @@ import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
@@ -41,6 +42,8 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
 import org.smartloli.kafka.eagle.core.factory.Mx4jService;
+import org.smartloli.kafka.eagle.core.factory.hub.KafkaHubFactory;
+import org.smartloli.kafka.eagle.core.factory.hub.KafkaHubService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
@@ -81,6 +84,9 @@ public class TopicServiceImpl implements TopicService {
 
 	/** Mx4j service interface. */
 	private Mx4jService mx4jService = new Mx4jFactory().create();
+
+	/** Kafka hub service interface. */
+	private KafkaHubService kafkaHubService = new KafkaHubFactory().create();
 
 	/** Find topic name in all topics. */
 	public boolean hasTopic(String clusterAlias, String topicName) {
@@ -373,6 +379,28 @@ public class TopicServiceImpl implements TopicService {
 		object.put("topicCapacity", capacity.getString("size"));
 		object.put("capacityType", capacity.getString("type"));
 		return object.toJSONString();
+	}
+
+	@Override
+	public JSONObject getBalanceGenerate(String clusterAlias, List<String> topics, String type) {
+		JSONObject object = new JSONObject();
+		object.put("version", 1);
+		JSONArray array = new JSONArray();
+		if (BrokerSever.BALANCE_SINGLE.equals(type)) {
+			for (String topic : topics) {
+				JSONObject topicChild = new JSONObject();
+				topicChild.put("topic", topic);
+				array.add(topicChild);
+			}
+		} else {
+			for (String topic : brokerService.topicList(clusterAlias)) {
+				JSONObject topicChild = new JSONObject();
+				topicChild.put("topic", topic);
+				array.add(topicChild);
+			}
+		}
+		object.put("topics", array);
+		return kafkaHubService.generate(clusterAlias, object.toJSONString(), brokerService.getBrokerIdList(clusterAlias));
 	}
 
 }

@@ -19,6 +19,8 @@ package org.smartloli.kafka.eagle.core.factory.hub;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * Used to realize data migration, capacity expansion, selection and other
  * central component operations.
@@ -31,4 +33,7 @@ public interface KafkaHubService {
 
 	/** Reassign partitions. */
 	public void reassignPartitions(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList);
+
+	/** Generate topics. */
+	public JSONObject generate(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList);
 }

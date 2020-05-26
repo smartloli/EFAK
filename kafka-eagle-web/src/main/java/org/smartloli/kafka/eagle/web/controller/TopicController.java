@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -298,6 +299,25 @@ public class TopicController {
 			JSONObject object = new JSONObject();
 			object.put("items", JSON.parseArray(topicService.getTopicProperties(clusterAlias, name)));
 			byte[] output = object.toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Balance topics by ajax. */
+	@RequestMapping(value = "/topic/balance/generate/", method = RequestMethod.GET)
+	public void topicBalanceAjax(HttpServletResponse response, HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String topics = request.getParameter("topics");
+			String type = request.getParameter("type");
+			List<String> topicList = new ArrayList<>();
+			for (String topic : topics.split(",")) {
+				topicList.add(topic);
+			}
+			byte[] output = topicService.getBalanceGenerate(clusterAlias, topicList, type).toJSONString().getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

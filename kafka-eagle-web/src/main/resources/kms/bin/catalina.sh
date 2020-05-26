@@ -107,7 +107,7 @@
 #                   case the default is "true"
 # -----------------------------------------------------------------------------
 
-JAVA_OPTS="-server -Xms2048M -Xmx2048M -Xmn1024M -Xss512k -XX:+AggressiveOpts -XX:SurvivorRatio=8 -XX:MetaspaceSize=96M -XX:+UseBiasedLocking -XX:CMSInitiatingOccupancyFraction=75 -XX:+DisableExplicitGC -XX:MaxTenuringThreshold=15 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -Djava.awt.headless=true"
+JAVA_OPTS=$KE_JAVA_OPTS
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false
