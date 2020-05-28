@@ -17,8 +17,6 @@
  */
 package org.smartloli.kafka.eagle.core.sql.tool;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,7 +25,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -43,77 +40,82 @@ import com.google.gson.Gson;
  * Define the data structure, query by condition.
  *
  * @author smartloli.
- * <p>
- * Created by Mar 29, 2016
+ *         <p>
+ *         Created by Mar 29, 2016
  */
 public class JSqlUtils {
 
-    /**
-     * @param tabSchema : Table column,such as {"id":"integer","name":"varchar"}
-     * @param dataSets  : DataSets ,such as
-     *                  [{"id":1,"name":"aaa"},{"id":2,"name":"bbb"},{}...]
-     * @param sql       : such as "SELECT * FROM TBL"
-     * @return String
-     * @throws Exception : Throws an exception
-     */
-    public static String query(JSONObject tabSchema, Map<String, List<List<String>>> dataSets, String sql) throws Exception {
-        String model = createTempJson();
+	/**
+	 * @param tabSchema
+	 *            : Table column,such as {"id":"integer","name":"varchar"}
+	 * @param dataSets
+	 *            : DataSets ,such as
+	 *            [{"id":1,"name":"aaa"},{"id":2,"name":"bbb"},{}...]
+	 * @param sql
+	 *            : such as "SELECT * FROM TBL"
+	 * @return String
+	 * @throws Exception
+	 *             : Throws an exception
+	 */
+	public static String query(JSONObject tabSchema, Map<String, List<List<String>>> dataSets, String sql) throws Exception {
+		String model = createTempJson();
 
-        JSqlMapData.loadSchema(tabSchema, dataSets);
+		JSqlMapData.loadSchema(tabSchema, dataSets);
 
-        Class.forName(JConstants.KAFKA_DRIVER);
-        Properties info = new Properties();
-        info.setProperty("lex", "JAVA");
+		Class.forName(JConstants.KAFKA_DRIVER);
+		Properties info = new Properties();
+		info.setProperty("lex", "JAVA");
 
-        Connection connection = DriverManager.getConnection("jdbc:calcite:model=inline:" + model, info);
-        Statement st = connection.createStatement();
-        ResultSet result = st.executeQuery(sql);
-        ResultSetMetaData rsmd = result.getMetaData();
-        List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
-        while (result.next()) {
-            Map<String, Object> map = new HashMap<String, Object>();
-            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                map.put(rsmd.getColumnName(i), result.getString(rsmd.getColumnName(i)));
-            }
-            ret.add(map);
-        }
-        result.close();
-        connection.close();
-        return new Gson().toJson(ret);
-    }
+		Connection connection = DriverManager.getConnection("jdbc:calcite:model=inline:" + model, info);
+		Statement st = connection.createStatement();
+		ResultSet result = st.executeQuery(sql);
+		ResultSetMetaData rsmd = result.getMetaData();
+		List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
+		while (result.next()) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+				map.put(rsmd.getColumnName(i), result.getString(rsmd.getColumnName(i)));
+			}
+			ret.add(map);
+		}
+		result.close();
+		st.close();
+		connection.close();
+		return new Gson().toJson(ret);
+	}
 
-    /**
-     * Parse datasets to datatable.
-     */
-    public static String toJSONObject(List<JSONArray> dataSets) {
-        List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
-        for (JSONArray dataSet : dataSets) {
-            for (Object obj : dataSet) {
-                JSONObject object = (JSONObject) obj;
-                Map<String, Object> map = new HashMap<String, Object>();
-                for (String key : object.keySet()) {
-                    map.put(key, object.getString(key));
-                }
-                results.add(map);
-            }
-        }
-        return new Gson().toJson(results);
-    }
+	/**
+	 * Parse datasets to datatable.
+	 */
+	public static String toJSONObject(List<JSONArray> dataSets) {
+		List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
+		for (JSONArray dataSet : dataSets) {
+			for (Object obj : dataSet) {
+				JSONObject object = (JSONObject) obj;
+				Map<String, Object> map = new HashMap<String, Object>();
+				for (String key : object.keySet()) {
+					map.put(key, object.getString(key));
+				}
+				results.add(map);
+			}
+		}
+		return new Gson().toJson(results);
+	}
 
-    private static String createTempJson() throws IOException {
-        JSONObject object = new JSONObject();
-        object.put("version", "1.21.0");
-        object.put("defaultSchema", "db");
-        JSONArray array = new JSONArray();
-        JSONObject tmp = new JSONObject();
-        tmp.put("name", "db");
-        tmp.put("type", "custom");
-        tmp.put("factory", "org.smartloli.kafka.eagle.core.sql.schema.JSqlSchemaFactory");
-        JSONObject tmp2 = new JSONObject();
-        tmp.put("operand", tmp2.put("database", "calcite_memory_db"));
-        array.add(tmp);
-        object.put("schemas", array);
-        return object.toJSONString();
-    }
+	private static String createTempJson() throws IOException {
+		JSONObject object = new JSONObject();
+		object.put("version", "1.21.0");
+		object.put("defaultSchema", "db");
+		JSONArray array = new JSONArray();
+		JSONObject tmp = new JSONObject();
+		tmp.put("name", "db");
+		tmp.put("type", "custom");
+		tmp.put("factory", "org.smartloli.kafka.eagle.core.sql.schema.JSqlSchemaFactory");
+		JSONObject tmp2 = new JSONObject();
+		tmp.put("operand", tmp2.put("database", "calcite_memory_db"));
+		array.add(tmp);
+		object.put("schemas", array);
+		return object.toJSONString();
+	}
 
 }

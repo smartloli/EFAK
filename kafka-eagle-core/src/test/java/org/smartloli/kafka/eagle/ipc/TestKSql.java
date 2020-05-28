@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
-import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -69,9 +68,9 @@ public class TestKSql {
 		List<JSONArray> dts = new ArrayList<>();
 		dts.add(dataSets);
 		long start = System.currentTimeMillis();
-		String rs = JSqlUtils.query(tabSchema, tableName, dts, sql);
+		// String rs = JSqlUtils.query(tabSchema, tableName, dts, sql);
+		// System.out.println(rs);
 		System.out.println("[Spent] :: " + (System.currentTimeMillis() - start) + "ms");
-		System.out.println(rs);
 	}
 
 }

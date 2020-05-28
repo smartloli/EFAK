@@ -18,12 +18,15 @@
 package org.smartloli.kafka.eagle.core.sql.execute;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -40,6 +43,10 @@ import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Parse the sql statement, and execute the sql content, get the message record
@@ -84,8 +91,7 @@ public class KafkaConsumerAdapter {
 			KafkaConsumer<String, String> consumer = null;
 			try {
 				consumer = new KafkaConsumer<>(props);
-				List<PartitionInfo> partitions = Optional.ofNullable(consumer.listTopics().get(tableName))
-						.orElseThrow(() -> new NullPointerException(tableName + " not exist"));
+				List<PartitionInfo> partitions = Optional.ofNullable(consumer.listTopics().get(tableName)).orElseThrow(() -> new NullPointerException(tableName + " not exist"));
 
 				List<TopicPartition> topics = new ArrayList<>();
 				for (PartitionInfo partition : partitions) {
@@ -111,7 +117,7 @@ public class KafkaConsumerAdapter {
 					for (ConsumerRecord<String, String> record : records) {
 						List<String> object = Lists.newLinkedList();
 						/**
-						 * 这边注意顺序，这个很重要，按字母顺序添加元素
+						 * msg, timestamp, offset, partition.
 						 */
 						object.add(record.value());
 						object.add(String.valueOf(record.timestamp()));
@@ -122,9 +128,7 @@ public class KafkaConsumerAdapter {
 					if (records.isEmpty()) {
 						flag = false;
 					}
-					Collections.sort(datasets, (list1, list2) -> ComparisonChain.start()
-							.compare(list1.get(1), list2.get(1))
-							.result());
+					Collections.sort(datasets, (list1, list2) -> ComparisonChain.start().compare(list1.get(1), list2.get(1)).result());
 				}
 				messages.put(tableName, datasets);
 			} catch (Exception e) {

@@ -37,29 +37,29 @@ import com.alibaba.druid.util.JdbcConstants;
  * and conditions.
  *
  * @author smartloli.
- * <p>
- * Created by May 19, 2019
+ *         <p>
+ *         Created by May 19, 2019
  */
 public class OdpsSqlParser {
 
-    private OdpsSqlParser() {
-    }
+	private OdpsSqlParser() {
+	}
 
-    /**
-     * Parser sql mapper kafka tree.
-     */
-    public static Set<String> parserTopic(String sql) {
-        try {
-            String dbType = JdbcConstants.MYSQL;
-            List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType);
-            SQLStatement stmt = stmtList.get(0);
-            OdpsSchemaStatVisitor visitor = new OdpsSchemaStatVisitor();
-            stmt.accept(visitor);
-            Map<Name, TableStat> tabmap = visitor.getTables();
-            return tabmap.keySet().stream().map(Name::getName).collect(Collectors.toSet());
-        } catch (Exception e) {
-            ThrowExceptionUtils.print(OdpsSqlParser.class).error("Parser kafka sql has error, msg is ", e);
-            return Collections.emptySet();
-        }
-    }
+	/**
+	 * Parser sql mapper kafka tree.
+	 */
+	public static Set<String> parserTopic(String sql) {
+		try {
+			String dbType = JdbcConstants.MYSQL;
+			List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType);
+			SQLStatement stmt = stmtList.get(0);
+			OdpsSchemaStatVisitor visitor = new OdpsSchemaStatVisitor();
+			stmt.accept(visitor);
+			Map<Name, TableStat> tabmap = visitor.getTables();
+			return tabmap.keySet().stream().map(Name::getName).collect(Collectors.toSet());
+		} catch (Exception e) {
+			ThrowExceptionUtils.print(OdpsSqlParser.class).error("Parser kafka sql has error, msg is ", e);
+			return Collections.emptySet();
+		}
+	}
 }
