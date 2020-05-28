@@ -19,23 +19,23 @@ package org.smartloli.kafka.eagle.common.protocol;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.alibaba.fastjson.JSONObject;
 
 /**
  * TODO
- * 
- * @author smartloli.
  *
- *         Created by Feb 28, 2017
+ * @author smartloli.
+ * <p>
+ * Created by Feb 28, 2017
  */
-public class KafkaSqlInfo extends BaseProtocol{
+public class KafkaSqlInfo extends BaseProtocol {
 
-	private List<Integer> partition = new ArrayList<>();
 	private String sql;
 	private String metaSql;
 	private JSONObject schema = new JSONObject();
-	private String tableName;
+	private Set<String> tableName;
 	private String topic;
 	private boolean status;
 	private List<HostsInfo> seeds = new ArrayList<>();
@@ -81,21 +81,14 @@ public class KafkaSqlInfo extends BaseProtocol{
 		this.schema = schema;
 	}
 
-	public String getTableName() {
+	public Set<String> getTableName() {
 		return tableName;
 	}
 
-	public void setTableName(String tableName) {
+	public void setTableName(Set<String> tableName) {
 		this.tableName = tableName;
 	}
 
-	public List<Integer> getPartition() {
-		return partition;
-	}
-
-	public void setPartition(List<Integer> partition) {
-		this.partition = partition;
-	}
 
 	public String getSql() {
 		return sql;

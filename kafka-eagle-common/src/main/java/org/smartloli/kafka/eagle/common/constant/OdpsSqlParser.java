@@ -17,9 +17,11 @@
  */
 package org.smartloli.kafka.eagle.common.constant;
 
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.smartloli.kafka.eagle.common.util.ThrowExceptionUtils;
 
@@ -33,35 +35,31 @@ import com.alibaba.druid.util.JdbcConstants;
 /**
  * The client requests the t operation to parse the SQL and obtain the fields
  * and conditions.
- * 
- * @author smartloli.
  *
- *         Created by May 19, 2019
+ * @author smartloli.
+ * <p>
+ * Created by May 19, 2019
  */
 public class OdpsSqlParser {
 
-	private OdpsSqlParser() {
-	}
+    private OdpsSqlParser() {
+    }
 
-	/** Parser sql mapper kafka tree. */
-	public static String parserTopic(String sql) {
-		try {
-			String dbType = JdbcConstants.MYSQL;
-			List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType);
-			SQLStatement stmt = stmtList.get(0);
-			OdpsSchemaStatVisitor visitor = new OdpsSchemaStatVisitor();
-			stmt.accept(visitor);
-			Map<Name, TableStat> tabmap = visitor.getTables();
-			String tableName = "";
-			Iterator<Name> iterator = tabmap.keySet().iterator();
-			while (iterator.hasNext()) {
-				Name name = iterator.next();
-				tableName = name.toString();
-			}
-			return tableName.trim();
-		} catch (Exception e) {
-			ThrowExceptionUtils.print(OdpsSqlParser.class).error("Parser kafka sql has error, msg is ", e);
-			return "";
-		}
-	}
+    /**
+     * Parser sql mapper kafka tree.
+     */
+    public static Set<String> parserTopic(String sql) {
+        try {
+            String dbType = JdbcConstants.MYSQL;
+            List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType);
+            SQLStatement stmt = stmtList.get(0);
+            OdpsSchemaStatVisitor visitor = new OdpsSchemaStatVisitor();
+            stmt.accept(visitor);
+            Map<Name, TableStat> tabmap = visitor.getTables();
+            return tabmap.keySet().stream().map(Name::getName).collect(Collectors.toSet());
+        } catch (Exception e) {
+            ThrowExceptionUtils.print(OdpsSqlParser.class).error("Parser kafka sql has error, msg is ", e);
+            return Collections.emptySet();
+        }
+    }
 }

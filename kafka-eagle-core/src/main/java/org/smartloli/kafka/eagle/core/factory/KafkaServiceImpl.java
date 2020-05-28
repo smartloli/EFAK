@@ -583,38 +583,17 @@ public class KafkaServiceImpl implements KafkaService {
 		kafkaSql.getSchema().put("partition", "integer");
 		kafkaSql.getSchema().put("offset", "bigint");
 		kafkaSql.getSchema().put("msg", "varchar");
+		kafkaSql.getSchema().put("createtime", "bigint");
 		if (!sql.startsWith("select") && !sql.startsWith("SELECT")) {
 			kafkaSql.setStatus(false);
 			return kafkaSql;
 		} else {
-			String tableName = OdpsSqlParser.parserTopic(sql);
-			if (!"".equals(tableName)) {
+			Set<String> tableNames = OdpsSqlParser.parserTopic(sql);
+			if (!tableNames.isEmpty()) {
 				kafkaSql.setStatus(true);
-				kafkaSql.setTableName(tableName);
+				kafkaSql.setTableName(tableNames);
 			}
-			sql = sql.toLowerCase();
-			if (sql.contains("and")) {
-				sql = sql.split("and")[0];
-			} else if (sql.contains("group by")) {
-				sql = sql.split("group")[0];
-			} else if (sql.contains("limit")) {
-				sql = sql.split("limit")[0];
-			}
-
-			Matcher matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(sql);
-			if (matcher.find()) {
-				if (matcher.group(2).trim().startsWith("\"partition\"")) {
-					String[] columns = matcher.group(2).trim().split("in")[1].replace("(", "").replace(")", "").trim().split(",");
-					for (String column : columns) {
-						try {
-							kafkaSql.getPartition().add(Integer.parseInt(column));
-						} catch (Exception e) {
-							LOG.error("Parse parition[" + column + "] has error,msg is " + e.getMessage());
-						}
-					}
-				}
-				kafkaSql.setSeeds(getBrokers(clusterAlias));
-			}
+			kafkaSql.setSeeds(getBrokers(clusterAlias));
 		}
 		return kafkaSql;
 	}
