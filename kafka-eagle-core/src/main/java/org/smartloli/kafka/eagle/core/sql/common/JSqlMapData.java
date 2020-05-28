@@ -69,18 +69,20 @@ public class JSqlMapData {
 		SQLTYPE_MAPPING.put("any", SqlTypeName.ANY);
 	}
 
-	public static void loadSchema(JSONObject cols, String tableName, List<List<String>> datas) {
+	public static void loadSchema(JSONObject cols, Map<String, List<List<String>>> dataSets) {
 		Database db = new Database();
-		Table table = new Table();
-		table.tableName = tableName;
-		for (String key : cols.keySet()) {
-			Column _col = new Column();
-			_col.name = key;
-			_col.type = cols.getString(key);
-			table.columns.add(_col);
+		for (Map.Entry<String, List<List<String>>> entry : dataSets.entrySet()) {
+			Table table = new Table();
+			table.tableName = entry.getKey();
+			for (String key : cols.keySet()) {
+				Column _col = new Column();
+				_col.name = key;
+				_col.type = cols.getString(key);
+				table.columns.add(_col);
+			}
+			table.data = entry.getValue();
+			db.tables.add(table);
 		}
-		table.data = datas;
-		db.tables.add(table);
 		MAP.put("db", db);
 	}
 
