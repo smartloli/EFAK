@@ -123,13 +123,10 @@ $(document).ready(function() {
 						topicBalanceResult.setValue(result);
 					}
 					if (datas.hasOwnProperty("proposed")) {
-						console.log(datas.proposed);
-						_jsonObj = JSON.stringify(JSON.parse(datas.proposed,null,4));
-						console.log(_jsonObj);
-						topicBalanceProposed.setValue(_jsonObj);
+						topicBalanceProposed.setValue(JSON.stringify(JSON.parse(datas.proposed),null,2));
 					}
 					if (datas.hasOwnProperty("current")) {
-						topicBalanceCurrent.setValue(JSON.stringify(datas.current));
+						topicBalanceCurrent.setValue(JSON.stringify(JSON.parse(datas.current),null,2));
 					}
 				}
 			}
