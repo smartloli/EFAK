@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.core.sql.function;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.Objects;
+
 /**
  * Parse a JSONObject or a JSONArray in a kafka topic message using a custom
  * function.
@@ -32,19 +34,31 @@ public class JSONFunction {
 
 	/** Parse a JSONObject. */
 	public String JSON(String jsonObject, String key) {
-		JSONObject object = com.alibaba.fastjson.JSON.parseObject(jsonObject);
+		JSONObject object = null;
+		try {
+			Objects.requireNonNull(jsonObject);
+			object = com.alibaba.fastjson.JSON.parseObject(jsonObject);
+		} catch (Exception e) {
+			return null;
+		}
 		return object.getString(key);
 	}
 
 	/** Parse a JSONArray. */
 	public String JSONS(String jsonArray, String key) {
-		JSONArray object = com.alibaba.fastjson.JSON.parseArray(jsonArray);
-		JSONArray target = new JSONArray();
-		for (Object tmp : object) {
-			JSONObject result = (JSONObject) tmp;
-			JSONObject value = new JSONObject();
-			value.put(key, result.getString(key));
-			target.add(value);
+		JSONArray target = null;
+		try {
+			Objects.requireNonNull(jsonArray);
+			JSONArray object = com.alibaba.fastjson.JSON.parseArray(jsonArray);
+			target = new JSONArray();
+			for (Object tmp : object) {
+				JSONObject result = (JSONObject) tmp;
+				JSONObject value = new JSONObject();
+				value.put(key, result.getString(key));
+				target.add(value);
+			}
+		} catch (Exception e) {
+			return null;
 		}
 		return target.toJSONString();
 	}

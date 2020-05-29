@@ -21,18 +21,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
-import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
-
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 
@@ -47,7 +42,6 @@ public class KafkaSqlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(KafkaSqlParser.class);
     private static KafkaService kafkaService = new KafkaFactory().create();
-    private static BrokerService brokerService = new BrokerFactory().create();
 
     public static String execute(String clusterAlias, String sql) {
         JSONObject status = new JSONObject();

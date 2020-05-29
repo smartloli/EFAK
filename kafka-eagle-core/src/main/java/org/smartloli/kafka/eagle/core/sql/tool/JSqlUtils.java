@@ -49,12 +49,11 @@ import com.google.gson.Gson;
 public class JSqlUtils {
 
     /**
-     * @param tabSchema : Table column,such as {"id":"integer","name":"varchar"}
-     * @param dataSets  : DataSets ,such as
-     *                  [{"id":1,"name":"aaa"},{"id":2,"name":"bbb"},{}...]
-     * @param sql       : such as "SELECT * FROM TBL"
-     * @return String
-     * @throws Exception : Throws an exception
+     * @param tabSchema
+     * @param dataSets
+     * @param sql
+     * @return
+     * @throws Exception
      */
     public static String query(JSONObject tabSchema, Map<String, List<List<String>>> dataSets, String sql) throws Exception {
         String model = createTempJson();
