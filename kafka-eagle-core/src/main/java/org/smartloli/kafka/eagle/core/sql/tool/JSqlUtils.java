@@ -17,21 +17,16 @@
  */
 package org.smartloli.kafka.eagle.core.sql.tool;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JConstants;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData;
 
@@ -48,6 +43,8 @@ import com.google.gson.Gson;
  */
 public class JSqlUtils {
 
+    private final static Logger LOG = LoggerFactory.getLogger(JSqlUtils.class);
+
     /**
      * @param tabSchema
      * @param dataSets
@@ -56,28 +53,46 @@ public class JSqlUtils {
      * @throws Exception
      */
     public static String query(JSONObject tabSchema, Map<String, List<List<String>>> dataSets, String sql) throws Exception {
-        String model = createTempJson();
+        Connection connection = null;
+        ResultSet result = null;
+        List<Map<String, Object>> ret = null;
+        Statement st = null;
+        try {
+            String model = createTempJson();
 
-        JSqlMapData.loadSchema(tabSchema, dataSets);
+            JSqlMapData.loadSchema(tabSchema, dataSets);
 
-        Class.forName(JConstants.KAFKA_DRIVER);
-        Properties info = new Properties();
-        info.setProperty("lex", "JAVA");
+            Class.forName(JConstants.KAFKA_DRIVER);
+            Properties info = new Properties();
+            info.setProperty("lex", "JAVA");
 
-        Connection connection = DriverManager.getConnection("jdbc:calcite:model=inline:" + model, info);
-        Statement st = connection.createStatement();
-        ResultSet result = st.executeQuery(sql);
-        ResultSetMetaData rsmd = result.getMetaData();
-        List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
-        while (result.next()) {
-            Map<String, Object> map = new HashMap<String, Object>();
-            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                map.put(rsmd.getColumnName(i), result.getString(rsmd.getColumnName(i)));
+            connection = DriverManager.getConnection("jdbc:calcite:model=inline:" + model, info);
+            st = connection.createStatement();
+            result = st.executeQuery(sql);
+            ResultSetMetaData rsmd = result.getMetaData();
+            ret = new ArrayList<Map<String, Object>>();
+            while (result.next()) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                    map.put(rsmd.getColumnName(i), result.getString(rsmd.getColumnName(i)));
+                }
+                ret.add(map);
             }
-            ret.add(map);
+        } catch (ClassNotFoundException e) {
+            LOG.error(ExceptionUtils.getStackTrace(e));
+        } catch (SQLException e) {
+            LOG.error(ExceptionUtils.getStackTrace(e));
+        } finally {
+            if (st != null) {
+                st.close();
+            }
+            if (result != null) {
+                result.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
         }
-        result.close();
-        connection.close();
         return new Gson().toJson(ret);
     }
 
@@ -99,7 +114,7 @@ public class JSqlUtils {
         return new Gson().toJson(results);
     }
 
-    private static String createTempJson() throws IOException {
+    private static String createTempJson() {
         JSONObject object = new JSONObject();
         object.put("version", "1.21.0");
         object.put("defaultSchema", "db");
