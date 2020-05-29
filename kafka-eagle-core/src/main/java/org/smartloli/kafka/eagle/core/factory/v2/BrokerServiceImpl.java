@@ -17,16 +17,8 @@
  */
 package org.smartloli.kafka.eagle.core.factory.v2;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -81,10 +73,20 @@ public class BrokerServiceImpl implements BrokerService {
 		return topicList(clusterAlias).size();
 	}
 
-	/** Exclude kafka topic(__consumer_offsets). */
-	private void excludeTopic(List<String> topics) {
-		if (topics.contains(Kafka.CONSUMER_OFFSET_TOPIC)) {
-			topics.remove(Kafka.CONSUMER_OFFSET_TOPIC);
+	/**
+	 * Exclude kafka topic(__consumer_offsets).
+	 */
+	private void excludeTopic(List<String> topics, String clusterAlias, KafkaZkClient zkc) {
+
+		topics.remove(Kafka.CONSUMER_OFFSET_TOPIC);
+
+		Iterator<String> iterator = topics.iterator();
+		while (iterator.hasNext()) {
+			String topic = iterator.next();
+			if (!zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic + "/partitions")) {
+				iterator.remove();
+				LOG.info("remove topic" + topic);
+			}
 		}
 	}
 
@@ -346,7 +348,7 @@ public class BrokerServiceImpl implements BrokerService {
 				if (zkc.pathExists(BROKER_TOPICS_PATH)) {
 					Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
 					topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-					excludeTopic(topics);
+					excludeTopic(topics, clusterAlias,zkc);
 				}
 			} catch (Exception e) {
 				LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
