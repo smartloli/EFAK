@@ -139,12 +139,14 @@ public class KafkaHubServiceImpl implements KafkaHubService {
 		if (tuple != null) {
 			try {
 				object.put("proposed", Files.readLines(createKafkaTempJson(tuple._1).getAbsoluteFile(), Charsets.UTF_8).toString());
+				object.put("proposed_status", true);
 			} catch (Exception e) {
 				LOG.error("Read proposed partition reassignment configuartion has error,msg is ", e);
 				object.put("error_proposed", "Read proposed partition reassignment configuartion has error,msg is " + e.getCause().getMessage());
 			}
 			try {
 				object.put("current", Files.readLines(createKafkaTempJson(tuple._2).getAbsoluteFile(), Charsets.UTF_8).toString());
+				object.put("current_status", true);
 			} catch (Exception e) {
 				LOG.error("Read current partition replica assignment has error,msg is ", e);
 				object.put("error_current", "Read current partition replica assignment has error,msg is " + e.getCause().getMessage());

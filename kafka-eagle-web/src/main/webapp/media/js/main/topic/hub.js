@@ -100,7 +100,7 @@ $(document).ready(function() {
 			}
 		} else if (radio == "balance_all") {
 			topicBalanceResult.setValue("Balance all topic task will be running.");
-			// 
+			// generate(topics, "ALL");
 		}
 	});
 
@@ -121,12 +121,18 @@ $(document).ready(function() {
 					}
 					if (result.length > 0) {
 						topicBalanceResult.setValue(result);
+						document.getElementById("ke_balancer_execute").style.display = "none";
 					}
 					if (datas.hasOwnProperty("proposed")) {
-						topicBalanceProposed.setValue(JSON.stringify(JSON.parse(datas.proposed),null,2));
+						topicBalanceProposed.setValue(JSON.stringify(JSON.parse(datas.proposed), null, 2));
 					}
 					if (datas.hasOwnProperty("current")) {
-						topicBalanceCurrent.setValue(JSON.stringify(JSON.parse(datas.current),null,2));
+						topicBalanceCurrent.setValue(JSON.stringify(JSON.parse(datas.current), null, 2));
+					}
+					if (datas.hasOwnProperty("proposed_status") && datas.hasOwnProperty("current_status")) {
+						if (datas.proposed_status && datas.current_status) {
+							document.getElementById("ke_balancer_execute").style.display = "";
+						}
 					}
 				}
 			}

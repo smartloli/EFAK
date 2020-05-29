@@ -41,6 +41,7 @@ import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.Role;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
@@ -311,11 +312,13 @@ public class TopicController {
 		try {
 			HttpSession session = request.getSession();
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-			String topics = request.getParameter("topics");
 			String type = request.getParameter("type");
 			List<String> topicList = new ArrayList<>();
-			for (String topic : topics.split(",")) {
-				topicList.add(topic);
+			if (BrokerSever.BALANCE_SINGLE.equals(type)) {
+				String topics = request.getParameter("topics");
+				for (String topic : topics.split(",")) {
+					topicList.add(topic);
+				}
 			}
 			byte[] output = topicService.getBalanceGenerate(clusterAlias, topicList, type).toJSONString().getBytes();
 			BaseController.response(output, response);
