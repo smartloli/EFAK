@@ -33,8 +33,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -67,7 +65,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer8;
-import org.smartloli.kafka.eagle.common.constant.OdpsSqlParser;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.HostsInfo;
@@ -90,6 +87,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import kafka.zk.KafkaZkClient;
+import org.smartloli.kafka.eagle.core.sql.tool.OdpsSqlParser;
 import scala.Option;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
@@ -339,16 +337,11 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/**
 	 * According to group, topic and partition to get offset from zookeeper.
-	 * 
-	 * @param topic
-	 *            Filter topic.
-	 * @param group
-	 *            Filter group.
-	 * @param partition
-	 *            Filter partition.
+	 *
+	 * @param topic     Filter topic.
+	 * @param group     Filter group.
+	 * @param partition Filter partition.
 	 * @return OffsetZkInfo.
-	 * 
-	 * @see org.smartloli.kafka.eagle.domain.OffsetZkInfo
 	 */
 	public OffsetZkInfo getOffset(String clusterAlias, String topic, String group, int partition) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);

@@ -32,7 +32,12 @@ public class TestKafkaParser {
 		// String sql = "SELECT \"partition\", \"offset\",\"msg\" from
 		// \"kv-test2019\" where \"partition\" in (0) and \"offset\"=37445 group
 		// by \"partition\" limit 10";
-		String sql = "select * from \"kv-test2019\" where \"partition\" in (0) limit 10";
+		//		"select * from job limit 10";
+		// "select * from job where `partition` in (0,1) limit 10";
+		//"select JSON(msg,'name') as name,JSON(msg,'sex') as sex from person where JSON(msg,'name') like 'zhangsan'";
+//		"select msg from test where `partition` in ('0','1')"
+//		"select JSON(p.msg,'name') as name,JSON(p.msg,'sex') as sex,JSON(j.msg,'age') as age from person p left join job j on JSON(p.msg,'name') = JSON(j.msg,'name')"
+		String sql = "select * from person union select * from job";
 		String result = KafkaSqlParser.execute("cluster1", sql);
 		System.out.println("result: " + result);
 	}
