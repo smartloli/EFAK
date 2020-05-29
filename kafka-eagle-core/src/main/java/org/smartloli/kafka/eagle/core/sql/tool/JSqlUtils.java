@@ -95,6 +95,7 @@ public class JSqlUtils {
 			ret.add(map);
 		}
 		result.close();
+		st.close();
 		connection.close();
 		return new Gson().toJson(ret);
 	}
