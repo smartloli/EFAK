@@ -100,7 +100,7 @@ $(document).ready(function() {
 			}
 		} else if (radio == "balance_all") {
 			topicBalanceResult.setValue("Balance all topic generate will be running.");
-			// generate(topics, "ALL");
+			generate("", "ALL");
 		}
 	});
 
@@ -153,7 +153,7 @@ $(document).ready(function() {
 			}
 		} else if (radio == "balance_all") {
 			topicBalanceResult.setValue("Balance all topic verify will be running.");
-			// verify(topics, "ALL");
+			verify("", "ALL");
 		}
 	});
 
