@@ -28,9 +28,10 @@ import java.util.Map.Entry;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.protocol.topic.ReassignPartitionInfo;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Charsets;
@@ -54,55 +55,11 @@ import scala.collection.Seq;
 public class KafkaHubServiceImpl implements KafkaHubService {
 
 	private final Logger LOG = LoggerFactory.getLogger(KafkaHubServiceImpl.class);
+	private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	private final PrintStream pStream = new PrintStream(baos);
 
 	/** Instance Kafka Zookeeper client pool. */
 	private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
-
-	/**
-	 * Reassign partitions.
-	 * 
-	 * @param reassignTopics
-	 *            {"topics":[{"topic":"k20200326"}],"version":1}
-	 * 
-	 * @param brokerIdList
-	 *            0,1,2 ...
-	 * 
-	 * 
-	 */
-	public void reassignPartitions(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList) {
-		Seq<Object> seq = JavaConverters.asScalaIteratorConverter(brokerIdList.iterator()).asScala().toSeq();
-		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-		Tuple2<Map<TopicPartition, Seq<Object>>, Map<TopicPartition, Seq<Object>>> tuple = ReassignPartitionsCommand.generateAssignment(zkc, seq, reassignTopicsJson, true);
-		LOG.info("Proposed partition reassignment configuartion");
-		try {
-			LOG.info(Files.readLines(createKafkaTempJson(tuple._1).getAbsoluteFile(), Charsets.UTF_8).toString());
-		} catch (Exception e) {
-			LOG.error("Read proposed partition reassignment configuartion has error,msg is ", e);
-		}
-		LOG.info("Current partition replica assignment");
-		try {
-			LOG.info(Files.readLines(createKafkaTempJson(tuple._2).getAbsoluteFile(), Charsets.UTF_8).toString());
-		} catch (Exception e) {
-			LOG.error("Read current partition replica assignment has error,msg is ", e);
-		}
-		ReassignPartitionInfo rpi = new ReassignPartitionInfo();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		PrintStream pStream = new PrintStream(baos);
-		PrintStream oldPStream = System.out;
-		System.setOut(pStream);
-		try {
-			ReassignPartitionsCommand.main(new String[] { "--zookeeper", "127.0.0.1:2181", "--reassignment-json-file", createKafkaTempJson(tuple._2).getAbsolutePath(), "--verify" });
-		} catch (Exception e) {
-			LOG.error("Execute command has error, msg is ", e);
-		}
-		System.out.flush();
-		System.setOut(oldPStream);
-		LOG.info("Result:\n" + baos.toString());
-		if (zkc != null) {
-			kafkaZKPool.release(clusterAlias, zkc);
-			zkc = null;
-		}
-	}
 
 	private File createKafkaTempJson(Map<TopicPartition, Seq<Object>> tuple) throws IOException {
 		JSONObject object = new JSONObject();
@@ -117,7 +74,7 @@ public class KafkaHubServiceImpl implements KafkaHubService {
 			array.add(tpObject);
 		}
 		object.put("partitions", array);
-		File f = File.createTempFile("ke_reassignmengt_", ".json");
+		File f = File.createTempFile("ke_reassignment_", ".json");
 		FileWriter out = new FileWriter(f);
 		out.write(object.toJSONString());
 		out.close();
@@ -125,6 +82,26 @@ public class KafkaHubServiceImpl implements KafkaHubService {
 		return f;
 	}
 
+	private File createKafkaTopicTempJson(String reassignTopicsJson) throws IOException {
+		File f = File.createTempFile("ke_reassignment_topic_", ".json");
+		FileWriter out = new FileWriter(f);
+		out.write(JSON.parseObject(reassignTopicsJson).toJSONString());
+		out.close();
+		f.deleteOnExit();
+		return f;
+	}
+
+	/**
+	 * Generate reassign topics json
+	 * 
+	 * @param reassignTopicsJson
+	 *            {"topics":[{"topic":"k20200326"}],"version":1}
+	 * 
+	 * @param brokerIdList
+	 *            0,1,2 ...
+	 * 
+	 * 
+	 */
 	public JSONObject generate(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList) {
 		JSONObject object = new JSONObject();
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
@@ -138,15 +115,25 @@ public class KafkaHubServiceImpl implements KafkaHubService {
 		}
 		if (tuple != null) {
 			try {
-				object.put("proposed", Files.readLines(createKafkaTempJson(tuple._1).getAbsoluteFile(), Charsets.UTF_8).toString());
-				object.put("proposed_status", true);
+				List<String> jsons = Files.readLines(createKafkaTempJson(tuple._1).getAbsoluteFile(), Charsets.UTF_8);
+				if (jsons.size() > 0) {
+					object.put("proposed", jsons.get(0).toString());
+					object.put("proposed_status", true);
+				} else {
+					object.put("proposed_status", false);
+				}
 			} catch (Exception e) {
 				LOG.error("Read proposed partition reassignment configuartion has error,msg is ", e);
 				object.put("error_proposed", "Read proposed partition reassignment configuartion has error,msg is " + e.getCause().getMessage());
 			}
 			try {
-				object.put("current", Files.readLines(createKafkaTempJson(tuple._2).getAbsoluteFile(), Charsets.UTF_8).toString());
-				object.put("current_status", true);
+				List<String> jsons = Files.readLines(createKafkaTempJson(tuple._2).getAbsoluteFile(), Charsets.UTF_8);
+				if (jsons.size() > 0) {
+					object.put("current", jsons.get(0).toString());
+					object.put("current_status", true);
+				} else {
+					object.put("current_status", false);
+				}
 			} catch (Exception e) {
 				LOG.error("Read current partition replica assignment has error,msg is ", e);
 				object.put("error_current", "Read current partition replica assignment has error,msg is " + e.getCause().getMessage());
@@ -157,6 +144,43 @@ public class KafkaHubServiceImpl implements KafkaHubService {
 			zkc = null;
 		}
 		return object;
+	}
+
+	/** Execute reassign topics json. */
+	public String execute(String clusterAlias, String reassignTopicsJson) {
+		JSONObject object = new JSONObject();
+		String zkServerAddress = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
+		PrintStream oldPStream = System.out;
+		System.setOut(pStream);
+		try {
+			ReassignPartitionsCommand.main(new String[] { "--zookeeper", zkServerAddress, "--reassignment-json-file", createKafkaTopicTempJson(reassignTopicsJson).getAbsolutePath(), "--execute" });
+			object.put("success", true);
+		} catch (Exception e) {
+			object.put("error", "Execute command has error, msg is " + e.getCause().getMessage());
+			LOG.error("Execute command has error, msg is ", e);
+		}
+		System.out.flush();
+		System.setOut(oldPStream);
+		object.put("result", baos.toString());
+		return object.toJSONString();
+	}
+
+	/** Verify reassign topics json. */
+	public String verify(String clusterAlias, String reassignTopicsJson) {
+		JSONObject object = new JSONObject();
+		String zkServerAddress = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
+		PrintStream oldPStream = System.out;
+		System.setOut(pStream);
+		try {
+			ReassignPartitionsCommand.main(new String[] { "--zookeeper", zkServerAddress, "--reassignment-json-file", createKafkaTopicTempJson(reassignTopicsJson).getAbsolutePath(), "--verify" });
+		} catch (Exception e) {
+			object.put("error", "Verify command has error, msg is " + e.getCause().getMessage());
+			LOG.error("Verify command has error, msg is ", e);
+		}
+		System.out.flush();
+		System.setOut(oldPStream);
+		object.put("result", baos.toString());
+		return object.toJSONString();
 	}
 
 }

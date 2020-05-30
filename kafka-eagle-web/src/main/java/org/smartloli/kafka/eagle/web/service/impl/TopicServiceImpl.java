@@ -403,4 +403,14 @@ public class TopicServiceImpl implements TopicService {
 		return kafkaHubService.generate(clusterAlias, object.toJSONString(), brokerService.getBrokerIdList(clusterAlias));
 	}
 
+	@Override
+	public String setBalanceExecute(String clusterAlias, String reassignTopicsJson) {
+		return kafkaHubService.execute(clusterAlias, reassignTopicsJson);
+	}
+
+	@Override
+	public String setBalanceVerify(String clusterAlias, String reassignTopicsJson) {
+		return kafkaHubService.verify(clusterAlias, reassignTopicsJson);
+	}
+
 }

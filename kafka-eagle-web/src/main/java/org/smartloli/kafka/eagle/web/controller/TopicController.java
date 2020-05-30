@@ -35,6 +35,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicBalanceJson;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicMockMessage;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
@@ -308,7 +309,7 @@ public class TopicController {
 
 	/** Balance topics by ajax. */
 	@RequestMapping(value = "/topic/balance/generate/", method = RequestMethod.GET)
-	public void topicBalanceAjax(HttpServletResponse response, HttpServletRequest request) {
+	public void topicGenerateAjax(HttpServletResponse response, HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession();
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
@@ -321,6 +322,47 @@ public class TopicController {
 				}
 			}
 			byte[] output = topicService.getBalanceGenerate(clusterAlias, topicList, type).toJSONString().getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Execute topics by ajax. */
+	@RequestMapping(value = "/topic/balance/execute/ajax", method = RequestMethod.POST)
+	public void topicExecuteAjax(@RequestBody TopicBalanceJson topicBalanceJson, HttpServletResponse response, HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			byte[] output = topicService.setBalanceExecute(clusterAlias, topicBalanceJson.getJson()).getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/** Verify topics by ajax. */
+	@RequestMapping(value = "/topic/balance/verify/ajax", method = RequestMethod.GET)
+	public void topicVerifyAjax(HttpServletResponse response, HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession();
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String type = request.getParameter("type");
+			List<String> topicList = new ArrayList<>();
+			if (BrokerSever.BALANCE_SINGLE.equals(type)) {
+				String topics = request.getParameter("topics");
+				for (String topic : topics.split(",")) {
+					topicList.add(topic);
+				}
+			}
+			String result = "";
+			if (topicService.getBalanceGenerate(clusterAlias, topicList, type).containsKey("current")) {
+				String reassignTopicsJson = topicService.getBalanceGenerate(clusterAlias, topicList, type).getString("current");
+				result = topicService.setBalanceVerify(clusterAlias, reassignTopicsJson);
+			} else {
+				result = topicService.getBalanceGenerate(clusterAlias, topicList, type).toJSONString();
+			}
+			byte[] output = result.getBytes();
 			BaseController.response(output, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();

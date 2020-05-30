@@ -15,28 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.core.factory.hub;
+package org.smartloli.kafka.eagle.common.protocol.topic;
 
-import java.util.List;
-
-import com.alibaba.fastjson.JSONObject;
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * Used to realize data migration, capacity expansion, selection and other
- * central component operations.
+ * Topic balance json string
  * 
  * @author smartloli.
  *
- *         Created by May 21, 2020
+ *         Created by May 30, 2020
  */
-public interface KafkaHubService {
+public class TopicBalanceJson extends BaseProtocol {
 
-	/** Generate topics. */
-	public JSONObject generate(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList);
+	private String json;
 
-	/** Execute topics. */
-	public String execute(String clusterAlias, String reassignTopicsJson);
+	public String getJson() {
+		return json;
+	}
 
-	/** Verify topics. */
-	public String verify(String clusterAlias, String reassignTopicsJson);
+	public void setJson(String json) {
+		this.json = json;
+	}
+
 }

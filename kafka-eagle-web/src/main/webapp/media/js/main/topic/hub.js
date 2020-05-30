@@ -96,13 +96,92 @@ $(document).ready(function() {
 				var topics = $("#ke_topic_balance").val().split(",");
 				generate(topics, "SINGLE");
 			} else {
-				topicBalanceResult.setValue("Balance topic can not null.");
+				topicBalanceResult.setValue("Balance topic generate can not null.");
 			}
 		} else if (radio == "balance_all") {
-			topicBalanceResult.setValue("Balance all topic task will be running.");
+			topicBalanceResult.setValue("Balance all topic generate will be running.");
 			// generate(topics, "ALL");
 		}
 	});
+
+	function isJson(str) {
+		try {
+			if (typeof JSON.parse(str) == 'object')
+				return true;
+			return false;
+		} catch (e) {
+			topicBalanceResult.setValue(e.message);
+			return false;
+		}
+	}
+
+	$("#ke_balancer_execute").on('click', function() {
+		var proposedValue = topicBalanceProposed.getValue();
+		if (isJson(proposedValue)) {
+			var json = proposedValue.replace(/\ +/g, "").replace(/[\r\n]/g, "")
+			$.ajax({
+				type : 'post',
+				dataType : 'json',
+				contentType : 'application/json;charset=UTF-8',
+				data : JSON.stringify({
+					"json" : json
+				}),
+				url : '/ke/topic/balance/execute/ajax',
+				success : function(datas) {
+					if (datas != null) {
+						if (datas.hasOwnProperty("success") && datas.success) {
+							document.getElementById("ke_balancer_verify").style.display = "";
+							topicBalanceResult.setValue(datas.result);
+						}
+						if (datas.hasOwnProperty("error")) {
+							topicBalanceResult.setValue(datas.error);
+						}
+					}
+				}
+			});
+		}
+	});
+
+	$("#ke_balancer_verify").on('click', function() {
+		var radio = $('input:radio[name="ke_topic_balance_type"]:checked').val();
+		if (radio == "balance_single") {
+			if ($("#ke_topic_balance").val().length > 0) {
+				var topics = $("#ke_topic_balance").val().split(",");
+				verify(topics, "SINGLE");
+			} else {
+				topicBalanceResult.setValue("Balance topic verify can not null.");
+			}
+		} else if (radio == "balance_all") {
+			topicBalanceResult.setValue("Balance all topic verify will be running.");
+			// verify(topics, "ALL");
+		}
+	});
+
+	function verify(topics, type) {
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/ke/topic/balance/verify/ajax/?topics=' + topics + '&type=' + type,
+			success : function(datas) {
+				if (datas != null) {
+					var result = "";
+					console.log(datas);
+					if (datas.hasOwnProperty("error_result")) {
+						result += datas.error_result;
+					} else if (datas.hasOwnProperty("error_proposed")) {
+						result += "\n" + datas.error_proposed;
+					} else if (datas.hasOwnProperty("error_current")) {
+						result += "\n" + datas.error_current;
+					} else if (datas.hasOwnProperty("result")) {
+						result += "\n" + datas.result;
+					}
+					if (result.length > 0) {
+						topicBalanceResult.setValue(result);
+					}
+				}
+			}
+		});
+	}
 
 	function generate(topics, type) {
 		$.ajax({
@@ -122,6 +201,7 @@ $(document).ready(function() {
 					if (result.length > 0) {
 						topicBalanceResult.setValue(result);
 						document.getElementById("ke_balancer_execute").style.display = "none";
+						document.getElementById("ke_balancer_verify").style.display = "none";
 					}
 					if (datas.hasOwnProperty("proposed")) {
 						topicBalanceProposed.setValue(JSON.stringify(JSON.parse(datas.proposed), null, 2));
@@ -132,6 +212,7 @@ $(document).ready(function() {
 					if (datas.hasOwnProperty("proposed_status") && datas.hasOwnProperty("current_status")) {
 						if (datas.proposed_status && datas.current_status) {
 							document.getElementById("ke_balancer_execute").style.display = "";
+							document.getElementById("ke_balancer_verify").style.display = "";
 						}
 					}
 				}

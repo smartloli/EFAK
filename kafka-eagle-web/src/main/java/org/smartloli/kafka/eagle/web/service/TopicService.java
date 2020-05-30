@@ -116,4 +116,10 @@ public interface TopicService {
 
 	/** Generate topics. */
 	public JSONObject getBalanceGenerate(String clusterAlias, List<String> topics, String type);
+
+	/** Execute topics. */
+	public String setBalanceExecute(String clusterAlias, String reassignTopicsJson);
+
+	/** Verify topics. */
+	public String setBalanceVerify(String clusterAlias, String reassignTopicsJson);
 }

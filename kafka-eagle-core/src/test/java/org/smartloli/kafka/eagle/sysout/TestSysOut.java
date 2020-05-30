@@ -15,38 +15,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.protocol.topic;
+package org.smartloli.kafka.eagle.sysout;
 
-import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Reassign Partition.
+ * TODO
  * 
  * @author smartloli.
  *
- *         Created by May 21, 2020
+ *         Created by May 30, 2020
  */
-public class ReassignPartitionInfo extends BaseProtocol {
+public class TestSysOut {
 
-	// {"--zookeeper","127.0.0.1:2181","--reassignment-json-file",createKafkaTempJson(tuple._1).getAbsolutePath(),"--execute"}
-	// {"--zookeeper","127.0.0.1:2181","--reassignment-json-file",createKafkaTempJson(tuple._2).getAbsolutePath(),"--verify"}
-	private String[] command;
-	private String type;// execute or verify
+	private static Logger LOG = LoggerFactory.getLogger(TestSysOut.class);
 
-	public String[] getCommand() {
-		return command;
+	public static void main(String[] args) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PrintStream pStream = new PrintStream(baos);
+		PrintStream oldPStream = System.out;
+		System.setOut(pStream);
+		try {
+			print();
+		} catch (Exception e) {
+			LOG.error("Print error, msg is ", e);
+		}
+		System.out.flush();
+		System.setOut(oldPStream);
+		System.out.println("Result:" + baos.toString());
 	}
 
-	public void setCommand(String[] command) {
-		this.command = command;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
+	public static void print() {
+		System.out.println("Hello,Kafka Eagle.");
 	}
 
 }
