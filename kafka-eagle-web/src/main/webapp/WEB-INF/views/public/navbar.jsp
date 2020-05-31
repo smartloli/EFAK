@@ -84,44 +84,44 @@
 				</a>
 			</li>
 			<li>
-				<a href="#" data-toggle="collapse" data-target="#demo">
+				<a href="#" data-toggle="collapse" data-target="#ke_topic_data">
 					<i class="fa fa-fw fa-comments-o"></i>
 					Topic
 					<i class="fa fa-fw fa-caret-down"></i>
 				</a>
-				<ul id="demo" class="collapse">
-					<li id="navbar_create">
-						<a href="/ke/topic/create">
+				<ul id="ke_topic_data" class="collapse">
+					<li id="navbar_topic_create_li">
+						<a id="navbar_topic_create_a" href="/ke/topic/create">
 							<i class="fa fa-edit fa-fw"></i>
 							Create
 						</a>
 					</li>
-					<li id="navbar_list">
-						<a href="/ke/topic/list">
+					<li id="navbar_topic_list_li">
+						<a id="navbar_topic_list_a" href="/ke/topic/list">
 							<i class="fa fa-table fa-fw"></i>
 							List
 						</a>
 					</li>
-					<li id="navbar_list">
-						<a href="/ke/topic/message">
+					<li id="navbar_topic_message_li">
+						<a id="navbar_topic_message_a" href="/ke/topic/message">
 							<i class="fa fa-file-text fa-fw"></i>
 							KSQL
 						</a>
 					</li>
-					<li id="navbar_list">
-						<a href="/ke/topic/mock">
+					<li id="navbar_topic_mock_li">
+						<a id="navbar_topic_mock_a" href="/ke/topic/mock">
 							<i class="fa fa-maxcdn fa-fw"></i>
 							Mock
 						</a>
 					</li>
-					<li id="navbar_list">
-						<a href="/ke/topic/manager">
+					<li id="navbar_topic_manager_li">
+						<a id="navbar_topic_manager_a" href="/ke/topic/manager">
 							<i class="fa fa-tasks fa-fw"></i>
 							Manager
 						</a>
 					</li>
-					<li id="navbar_list">
-						<a href="/ke/topic/hub">
+					<li id="navbar_topic_hub_li">
+						<a id="navbar_topic_hub_a" href="/ke/topic/hub">
 							<i class="fa fa-cube fa-fw"></i>
 							Hub
 						</a>
@@ -135,26 +135,26 @@
 				</a>
 			</li>
 			<li>
-				<a href="#" data-toggle="collapse" data-target="#demo2">
+				<a href="#" data-toggle="collapse" data-target="#ke_cluster_data">
 					<i class="fa fa-fw fa-cloud"></i>
 					Cluster
 					<i class="fa fa-fw fa-caret-down"></i>
 				</a>
-				<ul id="demo2" class="collapse">
-					<li id="navbar_cli">
-						<a href="/ke/cluster/info">
+				<ul id="ke_cluster_data" class="collapse">
+					<li id="navbar_cluster_info_li">
+						<a id="navbar_cluster_info_a" href="/ke/cluster/info">
 							<i class="fa fa-sitemap fa-fw"></i>
 							ZK & Kafka
 						</a>
 					</li>
-					<li id="navbar_cli">
-						<a href="/ke/cluster/multi">
+					<li id="navbar_cluster_multi_li">
+						<a id="navbar_cluster_multi_a" href="/ke/cluster/multi">
 							<i class="fa fa-maxcdn fa-fw"></i>
 							Multi-Clusters
 						</a>
 					</li>
-					<li id="navbar_zk">
-						<a href="/ke/cluster/zkcli">
+					<li id="navbar_cluster_zkcli_li">
+						<a id="navbar_cluster_zkcli_a" href="/ke/cluster/zkcli">
 							<i class="fa fa-terminal fa-fw"></i>
 							ZkCli
 						</a>
@@ -162,26 +162,26 @@
 				</ul>
 			</li>
 			<li>
-				<a href="#" data-toggle="collapse" data-target="#demo4">
+				<a href="#" data-toggle="collapse" data-target="#ke_metrics_data">
 					<i class="fa fa-fw fa-eye"></i>
 					Metrics
 					<i class="fa fa-fw fa-caret-down"></i>
 				</a>
-				<ul id="demo4" class="collapse">
-					<li id="navbar_cli">
-						<a href="/ke/metrics/brokers">
+				<ul id="ke_metrics_data" class="collapse">
+					<li id="navbar_metrics_brokers_li">
+						<a id="navbar_metrics_brokers_a" href="/ke/metrics/brokers">
 							<i class="fa fa-sitemap fa-fw"></i>
 							Brokers
 						</a>
 					</li>
-					<li id="navbar_cli">
-						<a href="/ke/metrics/kafka">
+					<li id="navbar_metrics_kafka_li">
+						<a id="navbar_metrics_kafka_a" href="/ke/metrics/kafka">
 							<i class="fa fa-bar-chart-o fa-fw"></i>
 							Kafka
 						</a>
 					</li>
-					<li id="navbar_cli">
-						<a href="/ke/metrics/zk">
+					<li id="navbar_metrics_zk_li">
+						<a id="navbar_metrics_zk_a" href="/ke/metrics/zk">
 							<i class="fa fa-area-chart fa-fw"></i>
 							Zookeeper
 						</a>
@@ -189,27 +189,27 @@
 				</ul>
 			</li>
 			<li>
-				<a href="#" data-toggle="collapse" data-target="#demo1">
+				<a href="#" data-toggle="collapse" data-target="#ke_alarm_data">
 					<i class="fa fa-fw fa-bell"></i>
 					Alarm
 					<i class="fa fa-fw fa-caret-down"></i>
 				</a>
-				<ul id="demo1" class="collapse">
+				<ul id="ke_alarm_data" class="collapse">
 					<li>
-						<a href="#" data-toggle="collapse" data-target="#demo1_3">
+						<a href="#" data-toggle="collapse" data-target="#ke_alarm_channel_data">
 							<i class="fa fa-fw fa-bullhorn"></i>
 							Channel
 							<i class="fa fa-fw fa-caret-down"></i>
 						</a>
-						<ul id="demo1_3" class="collapse" style="list-style: none; margin-left: -40px">
-							<li id="navbar_config">
-								<a href="/ke/alarm/config" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
+						<ul id="ke_alarm_channel_data" class="collapse" style="list-style: none; margin-left: -40px">
+							<li id="navbar_alarm_config_li">
+								<a id="navbar_alarm_config_a" href="/ke/alarm/config" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
 									<i class="fa fa-info-circle fa-fw"></i>
 									Config
 								</a>
 							</li>
-							<li id="navbar_list">
-								<a href="/ke/alarm/list" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
+							<li id="navbar_alarm_list_li">
+								<a id="navbar_alarm_list_a" href="/ke/alarm/list" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
 									<i class="fa fa-edit fa-fw"></i>
 									List
 								</a>
@@ -217,20 +217,20 @@
 						</ul>
 					</li>
 					<li>
-						<a href="#" data-toggle="collapse" data-target="#demo1_1">
+						<a href="#" data-toggle="collapse" data-target="#ke_alarm_consumer_data">
 							<i class="fa fa-fw fa-users"></i>
 							Consumer
 							<i class="fa fa-fw fa-caret-down"></i>
 						</a>
-						<ul id="demo1_1" class="collapse" style="list-style: none; margin-left: -40px">
-							<li id="navbar_add">
-								<a href="/ke/alarm/add" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
+						<ul id="ke_alarm_consumer_data" class="collapse" style="list-style: none; margin-left: -40px">
+							<li id="navbar_alarm_add_li">
+								<a id="navbar_alarm_add_a" href="/ke/alarm/add" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
 									<i class="fa fa-info-circle fa-fw"></i>
 									Add
 								</a>
 							</li>
-							<li id="navbar_modify">
-								<a href="/ke/alarm/modify" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
+							<li id="navbar_alarm_modify_li">
+								<a id="navbar_alarm_modify_a" href="/ke/alarm/modify" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
 									<i class="fa fa-edit fa-fw"></i>
 									Modify
 								</a>
@@ -238,20 +238,20 @@
 						</ul>
 					</li>
 					<li>
-						<a href="#" data-toggle="collapse" data-target="#demo1_2">
+						<a href="#" data-toggle="collapse" data-target="#ke_alarm_cluster_data">
 							<i class="fa fa-fw fa-cloud"></i>
 							Cluster
 							<i class="fa fa-fw fa-caret-down"></i>
 						</a>
-						<ul id="demo1_2" class="collapse" style="list-style: none; margin-left: -40px">
-							<li id="navbar_create">
-								<a href="/ke/alarm/create" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
+						<ul id="ke_alarm_cluster_data" class="collapse" style="list-style: none; margin-left: -40px">
+							<li id="navbar_alarm_create_li">
+								<a id="navbar_alarm_create_a" href="/ke/alarm/create" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
 									<i class="fa fa-info-circle fa-fw"></i>
 									Create
 								</a>
 							</li>
-							<li id="navbar_history">
-								<a href="/ke/alarm/history" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
+							<li id="navbar_alarm_history_li">
+								<a id="navbar_alarm_history_a" href="/ke/alarm/history" style="display: block; padding: 10px 15px 10px 68px; text-decoration: none; color: #999;">
 									<i class="fa fa-edit fa-fw"></i>
 									History
 								</a>
@@ -263,26 +263,26 @@
 
 			<c:if test="${WHETHER_SYSTEM_ADMIN==1}">
 				<li>
-					<a href="#" data-toggle="collapse" data-target="#demo3">
+					<a href="#" data-toggle="collapse" data-target="#ke_system_data">
 						<i class="fa fa-fw fa-cog"></i>
 						System
 						<i class="fa fa-fw fa-caret-down"></i>
 					</a>
-					<ul id="demo3" class="collapse">
-						<li>
-							<a href="/ke/system/user">
+					<ul id="ke_system_data" class="collapse">
+						<li id="navbar_system_user_li">
+							<a id="navbar_system_user_a" href="/ke/system/user">
 								<i class="fa fa-user fa-fw"></i>
 								User
 							</a>
 						</li>
-						<li>
-							<a href="/ke/system/role">
+						<li id="navbar_system_role_li">
+							<a id="navbar_system_role_a" href="/ke/system/role">
 								<i class="fa fa-key fa-fw"></i>
 								Role
 							</a>
 						</li>
-						<li>
-							<a href="/ke/system/resource">
+						<li id="navbar_system_resource_li">
+							<a id="navbar_system_resource_a" href="/ke/system/resource">
 								<i class="fa fa-folder-open fa-fw"></i>
 								Resource
 							</a>

@@ -150,6 +150,10 @@ ul.alert-dropdown {
     color: #999;
 }
 
+.navbar_clicked{
+    background-color: #080808;
+}
+
 .side-nav>li>ul>li>a:hover {
     color: #fff;
 }
