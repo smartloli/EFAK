@@ -120,14 +120,12 @@
 							Manager
 						</a>
 					</li>
-					<!-- 
 					<li id="navbar_list">
 						<a href="/ke/topic/hub">
 							<i class="fa fa-cube fa-fw"></i>
 							Hub
 						</a>
 					</li>
-					 -->
 				</ul>
 			</li>
 			<li id="navbar_consumers">
