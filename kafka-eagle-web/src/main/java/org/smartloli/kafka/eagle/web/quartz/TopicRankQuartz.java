@@ -344,9 +344,9 @@ public class TopicRankQuartz {
 
 		List<TopicRank> topicRanks = new ArrayList<>();
 		List<TopicLogSize> topicLogSizes = new ArrayList<>();
-		long producerThreads = 0L;
 		String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 		for (String clusterAlias : clusterAliass) {
+			long producerThreads = 0L;
 			List<String> topics = brokerService.topicList(clusterAlias);
 			for (String topic : topics) {
 				long logsize = brokerService.getTopicProducerLogSize(clusterAlias, topic);
