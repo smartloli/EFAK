@@ -429,11 +429,12 @@ public class AlarmController {
 		String value = "";
 		if (AlarmType.TOPIC.equals(type)) {
 			value = request.getParameter("ke_topic_alarm");
-		}
-		if (AlarmType.PRODUCER.equals(type)) {
-			value = request.getParameter("ke_producer_alarm");
 		} else {
-			value = request.getParameter("ke_server_alarm");
+			if (AlarmType.PRODUCER.equals(type)) {
+				value = request.getParameter("ke_producer_alarm");
+			} else {
+				value = request.getParameter("ke_server_alarm");
+			}
 		}
 		String level = request.getParameter("ke_alarm_cluster_level");
 		String alarmGroup = request.getParameter("ke_alarm_cluster_group");
