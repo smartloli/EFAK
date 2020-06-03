@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.smartloli.kafka.eagle</groupId>
 		<artifactId>kafka-eagle</artifactId>
-		<version>1.4.8</version>
+		<version>1.4.9</version>
 	</parent>
 	<artifactId>kafka-eagle-web</artifactId>
 	<packaging>war</packaging>
@@ -220,6 +220,11 @@
 					<descriptors>
 						<descriptor>src/main/resources/assembly.xml</descriptor>
 					</descriptors>
+					<archiverConfig>
+						<directoryMode>0755</directoryMode>
+						<defaultDirectoryMode>0755</defaultDirectoryMode>
+						<fileMode>0644</fileMode>
+					</archiverConfig>
 				</configuration>
 				<executions>
 					<execution>

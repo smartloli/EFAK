@@ -298,7 +298,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 	}
 
 	/** Get kafka topic capacity size . */
-	public long topicCapacity(String clusterAlias, String topic) {
+	public long topicCapacity(String clusterAlias, String topic) throws Exception {
 		String jmx = "";
 		JMXConnector connector = null;
 		List<MetadataInfo> leaders = kafkaService.findKafkaLeader(clusterAlias, topic);

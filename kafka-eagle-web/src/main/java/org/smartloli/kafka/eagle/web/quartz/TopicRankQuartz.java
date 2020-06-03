@@ -239,7 +239,12 @@ public class TopicRankQuartz {
 			}
 
 			for (String topic : topics) {
-				long capacity = kafkaMetricsService.topicCapacity(clusterAlias, topic);
+				long capacity = 0L;
+				try {
+					capacity = kafkaMetricsService.topicCapacity(clusterAlias, topic);
+				} catch (Exception e) {
+					LOG.error("Get topic capacity has error, msg is ", e);
+				}
 				TopicRank topicRank = new TopicRank();
 				topicRank.setCluster(clusterAlias);
 				topicRank.setTopic(topic);

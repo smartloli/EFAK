@@ -225,7 +225,12 @@ public class AlertQuartz {
 					JSONObject topicAlarmJson = JSON.parseObject(cluster.getServer());
 					String topic = topicAlarmJson.getString("topic");
 					long alarmCapacity = topicAlarmJson.getLong("capacity");
-					long realCapacity = kafkaMetricsService.topicCapacity(cluster.getCluster(), topic);
+					long realCapacity = 0L;
+					try {
+						realCapacity = kafkaMetricsService.topicCapacity(cluster.getCluster(), topic);
+					} catch (Exception e) {
+						LOG.error("Get topic capacity has error, msg is ", e);
+					}
 					JSONObject alarmTopicMsg = new JSONObject();
 					alarmTopicMsg.put("topic", topic);
 					alarmTopicMsg.put("alarmCapacity", alarmCapacity);
