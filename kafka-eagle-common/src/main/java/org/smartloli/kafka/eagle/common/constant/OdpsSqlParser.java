@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.smartloli.kafka.eagle.common.util.ThrowExceptionUtils;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
@@ -60,7 +60,7 @@ public class OdpsSqlParser {
 			}
 			return tableName.trim();
 		} catch (Exception e) {
-			ThrowExceptionUtils.print(OdpsSqlParser.class).error("Parser kafka sql has error, msg is ", e);
+			ErrorUtils.print(OdpsSqlParser.class).error("Parser kafka sql has error, msg is ", e);
 			return "";
 		}
 	}

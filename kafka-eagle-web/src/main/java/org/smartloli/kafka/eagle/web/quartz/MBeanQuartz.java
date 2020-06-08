@@ -27,11 +27,11 @@ import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
 import org.smartloli.kafka.eagle.common.protocol.ZkClusterInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.common.util.ThrowExceptionUtils;
 import org.smartloli.kafka.eagle.common.util.ZKMetricsUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -83,17 +83,17 @@ public class MBeanQuartz {
 				try {
 					kafkaCluster(clusterAlias);
 				} catch (Exception e) {
-					ThrowExceptionUtils.print(this.getClass()).error("Get kafka cluster metrics has error, msg is ", e);
+					ErrorUtils.print(this.getClass()).error("Get kafka cluster metrics has error, msg is ", e);
 				}
 				try {
 					zkCluster(clusterAlias);
 				} catch (Exception e) {
-					ThrowExceptionUtils.print(this.getClass()).error("Get zookeeper cluster metrics has error, msg is ", e);
+					ErrorUtils.print(this.getClass()).error("Get zookeeper cluster metrics has error, msg is ", e);
 				}
 				try {
 					brokerMbeanOffline(clusterAlias);
 				} catch (Exception e) {
-					ThrowExceptionUtils.print(this.getClass()).error("Get broker mbean metrics has error, msg is ", e);
+					ErrorUtils.print(this.getClass()).error("Get broker mbean metrics has error, msg is ", e);
 				}
 			}
 		}
@@ -116,7 +116,7 @@ public class MBeanQuartz {
 		try {
 			metrics.mbeanOfflineInsert(list);
 		} catch (Exception e) {
-			ThrowExceptionUtils.print(this.getClass()).error("Collector mbean offline data has error, msg is ", e);
+			ErrorUtils.print(this.getClass()).error("Collector mbean offline data has error, msg is ", e);
 		}
 	}
 
@@ -249,7 +249,7 @@ public class MBeanQuartz {
 		try {
 			metrics.insert(list);
 		} catch (Exception e) {
-			ThrowExceptionUtils.print(this.getClass()).error("Collector mbean data has error, msg is ", e);
+			ErrorUtils.print(this.getClass()).error("Collector mbean data has error, msg is ", e);
 		}
 	}
 
@@ -357,7 +357,7 @@ public class MBeanQuartz {
 					ZkClusterInfo zkInfo = ZKMetricsUtils.zkClusterMntrInfo(ip, Integer.parseInt(port));
 					zkAssembly(zkInfo, kpi, kpiInfo);
 				} catch (Exception ex) {
-					ThrowExceptionUtils.print(this.getClass()).error("Transcation string[" + port + "] to int has error, msg is ", ex);
+					ErrorUtils.print(this.getClass()).error("Transcation string[" + port + "] to int has error, msg is ", ex);
 				}
 			}
 			kpiInfo.setBroker(broker.length() == 0 ? "unkowns" : broker.substring(0, broker.length() - 1));
@@ -369,7 +369,7 @@ public class MBeanQuartz {
 		try {
 			metrics.insert(list);
 		} catch (Exception e) {
-			ThrowExceptionUtils.print(this.getClass()).error("Collector zookeeper data has error, msg is ", e);
+			ErrorUtils.print(this.getClass()).error("Collector zookeeper data has error, msg is ", e);
 		}
 	}
 

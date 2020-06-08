@@ -23,22 +23,11 @@
 	</repositories>
 	<!-- Reference to other modules -->
 
-	<properties>
-		<calcite.version>1.21.0</calcite.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.smartloli.kafka.eagle</groupId>
 			<artifactId>kafka-eagle-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- Calcite Adapter -->
-		<dependency>
-			<groupId>org.apache.calcite</groupId>
-			<artifactId>calcite-core</artifactId>
-			<version>${calcite.version}</version>
-		</dependency>
-		
 	</dependencies>
 </project>

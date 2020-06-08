@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
-import org.smartloli.kafka.eagle.common.util.ThrowExceptionUtils;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -57,7 +57,7 @@ public class MailJob implements Job {
 			BasicNameValuePair msg = new BasicNameValuePair("msg", object.getString("msg"));
 			HttpClientUtils.doPostForm(url, Arrays.asList(address, msg));
 		} catch (Exception e) {
-			ThrowExceptionUtils.print(this.getClass()).error("Send alarm message has error by mail, msg is ", e);
+			ErrorUtils.print(this.getClass()).error("Send alarm message has error by mail, msg is ", e);
 			LOG.error("Send alarm message has error by mail, msg is ", e);
 			return 0;
 		}

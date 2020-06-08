@@ -15,27 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.util;
+package org.smartloli.kafka.eagle.common.protocol.topic;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * Defined print throw exception message.
+ * KSQL topic and partitions schema.
  * 
  * @author smartloli.
  *
- *         Created by Jan 5, 2020
+ *         Created by Jun 8, 2020
  */
-public class ThrowExceptionUtils {
+public class TopicPartitionSchema extends BaseProtocol {
 
-	/** Print error message. */
-	public static Logger print(Class<?> clazz) {
-		return LoggerFactory.getLogger(clazz);
+	/**
+	 * key: topic
+	 * 
+	 * value: partitions
+	 * 
+	 */
+	private Map<String, List<Integer>> topicSchema = new HashMap<>();
+
+	public Map<String, List<Integer>> getTopicSchema() {
+		return topicSchema;
 	}
 
-	private ThrowExceptionUtils() {
-
+	public void setTopicSchema(Map<String, List<Integer>> topicSchema) {
+		this.topicSchema = topicSchema;
 	}
 
 }

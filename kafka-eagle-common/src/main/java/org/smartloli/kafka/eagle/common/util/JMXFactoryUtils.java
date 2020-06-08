@@ -54,7 +54,7 @@ public class JMXFactoryUtils {
 						connector.close();
 				} catch (Exception e) {
 					if (!blockQueue.offer(e)) {
-						ThrowExceptionUtils.print(JMXFactoryUtils.class).error("Block queue is full, error msg is ", e);
+						ErrorUtils.print(JMXFactoryUtils.class).error("Block queue is full, error msg is ", e);
 					}
 				}
 			}
@@ -66,7 +66,7 @@ public class JMXFactoryUtils {
 				result = blockQueue.take();
 			}
 		} catch (Exception e) {
-			ThrowExceptionUtils.print(JMXFactoryUtils.class).error("Take block queue has error, msg is ", e);
+			ErrorUtils.print(JMXFactoryUtils.class).error("Take block queue has error, msg is ", e);
 		} finally {
 			executor.shutdown();
 		}

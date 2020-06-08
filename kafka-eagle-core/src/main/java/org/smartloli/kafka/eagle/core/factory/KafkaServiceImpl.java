@@ -583,6 +583,7 @@ public class KafkaServiceImpl implements KafkaService {
 		kafkaSql.getSchema().put("partition", "integer");
 		kafkaSql.getSchema().put("offset", "bigint");
 		kafkaSql.getSchema().put("msg", "varchar");
+		// kafkaSql.getSchema().put("timespan", "varchar");
 		if (!sql.startsWith("select") && !sql.startsWith("SELECT")) {
 			kafkaSql.setStatus(false);
 			return kafkaSql;

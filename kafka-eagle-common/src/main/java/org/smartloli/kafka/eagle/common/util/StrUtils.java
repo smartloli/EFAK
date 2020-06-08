@@ -18,6 +18,8 @@
 package org.smartloli.kafka.eagle.common.util;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -136,6 +138,15 @@ public class StrUtils {
 			return "";
 		}
 		return value;
+	}
+
+	/** Convert strings to integers. */
+	public static List<Integer> stringsConvertIntegers(String[] values) {
+		List<Integer> integers = new ArrayList<Integer>();
+		for (String value : values) {
+			integers.add(Integer.parseInt(value.trim()));
+		}
+		return integers;
 	}
 
 }
