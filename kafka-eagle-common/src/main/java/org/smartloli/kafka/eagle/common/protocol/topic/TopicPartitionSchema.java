@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.common.protocol.topic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,25 @@ public class TopicPartitionSchema extends BaseProtocol {
 	 * 
 	 */
 	private Map<String, List<Integer>> topicSchema = new HashMap<>();
+
+	private String topic;
+	private List<Integer> partitions = new ArrayList<Integer>();
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	public List<Integer> getPartitions() {
+		return partitions;
+	}
+
+	public void setPartitions(List<Integer> partitions) {
+		this.partitions = partitions;
+	}
 
 	public Map<String, List<Integer>> getTopicSchema() {
 		return topicSchema;

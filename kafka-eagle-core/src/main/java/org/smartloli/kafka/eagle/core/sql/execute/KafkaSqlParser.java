@@ -29,7 +29,7 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
-import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
+import org.smartloli.kafka.eagle.core.sql.tool.KSqlUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -63,7 +63,7 @@ public class KafkaSqlParser {
 					List<JSONArray> dataSets = KafkaConsumerAdapter.executor(kafkaSql);
 					String results = "";
 					if (dataSets.size() > 0 && !dataSets.get(dataSets.size() - 1).isEmpty()) {
-						results = JSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
+						results = KSqlUtils.query(kafkaSql.getSchema(), kafkaSql.getTableName(), dataSets, kafkaSql.getSql());
 					} else {
 						List<Map<String, Object>> schemas = new ArrayList<Map<String, Object>>();
 						Map<String, Object> map = new HashMap<>();

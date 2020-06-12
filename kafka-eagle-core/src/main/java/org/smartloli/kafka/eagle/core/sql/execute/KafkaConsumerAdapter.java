@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.core.sql.execute;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -32,6 +33,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -95,10 +97,12 @@ public class KafkaConsumerAdapter {
 		while (flag) {
 			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Kafka.TIME_OUT));
 			for (ConsumerRecord<String, String> record : records) {
-				JSONObject object = new JSONObject();
-				object.put(TopicSchema.MSG, record.value());
-				object.put(TopicSchema.OFFSET, record.offset());
+				JSONObject object = new JSONObject(new LinkedHashMap<>());
 				object.put(TopicSchema.PARTITION, record.partition());
+				object.put(TopicSchema.OFFSET, record.offset());
+				object.put(TopicSchema.MSG, record.value());
+				object.put(TopicSchema.TIMESPAN, record.timestamp());
+				object.put(TopicSchema.DATE, CalendarUtils.convertUnixTime(record.timestamp()));
 				datasets.add(object);
 			}
 			if (records.isEmpty()) {

@@ -25,6 +25,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class KSqlUtils {
 	 */
 	public static String query(JSONObject tabSchema, String tableName, List<JSONArray> dataSets, String sql) throws Exception {
 		String model = createTempJson();
-		List<List<String>> list = new LinkedList<List<String>>();
+		List<List<String>> list = new LinkedList<>();
 		for (JSONArray dataSet : dataSets) {
 			for (Object obj : dataSet) {
 				JSONObject object = (JSONObject) obj;
@@ -85,9 +86,9 @@ public class KSqlUtils {
 		Statement st = connection.createStatement();
 		ResultSet result = st.executeQuery(sql);
 		ResultSetMetaData rsmd = result.getMetaData();
-		List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> ret = new ArrayList<>();
 		while (result.next()) {
-			Map<String, Object> map = new HashMap<String, Object>();
+			Map<String, Object> map = new LinkedHashMap<>();
 			for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 				map.put(rsmd.getColumnName(i), result.getString(rsmd.getColumnName(i)));
 			}

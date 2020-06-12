@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.common.protocol;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
@@ -29,12 +30,12 @@ import com.alibaba.fastjson.JSONObject;
  *
  *         Created by Feb 28, 2017
  */
-public class KafkaSqlInfo extends BaseProtocol{
+public class KafkaSqlInfo extends BaseProtocol {
 
 	private List<Integer> partition = new ArrayList<>();
 	private String sql;
 	private String metaSql;
-	private JSONObject schema = new JSONObject();
+	private JSONObject schema = new JSONObject(new LinkedHashMap<>());
 	private String tableName;
 	private String topic;
 	private boolean status;

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
-import org.smartloli.kafka.eagle.core.sql.tool.JSqlUtils;
+import org.smartloli.kafka.eagle.core.sql.tool.KSqlUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -37,11 +37,10 @@ import com.alibaba.fastjson.JSONObject;
 public class TestKSql {
 
 	public static void main(String[] args) throws Exception {
-		// ignite();
 		// calcite();
 		// String sql = "select * from \"k20200326_1\" where \"partition\" in
 		// (0) and \"msg\" like 's1%' limit 10";
-		String sql = "select * from k20200326_j where `partition` in (0) limit 10";
+		String sql = "select * from k20200326 where `partition` in (0) limit 10";
 		String result = KafkaSqlParser.execute("cluster1", sql);
 		System.out.println("result: " + result);
 	}
@@ -64,12 +63,12 @@ public class TestKSql {
 			dataSets.add(object);
 		}
 
-		String sql = "select * from \"stu\" where \"id\"=0 and \"age\"=10 limit 10";
+		String sql = "select * from stu where id=0 and age=10 limit 10";
 
 		List<JSONArray> dts = new ArrayList<>();
 		dts.add(dataSets);
 		long start = System.currentTimeMillis();
-		String rs = JSqlUtils.query(tabSchema, tableName, dts, sql);
+		String rs = KSqlUtils.query(tabSchema, tableName, dts, sql);
 		System.out.println("[Spent] :: " + (System.currentTimeMillis() - start) + "ms");
 		System.out.println(rs);
 	}

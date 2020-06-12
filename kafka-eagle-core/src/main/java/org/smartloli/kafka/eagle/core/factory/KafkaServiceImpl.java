@@ -33,8 +33,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -67,7 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer8;
-import org.smartloli.kafka.eagle.common.constant.OdpsSqlParser;
+import org.smartloli.kafka.eagle.common.constant.KSqlParser;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.HostsInfo;
@@ -75,6 +73,7 @@ import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
 import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicPartitionSchema;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
@@ -583,38 +582,18 @@ public class KafkaServiceImpl implements KafkaService {
 		kafkaSql.getSchema().put("partition", "integer");
 		kafkaSql.getSchema().put("offset", "bigint");
 		kafkaSql.getSchema().put("msg", "varchar");
-		// kafkaSql.getSchema().put("timespan", "varchar");
+		kafkaSql.getSchema().put("timespan", "varchar");
+		kafkaSql.getSchema().put("date", "varchar");
 		if (!sql.startsWith("select") && !sql.startsWith("SELECT")) {
 			kafkaSql.setStatus(false);
 			return kafkaSql;
 		} else {
-			String tableName = OdpsSqlParser.parserTopic(sql);
-			if (!"".equals(tableName)) {
+			TopicPartitionSchema tps = KSqlParser.parserTopic(sql);
+			if (tps != null && !"".equals(tps.getTopic())) {
 				kafkaSql.setStatus(true);
-				kafkaSql.setTableName(tableName);
-			}
-			sql = sql.toLowerCase();
-			if (sql.contains("and")) {
-				sql = sql.split("and")[0];
-			} else if (sql.contains("group by")) {
-				sql = sql.split("group")[0];
-			} else if (sql.contains("limit")) {
-				sql = sql.split("limit")[0];
-			}
-
-			Matcher matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.+)").matcher(sql);
-			if (matcher.find()) {
-				if (matcher.group(2).trim().startsWith("\"partition\"")) {
-					String[] columns = matcher.group(2).trim().split("in")[1].replace("(", "").replace(")", "").trim().split(",");
-					for (String column : columns) {
-						try {
-							kafkaSql.getPartition().add(Integer.parseInt(column));
-						} catch (Exception e) {
-							LOG.error("Parse parition[" + column + "] has error,msg is " + e.getMessage());
-						}
-					}
-				}
+				kafkaSql.setTableName(tps.getTopic());
 				kafkaSql.setSeeds(getBrokers(clusterAlias));
+				kafkaSql.setPartition(tps.getPartitions());
 			}
 		}
 		return kafkaSql;

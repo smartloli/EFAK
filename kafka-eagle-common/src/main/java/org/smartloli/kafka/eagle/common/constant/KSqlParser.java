@@ -76,6 +76,8 @@ public class KSqlParser {
 				if (sqlBasicCall.operands.length > 1) {
 					String[] partitions = sqlBasicCall.operands[1].toString().split(",");
 					tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
+					tps.setTopic(topic);
+					tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
 				}
 			} else if (sqlWhere.getKind() == SqlKind.AND) {// two and
 				SqlBasicCall sqlBasicCall = (SqlBasicCall) sqlWhere;
@@ -86,6 +88,8 @@ public class KSqlParser {
 						if (sqlBasicCallChild.operands.length > 1) {
 							String[] partitions = sqlBasicCallChild.operands[1].toString().split(",");
 							tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
+							tps.setTopic(topic);
+							tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
 						}
 					} else if (sqlNodeChild.getKind() == SqlKind.AND) {
 						SqlNode sqlBasicCallChild = ((SqlBasicCall) sqlNodeChild).operands[0];
@@ -94,6 +98,8 @@ public class KSqlParser {
 							if (sqlBasicCallGrandson.operands.length > 1) {
 								String[] partitions = sqlBasicCallGrandson.operands[1].toString().split(",");
 								tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
+								tps.setTopic(topic);
+								tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
 							}
 						}
 					}
