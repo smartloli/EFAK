@@ -594,6 +594,7 @@ public class KafkaServiceImpl implements KafkaService {
 				kafkaSql.setTableName(tps.getTopic());
 				kafkaSql.setSeeds(getBrokers(clusterAlias));
 				kafkaSql.setPartition(tps.getPartitions());
+				kafkaSql.setLimit(tps.getLimit());
 			}
 		}
 		return kafkaSql;

@@ -44,6 +44,16 @@ public class TopicPartitionSchema extends BaseProtocol {
 	private String topic;
 	private List<Integer> partitions = new ArrayList<Integer>();
 
+	private long limit = 0L;
+
+	public long getLimit() {
+		return limit;
+	}
+
+	public void setLimit(long limit) {
+		this.limit = limit;
+	}
+
 	public String getTopic() {
 		return topic;
 	}

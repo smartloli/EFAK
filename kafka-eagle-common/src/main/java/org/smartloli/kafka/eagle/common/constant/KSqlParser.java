@@ -136,6 +136,15 @@ public class KSqlParser {
 			break;
 		case ORDER_BY:
 			SqlOrderBy sqlOrderBy = (SqlOrderBy) sqlNode;
+			if (!StrUtils.isNull(sqlOrderBy.fetch.toString())) {
+				long limit = 0L;
+				try {
+					limit = Long.parseLong(sqlOrderBy.fetch.toString());
+				} catch (Exception e) {
+					ErrorUtils.print(KSqlParser.class).error("Parser limit string to long has error, msg is ", e);
+				}
+				tps.setLimit(limit);
+			}
 			parseNode(sqlOrderBy.query, tps);
 		default:
 			break;

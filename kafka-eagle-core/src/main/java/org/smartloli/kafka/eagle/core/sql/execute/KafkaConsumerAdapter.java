@@ -86,8 +86,9 @@ public class KafkaConsumerAdapter {
 
 		for (TopicPartition tp : topics) {
 			Map<TopicPartition, Long> offsets = consumer.endOffsets(Collections.singleton(tp));
-			if (offsets.get(tp).longValue() > Kafka.POSITION) {
-				consumer.seek(tp, offsets.get(tp).longValue() - Kafka.POSITION);
+			long position = kafkaSql.getLimit() == 0 ? Kafka.POSITION : kafkaSql.getLimit();
+			if (offsets.get(tp).longValue() > position) {
+				consumer.seek(tp, offsets.get(tp).longValue() - position);
 			} else {
 				consumer.seek(tp, 0);
 			}

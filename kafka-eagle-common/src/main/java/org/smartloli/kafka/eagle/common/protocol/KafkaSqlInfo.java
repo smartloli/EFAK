@@ -24,7 +24,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * TODO
+ * KSQL topic metadata management.
  * 
  * @author smartloli.
  *
@@ -37,10 +37,19 @@ public class KafkaSqlInfo extends BaseProtocol {
 	private String metaSql;
 	private JSONObject schema = new JSONObject(new LinkedHashMap<>());
 	private String tableName;
+	private long limit = 0L;
 	private String topic;
 	private boolean status;
 	private List<HostsInfo> seeds = new ArrayList<>();
 	private String clusterAlias;
+
+	public long getLimit() {
+		return limit;
+	}
+
+	public void setLimit(long limit) {
+		this.limit = limit;
+	}
 
 	public String getClusterAlias() {
 		return clusterAlias;

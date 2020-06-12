@@ -29,7 +29,7 @@ import org.smartloli.kafka.eagle.common.constant.KSqlParser;
 public class TestKSQLParser {
 
 	public static void main(String[] args) {
-		String sql = "select msg from kk a where `partition` in (0,1,2) and `offset`=10 and msg like '%aaabbb%' limit 10";
+		String sql = "select msg from kk a where `partition` in (0,1,2) and `offset`=10 and msg like '%aaabbb%' limit 240";
 		System.out.println(KSqlParser.parserTopic(sql));
 	}
 
