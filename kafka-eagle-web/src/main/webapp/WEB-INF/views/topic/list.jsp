@@ -286,7 +286,7 @@
 	</div>
 </body>
 <jsp:include page="../public/script.jsp">
-	<jsp:param value="main/topic/list.js?v=1.4.6" name="loader" />
+	<jsp:param value="main/topic/list.js?v=1.4.9" name="loader" />
 	<jsp:param value="plugins/echart/echarts.min.js" name="loader" />
 	<jsp:param value="plugins/echart/macarons.js" name="loader" />
 	<jsp:param value="plugins/datatimepicker/moment.min.js" name="loader" />

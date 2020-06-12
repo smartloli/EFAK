@@ -44,7 +44,7 @@
 						<button type="button" class="close" data-dismiss="alert"
 							aria-hidden="true">×</button>
 						<i class="fa fa-info-circle"></i> Sample SQL query: <strong>select
-							* from "ke_topic" where "partition" in (0,1,2) limit 10</strong><br /> <i
+							* from ke_topic where `partition` in (0,1,2) limit 10</strong><br /> <i
 							class="fa fa-info-circle"></i> AutoComplete: Press <strong>Alt
 							and /</strong>.
 					</div>

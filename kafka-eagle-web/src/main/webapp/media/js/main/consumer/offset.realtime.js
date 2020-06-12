@@ -153,6 +153,39 @@ $(document).ready(function() {
 	lagChart.setOption(lagOption);
 	producerChart.setOption(producerOption);
 	consumerChart.setOption(consumerOption);
+	
+	$("#sidebarToggleOff").on("click", function(e) {
+		var opt_lagChart=lagChart.getOption();
+		lagChart.clear();
+		lagChart.resize({width:$("#lag_chart").css('width')});
+		lagChart.setOption(opt_lagChart);
+	    
+	    var opt_producerChart=producerChart.getOption();
+	    producerChart.clear();
+	    producerChart.resize({width:$("#producer_chart").css('width')});
+	    producerChart.setOption(opt_producerChart);
+	    
+	    var opt_consumerChart=consumerChart.getOption();
+	    consumerChart.clear();
+	    consumerChart.resize({width:$("#consumer_chart").css('width')});
+	    consumerChart.setOption(opt_consumerChart);
+	});
+	$("#sidebarToggleOn").on("click", function(e) {
+		var opt_lagChart=lagChart.getOption();
+		lagChart.clear();
+		lagChart.resize({width:$("#lag_chart").css('width')});
+		lagChart.setOption(opt_lagChart);
+	    
+	    var opt_producerChart=producerChart.getOption();
+	    producerChart.clear();
+	    producerChart.resize({width:$("#producer_chart").css('width')});
+	    producerChart.setOption(opt_producerChart);
+	    
+	    var opt_consumerChart=consumerChart.getOption();
+	    consumerChart.clear();
+	    consumerChart.resize({width:$("#consumer_chart").css('width')});
+	    consumerChart.setOption(opt_consumerChart);
+	});
 
 	var start = moment();
 	var end = moment();
@@ -184,7 +217,6 @@ $(document).ready(function() {
 			success : function(datas) {
 				if (datas != null) {
 					// Area Chart
-					console.log(datas);
 					lagOption.xAxis.data = datas.lag.x;
 					lagOption.series.data = datas.lag.y;
 					lagChart.setOption(lagOption);
