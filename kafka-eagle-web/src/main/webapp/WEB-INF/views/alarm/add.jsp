@@ -17,7 +17,6 @@
 <jsp:include page="../public/css.jsp">
 	<jsp:param value="plugins/select2/select2.min.css" name="css" />
 </jsp:include>
-<jsp:include page="../public/tagcss.jsp"></jsp:include>
 </head>
 
 <body>

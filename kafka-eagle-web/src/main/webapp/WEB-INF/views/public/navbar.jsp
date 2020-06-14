@@ -5,7 +5,7 @@
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 	<!-- Brand and toggle get grouped for better mobile display -->
 	<div class="navbar-header">
-		<img class="user-avatar" style="border: 3px solid #fff; border-radius: 50%; margin-top: 6px; margin-left: 10px; float: left;" src="/ke/media/img/ke_login.png" width="40px">
+		<img class="user-avatar" style="border: 2px solid #fff; border-radius: 50%; margin-top: 6px; margin-left: 10px; float: left;" src="/ke/media/img/ke_login.png" width="40px">
 		<a class="navbar-brand" href="/ke"> Kafka Eagle</a><button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggleOff" href="#" style="margin-top: 10px"><i class="fa fa-bars"></i></button><button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggleOn" href="#" style="margin-top: 10px;display: none"><i class="fa fa-bars"></i></button>
 		<div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_account_reset_dialog" tabindex="-1" role="dialog">
 			<div class="modal-dialog">

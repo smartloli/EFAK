@@ -1,0 +1,18 @@
+<%@ page pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<link href="/ke/media/css/public/plus/common.css" rel="stylesheet"/>
+<!-- <link href="/ke/media/css/public/plus/ke.min.css" rel="stylesheet"/> -->
+<link href="/ke/media/css/public/plus/custom-color.css" rel="stylesheet"/>
+<link rel="shortcut icon" href="/ke/media/img/favicon.ico" />
+<%
+	String[] loader = request.getParameterValues("css");
+	if (loader == null) {
+		return;
+	}
+	for (String s : loader) {
+%>
+<link href="/ke/media/css/<%=s%>" rel="stylesheet"/>
+<%
+	}
+%>

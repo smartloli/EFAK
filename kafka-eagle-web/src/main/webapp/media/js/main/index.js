@@ -7,7 +7,7 @@ $(document).ready(function() {
 		return [ d.y, d.x ];
 	});
 
-	var vis = d3.select("#kafka_brokers").append("svg:svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+	var vis = d3.select("#ke_dash_brokers_graph").append("svg:svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
 	d3.json('/ke/dash/kafka/ajax', function(json) {
 		dashboard = JSON.parse(json.dashboard);
@@ -15,10 +15,10 @@ $(document).ready(function() {
 		root.x0 = h / 2;
 		root.y0 = 0;
 
-		$("#brokers_count").text(dashboard.brokers);
-		$("#topics_count").text(dashboard.topics);
-		$("#zks_count").text(dashboard.zks);
-		$("#consumers_count").text(dashboard.consumers);
+		$("#ke_dash_brokers_count").text(dashboard.brokers);
+		$("#ke_dash_topics_count").text(dashboard.topics);
+		$("#ke_dash_zks_count").text(dashboard.zks);
+		$("#ke_dash_consumers_count").text(dashboard.consumers);
 
 		function toggleAll(d) {
 			if (d.children) {
