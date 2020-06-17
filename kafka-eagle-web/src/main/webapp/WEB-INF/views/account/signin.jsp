@@ -11,7 +11,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>Login - KafkaEagle</title>
 <meta name="description" content="">
-<link rel="shortcut icon" href="/ke/media/img/favicon.ico" />
+<link rel="shortcut icon" href="/media/img/favicon.ico" />
 <style type="text/css">
 /** start: Add author by alisa. */
 input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill
@@ -28,19 +28,19 @@ input {
 }
 /** end*/
 </style>
-<link rel="stylesheet" href="/ke/media/css/public/account/main.css">
+<link rel="stylesheet" href="/media/css/public/account/main.css">
 </head>
 
 <body>
 	<div class="login-page">
 		<div class="row">
 			<div class="col-lg-4 col-lg-offset-4">
-				<img class="user-avatar" src="/ke/media/img/ke_login.png"
+				<img class="user-avatar" src="/media/img/ke_login.png"
 					width="150px">
 
 				<h1>Kafka Eagle</h1>
 
-				<form role="form" action="/ke/account/signin/action/" method="post"
+				<form role="form" action="/account/signin/action/" method="post"
 					onsubmit="return contextFormValid();return false;">
 					<div class="form-content">
 						<div class="form-group">
@@ -67,7 +67,7 @@ input {
 		</div>
 	</div>
 </body>
-<jsp:include page="../public/script.jsp">
+<jsp:include page="../public/plus/script.jsp">
 	<jsp:param value="main/account/signin.js" name="loader" />
 </jsp:include>
 <script type="text/javascript">

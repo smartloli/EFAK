@@ -44,7 +44,7 @@
 								<div class="card-body">
 									<div class="row">
 										<div class="col-lg-12">
-											<form role="form" action="/ke/topic/create/form" method="post" onsubmit="return contextFormValid();return false;">
+											<form role="form" action="/topic/create/form" method="post" onsubmit="return contextFormValid();return false;">
 												<div class="form-group">
 													<label>Topic Name (*)</label>
 													<input id="ke_topic_name" name="ke_topic_name" class="form-control" maxlength=50>
@@ -68,7 +68,7 @@
 												</div>
 												<button type="submit" class="btn btn-success">Create</button>
 												<div id="create_alert_msg" style="display: none" class="alert alert-danger">
-													<label>Error! Please make some changes . (*) is required .</label>
+													<label>Error! Please make some changes. (*) is required.</label>
 												</div>
 											</form>
 										</div>

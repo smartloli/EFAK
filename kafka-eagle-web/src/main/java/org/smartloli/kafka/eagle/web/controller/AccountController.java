@@ -66,7 +66,8 @@ public class AccountController {
 		Subject subject = SecurityUtils.getSubject();
 		if (subject.isAuthenticated()) {
 			setKafkaAlias(subject);
-			return "redirect:" + refUrl.replaceAll("/ke", "");
+			// return "redirect:" + refUrl.replaceAll("/ke", "");
+			return "redirect:" + refUrl;
 		} else {
 			subject.getSession().setAttribute(KConstants.Login.ERROR_LOGIN, "<div class='alert alert-danger'>Account or password is error .</div>");
 		}
@@ -81,15 +82,15 @@ public class AccountController {
 			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 			String defaultClusterAlias = clusterAliass[0];
 			subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
-			String dropList = "<ul class='dropdown-menu'>";
+			String dropList = "<div class='dropdown-menu dropdown-menu-right' aria-labelledby='clusterDropdown'>";
 			int i = 0;
 			for (String clusterAlias : clusterAliass) {
 				if (!clusterAlias.equals(defaultClusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT) {
-					dropList += "<li><a href='/ke/cluster/info/" + clusterAlias + "/change'><i class='fa fa-fw fa-sitemap'></i>" + clusterAlias + "</a></li>";
+					dropList += "<a class='dropdown-item' href='/cluster/info/" + clusterAlias + "/change'><i class='fas fa-feather-alt fa-sm fa-fw mr-1'></i>" + clusterAlias + "</a>";
 					i++;
 				}
 			}
-			dropList += "<li><a href='/ke/cluster/multi'><i class='fa fa-fw fa-tasks'></i>More...</a></li></ul>";
+			dropList += "<a class='dropdown-item' href='/cluster/multi'><i class='fas fa-server fa-sm fa-fw mr-1'></i>More...</a></div>";
 			subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST, dropList);
 		}
 	}

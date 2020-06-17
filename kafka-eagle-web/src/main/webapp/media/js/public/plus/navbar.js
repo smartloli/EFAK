@@ -16,4 +16,12 @@
 		e.preventDefault();
 		$("body").toggleClass("sb-sidenav-toggled");
 	});
+	
+	// Reset account
+	$(document).on('click', 'a[name=ke_account_reset]', function() {
+		$('#ke_account_reset_dialog').modal('show');
+		$(".modal-backdrop").css({
+			"z-index" : "999"
+		});
+	});
 })(jQuery);

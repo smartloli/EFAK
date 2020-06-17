@@ -80,7 +80,7 @@ public class SSOFilter implements Filter {
 				if (!StrUtils.isNull(query)) {
 					requestUri += "?" + query;
 				}
-				resp.sendRedirect("/ke/account/signin?" + requestUri);
+				resp.sendRedirect("/account/signin?" + requestUri);
 				return;
 			}
 		}
