@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	var m = [ 20, 240, 20, 240 ], w = 1280 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
+	var m = [ 20, 240, 20, 240 ], w = 1080 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
 
 	var tree = d3.layout.tree().size([ h, w ]);
 

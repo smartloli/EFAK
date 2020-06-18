@@ -113,3 +113,6 @@
     max-width: 100%;
 }
 
+.col-md-offset-6 {
+    margin-left: 50%;
+}

@@ -26,7 +26,12 @@
 			</a>
 			<div class="collapse" id="collapseTopics" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
 				<nav class="sb-sidenav-menu-nested nav">
-					<a class="nav-link" href="/topic/create"><i class="fas fa-edit fa-sm fa-fw mr-1"></i>Create</a> <a class="nav-link" href="#"><i class="fas fa-table fa-sm fa-fw mr-1"></i>List</a> <a class="nav-link" href="#"><i class="fas fa-code fa-sm fa-fw mr-1"></i>KSQL</a> <a class="nav-link" href="#"><i class="far fa-paper-plane fa-sm fa-fw mr-1"></i>Mock</a> <a class="nav-link" href="#"><i class="fas fa-tools fa-sm fa-fw mr-1"></i>Manager</a> <a class="nav-link" href="#"><i class="fas fa-cube fa-sm fa-fw mr-1"></i>Hub</a>
+					<a class="nav-link" href="/topic/create"><i class="fas fa-edit fa-sm fa-fw mr-1"></i>Create</a> 
+					<a class="nav-link" href="/topic/list"><i class="fas fa-table fa-sm fa-fw mr-1"></i>List</a> 
+					<a class="nav-link" href="#"><i class="fas fa-code fa-sm fa-fw mr-1"></i>KSQL</a> 
+					<a class="nav-link" href="#"><i class="far fa-paper-plane fa-sm fa-fw mr-1"></i>Mock</a> 
+					<a class="nav-link" href="#"><i class="fas fa-tools fa-sm fa-fw mr-1"></i>Manager</a> 
+					<a class="nav-link" href="#"><i class="fas fa-cube fa-sm fa-fw mr-1"></i>Hub</a>
 				</nav>
 			</div>
 			<a class="nav-link" href="#">

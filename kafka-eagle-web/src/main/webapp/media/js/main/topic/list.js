@@ -6,7 +6,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/topic/list/table/ajax",
+		"sAjaxSource" : "/topic/list/table/ajax",
 		"aoColumns" : [ {
 			"mData" : 'id'
 		}, {
@@ -74,7 +74,7 @@ $(document).ready(function() {
 			$("#ke_del_topic").attr("href", "#");
 		} else {
 			$("#ke_del_topic").attr("disabled", false);
-			$("#ke_del_topic").attr("href", "/ke/topic/" + topic + "/" + token + "/delete");
+			$("#ke_del_topic").attr("href", "/topic/" + topic + "/" + token + "/delete");
 		}
 	});
 
@@ -107,7 +107,7 @@ $(document).ready(function() {
 		$("#ke_topic_clean_content").html("");
 		$("#ke_topic_clean_content").append("<p>Are you sure you want to clean topic [<strong>" + topic + "</strong>] data ?</p>");
 		$("#ke_topic_clean_data_div").html("");
-		$("#ke_topic_clean_data_div").append("<a id='ke_del_topic' href='/ke/topic/clean/data/" + topic + "/' class='btn btn-danger'>Submit</a>");
+		$("#ke_topic_clean_data_div").append("<a id='ke_del_topic' href='/topic/clean/data/" + topic + "/' class='btn btn-danger'>Submit</a>");
 		$('#ke_topic_clean').modal({
 			backdrop : 'static',
 			keyboard : false
@@ -135,7 +135,7 @@ $(document).ready(function() {
 	$("#select2val").select2({
 		placeholder : "Topic",
 		ajax : {
-			url : "/ke/topic/mock/list/ajax",
+			url : "/topic/mock/list/ajax",
 			dataType : 'json',
 			delay : 250,
 			data : function(params) {
@@ -296,7 +296,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/list/filter/select/ajax?stime=' + stime + '&etime=' + etime,
+			url : '/topic/list/filter/select/ajax?stime=' + stime + '&etime=' + etime,
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");
@@ -350,7 +350,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/list/filter/select/ajax?stime=' + stime + '&etime=' + etime + '&topics=' + topics,
+			url : '/topic/list/filter/select/ajax?stime=' + stime + '&etime=' + etime + '&topics=' + topics,
 			success : function(datas) {
 				if (datas != null) {
 					setProducerBarData(topic_producer_agg, datas);
@@ -364,12 +364,11 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/list/total/jmx/ajax',
+			url : '/topic/list/total/jmx/ajax',
 			success : function(datas) {
 				if (datas != null) {
-					$("#producer_number").text(datas.producerSize);
-					$("#producer_total_capacity").text(datas.topicCapacity);
-					$("#producer_total_capacity_type").text(datas.capacityType);
+					$("#producer_number").text(datas.producerSize + " (APP)");
+					$("#producer_total_capacity").text(datas.topicCapacity + " ("+ datas.capacityType +")");
 				}
 			}
 		});
