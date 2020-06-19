@@ -132,7 +132,7 @@ public class QuartzManagerUtils {
 	 * 
 	 */
 	public static String getCron(final Date date, int delaySecond) {
-		SimpleDateFormat sdf = new SimpleDateFormat("ss mm HH dd MM ? yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("ss mm HH dd MM ?");
 		String formatTimeStr = "";
 		if (date != null) {
 			try {
