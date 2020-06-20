@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="fmt"%>
 
 <!-- Navigation bars -->
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
@@ -9,7 +10,7 @@
 			<a class="nav-link" href="/">
 				<div class="sb-nav-link-icon">
 					<i class="fas fa-tachometer-alt"></i>
-				</div> Dashboard
+				</div> <fmt:message code="ke.navbar.dashboard" />
 			</a> <a class="nav-link" href="/ke/bs">
 				<div class="sb-nav-link-icon">
 					<i class="fas fa-fw fa-desktop"></i>

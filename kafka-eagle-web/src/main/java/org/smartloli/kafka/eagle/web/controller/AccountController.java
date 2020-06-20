@@ -17,7 +17,10 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.SecurityUtils;
@@ -31,7 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 /**
  * Control user login, logout, reset password and other operations.
@@ -57,7 +62,7 @@ public class AccountController {
 
 	/** Login action and checked username&password. */
 	@RequestMapping(value = "/signin/action/", method = RequestMethod.POST)
-	public String login(HttpSession session, HttpServletRequest request) {
+	public String login(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		String refUrl = request.getParameter("ref_url");
@@ -67,6 +72,12 @@ public class AccountController {
 		if (subject.isAuthenticated()) {
 			setKafkaAlias(subject);
 			// return "redirect:" + refUrl.replaceAll("/ke", "");
+			LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
+			if ("zh_CN".equals(SystemConfigUtils.getProperty("kafka.eagle.i18n.language"))) {
+				localeResolver.setLocale(request, response, Locale.CHINA);
+			} else {
+				localeResolver.setLocale(request, response, Locale.ENGLISH);
+			}
 			return "redirect:" + refUrl;
 		} else {
 			subject.getSession().setAttribute(KConstants.Login.ERROR_LOGIN, "<div class='alert alert-danger'>Account or password is error .</div>");

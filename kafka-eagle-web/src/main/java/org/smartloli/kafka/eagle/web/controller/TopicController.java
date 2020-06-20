@@ -452,40 +452,40 @@ public class TopicController {
 		for (PartitionsInfo partition : topics) {
 			JSONObject object = new JSONObject();
 			object.put("id", partition.getId());
-			object.put("topic", "<a href='/ke/topic/meta/" + partition.getTopic() + "/' target='_blank'>" + partition.getTopic() + "</a>");
+			object.put("topic", "<a href='/topic/meta/" + partition.getTopic() + "/' target='_blank'>" + partition.getTopic() + "</a>");
 			object.put("partitions", partition.getPartitionNumbers());
 			try {
 				long brokerSpread = partition.getBrokersSpread();
 				if (brokerSpread < Topic.TOPIC_BROKER_SPREAD_ERROR) {
-					object.put("brokerSpread", "<a class='btn btn-danger btn-xs'>" + brokerSpread + "%</a>");
+					object.put("brokerSpread", "<span class='badge badge-danger'>" + brokerSpread + "%</span>");
 				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_ERROR && brokerSpread < Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-					object.put("brokerSpread", "<a class='btn btn-warning btn-xs'>" + brokerSpread + "%</a>");
+					object.put("brokerSpread", "<span class='badge badge-warning'>" + brokerSpread + "%</span>");
 				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-					object.put("brokerSpread", "<a class='btn btn-success btn-xs'>" + brokerSpread + "%</a>");
+					object.put("brokerSpread", "<span class='badge badge-success'>" + brokerSpread + "%</span>");
 				} else {
-					object.put("brokerSpread", "<a class='btn btn-primary btn-xs'>" + brokerSpread + "%</a>");
+					object.put("brokerSpread", "<span class='badge badge-primary'>" + brokerSpread + "%</span>");
 				}
 
 				long brokerSkewed = partition.getBrokersSkewed();
 				if (brokerSkewed >= Topic.TOPIC_BROKER_SKEW_ERROR) {
-					object.put("brokerSkewed", "<a class='btn btn-danger btn-xs'>" + brokerSkewed + "%</a>");
+					object.put("brokerSkewed", "<span class='badge badge-danger'>" + brokerSkewed + "%</span>");
 				} else if (brokerSkewed > Topic.TOPIC_BROKER_SKEW_NORMAL && brokerSkewed < Topic.TOPIC_BROKER_SKEW_ERROR) {
-					object.put("brokerSkewed", "<a class='btn btn-warning btn-xs'>" + brokerSkewed + "%</a>");
+					object.put("brokerSkewed", "<span class='badge badge-warning'>" + brokerSkewed + "%</span>");
 				} else if (brokerSkewed <= Topic.TOPIC_BROKER_SKEW_NORMAL) {
-					object.put("brokerSkewed", "<a class='btn btn-success btn-xs'>" + brokerSkewed + "%</a>");
+					object.put("brokerSkewed", "<span class='badge badge-success'>" + brokerSkewed + "%</span>");
 				} else {
-					object.put("brokerSkewed", "<a class='btn btn-primary btn-xs'>" + brokerSkewed + "%</a>");
+					object.put("brokerSkewed", "<span class='badge badge-primary'>" + brokerSkewed + "%</span>");
 				}
 
 				long brokerLeaderSkewed = partition.getBrokersLeaderSkewed();
 				if (brokerLeaderSkewed >= Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
-					object.put("brokerLeaderSkewed", "<a class='btn btn-danger btn-xs'>" + brokerLeaderSkewed + "%</a>");
+					object.put("brokerLeaderSkewed", "<span class='badge badge-danger'>" + brokerLeaderSkewed + "%</span>");
 				} else if (brokerLeaderSkewed > Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL && brokerLeaderSkewed < Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
-					object.put("brokerLeaderSkewed", "<a class='btn btn-warning btn-xs'>" + brokerLeaderSkewed + "%</a>");
+					object.put("brokerLeaderSkewed", "<span class='badge badge-warning'>" + brokerLeaderSkewed + "%</span>");
 				} else if (brokerLeaderSkewed <= Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL) {
-					object.put("brokerLeaderSkewed", "<a class='btn btn-success btn-xs'>" + brokerLeaderSkewed + "%</a>");
+					object.put("brokerLeaderSkewed", "<span class='badge badge-success'>" + brokerLeaderSkewed + "%</span>");
 				} else {
-					object.put("brokerLeaderSkewed", "<a class='btn btn-primary btn-xs'>" + brokerLeaderSkewed + "%</a>");
+					object.put("brokerLeaderSkewed", "<span class='badge badge-primary'>" + brokerLeaderSkewed + "%</span>");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -500,7 +500,7 @@ public class TopicController {
 			if (topicStates != null && topicStates.size() > 0) {
 				if (topicStates.get(0).getTvalue() == 0) {
 					if (Role.ADMIN.equals(signiner.getUsername())) {
-						object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
+						object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-sm dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
 								+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name=''><i class='fa fa-fw fa-trash-o'></i>Truncating</a></li></ul></div>");
 					} else {
 						object.put("operate", "");

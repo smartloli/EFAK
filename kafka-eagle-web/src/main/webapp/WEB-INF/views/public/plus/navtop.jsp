@@ -21,7 +21,7 @@
 							<div class="form-group">
 								<div class="input-group mb-3">
 									<div class="input-group-prepend">
-										<span class="input-group-text">NewPasswd</span>
+										<span class="input-group-text"><i class="fas fa-lock"></i></span>
 									</div>
 									<input id="ke_new_password_name" name="ke_new_password_name" type="password" class="form-control" maxlength="16" placeholder="Enter Your New Password">
 								</div>
