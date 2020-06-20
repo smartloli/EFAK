@@ -22,13 +22,12 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.support.RequestContextUtils;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 /**
  * Change local language.
@@ -43,20 +42,20 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 public class I18nController {
 
 	/** Change language. */
-	@RequestMapping(value = "/{language}/", method = RequestMethod.GET)
-	public ModelAndView language(@PathVariable("language") String language, HttpServletRequest request, HttpServletResponse response) {
-		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
-		language = language.toLowerCase();
-		System.out.println("language:" + language);
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public ModelAndView language(HttpServletRequest request, HttpServletResponse response) {
+		String language = request.getParameter("language");
 		if (language == null || language.equals("")) {
 			return new ModelAndView("redirect:/");
 		} else {
-			if (language.equals("zh_cn")) {
-				localeResolver.setLocale(request, response, Locale.CHINA);
-			} else if (language.equals("en")) {
-				localeResolver.setLocale(request, response, Locale.ENGLISH);
+			if ("zh_CN".equals(language)) {
+				Locale locale = new Locale("zh", "CN");
+				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
+			} else if ("en_US".equals(language)) {
+				Locale locale = new Locale("en", "US");
+				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
 			} else {
-				localeResolver.setLocale(request, response, Locale.CHINA);
+				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, LocaleContextHolder.getLocale());
 			}
 		}
 

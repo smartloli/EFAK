@@ -14,7 +14,7 @@
 			</a> <a class="nav-link" href="/ke/bs">
 				<div class="sb-nav-link-icon">
 					<i class="fas fa-fw fa-desktop"></i>
-				</div> BScreen
+				</div> <fmt:message code="ke.navbar.bscreen" />
 			</a>
 			<div class="sb-sidenav-menu-heading">Message</div>
 			<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTopics" aria-expanded="false" aria-controls="collapseTopics">

@@ -31,12 +31,12 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.support.RequestContextUtils;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 /**
  * Control user login, logout, reset password and other operations.
@@ -71,12 +71,14 @@ public class AccountController {
 		Subject subject = SecurityUtils.getSubject();
 		if (subject.isAuthenticated()) {
 			setKafkaAlias(subject);
-			// return "redirect:" + refUrl.replaceAll("/ke", "");
-			LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
 			if ("zh_CN".equals(SystemConfigUtils.getProperty("kafka.eagle.i18n.language"))) {
-				localeResolver.setLocale(request, response, Locale.CHINA);
+				Locale locale = new Locale("zh", "CN");
+				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
+			} else if ("en_US".equals(SystemConfigUtils.getProperty("kafka.eagle.i18n.language"))) {
+				Locale locale = new Locale("en", "US");
+				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
 			} else {
-				localeResolver.setLocale(request, response, Locale.ENGLISH);
+				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, LocaleContextHolder.getLocale());
 			}
 			return "redirect:" + refUrl;
 		} else {
