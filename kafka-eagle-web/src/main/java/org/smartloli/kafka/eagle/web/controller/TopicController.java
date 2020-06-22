@@ -500,23 +500,29 @@ public class TopicController {
 			if (topicStates != null && topicStates.size() > 0) {
 				if (topicStates.get(0).getTvalue() == 0) {
 					if (Role.ADMIN.equals(signiner.getUsername())) {
-						object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-sm dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
-								+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name=''><i class='fa fa-fw fa-trash-o'></i>Truncating</a></li></ul></div>");
+						object.put("operate",
+								"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
+										+ partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
+										+ "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
 					} else {
 						object.put("operate", "");
 					}
 				} else {
 					if (Role.ADMIN.equals(signiner.getUsername())) {
-						object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
-								+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Truncated</a></li></ul></div>");
+						object.put("operate",
+								"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
+										+ partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
+										+ "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
 					} else {
 						object.put("operate", "");
 					}
 				}
 			} else {
 				if (Role.ADMIN.equals(signiner.getUsername())) {
-					object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
-							+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Truncate</a></li></ul></div>");
+					object.put("operate",
+							"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
+									+ partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
+									+ "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
 				} else {
 					object.put("operate", "");
 				}

@@ -104,8 +104,9 @@ $(document).ready(function() {
 	$(document).on('click', 'a[name=topic_clean]', function() {
 		var href = $(this).attr("href");
 		var topic = href.split("#")[1];
+		console.log(topic);
 		$("#ke_topic_clean_content").html("");
-		$("#ke_topic_clean_content").append("<p>Are you sure you want to clean topic [<strong>" + topic + "</strong>] data ?</p>");
+		$("#ke_topic_clean_content").append("<p class='alert alert-danger alert-dismissable'>Are you sure to truncate the data of topic [ <strong>" + topic + "</strong> ] ?</p>");
 		$("#ke_topic_clean_data_div").html("");
 		$("#ke_topic_clean_data_div").append("<a id='ke_del_topic' href='/topic/clean/data/" + topic + "/' class='btn btn-danger'>Submit</a>");
 		$('#ke_topic_clean').modal({
@@ -124,10 +125,10 @@ $(document).ready(function() {
 		var partitions = $("#ke_modify_topic_partition").val();
 		var reg = /^[1-9]\d*$/;
 		if (!reg.test(partitions)) {
-			$("#ke_modify_topic_btn").attr("disabled", true);
+			$("#ke_modify_topic_btn").addClass("disabled");
 			$("#ke_modify_topic_btn").attr("href", "#");
 		} else {
-			$("#ke_modify_topic_btn").attr("disabled", false);
+			$("#ke_modify_topic_btn").removeClass("disabled");
 			$("#ke_modify_topic_btn").attr("href", "/ke/topic/" + topic + "/" + partitions + "/modify");
 		}
 	});
