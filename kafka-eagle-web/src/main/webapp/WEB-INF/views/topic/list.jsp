@@ -202,50 +202,19 @@
 									<button class="close" type="button" data-dismiss="modal">x</button>
 								</div>
 								<!-- /.row -->
-								<div id="ke_topic_clean_content" class="modal-body">
-									<!-- 
-									<fieldset class="form-horizontal">
-										<div class="form-group">
-											<div class="input-group mb-3">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fas fa-plus-circle"></i></span>
-												</div>
-												<input id="ke_modify_topic_partition" name="ke_modify_topic_partition" type="text" class="form-control" placeholder="Enter Partitions (Number >= 1)">
-											</div>
-										</div>
-									</fieldset>
-									 -->
-								</div>
-								<div id="ke_topic_clean_data_div" class="modal-footer">
-								</div>
+								<div id="ke_topic_clean_content" class="modal-body"></div>
+								<div id="ke_topic_clean_data_div" class="modal-footer"></div>
 							</div>
 						</div>
 					</div>
-					<!-- row -->
-					
-				</div>
-			</main>
-			<jsp:include page="../public/plus/footer.jsp"></jsp:include>
-		</div>
-	</div>
-	<div id="wrapper">
-		<div id="page-wrapper">
-			<!-- /.row -->
-			<!-- /.row -->
-			<!-- /.row -->
-
-			<!-- filter topic -->
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<i class="fa fa-filter fa-fw"></i> Topic Filter
-							<div class="pull-right"></div>
-						</div>
-						<!-- /.panel-heading -->
-						<div class="panel-body">
-							<div class="row">
-								<div class="col-lg-12">
+					<!-- row filter -->
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="card mb-4">
+								<div class="card-header">
+									<i class="fas fa-filter"></i> Topic Filter
+								</div>
+								<div class="card-body">
 									<div class="form-group">
 										<label>Topic Name (*)</label>
 										<select multiple="multiple" id="select2val" name="select2val" tabindex="-1" style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
@@ -257,32 +226,25 @@
 									<button id="ke_topic_select_query" class="btn btn-success">Query</button>
 								</div>
 							</div>
-							<!-- /.panel-body -->
 						</div>
 					</div>
-					<!-- /.col-lg-4 -->
-				</div>
-				<!-- /.row -->
-			</div>
-			<!-- producer history -->
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<i class="fa fa-bar-chart-o fa-fw"></i> <strong> Producer Message Aggregate</strong>
-							<div class="pull-right"></div>
+					<!-- row producer -->
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="card mb-4">
+								<div class="card-header">
+									<i class="far fa-chart-bar"></i> Producer Message Aggregate
+								</div>
+								<div class="card-body">
+									<div id="topic_producer_agg" class="charttopicdiv"></div>
+								</div>
+							</div>
 						</div>
-						<!-- /.panel-heading -->
-						<div class="panel-body">
-							<div id="topic_producer_agg" class="charttopicdiv"></div>
-						</div>
-						<!-- /.panel-body -->
 					</div>
 				</div>
-			</div>
-			<!-- /.row -->
+			</main>
+			<jsp:include page="../public/plus/footer.jsp"></jsp:include>
 		</div>
-		<!-- /#page-wrapper -->
 	</div>
 </body>
 <jsp:include page="../public/plus/script.jsp">

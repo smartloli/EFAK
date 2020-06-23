@@ -14,7 +14,9 @@
 	color: #343a40!important
 }
 
-
+.text-gray-500 {
+    color: #b7b9cc!important;
+}
 
 .border-left-primary {
     border-left: .25rem solid #4e73df!important;
@@ -115,4 +117,12 @@
 
 .col-md-offset-6 {
     margin-left: 50%;
+}
+
+.error {
+    color: #5a5c69;
+    font-size: 7rem;
+    position: relative;
+    line-height: 1;
+    width: 12.5rem;
 }
