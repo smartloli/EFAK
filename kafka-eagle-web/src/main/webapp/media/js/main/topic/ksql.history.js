@@ -6,7 +6,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/topic/sql/history/ajax",
+		"sAjaxSource" : "/topic/sql/history/ajax",
 		"aoColumns" : [ {
 			"mData" : 'id'
 		}, {
@@ -58,7 +58,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/ksql/detail/' + type + '/' + id + '/ajax',
+			url : '/topic/ksql/detail/' + type + '/' + id + '/ajax',
 			success : function(datas) {
 				$("#ke_sql_query_content").val(datas.result);
 			}

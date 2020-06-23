@@ -33,7 +33,7 @@
 
 .box  .right {
 	float: right;
-	width: 255px;
+	width: 260px;
 	margin-top: -120px;
 	background: #fff;
 	cursor: pointer;

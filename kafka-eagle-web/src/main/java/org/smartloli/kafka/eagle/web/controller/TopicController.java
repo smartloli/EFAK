@@ -208,14 +208,14 @@ public class TopicController {
 			object.put("replicas", metadata.getReplicas());
 			object.put("isr", metadata.getIsr());
 			if (metadata.isPreferredLeader()) {
-				object.put("preferred_leader", "<a class='btn btn-success btn-xs'>true</a>");
+				object.put("preferred_leader", "<span class='badge badge-success'>true</span>");
 			} else {
-				object.put("preferred_leader", "<a class='btn btn-danger btn-xs'>false</a>");
+				object.put("preferred_leader", "<span class='badge badge-danger btn-xs'>false</span>");
 			}
 			if (metadata.isUnderReplicated()) {
-				object.put("under_replicated", "<a class='btn btn-danger btn-xs'>true</a>");
+				object.put("under_replicated", "<span class='badge badge-danger btn-xs'>true</span>");
 			} else {
-				object.put("under_replicated", "<a class='btn btn-success btn-xs'>false</a>");
+				object.put("under_replicated", "<span class='badge badge-success btn-xs'>false</span>");
 			}
 			aaDatas.add(object);
 		}
@@ -804,9 +804,9 @@ public class TopicController {
 				obj.put("host", "<a href='#" + id + "/host' name='ke_sql_query_detail'>" + (host.length() > 20 ? host.substring(0, 20) + "..." : host) + "</a>");
 				obj.put("ksql", "<a href='#" + id + "/ksql' name='ke_sql_query_detail'>" + (ksql.length() > 60 ? ksql.substring(0, 60) + "..." : ksql) + "</a>");
 				if (topicSql.getStatus().equals("SUCCESSED")) {
-					obj.put("status", "<a class='btn btn-success btn-xs'>" + topicSql.getStatus() + "</a>");
+					obj.put("status", "<span class='badge badge-success'>" + topicSql.getStatus() + "</span>");
 				} else {
-					obj.put("status", "<a class='btn btn-danger btn-xs'>" + topicSql.getStatus() + "</a>");
+					obj.put("status", "<span class='badge badge-danger'>" + topicSql.getStatus() + "</span>");
 				}
 				obj.put("spendTime", topicSql.getSpendTime() / 1000.0 + "s");
 				obj.put("created", topicSql.getCreated());
