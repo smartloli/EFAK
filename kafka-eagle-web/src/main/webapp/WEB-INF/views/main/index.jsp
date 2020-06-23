@@ -60,7 +60,7 @@ path.link {
 									<div class="row no-gutters align-items-center">
 										<div class="col mr-2">
 											<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Brokers</div>
-											<a id="ke_dash_brokers_count" href="/ke/cluster/info" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
+											<a id="ke_dash_brokers_count" href="/cluster/info" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
 										</div>
 										<div class="col-auto">
 											<i class="fas fa-server fa-4x text-primary-panel"></i>
@@ -75,7 +75,7 @@ path.link {
 									<div class="row no-gutters align-items-center">
 										<div class="col mr-2">
 											<div class="text-xs font-weight-bold text-success text-uppercase mb-1">Topics</div>
-											<a id="ke_dash_topics_count" href="/ke/topic/list" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
+											<a id="ke_dash_topics_count" href="/topic/list" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
 										</div>
 										<div class="col-auto">
 											<i class="fas fa-comment fa-4x text-success-panel"></i>
@@ -90,7 +90,7 @@ path.link {
 									<div class="row no-gutters align-items-center">
 										<div class="col mr-2">
 											<div class="text-xs font-weight-bold text-info text-uppercase mb-1">Zookeepers</div>
-											<a id="ke_dash_zks_count" href="/ke/cluster/info" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
+											<a id="ke_dash_zks_count" href="/cluster/info" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
 										</div>
 										<div class="col-auto">
 											<i class="fas fa-sitemap fa-4x text-info-panel"></i>
@@ -105,7 +105,7 @@ path.link {
 									<div class="row no-gutters align-items-center">
 										<div class="col mr-2">
 											<div class="text-xs font-weight-bold text-dark text-uppercase mb-1">ConsumerGroups</div>
-											<a id="ke_dash_consumers_count" href="/ke/consumers" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
+											<a id="ke_dash_consumers_count" href="/consumers" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
 										</div>
 										<div class="col-auto">
 											<i class="fas fa-users fa-4x text-dark-panel"></i>

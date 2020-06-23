@@ -14,8 +14,8 @@
 <meta name="author" content="">
 
 <title>Topic Message - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
-<jsp:include page="../public/tcss.jsp"></jsp:include>
+<jsp:include page="../public/plus/css.jsp"></jsp:include>
+<jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>
 <style>
 .CodeMirror {
@@ -26,6 +26,74 @@
 }
 </style>
 <body>
+<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
+	<div id="layoutSidenav">
+		<div id="layoutSidenav_nav">
+			<jsp:include page="../public/plus/navbar.jsp"></jsp:include>
+		</div>
+		<div id="layoutSidenav_content">
+			<main>
+				<div class="container-fluid">
+					<h1 class="mt-4">Topic</h1>
+					<ol class="breadcrumb mb-4">
+						<li class="breadcrumb-item"><a href="#">Topic</a></li>
+						<li class="breadcrumb-item active">KSQL</li>
+					</ol>
+					<div class="alert alert-info alert-dismissable">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<i class="fas fa-info-circle"></i> Sample <a href="http://www.kafka-eagle.org/articles/docs/quickstart/ksql.html" target="_blank">KSQL</a> query: <strong>select
+							* from ke_topic where `partition` in (0,1,2) limit 10</strong><br /> <i
+							class="fas fa-info-circle"></i> AutoComplete: Press <strong>Alt
+							and /</strong>.
+					</div>
+					<!-- content body -->
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="card mb-4">
+								<div class="card-header">
+									<i class="fas fa-book-open"></i> Topic Property
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-lg-12">
+											<form role="form" action="/topic/create/form" method="post" onsubmit="return contextFormValid();return false;">
+												<div class="form-group">
+													<label>Topic Name (*)</label>
+													<input id="ke_topic_name" name="ke_topic_name" class="form-control" maxlength=50>
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> Made up of letters and digits or underscores . Such as "demo_kafka_topic_1" .
+													</label>
+												</div>
+												<div class="form-group">
+													<label>Partitions (*)</label>
+													<input id="ke_topic_partition" name="ke_topic_partition" class="form-control" maxlength=50 value="1">
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> Partition parameters must be numeric .
+													</label>
+												</div>
+												<div class="form-group">
+													<label>Replication Factor (*)</label>
+													<input id="ke_topic_repli" name="ke_topic_repli" class="form-control" maxlength=50 value="1">
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> Replication Factor parameters must be numeric . Pay attention to available brokers must be larger than replication factor .
+													</label>
+												</div>
+												<button type="submit" class="btn btn-success">Create</button>
+												<div id="create_alert_msg" style="display: none" class="alert alert-danger">
+													<label>Error! Please make some changes. (*) is required.</label>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+			<jsp:include page="../public/plus/footer.jsp"></jsp:include>
+		</div>
+	</div>
 	<jsp:include page="../public/navbar.jsp"></jsp:include>
 	<div id="wrapper">
 		<div id="page-wrapper">
@@ -157,7 +225,7 @@
 		<!-- /#page-wrapper -->
 	</div>
 </body>
-<jsp:include page="../public/script.jsp">
+<jsp:include page="../public/plus/script.jsp">
 	<jsp:param value="plugins/magicsuggest/magicsuggest.js" name="loader" />
 	<jsp:param value="plugins/tokenfield/bootstrap-tokenfield.js"
 		name="loader" />
@@ -168,5 +236,5 @@
 	<jsp:param value="main/topic/ksql.js" name="loader" />
 	<jsp:param value="main/topic/ksql.history.js" name="loader" />
 </jsp:include>
-<jsp:include page="../public/tscript.jsp"></jsp:include>
+<jsp:include page="../public/plus/tscript.jsp"></jsp:include>
 </html>
