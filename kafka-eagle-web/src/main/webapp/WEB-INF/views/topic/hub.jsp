@@ -13,10 +13,10 @@
 <meta name="author" content="">
 
 <title>Topic Hub - KafkaEagle</title>
-<jsp:include page="../public/css.jsp">
+<jsp:include page="../public/plus/css.jsp">
 	<jsp:param value="plugins/select2/select2.min.css" name="css" />
 </jsp:include>
-<jsp:include page="../public/tcss.jsp"></jsp:include>
+<jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>
 <style>
 .CodeMirror {
@@ -25,55 +25,77 @@
 	border-right: 1px solid #ddd;
 	border-left: 1px solid #ddd;
 }
-
-.box {
-	border-bottom: 1px solid #eee;
-	margin-bottom: 20px;
-	margin-top: 30px;
-	overflow: hidden;
-}
-
-.box .left {
-	font-size: 36px;
-	float: left
-}
-
-.box .left small {
-	font-size: 24px;
-	color: #777
-}
-
-.box  .right {
-	float: right;
-	width: 230px;
-	margin-top: 20px;
-	background: #fff;
-	cursor: pointer;
-	padding: 5px 10px;
-	border: 1px solid #ccc;
-}
 </style>
 <body>
+<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
+	<div id="layoutSidenav">
+		<div id="layoutSidenav_nav">
+			<jsp:include page="../public/plus/navbar.jsp"></jsp:include>
+		</div>
+		<div id="layoutSidenav_content">
+			<main>
+				<div class="container-fluid">
+					<h1 class="mt-4">Topic</h1>
+					<ol class="breadcrumb mb-4">
+						<li class="breadcrumb-item"><a href="#">Topic</a></li>
+						<li class="breadcrumb-item active">Hub</li>
+					</ol>
+					<div class="alert alert-info alert-dismissable">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<i class="fas fa-info-circle"></i> <strong>It is used to migrate the topic data or balance the expanded broker.</strong>
+					</div>
+					<!-- content body -->
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="card mb-4">
+								<div class="card-header">
+									<i class="fas fa-filter"></i> Topic Balance
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-lg-12">
+											<form role="form" action="/topic/create/form" method="post" onsubmit="return contextFormValid();return false;">
+												<div class="form-group">
+													<label>Topic Name (*)</label>
+													<input id="ke_topic_name" name="ke_topic_name" class="form-control" maxlength=50>
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> Made up of letters and digits or underscores . Such as "demo_kafka_topic_1" .
+													</label>
+												</div>
+												<div class="form-group">
+													<label>Partitions (*)</label>
+													<input id="ke_topic_partition" name="ke_topic_partition" class="form-control" maxlength=50 value="1">
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> Partition parameters must be numeric .
+													</label>
+												</div>
+												<div class="form-group">
+													<label>Replication Factor (*)</label>
+													<input id="ke_topic_repli" name="ke_topic_repli" class="form-control" maxlength=50 value="1">
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> Replication Factor parameters must be numeric . Pay attention to available brokers must be larger than replication factor .
+													</label>
+												</div>
+												<button type="submit" class="btn btn-success">Create</button>
+												<div id="create_alert_msg" style="display: none" class="alert alert-danger">
+													<label>Error! Please make some changes. (*) is required.</label>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+			<jsp:include page="../public/plus/footer.jsp"></jsp:include>
+		</div>
+	</div>
 	<jsp:include page="../public/navbar.jsp"></jsp:include>
 	<div id="wrapper">
 		<div id="page-wrapper">
-			<div class="row">
-				<div class="col-lg-12">
-					<h1 class="page-header">
-						Topic <small>hub</small>
-					</h1>
-				</div>
-				<!-- /.col-lg-12 -->
-			</div>
 			<!-- /.row -->
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="alert alert-info alert-dismissable">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> It is used to migrate the topic data or balance the expanded broker.
-					</div>
-				</div>
-			</div>
 			<!-- /.row -->
 			<div class="row">
 				<div class="col-lg-12">
@@ -179,7 +201,7 @@
 		<!-- /#page-wrapper -->
 	</div>
 </body>
-<jsp:include page="../public/script.jsp">
+<jsp:include page="../public/plus/script.jsp">
 	<jsp:param value="plugins/magicsuggest/magicsuggest.js" name="loader" />
 	<jsp:param value="plugins/tokenfield/bootstrap-tokenfield.js" name="loader" />
 	<jsp:param value="plugins/codemirror/codemirror.js" name="loader" />
@@ -190,5 +212,5 @@
 	<jsp:param value="main/topic/hub.js" name="loader" />
 	<jsp:param value="main/topic/ksql.history.js" name="loader" />
 </jsp:include>
-<jsp:include page="../public/tscript.jsp"></jsp:include>
+<jsp:include page="../public/plus/tscript.jsp"></jsp:include>
 </html>

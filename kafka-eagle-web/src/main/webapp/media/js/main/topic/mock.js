@@ -3,7 +3,7 @@ $(document).ready(function() {
 	$("#select2val").select2({
 		placeholder : "Topic",
 		ajax : {
-			url : "/ke/topic/mock/list/ajax",
+			url : "/topic/mock/list/ajax",
 			dataType : 'json',
 			delay : 250,
 			data : function(params) {
@@ -67,7 +67,7 @@ $(document).ready(function() {
 					"topic" : topic,
 					"message" : message
 				}),
-				url : '/ke/topic/mock/send/message/topic/ajax',
+				url : '/topic/mock/send/message/topic/ajax',
 				success : function(datas) {
 					if (datas != null) {
 						if (datas.status) {

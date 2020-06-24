@@ -64,7 +64,17 @@ public final class KafkaZKPoolUtils {
 			for (int i = 0; i < zkCliPoolSize; i++) {
 				try {
 					zkc = KafkaZkClient.apply(entry.getValue(), JaasUtils.isZkSecurityEnabled(), ZK_SESSION_TIMEOUT_MS, ZK_CONNECTION_TIMEOUT_MS, Integer.MAX_VALUE, Time.SYSTEM, METRIC_GROUP_NAME, "SessionExpireListener");
-					if(zkc!=null) {
+					if (zkc != null) {
+						if (SystemConfigUtils.getBooleanProperty(entry.getKey() + ".zk.acl.enable")) {
+							String schema = SystemConfigUtils.getProperty(entry.getKey() + ".zk.acl.schema");
+							String username = SystemConfigUtils.getProperty(entry.getKey() + ".zk.acl.username");
+							String password = SystemConfigUtils.getProperty(entry.getKey() + ".zk.acl.password");
+							try {
+								zkc.currentZooKeeper().addAuthInfo(schema, (username + ":" + password).getBytes());
+							} catch (Exception e) {
+								ErrorUtils.print(KafkaZKPoolUtils.class).error("ClusterAlias[" + entry.getKey() + "] add acl has error, msg is ", e);
+							}
+						}
 						zkCliPool.add(zkc);
 					}
 				} catch (Exception e) {

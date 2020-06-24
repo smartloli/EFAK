@@ -67,6 +67,7 @@
 						<h1 class="mt-4">Topic</h1>
 						<ol class="breadcrumb mb-4">
 							<li class="breadcrumb-item"><a href="#">Topic</a></li>
+							<li class="breadcrumb-item"><a href="/topic/list">List</a></li>
 							<li class="breadcrumb-item active">MetaData</li>
 						</ol>
 						<div id="reportrange" class="right">
