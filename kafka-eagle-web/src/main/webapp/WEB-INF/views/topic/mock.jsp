@@ -61,7 +61,7 @@
 								<input id="ke_topic_mock" name="ke_topic_mock" type="hidden" />
 								<label for="inputError" class="control-label text-danger"><i
 									class="fa fa-info-circle"></i> Select the topic you need to
-									alarm .</label>
+									send .</label>
 							</div>
 							<div class="form-group">
 								<label>Message (*)</label>
