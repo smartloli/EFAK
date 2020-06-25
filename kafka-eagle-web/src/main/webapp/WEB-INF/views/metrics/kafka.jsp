@@ -44,12 +44,15 @@
             width: 100%;
             height: 300px;
         }
+
+        .kechk {
+            float: left;
+        }
     </style>
 
     <title>Kafka - KafkaEagle</title>
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css"/>
-        <jsp:param value="plugins/checkbox/awesome-bootstrap-checkbox.css" name="css"/>
     </jsp:include>
 </head>
 <body>
@@ -84,56 +87,56 @@
                     <div class="col-lg-12">
                         <div class="alert alert-info alert-dismissable"
                              style="height: 110px;">
-                            <div class="checkbox">
-                                <div class="col-sm-3 checkbox checkbox-primary" style="margin-top: -5px">
+                            <div id="ke_chk_top" class="checkbox">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iMI" name="message_in" checked>
                                     <label for="iMI">Message In</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iBI" name="byte_in" checked>
                                     <label for="iBI">Topic Byte In</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iBO" name="byte_out" checked>
                                     <label for="iBO">Topic Byte Out</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iBR" name="byte_rejected" checked>
                                     <label for="iBR">Topic Byte Rejected</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iFFR" name="failed_fetch_request"
                                            checked> <label for="iFFR">Failed Fetch Request</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iFPR" name="failed_produce_request"
                                            checked> <label for="iFPR">Failed Produce
                                     Request</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iPMC"
                                            name="produce_message_conversions" checked> <label
                                         for="iPMC">Produce Message Conversions</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iTFR" name="total_fetch_requests"
                                            checked> <label for="iTFR">Total Fetch Requests</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iTPR" name="total_produce_requests"
                                            checked> <label for="iTPR">Total Produce
                                     Requests</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iRBO" name="replication_bytes_out"
                                            checked> <label for="iRBO">Replication Bytes
                                     Out</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iRBI" name="replication_bytes_in"
                                            checked> <label for="iRBI">Replication Bytes In</label>
                                 </div>
-                                <div class="col-sm-3 checkbox checkbox-primary">
+                                <div class="col-sm-3 checkbox checkbox-primary kechk">
                                     <input type="checkbox" id="iOFM" name="os_free_memory"
                                            checked> <label for="iOFM">OS Free Memory</label>
                                 </div>
@@ -143,13 +146,123 @@
                 </div>
                 <!-- content body -->
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-lg-12" id="message_in">
                         <div class="card mb-4">
                             <div class="card-header">
-                                <i class="fas fa-book-open"></i> Topic Property
+                                <i class="fas fa-chart-line"></i> MessagesInPerSec (per/sec)
                             </div>
                             <div class="card-body">
-
+                                <div id="mbean_msg_in" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="byte_in">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> BytesInPerSec (byte/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_msg_byte_in" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="byte_out">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> BytesOutPerSec (byte/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_msg_byte_out" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="byte_rejected">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> BytesRejectedPerSec (byte/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_byte_rejected" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="failed_fetch_request">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> FailedFetchRequestsPerSec (byte/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_failed_fetch_request" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="failed_produce_request">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> FailedProduceRequestsPerSec (/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_failed_produce_request" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="produce_message_conversions">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> ProduceMessageConversionsPerSec (/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_produce_message_conversions" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="total_fetch_requests">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> TotalFetchRequestsPerSec (/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_total_fetch_requests" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="total_produce_requests">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> TotalProduceRequestsPerSec (/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_total_produce_requests" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="replication_bytes_out">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> ReplicationBytesOutPerSec (byte/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_replication_bytes_out" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="replication_bytes_in">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> ReplicationBytesInPerSec (byte/sec)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_replication_bytes_in" class="chartkafkadiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" id="os_free_memory">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i> FreePhysicalMemorySize (byte/min)
+                            </div>
+                            <div class="card-body">
+                                <div id="mbean_os_free_memory" class="chartkafkadiv"></div>
                             </div>
                         </div>
                     </div>
@@ -157,204 +270,6 @@
         </main>
         <jsp:include page="../public/plus/footer.jsp"></jsp:include>
     </div>
-</div>
-<div id="wrapper">
-    <div id="page-wrapper">
-        <!-- /.row -->
-
-
-        <!-- /.row -->
-        <div class="row">
-            <div class="col-lg-12" id="message_in">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong>Kafka
-                        Message In (per/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_msg_in" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="byte_in">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong>Kafka
-                        Topic Byte In (byte/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_msg_byte_in" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="byte_out">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        Topic Byte Out (byte/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_msg_byte_out" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="byte_rejected">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        Byte Rejected (/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_byte_rejected" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="failed_fetch_request">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        Failed Fetch Request (/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_failed_fetch_request" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="failed_produce_request">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        Failed Produce Request (/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_failed_produce_request" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="produce_message_conversions">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        Produce Message Conversions (/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_produce_message_conversions" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="total_fetch_requests">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        Total Fetch Requests (/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_total_fetch_requests" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="total_produce_requests">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        Total Produce Requests (/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_total_produce_requests" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="replication_bytes_out">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        Replication Bytes Out (byte/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_replication_bytes_out" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="replication_bytes_in">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        Replication Bytes In (byte/sec)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_replication_bytes_in" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-            <div class="col-lg-12" id="os_free_memory">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <strong> Kafka
-                        OS Free Memory (byte/min)</strong>
-                        <div class="pull-right"></div>
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="mbean_os_free_memory" class="chartkafkadiv"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-            </div>
-            <!-- /.col-lg-4 -->
-        </div>
-    </div>
-    <!-- /#page-wrapper -->
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">

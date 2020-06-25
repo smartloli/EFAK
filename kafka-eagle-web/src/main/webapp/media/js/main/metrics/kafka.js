@@ -49,7 +49,7 @@ $(document).ready(function() {
 		}
 	};
 
-	initModuleVisualAndBingding();
+	initModuleVisualAndBindEvent();
 
 	var modules = getCheckedModules();
 
@@ -270,15 +270,15 @@ $(document).ready(function() {
 	// choise module
 	function getCheckedModules() {
 		var modules = '';
-		$('.checkbox').find('input[type="checkbox"]:checked').each(function() {
+		$('#ke_chk_top').find('input[type="checkbox"]:checked').each(function() {
 			modules += ($(this).attr('name')) + ',';
 		});
 		return modules.substring(0, modules.length - 1);
 	}
 
 	// init module show or hide & bind change event
-	function initModuleVisualAndBingding() {
-		$('.checkbox').find('input[type="checkbox"]').each(function() {
+	function initModuleVisualAndBindEvent() {
+		$('#ke_chk_top').find('input[type="checkbox"]').each(function() {
 			var that = this;
 			if ($(that).is(':checked')) {
 				module('#' + $(that).attr('name'), true);
@@ -291,7 +291,6 @@ $(document).ready(function() {
 					stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 					etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
 					mbeanRealtime(stime, etime, type, getCheckedModules());
-					$('svg').css('width', '100%');
 					return;
 				}
 				module('#' + $(that).attr('name'), false);
