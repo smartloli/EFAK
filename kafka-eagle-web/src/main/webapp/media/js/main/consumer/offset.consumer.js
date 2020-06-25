@@ -13,7 +13,7 @@ $(document).ready(function() {
 
 	var group = getQueryString("group");
 	var topic = getQueryString("topic");
-	$("#topic_name_header").find("strong").html("<a href='/ke/consumers/offset/realtime/?group=" + group + "&topic=" + topic + "'>" + topic + "</a>");
+	$("#topic_name_header").find("strong").html("<a href='/consumers/offset/realtime/?group=" + group + "&topic=" + topic + "'>" + topic + "</a>");
 
 	var offset = 0;
 
@@ -29,7 +29,7 @@ $(document).ready(function() {
 			"bProcessing" : true,
 			"bServerSide" : true,
 			"fnServerData" : retrieveData,
-			"sAjaxSource" : "/ke/consumer/offset/group/topic/ajax",
+			"sAjaxSource" : "/consumer/offset/group/topic/ajax",
 			"aoColumns" : [ {
 				"mData" : 'partition'
 			}, {

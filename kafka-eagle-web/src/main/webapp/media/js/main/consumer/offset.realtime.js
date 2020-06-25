@@ -1,5 +1,12 @@
 $(document).ready(function() {
 
+	try{
+		var path = window.location.href;
+		$("#ke_consumer_offsets_a").attr("href","/consumers/offset/?" + path.split("?")[1]);
+	}catch (e) {
+		console.error(e);
+	}
+
 	function getQueryString(name) {
 		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
 		var r = window.location.search.substr(1).match(reg);
@@ -213,7 +220,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/consumer/offset/group/topic/realtime/ajax?group=' + group + '&topic=' + topic + '&stime=' + stime + '&etime=' + etime,
+			url : '/consumer/offset/group/topic/realtime/ajax?group=' + group + '&topic=' + topic + '&stime=' + stime + '&etime=' + etime,
 			success : function(datas) {
 				if (datas != null) {
 					// Area Chart
@@ -236,7 +243,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/consumer/offset/rate/group/topic/realtime/ajax?group=' + group + '&topic=' + topic,
+			url : '/consumer/offset/rate/group/topic/realtime/ajax?group=' + group + '&topic=' + topic,
 			success : function(datas) {
 				if (datas != null) {
 					// Consumer & Producer Rate

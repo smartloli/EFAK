@@ -255,6 +255,9 @@
 					<exclude>conf/**</exclude>
 				</excludes>
 			</resource>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+			</resource>
 		</resources>
 	</build>
 </project>

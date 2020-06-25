@@ -6,7 +6,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/cluster/info/kafka/ajax",
+		"sAjaxSource" : "/cluster/info/kafka/ajax",
 		"aoColumns" : [ {
 			"mData" : 'id'
 		}, {
@@ -35,7 +35,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/cluster/info/zk/ajax",
+		"sAjaxSource" : "/cluster/info/zk/ajax",
 		"aoColumns" : [ {
 			"mData" : 'id'
 		}, {

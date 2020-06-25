@@ -28,7 +28,7 @@
 .box .left small {
 	/* font-size: 24px;
 	color: #777 */
-	
+
 }
 
 .box  .right {

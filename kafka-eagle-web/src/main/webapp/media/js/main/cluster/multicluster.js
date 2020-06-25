@@ -6,7 +6,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/cluster/info/multicluster/ajax",
+		"sAjaxSource" : "/cluster/info/multicluster/ajax",
 		"aoColumns" : [ {
 			"mData" : 'id'
 		}, {
@@ -37,12 +37,12 @@ $(document).ready(function() {
 		var href = $(this).attr("href");
 		var clusterAlias = href.split("#")[1];
 		$("#remove_div").html("");
-		$("#remove_div").append("<a href='/ke/cluster/info/" + clusterAlias + "/change' class='btn btn-success'>Sure</a>");
-		$('#doc_info').modal({
+		$("#remove_div").append("<a href='/cluster/info/" + clusterAlias + "/change' class='btn btn-success'>Sure</a>");
+		$('#ke_cluster_switch').modal({
 			backdrop : 'static',
 			keyboard : false
 		});
-		$('#doc_info').modal('show').css({
+		$('#ke_cluster_switch').modal('show').css({
 			position : 'fixed',
 			left : '50%',
 			top : '50%',

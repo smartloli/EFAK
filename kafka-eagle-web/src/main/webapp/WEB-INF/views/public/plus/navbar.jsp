@@ -35,7 +35,7 @@
 					<a class="nav-link" href="/topic/hub"><i class="fas fa-cube fa-sm fa-fw mr-1"></i>Hub</a>
 				</nav>
 			</div>
-			<a class="nav-link" href="#">
+			<a class="nav-link" href="/consumers">
 				<div class="sb-nav-link-icon">
 					<i class="fas fa-fw fa-users"></i>
 				</div> Consumers
@@ -51,7 +51,9 @@
 			</a>
 			<div class="collapse" id="collapseCluster" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
 				<nav class="sb-sidenav-menu-nested nav">
-					<a class="nav-link" href="#">ZK & Kafka</a> <a class="nav-link" href="#">Multi-Clusters</a> <a class="nav-link" href="#">ZkCli</a>
+					<a class="nav-link" href="/cluster/info"><i class="fas fa-sitemap fa-sm fa-fw mr-1"></i>ZK & Kafka</a>
+					<a class="nav-link" href="/cluster/multi"><i class="fab fa-maxcdn fa-sm fa-fw mr-1"></i>Multi-Clusters</a>
+					<a class="nav-link" href="/cluster/zkcli"><i class="fas fa-terminal fa-code fa-sm fa-fw mr-1"></i>ZkCli</a>
 				</nav>
 			</div>
 			<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMetrics" aria-expanded="false" aria-controls="collapseMetrics">
@@ -64,7 +66,9 @@
 			</a>
 			<div class="collapse" id="collapseMetrics" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
 				<nav class="sb-sidenav-menu-nested nav">
-					<a class="nav-link" href="#">Brokers</a> <a class="nav-link" href="#">Kafka</a> <a class="nav-link" href="#">Zookeeper</a>
+					<a class="nav-link" href="/metrics/brokers"><i class="fas fa-sitemap fa-sm fa-fw mr-1"></i>Brokers</a>
+					<a class="nav-link" href="/metrics/kafka"><i class="fas fa-chart-bar fa-sm fa-fw mr-1"></i>Kafka</a>
+					<a class="nav-link" href="/metrics/zk"><i class="fas fa-chart-area fa-code fa-sm fa-fw mr-1"></i>Zookeeper</a>
 				</nav>
 			</div>
 			<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAlarm" aria-expanded="false" aria-controls="collapseAlarm">

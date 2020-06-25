@@ -1479,7 +1479,7 @@ public class KafkaServiceImpl implements KafkaService {
 	/** Get kafka cpu. */
 	public String getUsedCpu(String host, int port) {
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
-		String cpu = "<a class='btn btn-danger btn-xs'>NULL</a>";
+		String cpu = "<span class='badge badge-danger'>NULL</span>";
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
 			JMXConnector connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
@@ -1488,11 +1488,11 @@ public class KafkaServiceImpl implements KafkaService {
 			double cpuValue = Double.parseDouble(value);
 			String percent = StrUtils.numberic((cpuValue * 100.0) + "") + "%";
 			if ((cpuValue * 100.0) < BrokerSever.CPU_NORMAL) {
-				cpu = "<a class='btn btn-success btn-xs'>" + percent + "</a>";
+				cpu = "<span class='badge badge-success'>" + percent + "</span>";
 			} else if ((cpuValue * 100.0) >= BrokerSever.CPU_NORMAL && (cpuValue * 100.0) < BrokerSever.CPU_DANGER) {
-				cpu = "<a class='btn btn-warning btn-xs'>" + percent + "</a>";
+				cpu = "<span class='badge badge-warning'>" + percent + "</span>";
 			} else if ((cpuValue * 100.0) >= BrokerSever.CPU_DANGER) {
-				cpu = "<a class='btn btn-danger btn-xs'>" + percent + "</a>";
+				cpu = "<span class='badge badge-danger'>" + percent + "</span>";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1505,7 +1505,7 @@ public class KafkaServiceImpl implements KafkaService {
 	public String getUsedMemory(String host, int port) {
 		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
-		String memory = "<a class='btn btn-danger btn-xs'>NULL</a>";
+		String memory = "<span class='badge badge-danger'>NULL</span>";
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
@@ -1515,11 +1515,11 @@ public class KafkaServiceImpl implements KafkaService {
 			long max = memBean.getHeapMemoryUsage().getMax();
 			String percent = StrUtils.stringify(used) + " (" + StrUtils.numberic((used * 100.0 / max) + "") + "%)";
 			if ((used * 100.0) / max < BrokerSever.MEM_NORMAL) {
-				memory = "<a class='btn btn-success btn-xs'>" + percent + "</a>";
+				memory = "<span class='badge badge-success'>" + percent + "</span>";
 			} else if ((used * 100.0) / max >= BrokerSever.MEM_NORMAL && (used * 100.0) / max < BrokerSever.MEM_DANGER) {
-				memory = "<a class='btn btn-warning btn-xs'>" + percent + "</a>";
+				memory = "<span class='badge badge-warning'>" + percent + "</span>";
 			} else if ((used * 100.0) / max >= BrokerSever.MEM_DANGER) {
-				memory = "<a class='btn btn-danger btn-xs'>" + percent + "</a>";
+				memory = "<span class='badge badge-danger'>" + percent + "</span>";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

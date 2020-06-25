@@ -8,7 +8,7 @@ $(document).ready(function() {
 			"bProcessing" : true,
 			"bServerSide" : true,
 			"fnServerData" : retrieveData,
-			"sAjaxSource" : "/ke/consumer/list/table/ajax",
+			"sAjaxSource" : "/consumer/list/table/ajax",
 			"aoColumns" : [ {
 				"mData" : 'id'
 			}, {
@@ -43,7 +43,7 @@ $(document).ready(function() {
 		console.log("Get consumer group has error, msg is " + e)
 	}
 
-	var m = [ 20, 140, 20, 140 ], w = 1100 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
+	var m = [ 20, 240, 20, 240 ], w = 1080 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
 
 	var tree = d3.layout.tree().size([ h, w ]);
 
@@ -53,7 +53,7 @@ $(document).ready(function() {
 
 	var vis = d3.select("#active_topic").append("svg:svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-	d3.json('/ke/consumers/info/ajax', function(json) {
+	d3.json('/consumers/info/ajax', function(json) {
 		root = JSON.parse(json.active);
 		root.x0 = h / 2;
 		root.y0 = 0;
@@ -183,9 +183,9 @@ $(document).ready(function() {
 	var offset = 0;
 	$(document).on('click', 'a[class=link]', function() {
 		var group = $(this).attr("group");
-		$('#doc_info').modal('show');
+		$('#ke_consumer_topics_detail').modal('show');
 
-		$("#consumer_detail_children").append("<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr><th>ID</th><th>Topic</th><th>Consumer Status</th></tr></thead></table></div>");
+		$("#consumer_detail_children").append("<div class='table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-condensed' width='100%'><thead><tr><th>ID</th><th>Topic</th><th>Consumer Status</th></tr></thead></table></div>");
 		if (offset > 0) {
 			$("#div_children" + (offset - 1)).remove();
 		}
@@ -198,7 +198,7 @@ $(document).ready(function() {
 			"bProcessing" : true,
 			"bServerSide" : true,
 			"fnServerData" : retrieveData,
-			"sAjaxSource" : "/ke/consumer/group/table/ajax",
+			"sAjaxSource" : "/consumer/group/table/ajax",
 			"aoColumns" : [ {
 				"mData" : 'id'
 			}, {

@@ -122,22 +122,22 @@ public class ClusterController {
 					String version = clusterService.getKafkaVersion(cluster.getString("host"), cluster.getInteger("jmxPort"), cluster.getString("ids"), clusterAlias);
 					version = (version == "" ? Kafka.UNKOWN : version);
 					if (Kafka.UNKOWN.equals(version)) {
-						obj.put("version", "<a class='btn btn-danger btn-xs'>" + version + "</a>");
+						obj.put("version", "<span class='badge badge-danger'>" + version + "</span>");
 					} else {
-						obj.put("version", "<a class='btn btn-success btn-xs'>" + version + "</a>");
+						obj.put("version", "<span class='badge badge-success'>" + version + "</span>");
 					}
 				} else if ("zk".equals(type)) {
 					String mode = cluster.getString("mode");
 					if ("death".equals(mode)) {
-						obj.put("mode", "<a class='btn btn-danger btn-xs'>" + mode + "</a>");
+						obj.put("mode", "<span class='badge badge-danger'>" + mode + "</span>");
 					} else {
-						obj.put("mode", "<a class='btn btn-success btn-xs'>" + mode + "</a>");
+						obj.put("mode", "<span class='badge badge-success'>" + mode + "</span>");
 					}
 					String version = cluster.getString("version");
 					if (StrUtils.isNull(version)) {
-						obj.put("version", "<a class='btn btn-danger btn-xs'>unkown</a>");
+						obj.put("version", "<span class='badge badge-danger'>unkown</span>");
 					} else {
-						obj.put("version", "<a class='btn btn-success btn-xs'>" + version + "</a>");
+						obj.put("version", "<span class='badge badge-success'>" + version + "</span>");
 					}
 				}
 				aaDatas.add(obj);
@@ -156,22 +156,22 @@ public class ClusterController {
 						String version = clusterService.getKafkaVersion(cluster.getString("host"), cluster.getInteger("jmxPort"), cluster.getString("ids"), clusterAlias);
 						version = (version == "" ? Kafka.UNKOWN : version);
 						if (Kafka.UNKOWN.equals(version)) {
-							obj.put("version", "<a class='btn btn-danger btn-xs'>" + version + "</a>");
+							obj.put("version", "<span class='badge badge-danger'>" + version + "</span>");
 						} else {
-							obj.put("version", "<a class='btn btn-success btn-xs'>" + version + "</a>");
+							obj.put("version", "<span class='badge badge-success'>" + version + "</span>");
 						}
 					} else if ("zk".equals(type)) {
 						String mode = cluster.getString("mode");
 						if ("death".equals(mode)) {
-							obj.put("mode", "<a class='btn btn-danger btn-xs'>" + mode + "</a>");
+							obj.put("mode", "<span class='badge badge-danger'>" + mode + "</span>");
 						} else {
-							obj.put("mode", "<a class='btn btn-success btn-xs'>" + mode + "</a>");
+							obj.put("mode", "<span class='badge badge-success'>" + mode + "</span>");
 						}
 						String version = cluster.getString("version");
 						if (StrUtils.isNull(version)) {
-							obj.put("version", "<a class='btn btn-danger btn-xs'>unkown</a>");
+							obj.put("version", "<span class='badge badge-danger'>unkown</span>");
 						} else {
-							obj.put("version", "<a class='btn btn-success btn-xs'>" + version + "</a>");
+							obj.put("version", "<span class='badge badge-success'>" + version + "</span>");
 						}
 					}
 					aaDatas.add(obj);
@@ -202,15 +202,15 @@ public class ClusterController {
 			session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS);
 			session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, clusterAlias);
 			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
-			String dropList = "<ul class='dropdown-menu'>";
+			String dropList = "<div class='dropdown-menu dropdown-menu-right' aria-labelledby='clusterDropdown'>";
 			int i = 0;
 			for (String clusterAliasStr : clusterAliass) {
 				if (!clusterAliasStr.equals(clusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT) {
-					dropList += "<li><a href='/ke/cluster/info/" + clusterAliasStr + "/change'><i class='fa fa-fw fa-sitemap'></i>" + clusterAliasStr + "</a></li>";
+					dropList += "<a class='dropdown-item' href='/cluster/info/" + clusterAliasStr + "/change'><i class='fas fa-feather-alt fa-sm fa-fw mr-1'></i>" + clusterAliasStr + "</a>";
 					i++;
 				}
 			}
-			dropList += "<li><a href='/ke/cluster/multi'><i class='fa fa-fw fa-tasks'></i>More...</a></li></ul>";
+			dropList += "<a class='dropdown-item' href='/cluster/multi'><i class='fas fa-server fa-sm fa-fw mr-1'></i>More...</a></div>";
 			session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST);
 			session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST, dropList);
 			return new ModelAndView("redirect:/");
@@ -247,7 +247,7 @@ public class ClusterController {
 				target.put("id", cluster.getInteger("id"));
 				target.put("clusterAlias", cluster.getString("clusterAlias"));
 				target.put("zkhost", cluster.getString("zkhost"));
-				target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='btn btn-primary btn-xs'>Change</a>");
+				target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='badge badge-primary'>Change</a>");
 				aaDatas.add(target);
 			} else if (search.length() == 0) {
 				if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
@@ -255,7 +255,7 @@ public class ClusterController {
 					target.put("id", cluster.getInteger("id"));
 					target.put("clusterAlias", cluster.getString("clusterAlias"));
 					target.put("zkhost", cluster.getString("zkhost"));
-					target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='btn btn-primary btn-xs'>Change</a>");
+					target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='badge badge-primary'>Change</a>");
 					aaDatas.add(target);
 				}
 				offset++;
