@@ -81,7 +81,7 @@
 			</a>
 			<div class="collapse" id="collapseAlarm" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
 				<nav class="sb-sidenav-menu-nested nav">
-					<a class="nav-link" href="layout-static.html">ZK & Kafka</a> <a class="nav-link" href="layout-sidenav-light.html">Multi-Clusters</a> <a class="nav-link" href="layout-sidenav-light.html">ZkCli</a>
+
 				</nav>
 			</div>
 			<c:if test="${WHETHER_SYSTEM_ADMIN==1}">
@@ -96,13 +96,15 @@
 				</a>
 				<div class="collapse" id="collapseSystem" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
 					<nav class="sb-sidenav-menu-nested nav">
-						<a class="nav-link" href="#">User</a> <a class="nav-link" href="#">Role</a> <a class="nav-link" href="#">Resource</a>
+						<a class="nav-link" href="/system/user"><i class="fas fa-user fa-sm fa-fw mr-1"></i>User</a>
+						<a class="nav-link" href="/system/role"><i class="fas fa-key fa-sm fa-fw mr-1"></i>Role</a>
+						<a class="nav-link" href="/system/resource"><i class="fas fa-folder-open fa-sm fa-fw mr-1"></i>Resource</a>
 					</nav>
 				</div>
 			</c:if>
 		</div>
 	</div>
-	<!-- 
+	<!--
 	<div class="sb-sidenav-footer">
 		<div class="small">Logged in as:</div>
 		Administrator
