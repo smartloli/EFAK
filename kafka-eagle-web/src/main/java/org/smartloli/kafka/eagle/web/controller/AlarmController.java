@@ -515,18 +515,18 @@ public class AlarmController {
 			obj.put("alarmTimes", clustersInfo.getAlarmTimes());
 			obj.put("alarmMaxTimes", clustersInfo.getAlarmMaxTimes());
 			if (clustersInfo.getAlarmLevel().equals("P0")) {
-				obj.put("alarmLevel", "<a class='btn btn-danger btn-xs'>" + clustersInfo.getAlarmLevel() + "</a>");
+				obj.put("alarmLevel", "<span class='badge badge-danger'>" + clustersInfo.getAlarmLevel() + "</span>");
 			} else if (clustersInfo.getAlarmLevel().equals("P1")) {
-				obj.put("alarmLevel", "<a class='btn btn-warning btn-xs'>" + clustersInfo.getAlarmLevel() + "</a>");
+				obj.put("alarmLevel", "<span class='badge badge-warning'>" + clustersInfo.getAlarmLevel() + "</span>");
 			} else if (clustersInfo.getAlarmLevel().equals("P2")) {
-				obj.put("alarmLevel", "<a class='btn btn-info btn-xs'>" + clustersInfo.getAlarmLevel() + "</a>");
+				obj.put("alarmLevel", "<span class='badge badge-info'>" + clustersInfo.getAlarmLevel() + "</span>");
 			} else {
-				obj.put("alarmLevel", "<a class='btn btn-primary btn-xs'>" + clustersInfo.getAlarmLevel() + "</a>");
+				obj.put("alarmLevel", "<span class='badge badge-primary'>" + clustersInfo.getAlarmLevel() + "</span>");
 			}
 			if (clustersInfo.getIsNormal().equals("Y")) {
-				obj.put("alarmIsNormal", "<a class='btn btn-success btn-xs'>Y</a>");
+				obj.put("alarmIsNormal", "<span class='badge badge-success'>Y</span>");
 			} else {
-				obj.put("alarmIsNormal", "<a class='btn btn-danger btn-xs'>N</a>");
+				obj.put("alarmIsNormal", "<span class='badge badge-danger'>N</span>");
 			}
 			if (clustersInfo.getIsEnable().equals("Y")) {
 				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
@@ -535,8 +535,10 @@ public class AlarmController {
 			}
 			obj.put("created", clustersInfo.getCreated());
 			obj.put("modify", clustersInfo.getModify());
-			obj.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_cluster_modify' href='#" + id
-					+ "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_cluster_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			obj.put("operate",
+					"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='alarm_cluster_modify' href='#"
+							+ id + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + id
+							+ "' name='alarm_cluster_remove'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Delete</a></div>");
 			aaDatas.add(obj);
 		}
 

@@ -71,17 +71,47 @@
 					<a class="nav-link" href="/metrics/zk"><i class="fas fa-chart-area fa-code fa-sm fa-fw mr-1"></i>Zookeeper</a>
 				</nav>
 			</div>
-			<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAlarm" aria-expanded="false" aria-controls="collapseAlarm">
+			<div class="sb-sidenav-menu-heading">Alarm</div>
+			<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAlarmChannel" aria-expanded="false" aria-controls="collapseAlarm">
 				<div class="sb-nav-link-icon">
-					<i class="fas fa-bell"></i>
-				</div> Alarm
+					<i class="fas fa-bullhorn"></i>
+				</div> Channel
 				<div class="sb-sidenav-collapse-arrow">
 					<i class="fas fa-angle-down"></i>
 				</div>
 			</a>
-			<div class="collapse" id="collapseAlarm" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+			<div class="collapse" id="collapseAlarmChannel" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
 				<nav class="sb-sidenav-menu-nested nav">
-
+					<a class="nav-link" href="/alarm/config"><i class="fas fa-copy fa-sm fa-fw mr-1"></i>Config</a>
+					<a class="nav-link" href="/alarm/list"><i class="fas fa-user-edit fa-sm fa-fw mr-1"></i>List</a>
+				</nav>
+			</div>
+			<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAlarmConsumer" aria-expanded="false" aria-controls="collapseAlarm">
+				<div class="sb-nav-link-icon">
+					<i class="fas fa-envelope"></i>
+				</div> AlarmConsumer
+				<div class="sb-sidenav-collapse-arrow">
+					<i class="fas fa-angle-down"></i>
+				</div>
+			</a>
+			<div class="collapse" id="collapseAlarmConsumer" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+				<nav class="sb-sidenav-menu-nested nav">
+					<a class="nav-link" href="/alarm/add"><i class="fas fa-plus-square fa-sm fa-fw mr-1"></i>Add</a>
+					<a class="nav-link" href="/alarm/modify"><i class="fas fa-pen-square fa-sm fa-fw mr-1"></i>Modify</a>
+				</nav>
+			</div>
+			<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAlarmCluster" aria-expanded="false" aria-controls="collapseAlarm">
+				<div class="sb-nav-link-icon">
+					<i class="fas fa-hdd"></i>
+				</div> AlarmCluster
+				<div class="sb-sidenav-collapse-arrow">
+					<i class="fas fa-angle-down"></i>
+				</div>
+			</a>
+			<div class="collapse" id="collapseAlarmCluster" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+				<nav class="sb-sidenav-menu-nested nav">
+					<a class="nav-link" href="/alarm/create"><i class="fas fa-edit fa-sm fa-fw mr-1"></i>Create</a>
+					<a class="nav-link" href="/alarm/history"><i class="fas fa-history fa-sm fa-fw mr-1"></i>History</a>
 				</nav>
 			</div>
 			<c:if test="${WHETHER_SYSTEM_ADMIN==1}">
