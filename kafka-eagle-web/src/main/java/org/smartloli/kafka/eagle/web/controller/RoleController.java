@@ -269,7 +269,7 @@ public class RoleController {
 			JSONObject obj = new JSONObject();
 			obj.put("name", role.getString("roleName"));
 			obj.put("describer", role.getString("roleDescriber"));
-			obj.put("operate", "<a id='operater_modal' name='operater_modal' href='#" + role.getInteger("id") + "' class='btn btn-primary btn-xs'>Setting</a>");
+			obj.put("operate", "<a id='operater_modal' name='operater_modal' href='#" + role.getInteger("id") + "' class='badge badge-primary'>Auth</a>");
 			aaDatas.add(obj);
 		}
 

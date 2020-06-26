@@ -104,12 +104,10 @@
 			</c:if>
 		</div>
 	</div>
-	<!--
 	<div class="sb-sidenav-footer">
-		<div class="small">Logged in as:</div>
-		Administrator
+		<div class="small">Logged in time is:</div>
+		${LOGIN_USER_SESSION_TIME}
 	</div>
-	 -->
 </nav>
 
 <script type="text/javascript">

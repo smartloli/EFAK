@@ -7,7 +7,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/system/role/table/ajax",
+		"sAjaxSource" : "/system/role/table/ajax",
 		"aoColumns" : [ {
 			"mData" : 'name'
 		}, {
@@ -39,19 +39,18 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/system/role/resource/' + id + '/ajax',
+			url : '/system/role/resource/' + id + '/ajax',
 			success : function(datas) {
 				if (datas != null) {
-					console.log(datas);
-					$('#treeview-checkable').treeview({
+					$('#ke_treeview_checkable').treeview({
 						data : datas,
 						showIcon : false,
 						showCheckbox : true,
 						onNodeChecked : function(event, node) {
-							updateRole('/ke/system/role/insert/' + id + '/' + node.href + '/');
+							updateRole('/system/role/insert/' + id + '/' + node.href + '/');
 						},
 						onNodeUnchecked : function(event, node) {
-							updateRole('/ke/system/role/delete/' + id + '/' + node.href + '/');
+							updateRole('/system/role/delete/' + id + '/' + node.href + '/');
 						}
 					});
 				}
