@@ -10105,6 +10105,7 @@ body {
 .sb-topnav.navbar-dark #sidebarToggle {
   color: rgba(255, 255, 255, 0.5);
 }
+
 .sb-topnav.navbar-light #sidebarToggle {
   color: #212529;
 }

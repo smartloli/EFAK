@@ -197,13 +197,7 @@ $(document).ready(function() {
 
 	var topic_producer_msg = morrisLineInit('topic_producer_msg');
 	
-	$("#sidebarToggleOff").on("click", function(e) {
-		var opt_topic_producer_msg=topic_producer_msg.getOption();
-		topic_producer_msg.clear();
-		topic_producer_msg.resize({width:$("#topic_producer_msg").css('width')});
-		topic_producer_msg.setOption(opt_topic_producer_msg);
-	});
-	$("#sidebarToggleOn").on("click", function(e) {
+	$("#topic_producer_msg").resize(function () {
 		var opt_topic_producer_msg=topic_producer_msg.getOption();
 		topic_producer_msg.clear();
 		topic_producer_msg.resize({width:$("#topic_producer_msg").css('width')});

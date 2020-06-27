@@ -162,6 +162,9 @@ public interface KafkaService {
 	/** Get kafka used cpu. */
 	public String getUsedCpu(String host, int port);
 
+	/** Get kafka used cpu value. */
+	public double getUsedCpuValue(String host, int port);
+
 	/** Get kafka used memory. */
 	public String getUsedMemory(String host, int port);
 

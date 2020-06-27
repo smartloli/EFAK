@@ -146,6 +146,7 @@ public class KConstants {
 		public static final String REPLICATIONBYTESOUTPERSEC = "replication_bytes_in";
 		public static final String OSTOTALMEMORY = "os_total_memory";
 		public static final String OSFREEMEMORY = "os_free_memory";
+		public static final String CPUUSED = "cpu_used";
 	}
 
 	public final class ZK {

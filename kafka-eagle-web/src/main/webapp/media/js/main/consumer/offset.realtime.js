@@ -161,37 +161,25 @@ $(document).ready(function() {
 	producerChart.setOption(producerOption);
 	consumerChart.setOption(consumerOption);
 	
-	$("#sidebarToggleOff").on("click", function(e) {
+	$("#lag_chart").resize(function () {
 		var opt_lagChart=lagChart.getOption();
 		lagChart.clear();
 		lagChart.resize({width:$("#lag_chart").css('width')});
 		lagChart.setOption(opt_lagChart);
-	    
-	    var opt_producerChart=producerChart.getOption();
-	    producerChart.clear();
-	    producerChart.resize({width:$("#producer_chart").css('width')});
-	    producerChart.setOption(opt_producerChart);
-	    
-	    var opt_consumerChart=consumerChart.getOption();
-	    consumerChart.clear();
-	    consumerChart.resize({width:$("#consumer_chart").css('width')});
-	    consumerChart.setOption(opt_consumerChart);
 	});
-	$("#sidebarToggleOn").on("click", function(e) {
-		var opt_lagChart=lagChart.getOption();
-		lagChart.clear();
-		lagChart.resize({width:$("#lag_chart").css('width')});
-		lagChart.setOption(opt_lagChart);
-	    
-	    var opt_producerChart=producerChart.getOption();
-	    producerChart.clear();
-	    producerChart.resize({width:$("#producer_chart").css('width')});
-	    producerChart.setOption(opt_producerChart);
-	    
-	    var opt_consumerChart=consumerChart.getOption();
-	    consumerChart.clear();
-	    consumerChart.resize({width:$("#consumer_chart").css('width')});
-	    consumerChart.setOption(opt_consumerChart);
+
+	$("#producer_chart").resize(function () {
+		var opt_producerChart=producerChart.getOption();
+		producerChart.clear();
+		producerChart.resize({width:$("#producer_chart").css('width')});
+		producerChart.setOption(opt_producerChart);
+	});
+
+	$("#consumer_chart").resize(function () {
+		var opt_consumerChart=consumerChart.getOption();
+		consumerChart.clear();
+		consumerChart.resize({width:$("#consumer_chart").css('width')});
+		consumerChart.setOption(opt_consumerChart);
 	});
 
 	var start = moment();

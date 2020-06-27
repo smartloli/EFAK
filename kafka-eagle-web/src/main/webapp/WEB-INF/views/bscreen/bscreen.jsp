@@ -12,9 +12,9 @@
 <meta name="author" content="">
 
 <title>BScreen - KafkaEagle</title>
-<link rel="shortcut icon" href="/ke/media/img/favicon.ico" />
-<link rel="stylesheet" href="/ke/media/css/bscreen/css/bscreen.css">
-<script type="text/javascript" src="/ke/media/js/bscreen/js/jquery.js"></script>
+<link rel="shortcut icon" href="/media/img/favicon.ico" />
+<link rel="stylesheet" href="/media/css/bscreen/css/bscreen.css">
+<script type="text/javascript" src="/media/js/bscreen/js/jquery.js"></script>
 <script>
 	$(document).ready(function() {
 		var whei = $(window).width()
@@ -30,8 +30,8 @@
 	});
 </script>
 
-<script type="text/javascript" src="/ke/media/js/bscreen/js/echarts.min.js"></script>
-<script type="text/javascript" src="/ke/media/js/bscreen/js/bscreen.js"></script>
+<script type="text/javascript" src="/media/js/bscreen/js/echarts.min.js"></script>
+<script type="text/javascript" src="/media/js/bscreen/js/bscreen.js"></script>
 <body>
 	<div class="head">
 		<h1>Kafka Eagle BScreen</h1>
@@ -106,13 +106,13 @@
 				</div>
 				<div class="map">
 					<div class="map1">
-						<img src="/ke/media/js/bscreen/picture/lbx.png">
+						<img src="/media/js/bscreen/picture/lbx.png">
 					</div>
 					<div class="map2">
-						<img src="/ke/media/js/bscreen/picture/jt.png">
+						<img src="/media/js/bscreen/picture/jt.png">
 					</div>
 					<div class="map3">
-						<img src="/ke/media/js/bscreen/picture/map.png">
+						<img src="/media/js/bscreen/picture/map.png">
 					</div>
 					<div class="map4">
 						<div style="height: 100%; width: 100%;">

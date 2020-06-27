@@ -159,11 +159,11 @@ path.link {
 									<i class="fas fa-hdd"></i> Kafka OS Used Memory (%)
 								</div>
 								<div class="card-body">
-									<div>
+									<div id="ke_dash_os_memory_div">
 										<svg id="fillgauge_kafka_memory" width="97%" height="424"></svg>
 									</div>
 									<div class="text-right">
-										<a href="/ke/metrics/kafka#os_free_memory">View Details <i class="far fa-arrow-alt-circle-right"></i></a>
+										<a href="/ke/metrics/kafka#os_free_memory"></a>
 									</div>
 								</div>
 							</div>
@@ -174,11 +174,11 @@ path.link {
 									<i class="fas fa-hdd"></i> Kafka CPU Used Memory (%)
 								</div>
 								<div class="card-body">
-									<div>
-										<svg id="fillgauge_kafka_memory" width="97%" height="424"></svg>
+									<div id="ke_dash_cpu_div">
+										<svg id="fillgauge_kafka_cpu" width="97%" height="424"></svg>
 									</div>
 									<div class="text-right">
-										<a href="/ke/metrics/kafka#os_free_memory">View Details <i class="far fa-arrow-alt-circle-right"></i></a>
+										<a href="#"><i class=""></i></a>
 									</div>
 								</div>
 							</div>

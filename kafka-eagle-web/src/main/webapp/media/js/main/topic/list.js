@@ -279,14 +279,8 @@ $(document).ready(function() {
 	}
 
 	var topic_producer_agg = morrisBarInit('topic_producer_agg');
-	
-	$("#sidebarToggleOff").on("click", function(e) {
-		var opt_topic_producer_agg=topic_producer_agg.getOption();
-		topic_producer_agg.clear();
-		topic_producer_agg.resize({width:$("#topic_producer_agg").css('width')});
-		topic_producer_agg.setOption(opt_topic_producer_agg);
-	});
-	$("#sidebarToggleOn").on("click", function(e) {
+
+	$("#topic_producer_agg").resize(function () {
 		var opt_topic_producer_agg=topic_producer_agg.getOption();
 		topic_producer_agg.clear();
 		topic_producer_agg.resize({width:$("#topic_producer_agg").css('width')});

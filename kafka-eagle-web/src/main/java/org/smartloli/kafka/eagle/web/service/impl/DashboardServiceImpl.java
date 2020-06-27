@@ -195,6 +195,18 @@ public class DashboardServiceImpl implements DashboardService {
 		return object.toJSONString();
 	}
 
+	/** Get used cpu data. */
+	public String getUsedCPU(Map<String, Object> params) {
+		List<KpiInfo> kpis = mbeanDao.getUsedCPU(params);
+		JSONObject object = new JSONObject();
+		if (kpis.size()>0) {
+			object.put("cpu", StrUtils.numberic(kpis.get(0).getValue()));
+		} else {
+			object.put("cpu", "0.0");
+		}
+		return object.toJSONString();
+	}
+
 	/** Read topic lastest logsize diffval data. */
 	public TopicLogSize readLastTopicLogSize(Map<String, Object> params) {
 		return topicDao.readLastTopicLogSize(params);

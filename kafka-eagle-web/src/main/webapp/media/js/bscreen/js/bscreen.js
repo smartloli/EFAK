@@ -17,7 +17,7 @@
 			$.ajax({
 				type : 'get',
 				dataType : 'json',
-				url : '/ke/bs/brokers/ins/outs/realrate/ajax',
+				url : '/bs/brokers/ins/outs/realrate/ajax',
 				success : function(datas) {
 					if (datas != null) {
 						$("#ke_bs_ins_rate").text(stringify(datas.ins).value);
@@ -40,7 +40,7 @@
 			$.ajax({
 				type : 'get',
 				dataType : 'json',
-				url : '/ke/bs/topic/total/capacity/ajax',
+				url : '/bs/topic/total/capacity/ajax',
 				success : function(datas) {
 					if (datas != null) {
 						$("#ke_topics_total_capacity_unit").text("Topic Total Capacity (" + datas.type + ")");
@@ -84,7 +84,7 @@
 			$.ajax({
 				type : 'get',
 				dataType : 'json',
-				url : '/ke/bs/topic/total/logsize/ajax',
+				url : '/bs/topic/total/logsize/ajax',
 				success : function(datas) {
 					if (datas != null) {
 						$("#ke_topics_total_logsize").text(datas.total);
@@ -187,7 +187,7 @@
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/bs/producer/history/ajax',
+			url : '/bs/producer/history/ajax',
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");
@@ -306,7 +306,7 @@
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/bs/consumer/history/ajax',
+			url : '/bs/consumer/history/ajax',
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");
@@ -442,7 +442,7 @@
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/bs/producers/day/ajax',
+			url : '/bs/producers/day/ajax',
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");
@@ -579,7 +579,7 @@
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/bs/consumers/day/ajax',
+			url : '/bs/consumers/day/ajax',
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");
@@ -715,7 +715,7 @@
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/bs/lag/day/ajax',
+			url : '/bs/lag/day/ajax',
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");

@@ -4,7 +4,6 @@
 <script src="/media/js/public/plus/bootstrap.bundle.min.js" type="text/javascript"></script>
 <script src="/media/js/public/plus/navbar.js" type="text/javascript"></script>
 <script src="/media/js/public/plus/all.min.js" type="text/javascript"></script>
-<script src="/media/js/public/bootstrap-treeview.min.js" type="text/javascript"></script>
 
 <%
 	String[] loader = request.getParameterValues("loader");

@@ -138,7 +138,6 @@ $(document).ready(function() {
 			d._children = null;
 		}
 	}
-
 	function fillgaugeGrahpPie(datas, id) {
 		var config = liquidFillGaugeDefaultSettings();
 		config.circleThickness = 0.1;
@@ -161,20 +160,53 @@ $(document).ready(function() {
 		loadLiquidFillGauge(id, datas, config);
 	}
 
-	try {
-		$.ajax({
-			type : 'get',
-			dataType : 'json',
-			url : '/dash/os/mem/ajax',
-			success : function(datas) {
-				if (datas != null) {
-					fillgaugeGrahpPie(datas.mem, "fillgauge_kafka_memory");
+
+
+	function osMem(){
+		try {
+			$.ajax({
+				type : 'get',
+				dataType : 'json',
+				url : '/dash/os/mem/ajax',
+				success : function(datas) {
+					if (datas != null) {
+						fillgaugeGrahpPie(datas.mem, "fillgauge_kafka_memory");
+					}
 				}
-			}
-		});
-	} catch (e) {
-		console.log(e);
+			});
+		} catch (e) {
+			console.log(e);
+		}
 	}
+
+	function cpu(){
+		try {
+			$.ajax({
+				type : 'get',
+				dataType : 'json',
+				url : '/dash/used/cpu/ajax',
+				success : function(datas) {
+					if (datas != null) {
+						fillgaugeGrahpPie(datas.cpu, "fillgauge_kafka_cpu");
+					}
+				}
+			});
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	osMem();
+	cpu();
+
+	$("#ke_dash_os_memory_div").resize(function () {
+		$("#ke_dash_os_memory_div").html("<svg id='fillgauge_kafka_memory' width='97%' height='424'></svg>");
+		osMem();
+	});
+	$("#ke_dash_cpu_div").resize(function () {
+		$("#ke_dash_cpu_div").html("<svg id='fillgauge_kafka_cpu' width='97%' height='424'></svg>");
+		cpu();
+	});
 
 	$.ajax({
 		type : 'get',
