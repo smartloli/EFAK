@@ -145,14 +145,14 @@ public class ConsumersController {
 				int activeTopics = consumer.getInteger("activeTopics");
 				int activeThreads = consumer.getInteger("activeThreads");
 				if (activeTopics > 0) {
-					obj.put("activeTopics", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
+					obj.put("activeTopics", "<span class='badge badge-success'>" + consumer.getInteger("activeTopics") + "</span>");
 				} else {
-					obj.put("activeTopics", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeTopics") + "</a>");
+					obj.put("activeTopics", "<span class='badge badge-danger'>" + consumer.getInteger("activeTopics") + "</span>");
 				}
 				if (activeThreads > 0) {
-					obj.put("activeThreads", "<a class='btn btn-success btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+					obj.put("activeThreads", "<span class='badge badge-success'>" + consumer.getInteger("activeThreads") + "</span>");
 				} else {
-					obj.put("activeThreads", "<a class='btn btn-danger btn-xs'>" + consumer.getInteger("activeThreads") + "</a>");
+					obj.put("activeThreads", "<span class='badge badge-danger'>" + consumer.getInteger("activeThreads") + "</span>");
 				}
 
 				aaDatas.add(obj);
@@ -175,14 +175,14 @@ public class ConsumersController {
 				int activeTopics = consumerSummary.getActiveTopic();
 				int activeThreads = consumerSummary.getActiveThread();
 				if (activeTopics > 0) {
-					obj.put("activeTopics", "<a class='btn btn-success btn-xs'>" + activeTopics + "</a>");
+					obj.put("activeTopics", "<span class='badge badge-success'>" + activeTopics + "</span>");
 				} else {
-					obj.put("activeTopics", "<a class='btn btn-danger btn-xs'>" + activeTopics + "</a>");
+					obj.put("activeTopics", "<span class='badge badge-danger'>" + activeTopics + "</span>");
 				}
 				if (activeThreads > 0) {
-					obj.put("activeThreads", "<a class='btn btn-success btn-xs'>" + activeThreads + "</a>");
+					obj.put("activeThreads", "<span class='badge badge-success'>" + activeThreads + "</span>");
 				} else {
-					obj.put("activeThreads", "<a class='btn btn-danger btn-xs'>" + activeThreads + "</a>");
+					obj.put("activeThreads", "<span class='badge badge-danger'>" + activeThreads + "</span>");
 				}
 
 				aaDatas.add(obj);
@@ -265,11 +265,11 @@ public class ConsumersController {
 					}
 
 					if (consumerDetail.getInteger("isConsumering") == Topic.RUNNING) {
-						obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-success btn-xs'>Running</a>");
+						obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-success'>Running</a>");
 					} else if (consumerDetail.getInteger("isConsumering") == Topic.SHUTDOWN) {
-						obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-danger btn-xs'>Shutdown</a>");
+						obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-danger'>Shutdown</a>");
 					} else {
-						obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-warning btn-xs'>Pending</a>");
+						obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-warning'>Pending</a>");
 					}
 					aaDatas.add(obj);
 				}
@@ -291,11 +291,11 @@ public class ConsumersController {
 				}
 				int isConsumering = consumerGroup.getStatus();
 				if (isConsumering == Topic.RUNNING) {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-success btn-xs'>Running</a>");
+					obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-success'>Running</a>");
 				} else if (isConsumering == Topic.SHUTDOWN) {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-danger btn-xs'>Shutdown</a>");
+					obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-danger'>Shutdown</a>");
 				} else {
-					obj.put("isConsumering", "<a href='/ke/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='btn btn-warning btn-xs'>Pending</a>");
+					obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-warning'>Pending</a>");
 				}
 				aaDatas.add(obj);
 				id++;

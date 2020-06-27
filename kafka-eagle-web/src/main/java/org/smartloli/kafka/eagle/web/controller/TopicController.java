@@ -208,14 +208,14 @@ public class TopicController {
 			object.put("replicas", metadata.getReplicas());
 			object.put("isr", metadata.getIsr());
 			if (metadata.isPreferredLeader()) {
-				object.put("preferred_leader", "<a class='btn btn-success btn-xs'>true</a>");
+				object.put("preferred_leader", "<span class='badge badge-success'>true</span>");
 			} else {
-				object.put("preferred_leader", "<a class='btn btn-danger btn-xs'>false</a>");
+				object.put("preferred_leader", "<span class='badge badge-danger btn-xs'>false</span>");
 			}
 			if (metadata.isUnderReplicated()) {
-				object.put("under_replicated", "<a class='btn btn-danger btn-xs'>true</a>");
+				object.put("under_replicated", "<span class='badge badge-danger btn-xs'>true</span>");
 			} else {
-				object.put("under_replicated", "<a class='btn btn-success btn-xs'>false</a>");
+				object.put("under_replicated", "<span class='badge badge-success btn-xs'>false</span>");
 			}
 			aaDatas.add(object);
 		}
@@ -452,40 +452,40 @@ public class TopicController {
 		for (PartitionsInfo partition : topics) {
 			JSONObject object = new JSONObject();
 			object.put("id", partition.getId());
-			object.put("topic", "<a href='/ke/topic/meta/" + partition.getTopic() + "/' target='_blank'>" + partition.getTopic() + "</a>");
+			object.put("topic", "<a href='/topic/meta/" + partition.getTopic() + "/' target='_blank'>" + partition.getTopic() + "</a>");
 			object.put("partitions", partition.getPartitionNumbers());
 			try {
 				long brokerSpread = partition.getBrokersSpread();
 				if (brokerSpread < Topic.TOPIC_BROKER_SPREAD_ERROR) {
-					object.put("brokerSpread", "<a class='btn btn-danger btn-xs'>" + brokerSpread + "%</a>");
+					object.put("brokerSpread", "<span class='badge badge-danger'>" + brokerSpread + "%</span>");
 				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_ERROR && brokerSpread < Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-					object.put("brokerSpread", "<a class='btn btn-warning btn-xs'>" + brokerSpread + "%</a>");
+					object.put("brokerSpread", "<span class='badge badge-warning'>" + brokerSpread + "%</span>");
 				} else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-					object.put("brokerSpread", "<a class='btn btn-success btn-xs'>" + brokerSpread + "%</a>");
+					object.put("brokerSpread", "<span class='badge badge-success'>" + brokerSpread + "%</span>");
 				} else {
-					object.put("brokerSpread", "<a class='btn btn-primary btn-xs'>" + brokerSpread + "%</a>");
+					object.put("brokerSpread", "<span class='badge badge-primary'>" + brokerSpread + "%</span>");
 				}
 
 				long brokerSkewed = partition.getBrokersSkewed();
 				if (brokerSkewed >= Topic.TOPIC_BROKER_SKEW_ERROR) {
-					object.put("brokerSkewed", "<a class='btn btn-danger btn-xs'>" + brokerSkewed + "%</a>");
+					object.put("brokerSkewed", "<span class='badge badge-danger'>" + brokerSkewed + "%</span>");
 				} else if (brokerSkewed > Topic.TOPIC_BROKER_SKEW_NORMAL && brokerSkewed < Topic.TOPIC_BROKER_SKEW_ERROR) {
-					object.put("brokerSkewed", "<a class='btn btn-warning btn-xs'>" + brokerSkewed + "%</a>");
+					object.put("brokerSkewed", "<span class='badge badge-warning'>" + brokerSkewed + "%</span>");
 				} else if (brokerSkewed <= Topic.TOPIC_BROKER_SKEW_NORMAL) {
-					object.put("brokerSkewed", "<a class='btn btn-success btn-xs'>" + brokerSkewed + "%</a>");
+					object.put("brokerSkewed", "<span class='badge badge-success'>" + brokerSkewed + "%</span>");
 				} else {
-					object.put("brokerSkewed", "<a class='btn btn-primary btn-xs'>" + brokerSkewed + "%</a>");
+					object.put("brokerSkewed", "<span class='badge badge-primary'>" + brokerSkewed + "%</span>");
 				}
 
 				long brokerLeaderSkewed = partition.getBrokersLeaderSkewed();
 				if (brokerLeaderSkewed >= Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
-					object.put("brokerLeaderSkewed", "<a class='btn btn-danger btn-xs'>" + brokerLeaderSkewed + "%</a>");
+					object.put("brokerLeaderSkewed", "<span class='badge badge-danger'>" + brokerLeaderSkewed + "%</span>");
 				} else if (brokerLeaderSkewed > Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL && brokerLeaderSkewed < Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
-					object.put("brokerLeaderSkewed", "<a class='btn btn-warning btn-xs'>" + brokerLeaderSkewed + "%</a>");
+					object.put("brokerLeaderSkewed", "<span class='badge badge-warning'>" + brokerLeaderSkewed + "%</span>");
 				} else if (brokerLeaderSkewed <= Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL) {
-					object.put("brokerLeaderSkewed", "<a class='btn btn-success btn-xs'>" + brokerLeaderSkewed + "%</a>");
+					object.put("brokerLeaderSkewed", "<span class='badge badge-success'>" + brokerLeaderSkewed + "%</span>");
 				} else {
-					object.put("brokerLeaderSkewed", "<a class='btn btn-primary btn-xs'>" + brokerLeaderSkewed + "%</a>");
+					object.put("brokerLeaderSkewed", "<span class='badge badge-primary'>" + brokerLeaderSkewed + "%</span>");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -500,23 +500,29 @@ public class TopicController {
 			if (topicStates != null && topicStates.size() > 0) {
 				if (topicStates.get(0).getTvalue() == 0) {
 					if (Role.ADMIN.equals(signiner.getUsername())) {
-						object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
-								+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Truncating</a></li></ul></div>");
+						object.put("operate",
+								"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
+										+ partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
+										+ "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
 					} else {
 						object.put("operate", "");
 					}
 				} else {
 					if (Role.ADMIN.equals(signiner.getUsername())) {
-						object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
-								+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Truncated</a></li></ul></div>");
+						object.put("operate",
+								"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
+										+ partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
+										+ "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
 					} else {
 						object.put("operate", "");
 					}
 				}
 			} else {
 				if (Role.ADMIN.equals(signiner.getUsername())) {
-					object.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='topic_modify' href='#" + partition.getTopic()
-							+ "'><i class='fa fa-fw fa-edit'></i>Alter</a></li><li><a href='#" + partition.getTopic() + "' name='topic_remove'><i class='fa fa-fw fa-minus-circle'></i>Drop</a></li><li><a href='#" + partition.getTopic() + "' name='topic_clean'><i class='fa fa-fw fa-trash-o'></i>Truncate</a></li></ul></div>");
+					object.put("operate",
+							"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
+									+ partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
+									+ "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
 				} else {
 					object.put("operate", "");
 				}
@@ -798,9 +804,9 @@ public class TopicController {
 				obj.put("host", "<a href='#" + id + "/host' name='ke_sql_query_detail'>" + (host.length() > 20 ? host.substring(0, 20) + "..." : host) + "</a>");
 				obj.put("ksql", "<a href='#" + id + "/ksql' name='ke_sql_query_detail'>" + (ksql.length() > 60 ? ksql.substring(0, 60) + "..." : ksql) + "</a>");
 				if (topicSql.getStatus().equals("SUCCESSED")) {
-					obj.put("status", "<a class='btn btn-success btn-xs'>" + topicSql.getStatus() + "</a>");
+					obj.put("status", "<span class='badge badge-success'>" + topicSql.getStatus() + "</span>");
 				} else {
-					obj.put("status", "<a class='btn btn-danger btn-xs'>" + topicSql.getStatus() + "</a>");
+					obj.put("status", "<span class='badge badge-danger'>" + topicSql.getStatus() + "</span>");
 				}
 				obj.put("spendTime", topicSql.getSpendTime() / 1000.0 + "s");
 				obj.put("created", topicSql.getCreated());

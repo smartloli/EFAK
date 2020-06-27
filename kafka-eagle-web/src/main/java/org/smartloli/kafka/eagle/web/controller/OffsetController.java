@@ -158,16 +158,16 @@ public class OffsetController {
 			JSONObject object = new JSONObject();
 			object.put("partition", offsetInfo.getPartition());
 			if (offsetInfo.getLogSize() == 0) {
-				object.put("logsize", "<a class='btn btn-warning btn-xs'>0</a>");
+				object.put("logsize", "<span class='badge badge--warning'>0</span>");
 			} else {
 				object.put("logsize", offsetInfo.getLogSize());
 			}
 			if (offsetInfo.getOffset() == -1) {
-				object.put("offset", "<a class='btn btn-warning btn-xs'>0</a>");
+				object.put("offset", "<span class='badge badge-warning'>0</span>");
 			} else {
-				object.put("offset", "<a class='btn btn-success btn-xs'>" + offsetInfo.getOffset() + "</a>");
+				object.put("offset", "<span class='badge badge-success'>" + offsetInfo.getOffset() + "</span>");
 			}
-			object.put("lag", "<a class='btn btn-danger btn-xs'>" + offsetInfo.getLag() + "</a>");
+			object.put("lag", "<span class='badge badge-danger'>" + offsetInfo.getLag() + "</span>");
 			object.put("owner", offsetInfo.getOwner());
 			object.put("created", offsetInfo.getCreate());
 			object.put("modify", offsetInfo.getModify());

@@ -56,7 +56,7 @@ $(document).ready(function() {
 			"bProcessing" : true,
 			"bServerSide" : true,
 			"fnServerData" : retrieveData,
-			"sAjaxSource" : '/ke/topic/physics/commit/?sql=' + sql,
+			"sAjaxSource" : '/topic/physics/commit/?sql=' + sql,
 			"aoColumns" : mData
 		});
 
@@ -78,13 +78,14 @@ $(document).ready(function() {
 		offset++;
 	}
 
-	$(document).on('click', 'a[name=run_task]', function() {
+	$(document).on('click', 'button[id=ke_ksql_query]', function() {
 		var sql = encodeURI(sqlEditor.getValue());
 		logEditor.setValue("");
+		console.log(sql);
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/logical/commit/?sql=' + sql,
+			url : '/topic/logical/commit/?sql=' + sql,
 			success : function(datas) {
 				if (datas != null) {
 					if (datas.error) {
@@ -149,7 +150,7 @@ $(document).ready(function() {
 			"bProcessing" : true,
 			"bServerSide" : true,
 			"fnServerData" : retrieveData,
-			"sAjaxSource" : '/ke/topic/sql/history/ajax',
+			"sAjaxSource" : '/topic/sql/history/ajax',
 			"aoColumns" : ksqlMData
 		});
 

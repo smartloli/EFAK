@@ -2,7 +2,7 @@ $(document).ready(function() {
 	$("#select2val").select2({
 		placeholder : "Alarm Type",
 		ajax : {
-			url : "/ke/alarm/type/list/ajax",
+			url : "/alarm/type/list/ajax",
 			dataType : 'json',
 			delay : 250,
 			data : function(params) {
@@ -81,7 +81,7 @@ $(document).ready(function() {
 			$.ajax({
 				type : 'get',
 				dataType : 'json',
-				url : '/ke/alarm/config/test/send/ajax?type=' + type + '&url=' + url + '&http=' + http + '&msg=' + msg,
+				url : '/alarm/config/test/send/ajax?type=' + type + '&url=' + url + '&http=' + http + '&msg=' + msg,
 				success : function(datas) {
 					if (type.indexOf("DingDing") > -1 || type.indexOf("WeChat") > -1 || type.indexOf("Email") > -1) {
 						if (datas.errcode == 0) {

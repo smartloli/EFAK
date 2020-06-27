@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -96,13 +96,12 @@ import scala.collection.Seq;
 
 /**
  * Implements KafkaService all method.
- * 
- * @author smartloli.
  *
+ * @author smartloli.
+ *         <p>
  *         Created by Jan 18, 2017.
- * 
+ *         <p>
  *         Update by hexiang 20170216
- * 
  * @see org.smartloli.kafka.eagle.core.factory.KafkaService
  */
 public class KafkaServiceImpl implements KafkaService {
@@ -114,15 +113,19 @@ public class KafkaServiceImpl implements KafkaService {
 	private final String TOPIC_ISR = "/brokers/topics/%s/partitions/%s/state";
 	private final Logger LOG = LoggerFactory.getLogger(KafkaServiceImpl.class);
 
-	/** Instance Kafka Zookeeper client pool. */
+	/**
+	 * Instance Kafka Zookeeper client pool.
+	 */
 	private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
 
-	/** Zookeeper service interface. */
+	/**
+	 * Zookeeper service interface.
+	 */
 	private ZkService zkService = new ZkFactory().create();
 
 	/**
 	 * Find topic and group exist in zookeeper.
-	 * 
+	 *
 	 * @param topic
 	 *            Filter topic.
 	 * @param group
@@ -142,7 +145,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/**
 	 * Obtaining metadata in zookeeper by topic.
-	 * 
+	 *
 	 * @param topic
 	 *            Selected condition.
 	 * @return List.
@@ -159,7 +162,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return topicAndPartitions;
 	}
 
-	/** Get kafka active consumer topic. */
+	/**
+	 * Get kafka active consumer topic.
+	 */
 	public Map<String, List<String>> getActiveTopic(String clusterAlias) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		Map<String, List<String>> actvTopics = new HashMap<String, List<String>>();
@@ -202,7 +207,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return actvTopics;
 	}
 
-	/** Get kafka active consumer topic. */
+	/**
+	 * Get kafka active consumer topic.
+	 */
 	public Set<String> getActiveTopic(String clusterAlias, String group) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		Set<String> activeTopics = new HashSet<>();
@@ -223,7 +230,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return activeTopics;
 	}
 
-	/** Get all broker list from zookeeper. */
+	/**
+	 * Get all broker list from zookeeper.
+	 */
 	public List<BrokersInfo> getAllBrokersInfo(String clusterAlias) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		List<BrokersInfo> targets = new ArrayList<BrokersInfo>();
@@ -265,7 +274,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets;
 	}
 
-	/** Obtaining kafka consumer information from zookeeper. */
+	/**
+	 * Obtaining kafka consumer information from zookeeper.
+	 */
 	public Map<String, List<String>> getConsumers(String clusterAlias) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		Map<String, List<String>> consumers = new HashMap<String, List<String>>();
@@ -293,7 +304,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return consumers;
 	}
 
-	/** Obtaining kafka consumer page information from zookeeper. */
+	/**
+	 * Obtaining kafka consumer page information from zookeeper.
+	 */
 	public Map<String, List<String>> getConsumers(String clusterAlias, DisplayInfo page) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		Map<String, List<String>> consumers = new HashMap<String, List<String>>();
@@ -338,7 +351,7 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/**
 	 * According to group, topic and partition to get offset from zookeeper.
-	 * 
+	 *
 	 * @param topic
 	 *            Filter topic.
 	 * @param group
@@ -346,8 +359,7 @@ public class KafkaServiceImpl implements KafkaService {
 	 * @param partition
 	 *            Filter partition.
 	 * @return OffsetZkInfo.
-	 * 
-	 * @see org.smartloli.kafka.eagle.domain.OffsetZkInfo
+	 * @see org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo
 	 */
 	public OffsetZkInfo getOffset(String clusterAlias, String topic, String group, int partition) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
@@ -393,7 +405,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return offsetZk;
 	}
 
-	/** According to topic and partition to obtain Replicas & Isr. */
+	/**
+	 * According to topic and partition to obtain Replicas & Isr.
+	 */
 	public String getReplicasIsr(String clusterAlias, String topic, int partitionid) {
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
 		TopicPartition tp = new TopicPartition(topic, partitionid);
@@ -406,7 +420,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets.toString();
 	}
 
-	/** Get zookeeper cluster information. */
+	/**
+	 * Get zookeeper cluster information.
+	 */
 	public String zkCluster(String clusterAlias) {
 		String[] zks = SystemConfigUtils.getPropertyArray(clusterAlias + ".zk.list", ",");
 		JSONArray targets = new JSONArray();
@@ -422,7 +438,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets.toJSONString();
 	}
 
-	/** Judge whether the zkcli is active. */
+	/**
+	 * Judge whether the zkcli is active.
+	 */
 	public JSONObject zkCliStatus(String clusterAlias) {
 		JSONObject target = new JSONObject();
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
@@ -443,7 +461,7 @@ public class KafkaServiceImpl implements KafkaService {
 	/**
 	 * Create topic to kafka cluster, it is worth noting that the backup number
 	 * must be less than or equal to brokers data.
-	 * 
+	 *
 	 * @param topicName
 	 *            Create topic name.
 	 * @param partitions
@@ -487,7 +505,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets;
 	}
 
-	/** Delete topic to kafka cluster. */
+	/**
+	 * Delete topic to kafka cluster.
+	 */
 	public Map<String, Object> delete(String clusterAlias, String topicName) {
 		Map<String, Object> targets = new HashMap<String, Object>();
 		Properties prop = new Properties();
@@ -515,7 +535,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets;
 	}
 
-	/** Get kafka brokers from zookeeper. */
+	/**
+	 * Get kafka brokers from zookeeper.
+	 */
 	private List<HostsInfo> getBrokers(String clusterAlias) {
 		List<HostsInfo> targets = new ArrayList<HostsInfo>();
 		List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
@@ -540,7 +562,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return brokerServer.substring(0, brokerServer.length() - 1);
 	}
 
-	/** Convert query sql to object. */
+	/**
+	 * Convert query sql to object.
+	 */
 	public KafkaSqlInfo parseSql(String clusterAlias, String sql) {
 		return segments(clusterAlias, prepare(sql));
 	}
@@ -551,7 +575,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return sql;
 	}
 
-	/** Set topic sasl. */
+	/**
+	 * Set topic sasl.
+	 */
 	public void sasl(Properties props, String clusterAlias) {
 		// configure the following four settings for SSL Encryption
 		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.protocol"));
@@ -562,7 +588,9 @@ public class KafkaServiceImpl implements KafkaService {
 		props.put(SaslConfigs.SASL_JAAS_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.sasl.jaas.config"));
 	}
 
-	/** Set topic ssl. */
+	/**
+	 * Set topic ssl.
+	 */
 	public void ssl(Properties props, String clusterAlias) {
 		// configure the following three settings for SSL Encryption
 		props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.protocol"));
@@ -600,7 +628,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return kafkaSql;
 	}
 
-	/** Get kafka 0.10.x after activer topics. */
+	/**
+	 * Get kafka 0.10.x after activer topics.
+	 */
 	public Set<String> getKafkaActiverTopics(String clusterAlias, String group) {
 		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
 		Set<String> topics = new HashSet<>();
@@ -629,7 +659,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return topics;
 	}
 
-	/** Get kafka 0.10.x, 1.x, 2.x consumer metadata. */
+	/**
+	 * Get kafka 0.10.x, 1.x, 2.x consumer metadata.
+	 */
 	public String getKafkaConsumer(String clusterAlias) {
 		Properties prop = new Properties();
 		JSONArray consumerGroups = new JSONArray();
@@ -674,7 +706,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return consumerGroups.toJSONString();
 	}
 
-	/** Get kafka 0.10.x consumer group & topic information used for page. */
+	/**
+	 * Get kafka 0.10.x consumer group & topic information used for page.
+	 */
 	public String getKafkaConsumer(String clusterAlias, DisplayInfo page) {
 		Properties prop = new Properties();
 		JSONArray consumerGroups = new JSONArray();
@@ -758,7 +792,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return consumerGroups.toJSONString();
 	}
 
-	/** Get kafka 0.10.x consumer metadata. */
+	/**
+	 * Get kafka 0.10.x consumer metadata.
+	 */
 	private JSONArray getKafkaMetadata(String bootstrapServers, String group, String clusterAlias) {
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -819,7 +855,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return consumerGroups;
 	}
 
-	/** Get kafka 0.10.x consumer pages. */
+	/**
+	 * Get kafka 0.10.x consumer pages.
+	 */
 	public String getKafkaActiverSize(String clusterAlias, String group) {
 		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
 		int activerCounter = 0;
@@ -840,7 +878,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return activerAndTopics.toJSONString();
 	}
 
-	/** Get kafka consumer information pages not owners. */
+	/**
+	 * Get kafka consumer information pages not owners.
+	 */
 	public OwnerInfo getKafkaActiverNotOwners(String clusterAlias, String group) {
 		OwnerInfo ownerInfo = new OwnerInfo();
 		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
@@ -861,7 +901,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return ownerInfo;
 	}
 
-	/** Get kafka 0.10.x, 1.x, 2.x consumer groups. */
+	/**
+	 * Get kafka 0.10.x, 1.x, 2.x consumer groups.
+	 */
 	public int getKafkaConsumerGroups(String clusterAlias) {
 		Properties prop = new Properties();
 		int counter = 0;
@@ -894,7 +936,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return counter;
 	}
 
-	/** Get kafka 0.10.x, 1.x, 2.x consumer topic information. */
+	/**
+	 * Get kafka 0.10.x, 1.x, 2.x consumer topic information.
+	 */
 	public Set<String> getKafkaConsumerTopic(String clusterAlias, String group) {
 		JSONArray consumerGroups = getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias);
 		Set<String> topics = new HashSet<>();
@@ -908,12 +952,16 @@ public class KafkaServiceImpl implements KafkaService {
 		return topics;
 	}
 
-	/** Get kafka 0.10.x consumer group and topic. */
+	/**
+	 * Get kafka 0.10.x consumer group and topic.
+	 */
 	public String getKafkaConsumerGroupTopic(String clusterAlias, String group) {
 		return getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias).toJSONString();
 	}
 
-	/** Get kafka 0.10.x, 1.x, 2.x offset from topic. */
+	/**
+	 * Get kafka 0.10.x, 1.x, 2.x offset from topic.
+	 */
 	public String getKafkaOffset(String clusterAlias) {
 		Properties prop = new Properties();
 		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
@@ -954,7 +1002,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets.toJSONString();
 	}
 
-	/** Get the data for the topic partition in the specified consumer group */
+	/**
+	 * Get the data for the topic partition in the specified consumer group
+	 */
 	public Map<Integer, Long> getKafkaOffset(String clusterAlias, String group, String topic, Set<Integer> partitionids) {
 		Map<Integer, Long> partitionOffset = new HashMap<>();
 		Properties prop = new Properties();
@@ -993,12 +1043,16 @@ public class KafkaServiceImpl implements KafkaService {
 		return partitionOffset;
 	}
 
-	/** Get kafka 0.10.x broker bootstrap server. */
+	/**
+	 * Get kafka 0.10.x broker bootstrap server.
+	 */
 	public String getKafkaBrokerServer(String clusterAlias) {
 		return parseBrokerServer(clusterAlias);
 	}
 
-	/** Get kafka 0.10.x topic history logsize. */
+	/**
+	 * Get kafka 0.10.x topic history logsize.
+	 */
 	public long getKafkaLogSize(String clusterAlias, String topic, int partitionid) {
 		long histyLogSize = 0L;
 		Properties props = new Properties();
@@ -1029,7 +1083,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return histyLogSize;
 	}
 
-	/** Get kafka 0.10.x topic history logsize. */
+	/**
+	 * Get kafka 0.10.x topic history logsize.
+	 */
 	public Map<TopicPartition, Long> getKafkaLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
 		Properties props = new Properties();
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
@@ -1057,7 +1113,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return endLogSize;
 	}
 
-	/** Get kafka 0.10.x topic real logsize by partitionid. */
+	/**
+	 * Get kafka 0.10.x topic real logsize by partitionid.
+	 */
 	public long getKafkaRealLogSize(String clusterAlias, String topic, int partitionid) {
 		long realLogSize = 0L;
 		Properties props = new Properties();
@@ -1089,7 +1147,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return realLogSize;
 	}
 
-	/** Get kafka 0.10.x topic real logsize by partitionid set. */
+	/**
+	 * Get kafka 0.10.x topic real logsize by partitionid set.
+	 */
 	public long getKafkaRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
 		long realLogSize = 0L;
 		Properties props = new Properties();
@@ -1133,7 +1193,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return realLogSize;
 	}
 
-	/** Get topic producer send logsize records. */
+	/**
+	 * Get topic producer send logsize records.
+	 */
 	public long getKafkaProducerLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
 		long producerLogSize = 0L;
 		Properties props = new Properties();
@@ -1170,7 +1232,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return producerLogSize;
 	}
 
-	/** Get kafka version. */
+	/**
+	 * Get kafka version.
+	 */
 	public String getKafkaVersion(String host, int port, String ids, String clusterAlias) {
 		JMXConnector connector = null;
 		String version = "-";
@@ -1198,7 +1262,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return version;
 	}
 
-	/** Get kafka 0.10.x sasl topic metadata. */
+	/**
+	 * Get kafka 0.10.x sasl topic metadata.
+	 */
 	public List<MetadataInfo> findKafkaLeader(String clusterAlias, String topic) {
 		List<MetadataInfo> targets = new ArrayList<>();
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
@@ -1229,7 +1295,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return targets;
 	}
 
-	/** Send mock message to kafka topic . */
+	/**
+	 * Send mock message to kafka topic .
+	 */
 	public boolean mockMessage(String clusterAlias, String topic, String message) {
 		Properties props = new Properties();
 		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
@@ -1250,7 +1318,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return true;
 	}
 
-	/** Get group consumer all topics lags. */
+	/**
+	 * Get group consumer all topics lags.
+	 */
 	public long getLag(String clusterAlias, String group, String topic) {
 		long lag = 0L;
 		try {
@@ -1268,7 +1338,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return lag;
 	}
 
-	/** Get kafka group consumer all topics lags. */
+	/**
+	 * Get kafka group consumer all topics lags.
+	 */
 	public long getKafkaLag(String clusterAlias, String group, String ketopic) {
 		long lag = 0L;
 
@@ -1300,7 +1372,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return lag;
 	}
 
-	/** Get kafka old version topic history logsize. */
+	/**
+	 * Get kafka old version topic history logsize.
+	 */
 	public long getLogSize(String clusterAlias, String topic, int partitionid) {
 		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
@@ -1337,7 +1411,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return logSize;
 	}
 
-	/** Get kafka old version topic history logsize by partition set. */
+	/**
+	 * Get kafka old version topic history logsize by partition set.
+	 */
 	public long getLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
 		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
@@ -1376,7 +1452,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return logSize;
 	}
 
-	/** Get kafka old version real topic logsize. */
+	/**
+	 * Get kafka old version real topic logsize.
+	 */
 	public long getRealLogSize(String clusterAlias, String topic, int partitionid) {
 		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
@@ -1415,7 +1493,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return logSize;
 	}
 
-	/** Get broker host and jmx_port info from ids. */
+	/**
+	 * Get broker host and jmx_port info from ids.
+	 */
 	public String getBrokerJMXFromIds(String clusterAlias, int ids) {
 		String jni = "";
 		KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
@@ -1445,7 +1525,9 @@ public class KafkaServiceImpl implements KafkaService {
 		return jni;
 	}
 
-	/** Get kafka os memory. */
+	/**
+	 * Get kafka os memory.
+	 */
 	public long getOSMemory(String host, int port, String property) {
 		JMXConnector connector = null;
 		long memory = 0L;
@@ -1476,11 +1558,13 @@ public class KafkaServiceImpl implements KafkaService {
 		return memory;
 	}
 
-	/** Get kafka cpu. */
+	/**
+	 * Get kafka cpu.
+	 */
 	public String getUsedCpu(String host, int port) {
 		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
-		String cpu = "<a class='btn btn-danger btn-xs'>NULL</a>";
+		String cpu = "<span class='badge badge-danger'>NULL</span>";
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
@@ -1489,11 +1573,11 @@ public class KafkaServiceImpl implements KafkaService {
 			double cpuValue = Double.parseDouble(value);
 			String percent = StrUtils.numberic((cpuValue * 100.0) + "") + "%";
 			if ((cpuValue * 100.0) < BrokerSever.CPU_NORMAL) {
-				cpu = "<a class='btn btn-success btn-xs'>" + percent + "</a>";
+				cpu = "<span class='badge badge-success'>" + percent + "</span>";
 			} else if ((cpuValue * 100.0) >= BrokerSever.CPU_NORMAL && (cpuValue * 100.0) < BrokerSever.CPU_DANGER) {
-				cpu = "<a class='btn btn-warning btn-xs'>" + percent + "</a>";
+				cpu = "<span class='badge badge-warning'>" + percent + "</span>";
 			} else if ((cpuValue * 100.0) >= BrokerSever.CPU_DANGER) {
-				cpu = "<a class='btn btn-danger btn-xs'>" + percent + "</a>";
+				cpu = "<span class='badge badge-danger'>" + percent + "</span>";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1503,18 +1587,49 @@ public class KafkaServiceImpl implements KafkaService {
 				try {
 					connector.close();
 				} catch (IOException e) {
-					LOG.error("Close kafka used cpu jmx connector has error, msg is " + e.getMessage());
+					LOG.error("Close kafka broker cpu jmx connector has error, msg is " + e.getMessage());
 				}
 			}
 		}
 		return cpu;
 	}
 
-	/** Get kafka used memory. */
+	/**
+	 * Get kafka cpu value.
+	 */
+	public double getUsedCpuValue(String host, int port) {
+		JMXConnector connector = null;
+		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+		double cpu = 0.00;
+		try {
+			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
+			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+			String value = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
+			double cpuValue = Double.parseDouble(value);
+			cpu = StrUtils.numberic(String.valueOf(cpuValue * 100.0));
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("Get kafka broker used cpu value has error, msg is ", e);
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					LOG.error("Close kafka used cpu value jmx connector has error, msg is " + e.getMessage());
+				}
+			}
+		}
+		return cpu;
+	}
+
+	/**
+	 * Get kafka used memory.
+	 */
 	public String getUsedMemory(String host, int port) {
 		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
-		String memory = "<a class='btn btn-danger btn-xs'>NULL</a>";
+		String memory = "<span class='badge badge-danger'>NULL</span>";
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
 			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
@@ -1524,15 +1639,15 @@ public class KafkaServiceImpl implements KafkaService {
 			long max = memBean.getHeapMemoryUsage().getMax();
 			String percent = StrUtils.stringify(used) + " (" + StrUtils.numberic((used * 100.0 / max) + "") + "%)";
 			if ((used * 100.0) / max < BrokerSever.MEM_NORMAL) {
-				memory = "<a class='btn btn-success btn-xs'>" + percent + "</a>";
+				memory = "<span class='badge badge-success'>" + percent + "</span>";
 			} else if ((used * 100.0) / max >= BrokerSever.MEM_NORMAL && (used * 100.0) / max < BrokerSever.MEM_DANGER) {
-				memory = "<a class='btn btn-warning btn-xs'>" + percent + "</a>";
+				memory = "<span class='badge badge-warning'>" + percent + "</span>";
 			} else if ((used * 100.0) / max >= BrokerSever.MEM_DANGER) {
-				memory = "<a class='btn btn-danger btn-xs'>" + percent + "</a>";
+				memory = "<span class='badge badge-danger'>" + percent + "</span>";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("Get kafka broker used memory has error, msg is ", e);
+			LOG.error("Get kafka broker used memroy has error, msg is ", e);
 		} finally {
 			if (connector != null) {
 				try {

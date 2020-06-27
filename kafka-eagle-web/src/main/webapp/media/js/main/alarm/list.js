@@ -5,7 +5,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/alarm/config/table/ajax",
+		"sAjaxSource" : "/alarm/config/table/ajax",
 		"aoColumns" : [ {
 			"mData" : 'cluster'
 		}, {
@@ -45,8 +45,8 @@ $(document).ready(function() {
 	$(document).on('click', 'a[name=ke_alarm_config_remove]', function() {
 		var href = $(this).attr("href");
 		var group = href.split("#")[1];
-		$("#remove_div").html("");
-		$("#remove_div").append("<a href='/ke/alarm/config/" + group + "/del' class='btn btn-danger'>Remove</a>");
+		$("#ke_alarm_consumer_remove_content").html("<p class='alert alert-danger'>Are you sure you want to delete group [<strong>" + group + "</strong>] ?<p>");
+		$("#remove_div").html("<a href='/alarm/config/" + group + "/del' class='btn btn-danger'>Remove</a>");
 		$('#ke_alarm_config_delete').modal({
 			backdrop : 'static',
 			keyboard : false
@@ -77,7 +77,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/alarm/config/get/' + type + '/' + group + '/ajax',
+			url : '/alarm/config/get/' + type + '/' + group + '/ajax',
 			success : function(datas) {
 				$("#ke_alarm_config_property").val(datas.result);
 			}
@@ -103,7 +103,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/alarm/config/get/' + type + '/' + group + '/ajax',
+			url : '/alarm/config/get/' + type + '/' + group + '/ajax',
 			success : function(datas) {
 				$("#ke_alarm_config_m_url").val(datas.url);
 				$("#ke_alarm_config_m_address").val(datas.address);

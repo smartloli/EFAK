@@ -89,6 +89,7 @@ public class KConstants {
 		}
 
 		public static final String SESSION_USER = "LOGIN_USER_SESSION";
+		public static final String SESSION_USER_TIME = "LOGIN_USER_SESSION_TIME";
 		public static final String UNKNOW_USER = "__unknow__";
 		public static final String ERROR_LOGIN = "error_msg";
 	}
@@ -145,6 +146,7 @@ public class KConstants {
 		public static final String REPLICATIONBYTESOUTPERSEC = "replication_bytes_in";
 		public static final String OSTOTALMEMORY = "os_total_memory";
 		public static final String OSFREEMEMORY = "os_free_memory";
+		public static final String CPUUSED = "cpu_used";
 	}
 
 	public final class ZK {

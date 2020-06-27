@@ -36,7 +36,7 @@ $(document).ready(function() {
 	$("#select2val").select2({
 		placeholder : "Topic",
 		ajax : {
-			url : "/ke/topic/mock/list/ajax",
+			url : "/topic/mock/list/ajax",
 			dataType : 'json',
 			delay : 250,
 			data : function(params) {
@@ -126,7 +126,7 @@ $(document).ready(function() {
 				data : JSON.stringify({
 					"json" : json
 				}),
-				url : '/ke/topic/balance/execute/ajax',
+				url : '/topic/balance/execute/ajax',
 				success : function(datas) {
 					if (datas != null) {
 						if (datas.hasOwnProperty("success") && datas.success) {
@@ -161,7 +161,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/balance/verify/ajax/?topics=' + topics + '&type=' + type,
+			url : '/topic/balance/verify/ajax/?topics=' + topics + '&type=' + type,
 			success : function(datas) {
 				if (datas != null) {
 					var result = "";
@@ -187,7 +187,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/balance/generate/?topics=' + topics + '&type=' + type,
+			url : '/topic/balance/generate/?topics=' + topics + '&type=' + type,
 			success : function(datas) {
 				if (datas != null) {
 					var result = "";

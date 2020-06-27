@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	var m = [ 20, 240, 20, 240 ], w = 1280 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
+	var m = [ 20, 240, 20, 240 ], w = 1080 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
 
 	var tree = d3.layout.tree().size([ h, w ]);
 
@@ -7,18 +7,18 @@ $(document).ready(function() {
 		return [ d.y, d.x ];
 	});
 
-	var vis = d3.select("#kafka_brokers").append("svg:svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+	var vis = d3.select("#ke_dash_brokers_graph").append("svg:svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-	d3.json('/ke/dash/kafka/ajax', function(json) {
+	d3.json('/dash/kafka/ajax', function(json) {
 		dashboard = JSON.parse(json.dashboard);
 		root = JSON.parse(json.kafka);
 		root.x0 = h / 2;
 		root.y0 = 0;
 
-		$("#brokers_count").text(dashboard.brokers);
-		$("#topics_count").text(dashboard.topics);
-		$("#zks_count").text(dashboard.zks);
-		$("#consumers_count").text(dashboard.consumers);
+		$("#ke_dash_brokers_count").text(dashboard.brokers);
+		$("#ke_dash_topics_count").text(dashboard.topics);
+		$("#ke_dash_zks_count").text(dashboard.zks);
+		$("#ke_dash_consumers_count").text(dashboard.consumers);
 
 		function toggleAll(d) {
 			if (d.children) {
@@ -138,7 +138,6 @@ $(document).ready(function() {
 			d._children = null;
 		}
 	}
-
 	function fillgaugeGrahpPie(datas, id) {
 		var config = liquidFillGaugeDefaultSettings();
 		config.circleThickness = 0.1;
@@ -161,25 +160,58 @@ $(document).ready(function() {
 		loadLiquidFillGauge(id, datas, config);
 	}
 
-	try {
-		$.ajax({
-			type : 'get',
-			dataType : 'json',
-			url : '/ke/dash/os/mem/ajax',
-			success : function(datas) {
-				if (datas != null) {
-					fillgaugeGrahpPie(datas.mem, "fillgauge_kafka_memory");
+
+
+	function osMem(){
+		try {
+			$.ajax({
+				type : 'get',
+				dataType : 'json',
+				url : '/dash/os/mem/ajax',
+				success : function(datas) {
+					if (datas != null) {
+						fillgaugeGrahpPie(datas.mem, "fillgauge_kafka_memory");
+					}
 				}
-			}
-		});
-	} catch (e) {
-		console.log(e);
+			});
+		} catch (e) {
+			console.log(e);
+		}
 	}
+
+	function cpu(){
+		try {
+			$.ajax({
+				type : 'get',
+				dataType : 'json',
+				url : '/dash/used/cpu/ajax',
+				success : function(datas) {
+					if (datas != null) {
+						fillgaugeGrahpPie(datas.cpu, "fillgauge_kafka_cpu");
+					}
+				}
+			});
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	osMem();
+	cpu();
+
+	$("#ke_dash_os_memory_div").resize(function () {
+		$("#ke_dash_os_memory_div").html("<svg id='fillgauge_kafka_memory' width='97%' height='424'></svg>");
+		osMem();
+	});
+	$("#ke_dash_cpu_div").resize(function () {
+		$("#ke_dash_cpu_div").html("<svg id='fillgauge_kafka_cpu' width='97%' height='424'></svg>");
+		cpu();
+	});
 
 	$.ajax({
 		type : 'get',
 		dataType : 'json',
-		url : '/ke/dash/logsize/table/ajax',
+		url : '/dash/logsize/table/ajax',
 		success : function(datas) {
 			if (datas != null) {
 				$("#topic_logsize").html("")
@@ -202,7 +234,7 @@ $(document).ready(function() {
 	$.ajax({
 		type : 'get',
 		dataType : 'json',
-		url : '/ke/dash/capacity/table/ajax',
+		url : '/dash/capacity/table/ajax',
 		success : function(datas) {
 			if (datas != null) {
 				$("#topic_capacity").html("")

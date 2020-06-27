@@ -1,5 +1,12 @@
 $(document).ready(function() {
 
+	try{
+		var path = window.location.href;
+		$("#ke_consumer_offsets_a").attr("href","/consumers/offset/?" + path.split("?")[1]);
+	}catch (e) {
+		console.error(e);
+	}
+
 	function getQueryString(name) {
 		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
 		var r = window.location.search.substr(1).match(reg);
@@ -154,37 +161,25 @@ $(document).ready(function() {
 	producerChart.setOption(producerOption);
 	consumerChart.setOption(consumerOption);
 	
-	$("#sidebarToggleOff").on("click", function(e) {
+	$("#lag_chart").resize(function () {
 		var opt_lagChart=lagChart.getOption();
 		lagChart.clear();
 		lagChart.resize({width:$("#lag_chart").css('width')});
 		lagChart.setOption(opt_lagChart);
-	    
-	    var opt_producerChart=producerChart.getOption();
-	    producerChart.clear();
-	    producerChart.resize({width:$("#producer_chart").css('width')});
-	    producerChart.setOption(opt_producerChart);
-	    
-	    var opt_consumerChart=consumerChart.getOption();
-	    consumerChart.clear();
-	    consumerChart.resize({width:$("#consumer_chart").css('width')});
-	    consumerChart.setOption(opt_consumerChart);
 	});
-	$("#sidebarToggleOn").on("click", function(e) {
-		var opt_lagChart=lagChart.getOption();
-		lagChart.clear();
-		lagChart.resize({width:$("#lag_chart").css('width')});
-		lagChart.setOption(opt_lagChart);
-	    
-	    var opt_producerChart=producerChart.getOption();
-	    producerChart.clear();
-	    producerChart.resize({width:$("#producer_chart").css('width')});
-	    producerChart.setOption(opt_producerChart);
-	    
-	    var opt_consumerChart=consumerChart.getOption();
-	    consumerChart.clear();
-	    consumerChart.resize({width:$("#consumer_chart").css('width')});
-	    consumerChart.setOption(opt_consumerChart);
+
+	$("#producer_chart").resize(function () {
+		var opt_producerChart=producerChart.getOption();
+		producerChart.clear();
+		producerChart.resize({width:$("#producer_chart").css('width')});
+		producerChart.setOption(opt_producerChart);
+	});
+
+	$("#consumer_chart").resize(function () {
+		var opt_consumerChart=consumerChart.getOption();
+		consumerChart.clear();
+		consumerChart.resize({width:$("#consumer_chart").css('width')});
+		consumerChart.setOption(opt_consumerChart);
 	});
 
 	var start = moment();
@@ -213,7 +208,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/consumer/offset/group/topic/realtime/ajax?group=' + group + '&topic=' + topic + '&stime=' + stime + '&etime=' + etime,
+			url : '/consumer/offset/group/topic/realtime/ajax?group=' + group + '&topic=' + topic + '&stime=' + stime + '&etime=' + etime,
 			success : function(datas) {
 				if (datas != null) {
 					// Area Chart
@@ -236,7 +231,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/consumer/offset/rate/group/topic/realtime/ajax?group=' + group + '&topic=' + topic,
+			url : '/consumer/offset/rate/group/topic/realtime/ajax?group=' + group + '&topic=' + topic,
 			success : function(datas) {
 				if (datas != null) {
 					// Consumer & Producer Rate

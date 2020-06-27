@@ -6,7 +6,6 @@
 <html lang="zh">
 
 <head>
-
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,46 +13,39 @@
 <meta name="author" content="">
 
 <title>Alarm - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
-<jsp:include page="../public/tcss.jsp"></jsp:include>
+<jsp:include page="../public/plus/css.jsp"></jsp:include>
+<jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>
 
 <body>
-	<jsp:include page="../public/navbar.jsp"></jsp:include>
-	<div id="wrapper">
-		<div id="page-wrapper">
-			<div class="row">
-				<div class="col-lg-12">
-					<h1 class="page-header">
-						Alarm <small>List</small>
-					</h1>
+<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
+<div id="layoutSidenav">
+	<div id="layoutSidenav_nav">
+		<jsp:include page="../public/plus/navbar.jsp"></jsp:include>
+	</div>
+	<div id="layoutSidenav_content">
+		<main>
+			<div class="container-fluid">
+				<h1 class="mt-4">AlarmConsumer</h1>
+				<ol class="breadcrumb mb-4">
+					<li class="breadcrumb-item"><a href="#">AlarmConsumer</a></li>
+					<li class="breadcrumb-item active">List</li>
+				</ol>
+				<div class="alert alert-info alert-dismissable">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+					<i class="fas fa-info-circle"></i> <strong>Manage the alarm policy of the consumer group.</strong>
 				</div>
-				<!-- /.col-lg-12 -->
-			</div>
-			<!-- /.row -->
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="alert alert-info alert-dismissable">
-						<button type="button" class="close" data-dismiss="alert"
-							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Manage cluster
-							alarm group config .</strong>
-					</div>
-				</div>
-			</div>
-			<!-- /.row -->
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<i class="fa fa-pencil"></i> Alarm list
-							<div class="pull-right"></div>
-						</div>
-						<!-- /.panel-heading -->
-						<div class="panel-body">
-							<table id="result" class="table table-bordered table-condensed"
-								width="100%">
-								<thead>
+				<!-- content body -->
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card mb-4">
+							<div class="card-header">
+								<i class="fas fa-server"></i> Channel List
+							</div>
+							<div class="card-body">
+								<table id="result" class="table table-bordered table-condensed"
+									   width="100%">
+									<thead>
 									<tr>
 										<th>Cluster</th>
 										<th>Alarm Group</th>
@@ -65,118 +57,116 @@
 										<th>Modify</th>
 										<th>Operate</th>
 									</tr>
-								</thead>
-							</table>
+									</thead>
+								</table>
+							</div>
 						</div>
-						<!-- /.panel-body -->
 					</div>
 				</div>
-				<!-- /.col-lg-4 -->
-			</div>
-			<!-- /.row -->
-			<div class="modal fade" aria-labelledby="keModalLabel"
-				aria-hidden="true" id="ke_alarm_config_delete" tabindex="-1"
-				role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keModalLabel">Notify</h4>
+				<!-- delete -->
+				<div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_alarm_config_delete"
+					 tabindex="-1" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h4 class="modal-title" id="keModalLabel">Notify</h4>
+								<button class="close" type="button" data-dismiss="modal">x</button>
+							</div>
+							<!-- /.row -->
+							<div id="ke_alarm_consumer_remove_content" class="modal-body"></div>
+							<div id="remove_div" class="modal-footer">
+							</div>
 						</div>
-						<!-- /.row -->
-						<div class="modal-body">
-							<p>Are you sure you want to delete it?
-							<p>
-						</div>
-						<div id="remove_div" class="modal-footer"></div>
 					</div>
 				</div>
-			</div>
-			<!-- modify -->
-			<div class="modal fade" aria-labelledby="keModalLabelModify"
-				aria-hidden="true" id="ke_alarm_config_modify" tabindex="-1"
-				role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keModalLabelModify">Modify</h4>
-						</div>
-						<!-- /.row -->
-						<form role="form" action="/ke/alarm/config/modify/form/"
-							method="post"
-							onsubmit="return contextModifyConfigFormValid();return false;">
-							<fieldset class="form-horizontal">
-								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">URL</label>
-									<div class="col-sm-9">
-										<input id="ke_alarm_group_m_name" name="ke_alarm_group_m_name"
-											type="hidden" class="form-control" placeholder=""> <input
-											id="ke_alarm_config_m_url" name="ke_alarm_config_m_url"
-											type="text" class="form-control" placeholder="">
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="path" class="col-sm-2 control-label">Address</label>
-									<div class="col-sm-9">
-										<textarea id="ke_alarm_config_m_address"
-											name="ke_alarm_config_m_address" class="form-control"
-											rows="3"></textarea>
-									</div>
-								</div>
-								<div id="alert_config_message_modify" style="display: none"
-									class="alert alert-danger">
-									<label> Oops! Please make some changes .</label>
-								</div>
-							</fieldset>
+				<!-- modify -->
+				<div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_alarm_config_modify"
+					 tabindex="-1" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h4 class="modal-title" id="keModalLabel">Modify</h4>
+								<button class="close" type="button" data-dismiss="modal">x</button>
+							</div>
+							<!-- /.row -->
+							<div class="modal-body">
+								<form role="form" action="/alarm/config/modify/form/"
+									  method="post"
+									  onsubmit="return contextModifyConfigFormValid();return false;">
+									<fieldset class="form-horizontal">
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text" id="basic-addon3">Server</span>
+											</div>
+											<input id="ke_alarm_group_m_name" name="ke_alarm_group_m_name"
+												   type="hidden" class="form-control" placeholder="">
+											<input id="ke_alarm_config_m_url" name="ke_alarm_config_m_url"
+												   type="text"
+												   class="form-control" placeholder=""
+												   aria-describedby="basic-addon3">
+										</div>
+										<div class="input-group">
+											<div class="input-group-prepend">
+												<span class="input-group-text">Address</span>
+											</div>
+											<textarea id="ke_alarm_config_m_address" name="ke_alarm_config_m_address" rows="3" class="form-control" aria-label="With textarea"></textarea>
+										</div>
+										<div id="alert_config_message_modify" style="display: none"
+											 class="alert alert-danger">
+											<label> Oops! Please make some changes .</label>
+										</div>
+									</fieldset>
 
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary"
+												data-dismiss="modal">Cancle</button>
+										<button type="submit" class="btn btn-primary" id="create-modify">Submit
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- More detail info -->
+				<div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_alarm_config_detail"
+					 tabindex="-1" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h4 class="modal-title" id="keModalLabel">Detail</h4>
+								<button class="close" type="button" data-dismiss="modal">x</button>
+							</div>
+							<!-- /.row -->
+							<div class="modal-body">
+								<fieldset class="form-horizontal">
+									<div class="form-group">
+										<div class="col-sm-12">
+									        <textarea id="ke_alarm_config_property"
+													  name="ke_alarm_config_property" class="form-control"
+													  readonly="readonly" rows="3"></textarea>
+										</div>
+									</div>
+								</fieldset>
+							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-default"
-									data-dismiss="modal">Cancle</button>
-								<button type="submit" class="btn btn-primary" id="create-modify">Submit
+								<button type="button" class="btn btn-secondary"
+										data-dismiss="modal">Cancle
 								</button>
 							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-			<!-- More detail info -->
-			<div class="modal fade" aria-labelledby="keModalLabelModify"
-				aria-hidden="true" id="ke_alarm_config_detail" tabindex="-1"
-				role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button class="close" type="button" data-dismiss="modal">×</button>
-							<h4 class="modal-title" id="keModalLabelModify">Detail</h4>
-						</div>
-						<!-- /.row -->
-						<fieldset class="form-horizontal">
-							<div class="form-group">
-								<label for="path" class="col-sm-2 control-label">Content</label>
-								<div class="col-sm-9">
-									<textarea id="ke_alarm_config_property"
-										name="ke_alarm_config_property" class="form-control"
-										readonly="readonly" rows="3"></textarea>
-								</div>
-							</div>
-						</fieldset>
-
-						<div class="modal-footer">
-							<button type="button" class="btn btn-default"
-								data-dismiss="modal">Cancle</button>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<!-- /#page-wrapper -->
+		</main>
+		<jsp:include page="../public/plus/footer.jsp"></jsp:include>
 	</div>
+</div>
 </body>
-<jsp:include page="../public/script.jsp">
+<jsp:include page="../public/plus/script.jsp">
 	<jsp:param value="main/alarm/list.js" name="loader" />
 </jsp:include>
-<jsp:include page="../public/tscript.jsp"></jsp:include>
+<jsp:include page="../public/plus/tscript.jsp"></jsp:include>
 <script type="text/javascript">
 	function contextModifyConfigFormValid() {
 		var ke_alarm_config_m_url = $("#ke_alarm_config_m_url").val();

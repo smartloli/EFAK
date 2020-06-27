@@ -2,7 +2,7 @@ $(document).ready(function() {
 	$.ajax({
 		type : 'get',
 		dataType : 'json',
-		url : '/ke/metrics/brokers/mbean/ajax',
+		url : '/metrics/brokers/mbean/ajax',
 		success : function(datas) {
 			if (datas != null) {
 				$("#kafka_metrics_tab").html("")
@@ -45,9 +45,9 @@ function brokerMetricData(field, data) {
 	}
 
 	if (field.toUpperCase().indexOf("BYTE") > -1) {
-		tr += "<tr><td>" + field + "</td><td><a class='btn btn-primary btn-xs'>" + data.meanRate + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.oneMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.fiveMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.fifteenMinute + "</a></td></tr>";
+		tr += "<tr><td>" + field + "</td><td><span class='badge badge-secondary'>" + data.meanRate + "</span></td><td><span class='badge badge-secondary'>" + data.oneMinute + "</span></td><td><span class='badge badge-secondary'>" + data.fiveMinute + "</span></td><td><span class='badge badge-secondary'>" + data.fifteenMinute + "</span></td></tr>";
 	} else {
-		tr += "<tr><td>" + field + "</td><td><a class='btn btn-primary btn-xs'>" + revertString2Long(data.meanRate) + "</a></td><td><a class='btn btn-primary btn-xs'>" + revertString2Long(data.oneMinute) + "</a></td><td><a class='btn btn-primary btn-xs'>" + revertString2Long(data.fiveMinute) + "</a></td><td><a class='btn btn-primary btn-xs'>" + revertString2Long(data.fifteenMinute) + "</a></td></tr>";
+		tr += "<tr><td>" + field + "</td><td><span class='badge badge-secondary'>" + revertString2Long(data.meanRate) + "</span></td><td><span class='badge badge-secondary'>" + revertString2Long(data.oneMinute) + "</span></td><td><span class='badge badge-secondary'>" + revertString2Long(data.fiveMinute) + "</span></td><td><span class='badge badge-secondary'>" + revertString2Long(data.fifteenMinute) + "</span></td></tr>";
 	}
 
 	return tr;

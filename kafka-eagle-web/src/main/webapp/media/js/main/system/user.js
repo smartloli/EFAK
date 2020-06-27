@@ -5,7 +5,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/system/user/role/table/ajax",
+		"sAjaxSource" : "/system/user/role/table/ajax",
 		"aoColumns" : [ {
 			"mData" : 'rtxno'
 		}, {
@@ -41,7 +41,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/system/user/signin/rtxno/ajax/',
+			url : '/system/user/signin/rtxno/ajax/',
 			success : function(datas) {
 				$("#ke_rtxno_name").val(datas.rtxno);
 				$("#ke_rtxno_name").attr("readonly","readonly");
@@ -56,9 +56,10 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/system/user/signin/' + id + '/ajax',
+			url : '/system/user/signin/' + id + '/ajax',
 			success : function(datas) {
 				$("#ke_rtxno_name_modify").val(datas.rtxno);
+				$("#ke_rtxno_name_modify").attr("readonly","readonly");
 				$("#ke_real_name_modify").val(datas.realname);
 				$("#ke_user_name_modify").val(datas.username);
 				$("#ke_user_email_modify").val(datas.email);
@@ -75,7 +76,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/system/user/signin/' + id + '/ajax',
+			url : '/system/user/signin/' + id + '/ajax',
 			success : function(datas) {
 				$("#ke_user_rtxno_reset").val(datas.rtxno);
 			}
@@ -90,7 +91,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/system/user/role/' + id + '/ajax',
+			url : '/system/user/role/' + id + '/ajax',
 			success : function(datas) {
 				$("#ke_role_list").html("");
 				var chk = "";
@@ -117,9 +118,9 @@ $(document).ready(function() {
 
 	$(document).on("click", ".actionRole", function() {
 		if ($(this).is(":checked")) {
-			updateRole('/ke/system/user/role/add/' + id + '/' + $(this).val() + '/ajax')
+			updateRole('/system/user/role/add/' + id + '/' + $(this).val() + '/ajax')
 		} else {
-			updateRole('/ke/system/user/role/delete/' + id + '/' + $(this).val() + '/ajax')
+			updateRole('/system/user/role/delete/' + id + '/' + $(this).val() + '/ajax')
 		}
 	});
 
@@ -145,5 +146,4 @@ $(document).ready(function() {
 			}
 		});
 	}
-
 });

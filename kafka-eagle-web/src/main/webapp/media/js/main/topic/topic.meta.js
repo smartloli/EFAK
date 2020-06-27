@@ -9,7 +9,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/topic/meta/" + topicName + "/ajax",
+		"sAjaxSource" : "/topic/meta/" + topicName + "/ajax",
 		"aoColumns" : [ {
 			"mData" : 'topic'
 		}, {
@@ -47,7 +47,7 @@ $(document).ready(function() {
 	$.ajax({
 		type : 'get',
 		dataType : 'json',
-		url : '/ke/topic/meta/mbean/' + topicName + '/ajax',
+		url : '/topic/meta/mbean/' + topicName + '/ajax',
 		success : function(datas) {
 			if (datas != null) {
 				$("#topic_metrics_tab").html("")
@@ -78,9 +78,9 @@ $(document).ready(function() {
 		}
 
 		if (field.toUpperCase().indexOf("BYTE") > -1) {
-			tr += "<tr><td>" + field + "</td><td><a class='btn btn-primary btn-xs'>" + data.meanRate + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.oneMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.fiveMinute + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.fifteenMinute + "</a></td></tr>";
+			tr += "<tr><td>" + field + "</td><td><span class='badge badge-secondary'>" + data.meanRate + "</span></td><td><span class='badge badge-secondary'>" + data.oneMinute + "</span></td><td><span class='badge badge-secondary'>" + data.fiveMinute + "</span></td><td><span class='badge badge-secondary'>" + data.fifteenMinute + "</span></td></tr>";
 		} else {
-			tr += "<tr><td>" + field + "</td><td><a class='btn btn-primary btn-xs'>" + data.meanRate.split("B")[0] + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.oneMinute.split("B")[0] + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.fiveMinute.split("B")[0] + "</a></td><td><a class='btn btn-primary btn-xs'>" + data.fifteenMinute.split("B")[0] + "</a></td></tr>";
+			tr += "<tr><td>" + field + "</td><td><span class='badge badge-secondary'>" + data.meanRate.split("B")[0] + "</span></td><td><span class='badge badge-secondary'>" + data.oneMinute.split("B")[0] + "</span></td><td><span class='badge badge-secondary'>" + data.fiveMinute.split("B")[0] + "</span></td><td><span class='badge badge-secondary'>" + data.fifteenMinute.split("B")[0] + "</span></td></tr>";
 		}
 
 		return tr;
@@ -89,12 +89,11 @@ $(document).ready(function() {
 	$.ajax({
 		type : 'get',
 		dataType : 'json',
-		url : '/ke/topic/meta/jmx/' + topicName + '/ajax',
+		url : '/topic/meta/jmx/' + topicName + '/ajax',
 		success : function(datas) {
 			if (datas != null) {
 				$("#producer_logsize").text(datas.logsize);
-				$("#producer_topicsize").text(datas.topicsize);
-				$("#producer_topicsize_type").text(datas.sizetype);
+				$("#producer_topicsize").text(datas.topicsize + " ("+ datas.sizetype +")");
 			}
 		}
 	});
@@ -198,13 +197,7 @@ $(document).ready(function() {
 
 	var topic_producer_msg = morrisLineInit('topic_producer_msg');
 	
-	$("#sidebarToggleOff").on("click", function(e) {
-		var opt_topic_producer_msg=topic_producer_msg.getOption();
-		topic_producer_msg.clear();
-		topic_producer_msg.resize({width:$("#topic_producer_msg").css('width')});
-		topic_producer_msg.setOption(opt_topic_producer_msg);
-	});
-	$("#sidebarToggleOn").on("click", function(e) {
+	$("#topic_producer_msg").resize(function () {
 		var opt_topic_producer_msg=topic_producer_msg.getOption();
 		topic_producer_msg.clear();
 		topic_producer_msg.resize({width:$("#topic_producer_msg").css('width')});
@@ -215,7 +208,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/producer/chart/ajax?stime=' + stime + '&etime=' + etime + '&topic=' + topicName,
+			url : '/topic/producer/chart/ajax?stime=' + stime + '&etime=' + etime + '&topic=' + topicName,
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");

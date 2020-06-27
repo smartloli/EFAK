@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	var m = [ 20, 140, 20, 140 ], w = 1100 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
+	var m = [ 20, 140, 20, 140 ], w = 1080 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
 
 	var tree = d3.layout.tree().size([ h, w ]);
 
@@ -9,7 +9,7 @@ $(document).ready(function() {
 
 	var vis = d3.select("#ke_graph_home").append("svg:svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-	d3.json('/ke/system/resource/graph/ajax', function(json) {
+	d3.json('/system/resource/graph/ajax', function(json) {
 		root = json;
 		root.x0 = h / 2;
 		root.y0 = 0;
@@ -142,12 +142,12 @@ $(document).ready(function() {
 
 	$("#config-children-btn").click(function() {
 		$('#ke_child_dialog').modal('show');
-		selectResource("#res_parent_id", "/ke/system/resource/parent/ajax");
+		selectResource("#res_parent_id", "/system/resource/parent/ajax");
 	});
 
 	$("#config-delete-btn").click(function() {
 		$('#ke_delete_dialog').modal('show');
-		selectResource("#res_child_root_id", "/ke/system/resource/parent/ajax");
+		selectResource("#res_child_root_id", "/system/resource/parent/ajax");
 	});
 
 	function selectResource(id, url) {
@@ -169,7 +169,6 @@ $(document).ready(function() {
 	}
 
 	$("#res_child_root_id").change(function() {
-		console.log($("#res_child_root_id").val());
-		selectResource("#res_child_id", "/ke/system/resource/child/" + $("#res_child_root_id").val() + "/ajax");
+		selectResource("#res_child_id", "/system/resource/child/" + $("#res_child_root_id").val() + "/ajax");
 	});
 });
