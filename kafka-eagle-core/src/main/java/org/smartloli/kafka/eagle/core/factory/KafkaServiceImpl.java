@@ -1478,11 +1478,12 @@ public class KafkaServiceImpl implements KafkaService {
 
 	/** Get kafka cpu. */
 	public String getUsedCpu(String host, int port) {
+		JMXConnector connector = null;
 		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
 		String cpu = "<a class='btn btn-danger btn-xs'>NULL</a>";
 		try {
 			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
-			JMXConnector connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+			connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
 			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
 			String value = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
 			double cpuValue = Double.parseDouble(value);
@@ -1497,6 +1498,14 @@ public class KafkaServiceImpl implements KafkaService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("Get kafka broker used cpu has error, msg is ", e);
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					LOG.error("Close kafka used cpu jmx connector has error, msg is " + e.getMessage());
+				}
+			}
 		}
 		return cpu;
 	}
@@ -1523,6 +1532,15 @@ public class KafkaServiceImpl implements KafkaService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			LOG.error("Get kafka broker used memory has error, msg is ", e);
+		} finally {
+			if (connector != null) {
+				try {
+					connector.close();
+				} catch (IOException e) {
+					LOG.error("Close kafka used memory jmx connector has error, msg is " + e.getMessage());
+				}
+			}
 		}
 		return memory;
 	}
