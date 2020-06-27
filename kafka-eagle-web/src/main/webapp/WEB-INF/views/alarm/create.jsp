@@ -26,9 +26,9 @@
 	<div id="layoutSidenav_content">
 		<main>
 			<div class="container-fluid">
-				<h1 class="mt-4">Channel</h1>
+				<h1 class="mt-4">AlarmCluster</h1>
 				<ol class="breadcrumb mb-4">
-					<li class="breadcrumb-item"><a href="#">Channel</a></li>
+					<li class="breadcrumb-item"><a href="#">AlarmCluster</a></li>
 					<li class="breadcrumb-item active">Create</li>
 				</ol>
 				<div class="alert alert-info alert-dismissable">

@@ -78,7 +78,7 @@ $(document).ready(function() {
 	$(document).on('click', 'a[name=alarm_cluster_remove]', function() {
 		var href = $(this).attr("href");
 		var id = href.split("#")[1].split("/")[0];
-		$("#alarm_cluster_remove_content").html("<p>Are you sure you want to delete id [" + id + "] ?<p>");
+		$("#alarm_cluster_remove_content").html("<p class='alert alert-danger'>Are you sure you want to delete id [<strong>" + id + "</strong>] ?<p>");
 		$("#remove_div").html("<a href='/alarm/history/" + id + "/del' class='btn btn-danger'>Remove</a>");
 		$('#alarm_cluster_remove').modal({
 			backdrop : 'static',

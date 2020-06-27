@@ -287,18 +287,18 @@ public class AlarmController {
 			obj.put("alarmTimes", alertConsumer.getAlarmTimes());
 			obj.put("alarmMaxTimes", alertConsumer.getAlarmMaxTimes());
 			if (alertConsumer.getAlarmLevel().equals("P0")) {
-				obj.put("alarmLevel", "<a class='btn btn-danger btn-xs'>" + alertConsumer.getAlarmLevel() + "</a>");
+				obj.put("alarmLevel", "<span class='badge badge-danger'>" + alertConsumer.getAlarmLevel() + "</span>");
 			} else if (alertConsumer.getAlarmLevel().equals("P1")) {
-				obj.put("alarmLevel", "<a class='btn btn-warning btn-xs'>" + alertConsumer.getAlarmLevel() + "</a>");
+				obj.put("alarmLevel", "<span class='badge badge-warning'>" + alertConsumer.getAlarmLevel() + "</span>");
 			} else if (alertConsumer.getAlarmLevel().equals("P2")) {
-				obj.put("alarmLevel", "<a class='btn btn-info btn-xs'>" + alertConsumer.getAlarmLevel() + "</a>");
+				obj.put("alarmLevel", "<span class='badge badge-info'>" + alertConsumer.getAlarmLevel() + "</span>");
 			} else {
-				obj.put("alarmLevel", "<a class='btn btn-primary btn-xs'>" + alertConsumer.getAlarmLevel() + "</a>");
+				obj.put("alarmLevel", "<span class='badge badge-primary'>" + alertConsumer.getAlarmLevel() + "</span>");
 			}
 			if (alertConsumer.getIsNormal().equals("Y")) {
-				obj.put("alarmIsNormal", "<a class='btn btn-success btn-xs'>Y</a>");
+				obj.put("alarmIsNormal", "<span class='badge badge-success'>Y</span>");
 			} else {
-				obj.put("alarmIsNormal", "<a class='btn btn-danger btn-xs'>N</a>");
+				obj.put("alarmIsNormal", "<span class='badge badge-danger'>N</span>");
 			}
 			if (alertConsumer.getIsEnable().equals("Y")) {
 				obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
@@ -307,8 +307,9 @@ public class AlarmController {
 			}
 			obj.put("created", alertConsumer.getCreated());
 			obj.put("modify", alertConsumer.getModify());
-			obj.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='alarm_consumer_modify' href='#" + id
-					+ "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + id + "' name='alarm_consumer_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			obj.put("operate",
+					"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='alarm_consumer_modify' href='#"
+							+ id + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Modify</a><a class='dropdown-item' href='#" + id + "' name='alarm_consumer_remove'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Delete</a></div>");
 			aaDatas.add(obj);
 		}
 
@@ -794,8 +795,9 @@ public class AlarmController {
 			obj.put("alarmAddress", "<a name='ke_alarm_config_detail' href='#" + alarmGroup + "/address'>" + (address.length() > 16 ? address.substring(0, 16) + "..." : address) + "</a>");
 			obj.put("created", config.getString("created"));
 			obj.put("modify", config.getString("modify"));
-			obj.put("operate", "<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a name='ke_alarm_config_modify' href='#" + alarmGroup
-					+ "/modify'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='#" + alarmGroup + "' name='ke_alarm_config_remove'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+			obj.put("operate",
+					"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_alarm_config_modify' href='#"
+							+ alarmGroup + "/modify'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Modify</a><a class='dropdown-item' href='#" + alarmGroup + "' name='ke_alarm_config_remove'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Delete</a></div>");
 			aaDatas.add(obj);
 		}
 
