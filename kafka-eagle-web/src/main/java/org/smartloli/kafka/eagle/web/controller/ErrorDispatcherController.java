@@ -6,30 +6,32 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.plugin.net;
+package org.smartloli.kafka.eagle.web.controller;
 
-import org.smartloli.kafka.eagle.common.util.NetUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.springframework.web.servlet.DispatcherServlet;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * Print kafka eagle system startup url.
- * 
+ * Error page dispatcher controller.
+ *
  * @author smartloli.
  *
- *         Created by Jun 10, 2019
+ * Created by Jun 27, 2020
  */
-public class KafkaEagleNet {
-	public static void main(String[] args) {
-		System.out.println("* Kafka Eagle Service has started success.");
-		System.out.println("* Welcome, Now you can visit 'http://"+NetUtils.ip()+":"+SystemConfigUtils.getIntProperty("kafka.eagle.webui.port"));
-	}
+public class ErrorDispatcherController extends DispatcherServlet {
+    @Override
+    protected void noHandlerFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        System.out.println(request);
+    }
 }

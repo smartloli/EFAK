@@ -53,7 +53,7 @@
                                 <i class="fas fa-sitemap"></i> Kafka Cluster Info
                             </div>
                             <div class="card-body">
-                                <div id="kafka_cluster_info">
+                                <div id="kafka_cluster_info" class="table-responsive">
                                     <table id="kafka_tab" class="table table-bordered table-hover">
                                         <thead>
                                         <tr>
@@ -82,7 +82,7 @@
                                 <i class="fas fa-sitemap"></i> Kafka Zookeeper Info
                             </div>
                             <div class="card-body">
-                                <div id="zookeeper_cluster_info">
+                                <div id="zookeeper_cluster_info" class="table-responsive">
                                     <table id="zk_tab" class="table table-bordered table-hover">
                                         <thead>
                                         <tr>

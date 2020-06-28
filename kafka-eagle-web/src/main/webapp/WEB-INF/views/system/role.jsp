@@ -49,21 +49,24 @@
                                 <i class="fas fa-cogs"></i> Role Manager
                             </div>
                             <div class="card-body">
-                                <table id="result" class="table table-bordered table-condensed" width="100%">
-                                    <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Describe</th>
-                                        <th>Operate</th>
-                                    </tr>
-                                    </thead>
-                                </table>
+                                <div class="table-responsive">
+                                    <table id="result" class="table table-bordered table-condensed" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Describe</th>
+                                            <th>Operate</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- modal -->
-                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_setting_dialog" tabindex="-1" role="dialog">
+                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_setting_dialog"
+                     tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">

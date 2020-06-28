@@ -62,7 +62,7 @@
                                 <i class="fas fa-users"></i> Consumers Info
                             </div>
                             <div class="card-body">
-                                <div id="kafka_cluster_info">
+                                <div id="kafka_cluster_info" class="table-responsive">
                                     <table id="result" class="table table-bordered table-condensed" width="100%">
                                         <thead>
                                         <tr>

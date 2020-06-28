@@ -31,7 +31,7 @@ $(document).ready(function() {
 	var offset = 0;
 	function viewerTopics(sql, dataSets) {
 		var ret = JSON.parse(dataSets);
-		var tabHeader = "<div class='panel-body' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
+		var tabHeader = "<div class='panel-body table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
 		var mData = [];
 		var i = 0;
 		for ( var key in ret[0]) {
@@ -124,7 +124,7 @@ $(document).ready(function() {
 			th : "Created",
 			column : "created"
 		} ];
-		var ksqlTabHeader = "<div class='panel-body' id='div_ksql_children" + historyOffset + "'><table id='result_ksql_children" + historyOffset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
+		var ksqlTabHeader = "<div class='panel-body table-responsive' id='div_ksql_children" + historyOffset + "'><table id='result_ksql_children" + historyOffset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
 		var ksqlMData = [];
 		var i = 0;
 		for (var i = 0; i < thList.length; i++) {

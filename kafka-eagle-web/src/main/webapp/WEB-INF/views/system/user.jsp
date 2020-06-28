@@ -49,19 +49,21 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <table id="result" class="table table-bordered table-condensed"
-                                       width="100%">
-                                    <thead>
-                                    <tr>
-                                        <th>RtxNo</th>
-                                        <th>UserName</th>
-                                        <th>RealName</th>
-                                        <th>Email</th>
-                                        <th>Password</th>
-                                        <th>Operate</th>
-                                    </tr>
-                                    </thead>
-                                </table>
+                                <div class="table-responsive">
+                                    <table id="result" class="table table-bordered table-condensed"
+                                           width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>RtxNo</th>
+                                            <th>UserName</th>
+                                            <th>RealName</th>
+                                            <th>Email</th>
+                                            <th>Password</th>
+                                            <th>Operate</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>

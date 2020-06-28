@@ -90,25 +90,27 @@
                                 <i class="fas fa-server"></i> Alarm Cluster History
                             </div>
                             <div class="card-body">
-                                <table id="result" class="table table-bordered table-condensed"
-                                       width="100%">
-                                    <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Type</th>
-                                        <th>Value</th>
-                                        <th>Name</th>
-                                        <th>Times</th>
-                                        <th>MaxTimes</th>
-                                        <th>Level</th>
-                                        <th>IsNormal</th>
-                                        <th>IsEnable</th>
-                                        <th>Created</th>
-                                        <th>Modify</th>
-                                        <th>Operate</th>
-                                    </tr>
-                                    </thead>
-                                </table>
+                                <div class="table-responsive">
+                                    <table id="result" class="table table-bordered table-condensed"
+                                           width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Type</th>
+                                            <th>Value</th>
+                                            <th>Name</th>
+                                            <th>Times</th>
+                                            <th>MaxTimes</th>
+                                            <th>Level</th>
+                                            <th>IsNormal</th>
+                                            <th>IsEnable</th>
+                                            <th>Created</th>
+                                            <th>Modify</th>
+                                            <th>Operate</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>

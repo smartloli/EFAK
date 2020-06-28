@@ -11,7 +11,7 @@
 				<div class="sb-nav-link-icon">
 					<i class="fas fa-tachometer-alt"></i>
 				</div>Dashboard <%--<fmt:message code="ke.navbar.dashboard" />--%>
-			</a> <a class="nav-link" href="/bs">
+			</a> <a class="nav-link" href="/bs" target="_blank">
 				<div class="sb-nav-link-icon">
 					<i class="fas fa-fw fa-desktop"></i>
 				</div>BScreen

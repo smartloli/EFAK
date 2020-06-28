@@ -129,7 +129,7 @@ path.link {
 										</table>
 									</div>
 									<div class="text-right">
-										<a href="/ke/topic/list">View Details <i class="far fa-arrow-alt-circle-right"></i></a>
+										<a href="/topic/list">View Details <i class="far fa-arrow-alt-circle-right"></i></a>
 									</div>
 								</div>
 							</div>
@@ -145,7 +145,7 @@ path.link {
 										</table>
 									</div>
 									<div class="text-right">
-										<a href="/ke/topic/list">View Details <i class="far fa-arrow-alt-circle-right"></i></a>
+										<a href="/topic/list">View Details <i class="far fa-arrow-alt-circle-right"></i></a>
 									</div>
 								</div>
 							</div>
@@ -163,7 +163,7 @@ path.link {
 										<svg id="fillgauge_kafka_memory" width="97%" height="424"></svg>
 									</div>
 									<div class="text-right">
-										<a href="/ke/metrics/kafka#os_free_memory"></a>
+										<a href="/metrics/kafka#os_free_memory"></a>
 									</div>
 								</div>
 							</div>

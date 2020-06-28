@@ -46,7 +46,7 @@
 								<i class="fas fa-server"></i> Kafka Multi-Cluster list
 							</div>
 							<div class="card-body">
-								<div id="kafka_cluster_list">
+								<div id="kafka_cluster_list" class="table-responsive">
 									<table id="cluster_tab" class="table table-bordered table-hover">
 										<thead>
 										<tr>

@@ -135,7 +135,7 @@ public class DashboardServiceImpl implements DashboardService {
 				JSONObject object = new JSONObject();
 				if (i < topicRank.size()) {
 					object.put("id", index);
-					object.put("topic", "<a href='/ke/topic/meta/" + topicRank.get(i).getTopic() + "/'>" + topicRank.get(i).getTopic() + "</a>");
+					object.put("topic", "<a href='/topic/meta/" + topicRank.get(i).getTopic() + "/'>" + topicRank.get(i).getTopic() + "</a>");
 					object.put("logsize", topicRank.get(i).getTvalue());
 				} else {
 					object.put("id", index);
@@ -151,7 +151,7 @@ public class DashboardServiceImpl implements DashboardService {
 				JSONObject object = new JSONObject();
 				if (i < topicRank.size()) {
 					object.put("id", index);
-					object.put("topic", "<a href='/ke/topic/meta/" + topicRank.get(i).getTopic() + "/'>" + topicRank.get(i).getTopic() + "</a>");
+					object.put("topic", "<a href='/topic/meta/" + topicRank.get(i).getTopic() + "/'>" + topicRank.get(i).getTopic() + "</a>");
 					object.put("capacity", StrUtils.stringify(topicRank.get(i).getTvalue()));
 				} else {
 					object.put("id", index);
@@ -200,7 +200,7 @@ public class DashboardServiceImpl implements DashboardService {
 		List<KpiInfo> kpis = mbeanDao.getUsedCPU(params);
 		JSONObject object = new JSONObject();
 		if (kpis.size()>0) {
-			object.put("cpu", StrUtils.numberic(kpis.get(0).getValue()));
+			object.put("cpu", StrUtils.numberic(kpis.get(0).getValue())/brokerService.brokerNumbers(params.get("cluster").toString()));
 		} else {
 			object.put("cpu", "0.0");
 		}
