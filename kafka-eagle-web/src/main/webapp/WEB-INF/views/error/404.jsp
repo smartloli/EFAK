@@ -31,6 +31,6 @@
 	</div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-	<jsp:param value="main/error/error.js" name="loader" />
+	<jsp:param value="main/error/e404.js" name="loader" />
 </jsp:include>
 </html>

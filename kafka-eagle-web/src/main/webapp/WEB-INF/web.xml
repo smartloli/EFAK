@@ -63,23 +63,23 @@
 	<!-- shiro end -->
 	<error-page>
 		<error-code>403</error-code>
-		<location>/errors/403</location>
+		<location>/errors/code/403</location>
 	</error-page>
 	<error-page>
 		<error-code>404</error-code>
-		<location>/errors/404</location>
+		<location>/errors/code/404</location>
 	</error-page>
 	<error-page>
 		<error-code>405</error-code>
-		<location>/errors/405</location>
+		<location>/errors/code/405</location>
 	</error-page>
 	<error-page>
 		<error-code>500</error-code>
-		<location>/errors/500</location>
+		<location>/errors/code/500</location>
 	</error-page>
 	<error-page>
 		<error-code>503</error-code>
-		<location>/errors/503</location>
+		<location>/errors/code/503</location>
 	</error-page>
 	<display-name>ke</display-name>
 	<welcome-file-list>
