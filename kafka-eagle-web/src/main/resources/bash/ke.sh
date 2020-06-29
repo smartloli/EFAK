@@ -77,10 +77,10 @@ start()
  CLASSPATH="${KE_HOME_CONF_DIR}"
  
  rm -rf $KE_HOME/kms/webapps/ke
- rm -rf $KE_HOME/kms/webapps/ROOT
+ rm -rf $KE_HOME/kms/ROOT
  rm -rf $KE_HOME/kms/work
  mkdir -p $KE_HOME/kms/webapps/ke
- mkdir -p $KE_HOME/kms/webapps/ROOT
+ mkdir -p $KE_HOME/kms/ROOT
  cd $KE_HOME/kms/webapps/ke
  ${JAVA_HOME}/bin/jar -xvf $KE_HOME/kms/webapps/ke.war
  
