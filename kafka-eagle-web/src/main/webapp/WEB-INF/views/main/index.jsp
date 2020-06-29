@@ -192,7 +192,7 @@ path.link {
 									<i class="fas fa-project-diagram"></i> Kafka Active Brokers
 								</div>
 								<div class="card-body">
-									<div id="ke_dash_brokers_graph"></div>
+									<div id="ke_dash_brokers_graph" style="width: 100%;height: 600px"></div>
 								</div>
 							</div>
 						</div>
@@ -206,6 +206,7 @@ path.link {
 <jsp:include page="../public/plus/script.jsp">
 	<jsp:param value="plugins/d3/d3.v3.min.js" name="loader" />
 	<jsp:param value="plugins/d3/liquidFillGauge.js" name="loader" />
+	<jsp:param value="plugins/echart/echarts.min.js" name="loader" />
 	<jsp:param value="main/index.js" name="loader" />
 </jsp:include>
 </html>

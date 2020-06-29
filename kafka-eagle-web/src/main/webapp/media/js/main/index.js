@@ -1,257 +1,187 @@
-$(document).ready(function() {
-	var m = [ 20, 240, 20, 240 ], w = 1080 - m[1] - m[3], h = 600 - m[0] - m[2], i = 0, root;
+$(document).ready(function () {
+    // tree option start
+    keBrokerTreeOption = {
+        series: {
+            type: 'tree',
+            //initialTreeDepth: -1,
+            data: [],
+            top: '1%',
+            left: '20%',
+            bottom: '1%',
+            right: '20%',
+            symbolSize: 10,
+            itemStyle: {
+                color: "rgb(176, 196, 222)", // fold color
+                borderColor: 'steelblue'
+            },
+            label: {
+                position: 'left',
+                verticalAlign: 'middle',
+                align: 'right',
+                fontSize: 14
+            },
+            leaves: {
+                label: {
+                    normal: {
+                        position: 'right',
+                        verticalAlign: 'middle',
+                        align: 'left',
+                    }
+                }
+            }
+        }
+    }
+    // tree option end
 
-	var tree = d3.layout.tree().size([ h, w ]);
+    keBrokerTree = echarts.init(document.getElementById("ke_dash_brokers_graph"));
 
-	var diagonal = d3.svg.diagonal().projection(function(d) {
-		return [ d.y, d.x ];
-	});
+    function dashPanel() {
+        try {
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/dash/kafka/ajax',
+                success: function (datas) {
+                    if (datas != null) {
+                        dashboard = JSON.parse(datas.dashboard);
+                        kafka = JSON.parse(datas.kafka);
+                        var kafkaData = new Array();
+                        kafkaData.push(kafka);
+                        $("#ke_dash_brokers_count").text(dashboard.brokers);
+                        $("#ke_dash_topics_count").text(dashboard.topics);
+                        $("#ke_dash_zks_count").text(dashboard.zks);
+                        $("#ke_dash_consumers_count").text(dashboard.consumers);
+                        keBrokerTreeOption.series.data = kafkaData;
+                        keBrokerTree.setOption(keBrokerTreeOption);
+                    }
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
-	var vis = d3.select("#ke_dash_brokers_graph").append("svg:svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+    dashPanel();
 
-	d3.json('/dash/kafka/ajax', function(json) {
-		dashboard = JSON.parse(json.dashboard);
-		root = JSON.parse(json.kafka);
-		root.x0 = h / 2;
-		root.y0 = 0;
+    $("#ke_dash_brokers_graph").resize(function () {
+        var optKeBrokerTree=keBrokerTree.getOption();
+        keBrokerTree.clear();
+        keBrokerTree.resize({width:$("#ke_dash_brokers_graph").css('width')});
+        keBrokerTree.setOption(optKeBrokerTree);
+    });
 
-		$("#ke_dash_brokers_count").text(dashboard.brokers);
-		$("#ke_dash_topics_count").text(dashboard.topics);
-		$("#ke_dash_zks_count").text(dashboard.zks);
-		$("#ke_dash_consumers_count").text(dashboard.consumers);
+    function fillgaugeGrahpPie(datas, id) {
+        var config = liquidFillGaugeDefaultSettings();
+        config.circleThickness = 0.1;
+        config.circleFillGap = 0.2;
+        config.textVertPosition = 0.8;
+        config.waveAnimateTime = 2000;
+        config.waveHeight = 0.3;
+        config.waveCount = 1;
+        if (datas > 65 && datas < 80) {
+            config.circleColor = "#D4AB6A";
+            config.textColor = "#553300";
+            config.waveTextColor = "#805615";
+            config.waveColor = "#AA7D39";
+        } else if (datas >= 80) {
+            config.circleColor = "#d9534f";
+            config.textColor = "#d9534f";
+            config.waveTextColor = "#d9534f";
+            config.waveColor = "#FFDDDD";
+        }
+        loadLiquidFillGauge(id, datas, config);
+    }
 
-		function toggleAll(d) {
-			if (d.children) {
-				d.children.forEach(toggleAll);
-				toggle(d);
-			}
-		}
+    function osMem() {
+        try {
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/dash/os/mem/ajax',
+                success: function (datas) {
+                    if (datas != null) {
+                        fillgaugeGrahpPie(datas.mem, "fillgauge_kafka_memory");
+                    }
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
-		// Initialize the display to show a few nodes.
-		root.children.forEach(toggleAll);
-		toggle(root.children[0]);
-		update(root);
-	});
+    function cpu() {
+        try {
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/dash/used/cpu/ajax',
+                success: function (datas) {
+                    if (datas != null) {
+                        fillgaugeGrahpPie(datas.cpu, "fillgauge_kafka_cpu");
+                    }
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
-	function update(source) {
-		var duration = d3.event && d3.event.altKey ? 5000 : 500;
+    osMem();
+    cpu();
 
-		// Compute the new tree layout.
-		var nodes = tree.nodes(root).reverse();
+    $("#ke_dash_os_memory_div").resize(function () {
+        $("#ke_dash_os_memory_div").html("<svg id='fillgauge_kafka_memory' width='97%' height='424'></svg>");
+        osMem();
+    });
+    $("#ke_dash_cpu_div").resize(function () {
+        $("#ke_dash_cpu_div").html("<svg id='fillgauge_kafka_cpu' width='97%' height='424'></svg>");
+        cpu();
+    });
 
-		// Normalize for fixed-depth.
-		nodes.forEach(function(d) {
-			d.y = d.depth * 580;
-		});
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/dash/logsize/table/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#topic_logsize").html("")
+                var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>LogSize</th></tr></thead>";
+                $("#topic_logsize").append(thead);
+                var tbody = "<tbody>";
+                var tr = '';
+                for (var i = 0; i < datas.length; i++) {
+                    var id = datas[i].id;
+                    var topic = datas[i].topic;
+                    var logsize = datas[i].logsize;
+                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + logsize + "</td></tr>"
+                }
+                tbody += tr + "</tbody>"
+                $("#topic_logsize").append(tbody);
+            }
+        }
+    });
 
-		// Update the nodes…
-		var node = vis.selectAll("g.node").data(nodes, function(d) {
-			return d.id || (d.id = ++i);
-		});
-
-		// Enter any new nodes at the parent's previous position.
-		var nodeEnter = node.enter().append("svg:g").attr("class", "node").attr("transform", function(d) {
-			return "translate(" + source.y0 + "," + source.x0 + ")";
-		}).on("click", function(d) {
-			toggle(d);
-			update(d);
-		});
-
-		nodeEnter.append("svg:circle").attr("r", 1e-6).style("fill", function(d) {
-			return d._children ? "lightsteelblue" : "#fff";
-		});
-
-		nodeEnter.append("svg:text").attr("x", function(d) {
-			return d.children || d._children ? -10 : 10;
-		}).attr("dy", ".35em").attr("text-anchor", function(d) {
-			return d.children || d._children ? "end" : "start";
-		}).text(function(d) {
-			return d.name;
-		}).style("fill-opacity", 1e-6);
-
-		// Transition nodes to their new position.
-		var nodeUpdate = node.transition().duration(duration).attr("transform", function(d) {
-			return "translate(" + d.y + "," + d.x + ")";
-		});
-
-		nodeUpdate.select("circle").attr("r", 4.5).style("fill", function(d) {
-			return d._children ? "lightsteelblue" : "#fff";
-		});
-
-		nodeUpdate.select("text").style("fill-opacity", 1);
-
-		// Transition exiting nodes to the parent's new position.
-		var nodeExit = node.exit().transition().duration(duration).attr("transform", function(d) {
-			return "translate(" + source.y + "," + source.x + ")";
-		}).remove();
-
-		nodeExit.select("circle").attr("r", 1e-6);
-
-		nodeExit.select("text").style("fill-opacity", 1e-6);
-
-		// Update the links…
-		var link = vis.selectAll("path.link").data(tree.links(nodes), function(d) {
-			return d.target.id;
-		});
-
-		// Enter any new links at the parent's previous position.
-		link.enter().insert("svg:path", "g").attr("class", "link").attr("d", function(d) {
-			var o = {
-				x : source.x0,
-				y : source.y0
-			};
-			return diagonal({
-				source : o,
-				target : o
-			});
-		}).transition().duration(duration).attr("d", diagonal);
-
-		// Transition links to their new position.
-		link.transition().duration(duration).attr("d", diagonal);
-
-		// Transition exiting nodes to the parent's new position.
-		link.exit().transition().duration(duration).attr("d", function(d) {
-			var o = {
-				x : source.x,
-				y : source.y
-			};
-			return diagonal({
-				source : o,
-				target : o
-			});
-		}).remove();
-
-		// Stash the old positions for transition.
-		nodes.forEach(function(d) {
-			d.x0 = d.x;
-			d.y0 = d.y;
-		});
-	}
-
-	// Toggle children.
-	function toggle(d) {
-		if (d.children) {
-			d._children = d.children;
-			d.children = null;
-		} else {
-			d.children = d._children;
-			d._children = null;
-		}
-	}
-	function fillgaugeGrahpPie(datas, id) {
-		var config = liquidFillGaugeDefaultSettings();
-		config.circleThickness = 0.1;
-		config.circleFillGap = 0.2;
-		config.textVertPosition = 0.8;
-		config.waveAnimateTime = 2000;
-		config.waveHeight = 0.3;
-		config.waveCount = 1;
-		if (datas > 65 && datas < 80) {
-			config.circleColor = "#D4AB6A";
-			config.textColor = "#553300";
-			config.waveTextColor = "#805615";
-			config.waveColor = "#AA7D39";
-		} else if (datas >= 80) {
-			config.circleColor = "#d9534f";
-			config.textColor = "#d9534f";
-			config.waveTextColor = "#d9534f";
-			config.waveColor = "#FFDDDD";
-		}
-		loadLiquidFillGauge(id, datas, config);
-	}
-
-
-
-	function osMem(){
-		try {
-			$.ajax({
-				type : 'get',
-				dataType : 'json',
-				url : '/dash/os/mem/ajax',
-				success : function(datas) {
-					if (datas != null) {
-						fillgaugeGrahpPie(datas.mem, "fillgauge_kafka_memory");
-					}
-				}
-			});
-		} catch (e) {
-			console.log(e);
-		}
-	}
-
-	function cpu(){
-		try {
-			$.ajax({
-				type : 'get',
-				dataType : 'json',
-				url : '/dash/used/cpu/ajax',
-				success : function(datas) {
-					if (datas != null) {
-						fillgaugeGrahpPie(datas.cpu, "fillgauge_kafka_cpu");
-					}
-				}
-			});
-		} catch (e) {
-			console.log(e);
-		}
-	}
-
-	osMem();
-	cpu();
-
-	$("#ke_dash_os_memory_div").resize(function () {
-		$("#ke_dash_os_memory_div").html("<svg id='fillgauge_kafka_memory' width='97%' height='424'></svg>");
-		osMem();
-	});
-	$("#ke_dash_cpu_div").resize(function () {
-		$("#ke_dash_cpu_div").html("<svg id='fillgauge_kafka_cpu' width='97%' height='424'></svg>");
-		cpu();
-	});
-
-	$.ajax({
-		type : 'get',
-		dataType : 'json',
-		url : '/dash/logsize/table/ajax',
-		success : function(datas) {
-			if (datas != null) {
-				$("#topic_logsize").html("")
-				var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>LogSize</th></tr></thead>";
-				$("#topic_logsize").append(thead);
-				var tbody = "<tbody>";
-				var tr = '';
-				for (var i = 0; i < datas.length; i++) {
-					var id = datas[i].id;
-					var topic = datas[i].topic;
-					var logsize = datas[i].logsize;
-					tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + logsize + "</td></tr>"
-				}
-				tbody += tr + "</tbody>"
-				$("#topic_logsize").append(tbody);
-			}
-		}
-	});
-
-	$.ajax({
-		type : 'get',
-		dataType : 'json',
-		url : '/dash/capacity/table/ajax',
-		success : function(datas) {
-			if (datas != null) {
-				$("#topic_capacity").html("")
-				var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>Capacity</th></tr></thead>";
-				$("#topic_capacity").append(thead);
-				var tbody = "<tbody>";
-				var tr = '';
-				for (var i = 0; i < datas.length; i++) {
-					var id = datas[i].id;
-					var topic = datas[i].topic;
-					var capacity = datas[i].capacity;
-					tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + capacity + "</td></tr>"
-				}
-				tbody += tr + "</tbody>"
-				$("#topic_capacity").append(tbody);
-			}
-		}
-	});
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/dash/capacity/table/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#topic_capacity").html("")
+                var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>Capacity</th></tr></thead>";
+                $("#topic_capacity").append(thead);
+                var tbody = "<tbody>";
+                var tr = '';
+                for (var i = 0; i < datas.length; i++) {
+                    var id = datas[i].id;
+                    var topic = datas[i].topic;
+                    var capacity = datas[i].capacity;
+                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + capacity + "</td></tr>"
+                }
+                tbody += tr + "</tbody>"
+                $("#topic_capacity").append(tbody);
+            }
+        }
+    });
 
 });

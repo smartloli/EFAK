@@ -88,7 +88,7 @@
                                 <i class="fas fa-comments"></i> Active Topic
                             </div>
                             <div class="card-body">
-                                <div id="active_topic"></div>
+                                <div id="active_topic" style="width: 100%;height: 600px"></div>
                             </div>
                         </div>
                     </div>
@@ -123,8 +123,7 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="plugins/d3/d3.js" name="loader"/>
-    <jsp:param value="plugins/d3/d3.layout.js" name="loader"/>
+    <jsp:param value="plugins/echart/echarts.min.js" name="loader" />
     <jsp:param value="main/consumer/consumers.js?v=1.4.5" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>

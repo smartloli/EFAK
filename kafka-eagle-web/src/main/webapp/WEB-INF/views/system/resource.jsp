@@ -93,7 +93,7 @@
                                 <i class="fas fa-server"></i> Resource Graph
                             </div>
                             <div class="card-body">
-                                <div id="ke_graph_home"></div>
+                                <div id="ke_graph_home" style="width: 100%;height: 600px"></div>
                             </div>
                         </div>
                     </div>
@@ -261,8 +261,7 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="plugins/d3/d3.js" name="loader"/>
-    <jsp:param value="plugins/d3/d3.layout.js" name="loader"/>
+    <jsp:param value="plugins/echart/echarts.min.js" name="loader" />
     <jsp:param value="main/system/resource.js" name="loader"/>
 </jsp:include>
 <script type="text/javascript">
