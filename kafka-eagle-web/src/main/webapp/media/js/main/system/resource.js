@@ -7,7 +7,7 @@ $(document).ready(function() {
 			top: '1%',
 			left: '20%',
 			bottom: '1%',
-			right: '20%',
+			right: '40%',
 			symbolSize: 10,
 			itemStyle: {
 				color: "rgb(176, 196, 222)", // fold color
