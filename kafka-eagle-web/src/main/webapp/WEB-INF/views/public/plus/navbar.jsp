@@ -40,7 +40,7 @@
 					<i class="fas fa-fw fa-users"></i>
 				</div> Consumers
 			</a>
-			<div class="sb-sidenav-menu-heading">Quartz</div>
+			<div class="sb-sidenav-menu-heading">Performance</div>
 			<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCluster" aria-expanded="false" aria-controls="collapseCluster">
 				<div class="sb-nav-link-icon">
 					<i class="fas fa-cloud"></i>
