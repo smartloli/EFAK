@@ -37,7 +37,7 @@ In addition to supporting ```email``` alerts, Kafka Eagle also supports im alert
 ![Rate Chart](http://www.kafka-eagle.org/images/docs/consumer_rate_graph@2x.png)
 
 # Start Kafka Eagle
-![KE Script](http://www.kafka-eagle.org/images/docs/startup@2x.png)
+![KE Script](http://www.kafka-eagle.org/images/docs/startup_v2@2x.png)
 
 # Kafka Offset Types
 
@@ -64,11 +64,11 @@ cluster2.kafka.eagle.offset.storage=zookeeper
 Use the SQL statement to query the topic message log, and visualize the results, you can read [Kafka SQL](http://www.kafka-eagle.org/articles/docs/quickstart/ksql.html) to view the syntax.
 For example, if you kafka has a topic with three partitions, the ksql query statement is as follows.
 ```
-select * from "kafka_topic_name" where "partition" in (0,1,2) limit 10
+select * from ke_p3_r2 where `partition` in (0,1,2) limit 10
 ```
 
-![ksql](http://www.kafka-eagle.org/images/docs/kafka_sql@2x.png)
-![ksql_result](http://www.kafka-eagle.org/images/docs/kafka_sql_result@2x.png)
+![ksql](http://www.kafka-eagle.org/images/docs/kafka_ksql_v2@2x.png)
+![ksql_result](http://www.kafka-eagle.org/images/docs/kafka_ksql_result_v2@2x.png)
 
 # Quickstart
 
