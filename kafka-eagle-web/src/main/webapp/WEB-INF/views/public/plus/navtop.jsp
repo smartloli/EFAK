@@ -46,7 +46,7 @@
 		<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" id="clusterDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-sitemap fa-sm fa-fw mr-1"></i>${clusterAlias}</a>${clusterAliasList}</li>
 	</ul>
 	<ul class="navbar-nav ml-auto ml-md-0">
-		<li class="nav-item dropdown"><a class="nav-link"><i class="fas fa-bookmark fa-sm fa-fw mr-1"></i>V2.0.0</a></li>
+		<li class="nav-item dropdown"><a class="nav-link"><i class="fas fa-bookmark fa-sm fa-fw mr-1"></i>V2.0.1</a></li>
 	</ul>
 	<!-- Navtop Login -->
 	<ul class="navbar-nav ml-auto ml-md-0">

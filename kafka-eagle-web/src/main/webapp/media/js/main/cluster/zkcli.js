@@ -52,6 +52,7 @@ $(document).ready(function() {
 					}, {
 						greetings : '********************************************************************************\n' + 'Name :  Zookeeper Client Interpreter\n' + 'Server :  [' + datas.list + ']\n' + '********************************************************************************\n',
 						height : 400,
+						// numChars : "50%",
 						prompt : '[zk: (CONNECTED) ] > '
 					});
 				} else {
@@ -59,6 +60,7 @@ $(document).ready(function() {
 					}, {
 						greetings : '********************************************************************************\n' + 'Name :  Zookeeper Client Interpreter\n' + 'Server :  [' + datas.list + ']\n' + '********************************************************************************\n',
 						height : 400,
+						// numChars : "50%",
 						prompt : '[zk: (DISCONNECTED) ] > '
 					});
 				}
