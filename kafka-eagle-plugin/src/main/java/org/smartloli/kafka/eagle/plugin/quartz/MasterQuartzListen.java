@@ -44,7 +44,7 @@ public class MasterQuartzListen {
                 xml = System.getProperty("user.dir") + "/kms/webapps/ke/WEB-INF/classes/master-quartz.xml";
             }
             String quartz = SystemConfigUtils.getProperty("kafka.eagle.quartz.master.time");
-            // DomUtils.setTomcatServerXML(xml, modifyPort);
+             DomUtils.setMasterQuartzXML(xml, quartz);
         } catch (Exception ex) {
             ex.printStackTrace();
             LOG.error("Listen Master Node Quartz Time Has Error,Msg is " + ex.getMessage());

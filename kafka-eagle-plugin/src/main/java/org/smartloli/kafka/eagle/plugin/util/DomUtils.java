@@ -28,11 +28,12 @@ import org.dom4j.io.XMLWriter;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
 /**
- * Analysis xml task.
+ * Parse XML nodes for custom processing of different XML files.
  *
  * @author smartloli
  *
  *         Created by Nov 17, 2015
+ *         Modify by Jul 07, 2020
  */
 public class DomUtils {
 	
@@ -80,11 +81,4 @@ public class DomUtils {
 		writer.write(document);
 		writer.close();
 	}
-
-	public static void main(String[] args) throws Exception {
-		String xml = "/Users/dengjie/workspace/kafka-eagle-plus/kafka-eagle-web/src/main/resources/master-quartz.xml";
-		String quartz = SystemConfigUtils.getProperty("kafka.eagle.quartz.master.time");
-		setMasterQuartzXML(xml,quartz);
-	}
-
 }

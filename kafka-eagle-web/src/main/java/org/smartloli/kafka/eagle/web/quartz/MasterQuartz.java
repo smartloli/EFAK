@@ -29,7 +29,7 @@ import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 public class MasterQuartz {
 
     public void masterJobQuartz() {
-        System.out.println("Date:" + CalendarUtils.getDate());
+        // TODO
     }
 
 }
