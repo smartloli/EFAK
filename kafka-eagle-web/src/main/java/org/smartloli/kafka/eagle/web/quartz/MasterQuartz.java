@@ -17,19 +17,49 @@
  */
 package org.smartloli.kafka.eagle.web.quartz;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.common.util.WorkUtils;
+
+import java.util.List;
 
 /**
  * Used to periodically generate all tasks and issue work node execution policy.
  *
  * @author smartloli.
- *
+ * <p>
  * Created by Jul 06, 2020
  */
 public class MasterQuartz {
 
+    private final Logger LOG = LoggerFactory.getLogger(MasterQuartz.class);
+    private static final String[] MBEAN_TASK_KEYS = new String[]{MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS, MBean.OSTOTALMEMORY, MBean.OSFREEMEMORY, MBean.CPUUSED};
+
+
     public void masterJobQuartz() {
-        // TODO
+        // whether is enable distributed
+        if (SystemConfigUtils.getBooleanProperty("kafka.eagle.distributed.enable")) {
+            jobForAllTasks();
+        } else {
+
+        }
+    }
+
+    private void jobForAllTasks() {
+        String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+        // get all kafka eagle work node
+        List<String> workNodes = WorkUtils.getWorkNodes();
+        for (String clusterAlias : clusterAliass) {
+            // get all topics
+
+            // get all consumer groups and topic
+
+            // get all
+        }
     }
 
 }
