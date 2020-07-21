@@ -19,11 +19,14 @@ package org.smartloli.kafka.eagle.web.quartz;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.WorkUtils;
+import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.core.factory.KafkaService;
 
 import java.util.List;
 
@@ -37,13 +40,20 @@ import java.util.List;
 public class MasterQuartz {
 
     private final Logger LOG = LoggerFactory.getLogger(MasterQuartz.class);
+
+    /**
+     * Service interface area, include  {@link KafkaService}.
+     *
+     */
+    private KafkaService kafkaService = new KafkaFactory().create();
+
     private static final String[] MBEAN_TASK_KEYS = new String[]{MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS, MBean.OSTOTALMEMORY, MBean.OSFREEMEMORY, MBean.CPUUSED};
 
 
     public void masterJobQuartz() {
         // whether is enable distributed
         if (SystemConfigUtils.getBooleanProperty("kafka.eagle.distributed.enable")) {
-            jobForAllTasks();
+           // jobForAllTasks();
         } else {
 
         }
@@ -54,12 +64,18 @@ public class MasterQuartz {
         // get all kafka eagle work node
         List<String> workNodes = WorkUtils.getWorkNodes();
         for (String clusterAlias : clusterAliass) {
+            strategyForBrokerMetrics(clusterAlias,workNodes);
             // get all topics
 
             // get all consumer groups and topic
 
             // get all
         }
+    }
+
+    private void strategyForBrokerMetrics(String clusterAlias, List<String> workNodes) {
+        // List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+
     }
 
 }

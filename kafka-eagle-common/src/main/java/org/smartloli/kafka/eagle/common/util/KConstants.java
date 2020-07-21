@@ -71,6 +71,7 @@ public class KConstants {
 		public static final String KEY_SERIALIZER = "key.serializer";
 		public static final String VALUE_SERIALIZER = "value.serializer";
 		public static final String UNKOWN = "Unknown";
+		public static final int ALL_PARTITION = -1;
 	}
 
 	/** Zookeeper session. */
