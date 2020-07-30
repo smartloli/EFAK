@@ -178,11 +178,11 @@
                                         </div>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="select2level">MaxTimes</label>
+                                                <label class="input-group-text" for="select2level">Levels</label>
                                             </div>
                                             <select class="custom-select" id="select2level" name="select2level"
                                                     tabindex="-1"
-                                                    style="width: 367px;height: 38px; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+                                                    style="width: 394px;height: 38px; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
                                             <input id="ke_alarm_cluster_level"
                                                    name="ke_alarm_cluster_level" type="hidden"/>
                                         </div>
