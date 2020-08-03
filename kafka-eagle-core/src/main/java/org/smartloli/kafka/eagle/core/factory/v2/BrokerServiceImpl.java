@@ -17,17 +17,12 @@
  */
 package org.smartloli.kafka.eagle.core.factory.v2;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.google.common.base.Strings;
+import kafka.zk.KafkaZkClient;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewPartitions;
@@ -36,25 +31,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
-import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
-import org.smartloli.kafka.eagle.common.util.MathUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.google.common.base.Strings;
-
-import kafka.zk.KafkaZkClient;
 import scala.Option;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Implements {@link BrokerService} all method.
@@ -95,9 +82,11 @@ public class BrokerServiceImpl implements BrokerService {
             topics.remove(Kafka.CONSUMER_OFFSET_TOPIC);
         }
         String[] blackListTopics = SystemConfigUtils.getPropertyArray(clusterAlias + ".kafka.eagle.blacklist.topics", ",");
-        for (String blackListTopic : blackListTopics) {
-            if (topics.contains(blackListTopic)) {
-                topics.remove(blackListTopic);
+        if (!StrUtils.isNull(blackListTopics)) {
+            for (String blackListTopic : blackListTopics) {
+                if (topics.contains(blackListTopic)) {
+                    topics.remove(blackListTopic);
+                }
             }
         }
     }
@@ -383,10 +372,11 @@ public class BrokerServiceImpl implements BrokerService {
             } catch (Exception e) {
                 LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
                 e.printStackTrace();
-            }
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
+            } finally {
+                if (zkc != null) {
+                    kafkaZKPool.release(clusterAlias, zkc);
+                    zkc = null;
+                }
             }
         }
         return topics;
@@ -633,10 +623,11 @@ public class BrokerServiceImpl implements BrokerService {
         } catch (Exception e) {
             LOG.error("Get topic real logsize has error, msg is " + e.getCause().getMessage());
             e.printStackTrace();
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return logSize;
     }
