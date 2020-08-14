@@ -7,9 +7,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,59 +18,59 @@
  */
 package org.smartloli.kafka.eagle.ipc;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
 import org.smartloli.kafka.eagle.core.sql.tool.KSqlUtils;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Test Kafka Sql.
- * 
+ *
  * @author smartloli.
  *
  *         Created by Feb 27, 2018
  */
 public class TestKSql {
 
-	public static void main(String[] args) throws Exception {
-		// calcite();
-		// String sql = "select * from \"k20200326_1\" where \"partition\" in
-		// (0) and \"msg\" like 's1%' limit 10";
-		String sql = "select * from test16 where `partition` in (-1) limit 10";
-		String result = KafkaSqlParser.execute("cluster1", sql);
-		System.out.println("result: " + result);
-	}
+    public static void main(String[] args) throws Exception {
+        // calcite();
+        // String sql = "select * from \"k20200326_1\" where \"partition\" in
+        // (0) and \"msg\" like 's1%' limit 10";
+        String sql = "select * from test16 where `partition` in (-1) limit 10";
+        String result = KafkaSqlParser.execute("cluster1", sql);
+        System.out.println("result: " + result);
+    }
 
-	public static void calcite() throws Exception {
-		JSONObject tabSchema = new JSONObject();
-		tabSchema.put("id", "integer");
-		tabSchema.put("name", "varchar");
-		tabSchema.put("age", "integer");
+    public static void calcite() throws Exception {
+        JSONObject tabSchema = new JSONObject();
+        tabSchema.put("id", "integer");
+        tabSchema.put("name", "varchar");
+        tabSchema.put("age", "integer");
 
-		String tableName = "stu";
+        String tableName = "stu";
 
-		JSONArray dataSets = new JSONArray();
+        JSONArray dataSets = new JSONArray();
 
-		for (int i = 0; i < 5000; i++) {
-			JSONObject object = new JSONObject();
-			object.put("id", i);
-			object.put("name", "aa" + i);
-			object.put("age", 10 + i);
-			dataSets.add(object);
-		}
+        for (int i = 0; i < 5000; i++) {
+            JSONObject object = new JSONObject();
+            object.put("id", i);
+            object.put("name", "aa" + i);
+            object.put("age", 10 + i);
+            dataSets.add(object);
+        }
 
-		String sql = "select * from stu where id=0 and age=10 limit 10";
+        String sql = "select * from stu where id=0 and age=10 limit 10";
 
-		List<JSONArray> dts = new ArrayList<>();
-		dts.add(dataSets);
-		long start = System.currentTimeMillis();
-		String rs = KSqlUtils.query(tabSchema, tableName, dts, sql);
-		System.out.println("[Spent] :: " + (System.currentTimeMillis() - start) + "ms");
-		System.out.println(rs);
-	}
+        List<JSONArray> dts = new ArrayList<>();
+        dts.add(dataSets);
+        long start = System.currentTimeMillis();
+        JSONObject object = KSqlUtils.query(tabSchema, tableName, dts, sql);
+        String rs = object.getString("result");
+        System.out.println("[Spent] :: " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println(rs);
+    }
 
 }
