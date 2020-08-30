@@ -105,7 +105,9 @@
             </a>
             <div class="collapse" id="collapseConnect" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav">
-                    <a id="ke_navbar_connect_info" class="nav-link" href="#"><i
+                    <a id="ke_navbar_connect_config" class="nav-link" href="/connect/config"><i
+                            class="fas fa-link fa-sm fa-fw mr-1"></i>Config</a>
+                    <a id="ke_navbar_connect_monitor" class="nav-link" href="#"><i
                             class="fas fa-eye fa-sm fa-fw mr-1"></i>Monitor</a>
                 </nav>
             </div>

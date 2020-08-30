@@ -1,0 +1,170 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.smartloli.kafka.eagle.web.controller;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.web.pojo.Signiner;
+import org.smartloli.kafka.eagle.web.service.ConnectService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Used to manage and display Kafka connect information.
+ *
+ * @author smartloli.
+ * <p>
+ * Created by Aug 30, 2020
+ */
+@Controller
+public class ConnectController {
+
+
+    @Autowired
+    private ConnectService connectService;
+
+    /**
+     * Kafka connect config uri address.
+     */
+    // @RequiresPermissions("/connect/config")
+    @RequestMapping(value = "/connect/config", method = RequestMethod.GET)
+    public ModelAndView connectConfigView(HttpSession session) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/connect/config");
+        return mav;
+    }
+
+    /**
+     * Get kafka connect uri schema datasets by ajax.
+     */
+    @RequestMapping(value = "/connect/uri/table/ajax", method = RequestMethod.GET)
+    public void connectUriListAjax(HttpServletResponse response, HttpServletRequest request) {
+        String aoData = request.getParameter("aoData");
+        JSONArray params = JSON.parseArray(aoData);
+        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+        String search = "";
+        for (Object object : params) {
+            JSONObject param = (JSONObject) object;
+            if ("sEcho".equals(param.getString("name"))) {
+                sEcho = param.getIntValue("value");
+            } else if ("iDisplayStart".equals(param.getString("name"))) {
+                iDisplayStart = param.getIntValue("value");
+            } else if ("iDisplayLength".equals(param.getString("name"))) {
+                iDisplayLength = param.getIntValue("value");
+            } else if ("sSearch".equals(param.getString("name"))) {
+                search = param.getString("value");
+            }
+        }
+
+        HttpSession session = request.getSession();
+        String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+        Signiner signiner = (Signiner) session.getAttribute(KConstants.Login.SESSION_USER);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("search", search);
+        map.put("start", iDisplayStart);
+        map.put("size", iDisplayLength);
+        map.put("cluster", clusterAlias);
+        long count = connectService.connectConfigCount(map);
+        List<ConnectConfigInfo> connectConfigs = connectService.getConnectConfigList(map);
+        JSONArray aaDatas = new JSONArray();
+        for (ConnectConfigInfo connectConfig : connectConfigs) {
+            JSONObject object = new JSONObject();
+            object.put("id", connectConfig.getId());
+            object.put("uri", connectConfig.getConnectUri());
+            object.put("version", connectConfig.getVersion());
+            object.put("commit", connectConfig.getCommit());
+            object.put("created", connectConfig.getCreated());
+            object.put("modify", connectConfig.getModify());
+            if (KConstants.Role.ADMIN.equals(signiner.getUsername())) {
+                object.put("operate",
+                        "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='connect_uri_modify' href='#"
+                                + connectConfig.getId() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Modify</a><a class='dropdown-item' href='#" + connectConfig.getId() + "' name='connect_uri_del'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Delete</a></div>");
+            } else {
+                object.put("operate", "");
+            }
+            aaDatas.add(object);
+        }
+
+        JSONObject target = new JSONObject();
+        target.put("sEcho", sEcho);
+        target.put("iTotalRecords", count);
+        target.put("iTotalDisplayRecords", count);
+        target.put("aaData", aaDatas);
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Add kafka connect uri.
+     */
+    @RequestMapping(value = "/connect/uri/add/", method = RequestMethod.POST)
+    public String addUser(HttpSession session, HttpServletRequest request) {
+        String uri = request.getParameter("ke_connect_uri_name");
+        String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+        ConnectConfigInfo connectConfig = new ConnectConfigInfo();
+        connectConfig.setCluster(clusterAlias);
+        connectConfig.setConnectUri(uri);
+        connectConfig.setCreated(CalendarUtils.getDate());
+        connectConfig.setModify(CalendarUtils.getDate());
+        String version = "";
+        String commit = "";
+        try {
+            String result = HttpClientUtils.doGet(uri);
+            JSONObject resultJson = JSON.parseObject(result);
+            version = resultJson.getString("version");
+            commit = resultJson.getString("commit");
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get kafka connect version and commit has error: ", e);
+        }
+        connectConfig.setVersion(version);
+        connectConfig.setCommit(commit);
+
+        try {
+            if (connectService.insertOrUpdateConnectConfig(connectConfig) > 0) {
+                return "redirect:/connect/config";
+            } else {
+                return "redirect:/errors/500";
+            }
+        } catch (Exception ex) {
+            ErrorUtils.print(this.getClass()).error("Add kafka connect config schema has error: ", ex);
+            return "redirect:/errors/500";
+        }
+    }
+
+}
