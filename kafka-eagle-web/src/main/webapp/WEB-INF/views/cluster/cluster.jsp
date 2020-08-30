@@ -51,6 +51,13 @@
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-sitemap"></i> Kafka Cluster Info
+                                <%--                                <c:if test="${WHETHER_SYSTEM_ADMIN==1}">--%>
+                                <%--                                    <div style="float: right!important;">--%>
+                                <%--                                        <button id="ke-add-acl-user-btn" type="button"--%>
+                                <%--                                                class="btn btn-primary btn-sm">ACL--%>
+                                <%--                                        </button>--%>
+                                <%--                                    </div>--%>
+                                <%--                                </c:if>--%>
                             </div>
                             <div class="card-body">
                                 <div id="kafka_cluster_info" class="table-responsive">
@@ -99,6 +106,71 @@
                         </div>
                     </div>
                 </div>
+                <!-- row -->
+                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_acl_add_dialog"
+                     tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="keModalLabel">Add ACL User</h4>
+                                <button class="close" type="button" data-dismiss="modal">x</button>
+                            </div>
+                            <!-- /.row -->
+                            <!-- add modal -->
+                            <div class="modal-body">
+                                <form role="form" action="/cluster/info/user/add/acl/" method="post"
+                                      onsubmit="return contextFormValid();return false;">
+                                    <fieldset class="form-horizontal">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon3">Mechanism</span>
+                                            </div>
+                                            <input id="ke_mechanism_name" name="ke_mechanism_name" type="text"
+                                                   class="form-control" placeholder="SCRAM-SHA-256"
+                                                   aria-describedby="basic-addon3" readonly="readonly">
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon3">RealName</span>
+                                            </div>
+                                            <input id="ke_real_name" name="ke_real_name" type="text"
+                                                   class="form-control" placeholder="kafka-eagle"
+                                                   aria-describedby="basic-addon3">
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon3">UserName</span>
+                                            </div>
+                                            <input id="ke_user_name" name="ke_user_name" type="text"
+                                                   class="form-control" placeholder="kafka-eagle"
+                                                   aria-describedby="basic-addon3">
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon3">Email</span>
+                                            </div>
+                                            <input id="ke_user_email" name="ke_user_email" type="text"
+                                                   class="form-control" placeholder="kafka-eagle@email.com"
+                                                   aria-describedby="basic-addon3">
+                                        </div>
+                                        <div id="alert_mssage_add" style="display: none"
+                                             class="alert alert-danger">
+                                            <label id="alert_mssage_add_label"></label>
+                                        </div>
+                                    </fieldset>
+
+                                    <div id="remove_div" class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Cancle
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="create-add">Submit
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
         <jsp:include page="../public/plus/footer.jsp"></jsp:include>
@@ -109,4 +181,30 @@
     <jsp:param value="main/cluster/cluster.js?v1.4.8" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>
+<script type="text/javascript">
+    function contextFormValid() {
+        var ke_rtxno_name = $("#ke_rtxno_name").val();
+        var ke_real_name = $("#ke_real_name").val();
+        var ke_user_name = $("#ke_user_name").val();
+        var ke_user_email = $("#ke_user_email").val();
+        if (ke_real_name == "Administrator" || ke_user_name == "admin") {
+            $("#alert_mssage_add").show();
+            $("#alert_mssage_add_label").text("Oops! Administrator or admin is not available.");
+            setTimeout(function () {
+                $("#alert_mssage_add").hide()
+            }, 3000);
+            return false;
+        }
+        if (ke_rtxno_name.length == 0 || ke_real_name.length == 0 || ke_user_name.length == 0 || ke_user_email.length == 0) {
+            $("#alert_mssage_add").show();
+            $("#alert_mssage_add_label").text("Oops! Please enter the complete information.");
+            setTimeout(function () {
+                $("#alert_mssage_add").hide()
+            }, 3000);
+            return false;
+        }
+
+        return true;
+    }
+</script>
 </html>

@@ -92,7 +92,6 @@
                             class="fas fa-chart-area fa-code fa-sm fa-fw mr-1"></i>Zookeeper</a>
                 </nav>
             </div>
-            <!--
             <div class="sb-sidenav-menu-heading">Plugins</div>
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseConnect"
                aria-expanded="false" aria-controls="collapseConnect">
@@ -110,7 +109,6 @@
                             class="fas fa-eye fa-sm fa-fw mr-1"></i>Monitor</a>
                 </nav>
             </div>
-            -->
             <div class="sb-sidenav-menu-heading">Alarm</div>
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAlarmChannel"
                aria-expanded="false" aria-controls="collapseAlarm">
