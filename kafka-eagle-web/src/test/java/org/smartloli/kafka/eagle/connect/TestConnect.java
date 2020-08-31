@@ -17,7 +17,7 @@
  */
 package org.smartloli.kafka.eagle.connect;
 
-import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
+import org.smartloli.kafka.eagle.common.util.NetUtils;
 
 /**
  * // NOTE
@@ -28,6 +28,8 @@ import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
  */
 public class TestConnect {
     public static void main(String[] args) {
-        System.out.println(HttpClientUtils.doGet("http://127.0.0.1:8083"));
+//        System.out.println(HttpClientUtils.doGet("http://192.168.2.1:8083"));
+        System.out.println(NetUtils.uri("http://192.168.2.1:8083"));
     }
+
 }

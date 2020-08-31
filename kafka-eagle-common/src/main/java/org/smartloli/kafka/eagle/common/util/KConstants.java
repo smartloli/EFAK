@@ -24,12 +24,14 @@ import java.util.List;
  * Define constants in the system.
  *
  * @author smartloli.
- *
- *         Created by Jan 3, 2017
+ * <p>
+ * Created by Jan 3, 2017
  */
 public class KConstants {
 
-    /** D3 data plugin size. */
+    /**
+     * D3 data plugin size.
+     */
     public final class D3 {
         private D3() {
         }
@@ -54,7 +56,9 @@ public class KConstants {
 
     }
 
-    /** Kafka parameter setting. */
+    /**
+     * Kafka parameter setting.
+     */
     public static final class Kafka {
         private Kafka() {
         }
@@ -76,7 +80,9 @@ public class KConstants {
         public static final String SSL = "SSL";
     }
 
-    /** Zookeeper session. */
+    /**
+     * Zookeeper session.
+     */
     public final class SessionAlias {
         private SessionAlias() {
         }
@@ -86,7 +92,9 @@ public class KConstants {
         public static final int CLUSTER_ALIAS_LIST_LIMIT = 5;
     }
 
-    /** Login session. */
+    /**
+     * Login session.
+     */
     public final class Login {
         private Login() {
         }
@@ -97,7 +105,9 @@ public class KConstants {
         public static final String ERROR_LOGIN = "error_msg";
     }
 
-    /** Role Administrator. */
+    /**
+     * Role Administrator.
+     */
     public final class Role {
         private Role() {
         }
@@ -108,7 +118,9 @@ public class KConstants {
         public static final String WHETHER_SYSTEM_ADMIN = "WHETHER_SYSTEM_ADMIN";
     }
 
-    /** Kafka jmx mbean. */
+    /**
+     * Kafka jmx mbean.
+     */
     public final class MBean {
         private MBean() {
         }
@@ -122,20 +134,34 @@ public class KConstants {
         public static final String RATE_UNIT = "RateUnit";
         public static final String VALUE = "Value";
 
-        /** Messages in /sec. */
+        /**
+         * Messages in /sec.
+         */
         public static final String MESSAGES_IN = "msg";
-        /** Bytes in /sec. */
+        /**
+         * Bytes in /sec.
+         */
         public static final String BYTES_IN = "ins";
-        /** Bytes out /sec. */
+        /**
+         * Bytes out /sec.
+         */
         public static final String BYTES_OUT = "out";
-        /** Bytes rejected /sec. */
+        /**
+         * Bytes rejected /sec.
+         */
         public static final String BYTES_REJECTED = "rejected";
-        /** Failed fetch request /sec. */
+        /**
+         * Failed fetch request /sec.
+         */
         public static final String FAILED_FETCH_REQUEST = "fetch";
-        /** Failed produce request /sec. */
+        /**
+         * Failed produce request /sec.
+         */
         public static final String FAILED_PRODUCE_REQUEST = "produce";
 
-        /** MBean keys. */
+        /**
+         * MBean keys.
+         */
         public static final String MESSAGEIN = "message_in";
         public static final String BYTEIN = "byte_in";
         public static final String BYTEOUT = "byte_out";
@@ -269,13 +295,18 @@ public class KConstants {
 
         public static final String BALANCE_SINGLE = "SINGLE";
         public static final String BALANCE_ALL = "ALL";
+
+        public static final String CONNECT_URI_ALIVE = "Y";
+        public static final String CONNECT_URI_SHUTDOWN = "N";
     }
 
     public final class Component {
         private Component() {
         }
 
-        /** Flink app consumer don't commit consumer info into kafka. */
+        /**
+         * Flink app consumer don't commit consumer info into kafka.
+         */
         public static final String UNKNOW = "unknow-host";
 
     }

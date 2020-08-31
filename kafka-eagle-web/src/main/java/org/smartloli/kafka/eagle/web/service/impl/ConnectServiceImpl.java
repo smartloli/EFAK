@@ -58,4 +58,14 @@ public class ConnectServiceImpl implements ConnectService {
     public int deleteConnectConfigById(Map<String, Object> params) {
         return brokerDao.deleteConnectConfigById(params);
     }
+
+    @Override
+    public int modifyConnectConfigById(ConnectConfigInfo connectConfig) {
+        return brokerDao.modifyConnectConfigById(connectConfig);
+    }
+
+    @Override
+    public ConnectConfigInfo findConnectUriById(int id) {
+        return brokerDao.findConnectUriById(id);
+    }
 }

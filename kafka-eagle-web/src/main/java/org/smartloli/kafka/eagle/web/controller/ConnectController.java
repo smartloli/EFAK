@@ -21,14 +21,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
-import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
-import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.ConnectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -103,14 +101,22 @@ public class ConnectController {
             JSONObject object = new JSONObject();
             object.put("id", connectConfig.getId());
             object.put("uri", connectConfig.getConnectUri());
-            object.put("version", connectConfig.getVersion());
-            object.put("commit", connectConfig.getCommit());
+            if (StrUtils.isNull(connectConfig.getVersion())) {
+                object.put("version", "<span class='badge badge-warning'>NULL</span>");
+            } else {
+                object.put("version", "<span class='badge badge-primary'>" + connectConfig.getVersion() + "</span>");
+            }
+            if (KConstants.BrokerSever.CONNECT_URI_ALIVE.equals(connectConfig.getAlive())) {
+                object.put("alive", "<span class='badge badge-success'>Alive</span>");
+            } else {
+                object.put("alive", "<span class='badge badge-danger'>Shutdown</span>");
+            }
             object.put("created", connectConfig.getCreated());
             object.put("modify", connectConfig.getModify());
             if (KConstants.Role.ADMIN.equals(signiner.getUsername())) {
                 object.put("operate",
-                        "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='connect_uri_modify' href='#"
-                                + connectConfig.getId() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Modify</a><a class='dropdown-item' href='#" + connectConfig.getId() + "' name='connect_uri_del'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Delete</a></div>");
+                        "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_connect_uri_modify' href='#"
+                                + connectConfig.getId() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Modify</a><a class='dropdown-item' href='#" + connectConfig.getId() + "' val='" + connectConfig.getConnectUri() + "' name='ke_connect_uri_del'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Delete</a></div>");
             } else {
                 object.put("operate", "");
             }
@@ -136,6 +142,9 @@ public class ConnectController {
     @RequestMapping(value = "/connect/uri/add/", method = RequestMethod.POST)
     public String addUser(HttpSession session, HttpServletRequest request) {
         String uri = request.getParameter("ke_connect_uri_name");
+        if (!NetUtils.uri(uri)) {
+            return "redirect:/errors/500";
+        }
         String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
         ConnectConfigInfo connectConfig = new ConnectConfigInfo();
         connectConfig.setCluster(clusterAlias);
@@ -153,7 +162,7 @@ public class ConnectController {
             ErrorUtils.print(this.getClass()).error("Get kafka connect version and commit has error: ", e);
         }
         connectConfig.setVersion(version);
-        connectConfig.setCommit(commit);
+        connectConfig.setAlive(KConstants.BrokerSever.CONNECT_URI_ALIVE);
 
         try {
             if (connectService.insertOrUpdateConnectConfig(connectConfig) > 0) {
@@ -164,6 +173,62 @@ public class ConnectController {
         } catch (Exception ex) {
             ErrorUtils.print(this.getClass()).error("Add kafka connect config schema has error: ", ex);
             return "redirect:/errors/500";
+        }
+    }
+
+    /**
+     * Modify kafka connect uri address by id
+     */
+    @RequestMapping(value = "/connect/uri/modify/", method = RequestMethod.POST)
+    public String modifyConnectUriById(HttpSession session, HttpServletRequest request) {
+        String idStr = request.getParameter("ke_connect_uri_id_modify");
+        String connectUri = request.getParameter("ke_connect_uri_name_modify");
+
+        ConnectConfigInfo configInfo = new ConnectConfigInfo();
+        configInfo.setModify(CalendarUtils.getDate());
+        try {
+            configInfo.setId(Integer.parseInt(idStr));
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get kafka connect uri id has error: ", e);
+            return "redirect:/errors/500";
+        }
+        configInfo.setConnectUri(connectUri);
+        if (connectService.modifyConnectConfigById(configInfo) > 0) {
+            return "redirect:/connect/config";
+        } else {
+            return "redirect:/errors/500";
+        }
+    }
+
+    /**
+     * Get kafka connect uri info.
+     */
+    @RequestMapping(value = "/connect/uri/schema/{id}/ajax", method = RequestMethod.GET)
+    public void findConnectUriByIdAjax(@PathVariable("id") int id, HttpServletResponse response, HttpServletRequest request) {
+        try {
+            byte[] output = connectService.findConnectUriById(id).toString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Delete kafka connect uri by id.
+     */
+    @RequestMapping(value = "/connect/uri/{id}/del", method = RequestMethod.GET)
+    public ModelAndView delConnectUriConfigById(@PathVariable("id") int id, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+        Map<String, Object> map = new HashMap<>();
+        map.put("cluster", clusterAlias);
+        map.put("id", id);
+
+        int code = connectService.deleteConnectConfigById(map);
+        if (code > 0) {
+            return new ModelAndView("redirect:/connect/config");
+        } else {
+            return new ModelAndView("redirect:/errors/500");
         }
     }
 

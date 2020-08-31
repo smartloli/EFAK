@@ -30,9 +30,9 @@ public class ConnectConfigInfo extends BaseProtocol {
 
     private long id;
     private String cluster;
-    private String connectUri;
-    private String version;
-    private String commit;
+    private String connectUri = "";
+    private String version = "";
+    private String alive = "";
     private String created;
     private String modify;
 
@@ -76,12 +76,12 @@ public class ConnectConfigInfo extends BaseProtocol {
         this.version = version;
     }
 
-    public String getCommit() {
-        return commit;
+    public String getAlive() {
+        return alive;
     }
 
-    public void setCommit(String commit) {
-        this.commit = commit;
+    public void setAlive(String alive) {
+        this.alive = alive;
     }
 
     public String getModify() {

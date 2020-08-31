@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,75 +17,86 @@
  */
 package org.smartloli.kafka.eagle.common.util;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.KConstants.ServerDevice;
 
+import java.io.IOException;
+import java.net.*;
+
 /**
  * Check whether the corresponding port on the server can be accessed.
- * 
- * @author smartloli.
  *
- *         Created by Mar 16, 2018
+ * @author smartloli.
+ * <p>
+ * Created by Mar 16, 2018
  */
 public class NetUtils {
 
-	private static final Logger LOG = LoggerFactory.getLogger(NetUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetUtils.class);
 
-	/** Check server host & port whether normal. */
-	public static boolean telnet(String host, int port) {
-		Socket socket = new Socket();
-		try {
-			socket.setReceiveBufferSize(ServerDevice.BUFFER_SIZE);
-			socket.setSoTimeout(ServerDevice.TIME_OUT);
-		} catch (Exception ex) {
-			LOG.error("Socket create failed.");
-		}
-		SocketAddress address = new InetSocketAddress(host, port);
-		try {
-			socket.connect(address, ServerDevice.TIME_OUT);
-			return true;
-		} catch (IOException e) {
-			LOG.error("Telnet [" + host + ":" + port + "] has crash,please check it.");
-			return false;
-		} finally {
-			if (socket != null) {
-				try {
-					socket.close();
-				} catch (IOException e) {
-					LOG.error("Close socket [" + host + ":" + port + "] has error.");
-				}
-			}
-		}
-	}
+    /**
+     * Check server host & port whether normal.
+     */
+    public static boolean telnet(String host, int port) {
+        Socket socket = new Socket();
+        try {
+            socket.setReceiveBufferSize(ServerDevice.BUFFER_SIZE);
+            socket.setSoTimeout(ServerDevice.TIME_OUT);
+        } catch (Exception ex) {
+            LOG.error("Socket create failed.");
+        }
+        SocketAddress address = new InetSocketAddress(host, port);
+        try {
+            socket.connect(address, ServerDevice.TIME_OUT);
+            return true;
+        } catch (IOException e) {
+            LOG.error("Telnet [" + host + ":" + port + "] has crash, please check it.");
+            return false;
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    LOG.error("Close socket [" + host + ":" + port + "] has error.");
+                }
+            }
+        }
+    }
 
-	/** Ping server whether alive. */
-	public static boolean ping(String host) {
-		try {
-			InetAddress address = InetAddress.getByName(host);
-			return address.isReachable(ServerDevice.TIME_OUT);
-		} catch (Exception e) {
-			LOG.error("Ping [" + host + "] server has crash or not exist.");
-			return false;
-		}
-	}
+    public static boolean uri(String uriStr) {
+        URI uri = URI.create(uriStr);
+        if (uri == null || StrUtils.isNull(uri.getHost())) {
+            return false;
+        }
+        return telnet(uri.getHost(), uri.getPort());
+    }
 
-	/** Get server ip. */
-	public static String ip() {
-		String ip = "";
-		try {
-			ip = InetAddress.getLocalHost().getHostAddress();
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOG.error("Get local server ip has error, msg is " + e.getMessage());
-		}
-		return ip;
-	}
-	
+    /**
+     * Ping server whether alive.
+     */
+    public static boolean ping(String host) {
+        try {
+            InetAddress address = InetAddress.getByName(host);
+            return address.isReachable(ServerDevice.TIME_OUT);
+        } catch (Exception e) {
+            LOG.error("Ping [" + host + "] server has crash or not exist.");
+            return false;
+        }
+    }
+
+    /**
+     * Get server ip.
+     */
+    public static String ip() {
+        String ip = "";
+        try {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("Get local server ip has error, msg is " + e.getMessage());
+        }
+        return ip;
+    }
+
 }

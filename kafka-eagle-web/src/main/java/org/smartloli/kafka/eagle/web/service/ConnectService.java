@@ -51,4 +51,14 @@ public interface ConnectService {
      */
     public int deleteConnectConfigById(Map<String, Object> params);
 
+    /**
+     * Modify kafka connect uri config by id.
+     */
+    public int modifyConnectConfigById(ConnectConfigInfo connectConfig);
+
+    /**
+     * Find kafka connect uri schema by id.
+     */
+    public ConnectConfigInfo findConnectUriById(int id);
+
 }

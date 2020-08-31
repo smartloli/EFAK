@@ -56,7 +56,7 @@
                                         <tr>
                                             <th>URI</th>
                                             <th>Version</th>
-                                            <th>Commit</th>
+                                            <th>Alive</th>
                                             <th>Create</th>
                                             <th>Modify</th>
                                             <th>Operate</th>
@@ -132,6 +132,8 @@
                                                    type="text"
                                                    class="form-control" placeholder="http://127.0.0.1:8083/"
                                                    aria-describedby="basic-addon3">
+                                            <input id="ke_connect_uri_id_modify" name="ke_connect_uri_id_modify"
+                                                   type="hidden">
                                         </div>
                                         <div id="alert_mssage_connect_uri_modify" style="display: none"
                                              class="alert alert-danger">
@@ -145,6 +147,22 @@
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Delete -->
+                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_connect_config_delete"
+                     tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="keModalLabel">Notify</h4>
+                                <button class="close" type="button" data-dismiss="modal">x</button>
+                            </div>
+                            <!-- /.row -->
+                            <div id="ke_connect_config_remove_content" class="modal-body"></div>
+                            <div id="ke_connect_config_footer" class="modal-footer">
                             </div>
                         </div>
                     </div>

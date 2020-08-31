@@ -89,7 +89,7 @@ public interface JConstants {
 
     static String CREATE_TABLE_KE_METRICS_OFFLINE = "CREATE TABLE IF NOT EXISTS `ke_metrics_offline` (`cluster` varchar(64) NOT NULL,`key` varchar(128) NOT NULL,`one` varchar(128) DEFAULT NULL,`mean` varchar(128) DEFAULT NULL,`five` varchar(128) DEFAULT NULL,`fifteen` varchar(128) DEFAULT NULL, PRIMARY KEY (`cluster`,`key`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-    static String CREATE_TABLE_KE_CONNECT_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_connect_config` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`cluster` varchar(64),`connect_uri` varchar(128),`version` varchar(128),`commit` varchar(128),`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+    static String CREATE_TABLE_KE_CONNECT_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_connect_config` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`cluster` varchar(64),`connect_uri` varchar(128),`version` varchar(32),`alive` varchar(16),`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     static String CREATE_TABLE_KE_ALARM_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_alarm_consumer` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(128) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`alarm_group` varchar(128) DEFAULT NULL,`alarm_times` int(11),`alarm_max_times` int(11) , `alarm_level` varchar(4),`is_normal` varchar(2) DEFAULT 'Y', `is_enable` varchar(2) DEFAULT 'Y', `created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -131,7 +131,7 @@ public interface JConstants {
 
     static String CREATE_TABLE_SQLITE_KE_METRICS_OFFLINE = "CREATE TABLE IF NOT EXISTS `ke_metrics_offline` (`cluster` varchar(64) ,`key` varchar(128) ,`one` varchar(128) ,`mean` varchar(128) ,`five` varchar(128) ,`fifteen` varchar(128) , PRIMARY KEY (`cluster`,`key`))";
 
-    static String CREATE_TABLE_SQLITE_KE_CONNECT_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_connect_config` (`id` integer primary key autoincrement,`cluster` varchar(64),`connect_uri` varchar(128), `version` varchar(128), `commit` varchar(128),`created` varchar(32) ,`modify` varchar(32))";
+    static String CREATE_TABLE_SQLITE_KE_CONNECT_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_connect_config` (`id` integer primary key autoincrement,`cluster` varchar(64),`connect_uri` varchar(128), `version` varchar(32), `alive` varchar(16),`created` varchar(32) ,`modify` varchar(32))";
 
     static String CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_alarm_consumer` (`id` integer primary key autoincrement,`cluster` varchar(64),`group` varchar(128),`topic` varchar(128),`lag` bigint(20),`alarm_group` varchar(128) ,`alarm_times` int(11),`alarm_max_times` int(11) , `alarm_level` varchar(4), `is_normal` varchar(2) DEFAULT 'Y', `is_enable` varchar(2) DEFAULT 'Y',`created` varchar(32),`modify` varchar(32))";
 

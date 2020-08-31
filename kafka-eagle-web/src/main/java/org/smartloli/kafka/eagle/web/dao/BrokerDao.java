@@ -37,6 +37,11 @@ public interface BrokerDao {
     public int insertOrUpdateConnectConfig(ConnectConfigInfo connectConfig);
 
     /**
+     * Modify kafka connect uri config by id.
+     */
+    public int modifyConnectConfigById(ConnectConfigInfo connectConfig);
+
+    /**
      * Get kafka connect uri schema from database table.
      */
     public List<ConnectConfigInfo> getConnectConfigList(Map<String, Object> params);
@@ -50,5 +55,10 @@ public interface BrokerDao {
      * Delete kafka connect uri schema from database table.
      */
     public int deleteConnectConfigById(Map<String, Object> params);
+
+    /**
+     * Find kafka connect uri schema by id.
+     */
+    public ConnectConfigInfo findConnectUriById(int id);
 
 }
