@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,37 +17,36 @@
  */
 package org.smartloli.kafka.eagle.factory;
 
-import java.util.concurrent.TimeUnit;
+import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
+import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
-
-import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
-import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
-import org.smartloli.kafka.eagle.common.util.StrUtils;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TODO
- * 
- * @author smartloli.
  *
- *         Created by Jun 14, 2019
+ * @author smartloli.
+ * <p>
+ * Created by Jun 14, 2019
  */
 public class TestBrokerServiceImpl {
 
-	public static void main(String[] args) {
-		String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
-		try {
-			JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, "127.0.0.1:9999"));
-			JMXConnector connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
-			MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-			String value = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
-			System.out.println(StrUtils.numberic((Double.parseDouble(value) * 100.0) + "") + "%");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public static void main(String[] args) {
+        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        try {
+            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, "127.0.0.1:9977"));
+            JMXConnector connector = JMXFactoryUtils.connectWithTimeout("cluster1", jmxSeriverUrl, 30, TimeUnit.SECONDS);
+            MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+            String value = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
+            System.out.println(StrUtils.numberic((Double.parseDouble(value) * 100.0) + "") + "%");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

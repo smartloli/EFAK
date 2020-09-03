@@ -17,37 +17,12 @@
  */
 package org.smartloli.kafka.eagle.core.factory;
 
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXServiceURL;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import kafka.zk.KafkaZkClient;
 import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.ConsumerGroupListing;
-import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
-import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsOptions;
-import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
-import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
-import org.apache.kafka.clients.admin.MemberDescription;
-import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -66,33 +41,27 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer8;
 import org.smartloli.kafka.eagle.common.constant.KSqlParser;
-import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
-import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
-import org.smartloli.kafka.eagle.common.protocol.HostsInfo;
-import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
-import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
-import org.smartloli.kafka.eagle.common.protocol.OffsetZkInfo;
-import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
+import org.smartloli.kafka.eagle.common.protocol.*;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicPartitionSchema;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
-import org.smartloli.kafka.eagle.common.util.KafkaPartitioner;
-import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
-import org.smartloli.kafka.eagle.common.util.StrUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
-import kafka.zk.KafkaZkClient;
 import scala.Option;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
+
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXServiceURL;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implements KafkaService all method.
@@ -1257,7 +1226,7 @@ public class KafkaServiceImpl implements KafkaService {
         String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
-            connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+            connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
             MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
             if (CollectorType.KAFKA.equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
                 version = mbeanConnection.getAttribute(new ObjectName(String.format(BrokerServer.BROKER_VERSION.getValue(), ids)), BrokerServer.BROKER_VERSION_VALUE.getValue()).toString();
@@ -1398,7 +1367,7 @@ public class KafkaServiceImpl implements KafkaService {
         for (BrokersInfo broker : brokers) {
             try {
                 JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
-                connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+                connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
                 if (connector != null) {
                     break;
                 }
@@ -1437,7 +1406,7 @@ public class KafkaServiceImpl implements KafkaService {
         for (BrokersInfo broker : brokers) {
             try {
                 JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
-                connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+                connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
                 if (connector != null) {
                     break;
                 }
@@ -1478,7 +1447,7 @@ public class KafkaServiceImpl implements KafkaService {
         for (BrokersInfo broker : brokers) {
             try {
                 JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
-                connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+                connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
                 if (connector != null) {
                     break;
                 }
@@ -1544,13 +1513,13 @@ public class KafkaServiceImpl implements KafkaService {
     /**
      * Get kafka os memory.
      */
-    public long getOSMemory(String host, int port, String property) {
+    public long getOSMemory(String clusterAlias, String host, int port, String property) {
         JMXConnector connector = null;
         long memory = 0L;
         String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
-            connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+            connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
             MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
             MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
             long max = memBean.getHeapMemoryUsage().getMax();
@@ -1577,13 +1546,13 @@ public class KafkaServiceImpl implements KafkaService {
     /**
      * Get kafka cpu.
      */
-    public String getUsedCpu(String host, int port) {
+    public String getUsedCpu(String clusterAlias, String host, int port) {
         JMXConnector connector = null;
         String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
         String cpu = "<span class='badge badge-danger'>NULL</span>";
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
-            connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+            connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
             MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
             String value = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
             double cpuValue = Double.parseDouble(value);
@@ -1613,13 +1582,13 @@ public class KafkaServiceImpl implements KafkaService {
     /**
      * Get kafka cpu value.
      */
-    public double getUsedCpuValue(String host, int port) {
+    public double getUsedCpuValue(String clusterAlias, String host, int port) {
         JMXConnector connector = null;
         String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
         double cpu = 0.00;
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
-            connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+            connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
             MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
             String value = mbeanConnection.getAttribute(new ObjectName(BrokerServer.JMX_PERFORMANCE_TYPE.getValue()), BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
             double cpuValue = Double.parseDouble(value);
@@ -1642,13 +1611,13 @@ public class KafkaServiceImpl implements KafkaService {
     /**
      * Get kafka used memory.
      */
-    public String getUsedMemory(String host, int port) {
+    public String getUsedMemory(String clusterAlias, String host, int port) {
         JMXConnector connector = null;
         String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
         String memory = "<span class='badge badge-danger'>NULL</span>";
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
-            connector = JMXFactoryUtils.connectWithTimeout(jmxSeriverUrl, 30, TimeUnit.SECONDS);
+            connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
             MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
             MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
             long used = memBean.getHeapMemoryUsage().getUsed();

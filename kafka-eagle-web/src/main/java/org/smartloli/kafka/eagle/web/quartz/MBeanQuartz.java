@@ -17,28 +17,20 @@
  */
 package org.smartloli.kafka.eagle.web.quartz;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
-import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
-import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
-import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
-import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
-import org.smartloli.kafka.eagle.common.protocol.ZkClusterInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.protocol.*;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
-import org.smartloli.kafka.eagle.common.util.StrUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.common.util.ZKMetricsUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
 import org.smartloli.kafka.eagle.core.factory.Mx4jService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.MetricsServiceImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Per mins to stats mbean from kafka jmx.
@@ -112,7 +104,7 @@ public class MBeanQuartz {
             mbeanOffline.setCluster(clusterAlias);
             mbeanOffline.setKey(kpi);
             for (BrokersInfo kafka : brokers) {
-                kafkaMBeanOfflineAssembly(mx4jService, kpi, mbeanOffline, kafka);
+                kafkaMBeanOfflineAssembly(clusterAlias, mx4jService, kpi, mbeanOffline, kafka);
             }
             list.add(mbeanOffline);
         }
@@ -124,11 +116,11 @@ public class MBeanQuartz {
         }
     }
 
-    private void kafkaMBeanOfflineAssembly(Mx4jService mx4jService, String type, MBeanOfflineInfo mbeanOffline, BrokersInfo kafka) {
+    private void kafkaMBeanOfflineAssembly(String clusterAlias, Mx4jService mx4jService, String type, MBeanOfflineInfo mbeanOffline, BrokersInfo kafka) {
         String uri = kafka.getHost() + ":" + kafka.getJmxPort();
         switch (type) {
             case MBean.MESSAGEIN:
-                MBeanInfo msg = mx4jService.messagesInPerSec(uri);
+                MBeanInfo msg = mx4jService.messagesInPerSec(clusterAlias, uri);
                 if (msg != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(msg.getOneMinute() == null ? "0.00" : msg.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(msg.getMeanRate() == null ? "0.00" : msg.getMeanRate()));
@@ -137,7 +129,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.BYTEIN:
-                MBeanInfo bin = mx4jService.bytesInPerSec(uri);
+                MBeanInfo bin = mx4jService.bytesInPerSec(clusterAlias, uri);
                 if (bin != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(bin.getOneMinute() == null ? "0.00" : bin.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(bin.getMeanRate() == null ? "0.00" : bin.getMeanRate()));
@@ -146,7 +138,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.BYTEOUT:
-                MBeanInfo bout = mx4jService.bytesOutPerSec(uri);
+                MBeanInfo bout = mx4jService.bytesOutPerSec(clusterAlias, uri);
                 if (bout != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(bout.getOneMinute() == null ? "0.00" : bout.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(bout.getMeanRate() == null ? "0.00" : bout.getMeanRate()));
@@ -155,7 +147,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.BYTESREJECTED:
-                MBeanInfo bytesRejectedPerSec = mx4jService.bytesRejectedPerSec(uri);
+                MBeanInfo bytesRejectedPerSec = mx4jService.bytesRejectedPerSec(clusterAlias, uri);
                 if (bytesRejectedPerSec != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(bytesRejectedPerSec.getOneMinute() == null ? "0.00" : bytesRejectedPerSec.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(bytesRejectedPerSec.getMeanRate() == null ? "0.00" : bytesRejectedPerSec.getMeanRate()));
@@ -164,7 +156,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.FAILEDFETCHREQUEST:
-                MBeanInfo failedFetchRequestsPerSec = mx4jService.failedFetchRequestsPerSec(uri);
+                MBeanInfo failedFetchRequestsPerSec = mx4jService.failedFetchRequestsPerSec(clusterAlias, uri);
                 if (failedFetchRequestsPerSec != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(failedFetchRequestsPerSec.getOneMinute() == null ? "0.00" : failedFetchRequestsPerSec.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(failedFetchRequestsPerSec.getMeanRate() == null ? "0.00" : failedFetchRequestsPerSec.getMeanRate()));
@@ -173,7 +165,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.FAILEDPRODUCEREQUEST:
-                MBeanInfo failedProduceRequestsPerSec = mx4jService.failedProduceRequestsPerSec(uri);
+                MBeanInfo failedProduceRequestsPerSec = mx4jService.failedProduceRequestsPerSec(clusterAlias, uri);
                 if (failedProduceRequestsPerSec != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(failedProduceRequestsPerSec.getOneMinute() == null ? "0.00" : failedProduceRequestsPerSec.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(failedProduceRequestsPerSec.getMeanRate() == null ? "0.00" : failedProduceRequestsPerSec.getMeanRate()));
@@ -182,7 +174,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.TOTALFETCHREQUESTSPERSEC:
-                MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(uri);
+                MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(clusterAlias, uri);
                 if (totalFetchRequests != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(totalFetchRequests.getOneMinute() == null ? "0.00" : totalFetchRequests.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(totalFetchRequests.getMeanRate() == null ? "0.00" : totalFetchRequests.getMeanRate()));
@@ -191,7 +183,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.TOTALPRODUCEREQUESTSPERSEC:
-                MBeanInfo totalProduceRequestsPerSec = mx4jService.totalProduceRequestsPerSec(uri);
+                MBeanInfo totalProduceRequestsPerSec = mx4jService.totalProduceRequestsPerSec(clusterAlias, uri);
                 if (totalProduceRequestsPerSec != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(totalProduceRequestsPerSec.getOneMinute() == null ? "0.00" : totalProduceRequestsPerSec.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(totalProduceRequestsPerSec.getMeanRate() == null ? "0.00" : totalProduceRequestsPerSec.getMeanRate()));
@@ -200,7 +192,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.REPLICATIONBYTESINPERSEC:
-                MBeanInfo replicationBytesInPerSec = mx4jService.replicationBytesInPerSec(uri);
+                MBeanInfo replicationBytesInPerSec = mx4jService.replicationBytesInPerSec(clusterAlias, uri);
                 if (replicationBytesInPerSec != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(replicationBytesInPerSec.getOneMinute() == null ? "0.00" : replicationBytesInPerSec.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(replicationBytesInPerSec.getMeanRate() == null ? "0.00" : replicationBytesInPerSec.getMeanRate()));
@@ -209,7 +201,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.REPLICATIONBYTESOUTPERSEC:
-                MBeanInfo replicationBytesOutPerSec = mx4jService.replicationBytesOutPerSec(uri);
+                MBeanInfo replicationBytesOutPerSec = mx4jService.replicationBytesOutPerSec(clusterAlias, uri);
                 if (replicationBytesOutPerSec != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(replicationBytesOutPerSec.getOneMinute() == null ? "0.00" : replicationBytesOutPerSec.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(replicationBytesOutPerSec.getMeanRate() == null ? "0.00" : replicationBytesOutPerSec.getMeanRate()));
@@ -218,7 +210,7 @@ public class MBeanQuartz {
                 }
                 break;
             case MBean.PRODUCEMESSAGECONVERSIONS:
-                MBeanInfo produceMessageConv = mx4jService.produceMessageConversionsPerSec(uri);
+                MBeanInfo produceMessageConv = mx4jService.produceMessageConversionsPerSec(clusterAlias, uri);
                 if (produceMessageConv != null) {
                     mbeanOffline.setOneMinute(StrUtils.assembly(produceMessageConv.getOneMinute() == null ? "0.00" : produceMessageConv.getOneMinute()));
                     mbeanOffline.setMeanRate(StrUtils.assembly(produceMessageConv.getMeanRate() == null ? "0.00" : produceMessageConv.getMeanRate()));
@@ -242,7 +234,7 @@ public class MBeanQuartz {
             kpiInfo.setTimespan(CalendarUtils.getTimeSpan());
             kpiInfo.setKey(kpi);
             for (BrokersInfo kafka : brokers) {
-                kafkaAssembly(mx4jService, kpi, kpiInfo, kafka);
+                kafkaAssembly(clusterAlias, mx4jService, kpi, kpiInfo, kafka);
             }
             kpiInfo.setBroker(clusterAlias);
             kpiInfo.setType(CollectorType.KAFKA);
@@ -257,85 +249,85 @@ public class MBeanQuartz {
         }
     }
 
-    private void kafkaAssembly(Mx4jService mx4jService, String type, KpiInfo kpiInfo, BrokersInfo kafka) {
+    private void kafkaAssembly(String clusterAlias, Mx4jService mx4jService, String type, KpiInfo kpiInfo, BrokersInfo kafka) {
         String uri = kafka.getHost() + ":" + kafka.getJmxPort();
         switch (type) {
             case MBean.MESSAGEIN:
-                MBeanInfo msg = mx4jService.messagesInPerSec(uri);
+                MBeanInfo msg = mx4jService.messagesInPerSec(clusterAlias, uri);
                 if (msg != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(msg.getOneMinute()) + "");
                 }
                 break;
             case MBean.BYTEIN:
-                MBeanInfo bin = mx4jService.bytesInPerSec(uri);
+                MBeanInfo bin = mx4jService.bytesInPerSec(clusterAlias, uri);
                 if (bin != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bin.getOneMinute()) + "");
                 }
                 break;
             case MBean.BYTEOUT:
-                MBeanInfo bout = mx4jService.bytesOutPerSec(uri);
+                MBeanInfo bout = mx4jService.bytesOutPerSec(clusterAlias, uri);
                 if (bout != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bout.getOneMinute()) + "");
                 }
                 break;
             case MBean.BYTESREJECTED:
-                MBeanInfo bytesRejectedPerSec = mx4jService.bytesRejectedPerSec(uri);
+                MBeanInfo bytesRejectedPerSec = mx4jService.bytesRejectedPerSec(clusterAlias, uri);
                 if (bytesRejectedPerSec != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(bytesRejectedPerSec.getOneMinute()) + "");
                 }
                 break;
             case MBean.FAILEDFETCHREQUEST:
-                MBeanInfo failedFetchRequestsPerSec = mx4jService.failedFetchRequestsPerSec(uri);
+                MBeanInfo failedFetchRequestsPerSec = mx4jService.failedFetchRequestsPerSec(clusterAlias, uri);
                 if (failedFetchRequestsPerSec != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(failedFetchRequestsPerSec.getOneMinute()) + "");
                 }
                 break;
             case MBean.FAILEDPRODUCEREQUEST:
-                MBeanInfo failedProduceRequestsPerSec = mx4jService.failedProduceRequestsPerSec(uri);
+                MBeanInfo failedProduceRequestsPerSec = mx4jService.failedProduceRequestsPerSec(clusterAlias, uri);
                 if (failedProduceRequestsPerSec != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(failedProduceRequestsPerSec.getOneMinute()) + "");
                 }
                 break;
             case MBean.TOTALFETCHREQUESTSPERSEC:
-                MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(uri);
+                MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(clusterAlias, uri);
                 if (totalFetchRequests != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(totalFetchRequests.getOneMinute()) + "");
                 }
                 break;
             case MBean.TOTALPRODUCEREQUESTSPERSEC:
-                MBeanInfo totalProduceRequestsPerSec = mx4jService.totalProduceRequestsPerSec(uri);
+                MBeanInfo totalProduceRequestsPerSec = mx4jService.totalProduceRequestsPerSec(clusterAlias, uri);
                 if (totalProduceRequestsPerSec != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(totalProduceRequestsPerSec.getOneMinute()) + "");
                 }
                 break;
             case MBean.REPLICATIONBYTESINPERSEC:
-                MBeanInfo replicationBytesInPerSec = mx4jService.replicationBytesInPerSec(uri);
+                MBeanInfo replicationBytesInPerSec = mx4jService.replicationBytesInPerSec(clusterAlias, uri);
                 if (replicationBytesInPerSec != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(replicationBytesInPerSec.getOneMinute()) + "");
                 }
                 break;
             case MBean.REPLICATIONBYTESOUTPERSEC:
-                MBeanInfo replicationBytesOutPerSec = mx4jService.replicationBytesOutPerSec(uri);
+                MBeanInfo replicationBytesOutPerSec = mx4jService.replicationBytesOutPerSec(clusterAlias, uri);
                 if (replicationBytesOutPerSec != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(replicationBytesOutPerSec.getOneMinute()) + "");
                 }
                 break;
             case MBean.PRODUCEMESSAGECONVERSIONS:
-                MBeanInfo produceMessageConv = mx4jService.produceMessageConversionsPerSec(uri);
+                MBeanInfo produceMessageConv = mx4jService.produceMessageConversionsPerSec(clusterAlias, uri);
                 if (produceMessageConv != null) {
                     kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.0" : kpiInfo.getValue()) + StrUtils.numberic(produceMessageConv.getOneMinute()) + "");
                 }
                 break;
             case MBean.OSTOTALMEMORY:
-                long totalMemory = kafkaService.getOSMemory(kafka.getHost(), kafka.getJmxPort(), BrokerServer.TOTAL_PHYSICAL_MEMORY_SIZE.getValue());
+                long totalMemory = kafkaService.getOSMemory(clusterAlias, kafka.getHost(), kafka.getJmxPort(), BrokerServer.TOTAL_PHYSICAL_MEMORY_SIZE.getValue());
                 kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + totalMemory + "");
                 break;
             case MBean.OSFREEMEMORY:
-                long freeMemory = kafkaService.getOSMemory(kafka.getHost(), kafka.getJmxPort(), BrokerServer.FREE_PHYSICAL_MEMORY_SIZE.getValue());
+                long freeMemory = kafkaService.getOSMemory(clusterAlias, kafka.getHost(), kafka.getJmxPort(), BrokerServer.FREE_PHYSICAL_MEMORY_SIZE.getValue());
                 kpiInfo.setValue(Long.parseLong(kpiInfo.getValue() == null ? "0" : kpiInfo.getValue()) + freeMemory + "");
                 break;
             case MBean.CPUUSED:
-                double cpu = kafkaService.getUsedCpuValue(kafka.getHost(), kafka.getJmxPort());
+                double cpu = kafkaService.getUsedCpuValue(clusterAlias, kafka.getHost(), kafka.getJmxPort());
                 kpiInfo.setValue(StrUtils.numberic(kpiInfo.getValue() == null ? "0.00" : kpiInfo.getValue()) + cpu + "");
                 break;
             default:
