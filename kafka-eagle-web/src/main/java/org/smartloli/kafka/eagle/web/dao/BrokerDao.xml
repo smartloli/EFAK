@@ -30,9 +30,21 @@
         limit #{start},#{size}
     </select>
 
+    <select id="detectConnectConfigList" parameterType="map" resultMap="connectConfig">
+        select * from ke_connect_config
+        <where>
+            `cluster`=#{cluster}
+        </where>
+    </select>
+
     <update id="modifyConnectConfigById"
             parameterType="org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo">
         update ke_connect_config set `connect_uri`=#{connectUri} where `id`=#{id}
+    </update>
+
+    <update id="modifyConnectConfigStatusById"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo">
+        update ke_connect_config set `alive`=#{alive},`modify`=#{modify} where `id`=#{id}
     </update>
 
     <select id="findConnectUriById" parameterType="Integer" resultMap="connectConfig">

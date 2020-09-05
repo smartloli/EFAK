@@ -27,6 +27,7 @@ import org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
+import org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.KConstants.ZK;
@@ -36,6 +37,7 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
 import org.smartloli.kafka.eagle.core.factory.Mx4jService;
+import org.smartloli.kafka.eagle.web.dao.BrokerDao;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
 import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.MetricsService;
@@ -52,8 +54,8 @@ import java.util.Map.Entry;
  * Achieve access to the kafka monitoring data interface through jmx.
  *
  * @author smartloli.
- *
- *         Created by Jul 17, 2017 Update by No 3, 2018 by cocodroid
+ * <p>
+ * Created by Jul 17, 2017 Update by No 3, 2018 by cocodroid
  */
 @Service
 public class MetricsServiceImpl implements MetricsService {
@@ -64,13 +66,22 @@ public class MetricsServiceImpl implements MetricsService {
     @Autowired
     private TopicDao topicDao;
 
-    /** Kafka service interface. */
+    @Autowired
+    private BrokerDao brokerDao;
+
+    /**
+     * Kafka service interface.
+     */
     private KafkaService kafkaService = new KafkaFactory().create();
 
-    /** Mx4j service interface. */
+    /**
+     * Mx4j service interface.
+     */
     private Mx4jService mx4jService = new Mx4jFactory().create();
 
-    /** Gets summary monitoring data for all broker. */
+    /**
+     * Gets summary monitoring data for all broker.
+     */
     public String getAllBrokersMBean(String clusterAlias) {
         String result = "";
         List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
@@ -85,7 +96,9 @@ public class MetricsServiceImpl implements MetricsService {
         return result;
     }
 
-    /** Gets summary offline monitoring data for all broker. */
+    /**
+     * Gets summary offline monitoring data for all broker.
+     */
     private String getOfflineAllBrokersMBean(Map<String, Object> params) {
         Map<String, MBeanInfo> mbeans = new HashMap<>();
         List<MBeanOfflineInfo> mbeanOfflines = mbeanDao.getMBeanOffline(params);
@@ -137,7 +150,9 @@ public class MetricsServiceImpl implements MetricsService {
         return new Gson().toJson(mbeans);
     }
 
-    /** Gets summary online monitoring data for all broker. */
+    /**
+     * Gets summary online monitoring data for all broker.
+     */
     private String getOnlineAllBrokersMBean(String clusterAlias, List<BrokersInfo> brokers) {
         Map<String, MBeanInfo> mbeans = new HashMap<>();
         for (BrokersInfo broker : brokers) {
@@ -213,12 +228,16 @@ public class MetricsServiceImpl implements MetricsService {
         }
     }
 
-    /** Collection statistics data from kafka jmx & insert into table. */
+    /**
+     * Collection statistics data from kafka jmx & insert into table.
+     */
     public int insert(List<KpiInfo> kpi) {
         return mbeanDao.insert(kpi);
     }
 
-    /** Query MBean data in different dimensions. */
+    /**
+     * Query MBean data in different dimensions.
+     */
     public String query(Map<String, Object> params) throws ParseException {
 
         List<KpiInfo> kpis = mbeanDao.query(params);
@@ -323,7 +342,9 @@ public class MetricsServiceImpl implements MetricsService {
         assemblys.add(object);
     }
 
-    /** Crontab clean data. */
+    /**
+     * Crontab clean data.
+     */
     public void remove(int tm) {
         mbeanDao.remove(tm);
     }
@@ -391,6 +412,21 @@ public class MetricsServiceImpl implements MetricsService {
     @Override
     public List<ConsumerSummaryInfo> getAllConsumerSummary(Map<String, Object> params) {
         return topicDao.getAllConsumerSummary(params);
+    }
+
+    @Override
+    public List<ConnectConfigInfo> detectConnectConfigList(Map<String, Object> params) {
+        return brokerDao.detectConnectConfigList(params);
+    }
+
+    @Override
+    public int insertOrUpdateConnectConfig(ConnectConfigInfo connectConfig) {
+        return brokerDao.insertOrUpdateConnectConfig(connectConfig);
+    }
+
+    @Override
+    public int modifyConnectConfigStatusById(ConnectConfigInfo connectConfig) {
+        return brokerDao.modifyConnectConfigStatusById(connectConfig);
     }
 
 }

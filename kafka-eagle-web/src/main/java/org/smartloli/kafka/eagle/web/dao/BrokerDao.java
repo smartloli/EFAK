@@ -42,9 +42,25 @@ public interface BrokerDao {
     public int modifyConnectConfigById(ConnectConfigInfo connectConfig);
 
     /**
+     * Modify kafka connect uri config status(alive or shutdown) by id.
+     */
+    public int modifyConnectConfigStatusById(ConnectConfigInfo connectConfig);
+
+    /**
      * Get kafka connect uri schema from database table.
      */
     public List<ConnectConfigInfo> getConnectConfigList(Map<String, Object> params);
+
+    /**
+     * Get kafka connect uri alive from database table.
+     */
+    public List<ConnectConfigInfo> getConnectConfigAliveList(Map<String, Object> params);
+
+    /**
+     * Detect whether the kafka connect uri is alive.
+     */
+    public List<ConnectConfigInfo> detectConnectConfigList(Map<String, Object> params);
+
 
     /**
      * Get kafka connect uri schema numbers from database table for page.

@@ -19,6 +19,7 @@ package org.smartloli.kafka.eagle.web.quartz;
 
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.protocol.*;
+import org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
@@ -30,7 +31,9 @@ import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.MetricsServiceImpl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Per mins to stats mbean from kafka jmx.
@@ -91,6 +94,38 @@ public class MBeanQuartz {
                 } catch (Exception e) {
                     ErrorUtils.print(this.getClass()).error("Get broker mbean metrics has error, msg is ", e);
                 }
+                try {
+                    detectConnectUri(clusterAlias);
+                } catch (Exception e) {
+                    ErrorUtils.print(this.getClass()).error("Get kafka connect uri has error, msg is ", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Whether kafka connect uri is alive by detected.
+     */
+    private void detectConnectUri(String clusterAlias) {
+        MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
+        Map<String, Object> params = new HashMap<>();
+        params.put("cluster", clusterAlias);
+        List<ConnectConfigInfo> connectUris = metrics.detectConnectConfigList(params);
+        for (ConnectConfigInfo configInfo : connectUris) {
+            try {
+                if (NetUtils.uri(configInfo.getConnectUri())) {
+                    configInfo.setAlive(KConstants.BrokerSever.CONNECT_URI_ALIVE);
+                } else {
+                    configInfo.setAlive(KConstants.BrokerSever.CONNECT_URI_SHUTDOWN);
+                }
+            } catch (Exception e) {
+                ErrorUtils.print(this.getClass()).error("Get kafka connect uri alive or shutdown has error, msg is ", e);
+            }
+            configInfo.setModify(CalendarUtils.getDate());
+            try {
+                metrics.modifyConnectConfigStatusById(configInfo);
+            } catch (Exception e) {
+                ErrorUtils.print(this.getClass()).error("Update kafka connect uri alive or shutdown has error, msg is ", e);
             }
         }
     }

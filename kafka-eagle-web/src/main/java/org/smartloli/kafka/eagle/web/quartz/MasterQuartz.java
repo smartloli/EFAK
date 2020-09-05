@@ -17,11 +17,6 @@
  */
 package org.smartloli.kafka.eagle.web.quartz;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.WorkUtils;
@@ -39,11 +34,8 @@ import java.util.List;
  */
 public class MasterQuartz {
 
-    private final Logger LOG = LoggerFactory.getLogger(MasterQuartz.class);
-
     /**
      * Service interface area, include  {@link KafkaService}.
-     *
      */
     private KafkaService kafkaService = new KafkaFactory().create();
 
@@ -53,7 +45,7 @@ public class MasterQuartz {
     public void masterJobQuartz() {
         // whether is enable distributed
         if (SystemConfigUtils.getBooleanProperty("kafka.eagle.distributed.enable")) {
-           // jobForAllTasks();
+            // jobForAllTasks();
         } else {
 
         }
@@ -64,7 +56,7 @@ public class MasterQuartz {
         // get all kafka eagle work node
         List<String> workNodes = WorkUtils.getWorkNodes();
         for (String clusterAlias : clusterAliass) {
-            strategyForBrokerMetrics(clusterAlias,workNodes);
+            strategyForBrokerMetrics(clusterAlias, workNodes);
             // get all topics
 
             // get all consumer groups and topic
