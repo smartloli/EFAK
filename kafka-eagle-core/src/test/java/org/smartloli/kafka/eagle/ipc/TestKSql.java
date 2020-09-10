@@ -30,8 +30,8 @@ import java.util.List;
  * Test Kafka Sql.
  *
  * @author smartloli.
- *
- *         Created by Feb 27, 2018
+ * <p>
+ * Created by Feb 27, 2018
  */
 public class TestKSql {
 
@@ -39,7 +39,7 @@ public class TestKSql {
         // calcite();
         // String sql = "select * from \"k20200326_1\" where \"partition\" in
         // (0) and \"msg\" like 's1%' limit 10";
-        String sql = "select * from test16 where `partition` in (-1) limit 10";
+        String sql = "select * from kjson where `partition` in (1) limit 10";
         String result = KafkaSqlParser.execute("cluster1", sql);
         System.out.println("result: " + result);
     }
