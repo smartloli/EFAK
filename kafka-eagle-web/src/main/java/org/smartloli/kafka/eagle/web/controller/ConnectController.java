@@ -63,11 +63,91 @@ public class ConnectController {
         return mav;
     }
 
+    @RequestMapping(value = "/connect/monitor", method = RequestMethod.GET)
+    public ModelAndView connectMonitorView(HttpSession session) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/connect/monitor");
+        return mav;
+    }
+
     /**
      * Get kafka connect uri schema datasets by ajax.
      */
     @RequestMapping(value = "/connect/uri/table/ajax", method = RequestMethod.GET)
     public void connectUriListAjax(HttpServletResponse response, HttpServletRequest request) {
+        String aoData = request.getParameter("aoData");
+        JSONArray params = JSON.parseArray(aoData);
+        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+        String search = "";
+        for (Object object : params) {
+            JSONObject param = (JSONObject) object;
+            if ("sEcho".equals(param.getString("name"))) {
+                sEcho = param.getIntValue("value");
+            } else if ("iDisplayStart".equals(param.getString("name"))) {
+                iDisplayStart = param.getIntValue("value");
+            } else if ("iDisplayLength".equals(param.getString("name"))) {
+                iDisplayLength = param.getIntValue("value");
+            } else if ("sSearch".equals(param.getString("name"))) {
+                search = param.getString("value");
+            }
+        }
+
+        HttpSession session = request.getSession();
+        String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+        Signiner signiner = (Signiner) session.getAttribute(KConstants.Login.SESSION_USER);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("search", search);
+        map.put("start", iDisplayStart);
+        map.put("size", iDisplayLength);
+        map.put("cluster", clusterAlias);
+        long count = connectService.connectConfigCount(map);
+        List<ConnectConfigInfo> connectConfigs = connectService.getConnectConfigList(map);
+        JSONArray aaDatas = new JSONArray();
+        for (ConnectConfigInfo connectConfig : connectConfigs) {
+            JSONObject object = new JSONObject();
+            object.put("id", connectConfig.getId());
+            object.put("uri", "<a href='/connect/monitor?uri=" + connectConfig.getConnectUri() + "'>" + connectConfig.getConnectUri() + "</a>");
+            if (StrUtils.isNull(connectConfig.getVersion())) {
+                object.put("version", "<span class='badge badge-warning'>NULL</span>");
+            } else {
+                object.put("version", "<span class='badge badge-primary'>" + connectConfig.getVersion() + "</span>");
+            }
+            if (KConstants.BrokerSever.CONNECT_URI_ALIVE.equals(connectConfig.getAlive())) {
+                object.put("alive", "<span class='badge badge-success'>Alive</span>");
+            } else {
+                object.put("alive", "<span class='badge badge-danger'>Shutdown</span>");
+            }
+            object.put("created", connectConfig.getCreated());
+            object.put("modify", connectConfig.getModify());
+            if (KConstants.Role.ADMIN.equals(signiner.getUsername())) {
+                object.put("operate",
+                        "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_connect_uri_modify' href='#"
+                                + connectConfig.getId() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Modify</a><a class='dropdown-item' href='#" + connectConfig.getId() + "' val='" + connectConfig.getConnectUri() + "' name='ke_connect_uri_del'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Delete</a></div>");
+            } else {
+                object.put("operate", "");
+            }
+            aaDatas.add(object);
+        }
+
+        JSONObject target = new JSONObject();
+        target.put("sEcho", sEcho);
+        target.put("iTotalRecords", count);
+        target.put("iTotalDisplayRecords", count);
+        target.put("aaData", aaDatas);
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Get kafka connect application datasets by ajax.
+     */
+    @RequestMapping(value = "/connect/monitor/table/ajax", method = RequestMethod.GET)
+    public void connectMonitorListAjax(HttpServletResponse response, HttpServletRequest request) {
         String aoData = request.getParameter("aoData");
         JSONArray params = JSON.parseArray(aoData);
         int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
