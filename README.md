@@ -3,6 +3,8 @@
 [![codebeat badge](https://codebeat.co/badges/bf22a7b2-76ac-4aba-b840-00328841d9e3)](https://codebeat.co/projects/github-com-smartloli-kafka-eagle-master)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/smartloli/kafka-eagle/blob/master/LICENSE)
 
+[![Stargazers over time](https://starchart.cc/smartloli/kafka-eagle.svg)](https://starchart.cc/smartloli/kafka-eagle)
+
 # Kafka Eagle
 
 This is an monitor system and monitor your kafka clusters, and visual consumer thread,offsets,owners etc.
