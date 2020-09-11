@@ -17,10 +17,14 @@
  */
 package org.smartloli.kafka.eagle.core.task.schedule;
 
-import org.smartloli.kafka.eagle.core.task.strategy.TaskStrategy;
+import com.alibaba.fastjson.JSONArray;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.core.task.rpc.MasterNodeClient;
+import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -31,37 +35,52 @@ import java.util.concurrent.CountDownLatch;
  * Created by Sep 11, 2020
  */
 public class WorkerSchedule implements Runnable {
-    private ConcurrentLinkedQueue<TaskStrategy> taskContainer;
-    private ConcurrentHashMap<String, Object> result;
+    private ConcurrentLinkedQueue<KSqlStrategy> taskContainer;
+    private CopyOnWriteArrayList<JSONArray> result;
     private CountDownLatch workerComplete;
 
-    public void setTaskContainer(ConcurrentLinkedQueue<TaskStrategy> taskContainer) {
+    private String workNodeHost;
+    private int workNodePort;
+
+    public void setTaskContainer(ConcurrentLinkedQueue<KSqlStrategy> taskContainer) {
         this.taskContainer = taskContainer;
     }
 
-    public void setResult(ConcurrentHashMap<String, Object> result) {
+    public void setResult(CopyOnWriteArrayList<JSONArray> result) {
         this.result = result;
+    }
+
+    public void setWorkNodeHost(String workNodeHost) {
+        this.workNodeHost = workNodeHost;
+    }
+
+    public void setWorkNodePort(int workNodePort) {
+        this.workNodePort = workNodePort;
     }
 
     @Override
     public void run() {
-        Integer output = null;
         while (true) {
-            TaskStrategy input = taskContainer.poll();
-            if (input == null) break;
-            output = (Integer) handler(input);
-            result.put(Integer.toString(input.getId()), output);
+            KSqlStrategy input = taskContainer.poll();
+            if (input == null) {
+                break;
+            }
+            result.addAll(handler(input));
             workerComplete.countDown();
         }
     }
 
-    public Object handler(TaskStrategy input) {
-        Object output = input.getPrice();
-        return output;
+    public List<JSONArray> handler(KSqlStrategy input) {
+        MasterNodeClient masterCli = new MasterNodeClient(workNodeHost, workNodePort, input);
+        try {
+            masterCli.start();
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Submit worknode[" + workNodeHost + ":" + workNodePort + "] has error, msg is ", e);
+        }
+        return masterCli.getResult();
     }
 
     public void setCountDownLatch(CountDownLatch workerComplete) {
         this.workerComplete = workerComplete;
-
     }
 }

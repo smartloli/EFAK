@@ -20,39 +20,30 @@ package org.smartloli.kafka.eagle.core.task.strategy;
 import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
- * Define a distribution strategy for master generation
+ * Assign WorkNodeServer nodes information.
  *
  * @author smartloli.
  * <p>
- * Created by Sep 11, 2020
+ * Created by Sep 12, 2020
  */
-public class TaskStrategy extends BaseProtocol {
+public class WorkNodeStrategy extends BaseProtocol {
 
-    private int id;
-    private String name;
-    private int price;
+    private String host;
+    private int port;
 
-    public int getId() {
-        return id;
+    public String getHost() {
+        return host;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setHost(String host) {
+        this.host = host;
     }
 
-    public String getName() {
-        return name;
+    public int getPort() {
+        return port;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
+    public void setPort(int port) {
+        this.port = port;
     }
 }

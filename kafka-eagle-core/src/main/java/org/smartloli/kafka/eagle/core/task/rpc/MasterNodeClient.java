@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.core.task.rpc;
 
+import com.alibaba.fastjson.JSONArray;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -28,12 +29,17 @@ import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.smartloli.kafka.eagle.core.task.rpc.handler.MasterNodeHandler;
+import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * // NOTE
+ * It is used to receive the tasks sent by the client,
+ * assign the tasks to the specified workers,
+ * and summarize the calculation results of the workers.
+ * It is the general controller of a task.
  *
  * @author smartloli.
  * <p>
@@ -42,6 +48,8 @@ import java.nio.charset.Charset;
 public class MasterNodeClient {
     private final String host;
     private final int port;
+    private KSqlStrategy ksql;
+    private CopyOnWriteArrayList<JSONArray> result = new CopyOnWriteArrayList<>();
 
     public MasterNodeClient() {
         this(0);
@@ -56,6 +64,12 @@ public class MasterNodeClient {
         this.port = port;
     }
 
+    public MasterNodeClient(String host, int port, KSqlStrategy ksql) {
+        this.host = host;
+        this.port = port;
+        this.ksql = ksql;
+    }
+
     public void start() throws Exception {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
@@ -67,25 +81,20 @@ public class MasterNodeClient {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new StringEncoder(Charset.forName("UTF-8")));
-                            ch.pipeline().addLast(new MasterNodeHandler());
+                            ch.pipeline().addLast(new MasterNodeHandler(ksql, result));
                             ch.pipeline().addLast(new ByteArrayEncoder());
                             ch.pipeline().addLast(new ChunkedWriteHandler());
-
                         }
                     });
-
             ChannelFuture cf = b.connect().sync();
-            System.out.println("WorkerNodeServer has connected");
-
             cf.channel().closeFuture().sync();
-            System.out.println("WorkerNodeServer has closed");
-
         } finally {
             group.shutdownGracefully().sync();
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        new MasterNodeClient("127.0.0.1", 8888).start();
+    public CopyOnWriteArrayList<JSONArray> getResult() {
+        return this.result;
     }
+
 }

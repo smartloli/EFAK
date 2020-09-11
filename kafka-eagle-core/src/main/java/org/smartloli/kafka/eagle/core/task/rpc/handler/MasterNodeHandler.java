@@ -17,17 +17,22 @@
  */
 package org.smartloli.kafka.eagle.core.task.rpc.handler;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * // NOTE
+ * Send master task policy.
  *
  * @author smartloli.
  * <p>
@@ -35,32 +40,48 @@ import java.nio.charset.Charset;
  */
 public class MasterNodeHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
+    private KSqlStrategy ksql;
+    private CopyOnWriteArrayList<JSONArray> result = new CopyOnWriteArrayList<>();
+
+    public MasterNodeHandler(KSqlStrategy ksql, CopyOnWriteArrayList<JSONArray> result) {
+        this.ksql = ksql;
+        this.result = result;
+    }
+
     /**
      * Sending data to the WorkerNodeServer.
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ErrorUtils.print(this.getClass()).info("MasterNodeClient and WorkerNodeServer [" + ctx.channel().localAddress() + "] channel active.");
-        String sendInfo = "Hello this is master node client";
-        ctx.writeAndFlush(Unpooled.copiedBuffer(sendInfo, CharsetUtil.UTF_8));
+        ErrorUtils.print(this.getClass()).info("Master send msg to worker, task strategy is : " + ksql);
+        ctx.writeAndFlush(Unpooled.copiedBuffer(ksql.toString(), CharsetUtil.UTF_8));
     }
 
     /**
      * When the client takes the initiative to disconnect the link from the server, the channel is inactive. That is to say, the communication channel between the client and the server is closed and the data can not be transmitted.
      */
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ErrorUtils.print(this.getClass()).info("MasterNodeClient and WorkerNodeServer [" + ctx.channel().localAddress() + "] channel inactive.");
+        ErrorUtils.print(this.getClass()).info("MasterNodeClient [" + ctx.channel().localAddress() + "] channel inactive.");
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        ByteBuf buf = msg.readBytes(msg.readableBytes());
-        System.out.println("Result: " + buf.toString(Charset.forName("utf-8")));
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
+        try {
+            ByteBuf buf = msg.readBytes(msg.readableBytes());
+            String revs = buf.toString(Charset.forName("UTF-8"));
+            List<JSONArray> resultMsg = JSON.parseArray(revs, JSONArray.class);
+            this.result.addAll(resultMsg);
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get result has error, msg is ", e);
+        }
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        ctx.close();
-        ErrorUtils.print(this.getClass()).error(cause.getMessage());
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        try {
+            ctx.close();
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Close ctx has error, msg is ", e);
+        }
     }
 }

@@ -27,12 +27,14 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.string.StringEncoder;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.core.task.rpc.handler.WorkerNodeHandler;
 
 import java.nio.charset.Charset;
 
 /**
- * // NOTE
+ * It is the object of true calculation and returns the calculation
+ * result to a container of master.
  *
  * @author smartloli.
  * <p>
@@ -66,7 +68,7 @@ public class WorkerNodeServer {
                         }
                     });
             ChannelFuture cf = sb.bind().sync();
-            System.out.println(WorkerNodeServer.class + " Started and listening from master task: " + cf.channel().localAddress());
+            ErrorUtils.print(this.getClass()).info(WorkerNodeServer.class + " Started and listening from master task: " + cf.channel().localAddress());
             cf.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully().sync();
@@ -75,6 +77,6 @@ public class WorkerNodeServer {
     }
 
     public static void main(String[] args) throws Exception {
-        new WorkerNodeServer(8888).start();
+        new WorkerNodeServer(8786).start();
     }
 }

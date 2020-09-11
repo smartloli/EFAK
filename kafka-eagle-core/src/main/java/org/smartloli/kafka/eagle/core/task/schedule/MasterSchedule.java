@@ -17,12 +17,16 @@
  */
 package org.smartloli.kafka.eagle.core.task.schedule;
 
-import org.smartloli.kafka.eagle.core.task.strategy.TaskStrategy;
+import com.alibaba.fastjson.JSONArray;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
+import org.smartloli.kafka.eagle.core.task.strategy.WorkNodeStrategy;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -36,16 +40,17 @@ import java.util.concurrent.CountDownLatch;
  */
 public class MasterSchedule {
     // 1.Defined the add task container
-    private ConcurrentLinkedQueue<TaskStrategy> taskContainer = new ConcurrentLinkedQueue<TaskStrategy>();
+    private ConcurrentLinkedQueue<KSqlStrategy> taskContainer = new ConcurrentLinkedQueue<KSqlStrategy>();
     // 2.That's the WorkerSchedule container, that's a thread
     private HashMap<String, Thread> workers = new HashMap<String, Thread>();
     // 3.That's the add result container
-    private ConcurrentHashMap<String, Object> result = new ConcurrentHashMap<String, Object>();
+    // private ConcurrentHashMap<String, Object> result = new ConcurrentHashMap<String, Object>();
+    private CopyOnWriteArrayList<JSONArray> result = new CopyOnWriteArrayList<>();
     // 4.Statistics of task completion
     private final CountDownLatch workerComplete;
 
     // 5.Initialize WorkerSchedule
-    public MasterSchedule(WorkerSchedule worker, int taskCount, CountDownLatch countDownLatch) {
+    public MasterSchedule(WorkerSchedule worker, List<WorkNodeStrategy> workNodes, CountDownLatch countDownLatch) {
         // Each worker must have a reference to the master to assign tasks
         worker.setTaskContainer(taskContainer);
         // Send the result to work, which is used to return to master after calculation
@@ -53,29 +58,27 @@ public class MasterSchedule {
         this.workerComplete = countDownLatch;
         worker.setCountDownLatch(workerComplete);
 
-        for (int i = 0; i < taskCount; i++) {
-            workers.put("NodeId_" + i, new Thread(worker));
+        for (WorkNodeStrategy workNode : workNodes) {
+            worker.setWorkNodeHost(workNode.getHost());
+            worker.setWorkNodePort(workNode.getPort());
+            workers.put("WorkNodeServer[" + workNode.toString() + "]", new Thread(worker));
         }
     }
 
-    // 6.Sunbmit task
-    public void submit(TaskStrategy task) {
+    // 6.Submit task
+    public void submit(KSqlStrategy task) {
         taskContainer.add(task);
     }
 
     // 7.Execute task
     public void execute() {
-        for (Map.Entry<String, Thread> mc : workers.entrySet()) {
-            System.out.println(mc.getKey() + "already has starting ...");
-            mc.getValue().start();
+        for (Map.Entry<String, Thread> work : workers.entrySet()) {
+            ErrorUtils.print(this.getClass()).info(work.getKey() + " task has submit.");
+            work.getValue().start();
         }
     }
 
-    public int getResult() {
-        int ret = 0;
-        for (Map.Entry<String, Object> rs : result.entrySet()) {
-            ret += (Integer) rs.getValue();
-        }
-        return ret;
+    public CopyOnWriteArrayList<JSONArray> getResult() {
+        return result;
     }
 }

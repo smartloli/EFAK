@@ -28,7 +28,6 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.protocol.KafkaSqlInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -36,9 +35,13 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
+import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
@@ -61,19 +64,19 @@ public class ShardSubScan {
         private final Logger LOG = LoggerFactory.getLogger(SubScanTask.class);
         private static final int THRESHOLD = 20;
 
-        private KafkaSqlInfo kafkaSql;
+        private KSqlStrategy ksql;
         private long start;
         private long end;
 
-        public SubScanTask(KafkaSqlInfo kafkaSql, long start, long end) {
-            this.kafkaSql = kafkaSql;
+        public SubScanTask(KSqlStrategy ksql, long start, long end) {
+            this.ksql = ksql;
             this.start = start;
             this.end = end;
         }
 
         private List<JSONArray> submit() {
             LOG.info("Sharding = ∑(" + start + "~" + end + ")");
-            return executor(kafkaSql, start, end);
+            return executor(ksql, start, end);
         }
 
         @Override
@@ -83,8 +86,8 @@ public class ShardSubScan {
                 return submit();
             } else {
                 long middle = (start + end) / 2;
-                SubScanTask left = new SubScanTask(kafkaSql, start, middle - 1);
-                SubScanTask right = new SubScanTask(kafkaSql, middle, end - 1);
+                SubScanTask left = new SubScanTask(ksql, start, middle - 1);
+                SubScanTask right = new SubScanTask(ksql, middle, end - 1);
                 invokeAll(left, right);
                 msg.addAll(left.join());
                 msg.addAll(right.join());
@@ -92,46 +95,29 @@ public class ShardSubScan {
             }
         }
 
-        private List<JSONArray> executor(KafkaSqlInfo kafkaSql, long start, long end) {
+        private List<JSONArray> executor(KSqlStrategy ksql, long start, long end) {
             List<JSONArray> messages = new ArrayList<>();
             Properties props = new Properties();
             props.put(ConsumerConfig.GROUP_ID_CONFIG, KConstants.Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
-            props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(kafkaSql.getClusterAlias()));
+            props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(ksql.getCluster()));
             props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
             props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
             if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sql.fix.error")) {
                 props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, KConstants.Kafka.EARLIEST);
             }
-            if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.enable")) {
-                kafkaService.sasl(props, kafkaSql.getClusterAlias());
+            if (SystemConfigUtils.getBooleanProperty(ksql.getCluster() + ".kafka.eagle.sasl.enable")) {
+                kafkaService.sasl(props, ksql.getCluster());
             }
-            if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.ssl.enable")) {
-                kafkaService.ssl(props, kafkaSql.getClusterAlias());
+            if (SystemConfigUtils.getBooleanProperty(ksql.getCluster() + ".kafka.eagle.ssl.enable")) {
+                kafkaService.ssl(props, ksql.getCluster());
             }
             KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
             List<TopicPartition> topics = new ArrayList<>();
-            if (kafkaSql.getPartition().contains(KConstants.Kafka.ALL_PARTITION)) {
-                long partitions = brokerService.partitionNumbers(kafkaSql.getClusterAlias(), kafkaSql.getTableName());
-                String partitionStr = "(";
-                for (int partition = 0; partition < partitions; partition++) {
-                    TopicPartition tp = new TopicPartition(kafkaSql.getTableName(), partition);
-                    topics.add(tp);
-                    partitionStr += partition + ",";
-                }
-                partitionStr = partitionStr.substring(0, partitionStr.length() - 1) + ")";
-                kafkaSql.setSql(kafkaSql.getSql().replace("(" + KConstants.Kafka.ALL_PARTITION + ")", partitionStr));
-            } else {
-                for (Integer partition : kafkaSql.getPartition()) {
-                    TopicPartition tp = new TopicPartition(kafkaSql.getTableName(), partition);
-                    topics.add(tp);
-                }
-            }
+            TopicPartition tp = new TopicPartition(ksql.getTopic(), ksql.getPartition());
+            topics.add(tp);
             consumer.assign(topics);
+            consumer.seek(tp, start);
 
-            for (TopicPartition tp : topics) {
-                // (topicName,partitionId) -> (start,end)
-                consumer.seek(tp, start);
-            }
             JSONArray datasets = new JSONArray();
             boolean flag = true;
             long counter = 0;
@@ -139,6 +125,8 @@ public class ShardSubScan {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(10000));
                 for (ConsumerRecord<String, String> record : records) {
                     counter++;
+                    // no filter
+                    //
                     JSONObject object = new JSONObject(new LinkedHashMap<>());
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.PARTITION, record.partition());
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.OFFSET, record.offset());
@@ -162,20 +150,22 @@ public class ShardSubScan {
     }
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        KafkaSqlInfo ksql = new KafkaSqlInfo();
-        ksql.setClusterAlias("cluster1");
-        ksql.setPartition(Arrays.asList(1));
-        ksql.setTableName("kjson");
+        KSqlStrategy ksql = new KSqlStrategy();
+        ksql.setCluster("cluster1");
+        ksql.setPartition(1);
         ksql.setTopic("kjson");
-        // Add
-        // (topicName,partitionId) -> (start,end)
-        List<JSONArray> results = queryTopicData(ksql, 0, 2);
+        ksql.setStart(4);
+        ksql.setEnd(7);
+        long startMill = System.currentTimeMillis();
+        List<JSONArray> results = query(ksql);
+        System.out.println("Spent: " + (System.currentTimeMillis() - startMill));
         System.out.println(results);
+        System.out.println(results.get(0).size());
     }
 
-    public static List<JSONArray> queryTopicData(KafkaSqlInfo kafkaSql, long start, long end) {
+    public static List<JSONArray> query(KSqlStrategy ksql) {
         ForkJoinPool pool = new ForkJoinPool();
-        ForkJoinTask<List<JSONArray>> result = pool.submit(new ShardSubScan().new SubScanTask(kafkaSql, start, end));
+        ForkJoinTask<List<JSONArray>> result = pool.submit(new ShardSubScan().new SubScanTask(ksql, ksql.getStart(), ksql.getEnd()));
         pool.shutdown();
         return result.invoke();
     }
