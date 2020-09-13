@@ -17,9 +17,10 @@
  */
 package org.smartloli.kafka.eagle.core.task.strategy;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Build kafka sql task policy.
@@ -34,8 +35,10 @@ public class KSqlStrategy extends BaseProtocol {
     private String sql;
     private String topic;
     private int partition;
+    private List<Integer> partitions = new ArrayList<>();
     private long start;
     private long end;
+    private long limit = 0L;
 
     /**
      * KSQL combined filters of multiple fields.
@@ -46,15 +49,7 @@ public class KSqlStrategy extends BaseProtocol {
      * <p>
      * So, filters include [{"like":"kafka-eagle",">":"1599754181586"},{"like":"smartloli"}]
      */
-    private JSONArray filters = new JSONArray();
-    /**
-     * <code>
-     * select * from topic where `partition` in (0) and msg like 'kafka-eagle' and timespan > 1599754181586 limit 10;
-     * </code>
-     * So, filter include {"like":"kafka-eagle",">":"1599754181586"}
-     */
-    private JSONObject filter = new JSONObject();
-    private long limit;
+    private List<FieldSchemaStrategy> fieldSchema = new ArrayList<>();
 
     public String getCluster() {
         return cluster;
@@ -88,6 +83,14 @@ public class KSqlStrategy extends BaseProtocol {
         this.partition = partition;
     }
 
+    public List<Integer> getPartitions() {
+        return partitions;
+    }
+
+    public void setPartitions(List<Integer> partitions) {
+        this.partitions = partitions;
+    }
+
     public long getStart() {
         return start;
     }
@@ -104,27 +107,19 @@ public class KSqlStrategy extends BaseProtocol {
         this.end = end;
     }
 
-    public JSONArray getFilters() {
-        return filters;
-    }
-
-    public void setFilters(JSONArray filters) {
-        this.filters = filters;
-    }
-
-    public JSONObject getFilter() {
-        return filter;
-    }
-
-    public void setFilter(JSONObject filter) {
-        this.filter = filter;
-    }
-
     public long getLimit() {
         return limit;
     }
 
     public void setLimit(long limit) {
         this.limit = limit;
+    }
+
+    public List<FieldSchemaStrategy> getFieldSchema() {
+        return fieldSchema;
+    }
+
+    public void setFieldSchema(List<FieldSchemaStrategy> fieldSchema) {
+        this.fieldSchema = fieldSchema;
     }
 }

@@ -73,7 +73,19 @@ public class WorkerNodeHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         String rev = getMessage(buf);
-        this.ksql = JSON.parseObject(rev, KSqlStrategy.class);
+        if (isJson(rev)) {
+            this.ksql = JSON.parseObject(rev, KSqlStrategy.class);
+        }
+    }
+
+    public boolean isJson(String rev) {
+        try {
+            JSON.parse(rev);
+            return true;
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Parse rev[" + rev + "] to json has error, msg is ", e);
+            return false;
+        }
     }
 
     /**
@@ -81,7 +93,9 @@ public class WorkerNodeHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.writeAndFlush(Unpooled.copiedBuffer(ShardSubScan.query(ksql).toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE);
+        if (this.ksql != null) {
+            ctx.writeAndFlush(Unpooled.copiedBuffer(ShardSubScan.query(ksql).toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE);
+        }
     }
 
     /**

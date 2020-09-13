@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.core.task.shard;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.kafka.clients.CommonClientConfigs;
@@ -35,6 +36,8 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
+import org.smartloli.kafka.eagle.core.sql.schema.TopicSchema;
+import org.smartloli.kafka.eagle.core.task.strategy.FieldSchemaStrategy;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
 import java.time.Duration;
@@ -42,7 +45,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
@@ -62,9 +64,12 @@ public class ShardSubScan {
     private class SubScanTask extends RecursiveTask<List<JSONArray>> {
 
         private final Logger LOG = LoggerFactory.getLogger(SubScanTask.class);
-        private static final int THRESHOLD = 20;
+        private final int THRESHOLD = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.fetch.threshold");
+        private final long TIMEOUT = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.fetch.timeout");
 
         private KSqlStrategy ksql;
+        private String topic;
+        private int partition;
         private long start;
         private long end;
 
@@ -72,10 +77,12 @@ public class ShardSubScan {
             this.ksql = ksql;
             this.start = start;
             this.end = end;
+            this.topic = ksql.getTopic();
+            this.partition = ksql.getPartition();
         }
 
         private List<JSONArray> submit() {
-            LOG.info("Sharding = ∑(" + start + "~" + end + ")");
+            LOG.info("Topic[" + this.topic + "], Partition[" + this.partition + "], Sharding = ∑(" + start + "~" + end + ")");
             return executor(ksql, start, end);
         }
 
@@ -116,25 +123,56 @@ public class ShardSubScan {
             TopicPartition tp = new TopicPartition(ksql.getTopic(), ksql.getPartition());
             topics.add(tp);
             consumer.assign(topics);
-            consumer.seek(tp, start);
+            long limit = ksql.getLimit() == 0 ? KConstants.KSQL.LIMIT : ksql.getLimit();
+            boolean desc = false;
+            for (FieldSchemaStrategy filter : ksql.getFieldSchema()) {
+                if (KConstants.KSQL.ORDER_BY.equals(filter.getType())) {
+                    if (KConstants.KSQL.ORDER_BY_DESC.equals(filter.getValue())) {
+                        desc = true;
+                        break;
+                    }
+                }
+            }
+            if (desc) {
+                consumer.seek(tp, end - limit);
+            } else {
+                consumer.seek(tp, start);
+            }
 
             JSONArray datasets = new JSONArray();
             boolean flag = true;
             long counter = 0;
             while (flag) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(10000));
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(TIMEOUT));
                 for (ConsumerRecord<String, String> record : records) {
                     counter++;
-                    // no filter
-                    //
+                    String msg = record.value();
+
                     JSONObject object = new JSONObject(new LinkedHashMap<>());
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.PARTITION, record.partition());
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.OFFSET, record.offset());
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.MSG, record.value());
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.TIMESPAN, record.timestamp());
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.DATE, CalendarUtils.convertUnixTime(record.timestamp()));
-                    datasets.add(object);
-                    if (counter == (end - start)) {
+                    // filter
+                    List<FieldSchemaStrategy> filters = ksql.getFieldSchema();
+                    List<Boolean> matchs = new ArrayList<>();
+                    for (FieldSchemaStrategy filter : filters) {
+                        String key = filter.getKey();
+                        String value = filter.getValue();
+                        if (filter.isJsonUdf()) {// sql include json object
+                            filterJSONObject(msg, filter, matchs);
+                        } else if (filter.isJsonsUdf()) {// sql include json array
+                            filterJSONArray(msg, filter, matchs);
+                        } else {// sql include text
+                            filterText(msg, filter, matchs);
+                        }
+                        filterTimeSpan(msg, filter, matchs, record.timestamp());
+                    }
+                    if (matchs.size() == filters.size()) {
+                        datasets.add(object);
+                    }
+                    if (counter == limit) {
                         flag = false;
                         break;
                     }
@@ -147,20 +185,80 @@ public class ShardSubScan {
             messages.add(datasets);
             return messages;
         }
-    }
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
-        KSqlStrategy ksql = new KSqlStrategy();
-        ksql.setCluster("cluster1");
-        ksql.setPartition(1);
-        ksql.setTopic("kjson");
-        ksql.setStart(4);
-        ksql.setEnd(7);
-        long startMill = System.currentTimeMillis();
-        List<JSONArray> results = query(ksql);
-        System.out.println("Spent: " + (System.currentTimeMillis() - startMill));
-        System.out.println(results);
-        System.out.println(results.get(0).size());
+        private void filterTimeSpan(String msg, FieldSchemaStrategy filter, List<Boolean> matchs, long timestamp) {
+            if (KConstants.KSQL.ORDER_BY.equals(filter.getType())) {
+                matchs.add(true);// order by default match one record
+            }
+            if (TopicSchema.TIMESPAN.equals(filter.getKey()) && !KConstants.KSQL.ORDER_BY.equals(filter.getType())) {
+                if (KConstants.KSQL.GT.equals(filter.getType())) {
+                    if (timestamp > Long.parseLong(filter.getValue())) {
+                        matchs.add(true);
+                    }
+                } else if (KConstants.KSQL.GE.equals(filter.getType())) {
+                    if (timestamp >= Long.parseLong(filter.getValue())) {
+                        matchs.add(true);
+                    }
+                } else if (KConstants.KSQL.EQ.equals(filter.getType())) {
+                    if (timestamp == Long.parseLong(filter.getValue())) {
+                        matchs.add(true);
+                    }
+                } else if (KConstants.KSQL.LT.equals(filter.getType())) {
+                    if (timestamp < Long.parseLong(filter.getValue())) {
+                        matchs.add(true);
+                    }
+                } else if (KConstants.KSQL.LE.equals(filter.getType())) {
+                    if (timestamp <= Long.parseLong(filter.getValue())) {
+                        matchs.add(true);
+                    }
+                }
+            }
+        }
+
+        private void filterJSONObject(String msg, FieldSchemaStrategy filter, List<Boolean> matchs) {
+            if (KConstants.KSQL.LIKE.equals(filter.getType())) {
+                if (JSON.parseObject(msg).getString(filter.getKey()).contains(filter.getValue())) {
+                    matchs.add(true);
+                }
+            } else if (KConstants.KSQL.EQ.equals(filter.getType())) {
+                if (JSON.parseObject(msg).getString(filter.getKey()).equals(filter.getValue())) {
+                    matchs.add(true);
+                }
+            }
+        }
+
+        private void filterText(String msg, FieldSchemaStrategy filter, List<Boolean> matchs) {
+            if (KConstants.KSQL.LIKE.equals(filter.getType())) {
+                if (msg.contains(filter.getValue())) {
+                    matchs.add(true);
+                }
+            } else if (KConstants.KSQL.EQ.equals(filter.getType())) {
+                if (msg.equals(filter.getValue())) {
+                    matchs.add(true);
+                }
+            }
+        }
+
+        private void filterJSONArray(String msg, FieldSchemaStrategy filter, List<Boolean> matchs) {
+            if (KConstants.KSQL.LIKE.equals(filter.getType())) {
+                for (Object obj : JSON.parseArray(msg)) {
+                    JSONObject json = (JSONObject) obj;
+                    if (json.getString(filter.getKey()).contains(filter.getValue())) {
+                        matchs.add(true);
+                        break;
+                    }
+                }
+            } else if (KConstants.KSQL.EQ.equals(filter.getType())) {
+                for (Object obj : JSON.parseArray(msg)) {
+                    JSONObject json = (JSONObject) obj;
+                    if (json.getString(filter.getKey()).equals(filter.getValue())) {
+                        matchs.add(true);
+                        break;
+                    }
+                }
+            }
+        }
+
     }
 
     public static List<JSONArray> query(KSqlStrategy ksql) {

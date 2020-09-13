@@ -19,9 +19,7 @@ package org.smartloli.kafka.eagle.core.task.rpc;
 
 import com.alibaba.fastjson.JSONArray;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -50,6 +48,7 @@ public class MasterNodeClient {
     private final int port;
     private KSqlStrategy ksql;
     private CopyOnWriteArrayList<JSONArray> result = new CopyOnWriteArrayList<>();
+    private final int BUFF_SIZE = 1024 * 1024 * 1024;
 
     public MasterNodeClient() {
         this(0);
@@ -85,7 +84,7 @@ public class MasterNodeClient {
                             ch.pipeline().addLast(new ByteArrayEncoder());
                             ch.pipeline().addLast(new ChunkedWriteHandler());
                         }
-                    });
+                    }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(BUFF_SIZE));
             ChannelFuture cf = b.connect().sync();
             cf.channel().closeFuture().sync();
         } finally {

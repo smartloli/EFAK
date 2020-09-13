@@ -17,11 +17,20 @@
  */
 package org.smartloli.kafka.eagle.core.task.schedule;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.common.util.WorkUtils;
+import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.sql.tool.KSqlUtils;
+import org.smartloli.kafka.eagle.core.task.parser.KSqlParser;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 import org.smartloli.kafka.eagle.core.task.strategy.WorkNodeStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -33,10 +42,54 @@ import java.util.concurrent.CountDownLatch;
  * Created by Sep 11, 2020
  */
 public class JobClient {
-    public static void main(String[] args) {
 
-        long startMill = System.currentTimeMillis();
-        List<KSqlStrategy> tasks = getTaskStrategy();
+    private ConcurrentHashMap<String, Object> taskLogs = new ConcurrentHashMap<>();
+    private static KafkaService kafkaService = new KafkaFactory().create();
+
+    public JobClient(ConcurrentHashMap<String, Object> taskLogs) {
+        this.taskLogs = taskLogs;
+    }
+
+    public static void main(String[] args) {
+        String sql = "select * from kjson where `partition` in (0,1,2) and JSON(msg,'id')='1' limit 10";
+        String cluster = "cluster1";
+        long start = System.currentTimeMillis();
+        JSONObject resultObject = query(sql, cluster);
+        String results = resultObject.getString("result");
+        int rows = resultObject.getInteger("size");
+        long end = System.currentTimeMillis();
+        JSONObject status = new JSONObject();
+        status.put("error", false);
+        status.put("msg", results);
+        status.put("status", "Time taken: " + (end - start) / 1000.0 + " seconds, Fetched: " + rows + " row(s)");
+        status.put("spent", end - start);
+        System.out.println("Result: " + status);
+    }
+
+    public static JSONObject query(String sql, String cluster) {
+        List<JSONArray> result = submit(sql, cluster);
+        KSqlStrategy ksql = KSqlParser.parseQueryKSql(sql, cluster);
+        JSONObject resultObject = new JSONObject();
+        try {
+            resultObject = KSqlUtils.query(getTableSchema(), ksql.getTopic(), result, sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resultObject;
+    }
+
+    private static JSONObject getTableSchema() {
+        JSONObject schema = new JSONObject();
+        schema.put("partition", "integer");
+        schema.put("offset", "bigint");
+        schema.put("msg", "varchar");
+        schema.put("timespan", "varchar");
+        schema.put("date", "varchar");
+        return schema;
+    }
+
+    public static List<JSONArray> submit(String sql, String cluster) {
+        List<KSqlStrategy> tasks = getTaskStrategy(sql, cluster);
 
         //Stats tasks finish
         CountDownLatch countDownLatch = new CountDownLatch(tasks.size());
@@ -52,42 +105,54 @@ public class JobClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("Result: " + master.getResult());
-        System.out.println("Spent: " + (System.currentTimeMillis() - startMill));
 
+        return master.getResult();
     }
 
-    private static List<KSqlStrategy> getTaskStrategy() {
+    private static List<KSqlStrategy> getTaskStrategy(String sql, String cluster) {
         List<KSqlStrategy> tasks = new ArrayList<>();
-        KSqlStrategy ksql = new KSqlStrategy();
-        ksql.setCluster("cluster1");
-        ksql.setTopic("kjson");
-        ksql.setPartition(1);
-        ksql.setStart(0);
-        ksql.setEnd(2);
-        tasks.add(ksql);
+        KSqlStrategy ksql = KSqlParser.parseQueryKSql(sql, cluster);
+        long limit = ksql.getLimit();
+        int workNodeSize = getWorkNodes().size();
+        for (int partitionId : ksql.getPartitions()) {
+            long endLogSize = 0L;
+            if ("kafka".equals(SystemConfigUtils.getProperty(cluster + ".kafka.eagle.offset.storage"))) {
+                endLogSize = kafkaService.getKafkaLogSize(cluster, ksql.getTopic(), partitionId);
+            } else {
+                endLogSize = kafkaService.getLogSize(cluster, ksql.getTopic(), partitionId);
+            }
 
-        KSqlStrategy ksql2 = new KSqlStrategy();
-        ksql2.setCluster("cluster1");
-        ksql2.setTopic("kjson");
-        ksql2.setPartition(0);
-        ksql2.setStart(1);
-        ksql2.setEnd(3);
-        tasks.add(ksql2);
+            long numberPer = endLogSize / workNodeSize;
+            for (int workNodeIndex = 0; workNodeIndex < workNodeSize; workNodeIndex++) {
+                KSqlStrategy kSqlStrategy = new KSqlStrategy();
+                if (workNodeIndex == (workNodeSize - 1)) {
+                    kSqlStrategy.setStart(workNodeIndex * numberPer);
+                    kSqlStrategy.setEnd(endLogSize);
+                } else {
+                    kSqlStrategy.setStart(workNodeIndex * numberPer);
+                    kSqlStrategy.setEnd((numberPer * (workNodeIndex + 1)) - 1);
+                }
+                kSqlStrategy.setPartition(partitionId);
+                kSqlStrategy.setCluster(cluster);
+                kSqlStrategy.setTopic(ksql.getTopic());
+                kSqlStrategy.setLimit(ksql.getLimit());
+                kSqlStrategy.setFieldSchema(ksql.getFieldSchema());
+                tasks.add(kSqlStrategy);
+            }
+        }
         return tasks;
     }
 
     private static List<WorkNodeStrategy> getWorkNodes() {
         List<WorkNodeStrategy> nodes = new ArrayList<>();
-        WorkNodeStrategy wns01 = new WorkNodeStrategy();
-        wns01.setHost("127.0.0.1");
-        wns01.setPort(8786);
-        nodes.add(wns01);
-
-//        WorkNodeStrategy wns02 = new WorkNodeStrategy();
-//        wns02.setHost("127.0.0.1");
-//        wns02.setPort(8787);
-//        nodes.add(wns02);
+        List<String> hosts = WorkUtils.getWorkNodes();
+        int port = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.port");
+        for (String host : hosts) {
+            WorkNodeStrategy wns = new WorkNodeStrategy();
+            wns.setHost(host);
+            wns.setPort(port);
+            nodes.add(wns);
+        }
         return nodes;
     }
 }

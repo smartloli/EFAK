@@ -333,4 +333,32 @@ public class KConstants {
         public static final String JOB_PARAMS = "job_params";
     }
 
+    public interface KSQL {
+        public static final String ORDER_BY = "ORDER_BY";
+        public static final String ORDER_BY_DEFAULT = "ASC";
+        public static final String ORDER_BY_DESC = "DESC";
+        public static final String ORDER_BY_ASC = ORDER_BY_DEFAULT;
+        public static final String COLUMN = "COLUMN";
+        public static final String PARTITIONS = "PARTITIONS";
+        public static final String LIKE = "LIKE";
+        public static final String AND = "AND";
+        public static final String OR = "OR";
+        public static final String IN = "IN";
+        public static final String EQ = "=";
+        public static final String GT = ">";
+        public static final String GE = ">=";
+        public static final String LT = "<";
+        public static final String LE = "<=";
+        public static final String LB = "(";
+        public static final String REG_LB = "\\(";
+        public static final String RB = ")";
+        public static final String REG_RB = "\\)";
+        public static final String[] COMPARE_CONDITIONS = new String[]{">", ">=", "=", "<", "<="};
+        public static final int LIMIT = 100;
+        public static final String JSON = "JSON";
+        public static final String JSONS = "JSONS";
+        public static final String INT = "INT";
+        public static final String STRING = "STRING";
+    }
+
 }

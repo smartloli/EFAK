@@ -18,10 +18,7 @@
 package org.smartloli.kafka.eagle.core.task.rpc;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -53,22 +50,21 @@ public class WorkerNodeServer {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             ServerBootstrap sb = new ServerBootstrap();
-            sb.option(ChannelOption.SO_BACKLOG, 1024);
+            sb.option(ChannelOption.SO_BACKLOG, 1024 * 1)
+                    .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1, 1024 * 1024 * 8));
             sb.group(group, bossGroup)
                     .channel(NioServerSocketChannel.class)
                     .localAddress(this.port)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
-
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-
                             ch.pipeline().addLast(new StringEncoder(Charset.forName("UTF-8")));
                             ch.pipeline().addLast(new WorkerNodeHandler());
                             ch.pipeline().addLast(new ByteArrayEncoder());
                         }
                     });
             ChannelFuture cf = sb.bind().sync();
-            ErrorUtils.print(this.getClass()).info(WorkerNodeServer.class + " Started and listening from master task: " + cf.channel().localAddress());
+            ErrorUtils.print(this.getClass()).info(WorkerNodeServer.class.getSimpleName() + " started and listening from master task: " + cf.channel().localAddress());
             cf.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully().sync();
@@ -77,6 +73,6 @@ public class WorkerNodeServer {
     }
 
     public static void main(String[] args) throws Exception {
-        new WorkerNodeServer(8786).start();
+        new WorkerNodeServer(8787).start();
     }
 }

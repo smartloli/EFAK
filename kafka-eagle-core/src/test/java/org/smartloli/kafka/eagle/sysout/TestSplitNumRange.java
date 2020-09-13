@@ -15,22 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.util;
-
-import org.smartloli.kafka.eagle.common.constant.KSqlParser;
+package org.smartloli.kafka.eagle.sysout;
 
 /**
- * Test KSQL parse.
+ * // NOTE
  *
  * @author smartloli.
  * <p>
- * Created by Jun 8, 2020
+ * Created by Sep 13, 2020
  */
-public class TestKSQLParser {
-
+public class TestSplitNumRange {
     public static void main(String[] args) {
-        String sql = "select msg from kk a where `partition` in (0,1,2) and `offset`=10 and msg like '%aaabbb%' order by timespan desc limit 240";
-        System.out.println(KSqlParser.parserTopic(sql));
+        int num = 10000;
+        int split = 7;
+        int size = num / split;
+        for (int i = 0; i < split; i++) {
+            if (i == (split - 1)) {
+                System.out.println("(" + i * size + "," + (num) + ")");
+            } else {
+                System.out.println("(" + i * size + "," + (size * (i + 1) - 1) + ")");
+            }
+        }
+        int buffer = 1024 * 1024 * 1024;
+        System.out.println("1".equals("1"));
     }
-
 }
