@@ -18,7 +18,9 @@
 package org.smartloli.kafka.eagle.core.task.schedule;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.core.task.rpc.MasterNodeClient;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
@@ -71,7 +73,10 @@ public class WorkerSchedule implements Runnable {
     }
 
     public List<JSONArray> handler(KSqlStrategy input) {
-        MasterNodeClient masterCli = new MasterNodeClient(workNodeHost, workNodePort, input);
+        JSONObject object = new JSONObject();
+        object.put(KConstants.Protocol.KEY, KConstants.Protocol.KSQL_QUERY);
+        object.put(KConstants.Protocol.VALUE, input);
+        MasterNodeClient masterCli = new MasterNodeClient(workNodeHost, workNodePort, object);
         try {
             masterCli.start();
         } catch (Exception e) {

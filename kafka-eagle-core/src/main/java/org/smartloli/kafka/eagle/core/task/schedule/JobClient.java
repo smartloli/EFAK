@@ -19,12 +19,13 @@ package org.smartloli.kafka.eagle.core.task.schedule;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.common.util.WorkUtils;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.sql.tool.KSqlUtils;
+import org.smartloli.kafka.eagle.core.task.metrics.WorkNodeMetrics;
 import org.smartloli.kafka.eagle.core.task.parser.KSqlParser;
+import org.smartloli.kafka.eagle.core.task.rpc.MasterNodeClient;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 import org.smartloli.kafka.eagle.core.task.strategy.WorkNodeStrategy;
 
@@ -51,6 +52,10 @@ public class JobClient {
     }
 
     public static void main(String[] args) {
+        System.out.println(getWorkNodeMetrics());
+    }
+
+    private static void testQueryTopic() {
         String sql = "select * from kjson where `partition` in (0,1,2) and JSON(msg,'id')='1' limit 10";
         String cluster = "cluster1";
         long start = System.currentTimeMillis();
@@ -64,6 +69,37 @@ public class JobClient {
         status.put("status", "Time taken: " + (end - start) / 1000.0 + " seconds, Fetched: " + rows + " row(s)");
         status.put("spent", end - start);
         System.out.println("Result: " + status);
+    }
+
+    public static List<WorkNodeMetrics> getWorkNodeMetrics() {
+        List<WorkNodeMetrics> metrics = new ArrayList<>();
+        for (WorkNodeStrategy workNode : getWorkNodes()) {
+            WorkNodeMetrics workNodeMetrics = new WorkNodeMetrics();
+            if (NetUtils.telnet(workNode.getHost(), workNode.getPort())) {
+                JSONObject object = new JSONObject();
+                object.put(KConstants.Protocol.KEY, KConstants.Protocol.HEART_BEAT);
+                MasterNodeClient masterCli = new MasterNodeClient(workNode.getHost(), workNode.getPort(), object);
+                try {
+                    masterCli.start();
+                } catch (Exception e) {
+                    ErrorUtils.print(JobClient.class).error("Submit worknode[" + workNode.getHost() + ":" + workNode.getPort() + "] has error, msg is ", e);
+                }
+                List<JSONArray> results = masterCli.getResult();
+                if (results.size() > 0) {
+                    if (results.get(0).size() > 0) {
+                        JSONObject result = (JSONObject) results.get(0).get(0);
+                        workNodeMetrics.setAlive(true);
+                        workNodeMetrics.setCpu(result.getDouble("cpu"));
+                        workNodeMetrics.setMemoryUser(result.getLong("mem_used"));
+                        workNodeMetrics.setMemoryMax(result.getLong("mem_max"));
+                    }
+                }
+            } else {
+                workNodeMetrics.setAlive(false);
+            }
+            metrics.add(workNodeMetrics);
+        }
+        return metrics;
     }
 
     public static JSONObject query(String sql, String cluster) {

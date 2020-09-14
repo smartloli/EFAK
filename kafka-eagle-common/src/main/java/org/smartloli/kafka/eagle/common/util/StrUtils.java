@@ -99,7 +99,7 @@ public class StrUtils {
     }
 
     /**
-     * Formmatter number.
+     * Formatter string number.
      */
     public static double numberic(String number) {
         DecimalFormat formatter = new DecimalFormat("###.##");
@@ -107,7 +107,15 @@ public class StrUtils {
     }
 
     /**
-     * Formmatter number.
+     * Formatter number.
+     */
+    public static double numberic(double number) {
+        DecimalFormat formatter = new DecimalFormat("###.##");
+        return Double.valueOf(formatter.format(number));
+    }
+
+    /**
+     * Formatter customer string number.
      */
     public static double numberic(String number, String format) {
         DecimalFormat formatter = new DecimalFormat(format);

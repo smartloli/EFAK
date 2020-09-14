@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.core.task.rpc;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -27,7 +28,6 @@ import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.smartloli.kafka.eagle.core.task.rpc.handler.MasterNodeHandler;
-import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
@@ -46,7 +46,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MasterNodeClient {
     private final String host;
     private final int port;
-    private KSqlStrategy ksql;
+    private JSONObject object;
     private CopyOnWriteArrayList<JSONArray> result = new CopyOnWriteArrayList<>();
     private final int BUFF_SIZE = 1024 * 1024 * 1024;
 
@@ -63,10 +63,10 @@ public class MasterNodeClient {
         this.port = port;
     }
 
-    public MasterNodeClient(String host, int port, KSqlStrategy ksql) {
+    public MasterNodeClient(String host, int port, JSONObject object) {
         this.host = host;
         this.port = port;
-        this.ksql = ksql;
+        this.object = object;
     }
 
     public void start() throws Exception {
@@ -80,7 +80,7 @@ public class MasterNodeClient {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new StringEncoder(Charset.forName("UTF-8")));
-                            ch.pipeline().addLast(new MasterNodeHandler(ksql, result));
+                            ch.pipeline().addLast(new MasterNodeHandler(object, result));
                             ch.pipeline().addLast(new ByteArrayEncoder());
                             ch.pipeline().addLast(new ChunkedWriteHandler());
                         }

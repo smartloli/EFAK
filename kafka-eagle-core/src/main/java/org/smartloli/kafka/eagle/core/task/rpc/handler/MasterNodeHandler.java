@@ -19,13 +19,13 @@ package org.smartloli.kafka.eagle.core.task.rpc.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
-import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -40,11 +40,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class MasterNodeHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
-    private KSqlStrategy ksql;
+    private JSONObject object;
     private CopyOnWriteArrayList<JSONArray> result = new CopyOnWriteArrayList<>();
 
-    public MasterNodeHandler(KSqlStrategy ksql, CopyOnWriteArrayList<JSONArray> result) {
-        this.ksql = ksql;
+    public MasterNodeHandler(JSONObject object, CopyOnWriteArrayList<JSONArray> result) {
+        this.object = object;
         this.result = result;
     }
 
@@ -53,8 +53,8 @@ public class MasterNodeHandler extends SimpleChannelInboundHandler<ByteBuf> {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ErrorUtils.print(this.getClass()).info("Master send msg to worker, task strategy is : " + ksql);
-        ctx.writeAndFlush(Unpooled.copiedBuffer(ksql.toString(), CharsetUtil.UTF_8));
+        ErrorUtils.print(this.getClass()).info("Master send msg to worker, task strategy is : " + object.toString());
+        ctx.writeAndFlush(Unpooled.copiedBuffer(object.toString(), CharsetUtil.UTF_8));
     }
 
     /**

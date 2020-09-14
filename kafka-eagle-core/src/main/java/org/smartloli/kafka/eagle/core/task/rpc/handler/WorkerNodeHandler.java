@@ -18,17 +18,23 @@
 package org.smartloli.kafka.eagle.core.task.rpc.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
+import org.smartloli.kafka.eagle.common.util.AppUtils;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.core.task.shard.ShardSubScan;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Receive and execute the assigned tasks of master.
@@ -40,6 +46,7 @@ import java.io.UnsupportedEncodingException;
 public class WorkerNodeHandler extends ChannelInboundHandlerAdapter {
 
     private KSqlStrategy ksql;
+    private String type;
 
     /**
      * When the client actively links the server link, the channel is active. In other words, the client and the server have established a communication channel and can transmit data.
@@ -74,7 +81,14 @@ public class WorkerNodeHandler extends ChannelInboundHandlerAdapter {
         ByteBuf buf = (ByteBuf) msg;
         String rev = getMessage(buf);
         if (isJson(rev)) {
-            this.ksql = JSON.parseObject(rev, KSqlStrategy.class);
+            JSONObject object = JSON.parseObject(rev);
+            if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.HEART_BEAT)) {//
+                this.type = KConstants.Protocol.HEART_BEAT;
+            } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.KSQL_QUERY)) {
+                this.type = KConstants.Protocol.KSQL_QUERY;
+                this.ksql = object.getObject(KConstants.Protocol.VALUE, KSqlStrategy.class);
+                // this.ksql = JSON.parseObject(rev, KSqlStrategy.class);
+            }
         }
     }
 
@@ -93,9 +107,22 @@ public class WorkerNodeHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        if (this.ksql != null) {
-            ctx.writeAndFlush(Unpooled.copiedBuffer(ShardSubScan.query(ksql).toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE);
+        if (KConstants.Protocol.HEART_BEAT.equals(this.type)) {//
+            JSONObject object = new JSONObject();
+            object.put("mem_used", AppUtils.getInstance().getProcessMemUsed());
+            object.put("mem_max", AppUtils.getInstance().getProcessMemMax());
+            object.put("cpu", AppUtils.getInstance().getProcessCpu());
+            JSONArray array = new JSONArray();
+            array.add(object);
+            List<JSONArray> results = new ArrayList<>();
+            results.add(array);
+            ctx.writeAndFlush(Unpooled.copiedBuffer(results.toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE);
+        } else if (KConstants.Protocol.KSQL_QUERY.equals(this.type)) {
+            if (this.ksql != null) {
+                ctx.writeAndFlush(Unpooled.copiedBuffer(ShardSubScan.query(ksql).toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE);
+            }
         }
+
     }
 
     /**
