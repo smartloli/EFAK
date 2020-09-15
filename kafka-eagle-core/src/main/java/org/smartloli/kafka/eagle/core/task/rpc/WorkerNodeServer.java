@@ -51,7 +51,8 @@ public class WorkerNodeServer {
         try {
             ServerBootstrap sb = new ServerBootstrap();
             sb.option(ChannelOption.SO_BACKLOG, 1024 * 1)
-                    .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1, 1024 * 1024 * 8));
+                    .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1, 1024 * 1024 * 8))
+                    .childOption(ChannelOption.TCP_NODELAY, true);
             sb.group(group, bossGroup)
                     .channel(NioServerSocketChannel.class)
                     .localAddress(this.port)

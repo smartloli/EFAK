@@ -43,7 +43,7 @@ public class WorkUtils {
                 if (StrUtils.isNull(path)) {
                     lines = Files.readLines(new File(WorkUtils.class.getClassLoader().getResource(workNodesName).getFile()), Charsets.UTF_8);
                 } else {
-                    lines = Files.readLines(new File(path + workNodesName), Charsets.UTF_8);
+                    lines = Files.readLines(new File(path), Charsets.UTF_8);
                 }
             } else {
                 lines = Files.readLines(new File(System.getProperty("user.dir") + "/conf/" + workNodesName), Charsets.UTF_8);

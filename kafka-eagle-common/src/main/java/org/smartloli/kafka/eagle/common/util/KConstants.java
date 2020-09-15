@@ -368,4 +368,10 @@ public class KConstants {
         public static final String KSQL_QUERY = "KSQL_QUERY";
     }
 
+    public interface WorkNode {
+        public static final String ALIVE = "Alive";
+        public static final String SHUTDOWN = "Shutdown";
+        public static final String UNKOWN = "Unkown";
+    }
+
 }

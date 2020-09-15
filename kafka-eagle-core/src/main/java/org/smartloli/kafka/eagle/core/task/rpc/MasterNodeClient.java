@@ -84,7 +84,8 @@ public class MasterNodeClient {
                             ch.pipeline().addLast(new ByteArrayEncoder());
                             ch.pipeline().addLast(new ChunkedWriteHandler());
                         }
-                    }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(BUFF_SIZE));
+                    }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(BUFF_SIZE))
+                    .option(ChannelOption.TCP_NODELAY, true);
             ChannelFuture cf = b.connect().sync();
             cf.channel().closeFuture().sync();
         } finally {

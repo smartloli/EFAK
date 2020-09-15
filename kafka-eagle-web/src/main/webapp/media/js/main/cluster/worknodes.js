@@ -14,7 +14,7 @@ $(document).ready(function () {
         }, {
             "mData": 'port'
         }, {
-            "mData": 'mem'
+            "mData": 'memory'
         }, {
             "mData": 'cpu'
         }, {

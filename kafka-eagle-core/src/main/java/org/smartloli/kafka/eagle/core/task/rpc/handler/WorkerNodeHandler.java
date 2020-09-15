@@ -122,7 +122,7 @@ public class WorkerNodeHandler extends ChannelInboundHandlerAdapter {
                 memory = "<span class='badge badge-danger'>" + percent + "</span>";
             }
             object.put("memory", memory);
-            object.put("cpu", "<span class='badge badge-secondary'>" + AppUtils.getInstance().getProcessCpu() + "</span>");
+            object.put("cpu", "<span class='badge badge-secondary'>" + AppUtils.getInstance().getProcessCpu() + "%</span>");
             object.put("created", AppUtils.getInstance().getStartTime());
             JSONArray array = new JSONArray();
             array.add(object);
