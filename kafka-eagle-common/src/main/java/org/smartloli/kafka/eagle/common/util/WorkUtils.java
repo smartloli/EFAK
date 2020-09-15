@@ -21,7 +21,6 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,9 +39,14 @@ public class WorkUtils {
         String workNodesName = "works";
         try {
             if (osName.contains("Mac") || osName.contains("Win")) {
-                lines = Files.readLines(new File(WorkUtils.class.getClassLoader().getResource(workNodesName).getFile()), Charsets.UTF_8);
+                String path = SystemConfigUtils.getProperty("kafka.eagle.sql.worknode.server.path");
+                if (StrUtils.isNull(path)) {
+                    lines = Files.readLines(new File(WorkUtils.class.getClassLoader().getResource(workNodesName).getFile()), Charsets.UTF_8);
+                } else {
+                    lines = Files.readLines(new File(path + workNodesName), Charsets.UTF_8);
+                }
             } else {
-                lines = Files.readLines(new File(System.getProperty("user.dir") + "/conf/"+workNodesName), Charsets.UTF_8);
+                lines = Files.readLines(new File(System.getProperty("user.dir") + "/conf/" + workNodesName), Charsets.UTF_8);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

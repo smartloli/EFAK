@@ -29,6 +29,7 @@ import io.netty.util.CharsetUtil;
 import org.smartloli.kafka.eagle.common.util.AppUtils;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.task.shard.ShardSubScan;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
@@ -109,9 +110,20 @@ public class WorkerNodeHandler extends ChannelInboundHandlerAdapter {
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         if (KConstants.Protocol.HEART_BEAT.equals(this.type)) {//
             JSONObject object = new JSONObject();
-            object.put("mem_used", AppUtils.getInstance().getProcessMemUsed());
-            object.put("mem_max", AppUtils.getInstance().getProcessMemMax());
-            object.put("cpu", AppUtils.getInstance().getProcessCpu());
+            String memory = "<span class='badge badge-danger'>NULL</span>";
+            long used = AppUtils.getInstance().getProcessMemUsed();
+            long max = AppUtils.getInstance().getProcessMemMax();
+            String percent = StrUtils.stringify(used) + " (" + StrUtils.numberic((used * 100.0 / max) + "") + "%)";
+            if ((used * 100.0) / max < KConstants.BrokerSever.MEM_NORMAL) {
+                memory = "<span class='badge badge-success'>" + percent + "</span>";
+            } else if ((used * 100.0) / max >= KConstants.BrokerSever.MEM_NORMAL && (used * 100.0) / max < KConstants.BrokerSever.MEM_DANGER) {
+                memory = "<span class='badge badge-warning'>" + percent + "</span>";
+            } else if ((used * 100.0) / max >= KConstants.BrokerSever.MEM_DANGER) {
+                memory = "<span class='badge badge-danger'>" + percent + "</span>";
+            }
+            object.put("memory", memory);
+            object.put("cpu", "<span class='badge badge-secondary'>" + AppUtils.getInstance().getProcessCpu() + "</span>");
+            object.put("created", AppUtils.getInstance().getStartTime());
             JSONArray array = new JSONArray();
             array.add(object);
             List<JSONArray> results = new ArrayList<>();

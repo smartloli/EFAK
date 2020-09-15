@@ -17,10 +17,7 @@
  */
 package org.smartloli.kafka.eagle.common.util;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.management.ThreadMXBean;
+import java.lang.management.*;
 
 /**
  * Count the percent of application resources.
@@ -34,6 +31,7 @@ public class AppUtils {
     private static AppUtils instance = new AppUtils();
 
     private OperatingSystemMXBean osMxBean;
+    private RuntimeMXBean runtimeMXBean;
     private ThreadMXBean threadBean;
     private MemoryMXBean memoryMXBean;
     private long preTime = System.nanoTime();
@@ -43,6 +41,7 @@ public class AppUtils {
         osMxBean = ManagementFactory.getOperatingSystemMXBean();
         memoryMXBean = ManagementFactory.getMemoryMXBean();
         threadBean = ManagementFactory.getThreadMXBean();
+        runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     }
 
     public static AppUtils getInstance() {
@@ -80,4 +79,10 @@ public class AppUtils {
     public long getProcessMemMax() {
         return memoryMXBean.getHeapMemoryUsage().getMax();
     }
+
+    public String getStartTime() {
+        return CalendarUtils.convertUnixTime2Date(runtimeMXBean.getStartTime());
+    }
+
 }
+

@@ -26,6 +26,8 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.ZkFactory;
 import org.smartloli.kafka.eagle.core.factory.ZkService;
+import org.smartloli.kafka.eagle.core.task.metrics.WorkNodeMetrics;
+import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
 import org.smartloli.kafka.eagle.web.service.ClusterService;
 import org.springframework.stereotype.Service;
 
@@ -35,18 +37,22 @@ import java.util.List;
  * Kafka & Zookeeper implements service to oprate related cluster.
  *
  * @author smartloli.
- *
- *         Created by Aug 12, 2016.
- *
- *         Update by hexiang 20170216
+ * <p>
+ * Created by Aug 12, 2016.
+ * <p>
+ * Update by hexiang 20170216
  */
 
 @Service
 public class ClusterServiceImpl implements ClusterService {
 
-    /** Kafka service interface. */
+    /**
+     * Kafka service interface.
+     */
     private KafkaService kafkaService = new KafkaFactory().create();
-    /** Zookeeper service interface. */
+    /**
+     * Zookeeper service interface.
+     */
     private ZkService zkService = new ZkFactory().create();
 
     @Override
@@ -64,7 +70,9 @@ public class ClusterServiceImpl implements ClusterService {
         return aliass;
     }
 
-    /** Execute zookeeper comand. */
+    /**
+     * Execute zookeeper comand.
+     */
     public String execute(String clusterAlias, String cmd, String type) {
         String target = "";
         String[] len = cmd.replaceAll(" ", "").split(type);
@@ -94,7 +102,9 @@ public class ClusterServiceImpl implements ClusterService {
         return target;
     }
 
-    /** Get kafka & zookeeper cluster information. */
+    /**
+     * Get kafka & zookeeper cluster information.
+     */
     public String get(String clusterAlias, String type) {
         JSONObject target = new JSONObject();
         if ("zk".equals(type)) {
@@ -103,6 +113,9 @@ public class ClusterServiceImpl implements ClusterService {
         } else if ("kafka".equals(type)) {
             List<BrokersInfo> kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);
             target.put("kafka", JSON.parseArray(kafkaBrokers.toString()));
+        } else if ("worknodes".equals(type)) {
+            List<WorkNodeMetrics> metrics = JobClient.getWorkNodeMetrics();
+            target.put("worknodes", JSON.parseArray(metrics.toString()));
         }
         return target.toJSONString();
     }
@@ -123,17 +136,23 @@ public class ClusterServiceImpl implements ClusterService {
         return false;
     }
 
-    /** Get Zookeeper whether live. */
+    /**
+     * Get Zookeeper whether live.
+     */
     public JSONObject status(String clusterAlias) {
         return zkService.zkCliStatus(clusterAlias);
     }
 
-    /** Get kafka used memory. */
+    /**
+     * Get kafka used memory.
+     */
     public String getUsedMemory(String clusterAlias, String host, int jmxPort) {
         return kafkaService.getUsedMemory(clusterAlias, host, jmxPort);
     }
 
-    /** Get kafka used cpu. */
+    /**
+     * Get kafka used cpu.
+     */
     public String getUsedCpu(String clusterAlias, String host, int jmxPort) {
         return kafkaService.getUsedCpu(clusterAlias, host, jmxPort);
     }

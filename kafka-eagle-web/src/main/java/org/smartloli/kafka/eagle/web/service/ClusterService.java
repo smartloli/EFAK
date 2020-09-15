@@ -24,35 +24,51 @@ import com.alibaba.fastjson.JSONObject;
  * Kafka & Zookeeper service api.
  *
  * @author smartloli.
- *
- *         Created by Jan 17, 2017.
- *
- *         Update by hexiang 20170216
+ * <p>
+ * Created by Jan 17, 2017.
+ * <p>
+ * Update by hexiang 20170216
  */
 public interface ClusterService {
 
-    /** Execute zookeeper comand interface */
+    /**
+     * Execute zookeeper comand interface
+     */
     public String execute(String clusterAlias, String cmd, String type);
 
-    /** Get Kafka & Zookeeper interface. */
+    /**
+     * Get Kafka & Zookeeper interface.
+     */
     public String get(String clusterAlias, String type);
 
-    /** Get kafka version. */
+    /**
+     * Get kafka version.
+     */
     public String getKafkaVersion(String host, int jmxPort, String ids, String clusterAlias);
 
-    /** Get Zookkeeper status interface. */
+    /**
+     * Get Zookkeeper status interface.
+     */
     public JSONObject status(String clusterAlias);
 
-    /** Get multi cluster aliass interface. */
+    /**
+     * Get multi cluster aliass interface.
+     */
     public JSONArray clusterAliass();
 
-    /** Checked cluster alias is exist interface. */
+    /**
+     * Checked cluster alias is exist interface.
+     */
     public boolean hasClusterAlias(String clusterAlias);
 
-    /** Get kafka used memory. */
+    /**
+     * Get kafka used memory.
+     */
     public String getUsedMemory(String clusterAlias, String host, int jmxPort);
 
-    /** Get kafka used cpu. */
+    /**
+     * Get kafka used cpu.
+     */
     public String getUsedCpu(String clusterAlias, String host, int jmxPort);
 
 }

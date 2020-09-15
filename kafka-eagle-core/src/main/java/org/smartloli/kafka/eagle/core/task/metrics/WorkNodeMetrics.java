@@ -27,10 +27,45 @@ import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
  * Created by Sep 15, 2020
  */
 public class WorkNodeMetrics extends BaseProtocol {
-    private long memoryUser;
-    private long memoryMax;
-    private double cpu;
+    private int id;
+    private String host;
+    private int port;
+    private String memory;
+    private String cpu;
     private boolean isAlive = false;
+    private String startTime;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
 
     public boolean isAlive() {
         return isAlive;
@@ -40,27 +75,19 @@ public class WorkNodeMetrics extends BaseProtocol {
         isAlive = alive;
     }
 
-    public long getMemoryUser() {
-        return memoryUser;
+    public String getMemory() {
+        return memory;
     }
 
-    public void setMemoryUser(long memoryUser) {
-        this.memoryUser = memoryUser;
+    public void setMemory(String memory) {
+        this.memory = memory;
     }
 
-    public long getMemoryMax() {
-        return memoryMax;
-    }
-
-    public void setMemoryMax(long memoryMax) {
-        this.memoryMax = memoryMax;
-    }
-
-    public double getCpu() {
+    public String getCpu() {
         return cpu;
     }
 
-    public void setCpu(double cpu) {
+    public void setCpu(String cpu) {
         this.cpu = cpu;
     }
 }

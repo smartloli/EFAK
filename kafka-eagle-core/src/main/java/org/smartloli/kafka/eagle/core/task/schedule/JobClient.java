@@ -73,8 +73,12 @@ public class JobClient {
 
     public static List<WorkNodeMetrics> getWorkNodeMetrics() {
         List<WorkNodeMetrics> metrics = new ArrayList<>();
+        int id = 1;
         for (WorkNodeStrategy workNode : getWorkNodes()) {
             WorkNodeMetrics workNodeMetrics = new WorkNodeMetrics();
+            workNodeMetrics.setId(id);
+            workNodeMetrics.setHost(workNode.getHost());
+            workNodeMetrics.setPort(workNode.getPort());
             if (NetUtils.telnet(workNode.getHost(), workNode.getPort())) {
                 JSONObject object = new JSONObject();
                 object.put(KConstants.Protocol.KEY, KConstants.Protocol.HEART_BEAT);
@@ -89,14 +93,15 @@ public class JobClient {
                     if (results.get(0).size() > 0) {
                         JSONObject result = (JSONObject) results.get(0).get(0);
                         workNodeMetrics.setAlive(true);
-                        workNodeMetrics.setCpu(result.getDouble("cpu"));
-                        workNodeMetrics.setMemoryUser(result.getLong("mem_used"));
-                        workNodeMetrics.setMemoryMax(result.getLong("mem_max"));
+                        workNodeMetrics.setCpu(result.getString("cpu"));
+                        workNodeMetrics.setMemory(result.getString("memory"));
+                        workNodeMetrics.setStartTime(result.getString("created"));
                     }
                 }
             } else {
                 workNodeMetrics.setAlive(false);
             }
+            id++;
             metrics.add(workNodeMetrics);
         }
         return metrics;

@@ -28,6 +28,8 @@
             $("#ke_navbar_cluster_multi").addClass("active");
         } else if (url.indexOf("/cluster/zkcli") > -1) {
             $("#ke_navbar_cluster_zkcli").addClass("active");
+        } else if (url.indexOf("/cluster/worknodes") > -1) {
+            $("#ke_navbar_cluster_worknodes").addClass("active");
         }
     } else if ((url.indexOf("/metrics") > -1)) {
         $("#collapseMetrics").addClass('show')
