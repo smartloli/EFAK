@@ -17,10 +17,12 @@
  */
 package org.smartloli.kafka.eagle.core.task.schedule;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.task.rpc.MasterNodeClient;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
@@ -67,22 +69,27 @@ public class WorkerSchedule implements Runnable {
             if (input == null) {
                 break;
             }
-            result.addAll(handler(input));
+            List<JSONArray> results = handler(input);
+            if (results != null) {
+                result.addAll(results);
+            }
             workerComplete.countDown();
         }
     }
 
-    public List<JSONArray> handler(KSqlStrategy input) {
+    private List<JSONArray> handler(KSqlStrategy input) {
         JSONObject object = new JSONObject();
         object.put(KConstants.Protocol.KEY, KConstants.Protocol.KSQL_QUERY);
         object.put(KConstants.Protocol.VALUE, input);
-        MasterNodeClient masterCli = new MasterNodeClient(workNodeHost, workNodePort, object);
+        String result = MasterNodeClient.getResult(workNodeHost, workNodePort, object);
         try {
-            masterCli.start();
+            if (!StrUtils.isNull(result)) {
+                return JSON.parseArray(result, JSONArray.class);
+            }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Submit worknode[" + workNodeHost + ":" + workNodePort + "] has error, msg is ", e);
+            ErrorUtils.print(this.getClass()).error("Deserialize result by [" + workNodeHost + ":" + workNodePort + "] has error, msg is ", e);
         }
-        return masterCli.getResult();
+        return null;
     }
 
     public void setCountDownLatch(CountDownLatch workerComplete) {

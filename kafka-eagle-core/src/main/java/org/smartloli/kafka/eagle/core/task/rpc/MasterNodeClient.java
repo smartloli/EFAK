@@ -17,21 +17,14 @@
  */
 package org.smartloli.kafka.eagle.core.task.rpc;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.bytes.ByteArrayEncoder;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.handler.stream.ChunkedWriteHandler;
-import org.smartloli.kafka.eagle.core.task.rpc.handler.MasterNodeHandler;
-
-import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.apache.thrift.protocol.TCompactProtocol;
+import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.transport.TFramedTransport;
+import org.apache.thrift.transport.TSocket;
+import org.apache.thrift.transport.TTransport;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
 /**
  * It is used to receive the tasks sent by the client,
@@ -41,60 +34,30 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author smartloli.
  * <p>
- * Created by Sep 11, 2020
+ * Created by Sep 16, 2020
  */
 public class MasterNodeClient {
-    private final String host;
-    private final int port;
-    private JSONObject object;
-    private CopyOnWriteArrayList<JSONArray> result = new CopyOnWriteArrayList<>();
-    private final int BUFF_SIZE = 1024 * 1024 * 1024;
+    private MasterNodeClient() {
 
-    public MasterNodeClient() {
-        this(0);
     }
 
-    public MasterNodeClient(int port) {
-        this("localhost", port);
-    }
-
-    public MasterNodeClient(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
-
-    public MasterNodeClient(String host, int port, JSONObject object) {
-        this.host = host;
-        this.port = port;
-        this.object = object;
-    }
-
-    public void start() throws Exception {
-        EventLoopGroup group = new NioEventLoopGroup();
+    /**
+     * Get worknode server metrics result.
+     */
+    public static String getResult(String host, int port, JSONObject object) {
+        int timeout = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.rpc.timeout");
+        TTransport transport = new TFramedTransport(new TSocket(host, port, timeout));
+        TProtocol protocol = new TCompactProtocol(transport);
+        WorkNodeService.Client client = new WorkNodeService.Client(protocol);
+        String result = "";
         try {
-            Bootstrap b = new Bootstrap();
-            b.group(group)
-                    .channel(NioSocketChannel.class)
-                    .remoteAddress(new InetSocketAddress(this.host, this.port))
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new StringEncoder(Charset.forName("UTF-8")));
-                            ch.pipeline().addLast(new MasterNodeHandler(object, result));
-                            ch.pipeline().addLast(new ByteArrayEncoder());
-                            ch.pipeline().addLast(new ChunkedWriteHandler());
-                        }
-                    }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(BUFF_SIZE))
-                    .option(ChannelOption.TCP_NODELAY, true);
-            ChannelFuture cf = b.connect().sync();
-            cf.channel().closeFuture().sync();
+            transport.open();
+            result = client.getResult(object.toJSONString());
+        } catch (Exception e) {
+            ErrorUtils.print(MasterNodeClient.class).error("Get result from worknode[" + host + ":" + port + "] has error, msg is ", e);
         } finally {
-            group.shutdownGracefully().sync();
+            transport.close();
         }
+        return result;
     }
-
-    public CopyOnWriteArrayList<JSONArray> getResult() {
-        return this.result;
-    }
-
 }

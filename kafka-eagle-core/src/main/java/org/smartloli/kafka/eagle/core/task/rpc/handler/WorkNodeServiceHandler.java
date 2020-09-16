@@ -20,20 +20,15 @@ package org.smartloli.kafka.eagle.core.task.rpc.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.CharsetUtil;
+import org.apache.thrift.TException;
 import org.smartloli.kafka.eagle.common.util.AppUtils;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.core.task.rpc.WorkNodeService;
 import org.smartloli.kafka.eagle.core.task.shard.ShardSubScan;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,72 +37,30 @@ import java.util.List;
  *
  * @author smartloli.
  * <p>
- * Created by Sep 11, 2020
+ * Created by Sep 16, 2020
  */
-public class WorkerNodeHandler extends ChannelInboundHandlerAdapter {
+public class WorkNodeServiceHandler implements WorkNodeService.Iface {
 
     private KSqlStrategy ksql;
     private String type;
 
-    /**
-     * When the client actively links the server link, the channel is active. In other words, the client and the server have established a communication channel and can transmit data.
-     */
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ErrorUtils.print(this.getClass()).info(ctx.channel().localAddress().toString() + " channel active.");
-    }
-
-    /**
-     * When the client takes the initiative to disconnect the link from the server, the channel is inactive. That is to say, the communication channel between the client and the server is closed and the data can not be transmitted.
-     */
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ErrorUtils.print(this.getClass()).info(ctx.channel().localAddress().toString() + " channel inactive.");
-    }
-
-    private String getMessage(ByteBuf buf) {
-        byte[] con = new byte[buf.readableBytes()];
-        buf.readBytes(con);
-        try {
-            return new String(con, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Read the information sent by the master server
-     */
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf buf = (ByteBuf) msg;
-        String rev = getMessage(buf);
-        if (isJson(rev)) {
-            JSONObject object = JSON.parseObject(rev);
+    public String getResult(String jsonObject) throws TException {
+        if (isJson(jsonObject)) {
+            JSONObject object = JSON.parseObject(jsonObject);
             if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.HEART_BEAT)) {//
                 this.type = KConstants.Protocol.HEART_BEAT;
             } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.KSQL_QUERY)) {
                 this.type = KConstants.Protocol.KSQL_QUERY;
                 this.ksql = object.getObject(KConstants.Protocol.VALUE, KSqlStrategy.class);
-                // this.ksql = JSON.parseObject(rev, KSqlStrategy.class);
             }
+            return handler();
         }
+        return "";
     }
 
-    public boolean isJson(String rev) {
-        try {
-            JSON.parse(rev);
-            return true;
-        } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Parse rev[" + rev + "] to json has error, msg is ", e);
-            return false;
-        }
-    }
-
-    /**
-     * Operation after reading the data sent by the master client.
-     */
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    public String handler() {
+        String result = "";
         if (KConstants.Protocol.HEART_BEAT.equals(this.type)) {//
             JSONObject object = new JSONObject();
             String memory = "<span class='badge badge-danger'>NULL</span>";
@@ -128,21 +81,22 @@ public class WorkerNodeHandler extends ChannelInboundHandlerAdapter {
             array.add(object);
             List<JSONArray> results = new ArrayList<>();
             results.add(array);
-            ctx.writeAndFlush(Unpooled.copiedBuffer(results.toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE);
+            result = results.toString();
         } else if (KConstants.Protocol.KSQL_QUERY.equals(this.type)) {
             if (this.ksql != null) {
-                ctx.writeAndFlush(Unpooled.copiedBuffer(ShardSubScan.query(ksql).toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE);
+                result = ShardSubScan.query(ksql).toString();
             }
         }
-
+        return result;
     }
 
-    /**
-     * Abnormal operation on the server
-     */
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        ctx.close();
-        ErrorUtils.print(this.getClass()).error(cause.getMessage());
+    public boolean isJson(String rev) {
+        try {
+            JSON.parse(rev);
+            return true;
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Parse rev[" + rev + "] to json has error, msg is ", e);
+            return false;
+        }
     }
 }

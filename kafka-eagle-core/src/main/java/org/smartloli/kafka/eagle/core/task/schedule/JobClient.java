@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.core.task.schedule;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.util.*;
@@ -52,11 +53,12 @@ public class JobClient {
     }
 
     public static void main(String[] args) {
-        System.out.println(getWorkNodeMetrics());
+        // System.out.println(getWorkNodeMetrics());
+        testQueryTopic();
     }
 
     private static void testQueryTopic() {
-        String sql = "select * from kjson where `partition` in (0,1,2) and JSON(msg,'id')='1' limit 10";
+        String sql = "select * from kjson where `partition` in (0,1,2) and JSON(msg,'id')=1 limit 10";
         String cluster = "cluster1";
         long start = System.currentTimeMillis();
         JSONObject resultObject = query(sql, cluster);
@@ -82,13 +84,15 @@ public class JobClient {
             if (NetUtils.telnet(workNode.getHost(), workNode.getPort())) {
                 JSONObject object = new JSONObject();
                 object.put(KConstants.Protocol.KEY, KConstants.Protocol.HEART_BEAT);
-                MasterNodeClient masterCli = new MasterNodeClient(workNode.getHost(), workNode.getPort(), object);
+                List<JSONArray> results = new ArrayList<>();
+                String resultStr = MasterNodeClient.getResult(workNode.getHost(), workNode.getPort(), object);
                 try {
-                    masterCli.start();
+                    if (!StrUtils.isNull(resultStr)) {
+                        results = JSON.parseArray(resultStr, JSONArray.class);
+                    }
                 } catch (Exception e) {
-                    ErrorUtils.print(JobClient.class).error("Submit worknode[" + workNode.getHost() + ":" + workNode.getPort() + "] has error, msg is ", e);
+                    ErrorUtils.print(JobClient.class).error("Deserialize result by [" + workNode.getHost() + ":" + workNode.getPort() + "] has error, msg is ", e);
                 }
-                List<JSONArray> results = masterCli.getResult();
                 if (results.size() > 0) {
                     if (results.get(0).size() > 0) {
                         JSONObject result = (JSONObject) results.get(0).get(0);
