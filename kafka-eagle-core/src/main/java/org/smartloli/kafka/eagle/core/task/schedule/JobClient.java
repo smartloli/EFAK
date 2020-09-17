@@ -47,6 +47,7 @@ public class JobClient {
 
     private ConcurrentHashMap<String, Object> taskLogs = new ConcurrentHashMap<>();
     private static KafkaService kafkaService = new KafkaFactory().create();
+    private LRUCacheUtils cache = new LRUCacheUtils();
 
     public JobClient(ConcurrentHashMap<String, Object> taskLogs) {
         this.taskLogs = taskLogs;
@@ -55,13 +56,15 @@ public class JobClient {
     public static void main(String[] args) {
         // System.out.println(getWorkNodeMetrics());
         testQueryTopic();
+        System.out.println(getWorkNodeTaskLogs("job_id_001"));
     }
 
     private static void testQueryTopic() {
         String sql = "select * from kjson where `partition` in (0,1,2) and JSON(msg,'id')=1 limit 10";
         String cluster = "cluster1";
+        String jobId = "job_id_001";
         long start = System.currentTimeMillis();
-        JSONObject resultObject = query(sql, cluster);
+        JSONObject resultObject = query(jobId, sql, cluster);
         String results = resultObject.getString("result");
         int rows = resultObject.getInteger("size");
         long end = System.currentTimeMillis();
@@ -111,8 +114,35 @@ public class JobClient {
         return metrics;
     }
 
-    public static JSONObject query(String sql, String cluster) {
-        List<JSONArray> result = submit(sql, cluster);
+    public static String getWorkNodeTaskLogs(String jobId) {
+        String logs = "";
+        for (WorkNodeStrategy workNode : getWorkNodes()) {
+            if (NetUtils.telnet(workNode.getHost(), workNode.getPort())) {
+                JSONObject object = new JSONObject();
+                object.put(KConstants.Protocol.KEY, KConstants.Protocol.KSQL_QUERY_LOG);
+                object.put(KConstants.Protocol.JOB_ID, jobId);
+                List<JSONArray> results = new ArrayList<>();
+                String resultStr = MasterNodeClient.getResult(workNode.getHost(), workNode.getPort(), object);
+                try {
+                    if (!StrUtils.isNull(resultStr)) {
+                        results = JSON.parseArray(resultStr, JSONArray.class);
+                    }
+                } catch (Exception e) {
+                    ErrorUtils.print(JobClient.class).error("Deserialize result by [" + workNode.getHost() + ":" + workNode.getPort() + "] has error, msg is ", e);
+                }
+                if (results.size() > 0) {
+                    if (results.get(0).size() > 0) {
+                        JSONObject result = (JSONObject) results.get(0).get(0);
+                        logs = result.getString("log") + "\n";
+                    }
+                }
+            }
+        }
+        return logs;
+    }
+
+    public static JSONObject query(String jobId, String sql, String cluster) {
+        List<JSONArray> result = submit(jobId, sql, cluster);
         KSqlStrategy ksql = KSqlParser.parseQueryKSql(sql, cluster);
         JSONObject resultObject = new JSONObject();
         try {
@@ -133,7 +163,7 @@ public class JobClient {
         return schema;
     }
 
-    public static List<JSONArray> submit(String sql, String cluster) {
+    public static List<JSONArray> submit(String jobId, String sql, String cluster) {
         List<KSqlStrategy> tasks = getTaskStrategy(sql, cluster);
 
         //Stats tasks finish
@@ -141,6 +171,7 @@ public class JobClient {
         MasterSchedule master = new MasterSchedule(new WorkerSchedule(), getWorkNodes(), countDownLatch);
 
         for (KSqlStrategy ksql : tasks) {
+            ksql.setJobId(jobId);
             master.submit(ksql);
         }
 
@@ -200,4 +231,5 @@ public class JobClient {
         }
         return nodes;
     }
+
 }

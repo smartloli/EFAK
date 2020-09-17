@@ -31,6 +31,7 @@ import java.util.List;
  */
 public class KSqlStrategy extends BaseProtocol {
 
+    private String jobId;
     private String cluster;
     private String sql;
     private String topic;
@@ -50,6 +51,14 @@ public class KSqlStrategy extends BaseProtocol {
      * So, filters include [{"like":"kafka-eagle",">":"1599754181586"},{"like":"smartloli"}]
      */
     private List<FieldSchemaStrategy> fieldSchema = new ArrayList<>();
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
 
     public String getCluster() {
         return cluster;

@@ -364,8 +364,10 @@ public class KConstants {
     public interface Protocol {
         public static final String KEY = "KEY";
         public static final String VALUE = "VALUE";
+        public static final String JOB_ID = "JOB_ID";
         public static final String HEART_BEAT = "HEART_BEAT";
         public static final String KSQL_QUERY = "KSQL_QUERY";
+        public static final String KSQL_QUERY_LOG = "KSQL_QUERY_LOG";
     }
 
     public interface WorkNode {

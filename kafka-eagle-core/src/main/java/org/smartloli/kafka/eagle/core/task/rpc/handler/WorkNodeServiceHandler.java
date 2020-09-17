@@ -25,6 +25,7 @@ import org.smartloli.kafka.eagle.common.util.AppUtils;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.core.task.cache.LogCacheFactory;
 import org.smartloli.kafka.eagle.core.task.rpc.WorkNodeService;
 import org.smartloli.kafka.eagle.core.task.shard.ShardSubScan;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
@@ -43,16 +44,20 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
 
     private KSqlStrategy ksql;
     private String type;
+    private String jobId;
 
     @Override
     public String getResult(String jsonObject) throws TException {
         if (isJson(jsonObject)) {
             JSONObject object = JSON.parseObject(jsonObject);
-            if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.HEART_BEAT)) {//
+            if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.HEART_BEAT)) {
                 this.type = KConstants.Protocol.HEART_BEAT;
             } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.KSQL_QUERY)) {
                 this.type = KConstants.Protocol.KSQL_QUERY;
                 this.ksql = object.getObject(KConstants.Protocol.VALUE, KSqlStrategy.class);
+            } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.KSQL_QUERY_LOG)) {
+                this.type = KConstants.Protocol.KSQL_QUERY_LOG;
+                this.jobId = object.getString(KConstants.Protocol.JOB_ID);
             }
             return handler();
         }
@@ -85,6 +90,17 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
         } else if (KConstants.Protocol.KSQL_QUERY.equals(this.type)) {
             if (this.ksql != null) {
                 result = ShardSubScan.query(ksql).toString();
+            }
+        } else if (KConstants.Protocol.KSQL_QUERY_LOG.equals(this.type)) {
+            if (!StrUtils.isNull(this.jobId)) {
+                String log = LogCacheFactory.LOG_RECORDS.get(this.jobId).toString();
+                JSONObject object = new JSONObject();
+                object.put("log", log);
+                JSONArray array = new JSONArray();
+                array.add(object);
+                List<JSONArray> results = new ArrayList<>();
+                results.add(array);
+                result = results.toString();
             }
         }
         return result;
