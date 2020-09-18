@@ -30,6 +30,7 @@ import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
@@ -47,6 +48,7 @@ import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
+import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
 import org.smartloli.kafka.eagle.web.dao.TopicDao;
 import org.smartloli.kafka.eagle.web.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,10 +63,10 @@ import java.util.Map.Entry;
  * Kafka topic implements service interface.
  *
  * @author smartloli.
- *
- *         Created by Aug 14, 2016.
- *
- *         Update by hexiang 20170216
+ * <p>
+ * Created by Aug 14, 2016.
+ * <p>
+ * Update by hexiang 20170216
  */
 @Service
 public class TopicServiceImpl implements TopicService {
@@ -72,37 +74,65 @@ public class TopicServiceImpl implements TopicService {
     @Autowired
     private TopicDao topicDao;
 
-    /** Kafka service interface. */
+    /**
+     * Kafka service interface.
+     */
     private KafkaService kafkaService = new KafkaFactory().create();
 
-    /** Kafka topic config service interface. */
+    /**
+     * Kafka topic config service interface.
+     */
     private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
 
-    /** Broker service interface. */
+    /**
+     * Broker service interface.
+     */
     private static BrokerService brokerService = new BrokerFactory().create();
 
-    /** Mx4j service interface. */
+    /**
+     * Mx4j service interface.
+     */
     private Mx4jService mx4jService = new Mx4jFactory().create();
 
-    /** Kafka hub service interface. */
+    /**
+     * Kafka hub service interface.
+     */
     private KafkaHubService kafkaHubService = new KafkaHubFactory().create();
 
-    /** Find topic name in all topics. */
+    /**
+     * Find topic name in all topics.
+     */
     public boolean hasTopic(String clusterAlias, String topicName) {
         return brokerService.findKafkaTopic(clusterAlias, topicName);
     }
 
-    /** Get metadata in topic. */
+    /**
+     * Get metadata in topic.
+     */
     public List<MetadataInfo> metadata(String clusterAlias, String topicName, Map<String, Object> params) {
         return brokerService.topicMetadataRecords(clusterAlias, topicName, params);
     }
 
-    /** Execute kafka execute query sql and viewer topic message. */
-    public String execute(String clusterAlias, String sql) {
-        return KafkaSqlParser.execute(clusterAlias, sql);
+    /**
+     * Execute kafka execute query sql and viewer topic message.
+     */
+    public String execute(String clusterAlias, String sql, String jobId, String type) {
+        String result = "";
+        if (SystemConfigUtils.getBooleanProperty("kafka.eagle.distributed.enable")) {
+            if (KConstants.Protocol.KSQL_PHYSICS.equals(type)) {
+                result = JobClient.physicsSubmit(clusterAlias, sql, jobId);
+            } else if (KConstants.Protocol.KSQL_LOGICAL.equals(type)) {
+                result = JobClient.logicalSubmit(clusterAlias, sql, jobId);
+            }
+        } else {
+            result = KafkaSqlParser.execute(clusterAlias, sql);
+        }
+        return result;
     }
 
-    /** Get kafka 0.10.x mock topics. */
+    /**
+     * Get kafka 0.10.x mock topics.
+     */
     public String mockTopics(String clusterAlias, String name) {
         List<String> topicList = brokerService.topicList(clusterAlias);
         int offset = 0;
@@ -129,12 +159,16 @@ public class TopicServiceImpl implements TopicService {
         return topics.toJSONString();
     }
 
-    /** Send mock message to kafka topic . */
+    /**
+     * Send mock message to kafka topic .
+     */
     public boolean mockSendMsg(String clusterAlias, String topic, String message) {
         return kafkaService.mockMessage(clusterAlias, topic, message);
     }
 
-    /** Get topic property keys */
+    /**
+     * Get topic property keys
+     */
     public String getTopicProperties(String clusterAlias, String name) {
         JSONArray topics = new JSONArray();
         int offset = 0;
@@ -157,12 +191,16 @@ public class TopicServiceImpl implements TopicService {
         return topics.toJSONString();
     }
 
-    /** Alter topic config. */
+    /**
+     * Alter topic config.
+     */
     public String changeTopicConfig(String clusterAlias, TopicConfig topicConfig) {
         return kafkaMetricsService.changeTopicConfig(clusterAlias, topicConfig.getName(), topicConfig.getType(), topicConfig.getConfigEntry());
     }
 
-    /** Get topic numbers. */
+    /**
+     * Get topic numbers.
+     */
     public long getTopicNumbers(String clusterAlias) {
         return brokerService.topicNumbers(clusterAlias);
     }
@@ -172,7 +210,9 @@ public class TopicServiceImpl implements TopicService {
         return brokerService.topicNumbers(clusterAlias, topic);
     }
 
-    /** Get topic list. */
+    /**
+     * Get topic list.
+     */
     public List<PartitionsInfo> list(String clusterAlias, Map<String, Object> params) {
         List<PartitionsInfo> topicRecords = brokerService.topicRecords(clusterAlias, params);
         for (PartitionsInfo partitionInfo : topicRecords) {
@@ -189,7 +229,9 @@ public class TopicServiceImpl implements TopicService {
         return topicRecords;
     }
 
-    /** Get topic partition numbers. */
+    /**
+     * Get topic partition numbers.
+     */
     public long getPartitionNumbers(String clusterAlias, String topic) {
         return brokerService.partitionNumbers(clusterAlias, topic);
     }
@@ -256,7 +298,9 @@ public class TopicServiceImpl implements TopicService {
         }
     }
 
-    /** Get topic logsize, topicsize from jmx data. */
+    /**
+     * Get topic logsize, topicsize from jmx data.
+     */
     public String getTopicSizeAndCapacity(String clusterAlias, String topic) {
         JSONObject object = new JSONObject();
         long logSize = brokerService.getTopicRealLogSize(clusterAlias, topic);
@@ -272,7 +316,9 @@ public class TopicServiceImpl implements TopicService {
         return object.toJSONString();
     }
 
-    /** Get topic producer logsize chart datasets. */
+    /**
+     * Get topic producer logsize chart datasets.
+     */
     public String queryTopicProducerChart(Map<String, Object> params) {
         List<TopicLogSize> topicLogSizes = topicDao.queryTopicProducerChart(params);
         JSONArray arrays = new JSONArray();

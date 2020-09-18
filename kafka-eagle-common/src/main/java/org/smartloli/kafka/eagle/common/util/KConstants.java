@@ -368,6 +368,9 @@ public class KConstants {
         public static final String HEART_BEAT = "HEART_BEAT";
         public static final String KSQL_QUERY = "KSQL_QUERY";
         public static final String KSQL_QUERY_LOG = "KSQL_QUERY_LOG";
+
+        public static final String KSQL_PHYSICS = "KSQL_PHYSICS";
+        public static final String KSQL_LOGICAL = "KSQL_LOGICAL";
     }
 
     public interface WorkNode {

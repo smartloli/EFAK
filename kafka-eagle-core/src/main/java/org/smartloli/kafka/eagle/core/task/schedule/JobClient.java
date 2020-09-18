@@ -23,6 +23,8 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.sql.tool.KSqlUtils;
 import org.smartloli.kafka.eagle.core.task.metrics.WorkNodeMetrics;
 import org.smartloli.kafka.eagle.core.task.parser.KSqlParser;
@@ -47,6 +49,7 @@ public class JobClient {
 
     private ConcurrentHashMap<String, Object> taskLogs = new ConcurrentHashMap<>();
     private static KafkaService kafkaService = new KafkaFactory().create();
+    private static BrokerService brokerService = new BrokerFactory().create();
     private LRUCacheUtils cache = new LRUCacheUtils();
 
     public JobClient(ConcurrentHashMap<String, Object> taskLogs) {
@@ -56,7 +59,7 @@ public class JobClient {
     public static void main(String[] args) {
         // System.out.println(getWorkNodeMetrics());
         testQueryTopic();
-        System.out.println(getWorkNodeTaskLogs("job_id_001"));
+        // System.out.println(getWorkNodeTaskLogs("job_id_001"));
     }
 
     private static void testQueryTopic() {
@@ -74,6 +77,54 @@ public class JobClient {
         status.put("status", "Time taken: " + (end - start) / 1000.0 + " seconds, Fetched: " + rows + " row(s)");
         status.put("spent", end - start);
         System.out.println("Result: " + status);
+    }
+
+    public static String physicsSubmit(String cluster, String sql, String jobId) {
+        JSONObject status = new JSONObject();
+        ErrorUtils.print(JobClient.class).info("JobClient - Physics KSQL[" + sql + "]");
+        long start = System.currentTimeMillis();
+        JSONObject resultObject = query(jobId, sql, cluster);
+        String results = resultObject.getString("result");
+        int rows = resultObject.getInteger("size");
+        long end = System.currentTimeMillis();
+
+        status.put("error", false);
+        status.put("msg", results);
+        status.put("status", "Time taken: " + (end - start) / 1000.0 + " seconds, Fetched: " + rows + " row(s)");
+        status.put("spent", end - start);
+        return status.toString();
+    }
+
+    public static String logicalSubmit(String cluster, String sql, String jobId) {
+        JSONObject status = new JSONObject();
+        ErrorUtils.print(JobClient.class).info("JobClient - Logical KSQL[" + sql + "]");
+        if (validForSql(sql)) {
+            KSqlStrategy ksql = KSqlParser.parseQueryKSql(sql, cluster);
+            if (!validForTopic(cluster, ksql.getTopic())) {
+                status.put("error", true);
+                status.put("msg", "ERROR - Topic[" + ksql.getTopic() + "] not exist.");
+            } else {
+                status.put("error", false);
+                status.put("spent", 0);
+            }
+        } else {
+            status.put("error", true);
+            status.put("msg", "ERROR - KSQL[" + sql + "] has error, please start with select.");
+        }
+
+        return status.toString();
+    }
+
+    private static boolean validForSql(String sql) {
+        if (sql.toLowerCase().contains("select")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean validForTopic(String clusterAlias, String topic) {
+        return brokerService.findKafkaTopic(clusterAlias, topic);
     }
 
     public static List<WorkNodeMetrics> getWorkNodeMetrics() {
@@ -141,7 +192,7 @@ public class JobClient {
         return logs;
     }
 
-    public static JSONObject query(String jobId, String sql, String cluster) {
+    private static JSONObject query(String jobId, String sql, String cluster) {
         List<JSONArray> result = submit(jobId, sql, cluster);
         KSqlStrategy ksql = KSqlParser.parseQueryKSql(sql, cluster);
         JSONObject resultObject = new JSONObject();
