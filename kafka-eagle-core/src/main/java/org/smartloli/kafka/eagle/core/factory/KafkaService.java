@@ -216,6 +216,11 @@ public interface KafkaService {
     public long getRealLogSize(String clusterAlias, String topic, int partitionid);
 
     /**
+     * Get kafka real logsize by old version partition set.
+     */
+    public long getRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
+
+    /**
      * Get topic metadata.
      */
     public String getReplicasIsr(String clusterAlias, String topic, int partitionid);

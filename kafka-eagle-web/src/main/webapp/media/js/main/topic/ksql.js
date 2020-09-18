@@ -28,17 +28,37 @@ $(document).ready(function () {
 
     $('#result_tab li:eq(0) a').tab('show');
 
+    var triggerTask;
+
+    function getProgress(jobId) {
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/shard/sub/scan/log/?jobId=' + jobId,
+            success: function (datas) {
+                console.log(datas)
+                if (datas != null) {
+                    logEditor.setValue(datas.logs);
+                    logEditor.execCommand("goDocEnd");
+                }
+            }
+        });
+        if (logEditor.getValue().indexOf("Time taken:") > -1) {
+            clearInterval(triggerTask);
+        }
+    }
+
     var offset = 0;
 
     function viewerTopics(sql, dataSets, jobId) {
-        var ret = JSON.parse(dataSets);
+        // var ret = JSON.parse(dataSets);
         var tabHeader = "<div class='panel-body table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
         var mData = [];
         var i = 0;
-        for (var key in ret[0]) {
-            tabHeader += "<th>" + key + "</th>";
+        for (var key in dataSets) {
+            tabHeader += "<th>" + dataSets[key] + "</th>";
             var obj = {
-                mData: key
+                mData: dataSets[key]
             };
             mData.push(obj);
         }
@@ -82,7 +102,6 @@ $(document).ready(function () {
     $(document).on('click', 'button[id=ke_ksql_query]', function () {
         var sql = encodeURI(sqlEditor.getValue());
         logEditor.setValue("");
-        console.log(sql);
         var jobId = "job_id_" + new Date().getTime();
         $.ajax({
             type: 'get',
@@ -90,13 +109,12 @@ $(document).ready(function () {
             url: '/topic/logical/commit/?sql=' + sql + '&jobId=' + jobId,
             success: function (datas) {
                 if (datas != null) {
-                    console.log(datas);
                     if (datas.error) {
                         logEditor.setValue(datas.msg);
                         viewerTopicSqlHistory();
                     } else {
-                        viewerTopics(sql, datas.msg, jobId);
-                        viewerTopicSqlHistory(); // todo change table event
+                        triggerTask = setInterval(getProgress, 1000, jobId);
+                        viewerTopics(sql, datas.columns, jobId);
                     }
                 }
             }
@@ -175,5 +193,11 @@ $(document).ready(function () {
 
         historyOffset++;
     }
+
+    $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+        if (e.target.id.indexOf("ke_ksql_history_textarea") > -1) {
+            viewerTopicSqlHistory();
+        }
+    })
 
 });

@@ -1479,6 +1479,51 @@ public class KafkaServiceImpl implements KafkaService {
     }
 
     /**
+     * Get kafka old version real topic logsize.
+     */
+    public long getRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
+        JMXConnector connector = null;
+        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+        for (BrokersInfo broker : brokers) {
+            try {
+                JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
+                connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
+                if (connector != null) {
+                    break;
+                }
+            } catch (Exception e) {
+                LOG.error("Get kafka old version logsize has error, msg is " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        long logSize = 0L;
+        try {
+            MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+            long endLogSize = 0L;
+            long startLogSize = 0L;
+            for (int partitionid : partitionids) {
+                endLogSize += Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.END_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
+                startLogSize += Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.START_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
+            }
+            logSize = endLogSize - startLogSize;
+        } catch (Exception ex) {
+            LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
+            ex.printStackTrace();
+        } finally {
+            if (connector != null) {
+                try {
+                    connector.close();
+                } catch (IOException e) {
+                    LOG.error("Close jmx connector has error, msg is " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }
+        return logSize;
+    }
+
+    /**
      * Get broker host and jmx_port info from ids.
      */
     public String getBrokerJMXFromIds(String clusterAlias, int ids) {

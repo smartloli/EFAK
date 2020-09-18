@@ -617,7 +617,7 @@ public class BrokerServiceImpl implements BrokerService {
                 if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
                     logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partitions);
                 } else {
-                    logSize = kafkaService.getLogSize(clusterAlias, topic, partitions);
+                    logSize = kafkaService.getRealLogSize(clusterAlias, topic, partitions);
                 }
             }
         } catch (Exception e) {

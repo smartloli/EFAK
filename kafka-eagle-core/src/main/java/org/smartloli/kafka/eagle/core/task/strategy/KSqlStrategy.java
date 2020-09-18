@@ -37,6 +37,7 @@ public class KSqlStrategy extends BaseProtocol {
     private String topic;
     private int partition;
     private List<Integer> partitions = new ArrayList<>();
+    private List<String> columns = new ArrayList<>();
     private long start;
     private long end;
     private long limit = 0L;
@@ -51,6 +52,14 @@ public class KSqlStrategy extends BaseProtocol {
      * So, filters include [{"like":"kafka-eagle",">":"1599754181586"},{"like":"smartloli"}]
      */
     private List<FieldSchemaStrategy> fieldSchema = new ArrayList<>();
+
+    public List<String> getColumns() {
+        return columns;
+    }
+
+    public void setColumns(List<String> columns) {
+        this.columns = columns;
+    }
 
     public String getJobId() {
         return jobId;

@@ -185,7 +185,8 @@ public class ShardSubScan {
             consumer.close();
             messages.add(datasets);
             try {
-                String lastestLog = "Cluster[" + ksql.getCluster() + "], Topic[" + ksql.getTopic() + "], Partition[" + ksql.getPartition() + "], Sharding = ∑(" + start + "~" + end + ") sub scan finished.";
+                String lastestLog = "Cluster[" + ksql.getCluster() + "], Topic[" + ksql.getTopic() + "], Partition[" + ksql.getPartition() + "], Sharding = ∑(" + start + "~" + end + ") sub scan task finished.";
+                System.out.println(lastestLog);
                 if (LogCacheFactory.LOG_RECORDS.containsKey(ksql.getJobId())) {
                     String earliestLog = LogCacheFactory.LOG_RECORDS.get(ksql.getJobId()).toString();
                     LogCacheFactory.LOG_RECORDS.put(ksql.getJobId(), earliestLog + "\n" + lastestLog);

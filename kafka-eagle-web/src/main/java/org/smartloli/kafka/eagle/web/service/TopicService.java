@@ -74,6 +74,11 @@ public interface TopicService {
     public String execute(String clusterAlias, String sql, String jobId, String type);
 
     /**
+     * Get shard sub scan task log.
+     */
+    public String getShardLogs(String jobId);
+
+    /**
      * Get mock topics.
      */
     public String mockTopics(String clusterAlias, String name);

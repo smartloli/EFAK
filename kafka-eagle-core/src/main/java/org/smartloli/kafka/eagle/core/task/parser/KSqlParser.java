@@ -24,8 +24,11 @@ import org.apache.calcite.sql.parser.SqlParser;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.core.sql.schema.TopicSchema;
 import org.smartloli.kafka.eagle.core.task.strategy.FieldSchemaStrategy;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
+
+import java.util.Arrays;
 
 /**
  * The filter conditions of kafka sql are analyzed and distributed execution
@@ -75,8 +78,23 @@ public class KSqlParser {
         switch (sqlKind) {
             case SELECT:
                 String topic = "";
+                SqlNode sqlColumns = ((SqlSelect) sqlNode).getSelectList();
                 SqlNode sqlFrom = ((SqlSelect) sqlNode).getFrom();
                 SqlNode sqlWhere = ((SqlSelect) sqlNode).getWhere();
+                // parser columns
+                if (sqlColumns.toString().contains("*")) {
+                    ksql.setColumns(Arrays.asList(TopicSchema.PARTITION, TopicSchema.OFFSET, TopicSchema.MSG, TopicSchema.TIMESPAN, TopicSchema.DATE));
+                } else {
+                    String[] columns = sqlColumns.toString().split(",");
+                    for (String column : columns) {
+                        if (column.contains("AS")) {
+                            ksql.getColumns().add(column.split("AS")[1].trim().replaceAll("`", ""));
+                        } else {
+                            ksql.getColumns().add(column.trim().replaceAll("`", ""));
+                        }
+                    }
+                }
+
                 if (sqlFrom.getKind() == SqlKind.IDENTIFIER) {
                     topic = sqlFrom.toString();
                 } else {

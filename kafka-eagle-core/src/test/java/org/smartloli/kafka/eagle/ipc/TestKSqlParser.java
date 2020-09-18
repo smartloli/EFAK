@@ -31,7 +31,7 @@ public class TestKSqlParser {
 //        String sql = "select * from kk where `partition` in (0,1,2) and JSON(msg,'id') = '2' order by timespan limit 10";
 //        String sql2 = "select * from kk where `partition` in (0,1,2) and (msg like 'kafka%' or msg like 'ss%') limit 10";
 //        String sql3 = "select * from kk where `partition` in (0,1,2) and JSONS(msg,'id') like '2%' limit 10";
-        String sql4 = "select * from kk where `partition` in (0,1,2) and JSON(msg,'id') like '2%' group by JSON(msg,'id') limit 10";
+        String sql4 = "select msg as records,`offset`,`partition` as 分区 from kk where `partition` in (0,1,2) and JSON(msg,'id') like '2%' group by JSON(msg,'id') limit 10";
 //        System.out.println(KSqlParser.parseQueryKSql(sql, "cluster1"));
 //        System.out.println(KSqlParser.parseQueryKSql(sql2, "cluster1"));
 //        System.out.println(KSqlParser.parseQueryKSql(sql3, "cluster1"));

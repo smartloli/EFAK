@@ -50,33 +50,10 @@ public class JobClient {
     private ConcurrentHashMap<String, Object> taskLogs = new ConcurrentHashMap<>();
     private static KafkaService kafkaService = new KafkaFactory().create();
     private static BrokerService brokerService = new BrokerFactory().create();
-    private LRUCacheUtils cache = new LRUCacheUtils();
+    private static LRUCacheUtils cache = new LRUCacheUtils(1024);
 
     public JobClient(ConcurrentHashMap<String, Object> taskLogs) {
         this.taskLogs = taskLogs;
-    }
-
-    public static void main(String[] args) {
-        // System.out.println(getWorkNodeMetrics());
-        testQueryTopic();
-        // System.out.println(getWorkNodeTaskLogs("job_id_001"));
-    }
-
-    private static void testQueryTopic() {
-        String sql = "select * from kjson where `partition` in (0,1,2) and JSON(msg,'id')=1 limit 10";
-        String cluster = "cluster1";
-        String jobId = "job_id_001";
-        long start = System.currentTimeMillis();
-        JSONObject resultObject = query(jobId, sql, cluster);
-        String results = resultObject.getString("result");
-        int rows = resultObject.getInteger("size");
-        long end = System.currentTimeMillis();
-        JSONObject status = new JSONObject();
-        status.put("error", false);
-        status.put("msg", results);
-        status.put("status", "Time taken: " + (end - start) / 1000.0 + " seconds, Fetched: " + rows + " row(s)");
-        status.put("spent", end - start);
-        System.out.println("Result: " + status);
     }
 
     public static String physicsSubmit(String cluster, String sql, String jobId) {
@@ -87,11 +64,10 @@ public class JobClient {
         String results = resultObject.getString("result");
         int rows = resultObject.getInteger("size");
         long end = System.currentTimeMillis();
-
         status.put("error", false);
         status.put("msg", results);
-        status.put("status", "Time taken: " + (end - start) / 1000.0 + " seconds, Fetched: " + rows + " row(s)");
         status.put("spent", end - start);
+        cache.put(jobId, "Time taken: " + (end - start) / 1000.0 + " seconds, Fetched: " + rows + " row(s)");
         return status.toString();
     }
 
@@ -106,6 +82,7 @@ public class JobClient {
             } else {
                 status.put("error", false);
                 status.put("spent", 0);
+                status.put("columns", ksql.getColumns());
             }
         } else {
             status.put("error", true);
@@ -184,7 +161,7 @@ public class JobClient {
                 if (results.size() > 0) {
                     if (results.get(0).size() > 0) {
                         JSONObject result = (JSONObject) results.get(0).get(0);
-                        logs = result.getString("log") + "\n";
+                        logs = result.getString("log") + "\n" + cache.get(jobId) + "\n";
                     }
                 }
             }
@@ -216,6 +193,7 @@ public class JobClient {
 
     public static List<JSONArray> submit(String jobId, String sql, String cluster) {
         List<KSqlStrategy> tasks = getTaskStrategy(sql, cluster);
+        ErrorUtils.print(JobClient.class).info("KSqlStrategy: " + tasks.toString());
 
         //Stats tasks finish
         CountDownLatch countDownLatch = new CountDownLatch(tasks.size());
@@ -243,21 +221,25 @@ public class JobClient {
         int workNodeSize = getWorkNodes().size();
         for (int partitionId : ksql.getPartitions()) {
             long endLogSize = 0L;
+            long endRealLogSize = 0L;
             if ("kafka".equals(SystemConfigUtils.getProperty(cluster + ".kafka.eagle.offset.storage"))) {
                 endLogSize = kafkaService.getKafkaLogSize(cluster, ksql.getTopic(), partitionId);
+                endRealLogSize = kafkaService.getKafkaRealLogSize(cluster, ksql.getTopic(), partitionId);
             } else {
                 endLogSize = kafkaService.getLogSize(cluster, ksql.getTopic(), partitionId);
+                endRealLogSize = kafkaService.getRealLogSize(cluster, ksql.getTopic(), partitionId);
             }
 
-            long numberPer = endLogSize / workNodeSize;
+            long startLogSize = (endLogSize - endRealLogSize);
+            long numberPer = (endLogSize - endRealLogSize) / workNodeSize;
             for (int workNodeIndex = 0; workNodeIndex < workNodeSize; workNodeIndex++) {
                 KSqlStrategy kSqlStrategy = new KSqlStrategy();
                 if (workNodeIndex == (workNodeSize - 1)) {
-                    kSqlStrategy.setStart(workNodeIndex * numberPer);
+                    kSqlStrategy.setStart(workNodeIndex * numberPer + startLogSize);
                     kSqlStrategy.setEnd(endLogSize);
                 } else {
-                    kSqlStrategy.setStart(workNodeIndex * numberPer);
-                    kSqlStrategy.setEnd((numberPer * (workNodeIndex + 1)) - 1);
+                    kSqlStrategy.setStart(workNodeIndex * numberPer + startLogSize);
+                    kSqlStrategy.setEnd((numberPer * (workNodeIndex + 1)) - 1 + startLogSize);
                 }
                 kSqlStrategy.setPartition(partitionId);
                 kSqlStrategy.setCluster(cluster);

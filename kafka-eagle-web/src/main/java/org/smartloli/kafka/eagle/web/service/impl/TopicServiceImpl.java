@@ -119,15 +119,20 @@ public class TopicServiceImpl implements TopicService {
     public String execute(String clusterAlias, String sql, String jobId, String type) {
         String result = "";
         if (SystemConfigUtils.getBooleanProperty("kafka.eagle.distributed.enable")) {
-            if (KConstants.Protocol.KSQL_PHYSICS.equals(type)) {
-                result = JobClient.physicsSubmit(clusterAlias, sql, jobId);
-            } else if (KConstants.Protocol.KSQL_LOGICAL.equals(type)) {
+            if (KConstants.Protocol.KSQL_LOGICAL.equals(type)) {
                 result = JobClient.logicalSubmit(clusterAlias, sql, jobId);
+            } else if (KConstants.Protocol.KSQL_PHYSICS.equals(type)) {
+                result = JobClient.physicsSubmit(clusterAlias, sql, jobId);
             }
         } else {
             result = KafkaSqlParser.execute(clusterAlias, sql);
         }
         return result;
+    }
+
+    @Override
+    public String getShardLogs(String jobId) {
+        return JobClient.getWorkNodeTaskLogs(jobId);
     }
 
     /**

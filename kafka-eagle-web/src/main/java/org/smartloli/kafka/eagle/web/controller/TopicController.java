@@ -711,6 +711,22 @@ public class TopicController {
     }
 
     /**
+     * Realtime access to shard sub scan task execute log.
+     */
+    @RequestMapping(value = "/shard/sub/scan/log/", method = RequestMethod.GET)
+    public void getShardSubScanLogAjax(@RequestParam String jobId, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+        try {
+            String logs = topicService.getShardLogs(jobId);
+            JSONObject object = new JSONObject();
+            object.put("logs", logs);
+            byte[] output = object.toString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
      * Logical execute kafka sql.
      */
     @RequestMapping(value = "/topic/logical/commit/", method = RequestMethod.GET)
