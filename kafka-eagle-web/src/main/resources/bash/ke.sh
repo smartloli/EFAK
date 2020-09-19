@@ -106,16 +106,6 @@ start()
  rm -rf ${KE_HOME}/kms/logs/*
  chmod +x ${KE_HOME}/kms/bin/*.sh
 
- # startup worknode server node
- mill=`date "+%N"`
- tdate=`date "+%Y-%m-%d %H:%M:%S,${mill:0:3}"`
-
- for i in `${KE_HOME}/conf/works`
- do
-  echo [$tdate] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] running.
-  ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh start>/dev/null" &
- done
- 
  ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS startup 2>&1
  nohup ${KE_HOME}/kms/bin/startup.sh >> ${LOG_DIR}/ke.out 2>&1
  ret=$?
