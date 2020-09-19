@@ -72,4 +72,52 @@ $(document).ready(function () {
             transform: 'translateX(-50%) translateY(-50%)'
         });
     });
+
+    // connectors details
+    var offset = 0;
+    $(document).on('click', 'a[class=connectors_link]', function () {
+        var uri = $(this).attr("uri");
+        $('#ke_connectors_detail').modal('show');
+
+        $("#ke_connectors_detail_children").append("<div class='table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-condensed' width='100%'><thead><tr><th>ID</th><th>Connectors</th></tr></thead></table></div>");
+        if (offset > 0) {
+            $("#div_children" + (offset - 1)).remove();
+        }
+
+        // Initialize consumer table list --start
+        $("#result_children" + offset).dataTable({
+            // "searching" : false,
+            "bSort": false,
+            "bLengthChange": false,
+            "bProcessing": true,
+            "bServerSide": true,
+            "fnServerData": retrieveData,
+            "sAjaxSource": "/connect/connectors/table/ajax?uri=" + uri,
+            "aoColumns": [{
+                "mData": 'id'
+            }, {
+                "mData": 'connector'
+            }]
+        });
+
+        function retrieveData(sSource, aoData, fnCallback) {
+            $.ajax({
+                "type": "get",
+                "contentType": "application/json",
+                "url": sSource,
+                "dataType": "json",
+                "data": {
+                    aoData: JSON.stringify(aoData),
+                    uri: uri
+                },
+                "success": function (data) {
+                    fnCallback(data)
+                }
+            });
+        }
+
+        // --end
+        offset++;
+    });
+
 });

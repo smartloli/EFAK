@@ -40,12 +40,10 @@
         } else if (url.indexOf("/metrics/zk") > -1) {
             $("#ke_navbar_metrics_zk").addClass("active");
         }
-    } else if ((url.indexOf("/connect/config") > -1) || (url.indexOf("/connect/monitor") > -1)) {
+    } else if (url.indexOf("/connect") > -1) {
         $("#collapseConnect").addClass('show')
-        if (url.indexOf("/connect/config") > -1) {
+        if (url.indexOf("/connect/config") > -1 || url.indexOf("/connect/connectors") > -1) {
             $("#ke_navbar_connect_config").addClass("active");
-        } else if (url.indexOf("/connect/monitor") > -1) {
-            $("#ke_navbar_connect_monitor").addClass("active");
         }
     } else if ((url.indexOf("/alarm/config") > -1) || (url.indexOf("/alarm/list") > -1)) {
         $("#collapseAlarmChannel").addClass('show')

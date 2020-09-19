@@ -90,18 +90,19 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
         } else if (KConstants.Protocol.KSQL_QUERY.equals(this.type)) {
             if (this.ksql != null) {
                 result = ShardSubScan.query(ksql).toString();
-                System.out.println(result);
             }
         } else if (KConstants.Protocol.KSQL_QUERY_LOG.equals(this.type)) {
             if (!StrUtils.isNull(this.jobId)) {
-                String log = LogCacheFactory.LOG_RECORDS.get(this.jobId).toString();
-                JSONObject object = new JSONObject();
-                object.put("log", log);
-                JSONArray array = new JSONArray();
-                array.add(object);
-                List<JSONArray> results = new ArrayList<>();
-                results.add(array);
-                result = results.toString();
+                if (LogCacheFactory.LOG_RECORDS.containsKey(this.jobId)) {
+                    String log = LogCacheFactory.LOG_RECORDS.get(this.jobId).toString();
+                    JSONObject object = new JSONObject();
+                    object.put("log", log);
+                    JSONArray array = new JSONArray();
+                    array.add(object);
+                    List<JSONArray> results = new ArrayList<>();
+                    results.add(array);
+                    result = results.toString();
+                }
             }
         }
         return result;

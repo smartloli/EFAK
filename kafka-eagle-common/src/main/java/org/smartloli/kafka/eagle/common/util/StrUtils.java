@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -185,6 +186,13 @@ public class StrUtils {
             integers.add(Integer.parseInt(value.trim()));
         }
         return integers;
+    }
+
+    /**
+     * Convert strings to list.
+     */
+    public static List<String> stringListConvertListStrings(String strings) {
+        return Arrays.asList(strings.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "").split(","));
     }
 
 }

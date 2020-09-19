@@ -14,10 +14,20 @@
     <meta name="author" content="">
 
     <title>Monitor - KafkaEagle</title>
-    <jsp:include page="../public/plus/css.jsp"></jsp:include>
+    <jsp:include page="../public/plus/css.jsp">
+        <jsp:param value="plugins/codemirror/codemirror.css" name="css"/>
+        <jsp:param value="plugins/codemirror/show-hint.css" name="css"/>
+    </jsp:include>
     <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>
-
+<style>
+    .CodeMirror {
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-left: 1px solid #ddd;
+    }
+</style>
 <body>
 <jsp:include page="../public/plus/navtop.jsp"></jsp:include>
 <div id="layoutSidenav">
@@ -34,136 +44,56 @@
                 </ol>
                 <div class="alert alert-info alert-dismissable">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <i class="fas fa-info-circle"></i> <strong>Kafka connect application monitor and manager.</strong>
+                    <i class="fas fa-info-circle"></i> <strong>Kafka connector application views.</strong>
                 </div>
-                <!-- content body -->
+                <!-- content body status -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card mb-4">
                             <div class="card-header">
-                                <i class="fas fa-link"></i> Connect Application Manager
+                                <i class="fas fa-link"></i> Connector Status Views
                                 <div style="float: right!important;">
-                                    <button id="ke-create-connect-uri-btn" type="button"
-                                            class="btn btn-primary btn-sm">Create
-                                    </button>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="result" class="table table-bordered table-condensed"
-                                           width="100%">
-                                        <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>State</th>
-                                            <th>WorkID</th>
-                                            <th>Type</th>
-                                            <th>Action</th> <!--config,tasks,status-->
-                                            <th>Operate</th>
-                                        </tr>
-                                        </thead>
-                                    </table>
+                                    <textarea id="ke_connect_result_status" name="ke_connect_result_status"></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- row -->
-                <!-- Add User -->
-                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true"
-                     id="ke_connect_uri_create_dialog"
-                     tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="keModalLabel">Add Connect URI</h4>
-                                <button class="close" type="button" data-dismiss="modal">x</button>
+                <!-- config -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-link"></i> Connector Config Views
+                                <div style="float: right!important;">
+                                </div>
                             </div>
-                            <!-- /.row -->
-                            <!-- add modal -->
-                            <div class="modal-body">
-                                <form role="form" action="/connect/uri/add/" method="post"
-                                      onsubmit="return contextFormValid();return false;">
-                                    <fieldset class="form-horizontal">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="basic-addon3">URI</span>
-                                            </div>
-                                            <input id="ke_connect_uri_name" name="ke_connect_uri_name" type="text"
-                                                   class="form-control" placeholder="http://127.0.0.1:8083/"
-                                                   aria-describedby="basic-addon3">
-                                        </div>
-                                        <div id="alert_mssage_connect_uri_add" style="display: none"
-                                             class="alert alert-danger">
-                                            <label id="alert_mssage_connect_uri_add_label"></label>
-                                        </div>
-                                    </fieldset>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                                data-dismiss="modal">Cancle
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="create-add">Submit
-                                        </button>
-                                    </div>
-                                </form>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <textarea id="ke_connect_result_config" name="ke_connect_result_config"></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- modal modify -->
-                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true"
-                     id="ke_connect_uri_modify_dialog"
-                     tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="keModalLabel">Modify Connect URI</h4>
-                                <button class="close" type="button" data-dismiss="modal">x</button>
+                <!-- tasks -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-link"></i> Connector Tasks Views
+                                <div style="float: right!important;">
+                                </div>
                             </div>
-                            <!-- /.row -->
-                            <div class="modal-body">
-                                <form role="form" action="/connect/uri/modify/" method="post"
-                                      onsubmit="return contextModifyFormValid();return false;">
-                                    <fieldset class="form-horizontal">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="basic-addon3">URI</span>
-                                            </div>
-                                            <input id="ke_connect_uri_name_modify" name="ke_connect_uri_name_modify"
-                                                   type="text"
-                                                   class="form-control" placeholder="http://127.0.0.1:8083/"
-                                                   aria-describedby="basic-addon3">
-                                            <input id="ke_connect_uri_id_modify" name="ke_connect_uri_id_modify"
-                                                   type="hidden">
-                                        </div>
-                                        <div id="alert_mssage_connect_uri_modify" style="display: none"
-                                             class="alert alert-danger">
-                                            <label id="alert_mssage_connect_uri_modify_label"></label>
-                                        </div>
-                                    </fieldset>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                                data-dismiss="modal">Cancle
-                                        </button>
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Delete -->
-                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_connect_config_delete"
-                     tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="keModalLabel">Notify</h4>
-                                <button class="close" type="button" data-dismiss="modal">x</button>
-                            </div>
-                            <!-- /.row -->
-                            <div id="ke_connect_config_remove_content" class="modal-body"></div>
-                            <div id="ke_connect_config_footer" class="modal-footer">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <textarea id="ke_connect_result_tasks" name="ke_connect_result_tasks"></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -175,37 +105,9 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
+    <jsp:param value="plugins/codemirror/codemirror.js" name="loader"/>
+    <jsp:param value="plugins/codemirror/sql.js" name="loader"/>
     <jsp:param value="main/connect/monitor.js" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>
-<script type="text/javascript">
-    function contextFormValid() {
-        var ke_connect_uri_name = $("#ke_connect_uri_name").val();
-        if (ke_connect_uri_name.length == 0) {
-            $("#alert_mssage_connect_uri_add").show();
-            $("#alert_mssage_connect_uri_add_label").text("Oops! Kafka connect uri cannot be empty.");
-            setTimeout(function () {
-                $("#alert_mssage_connect_uri_add").hide()
-            }, 3000);
-            return false;
-        }
-
-        return true;
-    }
-
-    function contextModifyFormValid() {
-        var ke_connect_uri_name_modify = $("#ke_connect_uri_name_modify").val();
-        if (ke_connect_uri_name_modify.length == 0) {
-            $("#alert_mssage_connect_uri_modify").show();
-            $("#alert_mssage_connect_uri_modify_label").text("Oops! Kafka connect uri cannot be empty.");
-            setTimeout(function () {
-                $("#alert_mssage_connect_uri_modify").hide()
-            }, 3000);
-            return false;
-        }
-
-        return true;
-    }
-
-</script>
 </html>

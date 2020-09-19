@@ -167,6 +167,29 @@
                         </div>
                     </div>
                 </div>
+                <!-- connectors -->
+                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_connectors_detail"
+                     tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="keModalLabel">Notify</h4>
+                                <button class="close" type="button" data-dismiss="modal">x</button>
+                            </div>
+                            <!-- /.row -->
+                            <div class="modal-body">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-comments"></i> Consumer Topic
+                                    </div>
+                                    <div id="ke_connectors_detail_children" class="card-body">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
         <jsp:include page="../public/plus/footer.jsp"></jsp:include>

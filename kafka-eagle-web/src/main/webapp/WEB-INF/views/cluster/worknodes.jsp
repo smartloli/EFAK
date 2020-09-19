@@ -55,7 +55,9 @@
                                             <th>CPU</th>
                                             <th>Status</th>
                                             <th>Created</th>
+                                            <!--
                                             <th>Operate</th>
+                                            -->
                                         </tr>
                                         </thead>
                                     </table>

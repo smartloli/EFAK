@@ -260,7 +260,9 @@ public class JobClient {
             WorkNodeStrategy wns = new WorkNodeStrategy();
             wns.setHost(host);
             wns.setPort(port);
-            nodes.add(wns);
+            if (NetUtils.telnet(host, port)) {
+                nodes.add(wns); // alive node
+            }
         }
         return nodes;
     }

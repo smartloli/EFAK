@@ -21,8 +21,6 @@ $(document).ready(function () {
             "mData": 'status'
         }, {
             "mData": 'created'
-        }, {
-            "mData": 'operate'
         }]
     });
 

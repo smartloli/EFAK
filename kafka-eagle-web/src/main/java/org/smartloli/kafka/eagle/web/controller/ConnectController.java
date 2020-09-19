@@ -34,6 +34,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,10 +65,25 @@ public class ConnectController {
         return mav;
     }
 
-    @RequestMapping(value = "/connect/monitor", method = RequestMethod.GET)
-    public ModelAndView connectMonitorView(HttpSession session) {
+    @RequestMapping(value = "/connect/connectors/details/", method = RequestMethod.GET)
+    public ModelAndView connectPluginsView(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/connect/monitor");
+        HttpSession session = request.getSession();
+        String uri = StrUtils.convertNull(request.getParameter("uri"));
+        String connector = StrUtils.convertNull(request.getParameter("connector"));
+
+        try {
+            uri = URLDecoder.decode(uri, "UTF-8");
+            connector = URLDecoder.decode(connector, "UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (connectService.connectorHasAlive(uri)) {
+            mav.setViewName("/connect/monitor");
+        } else {
+            mav.setViewName("/error/404");
+        }
         return mav;
     }
 
@@ -107,7 +124,7 @@ public class ConnectController {
         for (ConnectConfigInfo connectConfig : connectConfigs) {
             JSONObject object = new JSONObject();
             object.put("id", connectConfig.getId());
-            object.put("uri", "<a href='/connect/monitor?uri=" + connectConfig.getConnectUri() + "'>" + connectConfig.getConnectUri() + "</a>");
+            object.put("uri", "<a class='connectors_link' href='#' uri='" + connectConfig.getConnectUri() + "'>" + connectConfig.getConnectUri() + "</a>");
             if (StrUtils.isNull(connectConfig.getVersion())) {
                 object.put("version", "<span class='badge badge-warning'>NULL</span>");
             } else {
@@ -146,12 +163,20 @@ public class ConnectController {
     /**
      * Get kafka connect application datasets by ajax.
      */
-    @RequestMapping(value = "/connect/monitor/table/ajax", method = RequestMethod.GET)
-    public void connectMonitorListAjax(HttpServletResponse response, HttpServletRequest request) {
+    @RequestMapping(value = "/connect/connectors/table/ajax", method = RequestMethod.GET)
+    public void getconnectorsListAjax(HttpServletResponse response, HttpServletRequest request) {
         String aoData = request.getParameter("aoData");
         JSONArray params = JSON.parseArray(aoData);
         int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
         String search = "";
+
+        String uri = "";
+        try {
+            uri = URLDecoder.decode(request.getParameter("uri"), "UTF-8");
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get uri has error, msg is ", e);
+        }
+
         for (Object object : params) {
             JSONObject param = (JSONObject) object;
             if ("sEcho".equals(param.getString("name"))) {
@@ -165,48 +190,33 @@ public class ConnectController {
             }
         }
 
-        HttpSession session = request.getSession();
-        String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-        Signiner signiner = (Signiner) session.getAttribute(KConstants.Login.SESSION_USER);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("search", search);
-        map.put("start", iDisplayStart);
-        map.put("size", iDisplayLength);
-        map.put("cluster", clusterAlias);
-        long count = connectService.connectConfigCount(map);
-        List<ConnectConfigInfo> connectConfigs = connectService.getConnectConfigList(map);
+        List<String> connectors = connectService.getConnectorsTableList(uri, search);
         JSONArray aaDatas = new JSONArray();
-        for (ConnectConfigInfo connectConfig : connectConfigs) {
-            JSONObject object = new JSONObject();
-            object.put("id", connectConfig.getId());
-            object.put("uri", connectConfig.getConnectUri());
-            if (StrUtils.isNull(connectConfig.getVersion())) {
-                object.put("version", "<span class='badge badge-warning'>NULL</span>");
-            } else {
-                object.put("version", "<span class='badge badge-primary'>" + connectConfig.getVersion() + "</span>");
+        int offset = 0;
+        int id = iDisplayStart + 1;
+        for (String connector : connectors) {
+            if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
+                JSONObject object = new JSONObject();
+                String uriStr = "";
+                String connectorName = "";
+                try {
+                    uriStr = URLEncoder.encode(uri, "UTF-8");
+                    connectorName = URLEncoder.encode(connector, "UTF-8");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                object.put("id", id);
+                object.put("connector", "<a href='/connect/connectors/details/?uri=" + uriStr + "&connector=" + connectorName + "'>" + connector + "</a>");
+                id++;
+                aaDatas.add(object);
             }
-            if (KConstants.BrokerSever.CONNECT_URI_ALIVE.equals(connectConfig.getAlive())) {
-                object.put("alive", "<span class='badge badge-success'>Alive</span>");
-            } else {
-                object.put("alive", "<span class='badge badge-danger'>Shutdown</span>");
-            }
-            object.put("created", connectConfig.getCreated());
-            object.put("modify", connectConfig.getModify());
-            if (KConstants.Role.ADMIN.equals(signiner.getUsername())) {
-                object.put("operate",
-                        "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_connect_uri_modify' href='#"
-                                + connectConfig.getId() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Modify</a><a class='dropdown-item' href='#" + connectConfig.getId() + "' val='" + connectConfig.getConnectUri() + "' name='ke_connect_uri_del'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Delete</a></div>");
-            } else {
-                object.put("operate", "");
-            }
-            aaDatas.add(object);
+            offset++;
         }
 
         JSONObject target = new JSONObject();
         target.put("sEcho", sEcho);
-        target.put("iTotalRecords", count);
-        target.put("iTotalDisplayRecords", count);
+        target.put("iTotalRecords", connectors.size());
+        target.put("iTotalDisplayRecords", connectors.size());
         target.put("aaData", aaDatas);
         try {
             byte[] output = target.toJSONString().getBytes();
@@ -312,4 +322,21 @@ public class ConnectController {
         }
     }
 
+    @RequestMapping(value = "/connect/plugins/result/ajax/", method = RequestMethod.GET)
+    public void getConnectorsByNameAjax(HttpServletResponse response, HttpServletRequest request) {
+        String uri = "";
+        String connector = "";
+        try {
+            uri = URLDecoder.decode(request.getParameter("uri"), "UTF-8");
+            connector = URLDecoder.decode(request.getParameter("connector"), "UTF-8");
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get uri and connector has error, msg is ", e);
+        }
+        try {
+            byte[] output = connectService.getConnectorPluginsSummary(uri, connector).getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }

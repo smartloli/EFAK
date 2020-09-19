@@ -61,4 +61,19 @@ public interface ConnectService {
      */
     public ConnectConfigInfo findConnectUriById(int id);
 
+    /**
+     * Get connectors table list.
+     */
+    public List<String> getConnectorsTableList(String uri, String search);
+
+    /**
+     * Connector alive status.
+     */
+    public boolean connectorHasAlive(String uri);
+
+    /**
+     * Get connector plugins summary and return JSONObject result.
+     */
+    public String getConnectorPluginsSummary(String uri, String connector);
+
 }

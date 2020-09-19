@@ -98,12 +98,23 @@ start()
  
  CLASS=org.smartloli.kafka.eagle.plugin.progress.KafkaEagleProgress
  ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS port 2>&1
+
  rm -rf ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/*.properties
  cp ${KE_HOME}/conf/*.properties ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/
  
  ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS config 2>&1
  rm -rf ${KE_HOME}/kms/logs/*
  chmod +x ${KE_HOME}/kms/bin/*.sh
+
+ # startup worknode server node
+ mill=`date "+%N"`
+ tdate=`date "+%Y-%m-%d %H:%M:%S,${mill:0:3}"`
+
+ for i in `${KE_HOME}/conf/works`
+ do
+  echo [$tdate] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] running.
+  ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh start>/dev/null" &
+ done
  
  ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS startup 2>&1
  nohup ${KE_HOME}/kms/bin/startup.sh >> ${LOG_DIR}/ke.out 2>&1
@@ -127,6 +138,15 @@ start()
  ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}' > $DIALUP_PID
  rm -rf ${LOG_DIR}/ke_console.out
  ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out
+}
+
+shutdown()
+{
+ for i in `${KE_HOME}/conf/works`
+ do
+  echo [$tdate] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] stopping.
+  ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh stop>/dev/null" &
+ done
 }
 
 stop()

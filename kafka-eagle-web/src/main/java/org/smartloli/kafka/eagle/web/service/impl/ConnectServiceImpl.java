@@ -17,12 +17,18 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
+import org.smartloli.kafka.eagle.common.util.NetUtils;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.web.dao.BrokerDao;
 import org.smartloli.kafka.eagle.web.service.ConnectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -67,5 +73,65 @@ public class ConnectServiceImpl implements ConnectService {
     @Override
     public ConnectConfigInfo findConnectUriById(int id) {
         return brokerDao.findConnectUriById(id);
+    }
+
+    @Override
+    public List<String> getConnectorsTableList(String uri, String search) {
+        String uriStr = "";
+        if (!uri.endsWith("/")) {
+            uriStr = uri + "/";
+        } else {
+            uriStr = uri;
+        }
+        List<String> connectors = StrUtils.stringListConvertListStrings(HttpClientUtils.doGet(uriStr + "connectors"));
+        List<String> result = new ArrayList<>();
+        if (!StrUtils.isNull(search)) {
+            for (String connector : connectors) {
+                if (connector.contains(search)) {
+                    result.add(connector);
+                }
+            }
+        } else {
+            result = connectors;
+        }
+        return result;
+    }
+
+    @Override
+    public boolean connectorHasAlive(String uri) {
+        return NetUtils.uri(uri);
+    }
+
+    @Override
+    public String getConnectorPluginsSummary(String uri, String connector) {
+        String uriStr = "";
+        if (!uri.endsWith("/")) {
+            uriStr = uri + "/";
+        } else {
+            uriStr = uri;
+        }
+        JSONObject object = new JSONObject();
+        String status = "";
+        String config = "";
+        String tasks = "";
+        try {
+            status = HttpClientUtils.doGet(uriStr + "connectors/" + connector + "/status");
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get connector[" + uriStr + connector + "] status has error, msg is ", e);
+        }
+        try {
+            config = HttpClientUtils.doGet(uriStr + "connectors/" + connector + "/config");
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get connector[" + uriStr + connector + "] config has error, msg is ", e);
+        }
+        try {
+            tasks = HttpClientUtils.doGet(uriStr + "connectors/" + connector + "/tasks");
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get connector[" + uriStr + connector + "] tasks has error, msg is ", e);
+        }
+        object.put("status", status);
+        object.put("config", config);
+        object.put("tasks", tasks);
+        return object.toString();
     }
 }
