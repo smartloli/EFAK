@@ -140,6 +140,15 @@ start()
  ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out
 }
 
+startup()
+{
+ for i in `${KE_HOME}/conf/works`
+ do
+  echo [$tdate] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] stopping.
+  ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh start>/dev/null" &
+ done
+}
+
 shutdown()
 {
  for i in `${KE_HOME}/conf/works`
@@ -323,8 +332,14 @@ case "$1" in
   sdate)
       sdate
       ;;
+  startup)
+      startup
+      ;;
+  shutdown)
+      shutdown
+      ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate}"
+      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate|startup|shutdown}"
       RETVAL=1
 esac
 exit $RETVAL

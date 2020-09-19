@@ -66,7 +66,7 @@ start()
  PID=`ps -ef | grep org.smartloli.kafka.eagle.core.task.rpc.server.WorkNodeServer | grep -v grep | awk '{print $2}'`
      
  if [ -n "$PID" ]; then
-  echo "[$stime] Error: The Kafka Eagle[$PID] has started."
+  echo "[$stime] Error: The WorkNode Server[$PID] has started."
   exit 1
  fi
  
