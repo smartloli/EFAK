@@ -100,7 +100,7 @@ stop()
  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
  if [ "$SPID" != "" ];then
   kill -9  $SPID
-  echo "[$stime] INFO: WorkNode Server Stop Success."
+  echo "[$stime] INFO: WorkNodeServer_`hostname` Stop Success."
  fi
 }
 

@@ -132,31 +132,35 @@ start()
 
 startup()
 {
- stime=`date "+%Y-%m-%d %H:%M:%S"`
  for i in `cat ${KE_HOME}/conf/works`
  do
-  echo [$stime] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] starting.
-  ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh start>/dev/null" &
+  ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh start>/dev/null" &
+  echo "[$stime] INFO: WorkNodeServer-$i Start Success."
+  sleep 1
  done
 }
 
 shutdown()
 {
- stime=`date "+%Y-%m-%d %H:%M:%S"`
  for i in `cat ${KE_HOME}/conf/works`
  do
-  echo [$stime] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] stopping.
-  ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh stop>/dev/null" &
+  log=`ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh stop" &`
+  echo $log
  done
 }
 
 nodes()
 {
- stime=`date "+%Y-%m-%d %H:%M:%S"`
+ starttime=`date "+%Y-%m-%d %H:%M:%S"`
  for i in `cat ${KE_HOME}/conf/works`
  do
-  ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh status" &
+  log=`ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh status" &`
+  echo $log
  done
+ endtime=`date +'%Y-%m-%d %H:%M:%S'`
+ start_seconds=$(date --date="$starttime" +%s);
+ end_seconds=$(date --date="$endtime" +%s);
+ echo "Time taken: "$((end_seconds-start_seconds))" seconds."
 }
 
 stop()

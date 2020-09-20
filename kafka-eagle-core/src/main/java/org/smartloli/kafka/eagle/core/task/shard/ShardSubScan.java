@@ -81,7 +81,7 @@ public class ShardSubScan {
         }
 
         private List<JSONArray> submit() {
-            LOG.info("WorkNodeServer[" + NetUtils.hostname() + "], Cluster[" + ksql.getCluster() + "],Topic[" + this.topic + "], Partition[" + this.partition + "], Sharding = ∑(" + start + "~" + end + ")");
+            LOG.info("WorkNodeServer[" + NetUtils.hostname() + "], Cluster[" + ksql.getCluster() + "], Topic[" + this.topic + "], Partition[" + this.partition + "], Sharding = ∑(" + start + "~" + end + ")");
             return executor(ksql, start, end);
         }
 
@@ -181,8 +181,9 @@ public class ShardSubScan {
             }
             consumer.close();
             messages.add(datasets);
+            System.out.println("ShardSubScan: " + messages.toString());
             try {
-                String lastestLog = "WorkNodeServer[" + NetUtils.hostname() + "], Cluster[" + ksql.getCluster() + "], Topic[" + ksql.getTopic() + "], Partition[" + ksql.getPartition() + "], Sharding = ∑(" + start + "~" + end + ") sub scan task finished.";
+                String lastestLog = CalendarUtils.getDate() + " INFO [WorkNodeServer-" + NetUtils.hostname() + "], Cluster[" + ksql.getCluster() + "], Topic[" + ksql.getTopic() + "], Partition[" + ksql.getPartition() + "], Sharding = ∑(" + start + "~" + end + ") finished.";
                 if (LogCacheFactory.LOG_RECORDS.containsKey(ksql.getJobId())) {
                     String earliestLog = LogCacheFactory.LOG_RECORDS.get(ksql.getJobId()).toString();
                     LogCacheFactory.LOG_RECORDS.put(ksql.getJobId(), earliestLog + "\n" + lastestLog);
