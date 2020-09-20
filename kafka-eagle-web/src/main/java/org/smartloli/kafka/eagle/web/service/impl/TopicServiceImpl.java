@@ -247,15 +247,15 @@ public class TopicServiceImpl implements TopicService {
         Map<String, MBeanInfo> mbeans = new HashMap<>();
         for (BrokersInfo broker : brokers) {
             String uri = broker.getHost() + ":" + broker.getJmxPort();
-            MBeanInfo bytesIn = mx4jService.bytesInPerSec(uri, topic);
-            MBeanInfo bytesOut = mx4jService.bytesOutPerSec(uri, topic);
-            MBeanInfo bytesRejected = mx4jService.bytesRejectedPerSec(uri, topic);
-            MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(uri, topic);
-            MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(uri, topic);
-            MBeanInfo messageIn = mx4jService.messagesInPerSec(uri, topic);
-            MBeanInfo produceMessageConversions = mx4jService.produceMessageConversionsPerSec(uri, topic);
-            MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(uri, topic);
-            MBeanInfo totalProduceRequests = mx4jService.totalProduceRequestsPerSec(uri, topic);
+            MBeanInfo bytesIn = mx4jService.bytesInPerSec(clusterAlias, uri, topic);
+            MBeanInfo bytesOut = mx4jService.bytesOutPerSec(clusterAlias, uri, topic);
+            MBeanInfo bytesRejected = mx4jService.bytesRejectedPerSec(clusterAlias, uri, topic);
+            MBeanInfo failedFetchRequest = mx4jService.failedFetchRequestsPerSec(clusterAlias, uri, topic);
+            MBeanInfo failedProduceRequest = mx4jService.failedProduceRequestsPerSec(clusterAlias, uri, topic);
+            MBeanInfo messageIn = mx4jService.messagesInPerSec(clusterAlias, uri, topic);
+            MBeanInfo produceMessageConversions = mx4jService.produceMessageConversionsPerSec(clusterAlias, uri, topic);
+            MBeanInfo totalFetchRequests = mx4jService.totalFetchRequestsPerSec(clusterAlias, uri, topic);
+            MBeanInfo totalProduceRequests = mx4jService.totalProduceRequestsPerSec(clusterAlias, uri, topic);
 
             assembleMBeanInfo(mbeans, MBean.MESSAGES_IN, messageIn);
             assembleMBeanInfo(mbeans, MBean.BYTES_IN, bytesIn);

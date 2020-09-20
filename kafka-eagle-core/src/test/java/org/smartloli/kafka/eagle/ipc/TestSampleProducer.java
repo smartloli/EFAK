@@ -36,9 +36,9 @@ public class TestSampleProducer extends Thread {
             json.put("id", id);
             json.put("time", new Date().getTime());
             id++;
-            producer.send(new ProducerRecord<String, String>("kjson", "k_" + new Date().getTime(), json.toJSONString()));
+            producer.send(new ProducerRecord<String, String>("ke0920", "k_" + new Date().getTime(), json.toJSONString()));
             try {
-                sleep(100);
+                sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

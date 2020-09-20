@@ -99,4 +99,18 @@ public class NetUtils {
         return ip;
     }
 
+    /**
+     * Get server hostname.
+     */
+    public static String hostname() {
+        String ip = "";
+        try {
+            ip = InetAddress.getLocalHost().getHostName();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("Get local server ip has error, msg is " + e.getMessage());
+        }
+        return ip;
+    }
+
 }

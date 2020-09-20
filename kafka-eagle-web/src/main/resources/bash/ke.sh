@@ -132,19 +132,30 @@ start()
 
 startup()
 {
- for i in `${KE_HOME}/conf/works`
+ stime=`date "+%Y-%m-%d %H:%M:%S"`
+ for i in `cat ${KE_HOME}/conf/works`
  do
-  echo [$tdate] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] stopping.
+  echo [$stime] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] starting.
   ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh start>/dev/null" &
  done
 }
 
 shutdown()
 {
- for i in `${KE_HOME}/conf/works`
+ stime=`date "+%Y-%m-%d %H:%M:%S"`
+ for i in `cat ${KE_HOME}/conf/works`
  do
-  echo [$tdate] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] stopping.
+  echo [$stime] INFO [Kafka Eagle WorkNodeServer] begins to execute the [$i] stopping.
   ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh stop>/dev/null" &
+ done
+}
+
+nodes()
+{
+ stime=`date "+%Y-%m-%d %H:%M:%S"`
+ for i in `cat ${KE_HOME}/conf/works`
+ do
+  ssh $i "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh status" &
  done
 }
 
@@ -197,7 +208,7 @@ CheckProcessStata()
   else
    CPS_PIDLIST=`ps -ef|grep "$CPS_PNAME"|grep -v grep|awk -F" " '{print $2}'`
   fi
-  
+
   for CPS_i in `echo $CPS_PIDLIST`
   do
    if [ "$CPS_PID" = "" ] ;then
@@ -205,13 +216,13 @@ CheckProcessStata()
    else
     CPS_i1="$CPS_i"
    fi
-   
+
    if [ "$CPS_i1" = "$CPS_PID" ] ;then
     kill -0 $CPS_i >/dev/null 2>&1
     if [ $? != 0 ] ;then
      echo "[`date`] MC-10500: Process $i have Dead"
      kill -9 $CPS_i >/dev/null 2>&1
-     
+
      return 1
     else
      return 0
@@ -328,8 +339,11 @@ case "$1" in
   shutdown)
       shutdown
       ;;
+  nodes)
+      nodes
+      ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate|startup|shutdown}"
+      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate|startup|shutdown|nodes}"
       RETVAL=1
 esac
 exit $RETVAL

@@ -44,8 +44,6 @@ isexit()
  fi
 }
 
-DIALUP_PID=$KE_HOME/bin/worknode.pid
-
 start()
 {
  echo -n [$stime] INFO:  $"Starting $prog "
@@ -63,7 +61,7 @@ start()
   exit 1
  fi
  
- PID=`ps -ef | grep org.smartloli.kafka.eagle.core.task.rpc.server.WorkNodeServer | grep -v grep | awk '{print $2}'`
+ PID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
      
  if [ -n "$PID" ]; then
   echo "[$stime] Error: The WorkNode Server[$PID] has started."
@@ -95,65 +93,31 @@ start()
  cd ${KE_HOME}
  CLASS=org.smartloli.kafka.eagle.core.task.rpc.server.WorkNodeServer
  ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/worknode.log 2>&1
- ps -ef | grep org.smartloli.kafka.eagle.core.task.rpc.server.WorkNodeServer | grep -v grep | awk '{print $2}' > $DIALUP_PID
- 
 }
 
 stop()
 {
- if [ -f $KE_HOME/bin/worknode.pid ];then
-  SPID=`cat $KE_HOME/bin/worknode.pid`
-  if [ "$SPID" != "" ];then
-    kill -9  $SPID
-    echo > $DIALUP_PID
-   echo "[$stime] INFO: WorkNode Server Stop Success."
-  fi
+ SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
+ if [ "$SPID" != "" ];then
+  kill -9  $SPID
+  echo "[$stime] INFO: WorkNode Server Stop Success."
  fi
-}
-
-CheckProcessStata()
-{
-  CPS_PID=$1
-  if [ "$CPS_PID" != "" ] ;then
-   CPS_PIDLIST=`ps -ef|grep $CPS_PID|grep -v grep|awk -F" " '{print $2}'`
-  else
-   CPS_PIDLIST=`ps -ef|grep "$CPS_PNAME"|grep -v grep|awk -F" " '{print $2}'`
-  fi
-  
-  for CPS_i in `echo $CPS_PIDLIST`
-  do
-   if [ "$CPS_PID" = "" ] ;then
-    CPS_i1="$CPS_PID"
-   else
-    CPS_i1="$CPS_i"
-   fi
-   
-   if [ "$CPS_i1" = "$CPS_PID" ] ;then
-    kill -0 $CPS_i >/dev/null 2>&1
-    if [ $? != 0 ] ;then
-     echo "[`date`] MC-10500: Process $i have Dead"
-     kill -9 $CPS_i >/dev/null 2>&1
-     
-     return 1
-    else
-     return 0
-    fi
-   fi
-  done
-  echo "[`date`] MC-10502: Process $CPS_i is not exists"
-  return 1
 }
 
 status()
 {
-  SPID=`cat $KE_HOME/bin/worknode.pid`
-  CheckProcessStata $SPID >/dev/null
-  if [ $? != 0 ];then
-   echo "[$stime] INFO : WorkNode Server has stopped, [$SPID] ."
+  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
+  HOSTNAME=`hostname`
+  if [ "$SPID" = "" ] ;then
+    echo "[$stime] INFO : WorkNodeServer-$HOSTNAME has stopped, [$SPID] ."
   else
-   echo "[$stime] INFO : WorkNode Server is running, [$SPID] ."
+    PID_EXIST=$(ps aux | awk '{print $2}'| grep -w $SPID)
+    if [ ! $PID_EXIST ];then
+      echo "[$stime] INFO : WorkNodeServer-$HOSTNAME has stopped, [$SPID] ."
+    else
+      echo "[$stime] INFO : WorkNodeServer-$HOSTNAME is running, [$SPID] ."
+    fi
   fi
-
 }
 
 restart()
@@ -166,12 +130,10 @@ restart()
 
 gc()
 {	
-  if [ -f $KE_HOME/bin/worknode.pid ];then
-   SPID=`cat $KE_HOME/bin/worknode.pid`
-   if [ "$SPID" != "" ];then
-    echo "[$stime] INFO : WorkNode Server Process[$SPID] GC."
-    ${JAVA_HOME}/bin/jstat -gcutil $SPID 1000
-   fi
+  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
+  if [ "$SPID" != "" ];then
+   echo "[$stime] INFO : WorkNode Server Process[$SPID] GC."
+   ${JAVA_HOME}/bin/jstat -gcutil $SPID 1000
   fi
 }
 
@@ -187,12 +149,10 @@ jdk()
 
 sdate()
 {	
-  if [ -f $KE_HOME/bin/worknode.pid ];then
-   SPID=`cat $KE_HOME/bin/worknode.pid`
-   if [ "$SPID" != "" ];then
-    echo "[$stime] INFO : WorkNode Server Process[$SPID] Runtime."
-    ps -eo pid,user,lstart | grep $SPID
-   fi
+  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
+  if [ "$SPID" != "" ];then
+   echo "[$stime] INFO : WorkNode Server Process[$SPID] Runtime."
+   ps -eo pid,user,lstart | grep $SPID
   fi
 }
 

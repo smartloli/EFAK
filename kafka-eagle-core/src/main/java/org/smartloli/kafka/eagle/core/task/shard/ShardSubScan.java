@@ -29,10 +29,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
@@ -84,7 +81,7 @@ public class ShardSubScan {
         }
 
         private List<JSONArray> submit() {
-            LOG.info("Topic[" + this.topic + "], Partition[" + this.partition + "], Sharding = ∑(" + start + "~" + end + ")");
+            LOG.info("WorkNodeServer[" + NetUtils.hostname() + "], Cluster[" + ksql.getCluster() + "],Topic[" + this.topic + "], Partition[" + this.partition + "], Sharding = ∑(" + start + "~" + end + ")");
             return executor(ksql, start, end);
         }
 
@@ -185,7 +182,7 @@ public class ShardSubScan {
             consumer.close();
             messages.add(datasets);
             try {
-                String lastestLog = "Cluster[" + ksql.getCluster() + "], Topic[" + ksql.getTopic() + "], Partition[" + ksql.getPartition() + "], Sharding = ∑(" + start + "~" + end + ") sub scan task finished.";
+                String lastestLog = "WorkNodeServer[" + NetUtils.hostname() + "], Cluster[" + ksql.getCluster() + "], Topic[" + ksql.getTopic() + "], Partition[" + ksql.getPartition() + "], Sharding = ∑(" + start + "~" + end + ") sub scan task finished.";
                 if (LogCacheFactory.LOG_RECORDS.containsKey(ksql.getJobId())) {
                     String earliestLog = LogCacheFactory.LOG_RECORDS.get(ksql.getJobId()).toString();
                     LogCacheFactory.LOG_RECORDS.put(ksql.getJobId(), earliestLog + "\n" + lastestLog);

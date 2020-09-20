@@ -353,7 +353,7 @@ public class BrokerServiceImpl implements BrokerService {
     }
 
     /**
-     * Get topic list {@link #topicList()} include cgroups from zookeeper.
+     * Get topic list include cgroups from zookeeper.
      */
     public List<String> topicList(String clusterAlias) {
         List<String> topics = new ArrayList<>();
@@ -370,8 +370,7 @@ public class BrokerServiceImpl implements BrokerService {
                     excludeTopic(clusterAlias, topics);
                 }
             } catch (Exception e) {
-                LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
-                e.printStackTrace();
+                ErrorUtils.print(this.getClass()).error("Get topic list has error, msg is ", e);
             } finally {
                 if (zkc != null) {
                     kafkaZKPool.release(clusterAlias, zkc);
@@ -621,8 +620,7 @@ public class BrokerServiceImpl implements BrokerService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("Get topic real logsize has error, msg is " + e.getCause().getMessage());
-            e.printStackTrace();
+            ErrorUtils.print(this.getClass()).error("Get topic real logsize has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
