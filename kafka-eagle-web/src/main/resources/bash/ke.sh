@@ -149,7 +149,7 @@ shutdown()
  done
 }
 
-nodes()
+list()
 {
  starttime=`date "+%Y-%m-%d %H:%M:%S"`
  for i in `cat ${KE_HOME}/conf/works`
@@ -306,6 +306,23 @@ sdate()
   fi
 }
 
+worknode()
+{
+  case "$1" in
+  startup)
+      startup
+      ;;
+  shutdown)
+      shutdown
+      ;;
+  list)
+      list
+      ;;
+  *)
+      echo $"Usage: $0 {startup|shutdown|list}"
+esac
+}
+
 case "$1" in
   start)
       start
@@ -337,17 +354,11 @@ case "$1" in
   sdate)
       sdate
       ;;
-  startup)
-      startup
-      ;;
-  shutdown)
-      shutdown
-      ;;
-  nodes)
-      nodes
+  worknode)
+      worknode $2
       ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate|startup|shutdown|nodes}"
+      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate|worknode}"
       RETVAL=1
 esac
 exit $RETVAL
