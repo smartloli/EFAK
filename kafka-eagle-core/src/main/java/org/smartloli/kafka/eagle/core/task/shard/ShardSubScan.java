@@ -92,8 +92,9 @@ public class ShardSubScan {
                 return submit();
             } else {
                 long middle = (start + end) / 2;
-                SubScanTask left = new SubScanTask(ksql, start, middle - 1);
-                SubScanTask right = new SubScanTask(ksql, middle, end - 1);
+                ErrorUtils.print(this.getClass()).info("Split: [" + start + "," + end + "]");
+                SubScanTask left = new SubScanTask(ksql, start, middle);
+                SubScanTask right = new SubScanTask(ksql, middle, end);
                 invokeAll(left, right);
                 msg.addAll(left.join());
                 msg.addAll(right.join());
@@ -108,9 +109,7 @@ public class ShardSubScan {
             props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(ksql.getCluster()));
             props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
             props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
-            if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sql.fix.error")) {
-                props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, KConstants.Kafka.EARLIEST);
-            }
+            props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, KConstants.Kafka.EARLIEST);
             if (SystemConfigUtils.getBooleanProperty(ksql.getCluster() + ".kafka.eagle.sasl.enable")) {
                 kafkaService.sasl(props, ksql.getCluster());
             }

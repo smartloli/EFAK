@@ -15,25 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.ipc;
-
-import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
-
-import java.util.Date;
+package org.smartloli.kafka.eagle.sysout;
 
 /**
- * Test JobClient
+ * // NOTE
  *
  * @author smartloli.
  * <p>
  * Created by Sep 20, 2020
  */
-public class TestJobClient {
+public class TestStrategyRange {
+
     public static void main(String[] args) {
-        // partition-0 -> 90
-        String sql = "select * from ke0920 where `partition` in (0) and JSON(msg,'id')=1 limit 10";
-        String jobId = "job_id_" + new Date().getTime();
-        String result = JobClient.physicsSubmit("cluster1", sql, jobId);
-        System.out.println(result);
+//        if ((end - start) <= 20) {
+//            submit();
+//        } else {
+//            long middle = (start + end) / 2;
+//        }
+        System.out.println((0 + 30) / 2);
+
     }
+
 }

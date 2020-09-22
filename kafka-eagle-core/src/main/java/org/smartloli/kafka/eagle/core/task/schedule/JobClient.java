@@ -218,7 +218,11 @@ public class JobClient {
         List<KSqlStrategy> tasks = new ArrayList<>();
         KSqlStrategy ksql = KSqlParser.parseQueryKSql(sql, cluster);
         long limit = ksql.getLimit();
-        int workNodeSize = getWorkNodes().size();
+        //int workNodeSize = getWorkNodes().size();
+        int workNodeSize = 3;
+        if (workNodeSize == 0) {
+            return tasks;
+        }
         for (int partitionId : ksql.getPartitions()) {
             long endLogSize = 0L;
             long endRealLogSize = 0L;
@@ -231,15 +235,19 @@ public class JobClient {
             }
 
             long startLogSize = (endLogSize - endRealLogSize);
-            long numberPer = (endLogSize - endRealLogSize) / workNodeSize;
+            long numberPer = endRealLogSize / workNodeSize;
             for (int workNodeIndex = 0; workNodeIndex < workNodeSize; workNodeIndex++) {
                 KSqlStrategy kSqlStrategy = new KSqlStrategy();
                 if (workNodeIndex == (workNodeSize - 1)) {
-                    kSqlStrategy.setStart(workNodeIndex * numberPer + startLogSize);
+                    kSqlStrategy.setStart(workNodeIndex * numberPer + startLogSize + 1);
                     kSqlStrategy.setEnd(endLogSize);
                 } else {
-                    kSqlStrategy.setStart(workNodeIndex * numberPer + startLogSize);
-                    kSqlStrategy.setEnd((numberPer * (workNodeIndex + 1)) - 1 + startLogSize);
+                    if (workNodeIndex == 0) {
+                        kSqlStrategy.setStart(numberPer * workNodeIndex + startLogSize);
+                    } else {
+                        kSqlStrategy.setStart(numberPer * workNodeIndex + startLogSize + 1);
+                    }
+                    kSqlStrategy.setEnd(numberPer * (workNodeIndex + 1) + startLogSize);
                 }
                 kSqlStrategy.setPartition(partitionId);
                 kSqlStrategy.setCluster(cluster);
@@ -265,6 +273,11 @@ public class JobClient {
             }
         }
         return nodes;
+    }
+
+    public static void main(String[] args) {
+        String sql = "select * from kjson where `partition` in (0) and JSON(msg,'id')=1 limit 10";
+        System.out.println(getTaskStrategy(sql, "cluster1"));
     }
 
 }

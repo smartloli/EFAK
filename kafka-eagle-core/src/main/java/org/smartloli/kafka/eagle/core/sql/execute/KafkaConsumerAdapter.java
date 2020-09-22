@@ -17,14 +17,8 @@
  */
 package org.smartloli.kafka.eagle.core.sql.execute;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -42,16 +36,16 @@ import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.core.sql.schema.TopicSchema;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import java.time.Duration;
+import java.util.*;
 
 /**
  * Parse the sql statement, and execute the sql content, get the message record
  * of kafka in topic, and map to sql tree to query operation.
  *
  * @author smartloli.
- *
- *         Created by Jun 23, 2017
+ * <p>
+ * Created by Jun 23, 2017
  */
 public class KafkaConsumerAdapter {
 
@@ -62,7 +56,9 @@ public class KafkaConsumerAdapter {
 
     }
 
-    /** Executor ksql query topic data. */
+    /**
+     * Executor ksql query topic data.
+     */
     public static List<JSONArray> executor(KafkaSqlInfo kafkaSql) {
         List<JSONArray> messages = new ArrayList<>();
         Properties props = new Properties();
@@ -70,9 +66,7 @@ public class KafkaConsumerAdapter {
         props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(kafkaSql.getClusterAlias()));
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
-        if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sql.fix.error")) {
-            props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, Kafka.EARLIEST);
-        }
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, Kafka.EARLIEST);
         if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.enable")) {
             kafkaService.sasl(props, kafkaSql.getClusterAlias());
         }
@@ -87,10 +81,10 @@ public class KafkaConsumerAdapter {
             for (int partition = 0; partition < partitions; partition++) {
                 TopicPartition tp = new TopicPartition(kafkaSql.getTableName(), partition);
                 topics.add(tp);
-                partitionStr+=partition+",";
+                partitionStr += partition + ",";
             }
-            partitionStr=partitionStr.substring(0,partitionStr.length()-1)+")";
-            kafkaSql.setSql(kafkaSql.getSql().replace("("+Kafka.ALL_PARTITION+")",partitionStr));
+            partitionStr = partitionStr.substring(0, partitionStr.length() - 1) + ")";
+            kafkaSql.setSql(kafkaSql.getSql().replace("(" + Kafka.ALL_PARTITION + ")", partitionStr));
         } else {
             for (Integer partition : kafkaSql.getPartition()) {
                 TopicPartition tp = new TopicPartition(kafkaSql.getTableName(), partition);
