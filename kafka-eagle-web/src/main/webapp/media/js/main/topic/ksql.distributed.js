@@ -28,17 +28,37 @@ $(document).ready(function () {
 
     $('#result_tab li:eq(0) a').tab('show');
 
+    var triggerTask;
+
+    function getProgress(jobId) {
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/shard/sub/scan/log/?jobId=' + jobId,
+            success: function (datas) {
+                console.log(datas)
+                if (datas != null) {
+                    logEditor.setValue(datas.logs);
+                    logEditor.execCommand("goDocEnd");
+                }
+            }
+        });
+        if (logEditor.getValue().indexOf("Time taken:") > -1) {
+            clearInterval(triggerTask);
+        }
+    }
+
     var offset = 0;
 
     function viewerTopics(sql, dataSets, jobId) {
-        var ret = JSON.parse(dataSets);
+        // var ret = JSON.parse(dataSets);
         var tabHeader = "<div class='panel-body table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
         var mData = [];
         var i = 0;
-        for (var key in ret[0]) {
-            tabHeader += "<th>" + key + "</th>";
+        for (var key in dataSets) {
+            tabHeader += "<th>" + dataSets[key] + "</th>";
             var obj = {
-                mData: key
+                mData: dataSets[key]
             };
             mData.push(obj);
         }
@@ -91,11 +111,11 @@ $(document).ready(function () {
                 if (datas != null) {
                     if (datas.error) {
                         logEditor.setValue(datas.msg);
+                        viewerTopicSqlHistory();
                     } else {
-                        logEditor.setValue(datas.status);
-                        viewerTopics(sql, datas.msg, jobId);
+                        triggerTask = setInterval(getProgress, 1000, jobId);
+                        viewerTopics(sql, datas.columns, jobId);
                     }
-                    viewerTopicSqlHistory();
                 }
             }
         });
@@ -173,4 +193,11 @@ $(document).ready(function () {
 
         historyOffset++;
     }
+
+    $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+        if (e.target.id.indexOf("ke_ksql_history_textarea") > -1) {
+            viewerTopicSqlHistory();
+        }
+    })
+
 });

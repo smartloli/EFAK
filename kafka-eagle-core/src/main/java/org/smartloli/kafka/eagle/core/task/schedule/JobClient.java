@@ -275,9 +275,4 @@ public class JobClient {
         return nodes;
     }
 
-    public static void main(String[] args) {
-        String sql = "select * from kjson where `partition` in (0) and JSON(msg,'id')=1 limit 10";
-        System.out.println(getTaskStrategy(sql, "cluster1"));
-    }
-
 }

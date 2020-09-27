@@ -11,7 +11,7 @@
             <directory>src/main/resources/bash/</directory>
             <outputDirectory>/bin</outputDirectory>
             <includes>
-                <include>*.sh</include>
+                <include>ke.sh</include>
             </includes>
             <fileMode>0755</fileMode>
         </fileSet>
@@ -28,7 +28,6 @@
             <includes>
                 <include>*.properties</include>
                 <include>*.conf</include>
-                <include>works</include>
             </includes>
         </fileSet>
         <fileSet>
