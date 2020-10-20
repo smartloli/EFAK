@@ -109,11 +109,15 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
     }
 
     public boolean isJson(String rev) {
+        return isJsonObject(rev);
+    }
+
+    private boolean isJsonObject(String text) {
         try {
-            JSON.parse(rev);
+            JSON.parseObject(text);
             return true;
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Parse rev[" + rev + "] to json has error, msg is ", e);
+            ErrorUtils.print(this.getClass()).error("Verify that the string[" + text + "] is JSONObject has error, msg is ", e);
             return false;
         }
     }
