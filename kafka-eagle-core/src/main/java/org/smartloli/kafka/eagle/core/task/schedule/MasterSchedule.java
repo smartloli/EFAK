@@ -38,6 +38,7 @@ import java.util.concurrent.CountDownLatch;
  * <p>
  * Created by Sep 11, 2020
  */
+@Deprecated
 public class MasterSchedule {
     // 1.Defined the add task container
     private ConcurrentLinkedQueue<KSqlStrategy> taskContainer = new ConcurrentLinkedQueue<KSqlStrategy>();

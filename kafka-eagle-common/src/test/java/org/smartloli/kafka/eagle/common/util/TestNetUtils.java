@@ -27,12 +27,12 @@ package org.smartloli.kafka.eagle.common.util;
 public class TestNetUtils {
 
     public static void main(String[] args) {
-        // System.out.println(NetUtils.telnet("dn1", 9092));
-        // System.out.println(NetUtils.ping("nna"));
+        System.out.println(NetUtils.telnet("dn1", 9093));
+        System.out.println(NetUtils.ping("nna"));
 //		System.out.println(CalendarUtils.convertUnixTime(1524249300080L));
 //		System.out.println(CalendarUtils.convertUnixTime(1524249900097L));
-        String result = HttpClientUtils.doGet("http://127.0.0.1:8083/connectors");
-        System.out.println(StrUtils.stringListConvertListStrings(result).size());
+//        String result = HttpClientUtils.doGet("http://127.0.0.1:8083/connectors");
+//        System.out.println(StrUtils.stringListConvertListStrings(result).size());
     }
 
 }

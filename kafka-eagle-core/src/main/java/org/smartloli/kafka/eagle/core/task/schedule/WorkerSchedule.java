@@ -38,6 +38,7 @@ import java.util.concurrent.CountDownLatch;
  * <p>
  * Created by Sep 11, 2020
  */
+@Deprecated
 public class WorkerSchedule implements Runnable {
     private ConcurrentLinkedQueue<KSqlStrategy> taskContainer;
     private CopyOnWriteArrayList<JSONArray> result;

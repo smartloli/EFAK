@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.core.task.schedule;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -32,10 +33,8 @@ import org.smartloli.kafka.eagle.core.task.rpc.MasterNodeClient;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 import org.smartloli.kafka.eagle.core.task.strategy.WorkNodeStrategy;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * The client generate the query strategy, initializes the master query task,
@@ -192,36 +191,35 @@ public class JobClient {
     }
 
     public static List<JSONArray> submit(String jobId, String sql, String cluster) {
-        List<KSqlStrategy> tasks = getTaskStrategy(sql, cluster);
-        ErrorUtils.print(JobClient.class).info("KSqlStrategy: " + tasks.toString());
-
+        Map<WorkNodeStrategy, List<KSqlStrategy>> tasks = getTaskStrategy(sql, cluster);
+        ErrorUtils.print(JobClient.class).info("KSqlStrategy: " + new Gson().toJson(tasks));
+        
         //Stats tasks finish
-        CountDownLatch countDownLatch = new CountDownLatch(tasks.size());
-        MasterSchedule master = new MasterSchedule(new WorkerSchedule(), getWorkNodes(), countDownLatch);
+//        CountDownLatch countDownLatch = new CountDownLatch(tasks.size());
+//        MasterSchedule master = new MasterSchedule(new WorkerSchedule(), getWorkNodes(), countDownLatch);
+//
+//        for (Map.Entry<WorkNodeStrategy, List<KSqlStrategy>> ksql : tasks.entrySet()) {
+//            ksql.setJobId(jobId);
+//            master.submit(ksql);
+//        }
+//
+//        master.execute();
+//        try {
+//            countDownLatch.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
-        for (KSqlStrategy ksql : tasks) {
-            ksql.setJobId(jobId);
-            master.submit(ksql);
-        }
-
-        master.execute();
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return master.getResult();
+        return null;
     }
 
-    private static List<KSqlStrategy> getTaskStrategy(String sql, String cluster) {
-        List<KSqlStrategy> tasks = new ArrayList<>();
+    private static Map<WorkNodeStrategy, List<KSqlStrategy>> getTaskStrategy(String sql, String cluster) {
+        // List<KSqlStrategy> tasks = new ArrayList<>();
+        Map<WorkNodeStrategy, List<KSqlStrategy>> workNodeTasks = new HashMap<>();
         KSqlStrategy ksql = KSqlParser.parseQueryKSql(sql, cluster);
-        long limit = ksql.getLimit();
-        //int workNodeSize = getWorkNodes().size();
-        int workNodeSize = 3;
-        if (workNodeSize == 0) {
-            return tasks;
+        List<WorkNodeStrategy> workNodes = getWorkNodes();
+        if (workNodes.size() == 0) {
+            return workNodeTasks;
         }
         for (int partitionId : ksql.getPartitions()) {
             long endLogSize = 0L;
@@ -234,11 +232,11 @@ public class JobClient {
                 endRealLogSize = kafkaService.getRealLogSize(cluster, ksql.getTopic(), partitionId);
             }
 
-            long startLogSize = (endLogSize - endRealLogSize);
-            long numberPer = endRealLogSize / workNodeSize;
-            for (int workNodeIndex = 0; workNodeIndex < workNodeSize; workNodeIndex++) {
+            long startLogSize = endLogSize - endRealLogSize;
+            long numberPer = endRealLogSize / workNodes.size();
+            for (int workNodeIndex = 0; workNodeIndex < workNodes.size(); workNodeIndex++) {
                 KSqlStrategy kSqlStrategy = new KSqlStrategy();
-                if (workNodeIndex == (workNodeSize - 1)) {
+                if (workNodeIndex == (workNodes.size() - 1)) {
                     kSqlStrategy.setStart(workNodeIndex * numberPer + startLogSize + 1);
                     kSqlStrategy.setEnd(endLogSize);
                 } else {
@@ -254,10 +252,17 @@ public class JobClient {
                 kSqlStrategy.setTopic(ksql.getTopic());
                 kSqlStrategy.setLimit(ksql.getLimit());
                 kSqlStrategy.setFieldSchema(ksql.getFieldSchema());
-                tasks.add(kSqlStrategy);
+                WorkNodeStrategy worknode = new WorkNodeStrategy();
+                worknode.setHost(workNodes.get(workNodeIndex).getHost());
+                worknode.setPort(workNodes.get(workNodeIndex).getPort());
+                if (workNodeTasks.containsKey(worknode)) {
+                    workNodeTasks.get(worknode).add(kSqlStrategy);
+                } else {
+                    workNodeTasks.put(worknode, Arrays.asList(kSqlStrategy));
+                }
             }
         }
-        return tasks;
+        return workNodeTasks;
     }
 
     private static List<WorkNodeStrategy> getWorkNodes() {
