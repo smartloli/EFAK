@@ -193,24 +193,17 @@ public class JobClient {
     public static List<JSONArray> submit(String jobId, String sql, String cluster) {
         Map<WorkNodeStrategy, List<KSqlStrategy>> tasks = getTaskStrategy(sql, cluster);
         ErrorUtils.print(JobClient.class).info("KSqlStrategy: " + new Gson().toJson(tasks));
-        
-        //Stats tasks finish
-//        CountDownLatch countDownLatch = new CountDownLatch(tasks.size());
-//        MasterSchedule master = new MasterSchedule(new WorkerSchedule(), getWorkNodes(), countDownLatch);
-//
-//        for (Map.Entry<WorkNodeStrategy, List<KSqlStrategy>> ksql : tasks.entrySet()) {
-//            ksql.setJobId(jobId);
-//            master.submit(ksql);
-//        }
-//
-//        master.execute();
-//        try {
-//            countDownLatch.await();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
-        return null;
+        List<JSONArray> parentResult = new ArrayList<>();
+        for (Map.Entry<WorkNodeStrategy, List<KSqlStrategy>> task : tasks.entrySet()) {
+            for (KSqlStrategy ksql : task.getValue()) {
+                ksql.setJobId(jobId);
+                List<JSONArray> daughterResult = WorkerScheduleTask.evaluate(ksql, task.getKey());
+                if (daughterResult != null && daughterResult.size() > 0) {
+                    parentResult.addAll(daughterResult);
+                }
+            }
+        }
+        return parentResult;
     }
 
     private static Map<WorkNodeStrategy, List<KSqlStrategy>> getTaskStrategy(String sql, String cluster) {
