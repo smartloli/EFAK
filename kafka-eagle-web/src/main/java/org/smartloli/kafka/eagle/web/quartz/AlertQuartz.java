@@ -139,6 +139,7 @@ public class AlertQuartz {
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
                 object.put("msg", alarmMsg.toMail());
+                object.put("title", alarmMsg.getTitle());
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
                 alarmMsg.setTitle("**<font color=\"#FF0000\">Kafka Eagle Alarm Consumer Notice</font>** \n\n");
@@ -164,6 +165,7 @@ public class AlertQuartz {
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
                 object.put("msg", alarmMsg.toMail());
+                object.put("title", alarmMsg.getTitle());
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
                 alarmMsg.setTitle("**<font color=\"#008000\">Kafka Eagle Alarm Consumer Cancel</font>** \n\n");
@@ -354,6 +356,7 @@ public class AlertQuartz {
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
                 object.put("msg", alarmMsg.toMail());
+                object.put("title", alarmMsg.getTitle());
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
@@ -442,6 +445,7 @@ public class AlertQuartz {
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
                 object.put("msg", alarmMsg.toMail());
+                object.put("title", alarmMsg.getTitle());
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();

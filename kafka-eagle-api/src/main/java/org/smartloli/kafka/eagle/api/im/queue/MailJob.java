@@ -23,9 +23,12 @@ import org.apache.http.message.BasicNameValuePair;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.smartloli.kafka.eagle.api.util.MailFactoryUtils;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmEmailJsonInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
+import org.smartloli.kafka.eagle.common.util.JSONUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
 
 import java.util.Arrays;
@@ -48,14 +51,24 @@ public class MailJob implements Job {
     }
 
     private int sendMsg(String data, String url) {
-        try {
-            JSONObject object = JSON.parseObject(data);
-            BasicNameValuePair address = new BasicNameValuePair("address", object.getString("address"));
-            BasicNameValuePair msg = new BasicNameValuePair("msg", object.getString("msg"));
-            HttpClientUtils.doPostForm(url, Arrays.asList(address, msg));
-        } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Send alarm message has error by mail, msg is ", e);
-            return 0;
+        if (JSONUtils.isJsonObject(url)) {
+            try {
+                AlarmEmailJsonInfo email = JSON.parseObject(url, AlarmEmailJsonInfo.class);
+                MailFactoryUtils.send(email, data);
+            } catch (Exception e) {
+                ErrorUtils.print(this.getClass()).error("Send alarm message has error by mail address, msg is ", e);
+                return 0;
+            }
+        } else {
+            try {
+                JSONObject object = JSON.parseObject(data);
+                BasicNameValuePair address = new BasicNameValuePair("address", object.getString("address"));
+                BasicNameValuePair msg = new BasicNameValuePair("msg", object.getString("msg"));
+                HttpClientUtils.doPostForm(url, Arrays.asList(address, msg));
+            } catch (Exception e) {
+                ErrorUtils.print(this.getClass()).error("Send alarm message has error by mail, msg is ", e);
+                return 0;
+            }
         }
         return 1;
     }
