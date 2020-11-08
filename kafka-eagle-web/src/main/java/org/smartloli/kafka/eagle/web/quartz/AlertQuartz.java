@@ -27,11 +27,8 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
-import org.smartloli.kafka.eagle.common.util.NetUtils;
-import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
@@ -138,7 +135,11 @@ public class AlertQuartz {
                 IMService im = new IMFactory().create();
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
-                object.put("msg", alarmMsg.toMail());
+                if (JSONUtils.isJsonObject(alarmConfing.getAlarmUrl())) {
+                    object.put("msg", alarmMsg.toMailJSON());
+                } else {
+                    object.put("msg", alarmMsg.toMail());
+                }
                 object.put("title", alarmMsg.getTitle());
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
@@ -164,7 +165,11 @@ public class AlertQuartz {
                 IMService im = new IMFactory().create();
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
-                object.put("msg", alarmMsg.toMail());
+                if (JSONUtils.isJsonObject(alarmConfing.getAlarmUrl())) {
+                    object.put("msg", alarmMsg.toMailJSON());
+                } else {
+                    object.put("msg", alarmMsg.toMail());
+                }
                 object.put("title", alarmMsg.getTitle());
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
@@ -355,7 +360,11 @@ public class AlertQuartz {
                 IMService im = new IMFactory().create();
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
-                object.put("msg", alarmMsg.toMail());
+                if (JSONUtils.isJsonObject(alarmConfing.getAlarmUrl())) {
+                    object.put("msg", alarmMsg.toMailJSON());
+                } else {
+                    object.put("msg", alarmMsg.toMail());
+                }
                 object.put("title", alarmMsg.getTitle());
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
@@ -444,8 +453,12 @@ public class AlertQuartz {
                 IMService im = new IMFactory().create();
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
-                object.put("msg", alarmMsg.toMail());
                 object.put("title", alarmMsg.getTitle());
+                if (JSONUtils.isJsonObject(alarmConfing.getAlarmUrl())) {
+                    object.put("msg", alarmMsg.toMailJSON());
+                } else {
+                    object.put("msg", alarmMsg.toMail());
+                }
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();

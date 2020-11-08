@@ -71,6 +71,11 @@ public class AlarmMessageInfo extends BaseProtocol {
                 + " ]\n AlarmDate : [ " + alarmDate + " ]\n" + " AlarmContent : [ " + alarmContent + " ]";
     }
 
+    public String toMailJSON() {
+        return title + " <br/> AlarmID : [ " + alarmId + " ]<br/> AlarmCluster : [ " + alarmCluster + " ]<br/> AlarmStatus : [ " + alarmStatus + " ]<br/>" + " AlarmLevel : [ " + alarmLevel + " ]<br/>" + " AlarmProject : [ " + alarmProject + " ]<br/>" + " AlarmTimes : [ " + alarmTimes
+                + " ]<br/> AlarmDate : [ " + alarmDate + " ]<br/>" + " AlarmContent : [ " + alarmContent + " ]";
+    }
+
     public String getAlarmCluster() {
         return alarmCluster;
     }

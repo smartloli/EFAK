@@ -25,5 +25,4 @@ package org.smartloli.kafka.eagle.api.sms;
  * Created by Nov 03, 2020
  */
 public class TestMail {
-    
 }
