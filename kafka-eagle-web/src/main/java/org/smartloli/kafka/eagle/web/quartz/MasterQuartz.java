@@ -45,13 +45,13 @@ public class MasterQuartz {
     public void masterJobQuartz() {
         // whether is enable distributed
         if (SystemConfigUtils.getBooleanProperty("kafka.eagle.distributed.enable")) {
-            // jobForAllTasks();
+            // jobForDistributedAllTasks();
         } else {
-
+            // jobForStandaloneAllTasks();
         }
     }
 
-    private void jobForAllTasks() {
+    private void jobForDistributedAllTasks() {
         String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
         // get all kafka eagle work node
         List<String> workNodes = WorkUtils.getWorkNodes();
@@ -63,6 +63,10 @@ public class MasterQuartz {
 
             // get all
         }
+    }
+
+    private void jobForStandaloneAllTasks() {
+        
     }
 
     private void strategyForBrokerMetrics(String clusterAlias, List<String> workNodes) {

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,33 +19,45 @@ package org.smartloli.kafka.eagle.core.sql.function;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.smartloli.kafka.eagle.common.util.UnicodeUtils;
 
 /**
  * Parse a JSONObject or a JSONArray in a kafka topic message using a custom
  * function.
- * 
- * @author smartloli.
  *
- *         Created by Feb 16, 2019
+ * @author smartloli.
+ * <p>
+ * Created by Feb 16, 2019
  */
 public class JSONFunction {
 
-	/** Parse a JSONObject. */
-	public String JSON(String jsonObject, String key) {
-		JSONObject object = com.alibaba.fastjson.JSON.parseObject(jsonObject);
-		return object.getString(key);
-	}
+    /**
+     * Parse a JSONObject.
+     */
+    public String JSON(String jsonObject, String key) {
+        JSONObject object = com.alibaba.fastjson.JSON.parseObject(jsonObject);
+        return object.getString(key);
+    }
 
-	/** Parse a JSONArray. */
-	public String JSONS(String jsonArray, String key) {
-		JSONArray object = com.alibaba.fastjson.JSON.parseArray(jsonArray);
-		JSONArray target = new JSONArray();
-		for (Object tmp : object) {
-			JSONObject result = (JSONObject) tmp;
-			JSONObject value = new JSONObject();
-			value.put(key, result.getString(key));
-			target.add(value);
-		}
-		return target.toJSONString();
-	}
+    /**
+     * Parse a JSONArray.
+     */
+    public String JSONS(String jsonArray, String key) {
+        JSONArray object = com.alibaba.fastjson.JSON.parseArray(jsonArray);
+        JSONArray target = new JSONArray();
+        for (Object tmp : object) {
+            JSONObject result = (JSONObject) tmp;
+            JSONObject value = new JSONObject();
+            value.put(key, result.getString(key));
+            target.add(value);
+        }
+        return target.toJSONString();
+    }
+
+    /**
+     * Encode text.
+     */
+    public String ENCODE(String leftMatch, String text, String rightMatch) {
+        return leftMatch + UnicodeUtils.encode(text) + rightMatch;
+    }
 }

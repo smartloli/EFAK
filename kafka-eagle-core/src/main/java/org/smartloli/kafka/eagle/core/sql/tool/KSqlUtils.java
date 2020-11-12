@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import org.smartloli.kafka.eagle.common.constant.JConstants;
+import org.smartloli.kafka.eagle.common.util.UnicodeUtils;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class KSqlUtils {
                 JSONObject object = (JSONObject) obj;
                 List<String> tmp = new LinkedList<>();
                 for (String key : object.keySet()) {
-                    tmp.add(object.getString(key));
+                    tmp.add(UnicodeUtils.encode(object.getString(key)));
                 }
                 list.add(tmp);
             }
@@ -73,7 +74,7 @@ public class KSqlUtils {
         while (result.next()) {
             Map<String, Object> map = new LinkedHashMap<>();
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                map.put(rsmd.getColumnName(i), result.getString(rsmd.getColumnName(i)));
+                map.put(rsmd.getColumnName(i), UnicodeUtils.decode(result.getString(rsmd.getColumnName(i))));
             }
             ret.add(map);
         }
