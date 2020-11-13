@@ -19,7 +19,6 @@ package org.smartloli.kafka.eagle.core.sql.function;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.smartloli.kafka.eagle.common.util.UnicodeUtils;
 
 /**
  * Parse a JSONObject or a JSONArray in a kafka topic message using a custom
@@ -54,10 +53,4 @@ public class JSONFunction {
         return target.toJSONString();
     }
 
-    /**
-     * Encode text.
-     */
-    public String ENCODE(String leftMatch, String text, String rightMatch) {
-        return leftMatch + UnicodeUtils.encode(text) + rightMatch;
-    }
 }

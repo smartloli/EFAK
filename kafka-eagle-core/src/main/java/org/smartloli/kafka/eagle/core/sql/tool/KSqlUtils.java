@@ -55,7 +55,7 @@ public class KSqlUtils {
                 JSONObject object = (JSONObject) obj;
                 List<String> tmp = new LinkedList<>();
                 for (String key : object.keySet()) {
-                    tmp.add(UnicodeUtils.encode(object.getString(key)));
+                    tmp.add(UnicodeUtils.encodeForUnicode(object.getString(key)));
                 }
                 list.add(tmp);
             }
@@ -68,13 +68,13 @@ public class KSqlUtils {
 
         Connection connection = DriverManager.getConnection("jdbc:calcite:model=inline:" + model, info);
         Statement st = connection.createStatement();
-        ResultSet result = st.executeQuery(sql);
+        ResultSet result = st.executeQuery(UnicodeUtils.encodeForUnicode(sql));
         ResultSetMetaData rsmd = result.getMetaData();
         List<Map<String, Object>> ret = new ArrayList<>();
         while (result.next()) {
             Map<String, Object> map = new LinkedHashMap<>();
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                map.put(rsmd.getColumnName(i), UnicodeUtils.decode(result.getString(rsmd.getColumnName(i))));
+                map.put(rsmd.getColumnName(i), UnicodeUtils.decodeForUnicode(result.getString(rsmd.getColumnName(i))));
             }
             ret.add(map);
         }
