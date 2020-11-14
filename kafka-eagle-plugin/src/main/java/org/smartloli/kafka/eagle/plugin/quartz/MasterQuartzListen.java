@@ -20,7 +20,6 @@ package org.smartloli.kafka.eagle.plugin.quartz;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.plugin.server.TomcatServerListen;
 import org.smartloli.kafka.eagle.plugin.util.DomUtils;
 import org.smartloli.kafka.eagle.plugin.util.JConstants;
 
@@ -28,7 +27,7 @@ import org.smartloli.kafka.eagle.plugin.util.JConstants;
  * Dynamically modify the master node scheduling time.
  *
  * @author smartloli.
- *
+ * <p>
  * Created by Jul 07, 2020
  */
 public class MasterQuartzListen {
@@ -44,10 +43,10 @@ public class MasterQuartzListen {
                 xml = System.getProperty("user.dir") + "/kms/webapps/ke/WEB-INF/classes/master-quartz.xml";
             }
             String quartz = SystemConfigUtils.getProperty("kafka.eagle.quartz.master.time");
-             DomUtils.setMasterQuartzXML(xml, quartz);
+            DomUtils.setMasterQuartzXML(xml, quartz);
         } catch (Exception ex) {
             ex.printStackTrace();
-            LOG.error("Listen Master Node Quartz Time Has Error,Msg is " + ex.getMessage());
+            LOG.error("Listen master node quartz time has error, msg is " + ex.getMessage());
         }
     }
 
