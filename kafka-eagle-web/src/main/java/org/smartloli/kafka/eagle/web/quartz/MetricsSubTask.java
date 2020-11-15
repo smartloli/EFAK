@@ -47,7 +47,7 @@ import java.util.Map.Entry;
  * <p>
  * Created by Jan 15, 2019
  */
-public class MetricsQuartz {
+public class MetricsSubTask extends Thread {
 
     /**
      * Kafka service interface.
@@ -59,7 +59,13 @@ public class MetricsQuartz {
      */
     private static BrokerService brokerService = new BrokerFactory().create();
 
-    public void metricsConsumerTopicQuartz() {
+
+    @Override
+    public void run() {
+        this.metricsConsumerTopicQuartz();
+    }
+
+    private void metricsConsumerTopicQuartz() {
         try {
             bscreenConsumerTopicStats();
         } catch (Exception e) {

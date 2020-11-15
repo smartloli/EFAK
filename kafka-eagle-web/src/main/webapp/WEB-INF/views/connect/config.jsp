@@ -180,7 +180,7 @@
                             <div class="modal-body">
                                 <div class="card mb-4">
                                     <div class="card-header">
-                                        <i class="fas fa-comments"></i> Consumer Topic
+                                        <i class="fas fa-comments"></i> Connect Detail
                                     </div>
                                     <div id="ke_connectors_detail_children" class="card-body">
 

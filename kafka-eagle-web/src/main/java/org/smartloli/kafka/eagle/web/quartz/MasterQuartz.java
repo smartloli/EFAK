@@ -17,11 +17,15 @@
  */
 package org.smartloli.kafka.eagle.web.quartz;
 
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.WorkUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.web.controller.StartupListener;
+import org.smartloli.kafka.eagle.web.service.impl.MetricsServiceImpl;
 
 import java.util.List;
 
@@ -41,13 +45,24 @@ public class MasterQuartz {
 
     private static final String[] MBEAN_TASK_KEYS = new String[]{MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS, MBean.OSTOTALMEMORY, MBean.OSFREEMEMORY, MBean.CPUUSED};
 
+    public void clean() {
+        ErrorUtils.print(this.getClass()).info("Master node starts cleaning up expired data.");
+        if (SystemConfigUtils.getBooleanProperty("kafka.eagle.metrics.charts")) {
+            MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
+            int retain = SystemConfigUtils.getIntProperty("kafka.eagle.metrics.retain");
+            metrics.remove(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
+            metrics.cleanTopicLogSize(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
+            metrics.cleanBScreenConsumerTopic(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
+            metrics.cleanTopicSqlHistory(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
+        }
+    }
 
     public void masterJobQuartz() {
         // whether is enable distributed
         if (SystemConfigUtils.getBooleanProperty("kafka.eagle.distributed.enable")) {
             // jobForDistributedAllTasks();
         } else {
-            // jobForStandaloneAllTasks();
+            jobForStandaloneAllTasks();
         }
     }
 
@@ -56,6 +71,7 @@ public class MasterQuartz {
         // get all kafka eagle work node
         List<String> workNodes = WorkUtils.getWorkNodes();
         for (String clusterAlias : clusterAliass) {
+            //
             strategyForBrokerMetrics(clusterAlias, workNodes);
             // get all topics
 
@@ -66,7 +82,14 @@ public class MasterQuartz {
     }
 
     private void jobForStandaloneAllTasks() {
-        
+        // topic
+        new TopicRankSubTask().start();
+
+        // broker metrics
+        new MetricsSubTask().start();
+
+        // broker mbean
+        new MBeanSubTask().start();
     }
 
     private void strategyForBrokerMetrics(String clusterAlias, List<String> workNodes) {

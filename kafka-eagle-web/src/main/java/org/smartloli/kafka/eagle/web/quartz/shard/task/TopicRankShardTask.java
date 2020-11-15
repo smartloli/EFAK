@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.web.quartz;
+package org.smartloli.kafka.eagle.web.quartz.shard.task;
 
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
@@ -34,13 +34,13 @@ import org.smartloli.kafka.eagle.web.service.impl.DashboardServiceImpl;
 import java.util.*;
 
 /**
- * Collector topic logsize, capacity etc.
+ * The task of topic shard is divided into several parts.
  *
  * @author smartloli.
  * <p>
- * Created by Jul 27, 2019
+ * Created by Nov 15, 2020
  */
-public class TopicRankQuartz {
+public class TopicRankShardTask extends Thread {
 
     /**
      * Kafka service interface.
@@ -52,7 +52,12 @@ public class TopicRankQuartz {
      */
     private static BrokerService brokerService = new BrokerFactory().create();
 
-    public void topicRankQuartz() {
+    @Override
+    public void run() {
+        this.topicRankQuartz();
+    }
+
+    private void topicRankQuartz() {
         try {
             topicLogsizeStats();
         } catch (Exception e) {
