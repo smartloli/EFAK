@@ -14,8 +14,9 @@
         <junit.version>4.11</junit.version>
         <jdk.version>1.8</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>5.2.0.RELEASE</spring.version>
-        <mybatis.version>3.5.3</mybatis.version>
+        <spring.version>5.3.1</spring.version>
+        <mybatis.version>3.5.6</mybatis.version>
+        <mybatis.spring.version>2.0.6</mybatis.spring.version>
         <shiro.version>1.6.0</shiro.version>
         <jackson.version>2.10.0</jackson.version>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -25,7 +26,7 @@
         <repository>
             <id>nexus</id>
             <name>nexus</name>
-            <url>https://repo.spring.io/libs-snapshot/</url>
+            <url>https://repo1.maven.org/maven2/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -124,7 +125,7 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
-            <version>2.0.3</version>
+            <version>${mybatis.spring.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
