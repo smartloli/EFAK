@@ -134,9 +134,9 @@ public class BrokerServiceImpl implements BrokerService {
      * Get the number of page records for topic.
      */
     public List<PartitionsInfo> topicRecords(String clusterAlias, Map<String, Object> params) {
-        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
         List<PartitionsInfo> targets = new ArrayList<PartitionsInfo>();
         List<String> topics = topicList(clusterAlias);
+        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
         try {
             int start = Integer.parseInt(params.get("start").toString());
             int length = Integer.parseInt(params.get("length").toString());
@@ -199,10 +199,11 @@ public class BrokerServiceImpl implements BrokerService {
         } catch (Exception e) {
             LOG.error("Get topic records has error, msg is " + e.getCause().getMessage());
             e.printStackTrace();
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return targets;
     }
@@ -344,10 +345,11 @@ public class BrokerServiceImpl implements BrokerService {
         } catch (Exception e) {
             LOG.error("Get kafka broker numbers has error, msg is " + e.getCause().getMessage());
             e.printStackTrace();
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return count;
     }
@@ -507,10 +509,11 @@ public class BrokerServiceImpl implements BrokerService {
         } catch (Exception e) {
             LOG.error("Get topic metadata records has error, msg is " + e.getCause().getMessage());
             e.printStackTrace();
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return targets;
     }
@@ -540,12 +543,12 @@ public class BrokerServiceImpl implements BrokerService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("Get topic metadata records has error, msg is " + e.getCause().getMessage());
-            e.printStackTrace();
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+            LOG.error("Get topic metadata records has error, msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return targets;
     }
@@ -580,12 +583,12 @@ public class BrokerServiceImpl implements BrokerService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("Get topic logsize total has error, msg is " + e.getCause().getMessage());
-            e.printStackTrace();
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+            LOG.error("Get topic logsize total has error, msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return logSize;
     }
@@ -609,8 +612,7 @@ public class BrokerServiceImpl implements BrokerService {
                     try {
                         partitions.add(Integer.valueOf(partition));
                     } catch (Exception e) {
-                        LOG.error("Convert partition string to integer has error, msg is " + e.getCause().getMessage());
-                        e.printStackTrace();
+                        LOG.error("Convert partition string to integer has error, msg is ", e);
                     }
                 }
                 if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
@@ -660,12 +662,12 @@ public class BrokerServiceImpl implements BrokerService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("Get topic real logsize has error, msg is " + e.getCause().getMessage());
-            e.printStackTrace();
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+            LOG.error("Get topic real logsize has error, msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return logSize;
     }
@@ -720,11 +722,11 @@ public class BrokerServiceImpl implements BrokerService {
             }
         } catch (Exception e) {
             LOG.error("Get kafka broker id has error, msg is ", e);
-            e.printStackTrace();
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return brokerIds;
     }

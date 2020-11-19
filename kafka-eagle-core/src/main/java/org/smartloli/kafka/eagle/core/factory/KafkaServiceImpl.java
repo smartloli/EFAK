@@ -102,10 +102,16 @@ public class KafkaServiceImpl implements KafkaService {
     public boolean findTopicAndGroupExist(String clusterAlias, String topic, String group) {
         KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
         String ownersPath = CONSUMERS_PATH + "/" + group + "/owners/" + topic;
-        boolean status = zkc.pathExists(ownersPath);
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        boolean status = false;
+        try {
+            status = zkc.pathExists(ownersPath);
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Find topic and group exist has error, msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return status;
     }
@@ -118,12 +124,19 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public List<String> findTopicPartition(String clusterAlias, String topic) {
         KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        Seq<String> brokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
-        List<String> topicAndPartitions = JavaConversions.seqAsJavaList(brokerTopicsPaths);
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
-            brokerTopicsPaths = null;
+        List<String> topicAndPartitions = null;
+        Seq<String> brokerTopicsPaths = null;
+        try {
+            brokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
+            topicAndPartitions = JavaConversions.seqAsJavaList(brokerTopicsPaths);
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Find topic partition has error, msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+                brokerTopicsPaths = null;
+            }
         }
         return topicAndPartitions;
     }
@@ -162,8 +175,8 @@ public class KafkaServiceImpl implements KafkaService {
                     actvTopics.put(group + "_" + topic, topics);
                 }
             }
-        } catch (Exception ex) {
-            LOG.error(ex.getMessage());
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get active topic has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -184,9 +197,8 @@ public class KafkaServiceImpl implements KafkaService {
             for (String topic : JavaConversions.seqAsJavaList(topics)) {
                 activeTopics.add(topic);
             }
-        } catch (Exception ex) {
-            LOG.error("Get kafka active topic has error, msg is " + ex.getMessage());
-            LOG.error(ex.getMessage());
+        } catch (Exception e) {
+            LOG.error("Get kafka active topic has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -202,65 +214,70 @@ public class KafkaServiceImpl implements KafkaService {
     public List<BrokersInfo> getAllBrokersInfo(String clusterAlias) {
         KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
         List<BrokersInfo> targets = new ArrayList<BrokersInfo>();
-        if (zkc.pathExists(BROKER_IDS_PATH)) {
-            Seq<String> subBrokerIdsPaths = zkc.getChildren(BROKER_IDS_PATH);
-            List<String> brokerIdss = JavaConversions.seqAsJavaList(subBrokerIdsPaths);
-            int id = 0;
-            for (String ids : brokerIdss) {
-                try {
-                    Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
-                    BrokersInfo broker = new BrokersInfo();
-                    broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
-                    broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
-                    String tupleString = new String(tuple._1.get());
-                    if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
-                        String endpoints = JSON.parseObject(tupleString).getString("endpoints");
-                        List<String> endpointsList = JSON.parseArray(endpoints, String.class);
-                        String host = "";
-                        int port = 0;
-                        if (endpointsList.size() > 1) {
-                            String protocol = "";
-                            if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-                                protocol = Kafka.SASL_PLAINTEXT;
-                            }
-                            if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
-                                protocol = Kafka.SSL;
-                            }
-                            for (String endpointsStr : endpointsList) {
-                                if (endpointsStr.contains(protocol)) {
-                                    String tmp = endpointsStr.split("//")[1];
+        try {
+            if (zkc.pathExists(BROKER_IDS_PATH)) {
+                Seq<String> subBrokerIdsPaths = zkc.getChildren(BROKER_IDS_PATH);
+                List<String> brokerIdss = JavaConversions.seqAsJavaList(subBrokerIdsPaths);
+                int id = 0;
+                for (String ids : brokerIdss) {
+                    try {
+                        Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
+                        BrokersInfo broker = new BrokersInfo();
+                        broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
+                        broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
+                        String tupleString = new String(tuple._1.get());
+                        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+                            String endpoints = JSON.parseObject(tupleString).getString("endpoints");
+                            List<String> endpointsList = JSON.parseArray(endpoints, String.class);
+                            String host = "";
+                            int port = 0;
+                            if (endpointsList.size() > 1) {
+                                String protocol = "";
+                                if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+                                    protocol = Kafka.SASL_PLAINTEXT;
+                                }
+                                if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+                                    protocol = Kafka.SSL;
+                                }
+                                for (String endpointsStr : endpointsList) {
+                                    if (endpointsStr.contains(protocol)) {
+                                        String tmp = endpointsStr.split("//")[1];
+                                        host = tmp.split(":")[0];
+                                        port = Integer.parseInt(tmp.split(":")[1]);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                if (endpointsList.size() > 0) {
+                                    String tmp = endpointsList.get(0).split("//")[1];
                                     host = tmp.split(":")[0];
                                     port = Integer.parseInt(tmp.split(":")[1]);
-                                    break;
                                 }
                             }
+                            broker.setHost(host);
+                            broker.setPort(port);
                         } else {
-                            if (endpointsList.size() > 0) {
-                                String tmp = endpointsList.get(0).split("//")[1];
-                                host = tmp.split(":")[0];
-                                port = Integer.parseInt(tmp.split(":")[1]);
-                            }
+                            String host = JSON.parseObject(tupleString).getString("host");
+                            int port = JSON.parseObject(tupleString).getInteger("port");
+                            broker.setHost(host);
+                            broker.setPort(port);
                         }
-                        broker.setHost(host);
-                        broker.setPort(port);
-                    } else {
-                        String host = JSON.parseObject(tupleString).getString("host");
-                        int port = JSON.parseObject(tupleString).getInteger("port");
-                        broker.setHost(host);
-                        broker.setPort(port);
+                        broker.setJmxPort(JSON.parseObject(tupleString).getInteger("jmx_port"));
+                        broker.setId(++id);
+                        broker.setIds(ids);
+                        targets.add(broker);
+                    } catch (Exception ex) {
+                        LOG.error(ex.getMessage());
                     }
-                    broker.setJmxPort(JSON.parseObject(tupleString).getInteger("jmx_port"));
-                    broker.setId(++id);
-                    broker.setIds(ids);
-                    targets.add(broker);
-                } catch (Exception ex) {
-                    LOG.error(ex.getMessage());
                 }
             }
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get all brokers info has error,msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return targets;
     }
@@ -374,21 +391,26 @@ public class KafkaServiceImpl implements KafkaService {
             }
             return offsetZk;
         }
-        String tupleString = new String(tuple._1.get());
-        long offsetSize = Long.parseLong(tupleString);
-        if (zkc.pathExists(ownersPath)) {
-            Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(ownersPath);
-            String tupleString2 = new String(tuple2._1.get());
-            offsetZk.setOwners(tupleString2 == null ? "" : tupleString2);
-        } else {
-            offsetZk.setOwners("");
-        }
-        offsetZk.setOffset(offsetSize);
-        offsetZk.setCreate(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
-        offsetZk.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        try {
+            String tupleString = new String(tuple._1.get());
+            long offsetSize = Long.parseLong(tupleString);
+            if (zkc.pathExists(ownersPath)) {
+                Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(ownersPath);
+                String tupleString2 = new String(tuple2._1.get());
+                offsetZk.setOwners(tupleString2 == null ? "" : tupleString2);
+            } else {
+                offsetZk.setOwners("");
+            }
+            offsetZk.setOffset(offsetSize);
+            offsetZk.setCreate(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
+            offsetZk.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get consumer offsets from zookeeper has error, msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return offsetZk;
     }
@@ -399,11 +421,17 @@ public class KafkaServiceImpl implements KafkaService {
     public String getReplicasIsr(String clusterAlias, String topic, int partitionid) {
         KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
         TopicPartition tp = new TopicPartition(topic, partitionid);
-        Seq<Object> replis = zkc.getReplicasForPartition(tp);
-        List<Object> targets = JavaConversions.seqAsJavaList(replis);
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        List<Object> targets = null;
+        try {
+            Seq<Object> replis = zkc.getReplicasForPartition(tp);
+            targets = JavaConversions.seqAsJavaList(replis);
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get topic replicas isr has error, msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return targets.toString();
     }
@@ -432,16 +460,21 @@ public class KafkaServiceImpl implements KafkaService {
     public JSONObject zkCliStatus(String clusterAlias) {
         JSONObject target = new JSONObject();
         KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        if (zkc != null) {
-            target.put("live", true);
-            target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
-        } else {
-            target.put("live", false);
-            target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        try {
+            if (zkc != null) {
+                target.put("live", true);
+                target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
+            } else {
+                target.put("live", false);
+                target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
+            }
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get zookeeper client status has error,msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return target;
     }
@@ -1253,29 +1286,34 @@ public class KafkaServiceImpl implements KafkaService {
     public List<MetadataInfo> findKafkaLeader(String clusterAlias, String topic) {
         List<MetadataInfo> targets = new ArrayList<>();
         KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
-            Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
-            String tupleString = new String(tuple._1.get());
-            JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
-            for (String partition : partitionObject.keySet()) {
-                String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
-                Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
-                String tupleString2 = new String(tuple2._1.get());
-                JSONObject topicMetadata = JSON.parseObject(tupleString2);
-                MetadataInfo metadate = new MetadataInfo();
-                try {
-                    metadate.setLeader(topicMetadata.getInteger("leader"));
-                } catch (Exception e) {
-                    LOG.error("Parse string brokerid to int has error, brokerid[" + topicMetadata.getString("leader") + "]");
-                    e.printStackTrace();
+        try {
+            if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
+                Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+                String tupleString = new String(tuple._1.get());
+                JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+                for (String partition : partitionObject.keySet()) {
+                    String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
+                    Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
+                    String tupleString2 = new String(tuple2._1.get());
+                    JSONObject topicMetadata = JSON.parseObject(tupleString2);
+                    MetadataInfo metadate = new MetadataInfo();
+                    try {
+                        metadate.setLeader(topicMetadata.getInteger("leader"));
+                    } catch (Exception e) {
+                        LOG.error("Parse string brokerid to int has error, brokerid[" + topicMetadata.getString("leader") + "]");
+                        e.printStackTrace();
+                    }
+                    metadate.setPartitionId(Integer.valueOf(partition));
+                    targets.add(metadate);
                 }
-                metadate.setPartitionId(Integer.valueOf(partition));
-                targets.add(metadate);
             }
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Find kafka partition leader has error, msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return targets;
     }
@@ -1529,28 +1567,33 @@ public class KafkaServiceImpl implements KafkaService {
     public String getBrokerJMXFromIds(String clusterAlias, int ids) {
         String jni = "";
         KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        if (zkc.pathExists(BROKER_IDS_PATH)) {
-            try {
-                Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
-                String tupleString = new String(tuple._1.get());
-                String host = "";
-                if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
-                    String endpoints = JSON.parseObject(tupleString).getString("endpoints");
-                    String tmp = endpoints.split("//")[1];
-                    host = tmp.substring(0, tmp.length() - 2).split(":")[0];
-                } else {
-                    host = JSON.parseObject(tupleString).getString("host");
+        try {
+            if (zkc.pathExists(BROKER_IDS_PATH)) {
+                try {
+                    Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
+                    String tupleString = new String(tuple._1.get());
+                    String host = "";
+                    if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+                        String endpoints = JSON.parseObject(tupleString).getString("endpoints");
+                        String tmp = endpoints.split("//")[1];
+                        host = tmp.substring(0, tmp.length() - 2).split(":")[0];
+                    } else {
+                        host = JSON.parseObject(tupleString).getString("host");
+                    }
+                    int jmxPort = JSON.parseObject(tupleString).getInteger("jmx_port");
+                    jni = host + ":" + jmxPort;
+                } catch (Exception ex) {
+                    LOG.error("Get broker from ids has error, msg is " + ex.getCause().getMessage());
+                    ex.printStackTrace();
                 }
-                int jmxPort = JSON.parseObject(tupleString).getInteger("jmx_port");
-                jni = host + ":" + jmxPort;
-            } catch (Exception ex) {
-                LOG.error("Get broker from ids has error, msg is " + ex.getCause().getMessage());
-                ex.printStackTrace();
             }
-        }
-        if (zkc != null) {
-            kafkaZKPool.release(clusterAlias, zkc);
-            zkc = null;
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Get broker jmx info from ids has error,msg is ", e);
+        } finally {
+            if (zkc != null) {
+                kafkaZKPool.release(clusterAlias, zkc);
+                zkc = null;
+            }
         }
         return jni;
     }
