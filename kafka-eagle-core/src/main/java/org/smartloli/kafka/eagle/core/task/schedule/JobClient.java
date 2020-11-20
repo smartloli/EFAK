@@ -143,7 +143,7 @@ public class JobClient {
 
     public static String getWorkNodeTaskLogs(String jobId) {
         String logs = "";
-        for (WorkNodeStrategy workNode : getWorkNodes()) {
+        for (WorkNodeStrategy workNode : getWorkNodesAlive()) {
             if (NetUtils.telnet(workNode.getHost(), workNode.getPort())) {
                 JSONObject object = new JSONObject();
                 object.put(KConstants.Protocol.KEY, KConstants.Protocol.KSQL_QUERY_LOG);
@@ -210,7 +210,7 @@ public class JobClient {
         // List<KSqlStrategy> tasks = new ArrayList<>();
         Map<WorkNodeStrategy, List<KSqlStrategy>> workNodeTasks = new HashMap<>();
         KSqlStrategy ksql = KSqlParser.parseQueryKSql(sql, cluster);
-        List<WorkNodeStrategy> workNodes = getWorkNodes();
+        List<WorkNodeStrategy> workNodes = getWorkNodesAlive();
         if (workNodes.size() == 0) {
             return workNodeTasks;
         }
@@ -259,6 +259,19 @@ public class JobClient {
     }
 
     private static List<WorkNodeStrategy> getWorkNodes() {
+        List<WorkNodeStrategy> nodes = new ArrayList<>();
+        List<String> hosts = WorkUtils.getWorkNodes();
+        int port = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.port");
+        for (String host : hosts) {
+            WorkNodeStrategy wns = new WorkNodeStrategy();
+            wns.setHost(host);
+            wns.setPort(port);
+            nodes.add(wns);
+        }
+        return nodes;
+    }
+
+    private static List<WorkNodeStrategy> getWorkNodesAlive() {
         List<WorkNodeStrategy> nodes = new ArrayList<>();
         List<String> hosts = WorkUtils.getWorkNodes();
         int port = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.port");

@@ -45,6 +45,24 @@
                             class="fas fa-cube fa-sm fa-fw mr-1"></i>Hub</a>
                 </nav>
             </div>
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLog"
+               aria-expanded="false" aria-controls="collapseLog">
+                <div class="sb-nav-link-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                Log
+                <div class="sb-sidenav-collapse-arrow">
+                    <i class="fas fa-angle-down"></i>
+                </div>
+            </a>
+            <div class="collapse" id="collapseLog" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+                <nav class="sb-sidenav-menu-nested nav">
+                    <a id="ke_navbar_topic_common" class="nav-link" href="/log/common"><i
+                            class="fab fa-buromobelexperte fa-sm fa-fw mr-1"></i>Common</a>
+                    <a id="ke_navbar_topic_task" class="nav-link" href="/log/task"><i
+                            class="fab fa-buffer fa-sm fa-fw mr-1"></i>Task</a>
+                </nav>
+            </div>
             <a id="ke_navbar_consumers" class="nav-link" href="/consumers">
                 <div class="sb-nav-link-icon">
                     <i class="fas fa-fw fa-users"></i>
@@ -70,10 +88,8 @@
                             class="fab fa-maxcdn fa-sm fa-fw mr-1"></i>Multi-Clusters</a>
                     <a id="ke_navbar_cluster_zkcli" class="nav-link" href="/cluster/zkcli"><i
                             class="fas fa-terminal fa-code fa-sm fa-fw mr-1"></i>ZkCli</a>
-                    <!--
                     <a id="ke_navbar_cluster_worknodes" class="nav-link" href="/cluster/worknodes"><i
                             class="fas fa-bezier-curve fa-sm fa-fw mr-1"></i>WorkNodes</a>
-                    -->
                 </nav>
             </div>
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMetrics"
