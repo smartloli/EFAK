@@ -18,6 +18,9 @@
         } else if (url.indexOf("/topic/hub") > -1) {
             $("#ke_navbar_topic_hub").addClass("active");
         }
+    } else if (url.indexOf("/log") > -1) {
+        $("#collapseLog").addClass('show')
+        $("#ke_navbar_topic_tasks").addClass("active");
     } else if (url.indexOf("/consumers") > -1) {
         $("#ke_navbar_consumers").addClass("active");
     } else if ((url.indexOf("/cluster") > -1)) {

@@ -57,9 +57,7 @@
             </a>
             <div class="collapse" id="collapseLog" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav">
-                    <a id="ke_navbar_topic_common" class="nav-link" href="/log/common"><i
-                            class="fab fa-buromobelexperte fa-sm fa-fw mr-1"></i>Common</a>
-                    <a id="ke_navbar_topic_task" class="nav-link" href="/log/task"><i
+                    <a id="ke_navbar_topic_tasks" class="nav-link" href="/log/tasks"><i
                             class="fab fa-buffer fa-sm fa-fw mr-1"></i>Task</a>
                 </nav>
             </div>
