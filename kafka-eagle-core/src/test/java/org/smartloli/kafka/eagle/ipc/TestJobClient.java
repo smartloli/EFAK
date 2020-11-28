@@ -32,7 +32,7 @@ public class TestJobClient {
     public static void main(String[] args) {
         // partition-0 -> 90
 //        String sql = "select * from test16 where `partition` in (0,1,2) and JSON(msg,'id')=1 limit 10";
-        String sql = "select * from test16 where `partition` in (0,1,2) limit 10";
+        String sql = "select * from ke1115 where `partition` in (0) limit 10";
         String jobId = "job_id_" + new Date().getTime();
         String result = JobClient.physicsSubmit("cluster1", sql, jobId);
         System.out.println(result);

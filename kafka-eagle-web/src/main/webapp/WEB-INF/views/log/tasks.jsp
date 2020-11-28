@@ -42,7 +42,7 @@
                     <div class="col-lg-12">
                         <div class="card mb-4">
                             <div class="card-header">
-                                <i class="fas fa-users-cog"></i> Tasks Manager
+                                <i class="fas fa-users-cog"></i> Job Manager
                                 <div style="float: right!important;">
                                     <a href="/log/add" class="btn btn-primary btn-sm">Add</a>
                                 </div>

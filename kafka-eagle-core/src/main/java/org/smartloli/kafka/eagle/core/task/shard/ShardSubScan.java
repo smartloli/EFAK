@@ -140,6 +140,7 @@ public class ShardSubScan {
             JSONArray datasets = new JSONArray();
             boolean flag = true;
             long counter = 0;
+            long batchOffset = 0L;
             while (flag) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(TIMEOUT));
                 for (ConsumerRecord<String, String> record : records) {
@@ -151,6 +152,8 @@ public class ShardSubScan {
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.MSG, record.value());
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.TIMESPAN, record.timestamp());
                     object.put(org.smartloli.kafka.eagle.core.sql.schema.TopicSchema.DATE, CalendarUtils.convertUnixTime(record.timestamp()));
+                    // record offset
+                    batchOffset = record.offset();
                     // filter
                     List<FieldSchemaStrategy> filters = ksql.getFieldSchema();
                     List<Boolean> matchs = new ArrayList<>();
@@ -180,7 +183,8 @@ public class ShardSubScan {
             }
             consumer.close();
             messages.add(datasets);
-            System.out.println("ShardSubScan: " + messages.toString());
+            LOG.info("ShardSubScan: " + messages.toString());
+            LOG.info(this.ksql.getJobId() + ", [BatchOffset: " + batchOffset + "], [Progress:" + MathUtils.percent(batchOffset, this.ksql.getEnd()) + "%]");
             try {
                 String lastestLog = CalendarUtils.getDate() + " INFO [WorkNodeServer-" + NetUtils.hostname() + "], Cluster[" + ksql.getCluster() + "], Topic[" + ksql.getTopic() + "], Partition[" + ksql.getPartition() + "], Sharding = ∑(" + start + "~" + end + ") finished.";
                 if (LogCacheFactory.LOG_RECORDS.containsKey(ksql.getJobId())) {
