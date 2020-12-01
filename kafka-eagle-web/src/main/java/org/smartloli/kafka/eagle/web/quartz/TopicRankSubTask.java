@@ -254,9 +254,12 @@ public class TopicRankSubTask extends Thread {
                     TopicLogSize lastTopicLogSize = dashboardServiceImpl.readLastTopicLogSize(params);
                     TopicLogSize topicLogSize = new TopicLogSize();
                     if (lastTopicLogSize == null || lastTopicLogSize.getLogsize() == 0) {
-                        topicLogSize.setDiffval(0);
+                        topicLogSize.setDiffval(logsize);
                     } else {
-                        topicLogSize.setDiffval(logsize - lastTopicLogSize.getLogsize());
+                        //  if we get the logsize and it bigger than lasttime, we can set diffval.
+                        if (logsize - lastTopicLogSize.getLogsize() > 0){
+                            topicLogSize.setDiffval(logsize - lastTopicLogSize.getLogsize());
+                        }
                     }
                     // stats producer threads
                     if (topicLogSize.getDiffval() > 0) {
