@@ -256,7 +256,8 @@ public class TopicRankSubTask extends Thread {
                     if (lastTopicLogSize == null || lastTopicLogSize.getLogsize() == 0) {
                         topicLogSize.setDiffval(0);
                     } else {
-                        topicLogSize.setDiffval(logsize - lastTopicLogSize.getLogsize());
+                        // maybe server timespan is not synchronized.
+                        topicLogSize.setDiffval(Math.abs(logsize - lastTopicLogSize.getLogsize()));
                     }
                     // stats producer threads
                     if (topicLogSize.getDiffval() > 0) {

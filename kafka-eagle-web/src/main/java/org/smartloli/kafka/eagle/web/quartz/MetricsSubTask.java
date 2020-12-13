@@ -195,16 +195,18 @@ public class MetricsSubTask extends Thread {
                         if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getLogsize() == 0) {
                             bscreenConsumer.setDifflogsize(0);
                         } else {
-                            bscreenConsumer.setDifflogsize(logsize - lastBScreenConsumerTopic.getLogsize());
+                            // maybe server timespan is not synchronized.
+                            bscreenConsumer.setDifflogsize(Math.abs(logsize - lastBScreenConsumerTopic.getLogsize()));
                         }
                         if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getOffsets() == 0) {
                             bscreenConsumer.setDiffoffsets(0);
                         } else {
-                            bscreenConsumer.setDiffoffsets(offsets - lastBScreenConsumerTopic.getOffsets());
+                            // maybe server timespan is not synchronized.
+                            bscreenConsumer.setDiffoffsets(Math.abs(offsets - lastBScreenConsumerTopic.getOffsets()));
                         }
                         bscreenConsumer.setLogsize(logsize);
                         bscreenConsumer.setOffsets(offsets);
-                        bscreenConsumer.setLag(logsize - offsets);
+                        bscreenConsumer.setLag(Math.abs(logsize - offsets));
                         bscreenConsumer.setTimespan(CalendarUtils.getTimeSpan());
                         bscreenConsumer.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
                         bscreenConsumers.add(bscreenConsumer);
