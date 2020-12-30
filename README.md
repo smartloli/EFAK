@@ -113,7 +113,7 @@ If this project help you reduce time to develop, you can give me a cup of coffee
 
 # Contributors
 
-Thanks to the following members for maintaining the project.If this project help you reduce time to develop, you can give us a star. 
+Thanks to the following members for maintaining the project. If this project help you reduce time to develop, you can give us a star. 
 
 |Alias |Github |Email |
 |:-- |:-- |:-- |
