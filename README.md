@@ -100,8 +100,6 @@ Since this is an open source tool, please comply with the relevant laws and regu
 
 [Kafka Eagle Architecture PDF](http://www.kafka-eagle.org/articles/docs/architecture/pdf.html)
 
-If this project help you reduce time to develop, you can give me a star.
-
 <!--
 # Donation
 If this project help you reduce time to develop, you can give me a cup of coffee.
