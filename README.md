@@ -100,12 +100,12 @@ Since this is an open source tool, please comply with the relevant laws and regu
 
 [Kafka Eagle Architecture PDF](http://www.kafka-eagle.org/articles/docs/architecture/pdf.html)
 
-# Donation
-If this project help you reduce time to develop, you can give me a cup of coffee.
+[^_^]: # Donation
+[^_^]: If this project help you reduce time to develop, you can give me a cup of coffee.
 
-[![](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/KafkaEagle)
-[![](https://img.shields.io/badge/Donate-WeChat-green.svg)](http://www.kafka-eagle.org/articles/donate/pay.html)
-[![](https://img.shields.io/badge/Donate-Alipay-green.svg)](http://www.kafka-eagle.org/articles/donate/pay.html)
+[^_^]: [![](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/KafkaEagle)
+[^_^]: [![](https://img.shields.io/badge/Donate-WeChat-green.svg)](http://www.kafka-eagle.org/articles/donate/pay.html)
+[^_^]: [![](https://img.shields.io/badge/Donate-Alipay-green.svg)](http://www.kafka-eagle.org/articles/donate/pay.html)
 
 # Contributors
 
