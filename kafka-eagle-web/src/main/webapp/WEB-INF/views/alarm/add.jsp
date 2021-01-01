@@ -90,20 +90,6 @@
                                                     class="fa fa-info-circle"></i> Select the cluster level you
                                                 need to alarm .</label>
                                             </div>
-                                            <!--
-                                            <div class="form-group">
-                                                <label>Alarm Crontab (*) <strong>Default</strong></label> <input
-                                                    id="ke_alarm_crontab"
-                                                    name="ke_alarm_crontab"
-                                                    class="form-control"
-                                                    maxlength=50
-                                                    value="0 */1 * * * ?"> <label
-                                                    for="inputError"
-                                                    class="control-label text-danger"><i
-                                                    class="fa fa-info-circle"></i> Setting crontab expression, such as 0
-                                                */1 * * * ?.</label>
-                                            </div>
-                                            -->
                                             <div class="form-group">
                                                 <label>Alarm Max Times (*)</label> <select
                                                     id="select2maxtimes" name="select2maxtimes" tabindex="-1"
@@ -152,7 +138,6 @@
         var ke_alarm_consumer_group = $("#ke_alarm_consumer_group").val();
         var ke_alarm_consumer_topic = $("#ke_alarm_consumer_topic").val();
         var ke_topic_lag = $("#ke_topic_lag").val();
-        var ke_alarm_crontab = $("#ke_alarm_crontab").val();
         var ke_alarm_cluster_level = $("#ke_alarm_cluster_level").val();
         var ke_alarm_cluster_maxtimes = $("#ke_alarm_cluster_maxtimes").val();
         var ke_alarm_cluster_group = $("#ke_alarm_cluster_group").val();
@@ -166,14 +151,6 @@
         }
 
         if (isNaN(ke_topic_lag)) {
-            $("#alert_consumer_message").show();
-            setTimeout(function () {
-                $("#alert_consumer_message").hide()
-            }, 3000);
-            return false;
-        }
-
-        if (isNaN(ke_alarm_crontab)) {
             $("#alert_consumer_message").show();
             setTimeout(function () {
                 $("#alert_consumer_message").hide()

@@ -74,7 +74,7 @@ public interface JConstants {
     /**
      * Automatically create databases and tables.
      */
-    public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen", "ke_alarm_config", "ke_consumer_group", "ke_consumer_group_summary", "ke_connect_config");
+    public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen", "ke_alarm_config", "ke_consumer_group", "ke_consumer_group_summary", "ke_connect_config", "ke_alarm_crontab");
 
     static String CREATE_TABLE_KE_P_ROLE = "CREATE TABLE IF NOT EXISTS `ke_p_role` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`name` varchar(64) CHARACTER SET utf8 NOT NULL COMMENT 'role name',`seq` tinyint(4) NOT NULL COMMENT 'rank',`description` varchar(128) CHARACTER SET utf8 NOT NULL COMMENT 'role describe',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4";
     static String CREATE_TABLE_KE_P_ROLE_INSERT = "INSERT INTO `ke_p_role` VALUES ('1', 'Administrator', '1', 'Have all permissions'), ('2', 'Devs', '2', 'Own add or delete'), ('3', 'Tourist', '3', 'Only viewer')";
@@ -92,6 +92,8 @@ public interface JConstants {
     static String CREATE_TABLE_KE_CONNECT_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_connect_config` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`cluster` varchar(64),`connect_uri` varchar(128),`version` varchar(32),`alive` varchar(16),`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     static String CREATE_TABLE_KE_ALARM_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_alarm_consumer` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(128) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`alarm_group` varchar(128) DEFAULT NULL,`alarm_times` int(11),`alarm_max_times` int(11) , `alarm_level` varchar(4),`is_normal` varchar(2) DEFAULT 'Y', `is_enable` varchar(2) DEFAULT 'Y', `created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+    static String CREATE_TABLE_KE_ALARM_CRONTAB = "CREATE TABLE IF NOT EXISTS `ke_alarm_crontab` (`id` bigint(20) NOT NULL ,`type` varchar(64) NOT NULL,`crontab` varchar(32) DEFAULT NULL, `is_enable` varchar(2) DEFAULT 'Y', `created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`,`type`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     static String CREATE_TABLE_KE_ALARM_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_alarm_config` (`cluster` varchar(64) NOT NULL,`alarm_group` varchar(128) NOT NULL,`alarm_type` varchar(16) DEFAULT NULL,`alarm_url` text DEFAULT NULL,`http_method` varchar(16) DEFAULT NULL,`alarm_address` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`cluster`,`alarm_group`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -135,6 +137,8 @@ public interface JConstants {
 
     static String CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_alarm_consumer` (`id` integer primary key autoincrement,`cluster` varchar(64),`group` varchar(128),`topic` varchar(128),`lag` bigint(20),`alarm_group` varchar(128) ,`alarm_times` int(11),`alarm_max_times` int(11) , `alarm_level` varchar(4), `is_normal` varchar(2) DEFAULT 'Y', `is_enable` varchar(2) DEFAULT 'Y',`created` varchar(32),`modify` varchar(32))";
 
+    static String CREATE_TABLE_SQLITE_KE_ALARM_CRONTAB = "CREATE TABLE IF NOT EXISTS `ke_alarm_consumer` (`id` integer,`type` varchar(64),`crontab` varchar(32),`is_enable` varchar(2) DEFAULT 'Y',`created` varchar(32),`modify` varchar(32),primary key (`id`,`type`))";
+
     static String CREATE_TABLE_SQLITE_KE_ALARM_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_alarm_config` (`cluster` varchar(64) ,`alarm_group` varchar(128) ,`alarm_type` varchar(16) ,`alarm_url` text ,`http_method` varchar(16) ,`alarm_address` text ,`created` varchar(32) ,`modify` varchar(32) , PRIMARY KEY (`cluster`,`alarm_group`))";
 
     static String CREATE_TABLE_SQLITE_KE_ALARM_CLUSTERS = "CREATE TABLE IF NOT EXISTS `ke_alarm_clusters` (`id` integer primary key autoincrement,`type` varchar(32),`cluster` varchar(64),`server` text,`alarm_group` text ,`alarm_times` int(11),`alarm_max_times` int(11) , `alarm_level` varchar(4),`is_normal` varchar(2) DEFAULT 'Y', `is_enable` varchar(2) DEFAULT 'Y',`created` varchar(32),`modify` varchar(32))";
@@ -176,6 +180,7 @@ public interface JConstants {
             put("CREATE_TABLE_KE_METRICS_OFFLINE", CREATE_TABLE_KE_METRICS_OFFLINE);
             put("CREATE_TABLE_KE_CONNECT_CONFIG", CREATE_TABLE_KE_CONNECT_CONFIG);
             put("CREATE_TABLE_KE_ALARM_CONSUMER", CREATE_TABLE_KE_ALARM_CONSUMER);
+            put("CREATE_TABLE_KE_ALARM_CRONTAB", CREATE_TABLE_KE_ALARM_CRONTAB);
             put("CREATE_TABLE_KE_ALARM_CONFIG", CREATE_TABLE_KE_ALARM_CONFIG);
             put("CREATE_TABLE_KE_ALARM_CLUSTERS", CREATE_TABLE_KE_ALARM_CLUSTERS);
             put("CREATE_TABLE_KE_CONSUMER_GROUP", CREATE_TABLE_KE_CONSUMER_GROUP);
@@ -199,6 +204,7 @@ public interface JConstants {
             put("CREATE_TABLE_SQLITE_KE_METRICS_OFFLINE", CREATE_TABLE_SQLITE_KE_METRICS_OFFLINE);
             put("CREATE_TABLE_SQLITE_KE_CONNECT_CONFIG", CREATE_TABLE_SQLITE_KE_CONNECT_CONFIG);
             put("CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER", CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER);
+            put("CREATE_TABLE_SQLITE_KE_ALARM_CRONTAB", CREATE_TABLE_SQLITE_KE_ALARM_CRONTAB);
             put("CREATE_TABLE_SQLITE_KE_ALARM_CONFIG", CREATE_TABLE_SQLITE_KE_ALARM_CONFIG);
             put("CREATE_TABLE_SQLITE_KE_ALARM_CLUSTERS", CREATE_TABLE_SQLITE_KE_ALARM_CLUSTERS);
             put("CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP", CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP);

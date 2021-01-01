@@ -261,6 +261,7 @@ public class AlarmController {
         alarmConsumer.setTopic(topic);
 
         int code = alertService.insertAlarmConsumer(alarmConsumer);
+
         if (code > 0) {
             session.removeAttribute("Alarm_Submit_Status");
             session.setAttribute("Alarm_Submit_Status", "Insert success.");

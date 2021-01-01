@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,131 +21,131 @@ import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
  * Definition AlertConsumerInfo information.
- * 
+ *
  * @author smartloli.
  *
  *         Created by Oct 27, 2018
  */
 public class AlarmConsumerInfo extends BaseProtocol {
 
-	private int id;
-	private String cluster = "";
-	/** Consumer group name. */
-	private String group = "";
-	private String topic = "";
-	private long lag = 0L;
-	private String alarmGroup = "";
-	private int alarmTimes;
-	private int alarmMaxTimes;
-	private String alarmLevel = "";
-	private String isNormal = "";
-	private String isEnable = "";
-	private String created = "";
-	private String modify = "";
+    private int id;
+    private String cluster = "";
+    /** Consumer group name. */
+    private String group = "";
+    private String topic = "";
+    private long lag = 0L;
+    private String alarmGroup = "";
+    private int alarmTimes;
+    private int alarmMaxTimes;
+    private String alarmLevel = "";
+    private String isNormal = "";
+    private String isEnable = "";
+    private String created = "";
+    private String modify = "";
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	/** Consumer group name. */
-	public String getGroup() {
-		return group;
-	}
+    /** Consumer group name. */
+    public String getGroup() {
+        return group;
+    }
 
-	public void setGroup(String group) {
-		this.group = group;
-	}
+    public void setGroup(String group) {
+        this.group = group;
+    }
 
-	public String getCluster() {
-		return cluster;
-	}
+    public String getCluster() {
+        return cluster;
+    }
 
-	public void setCluster(String cluster) {
-		this.cluster = cluster;
-	}
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
+    }
 
-	public String getTopic() {
-		return topic;
-	}
+    public String getTopic() {
+        return topic;
+    }
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 
-	public long getLag() {
-		return lag;
-	}
+    public long getLag() {
+        return lag;
+    }
 
-	public void setLag(long lag) {
-		this.lag = lag;
-	}
+    public void setLag(long lag) {
+        this.lag = lag;
+    }
 
-	public String getAlarmGroup() {
-		return alarmGroup;
-	}
+    public String getAlarmGroup() {
+        return alarmGroup;
+    }
 
-	public void setAlarmGroup(String alarmGroup) {
-		this.alarmGroup = alarmGroup;
-	}
+    public void setAlarmGroup(String alarmGroup) {
+        this.alarmGroup = alarmGroup;
+    }
 
-	public int getAlarmTimes() {
-		return alarmTimes;
-	}
+    public int getAlarmTimes() {
+        return alarmTimes;
+    }
 
-	public void setAlarmTimes(int alarmTimes) {
-		this.alarmTimes = alarmTimes;
-	}
+    public void setAlarmTimes(int alarmTimes) {
+        this.alarmTimes = alarmTimes;
+    }
 
-	public int getAlarmMaxTimes() {
-		return alarmMaxTimes;
-	}
+    public int getAlarmMaxTimes() {
+        return alarmMaxTimes;
+    }
 
-	public void setAlarmMaxTimes(int alarmMaxTimes) {
-		this.alarmMaxTimes = alarmMaxTimes;
-	}
+    public void setAlarmMaxTimes(int alarmMaxTimes) {
+        this.alarmMaxTimes = alarmMaxTimes;
+    }
 
-	public String getAlarmLevel() {
-		return alarmLevel;
-	}
+    public String getAlarmLevel() {
+        return alarmLevel;
+    }
 
-	public void setAlarmLevel(String alarmLevel) {
-		this.alarmLevel = alarmLevel;
-	}
+    public void setAlarmLevel(String alarmLevel) {
+        this.alarmLevel = alarmLevel;
+    }
 
-	public String getIsNormal() {
-		return isNormal;
-	}
+    public String getIsNormal() {
+        return isNormal;
+    }
 
-	public void setIsNormal(String isNormal) {
-		this.isNormal = isNormal;
-	}
+    public void setIsNormal(String isNormal) {
+        this.isNormal = isNormal;
+    }
 
-	public String getIsEnable() {
-		return isEnable;
-	}
+    public String getIsEnable() {
+        return isEnable;
+    }
 
-	public void setIsEnable(String isEnable) {
-		this.isEnable = isEnable;
-	}
+    public void setIsEnable(String isEnable) {
+        this.isEnable = isEnable;
+    }
 
-	public String getCreated() {
-		return created;
-	}
+    public String getCreated() {
+        return created;
+    }
 
-	public void setCreated(String created) {
-		this.created = created;
-	}
+    public void setCreated(String created) {
+        this.created = created;
+    }
 
-	public String getModify() {
-		return modify;
-	}
+    public String getModify() {
+        return modify;
+    }
 
-	public void setModify(String modify) {
-		this.modify = modify;
-	}
+    public void setModify(String modify) {
+        this.modify = modify;
+    }
 
 }
