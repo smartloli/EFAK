@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.smartloli.kafka.eagle.web.dao.BrokerDao">
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo" id="connectConfig">
+        <result property="id" column="id"/>
+        <result property="cluster" column="cluster"/>
+        <result property="connectUri" column="connect_uri"/>
+        <result property="version" column="version"/>
+        <result property="alive" column="alive"/>
+        <result property="created" column="created"/>
+        <result property="modify" column="modify"/>
+    </resultMap>
+
+    <insert id="insertOrUpdateConnectConfig"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo">
+        replace into
+        ke_connect_config(`cluster`,`connect_uri`,`version`,`alive`,`created`,`modify`)
+        values(#{cluster},#{connectUri},#{version},#{alive},#{created},#{modify})
+    </insert>
+
+    <select id="getConnectConfigList" parameterType="map" resultMap="connectConfig">
+        select * from ke_connect_config
+        <where>
+            `cluster`=#{cluster}
+            <if test="search!=null and search!=''">
+                and `connect_uri` like #{search}
+            </if>
+        </where>
+        limit #{start},#{size}
+    </select>
+
+    <select id="detectConnectConfigList" parameterType="map" resultMap="connectConfig">
+        select * from ke_connect_config
+        <where>
+            `cluster`=#{cluster}
+        </where>
+    </select>
+
+    <update id="modifyConnectConfigById"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo">
+        update ke_connect_config set `connect_uri`=#{connectUri} where `id`=#{id}
+    </update>
+
+    <update id="modifyConnectConfigStatusById"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo">
+        update ke_connect_config set `alive`=#{alive},`modify`=#{modify} where `id`=#{id}
+    </update>
+
+    <select id="findConnectUriById" parameterType="Integer" resultMap="connectConfig">
+        select * from ke_connect_config where `id`=#{id}
+    </select>
+
+    <select id="connectConfigCount" parameterType="map" resultType="Integer">
+        select count(*) from ke_connect_config
+        <where>
+            `cluster`=#{cluster}
+            <if test="search!=null and search!=''">
+                and `connect_uri` like #{search}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteConnectConfigById" parameterType="map">
+        delete from ke_connect_config where `id`=#{id}
+    </delete>
+
+</mapper>

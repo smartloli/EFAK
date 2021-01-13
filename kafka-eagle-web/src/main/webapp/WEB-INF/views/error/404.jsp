@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html>
@@ -7,32 +6,31 @@
 
 <head>
 <title>404 - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/plus/css.jsp"></jsp:include>
 </head>
-<div class="container">
-	<div class="row">
-		<div class="col-md-4 col-md-offset-4">
-			<div class="login-panel panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">404...</h3>
+<body>
+	<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
+	<div id="layoutSidenav">
+		<div id="layoutSidenav_nav">
+			<jsp:include page="../public/plus/navbar.jsp"></jsp:include>
+		</div>
+		<div id="layoutSidenav_content">
+			<main>
+				<div class="container-fluid">
+					<!-- 404 Error Text -->
+					<div class="text-center">
+						<div class="error mx-auto" data-text="404">404</div>
+						<p class="lead text-gray-800 mb-5">Page Not Found</p>
+						<p class="text-gray-500 mb-0">It looks like you found a glitch in the <strong>Kafka Eagle</strong>...</p>
+						<a href="/" style="text-decoration:none;">&larr; Back to Dashboard</a>
+					</div>
 				</div>
-				<div class="panel-body">
-					<form role="form">
-						<fieldset>
-							<h1 class="form-signin-heading">Oops. Not found ~~</h1>
-							<!-- Change this to a button or input when using this as a form -->
-							<a href="/ke" id="submit" class="btn btn-lg btn-primary btn-block">Return</a>
-						</fieldset>
-					</form>
-				</div>
-			</div>
+			</main>
+			<jsp:include page="../public/plus/footer.jsp"></jsp:include>
 		</div>
 	</div>
-</div>
-<body>
-
 </body>
-<jsp:include page="../public/script.jsp">
-	<jsp:param value="main/error/error.js" name="loader" />
+<jsp:include page="../public/plus/script.jsp">
+	<jsp:param value="main/error/e404.js" name="loader" />
 </jsp:include>
 </html>

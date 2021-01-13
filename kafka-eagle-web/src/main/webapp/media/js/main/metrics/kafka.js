@@ -49,7 +49,7 @@ $(document).ready(function() {
 		}
 	};
 
-	initModuleVisualAndBingding();
+	initModuleVisualAndBindEvent();
 
 	var modules = getCheckedModules();
 
@@ -65,12 +65,136 @@ $(document).ready(function() {
 	var mbean_replication_bytes_out = morrisLineInit('mbean_replication_bytes_out');
 	var mbean_replication_bytes_in = morrisLineInit('mbean_replication_bytes_in');
 	var mbean_os_free_memory = morrisLineInit('mbean_os_free_memory');
+	
+	$("#sidebarToggleOff").on("click", function(e) {
+		var opt_mbean_msg_in=mbean_msg_in.getOption();
+		mbean_msg_in.clear();
+		mbean_msg_in.resize({width:$("#mbean_msg_in").css('width')});
+		mbean_msg_in.setOption(opt_mbean_msg_in);
+	    
+	    var opt_mbean_msg_byte_in=mbean_msg_byte_in.getOption();
+	    mbean_msg_byte_in.clear();
+	    mbean_msg_byte_in.resize({width:$("#mbean_msg_byte_in").css('width')});
+	    mbean_msg_byte_in.setOption(opt_mbean_msg_byte_in);
+	    
+	    var opt_mbean_msg_byte_out=mbean_msg_byte_out.getOption();
+	    mbean_msg_byte_out.clear();
+	    mbean_msg_byte_out.resize({width:$("#mbean_msg_byte_out").css('width')});
+	    mbean_msg_byte_out.setOption(opt_mbean_msg_byte_out);
+	    
+	    var opt_mbean_byte_rejected=mbean_byte_rejected.getOption();
+	    mbean_byte_rejected.clear();
+	    mbean_byte_rejected.resize({width:$("#mbean_byte_rejected").css('width')});
+	    mbean_byte_rejected.setOption(opt_mbean_byte_rejected);
+	    
+	    var opt_mbean_failed_fetch_request=mbean_failed_fetch_request.getOption();
+	    mbean_failed_fetch_request.clear();
+	    mbean_failed_fetch_request.resize({width:$("#mbean_failed_fetch_request").css('width')});
+	    mbean_failed_fetch_request.setOption(opt_mbean_failed_fetch_request);
+	    
+	    var opt_mbean_failed_produce_request=mbean_failed_produce_request.getOption();
+	    mbean_failed_produce_request.clear();
+	    mbean_failed_produce_request.resize({width:$("#mbean_failed_produce_request").css('width')});
+	    mbean_failed_produce_request.setOption(opt_mbean_failed_produce_request);
+	    
+	    var opt_mbean_produce_message_conversions=mbean_produce_message_conversions.getOption();
+	    mbean_produce_message_conversions.clear();
+	    mbean_produce_message_conversions.resize({width:$("#mbean_produce_message_conversions").css('width')});
+	    mbean_produce_message_conversions.setOption(opt_mbean_produce_message_conversions);
+	    
+	    var opt_mbean_total_fetch_requests=mbean_total_fetch_requests.getOption();
+	    mbean_total_fetch_requests.clear();
+	    mbean_total_fetch_requests.resize({width:$("#mbean_total_fetch_requests").css('width')});
+	    mbean_total_fetch_requests.setOption(opt_mbean_total_fetch_requests);
+	    
+	    var opt_mbean_total_produce_requests=mbean_total_produce_requests.getOption();
+	    mbean_total_produce_requests.clear();
+	    mbean_total_produce_requests.resize({width:$("#mbean_total_produce_requests").css('width')});
+	    mbean_total_produce_requests.setOption(opt_mbean_total_produce_requests);
+	    
+	    var opt_mbean_replication_bytes_out=mbean_replication_bytes_out.getOption();
+	    mbean_replication_bytes_out.clear();
+	    mbean_replication_bytes_out.resize({width:$("#mbean_replication_bytes_out").css('width')});
+	    mbean_replication_bytes_out.setOption(opt_mbean_replication_bytes_out);
+	    
+	    var opt_mbean_replication_bytes_in=mbean_replication_bytes_in.getOption();
+	    mbean_replication_bytes_in.clear();
+	    mbean_replication_bytes_in.resize({width:$("#mbean_replication_bytes_in").css('width')});
+	    mbean_replication_bytes_in.setOption(opt_mbean_replication_bytes_in);
+	    
+	    var opt_mbean_os_free_memory=mbean_os_free_memory.getOption();
+	    mbean_os_free_memory.clear();
+	    mbean_os_free_memory.resize({width:$("#mbean_os_free_memory").css('width')});
+	    mbean_os_free_memory.setOption(opt_mbean_os_free_memory);
+	});
+	
+	$("#sidebarToggleOn").on("click", function(e) {
+		var opt_mbean_msg_in=mbean_msg_in.getOption();
+		mbean_msg_in.clear();
+		mbean_msg_in.resize({width:$("#mbean_msg_in").css('width')});
+		mbean_msg_in.setOption(opt_mbean_msg_in);
+	    
+	    var opt_mbean_msg_byte_in=mbean_msg_byte_in.getOption();
+	    mbean_msg_byte_in.clear();
+	    mbean_msg_byte_in.resize({width:$("#mbean_msg_byte_in").css('width')});
+	    mbean_msg_byte_in.setOption(opt_mbean_msg_byte_in);
+	    
+	    var opt_mbean_msg_byte_out=mbean_msg_byte_out.getOption();
+	    mbean_msg_byte_out.clear();
+	    mbean_msg_byte_out.resize({width:$("#mbean_msg_byte_out").css('width')});
+	    mbean_msg_byte_out.setOption(opt_mbean_msg_byte_out);
+	    
+	    var opt_mbean_byte_rejected=mbean_byte_rejected.getOption();
+	    mbean_byte_rejected.clear();
+	    mbean_byte_rejected.resize({width:$("#mbean_byte_rejected").css('width')});
+	    mbean_byte_rejected.setOption(opt_mbean_byte_rejected);
+	    
+	    var opt_mbean_failed_fetch_request=mbean_failed_fetch_request.getOption();
+	    mbean_failed_fetch_request.clear();
+	    mbean_failed_fetch_request.resize({width:$("#mbean_failed_fetch_request").css('width')});
+	    mbean_failed_fetch_request.setOption(opt_mbean_failed_fetch_request);
+	    
+	    var opt_mbean_failed_produce_request=mbean_failed_produce_request.getOption();
+	    mbean_failed_produce_request.clear();
+	    mbean_failed_produce_request.resize({width:$("#mbean_failed_produce_request").css('width')});
+	    mbean_failed_produce_request.setOption(opt_mbean_failed_produce_request);
+	    
+	    var opt_mbean_produce_message_conversions=mbean_produce_message_conversions.getOption();
+	    mbean_produce_message_conversions.clear();
+	    mbean_produce_message_conversions.resize({width:$("#mbean_produce_message_conversions").css('width')});
+	    mbean_produce_message_conversions.setOption(opt_mbean_produce_message_conversions);
+	    
+	    var opt_mbean_total_fetch_requests=mbean_total_fetch_requests.getOption();
+	    mbean_total_fetch_requests.clear();
+	    mbean_total_fetch_requests.resize({width:$("#mbean_total_fetch_requests").css('width')});
+	    mbean_total_fetch_requests.setOption(opt_mbean_total_fetch_requests);
+	    
+	    var opt_mbean_total_produce_requests=mbean_total_produce_requests.getOption();
+	    mbean_total_produce_requests.clear();
+	    mbean_total_produce_requests.resize({width:$("#mbean_total_produce_requests").css('width')});
+	    mbean_total_produce_requests.setOption(opt_mbean_total_produce_requests);
+	    
+	    var opt_mbean_replication_bytes_out=mbean_replication_bytes_out.getOption();
+	    mbean_replication_bytes_out.clear();
+	    mbean_replication_bytes_out.resize({width:$("#mbean_replication_bytes_out").css('width')});
+	    mbean_replication_bytes_out.setOption(opt_mbean_replication_bytes_out);
+	    
+	    var opt_mbean_replication_bytes_in=mbean_replication_bytes_in.getOption();
+	    mbean_replication_bytes_in.clear();
+	    mbean_replication_bytes_in.resize({width:$("#mbean_replication_bytes_in").css('width')});
+	    mbean_replication_bytes_in.setOption(opt_mbean_replication_bytes_in);
+	    
+	    var opt_mbean_os_free_memory=mbean_os_free_memory.getOption();
+	    mbean_os_free_memory.clear();
+	    mbean_os_free_memory.resize({width:$("#mbean_os_free_memory").css('width')});
+	    mbean_os_free_memory.setOption(opt_mbean_os_free_memory);
+	});
 
 	function mbeanRealtime(stime, etime, type, modules) {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/metrics/trend/mbean/ajax?stime=' + stime + '&etime=' + etime + '&type=' + type + '&modules=' + modules,
+			url : '/metrics/trend/mbean/ajax?stime=' + stime + '&etime=' + etime + '&type=' + type + '&modules=' + modules,
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");
@@ -106,7 +230,7 @@ $(document).ready(function() {
 		endDate : end,
 		ranges : {
 			'Today' : [ moment(), moment() ],
-			'Yesterday' : [ moment().subtract(1, 'days'), moment().subtract(1, 'days') ],
+			'Yesterday' : [ moment().subtract(1, 'days'), moment() ],
 			'Lastest 3 days' : [ moment().subtract(3, 'days'), moment() ],
 			'Lastest 7 days' : [ moment().subtract(6, 'days'), moment() ]
 		}
@@ -146,15 +270,15 @@ $(document).ready(function() {
 	// choise module
 	function getCheckedModules() {
 		var modules = '';
-		$('.checkbox').find('input[type="checkbox"]:checked').each(function() {
+		$('#ke_chk_top').find('input[type="checkbox"]:checked').each(function() {
 			modules += ($(this).attr('name')) + ',';
 		});
 		return modules.substring(0, modules.length - 1);
 	}
 
 	// init module show or hide & bind change event
-	function initModuleVisualAndBingding() {
-		$('.checkbox').find('input[type="checkbox"]').each(function() {
+	function initModuleVisualAndBindEvent() {
+		$('#ke_chk_top').find('input[type="checkbox"]').each(function() {
 			var that = this;
 			if ($(that).is(':checked')) {
 				module('#' + $(that).attr('name'), true);
@@ -167,7 +291,6 @@ $(document).ready(function() {
 					stime = reportrange[0].innerText.replace(/-/g, '').split("To")[0].trim();
 					etime = reportrange[0].innerText.replace(/-/g, '').split("To")[1].trim();
 					mbeanRealtime(stime, etime, type, getCheckedModules());
-					$('svg').css('width', '100%');
 					return;
 				}
 				module('#' + $(that).attr('name'), false);

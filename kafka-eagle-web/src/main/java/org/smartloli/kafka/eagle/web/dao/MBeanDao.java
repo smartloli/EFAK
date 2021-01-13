@@ -61,6 +61,10 @@ public interface MBeanDao {
 	public List<TopicOffsetsInfo> getConsumerRateTopic(Map<String, Object> params);
 
 	/** Query os memory data. */
+
 	public List<KpiInfo> getOsMem(Map<String, Object> params);
+
+	/** Query used cpu data. */
+	public List<KpiInfo> getUsedCPU(Map<String, Object> params);
 
 }

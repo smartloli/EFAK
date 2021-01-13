@@ -64,11 +64,21 @@ public final class KafkaZKPoolUtils {
 			for (int i = 0; i < zkCliPoolSize; i++) {
 				try {
 					zkc = KafkaZkClient.apply(entry.getValue(), JaasUtils.isZkSecurityEnabled(), ZK_SESSION_TIMEOUT_MS, ZK_CONNECTION_TIMEOUT_MS, Integer.MAX_VALUE, Time.SYSTEM, METRIC_GROUP_NAME, "SessionExpireListener");
-					if(zkc!=null) {
+					if (zkc != null) {
+						if (SystemConfigUtils.getBooleanProperty(entry.getKey() + ".zk.acl.enable")) {
+							String schema = SystemConfigUtils.getProperty(entry.getKey() + ".zk.acl.schema");
+							String username = SystemConfigUtils.getProperty(entry.getKey() + ".zk.acl.username");
+							String password = SystemConfigUtils.getProperty(entry.getKey() + ".zk.acl.password");
+							try {
+								zkc.currentZooKeeper().addAuthInfo(schema, (username + ":" + password).getBytes());
+							} catch (Exception e) {
+								ErrorUtils.print(KafkaZKPoolUtils.class).error("ClusterAlias[" + entry.getKey() + "] add acl has error, msg is ", e);
+							}
+						}
 						zkCliPool.add(zkc);
 					}
 				} catch (Exception e) {
-					ThrowExceptionUtils.print(KafkaZKPoolUtils.class).error("Error initializing zookeeper, msg is ", e);
+					ErrorUtils.print(KafkaZKPoolUtils.class).error("Error initializing zookeeper, msg is ", e);
 				}
 			}
 			zkCliPools.put(entry.getKey(), zkCliPool);
@@ -94,9 +104,9 @@ public final class KafkaZKPoolUtils {
 				zkCliPool.remove(0);
 				String osName = System.getProperties().getProperty(OperateSystem.OS_NAME.getValue());
 				if (osName.contains(OperateSystem.LINUX.getValue())) {
-					ThrowExceptionUtils.print(KafkaZKPoolUtils.class).debug(errorMessageByZookeeper, zkCliPool.size());
+					ErrorUtils.print(KafkaZKPoolUtils.class).debug(errorMessageByZookeeper, zkCliPool.size());
 				} else {
-					ThrowExceptionUtils.print(KafkaZKPoolUtils.class).info(errorMessageByZookeeper, zkCliPool.size());
+					ErrorUtils.print(KafkaZKPoolUtils.class).info(errorMessageByZookeeper, zkCliPool.size());
 				}
 			} else {
 				for (int i = 0; i < zkCliPoolSize; i++) {
@@ -110,14 +120,14 @@ public final class KafkaZKPoolUtils {
 				zkCliPool.remove(0);
 				String osName = System.getProperties().getProperty(OperateSystem.OS_NAME.getValue());
 				if (osName.contains(OperateSystem.LINUX.getValue())) {
-					ThrowExceptionUtils.print(KafkaZKPoolUtils.class).debug(errorMessageByZookeeper, zkCliPool.size());
+					ErrorUtils.print(KafkaZKPoolUtils.class).debug(errorMessageByZookeeper, zkCliPool.size());
 				} else {
-					ThrowExceptionUtils.print(KafkaZKPoolUtils.class).warn(errorMessageByZookeeper, zkCliPool.size());
+					ErrorUtils.print(KafkaZKPoolUtils.class).warn(errorMessageByZookeeper, zkCliPool.size());
 				}
 			}
 		} catch (Exception e) {
-			ThrowExceptionUtils.print(KafkaZKPoolUtils.class).error("Error initializing zookeeper, msg is ", e);
-			ThrowExceptionUtils.print(KafkaZKPoolUtils.class).error("Kafka cluster[" + clusterAlias + ".zk.list] address has null.");
+			ErrorUtils.print(KafkaZKPoolUtils.class).error("Error initializing zookeeper, msg is ", e);
+			ErrorUtils.print(KafkaZKPoolUtils.class).error("Kafka cluster[" + clusterAlias + ".zk.list] address has null.");
 		}
 		return zkc;
 	}
@@ -130,9 +140,9 @@ public final class KafkaZKPoolUtils {
 		}
 		String osName = System.getProperties().getProperty(OperateSystem.OS_NAME.getValue());
 		if (osName.contains(OperateSystem.LINUX.getValue())) {
-			ThrowExceptionUtils.print(KafkaZKPoolUtils.class).debug(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
+			ErrorUtils.print(KafkaZKPoolUtils.class).debug(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
 		} else {
-			ThrowExceptionUtils.print(KafkaZKPoolUtils.class).info(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
+			ErrorUtils.print(KafkaZKPoolUtils.class).info(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
 		}
 	}
 

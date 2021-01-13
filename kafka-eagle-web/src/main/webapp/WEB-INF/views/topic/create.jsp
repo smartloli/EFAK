@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html>
@@ -14,29 +13,26 @@
 <meta name="author" content="">
 
 <title>Topic Create - KafkaEagle</title>
-<jsp:include page="../public/css.jsp"></jsp:include>
+<jsp:include page="../public/plus/css.jsp"></jsp:include>
 </head>
 
 <body>
-	<jsp:include page="../public/navbar.jsp"></jsp:include>
-	<div id="wrapper">
-		<div id="page-wrapper">
-			<div class="row">
-				<div class="col-lg-12">
-					<h1 class="page-header">
-						Topic <small>create</small>
-					</h1>
-				</div>
-				<!-- /.col-lg-12 -->
-			</div>
-			<!-- /.row -->
-			<div class="row">
-				<div class="col-lg-12">
+	<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
+	<div id="layoutSidenav">
+		<div id="layoutSidenav_nav">
+			<jsp:include page="../public/plus/navbar.jsp"></jsp:include>
+		</div>
+		<div id="layoutSidenav_content">
+			<main>
+				<div class="container-fluid">
+					<h1 class="mt-4">Topic</h1>
+					<ol class="breadcrumb mb-4">
+						<li class="breadcrumb-item"><a href="#">Topic</a></li>
+						<li class="breadcrumb-item active">Create</li>
+					</ol>
 					<div class="alert alert-info alert-dismissable">
-						<button type="button" class="close" data-dismiss="alert"
-							aria-hidden="true">×</button>
-						<i class="fa fa-info-circle"></i> <strong>Create a new
-							kafka's topic.</strong>
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<i class="fas fa-info-circle"></i> <strong>Create a new kafka's topic.</strong>
 					</div>
 				</div>
 			</div>
@@ -77,7 +73,6 @@
 												class="fa fa-info-circle"></i> Replication Factor parameters
 												must be numeric . Pay attention to available brokers must be larger than replication factor .</label>
 										</div>
-										
 										<div class="form-group">
 											<label>授权用户 </label> 
 											<select id="ke_topic_username" name="ke_topic_username"  class="form-control">
@@ -90,7 +85,6 @@
 												<i class="fa fa-info-circle"></i> 授予用户生产者和消费者权限,添加消费者组(group_username).
 											</label>
 										</div>
-										
 										<button type="submit" class="btn btn-success">Create</button>
 										<div id="create_alert_msg" style="display: none"
 											class="alert alert-danger">
@@ -110,7 +104,7 @@
 			<!-- /#page-wrapper -->
 		</div>
 </body>
-<jsp:include page="../public/script.jsp">
+<jsp:include page="../public/plus/script.jsp">
 	<jsp:param value="main/topic/create.js" name="loader" />
 </jsp:include>
 <script type="text/javascript">

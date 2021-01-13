@@ -17,7 +17,10 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.SecurityUtils;
@@ -28,10 +31,12 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.pojo.Signiner;
 import org.smartloli.kafka.eagle.web.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 /**
  * Control user login, logout, reset password and other operations.
@@ -57,7 +62,7 @@ public class AccountController {
 
 	/** Login action and checked username&password. */
 	@RequestMapping(value = "/signin/action/", method = RequestMethod.POST)
-	public String login(HttpSession session, HttpServletRequest request) {
+	public String login(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		String refUrl = request.getParameter("ref_url");
@@ -66,7 +71,16 @@ public class AccountController {
 		Subject subject = SecurityUtils.getSubject();
 		if (subject.isAuthenticated()) {
 			setKafkaAlias(subject);
-			return "redirect:" + refUrl.replaceAll("/ke", "");
+			if ("zh_CN".equals(SystemConfigUtils.getProperty("kafka.eagle.i18n.language"))) {
+				Locale locale = new Locale("zh", "CN");
+				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
+			} else if ("en_US".equals(SystemConfigUtils.getProperty("kafka.eagle.i18n.language"))) {
+				Locale locale = new Locale("en", "US");
+				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
+			} else {
+				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, LocaleContextHolder.getLocale());
+			}
+			return "redirect:" + refUrl;
 		} else {
 			subject.getSession().setAttribute(KConstants.Login.ERROR_LOGIN, "<div class='alert alert-danger'>Account or password is error .</div>");
 		}
@@ -81,15 +95,15 @@ public class AccountController {
 			String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
 			String defaultClusterAlias = clusterAliass[0];
 			subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
-			String dropList = "<ul class='dropdown-menu'>";
+			String dropList = "<div class='dropdown-menu dropdown-menu-right' aria-labelledby='clusterDropdown'>";
 			int i = 0;
 			for (String clusterAlias : clusterAliass) {
 				if (!clusterAlias.equals(defaultClusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT) {
-					dropList += "<li><a href='/ke/cluster/info/" + clusterAlias + "/change'><i class='fa fa-fw fa-sitemap'></i>" + clusterAlias + "</a></li>";
+					dropList += "<a class='dropdown-item' href='/cluster/info/" + clusterAlias + "/change'><i class='fas fa-feather-alt fa-sm fa-fw mr-1'></i>" + clusterAlias + "</a>";
 					i++;
 				}
 			}
-			dropList += "<li><a href='/ke/cluster/multi'><i class='fa fa-fw fa-tasks'></i>More...</a></li></ul>";
+			dropList += "<a class='dropdown-item' href='/cluster/multi'><i class='fas fa-server fa-sm fa-fw mr-1'></i>More...</a></div>";
 			subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST, dropList);
 		}
 	}
@@ -115,6 +129,7 @@ public class AccountController {
 		Subject subject = SecurityUtils.getSubject();
 		if (subject.isAuthenticated()) {
 			subject.getSession().removeAttribute(KConstants.Login.SESSION_USER);
+			subject.getSession().removeAttribute(KConstants.Login.SESSION_USER_TIME);
 			subject.getSession().removeAttribute(KConstants.Login.ERROR_LOGIN);
 			subject.getSession().removeAttribute(KConstants.Role.WHETHER_SYSTEM_ADMIN);
 		}

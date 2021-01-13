@@ -95,6 +95,10 @@
 		select `value` from ke_metrics where `cluster`=#{cluster} and `key` like #{key} order by `timespan` desc limit 2
 	</select>
 
+	<select id="getUsedCPU" parameterType="map" resultMap="kpi">
+		select `value` from ke_metrics where `cluster`=#{cluster} and `key`=#{key} order by `timespan` desc limit 1
+	</select>
+
 	<select id="getConsumerRateTopic" parameterType="map" resultMap="topicOffsets">
 		select logsize,offsets,timespan from ke_consumer_bscreen
 		where `cluster`=#{cluster} and `group`=#{group}

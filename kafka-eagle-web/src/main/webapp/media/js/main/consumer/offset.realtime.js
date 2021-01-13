@@ -1,5 +1,12 @@
 $(document).ready(function() {
 
+	try{
+		var path = window.location.href;
+		$("#ke_consumer_offsets_a").attr("href","/consumers/offset/?" + path.split("?")[1]);
+	}catch (e) {
+		console.error(e);
+	}
+
 	function getQueryString(name) {
 		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
 		var r = window.location.search.substr(1).match(reg);
@@ -153,6 +160,27 @@ $(document).ready(function() {
 	lagChart.setOption(lagOption);
 	producerChart.setOption(producerOption);
 	consumerChart.setOption(consumerOption);
+	
+	$("#lag_chart").resize(function () {
+		var opt_lagChart=lagChart.getOption();
+		lagChart.clear();
+		lagChart.resize({width:$("#lag_chart").css('width')});
+		lagChart.setOption(opt_lagChart);
+	});
+
+	$("#producer_chart").resize(function () {
+		var opt_producerChart=producerChart.getOption();
+		producerChart.clear();
+		producerChart.resize({width:$("#producer_chart").css('width')});
+		producerChart.setOption(opt_producerChart);
+	});
+
+	$("#consumer_chart").resize(function () {
+		var opt_consumerChart=consumerChart.getOption();
+		consumerChart.clear();
+		consumerChart.resize({width:$("#consumer_chart").css('width')});
+		consumerChart.setOption(opt_consumerChart);
+	});
 
 	var start = moment();
 	var end = moment();
@@ -180,11 +208,10 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/consumer/offset/group/topic/realtime/ajax?group=' + group + '&topic=' + topic + '&stime=' + stime + '&etime=' + etime,
+			url : '/consumer/offset/group/topic/realtime/ajax?group=' + group + '&topic=' + topic + '&stime=' + stime + '&etime=' + etime,
 			success : function(datas) {
 				if (datas != null) {
 					// Area Chart
-					console.log(datas);
 					lagOption.xAxis.data = datas.lag.x;
 					lagOption.series.data = datas.lag.y;
 					lagChart.setOption(lagOption);
@@ -204,7 +231,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/consumer/offset/rate/group/topic/realtime/ajax?group=' + group + '&topic=' + topic,
+			url : '/consumer/offset/rate/group/topic/realtime/ajax?group=' + group + '&topic=' + topic,
 			success : function(datas) {
 				if (datas != null) {
 					// Consumer & Producer Rate

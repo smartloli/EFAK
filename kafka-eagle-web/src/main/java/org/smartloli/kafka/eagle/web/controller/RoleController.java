@@ -220,9 +220,9 @@ public class RoleController {
 				obj.put("operate", "");
 			} else {
 				obj.put("operate",
-						"<div class='btn-group'><button class='btn btn-primary btn-xs dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><ul class='dropdown-menu dropdown-menu-right'><li><a id='operater_modal' name='operater_modal' href='#"
-								+ id + "/'><i class='fa fa-fw fa-adn'></i>Assign</a></li><li><a name='operater_reset_modal' href='#" + id + "'><i class='fa fa-fw fa-gear'></i>Reset</a></li><li><a name='operater_modify_modal' href='#" + id + "'><i class='fa fa-fw fa-edit'></i>Modify</a></li><li><a href='/ke/system/user/delete/" + id
-								+ "/'><i class='fa fa-fw fa-trash-o'></i>Delete</a></li></ul></div>");
+						"<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a id='operater_modal' name='operater_modal' class='dropdown-item' name='topic_modify' href='#"
+								+ id + "'><i class='fab fa-adn fa-sm fa-fw mr-1'></i>Assign</a><a name='operater_reset_modal' class='dropdown-item' href='#" + id + "'><i class='fas fa-cog fa-sm fa-fw mr-1'></i>Reset</a><a name='operater_modify_modal' class='dropdown-item' href='#" + id
+								+ "'><i class='fas fa-user-edit fa-sm fa-fw mr-1'></i>Modify</a><a name='operater_modify_modal' class='dropdown-item' href='/system/user/delete/" + id + "/'><i class='far fa-trash-alt fa-sm fa-fw mr-1'></i>Delete</a></div>");
 			}
 			aaDatas.add(obj);
 		}
@@ -269,7 +269,7 @@ public class RoleController {
 			JSONObject obj = new JSONObject();
 			obj.put("name", role.getString("roleName"));
 			obj.put("describer", role.getString("roleDescriber"));
-			obj.put("operate", "<a id='operater_modal' name='operater_modal' href='#" + role.getInteger("id") + "' class='btn btn-primary btn-xs'>Setting</a>");
+			obj.put("operate", "<a id='operater_modal' name='operater_modal' href='#" + role.getInteger("id") + "' class='badge badge-primary'>Auth</a>");
 			aaDatas.add(obj);
 		}
 

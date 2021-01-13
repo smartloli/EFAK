@@ -32,5 +32,9 @@ public class BaseTopicSchema {
 	public static final String PARTITION = "partition";
 	/** Topic message content. */
 	public static final String MSG = "msg";
+	/** Topic message content timespan. */
+	public static final String TIMESPAN = "timespan";
+	/** Topic message content date. */
+	public static final String DATE = "date";
 
 }

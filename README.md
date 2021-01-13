@@ -3,6 +3,8 @@
 [![codebeat badge](https://codebeat.co/badges/bf22a7b2-76ac-4aba-b840-00328841d9e3)](https://codebeat.co/projects/github-com-smartloli-kafka-eagle-master)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/smartloli/kafka-eagle/blob/master/LICENSE)
 
+[![Stargazers over time](https://starchart.cc/smartloli/kafka-eagle.svg)](https://starchart.cc/smartloli/kafka-eagle)
+
 # Kafka Eagle
 
 This is an monitor system and monitor your kafka clusters, and visual consumer thread,offsets,owners etc.
@@ -20,24 +22,24 @@ Supported JDK: ```JDK8+```
 Here are a few Kafka Eagle system screenshots:
 
 # Big Screen Support
-![BScreen](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-LnhzyWefw2gURVMl-Km%2F-LnhzzESQ0FVm_ReDJkb%2Fbscreen@2x.png?generation=1567361072225328&alt=media)
+![BScreen Data](http://www.kafka-eagle.org/images/docs/bscreen@2x.jpg)
 
 # Alert Support
 In addition to supporting ```email``` alerts, Kafka Eagle also supports im alerts, such as ```DingDing``` and ```WeChat```.
-![DingDing Alert](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-YCJshnbZ9rWX7eOMA%2F-M-YCKhrhv8_KksGY2vY%2Fdingding_alert@2x.png?generation=1581138667614351&alt=media)
-![WeChat Alert](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-YCJshnbZ9rWX7eOMA%2F-M-YCKhthAB9NHKTUcZG%2Fwechat_alert@2x.png?generation=1581138665418224&alt=media)
+![DingDing Alert](http://www.kafka-eagle.org/images/docs/dingding_alert@2x.png)
+![WeChat Alert](http://www.kafka-eagle.org/images/docs/wechat_alert@2x.png)
 
 # List of Consumer Groups & Active Group Graph
-![Consumer & Active Graph](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-LjfrvZnr8VnQqA2gTze%2F-LjfrwYhk2GyuRfT-Keh%2Fconsumer@2x.png?generation=1563030447787989&alt=media)
+![Consumer & Active Graph](http://www.kafka-eagle.org/images/docs/consumer@2x.png)
 
 # List of Topics Detail
-![Topics](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-LjfrvZnr8VnQqA2gTze%2F-LjfrwfE8uFt6dAdw0kU%2Flist@2x.png?generation=1563030448602231&alt=media)
+![Topics](http://www.kafka-eagle.org/images/docs/list@2x.png)
 
 # Consumer & Producer Rate Chart
-![Rate Chart](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-TYOxvLPc3po_hZb0J%2F-M-TYPrf-qd3i1TjJ5NS%2Fconsumer_rate_graph@2x.png?generation=1581060568671558&alt=media)
+![Rate Chart](http://www.kafka-eagle.org/images/docs/consumer_rate_graph@2x.png)
 
 # Start Kafka Eagle
-![KE Script](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LjfmXHRajdxow3o-cxI%2F-M-TbAtsxTA91c-ii-mY%2F-M-TYPcgh7KPMYNerWJD%2Fke_bash@2x.png?generation=1581061556694462&alt=media)
+![KE Script](http://www.kafka-eagle.org/images/docs/startup_v2@2x.png)
 
 # Kafka Offset Types
 
@@ -61,15 +63,18 @@ cluster2.kafka.eagle.offset.storage=zookeeper
 
 # Kafka SQL
 
-Use the SQL statement to query the topic message log, and visualize the results, you can read [Kafka SQL](https://docs.kafka-eagle.org/3.Manuals/9.KafkaSQL.html) to view the syntax.
+Use the SQL statement to query the topic message log, and visualize the results, you can read [Kafka SQL](http://www.kafka-eagle.org/articles/docs/quickstart/ksql.html) to view the syntax.
 For example, if you kafka has a topic with three partitions, the ksql query statement is as follows.
 ```
-select * from "kafka_topic_name" where "partition" in (0,1,2) limit 10
+select * from ke_p3_r2 where `partition` in (0,1,2) limit 10
 ```
+
+![ksql](http://www.kafka-eagle.org/images/docs/kafka_ksql_v2@2x.png)
+![ksql_result](http://www.kafka-eagle.org/images/docs/kafka_ksql_result_v2@2x.png)
 
 # Quickstart
 
-Please read [Kafka Eagle Install](https://docs.kafka-eagle.org/2.Install/2.Installing.html) for setting up and running Kafka Eagle. It is worth noting that, please use ```chrome``` to access Kafka Eagle.
+Please read [Kafka Eagle Install](http://www.kafka-eagle.org/articles/docs/installation/linux-macos.html) for setting up and running Kafka Eagle.
 
 # Deploy
 
@@ -79,7 +84,7 @@ The project is a maven project that uses the Maven command to pack the deploymen
 ```
 # More Information
 
-Please see the [Kafka Eagle Manual](https://docs.kafka-eagle.org) for for more information including:
+Please see the [Kafka Eagle Manual](http://www.kafka-eagle.org/articles/docs/documentation.html) for for more information including:
   * System environment settings and installation instructions.
   * Information about how to use script command.
   * Visual group,topic,offset metadata information etc.
@@ -93,11 +98,11 @@ Since this is an open source tool, please comply with the relevant laws and regu
 
 # Kafka Eagle PDF
 
-[Kafka Eagle Architecture PDF](http://pdf.kafka-eagle.org/)
+[Kafka Eagle Architecture PDF](http://www.kafka-eagle.org/articles/docs/architecture/pdf.html)
 
 # Contributors
 
-Thanks to the following members for maintaining the project.
+Thanks to the following members for maintaining the project. If this project help you reduce time to develop, you can give us a star. 
 
 |Alias |Github |Email |
 |:-- |:-- |:-- |

@@ -5,7 +5,7 @@ $(document).ready(function() {
 		"bProcessing" : true,
 		"bServerSide" : true,
 		"fnServerData" : retrieveData,
-		"sAjaxSource" : "/ke/alarm/history/table/ajax",
+		"sAjaxSource" : "/alarm/history/table/ajax",
 		"aoColumns" : [ {
 			"mData" : 'id'
 		}, {
@@ -67,7 +67,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/alarm/cluster/detail/' + type + '/' + id + '/ajax',
+			url : '/alarm/cluster/detail/' + type + '/' + id + '/ajax',
 			success : function(datas) {
 				$("#ke_alarm_cluster_property").val(datas.result);
 			}
@@ -78,8 +78,8 @@ $(document).ready(function() {
 	$(document).on('click', 'a[name=alarm_cluster_remove]', function() {
 		var href = $(this).attr("href");
 		var id = href.split("#")[1].split("/")[0];
-		$("#alarm_cluster_remove_content").html("<p>Are you sure you want to delete id [" + id + "] ?<p>");
-		$("#remove_div").html("<a href='/ke/alarm/history/" + id + "/del' class='btn btn-danger'>Remove</a>");
+		$("#alarm_cluster_remove_content").html("<p class='alert alert-danger'>Are you sure you want to delete id [<strong>" + id + "</strong>] ?<p>");
+		$("#remove_div").html("<a href='/alarm/history/" + id + "/del' class='btn btn-danger'>Remove</a>");
 		$('#alarm_cluster_remove').modal({
 			backdrop : 'static',
 			keyboard : false
@@ -161,7 +161,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/alarm/history/modify/switch/' + id + '/ajax',
+			url : '/alarm/history/modify/switch/' + id + '/ajax',
 			success : function(datas) {
 			}
 		});
@@ -186,7 +186,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/alarm/history/modify/' + id + '/ajax',
+			url : '/alarm/history/modify/' + id + '/ajax',
 			success : function(datas) {
 				$.fn.modal.Constructor.prototype.enforceFocus = function () { };
 				$("#ke_alarm_cluster_name_server").val(datas.server);
@@ -197,17 +197,17 @@ $(document).ready(function() {
 					var option;
 					if (id.indexOf("select2level") > -1) {
 						placeholder = select2placeholder[0];
-						url = "/ke/alarm/cluster/level/list/ajax";
+						url = "/alarm/cluster/level/list/ajax";
 						option = new Option(datas.alarmLevel, "0", true, true);
 						$("#ke_alarm_cluster_level").val(datas.alarmLevel);
 					} else if (id.indexOf("select2maxtimes") > -1) {
 						placeholder = select2placeholder[1];
-						url = "/ke/alarm/cluster/maxtimes/list/ajax";
+						url = "/alarm/cluster/maxtimes/list/ajax";
 						option = new Option(datas.alarmMaxTimes, "0", true, true);
 						$("#ke_alarm_cluster_maxtimes").val(datas.alarmMaxTimes);
 					} else if (id.indexOf("select2group") > -1) {
 						placeholder = select2placeholder[2];
-						url = "/ke/alarm/cluster/group/list/ajax";
+						url = "/alarm/cluster/group/list/ajax";
 						option = new Option(datas.alarmGroup, "0", true, true);
 						$("#ke_alarm_cluster_group").val(datas.alarmGroup);
 					}

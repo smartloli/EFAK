@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,116 +21,131 @@ import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 
 /**
  * Alarm message info.
- * 
- * @author smartloli.
  *
- *         Created by Oct 7, 2019
+ * @author smartloli.
+ * <p>
+ * Created by Oct 7, 2019
  */
 public class AlarmMessageInfo extends BaseProtocol {
 
-	/**
-	 * AlarmID : [ 1 ]
-	 * 
-	 * AlarmStatus : [ PROBLEM ]
-	 * 
-	 * AlarmLevel : [ P0 ]
-	 * 
-	 * AlarmProject : [ Kafka ]
-	 * 
-	 * AlarmTimes : [ current(1), max(7) ]
-	 * 
-	 * AlarmDate : [ 2019-10-07 21:43:22 ]
-	 * 
-	 * AlarmContent : [ node.shutdown [ localhost:9092 ] ]
-	 * 
-	 */
+    /**
+     * AlarmID : [ 1 ]
+     * <p>
+     * AlarmCluster : [ Cluster1 ]
+     * <p>
+     * AlarmStatus : [ PROBLEM ]
+     * <p>
+     * AlarmLevel : [ P0 ]
+     * <p>
+     * AlarmProject : [ Kafka ]
+     * <p>
+     * AlarmTimes : [ current(1), max(7) ]
+     * <p>
+     * AlarmDate : [ 2019-10-07 21:43:22 ]
+     * <p>
+     * AlarmContent : [ node.shutdown [ localhost:9092 ] ]
+     */
 
-	private String title;
-	private String alarmStatus;
-	private String alarmProject;
-	private String alarmLevel;
-	private String alarmTimes;
-	private String alarmContent;
-	private String alarmDate;
-	private int alarmId;
+    private String title;
+    private String alarmStatus;
+    private String alarmProject;
+    private String alarmLevel;
+    private String alarmTimes;
+    private String alarmContent;
+    private String alarmDate;
+    private int alarmId;
+    private String alarmCluster;
 
-	public String toDingDingMarkDown() {
-		return title + " \n\n>#### AlarmID : [ **" + alarmId + "** ]\n> #### AlarmStatus : [ **" + alarmStatus + "** ]\n> #### AlarmLevel : [ " + alarmLevel + " ]\n" + "> #### AlarmProject : [ " + alarmProject + " ]\n"
-				+ "> #### AlarmTimes : [ " + alarmTimes + " ]\n" + "> #### AlarmDate : [ " + alarmDate + " ]\n" + "> #### AlarmContent : [ " + alarmContent + " ]";
-	}
+    public String toDingDingMarkDown() {
+        return title + " \n\n>#### AlarmID : [ **" + alarmId + "** ]\n> #### AlarmCluster : [ **" + alarmCluster + "** ]\n> #### AlarmStatus : [ **" + alarmStatus + "** ]\n> #### AlarmLevel : [ " + alarmLevel + " ]\n" + "> #### AlarmProject : [ " + alarmProject + " ]\n"
+                + "> #### AlarmTimes : [ " + alarmTimes + " ]\n" + "> #### AlarmDate : [ " + alarmDate + " ]\n" + "> #### AlarmContent : [ " + alarmContent + " ]";
+    }
 
-	public String toWeChatMarkDown() {
-		return title + " \n\n>AlarmID : [ **" + alarmId + "** ]\n> AlarmStatus : [ **" + alarmStatus + "** ]\n" + "> AlarmLevel : [ " + alarmLevel + " ]\n" + "> AlarmProject : [ " + alarmProject + " ]\n" + "> AlarmTimes : [ " + alarmTimes
-				+ " ]\n" + "> AlarmDate : [ " + alarmDate + " ]\n" + "> AlarmContent : [ " + alarmContent + " ]";
-	}
-	
-	public String toMail() {
-		return title + " \n AlarmID : [ " + alarmId + " ]\n AlarmStatus : [ " + alarmStatus + " ]\n" + " AlarmLevel : [ " + alarmLevel + " ]\n" + " AlarmProject : [ " + alarmProject + " ]\n" + " AlarmTimes : [ " + alarmTimes
-				+ " ]\n AlarmDate : [ " + alarmDate + " ]\n" + " AlarmContent : [ " + alarmContent + " ]"; 
-	}
+    public String toWeChatMarkDown() {
+        return title + " \n\n>AlarmID : [ **" + alarmId + "** ]\n> AlarmCluster : [ **" + alarmCluster + "** ]\n> AlarmStatus : [ **" + alarmStatus + "** ]\n" + "> AlarmLevel : [ " + alarmLevel + " ]\n" + "> AlarmProject : [ " + alarmProject + " ]\n" + "> AlarmTimes : [ " + alarmTimes
+                + " ]\n" + "> AlarmDate : [ " + alarmDate + " ]\n" + "> AlarmContent : [ " + alarmContent + " ]";
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String toMail() {
+        return title + " \n AlarmID : [ " + alarmId + " ]\n AlarmCluster : [ " + alarmCluster + " ]\n AlarmStatus : [ " + alarmStatus + " ]\n" + " AlarmLevel : [ " + alarmLevel + " ]\n" + " AlarmProject : [ " + alarmProject + " ]\n" + " AlarmTimes : [ " + alarmTimes
+                + " ]\n AlarmDate : [ " + alarmDate + " ]\n" + " AlarmContent : [ " + alarmContent + " ]";
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String toMailJSON() {
+        return title + " <br/> AlarmID : [ " + alarmId + " ]<br/> AlarmCluster : [ " + alarmCluster + " ]<br/> AlarmStatus : [ " + alarmStatus + " ]<br/>" + " AlarmLevel : [ " + alarmLevel + " ]<br/>" + " AlarmProject : [ " + alarmProject + " ]<br/>" + " AlarmTimes : [ " + alarmTimes
+                + " ]<br/> AlarmDate : [ " + alarmDate + " ]<br/>" + " AlarmContent : [ " + alarmContent + " ]";
+    }
 
-	public String getAlarmStatus() {
-		return alarmStatus;
-	}
+    public String getAlarmCluster() {
+        return alarmCluster;
+    }
 
-	public void setAlarmStatus(String alarmStatus) {
-		this.alarmStatus = alarmStatus;
-	}
+    public void setAlarmCluster(String alarmCluster) {
+        this.alarmCluster = alarmCluster;
+    }
 
-	public String getAlarmProject() {
-		return alarmProject;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setAlarmProject(String alarmProject) {
-		this.alarmProject = alarmProject;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public String getAlarmLevel() {
-		return alarmLevel;
-	}
+    public String getAlarmStatus() {
+        return alarmStatus;
+    }
 
-	public void setAlarmLevel(String alarmLevel) {
-		this.alarmLevel = alarmLevel;
-	}
+    public void setAlarmStatus(String alarmStatus) {
+        this.alarmStatus = alarmStatus;
+    }
 
-	public String getAlarmTimes() {
-		return alarmTimes;
-	}
+    public String getAlarmProject() {
+        return alarmProject;
+    }
 
-	public void setAlarmTimes(String alarmTimes) {
-		this.alarmTimes = alarmTimes;
-	}
+    public void setAlarmProject(String alarmProject) {
+        this.alarmProject = alarmProject;
+    }
 
-	public String getAlarmContent() {
-		return alarmContent;
-	}
+    public String getAlarmLevel() {
+        return alarmLevel;
+    }
 
-	public void setAlarmContent(String alarmContent) {
-		this.alarmContent = alarmContent;
-	}
+    public void setAlarmLevel(String alarmLevel) {
+        this.alarmLevel = alarmLevel;
+    }
 
-	public String getAlarmDate() {
-		return alarmDate;
-	}
+    public String getAlarmTimes() {
+        return alarmTimes;
+    }
 
-	public void setAlarmDate(String alarmDate) {
-		this.alarmDate = alarmDate;
-	}
+    public void setAlarmTimes(String alarmTimes) {
+        this.alarmTimes = alarmTimes;
+    }
 
-	public int getAlarmId() {
-		return alarmId;
-	}
+    public String getAlarmContent() {
+        return alarmContent;
+    }
 
-	public void setAlarmId(int alarmId) {
-		this.alarmId = alarmId;
-	}
+    public void setAlarmContent(String alarmContent) {
+        this.alarmContent = alarmContent;
+    }
+
+    public String getAlarmDate() {
+        return alarmDate;
+    }
+
+    public void setAlarmDate(String alarmDate) {
+        this.alarmDate = alarmDate;
+    }
+
+    public int getAlarmId() {
+        return alarmId;
+    }
+
+    public void setAlarmId(int alarmId) {
+        this.alarmId = alarmId;
+    }
 
 }

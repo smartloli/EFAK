@@ -136,6 +136,15 @@ public class CalendarUtils {
 		return df.format(calendar.getTime());
 	}
 
+	/** Get custom hour. */
+	public static long getCustomLastHourUnix(int hour) {
+		Calendar calendar = Calendar.getInstance();
+		Date date = new Date();
+		calendar.setTime(date);
+		calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + hour);
+		return calendar.getTime().getTime();
+	}
+
 	/** Convert date to date. */
 	public static String convertDate2Date(String date) throws ParseException {
 		SimpleDateFormat newly = new SimpleDateFormat(DATA_FORMAT_SPLIT_YEAR);

@@ -75,6 +75,7 @@ public class JmxConstants {
 		JMX_PERFORMANCE_TYPE("java.lang:type=OperatingSystem"),
 		TOTAL_PHYSICAL_MEMORY_SIZE("TotalPhysicalMemorySize"),
 		FREE_PHYSICAL_MEMORY_SIZE("FreePhysicalMemorySize"),
+		PROCESS_CPU_LOAD("ProcessCpuLoad"),
 		BROKER_VERSION("kafka.server:type=app-info,id=%s"),
 		BROKER_VERSION_VALUE("Version");
 

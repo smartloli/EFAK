@@ -61,6 +61,9 @@ public interface TopicDao {
 	/** Read topic spread, skewed, leader skewed data. */
 	public TopicRank readBrokerPerformance(Map<String, Object> params);
 
+	/** Read producer threads data. */
+	public TopicRank readProducerThreads(Map<String, Object> params);
+
 	/** Get topic total capacity. */
 	public long getTopicCapacity(Map<String, Object> params);
 
@@ -157,8 +160,5 @@ public interface TopicDao {
 
 	/** Count consumer group summary pages. */
 	public long countConsumerSummaryPages(Map<String, Object> params);
-
-	/** Get producer alive threads. */
-	public List<TopicLogSize> queryProducerAlives(Map<String, Object> params);
 
 }

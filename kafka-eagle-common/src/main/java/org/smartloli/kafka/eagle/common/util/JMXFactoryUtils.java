@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,68 +17,110 @@
  */
 package org.smartloli.kafka.eagle.common.util;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.management.remote.rmi.RMIConnectorServer;
+import javax.naming.Context;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.rmi.ssl.SslRMIClientSocketFactory;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * Manager jmx connector object && release.
- * 
- * @author smartloli.
  *
- *         Created by Feb 25, 2019
+ * @author smartloli.
+ * <p>
+ * Created by Feb 25, 2019
  */
 public class JMXFactoryUtils {
 
-	private static final ThreadFactory daemonThreadFactory = new DaemonThreadFactory();
+    private static final ThreadFactory daemonThreadFactory = new DaemonThreadFactory();
 
-	private JMXFactoryUtils() {
+    private JMXFactoryUtils() {
 
-	}
+    }
 
-	public static JMXConnector connectWithTimeout(final JMXServiceURL url, long timeout, TimeUnit unit) {
-		final BlockingQueue<Object> blockQueue = new ArrayBlockingQueue<>(1);
-		ExecutorService executor = Executors.newSingleThreadExecutor(daemonThreadFactory);
-		executor.submit(new Runnable() {
-			public void run() {
-				try {
-					JMXConnector connector = JMXConnectorFactory.connect(url);
-					if (!blockQueue.offer(connector))
-						connector.close();
-				} catch (Exception e) {
-					if (!blockQueue.offer(e)) {
-						ThrowExceptionUtils.print(JMXFactoryUtils.class).error("Block queue is full, error msg is ", e);
-					}
-				}
-			}
-		});
-		Object result = null;
-		try {
-			result = blockQueue.poll(timeout, unit);
-			if (result == null && !blockQueue.offer("")) {
-				result = blockQueue.take();
-			}
-		} catch (Exception e) {
-			ThrowExceptionUtils.print(JMXFactoryUtils.class).error("Take block queue has error, msg is ", e);
-		} finally {
-			executor.shutdown();
-		}
-		return (JMXConnector) result;
-	}
+    public static JMXConnector connectWithTimeout(String clusterAlias, final JMXServiceURL url, long timeout, TimeUnit unit) {
+        final BlockingQueue<Object> blockQueue = new ArrayBlockingQueue<>(1);
+        ExecutorService executor = Executors.newSingleThreadExecutor(daemonThreadFactory);
+        executor.submit(new Runnable() {
+            public void run() {
+                try {
+                    JMXConnector connector = null;
+                    if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.jmx.acl")) {
+                        Map<String, Object> envs = new HashMap<>();
+                        String user = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.user");
+                        String passwd = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.password");
+                        String[] credentials = new String[]{user, passwd};
+                        envs.put(JMXConnector.CREDENTIALS, credentials);
+                        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.jmx.ssl")) {
+                            envs.put(Context.SECURITY_PROTOCOL, "ssl");
+                            envs.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, new SslRMIClientSocketFactory());
+                            String truststoreLocation = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.truststore.location");
+                            String truststorePassword = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.truststore.password");
+                            TrustManager[] tms = getTrustManagers(truststoreLocation, truststorePassword);
+                            SSLContext sslContext = SSLContext.getInstance("TLS");
+                            sslContext.init(null, tms, null);
+                            SSLContext.setDefault(sslContext);
+                            envs.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+                        }
+                        connector = JMXConnectorFactory.connect(url, envs);
+                    } else {
+                        connector = JMXConnectorFactory.connect(url);
+                    }
+                    if (!blockQueue.offer(connector))
+                        connector.close();
+                } catch (Exception e) {
+                    if (!blockQueue.offer(e)) {
+                        ErrorUtils.print(JMXFactoryUtils.class).error("Block queue is full, error msg is ", e);
+                    }
+                }
+            }
+        });
+        Object result = null;
+        try {
+            result = blockQueue.poll(timeout, unit);
+            if (result == null && !blockQueue.offer("")) {
+                result = blockQueue.take();
+            }
+        } catch (Exception e) {
+            ErrorUtils.print(JMXFactoryUtils.class).error("Take block queue has error, msg is ", e);
+        } finally {
+            executor.shutdown();
+        }
+        return (JMXConnector) result;
+    }
 
-	private static class DaemonThreadFactory implements ThreadFactory {
-		public Thread newThread(Runnable r) {
-			Thread t = Executors.defaultThreadFactory().newThread(r);
-			t.setDaemon(true);
-			return t;
-		}
-	}
+    private static TrustManager[] getTrustManagers(String location, String password)
+            throws IOException, GeneralSecurityException {
+        String alg = TrustManagerFactory.getDefaultAlgorithm();
+        TrustManagerFactory tmFact = TrustManagerFactory.getInstance(alg);
+
+        FileInputStream fis = new FileInputStream(location);
+        KeyStore ks = KeyStore.getInstance("jks");
+        ks.load(fis, password.toCharArray());
+        fis.close();
+
+        tmFact.init(ks);
+        TrustManager[] tms = tmFact.getTrustManagers();
+        return tms;
+    }
+
+    private static class DaemonThreadFactory implements ThreadFactory {
+        public Thread newThread(Runnable r) {
+            Thread t = Executors.defaultThreadFactory().newThread(r);
+            t.setDaemon(true);
+            return t;
+        }
+    }
 
 }

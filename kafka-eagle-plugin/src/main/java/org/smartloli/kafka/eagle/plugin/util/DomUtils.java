@@ -25,17 +25,19 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
 /**
- * Analysis xml task.
+ * Parse XML nodes for custom processing of different XML files.
  *
  * @author smartloli
  *
  *         Created by Nov 17, 2015
+ *         Modify by Jul 07, 2020
  */
 public class DomUtils {
 	
-	public static void getTomcatServerXML(String xml, String modifyPort) throws Exception {
+	public static void setTomcatServerXML(String xml, String modifyPort) throws Exception {
 		SAXReader reader = new SAXReader();
 		Document document = reader.read(new File(xml));
 		Element node = document.getRootElement();
@@ -56,4 +58,27 @@ public class DomUtils {
 		writer.close();
 	}
 
+	public static void setMasterQuartzXML(String xml, String quartz) throws Exception {
+		SAXReader reader = new SAXReader();
+		Document document = reader.read(new File(xml));
+		Element node = document.getRootElement();
+		List<?> tasks = node.elements();
+		for (Object task : tasks) {
+			Element taskNode = (Element) task;
+			String id = taskNode.attributeValue("id");
+			if ("masterTrigger".equals(id)) {
+				for(Object property : taskNode.elements()){
+					Element propertyNode = (Element) property;
+					String name = propertyNode.attributeValue("name");
+					if ("cronExpression".equals(name)) {
+						propertyNode.element("value").setText(quartz);
+					}
+				}
+			}
+		}
+
+		XMLWriter writer = new XMLWriter(new FileWriter(xml));
+		writer.write(document);
+		writer.close();
+	}
 }

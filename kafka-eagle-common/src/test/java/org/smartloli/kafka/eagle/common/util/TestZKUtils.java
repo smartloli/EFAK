@@ -20,18 +20,18 @@ package org.smartloli.kafka.eagle.common.util;
 import kafka.zk.KafkaZkClient;
 
 /**
-* TODO
-* 
-* @author smartloli.
-*
-* Created by Oct 28, 2018
-*/
+ * TODO
+ * 
+ * @author smartloli.
+ *
+ *         Created by Oct 28, 2018
+ */
 public class TestZKUtils {
 
 	public static void main(String[] args) {
-		KafkaZkClient zkCli = KafkaZKPoolUtils.getInstance().getZkClient("cluster2");
-		KafkaZKPoolUtils.getInstance().release("cluster2", zkCli);
-		System.out.println(zkCli);
+		KafkaZkClient zkCli = KafkaZKPoolUtils.getInstance().getZkClient("cluster4");
+		System.out.println(new String(zkCli.getDataAndStat("/node1")._1().get()));
+		KafkaZKPoolUtils.getInstance().release("cluster4", zkCli);
 	}
-	
+
 }

@@ -195,9 +195,9 @@ public class BScreenServiceImpl implements BScreenService {
 						e.printStackTrace();
 					}
 					if (map.containsKey(hour)) {
-						map.put(hour, map.get(hour) + bscreenConsumer.getLag());
+						map.put(hour, map.get(hour) + Math.abs(bscreenConsumer.getLogsize() - bscreenConsumer.getDiffoffsets()));
 					} else {
-						map.put(hour, bscreenConsumer.getLag());
+						map.put(hour, Math.abs(bscreenConsumer.getLogsize() - bscreenConsumer.getDiffoffsets()));
 					}
 				}
 			}

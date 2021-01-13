@@ -64,4 +64,7 @@ public interface DashboardService {
 
 	/** Get os memory data. */
 	public String getOSMem(Map<String, Object> params);
+
+	/** Get used cpu data. */
+	public String getUsedCPU(Map<String, Object> params);
 }

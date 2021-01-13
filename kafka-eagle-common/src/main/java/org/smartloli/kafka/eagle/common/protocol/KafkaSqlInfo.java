@@ -18,28 +18,38 @@
 package org.smartloli.kafka.eagle.common.protocol;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * TODO
+ * KSQL topic metadata management.
  * 
  * @author smartloli.
  *
  *         Created by Feb 28, 2017
  */
-public class KafkaSqlInfo extends BaseProtocol{
+public class KafkaSqlInfo extends BaseProtocol {
 
 	private List<Integer> partition = new ArrayList<>();
 	private String sql;
 	private String metaSql;
-	private JSONObject schema = new JSONObject();
+	private JSONObject schema = new JSONObject(new LinkedHashMap<>());
 	private String tableName;
+	private long limit = 0L;
 	private String topic;
 	private boolean status;
 	private List<HostsInfo> seeds = new ArrayList<>();
 	private String clusterAlias;
+
+	public long getLimit() {
+		return limit;
+	}
+
+	public void setLimit(long limit) {
+		this.limit = limit;
+	}
 
 	public String getClusterAlias() {
 		return clusterAlias;

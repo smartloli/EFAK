@@ -23,6 +23,7 @@
 # Update by Jul 27, 2019
 
 export MALLOC_ARENA_MAX=1
+export KE_JAVA_OPTS="-server -Xmx2g -Xms2g -XX:MaxGCPauseMillis=20 -XX:+UseG1GC -XX:MetaspaceSize=128m -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80"
 
 stime=`date "+%Y-%m-%d %H:%M:%S"`
 
@@ -76,8 +77,10 @@ start()
  CLASSPATH="${KE_HOME_CONF_DIR}"
  
  rm -rf $KE_HOME/kms/webapps/ke
+ rm -rf $KE_HOME/kms/ROOT
  rm -rf $KE_HOME/kms/work
  mkdir -p $KE_HOME/kms/webapps/ke
+ mkdir -p $KE_HOME/kms/ROOT
  cd $KE_HOME/kms/webapps/ke
  ${JAVA_HOME}/bin/jar -xvf $KE_HOME/kms/webapps/ke.war
  
@@ -95,13 +98,14 @@ start()
  
  CLASS=org.smartloli.kafka.eagle.plugin.progress.KafkaEagleProgress
  ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS port 2>&1
+
  rm -rf ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/*.properties
  cp ${KE_HOME}/conf/*.properties ${KE_HOME}/kms/webapps/ke/WEB-INF/classes/
  
  ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS config 2>&1
  rm -rf ${KE_HOME}/kms/logs/*
  chmod +x ${KE_HOME}/kms/bin/*.sh
- 
+
  ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS startup 2>&1
  nohup ${KE_HOME}/kms/bin/startup.sh >> ${LOG_DIR}/ke.out 2>&1
  ret=$?
@@ -124,6 +128,39 @@ start()
  ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}' > $DIALUP_PID
  rm -rf ${LOG_DIR}/ke_console.out
  ln -s ${KE_HOME}/kms/logs/catalina.out ${LOG_DIR}/ke_console.out
+}
+
+startup()
+{
+ for i in `cat ${KE_HOME}/conf/works`
+ do
+  ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh start>/dev/null" &
+  echo "[$stime] INFO: WorkNodeServer-$i Start Success."
+  sleep 1
+ done
+}
+
+shutdown()
+{
+ for i in `cat ${KE_HOME}/conf/works`
+ do
+  log=`ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh stop" &`
+  echo $log
+ done
+}
+
+list()
+{
+ starttime=`date "+%Y-%m-%d %H:%M:%S"`
+ for i in `cat ${KE_HOME}/conf/works`
+ do
+  log=`ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh status" &`
+  echo $log
+ done
+ endtime=`date +'%Y-%m-%d %H:%M:%S'`
+ start_seconds=$(date --date="$starttime" +%s);
+ end_seconds=$(date --date="$endtime" +%s);
+ echo "Time taken: "$((end_seconds-start_seconds))" seconds."
 }
 
 stop()
@@ -175,7 +212,7 @@ CheckProcessStata()
   else
    CPS_PIDLIST=`ps -ef|grep "$CPS_PNAME"|grep -v grep|awk -F" " '{print $2}'`
   fi
-  
+
   for CPS_i in `echo $CPS_PIDLIST`
   do
    if [ "$CPS_PID" = "" ] ;then
@@ -183,13 +220,13 @@ CheckProcessStata()
    else
     CPS_i1="$CPS_i"
    fi
-   
+
    if [ "$CPS_i1" = "$CPS_PID" ] ;then
     kill -0 $CPS_i >/dev/null 2>&1
     if [ $? != 0 ] ;then
      echo "[`date`] MC-10500: Process $i have Dead"
      kill -9 $CPS_i >/dev/null 2>&1
-     
+
      return 1
     else
      return 0
@@ -258,6 +295,34 @@ version()
  fi
 }
 
+sdate()
+{	
+  if [ -f $KE_HOME/bin/ke.pid ];then
+   SPID=`cat $KE_HOME/bin/ke.pid`
+   if [ "$SPID" != "" ];then
+    echo "[$stime] INFO : Kafka Eagle Process[$SPID] Runtime."
+    ps -eo pid,user,lstart | grep $SPID
+   fi
+  fi
+}
+
+worknode()
+{
+  case "$1" in
+  startup)
+      startup
+      ;;
+  shutdown)
+      shutdown
+      ;;
+  list)
+      list
+      ;;
+  *)
+      echo $"Usage: $0 {startup|shutdown|list}"
+esac
+}
+
 case "$1" in
   start)
       start
@@ -286,8 +351,14 @@ case "$1" in
   version)
       version
       ;;
+  sdate)
+      sdate
+      ;;
+  worknode)
+      worknode $2
+      ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version}"
+      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate|worknode}"
       RETVAL=1
 esac
 exit $RETVAL

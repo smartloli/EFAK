@@ -57,7 +57,7 @@ $(document).ready(function() {
 			endDate : end,
 			ranges : {
 				'Today' : [ moment(), moment() ],
-				'Yesterday' : [ moment().subtract(1, 'days'), moment().subtract(1, 'days') ],
+				'Yesterday' : [ moment().subtract(1, 'days'), moment() ],
 				'Lastest 3 days' : [ moment().subtract(3, 'days'), moment() ],
 				'Lastest 7 days' : [ moment().subtract(6, 'days'), moment() ]
 			}
@@ -92,12 +92,55 @@ $(document).ready(function() {
 	var zk_packets_received = morrisLineInit('zk_recevied_packets');
 	var zk_num_alive_connections = morrisLineInit('zk_alives_connections');
 	var zk_outstanding_requests = morrisLineInit('zk_queue_requests');
-
+	
+	$("#sidebarToggleOff").on("click", function(e) {
+		var opt_zk_packets_sent=zk_packets_sent.getOption();
+	    zk_packets_sent.clear();
+	    zk_packets_sent.resize({width:$("#zk_send_packets").css('width')});
+	    zk_packets_sent.setOption(opt_zk_packets_sent);
+	    
+	    var opt_zk_packets_received=zk_packets_received.getOption();
+	    zk_packets_received.clear();
+	    zk_packets_received.resize({width:$("#zk_recevied_packets").css('width')});
+	    zk_packets_received.setOption(opt_zk_packets_received);
+	    
+	    var opt_zk_num_alive_connections=zk_num_alive_connections.getOption();
+	    zk_num_alive_connections.clear();
+	    zk_num_alive_connections.resize({width:$("#zk_alives_connections").css('width')});
+	    zk_num_alive_connections.setOption(opt_zk_num_alive_connections);
+	    
+	    var opt_zk_outstanding_requests=zk_outstanding_requests.getOption();
+	    zk_outstanding_requests.clear();
+	    zk_outstanding_requests.resize({width:$("#zk_queue_requests").css('width')});
+	    zk_outstanding_requests.setOption(opt_zk_outstanding_requests);
+	});
+	$("#sidebarToggleOn").on("click", function(e) {
+		var opt_zk_packets_sent=zk_packets_sent.getOption();
+	    zk_packets_sent.clear();
+	    zk_packets_sent.resize({width:$("#zk_send_packets").css('width')});
+	    zk_packets_sent.setOption(opt_zk_packets_sent);
+	    
+	    var opt_zk_packets_received=zk_packets_received.getOption();
+	    zk_packets_received.clear();
+	    zk_packets_received.resize({width:$("#zk_recevied_packets").css('width')});
+	    zk_packets_received.setOption(opt_zk_packets_received);
+	    
+	    var opt_zk_num_alive_connections=zk_num_alive_connections.getOption();
+	    zk_num_alive_connections.clear();
+	    zk_num_alive_connections.resize({width:$("#zk_alives_connections").css('width')});
+	    zk_num_alive_connections.setOption(opt_zk_num_alive_connections);
+	    
+	    var opt_zk_outstanding_requests=zk_outstanding_requests.getOption();
+	    zk_outstanding_requests.clear();
+	    zk_outstanding_requests.resize({width:$("#zk_queue_requests").css('width')});
+	    zk_outstanding_requests.setOption(opt_zk_outstanding_requests);
+	});
+	
 	function zkRealtime(stime, etime, type) {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/metrics/trend/mbean/ajax?stime=' + stime + '&etime=' + etime + '&type=' + type,
+			url : '/metrics/trend/mbean/ajax?stime=' + stime + '&etime=' + etime + '&type=' + type,
 			beforeSend : function(xmlHttp) {
 				xmlHttp.setRequestHeader("If-Modified-Since", "0");
 				xmlHttp.setRequestHeader("Cache-Control", "no-cache");

@@ -3,7 +3,7 @@ $(document).ready(function() {
 	$("#select2val").select2({
 		placeholder : "Topic",
 		ajax : {
-			url : "/ke/topic/mock/list/ajax",
+			url : "/topic/mock/list/ajax",
 			dataType : 'json',
 			delay : 250,
 			data : function(params) {
@@ -53,7 +53,7 @@ $(document).ready(function() {
 	$("#select2key").select2({
 		placeholder : "Key",
 		ajax : {
-			url : "/ke/topic/manager/keys/ajax",
+			url : "/topic/manager/keys/ajax",
 			dataType : 'json',
 			delay : 250,
 			data : function(params) {
@@ -141,7 +141,7 @@ $(document).ready(function() {
 		$.ajax({
 			type : 'get',
 			dataType : 'json',
-			url : '/ke/topic/manager/' + type + '/ajax?topic=' + topic + '&key=' + key + '&value=' + value,
+			url : '/topic/manager/' + type + '/ajax?topic=' + topic + '&key=' + key + '&value=' + value,
 			success : function(datas) {
 				if (datas != null) {
 					$("#ke_topic_config_content").text(datas.result);

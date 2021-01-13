@@ -43,7 +43,7 @@ public class TomcatServerListen {
 				xml = System.getProperty("user.dir") + "/kms/conf/server.xml";
 			}
 			String modifyPort = SystemConfigUtils.getProperty("kafka.eagle.webui.port");
-			DomUtils.getTomcatServerXML(xml, modifyPort);
+			DomUtils.setTomcatServerXML(xml, modifyPort);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			LOG.error("Listen Tomcat Server Port Has Error,Msg is " + ex.getMessage());

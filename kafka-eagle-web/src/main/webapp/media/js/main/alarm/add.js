@@ -13,19 +13,19 @@ $(document).ready(function() {
 			var url = "";
 			if (id.indexOf("select2consumergroup") > -1) {
 				placeholder = select2placeholder[0];
-				url = "/ke/alarm/consumer/group/ajax";
+				url = "/alarm/consumer/group/ajax";
 			} else if (id.indexOf("select2consumertopic") > -1) {
 				placeholder = select2placeholder[1];
 				$("#div_select_consumer_topic").html("<select id='select2consumertopic' name='select2consumertopic' tabindex='-1' style='width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;'></select>");
 			} else if (id.indexOf("select2level") > -1) {
 				placeholder = select2placeholder[2];
-				url = "/ke/alarm/cluster/level/list/ajax";
+				url = "/alarm/cluster/level/list/ajax";
 			} else if (id.indexOf("select2maxtimes") > -1) {
 				placeholder = select2placeholder[3];
-				url = "/ke/alarm/cluster/maxtimes/list/ajax";
+				url = "/alarm/cluster/maxtimes/list/ajax";
 			} else if (id.indexOf("select2group") > -1) {
 				placeholder = select2placeholder[4];
-				url = "/ke/alarm/cluster/group/list/ajax";
+				url = "/alarm/cluster/group/list/ajax";
 			}
 			select2common(id, url, placeholder);
 			select2select(id);
@@ -37,7 +37,7 @@ $(document).ready(function() {
 		var url = "";
 		var group = $("#ke_alarm_consumer_group").val();
 		if (group.length > 0) {
-			url = "/ke/alarm/consumer/" + group + "/topic/ajax";
+			url = "/alarm/consumer/" + group + "/topic/ajax";
 		}
 		return url;
 	}
@@ -97,7 +97,7 @@ $(document).ready(function() {
 			if (id.indexOf("select2consumergroup") > -1) {
 				$("#ke_alarm_consumer_group").val(text);
 				var placeholder = select2placeholder[1];
-				var url = "/ke/alarm/consumer/" + text + "/topic/ajax";
+				var url = "/alarm/consumer/" + text + "/topic/ajax";
 				$("#div_select_consumer_topic").html("");
 				$("#div_select_consumer_topic").html("<select id='select2consumertopic' name='select2consumertopic' tabindex='-1' style='width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;'></select>");
 				select2common("select2consumertopic", url, placeholder);
