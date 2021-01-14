@@ -34,75 +34,66 @@
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 						<i class="fas fa-info-circle"></i> <strong>Create a new kafka's topic.</strong>
 					</div>
-				</div>
-			</div>
-			<!-- /.row -->
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<i class="fa fa-tasks fa-fw"></i> Topic Property
-							<div class="pull-right"></div>
-						</div>
-						<!-- /.panel-heading -->
-						<div class="panel-body">
-							<div class="row">
-								<div class="col-lg-12">
-									<form role="form" action="/ke/topic/create/form" method="post"
-										onsubmit="return contextFormValid();return false;">
-										<div class="form-group">
-											<label>Topic Name (*)</label> <input id="ke_topic_name"
-												name="ke_topic_name" class="form-control" maxlength=50>
-											<label for="inputError" class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Made up of letters and digits
-												or underscores . Such as "demo_kafka_topic_1" .</label>
+					<!-- content body -->
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="card mb-4">
+								<div class="card-header">
+									<i class="fas fa-book-open"></i> Topic Property
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-lg-12">
+											<form role="form" action="/topic/create/form" method="post" onsubmit="return contextFormValid();return false;">
+												<div class="form-group">
+													<label>Topic Name (*)</label>
+													<input id="ke_topic_name" name="ke_topic_name" class="form-control" maxlength=50>
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> Made up of letters and digits or underscores . Such as "demo_kafka_topic_1" .
+													</label>
+												</div>
+												<div class="form-group">
+													<label>Partitions (*)</label>
+													<input id="ke_topic_partition" name="ke_topic_partition" class="form-control" maxlength=50 value="1">
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> Partition parameters must be numeric .
+													</label>
+												</div>
+												<div class="form-group">
+													<label>Replication Factor (*)</label>
+													<input id="ke_topic_repli" name="ke_topic_repli" class="form-control" maxlength=50 value="1">
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> Replication Factor parameters must be numeric . Pay attention to available brokers must be larger than replication factor .
+													</label>
+												</div>
+												<div class="form-group">
+													<label>授权用户 </label> 
+													<select id="ke_topic_username" name="ke_topic_username"  class="form-control">
+													  <option value="">选择用户</option>
+													  <option value="gs">GS</option>
+													  <option value="cs">CS</option>
+													  <option value="bi">BI</option>
+													</select>
+													<label for="inputError" class="control-label text-danger">
+														<i class="fa fa-info-circle"></i> 授予用户生产者和消费者权限,添加消费者组(group_username).
+													</label>
+												</div>												
+												<button type="submit" class="btn btn-success">Create</button>
+												<div id="create_alert_msg" style="display: none" class="alert alert-danger">
+													<label>Error! Please make some changes. (*) is required.</label>
+												</div>
+											</form>
 										</div>
-										<div class="form-group">
-											<label>Partitions (*)</label> <input id="ke_topic_partition"
-												name="ke_topic_partition" class="form-control" maxlength=50
-												value="1"> <label for="inputError"
-												class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Partition parameters must be
-												numeric .</label>
-										</div>
-										<div class="form-group">
-											<label>Replication Factor (*)</label> <input
-												id="ke_topic_repli" name="ke_topic_repli"
-												class="form-control" maxlength=50 value="1"><label
-												for="inputError" class="control-label text-danger"><i
-												class="fa fa-info-circle"></i> Replication Factor parameters
-												must be numeric . Pay attention to available brokers must be larger than replication factor .</label>
-										</div>
-										<div class="form-group">
-											<label>授权用户 </label> 
-											<select id="ke_topic_username" name="ke_topic_username"  class="form-control">
-											  <option value="">选择用户</option>
-											  <option value="gs">GS</option>
-											  <option value="cs">CS</option>
-											  <option value="bi">BI</option>
-											</select>
-											<label for="inputError" class="control-label text-danger">
-												<i class="fa fa-info-circle"></i> 授予用户生产者和消费者权限,添加消费者组(group_username).
-											</label>
-										</div>
-										<button type="submit" class="btn btn-success">Create</button>
-										<div id="create_alert_msg" style="display: none"
-											class="alert alert-danger">
-											<label>Error! Please make some changes . (*) is
-												required .</label>
-										</div>
-									</form>
+									</div>
 								</div>
 							</div>
-							<!-- /.panel-body -->
 						</div>
 					</div>
-					<!-- /.col-lg-4 -->
 				</div>
-				<!-- /.row -->
-			</div>
-			<!-- /#page-wrapper -->
+			</main>
+			<jsp:include page="../public/plus/footer.jsp"></jsp:include>
 		</div>
+	</div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
 	<jsp:param value="main/topic/create.js" name="loader" />
