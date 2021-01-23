@@ -39,4 +39,7 @@ public interface KafkaHubService {
 
 	/** Verify topics. */
 	public String verify(String clusterAlias, String reassignTopicsJson);
+
+	/** Preferred replica leader election */
+	public String prefReplicaElection(String clusterAlias, String topic);
 }

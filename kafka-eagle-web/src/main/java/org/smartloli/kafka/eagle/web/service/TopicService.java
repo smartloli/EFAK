@@ -35,6 +35,8 @@ import java.util.Map;
  * Created by Jan 17, 2017.
  * <p>
  * Update by hexiang 20170216
+ * <p>
+ * Update by shen wenbing 20210124
  */
 public interface TopicService {
 
@@ -182,4 +184,9 @@ public interface TopicService {
      * Verify topics.
      */
     public String setBalanceVerify(String clusterAlias, String reassignTopicsJson);
+
+    /**
+     * Preferred replica leader election
+     */
+    public String prefReplicaElection(String clusterAlias, String topic);
 }

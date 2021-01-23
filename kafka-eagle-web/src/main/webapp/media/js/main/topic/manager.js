@@ -134,6 +134,15 @@ $(document).ready(function() {
 			} else {
 				alterTopicConfig('describe', topic, '', '');
 			}
+		} else if (type == "pref_election") {
+			if (topic.length == 0) {
+				$("#alert_message_alter").show();
+				setTimeout(function() {
+					$("#alert_message_alter").hide()
+				}, 3000);
+			} else {
+				prefReplicaElection('election', topic);
+			}
 		}
 	});
 
@@ -142,6 +151,19 @@ $(document).ready(function() {
 			type : 'get',
 			dataType : 'json',
 			url : '/topic/manager/' + type + '/ajax?topic=' + topic + '&key=' + key + '&value=' + value,
+			success : function(datas) {
+				if (datas != null) {
+					$("#ke_topic_config_content").text(datas.result);
+				}
+			}
+		});
+	}
+
+	function prefReplicaElection(type, topic) {
+		$.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/topic/manager/' + type + '/ajax?topic=' + topic,
 			success : function(datas) {
 				if (datas != null) {
 					$("#ke_topic_config_content").text(datas.result);
@@ -162,6 +184,11 @@ $(document).ready(function() {
 			$("#div_topic_msg").show();
 			$("#ke_topic_config_content").text("");
 		} else if ($(this).val() == "desc_config") {
+			$("#div_topic_keys").hide();
+			$("#div_topic_value").hide();
+			$("#div_topic_msg").show();
+			$("#ke_topic_config_content").text("");
+		} else if ($(this).val() == "pref_election") {
 			$("#div_topic_keys").hide();
 			$("#div_topic_value").hide();
 			$("#div_topic_msg").show();

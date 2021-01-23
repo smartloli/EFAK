@@ -427,6 +427,25 @@ public class TopicController {
     }
 
     /**
+     * Preferred replica leader election for a given topic
+     */
+    @RequestMapping(value = "/topic/manager/election/ajax", method = RequestMethod.GET)
+    public void prefReplicaElection(HttpServletResponse response, HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession();
+            String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+            String topic = request.getParameter("topic");
+
+            JSONObject object = new JSONObject();
+            object.put("result", topicService.prefReplicaElection(clusterAlias, topic));
+            byte[] output = object.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
      * Send mock data to topic.
      */
     @RequestMapping(value = "/topic/mock/send/message/topic/ajax", method = RequestMethod.POST)

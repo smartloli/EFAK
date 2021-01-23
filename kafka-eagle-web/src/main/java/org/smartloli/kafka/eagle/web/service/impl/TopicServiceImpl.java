@@ -464,4 +464,9 @@ public class TopicServiceImpl implements TopicService {
         return kafkaHubService.verify(clusterAlias, reassignTopicsJson);
     }
 
+    @Override
+    public String prefReplicaElection(String clusterAlias, String topic) {
+        return kafkaHubService.prefReplicaElection(clusterAlias, topic);
+    }
+
 }

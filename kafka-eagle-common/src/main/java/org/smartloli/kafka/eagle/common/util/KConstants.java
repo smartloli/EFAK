@@ -243,6 +243,7 @@ public class KConstants {
         public static final String ADD = "ADD";
         public static final String DELETE = "DELETE";
         public static final String DESCRIBE = "DESCRIBE";
+        public static final String ELECTION = "ELECTION";
 
         public static final String SUCCESS = "SUCCESS";
         public static final String FAILED = "FAILED";

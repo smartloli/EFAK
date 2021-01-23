@@ -22,13 +22,20 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import kafka.admin.PreferredReplicaLeaderElectionCommand;
 import kafka.admin.ReassignPartitionsCommand;
 import kafka.zk.KafkaZkClient;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
 import scala.collection.JavaConverters;
@@ -36,24 +43,34 @@ import scala.collection.Map;
 import scala.collection.Seq;
 
 import java.io.*;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * Implements {@link KafkaHubService} all method.
  *
  * @author smartloli.
- *
- *         Created by May 21, 2020
+ * <p>
+ * Created by May 21, 2020
  */
 public class KafkaHubServiceImpl implements KafkaHubService {
 
     private final Logger LOG = LoggerFactory.getLogger(KafkaHubServiceImpl.class);
     private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     private final PrintStream pStream = new PrintStream(baos);
+    private final static String KE_REASSIGNMENT_TOPIC = "ke_reassignment_topic_";
+    private final static String KE_ELECTION_TOPIC = "ke_election_topic";
 
-    /** Instance Kafka Zookeeper client pool. */
+    /**
+     * Instance Kafka Zookeeper client pool.
+     */
     private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+
+    /**
+     * Kafka service interface.
+     */
+    private KafkaService kafkaService = new KafkaFactory().create();
 
     private File createKafkaTempJson(Map<TopicPartition, Seq<Object>> tuple) throws IOException {
         JSONObject object = new JSONObject();
@@ -76,8 +93,8 @@ public class KafkaHubServiceImpl implements KafkaHubService {
         return f;
     }
 
-    private File createKafkaTopicTempJson(String reassignTopicsJson) throws IOException {
-        File f = File.createTempFile("ke_reassignment_topic_", ".json");
+    private File createKafkaTopicTempJson(String reassignTopicsJson, String filePrefix) throws IOException {
+        File f = File.createTempFile(filePrefix, ".json");
         FileWriter out = new FileWriter(f);
         out.write(JSON.parseObject(reassignTopicsJson).toJSONString());
         out.close();
@@ -88,13 +105,8 @@ public class KafkaHubServiceImpl implements KafkaHubService {
     /**
      * Generate reassign topics json
      *
-     * @param reassignTopicsJson
-     *            {"topics":[{"topic":"k20200326"}],"version":1}
-     *
-     * @param brokerIdList
-     *            0,1,2 ...
-     *
-     *
+     * @param reassignTopicsJson {"topics":[{"topic":"k20200326"}],"version":1}
+     * @param brokerIdList       0,1,2 ...
      */
     public JSONObject generate(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList) {
         JSONObject object = new JSONObject();
@@ -140,14 +152,16 @@ public class KafkaHubServiceImpl implements KafkaHubService {
         return object;
     }
 
-    /** Execute reassign topics json. */
+    /**
+     * Execute reassign topics json.
+     */
     public String execute(String clusterAlias, String reassignTopicsJson) {
         JSONObject object = new JSONObject();
         String zkServerAddress = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
         PrintStream oldPStream = System.out;
         System.setOut(pStream);
         try {
-            ReassignPartitionsCommand.main(new String[]{"--zookeeper", zkServerAddress, "--reassignment-json-file", createKafkaTopicTempJson(reassignTopicsJson).getAbsolutePath(), "--execute"});
+            ReassignPartitionsCommand.main(new String[]{"--zookeeper", zkServerAddress, "--reassignment-json-file", createKafkaTopicTempJson(reassignTopicsJson, KE_REASSIGNMENT_TOPIC).getAbsolutePath(), "--execute"});
             object.put("success", true);
         } catch (Exception e) {
             object.put("error", "Execute command has error, msg is " + e.getCause().getMessage());
@@ -159,14 +173,16 @@ public class KafkaHubServiceImpl implements KafkaHubService {
         return object.toJSONString();
     }
 
-    /** Verify reassign topics json. */
+    /**
+     * Verify reassign topics json.
+     */
     public String verify(String clusterAlias, String reassignTopicsJson) {
         JSONObject object = new JSONObject();
         String zkServerAddress = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
         PrintStream oldPStream = System.out;
         System.setOut(pStream);
         try {
-            ReassignPartitionsCommand.main(new String[]{"--zookeeper", zkServerAddress, "--reassignment-json-file", createKafkaTopicTempJson(reassignTopicsJson).getAbsolutePath(), "--verify"});
+            ReassignPartitionsCommand.main(new String[]{"--zookeeper", zkServerAddress, "--reassignment-json-file", createKafkaTopicTempJson(reassignTopicsJson, KE_REASSIGNMENT_TOPIC).getAbsolutePath(), "--verify"});
         } catch (Exception e) {
             object.put("error", "Verify command has error, msg is " + e.getCause().getMessage());
             LOG.error("Verify command has error, msg is ", e);
@@ -175,6 +191,63 @@ public class KafkaHubServiceImpl implements KafkaHubService {
         System.setOut(oldPStream);
         object.put("result", baos.toString());
         return object.toJSONString();
+    }
+
+    @Override
+    public String prefReplicaElection(String clusterAlias, String topic) {
+        JSONObject object = new JSONObject();
+        object.put("type", KConstants.Topic.ELECTION);
+        String zkServerAddress = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
+
+        Properties prop = new Properties();
+        prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+            kafkaService.sasl(prop, clusterAlias);
+        }
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+            kafkaService.ssl(prop, clusterAlias);
+        }
+        AdminClient adminClient = null;
+
+        HashMap<String, List<HashMap<String, Object>>> totalTopics = new HashMap<>();
+        ArrayList<HashMap<String, Object>> totalPartitions = new ArrayList<>();
+        try {
+            adminClient = AdminClient.create(prop);
+            List<Integer> partitionsList = adminClient.describeTopics(Collections.singleton(topic))
+                    .all().get().get(topic).partitions().stream().map(p -> p.partition()).collect(Collectors.toList());
+            for (int i = 0; i < partitionsList.size(); i++) {
+                HashMap<String, Object> partition = new HashMap<>();
+                partition.put("topic", topic);
+                partition.put("partition", partitionsList.get(i));
+                totalPartitions.add(partition);
+            }
+            totalTopics.put("partitions", totalPartitions);
+            String totalPartitionsForPrefElection = JSON.toJSON(totalTopics).toString();
+            PreferredReplicaLeaderElectionCommand.main(new String[]{"--zookeeper", zkServerAddress, "--path-to-json-file", createKafkaTopicTempJson(totalPartitionsForPrefElection, KE_ELECTION_TOPIC).getAbsolutePath()});
+            object.put("value", "Execute preferred replica leader election command successfully for topic " + topic);
+        } catch (Exception e) {
+            object.put("value", "Execute preferred replica leader election command has error, msg is " + e.getCause().getMessage());
+            LOG.error("Execute preferred replica leader election command for topic {} has error, msg is {}", topic, e);
+        }
+
+        if (adminClient != null) {
+            adminClient.close();
+        }
+
+        return object.toJSONString();
+    }
+
+    private String parseBrokerServer(String clusterAlias) {
+        String brokerServer = "";
+        List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+        for (BrokersInfo broker : brokers) {
+            brokerServer += broker.getHost() + ":" + broker.getPort() + ",";
+        }
+        if ("".equals(brokerServer)) {
+            return "";
+        }
+        return brokerServer.substring(0, brokerServer.length() - 1);
     }
 
 }

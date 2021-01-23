@@ -57,6 +57,9 @@
 										<label class="radio-inline">
 											<input type="radio" name="ke_topic_alter" id="ke_topic_describe" value="desc_config">Describe Config
 										</label>
+										<label class="radio-inline">
+											<input type="radio" name="ke_topic_alter" id="ke_topic_election" value="pref_election">Preferred Replica Election
+										</label>
 										<br />
 										<label for="inputError" class="control-label text-danger">
 											<i class="fa fa-info-circle"></i> Select operate type when you getter/setter topic .
