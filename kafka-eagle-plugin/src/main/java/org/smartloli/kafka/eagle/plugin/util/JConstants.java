@@ -93,7 +93,7 @@ public interface JConstants {
 
     static String CREATE_TABLE_KE_ALARM_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_alarm_consumer` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(128) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`alarm_group` varchar(128) DEFAULT NULL,`alarm_times` int(11),`alarm_max_times` int(11) , `alarm_level` varchar(4),`is_normal` varchar(2) DEFAULT 'Y', `is_enable` varchar(2) DEFAULT 'Y', `created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-    static String CREATE_TABLE_KE_ALARM_CRONTAB = "CREATE TABLE IF NOT EXISTS `ke_alarm_crontab` (`id` bigint(20) NOT NULL ,`type` varchar(64) NOT NULL,`crontab` varchar(32) DEFAULT NULL, `is_enable` varchar(2) DEFAULT 'Y', `created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`,`type`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+    static String CREATE_TABLE_KE_ALARM_CRONTAB = "CREATE TABLE IF NOT EXISTS `ke_alarm_crontab` (`id` bigint(20) NOT NULL,`type` varchar(64) NOT NULL,`crontab` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`,`type`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     static String CREATE_TABLE_KE_ALARM_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_alarm_config` (`cluster` varchar(64) NOT NULL,`alarm_group` varchar(128) NOT NULL,`alarm_type` varchar(16) DEFAULT NULL,`alarm_url` text DEFAULT NULL,`http_method` varchar(16) DEFAULT NULL,`alarm_address` text DEFAULT NULL,`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`cluster`,`alarm_group`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -137,7 +137,7 @@ public interface JConstants {
 
     static String CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER = "CREATE TABLE IF NOT EXISTS `ke_alarm_consumer` (`id` integer primary key autoincrement,`cluster` varchar(64),`group` varchar(128),`topic` varchar(128),`lag` bigint(20),`alarm_group` varchar(128) ,`alarm_times` int(11),`alarm_max_times` int(11) , `alarm_level` varchar(4), `is_normal` varchar(2) DEFAULT 'Y', `is_enable` varchar(2) DEFAULT 'Y',`created` varchar(32),`modify` varchar(32))";
 
-    static String CREATE_TABLE_SQLITE_KE_ALARM_CRONTAB = "CREATE TABLE IF NOT EXISTS `ke_alarm_consumer` (`id` integer,`type` varchar(64),`crontab` varchar(32),`is_enable` varchar(2) DEFAULT 'Y',`created` varchar(32),`modify` varchar(32),primary key (`id`,`type`))";
+    static String CREATE_TABLE_SQLITE_KE_ALARM_CRONTAB = "CREATE TABLE IF NOT EXISTS `ke_alarm_crontab` (`id` integer,`type` varchar(64),`crontab` varchar(32),primary key (`id`,`type`))";
 
     static String CREATE_TABLE_SQLITE_KE_ALARM_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_alarm_config` (`cluster` varchar(64) ,`alarm_group` varchar(128) ,`alarm_type` varchar(16) ,`alarm_url` text ,`http_method` varchar(16) ,`alarm_address` text ,`created` varchar(32) ,`modify` varchar(32) , PRIMARY KEY (`cluster`,`alarm_group`))";
 

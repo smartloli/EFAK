@@ -204,6 +204,56 @@
                         </div>
                     </div>
                 </div>
+                <!-- Crontab -->
+                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="alarm_cluster_crontab"
+                     tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="keModalLabel">Crontab</h4>
+                                <button class="close" type="button" data-dismiss="modal">x</button>
+                            </div>
+                            <!-- /.row -->
+                            <div class="modal-body">
+                                <form role="form" action="/alarm/history/modify/crontab/" method="post"
+                                      onsubmit="return contextCrontabFormValid();return false;">
+                                    <fieldset class="form-horizontal">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon3">Crontab</span>
+                                            </div>
+                                            <input id="ke_alarm_cluster_id_crontab" name="ke_alarm_cluster_id_crontab"
+                                                   type="hidden" class="form-control" placeholder="">
+                                            <input id="ke_alarm_cluster_id_type" name="ke_alarm_cluster_id_type"
+                                                   type="hidden" class="form-control" placeholder="">
+                                            <input id="ke_alarm_cluster_name_crontab"
+                                                   name="ke_alarm_cluster_name_crontab"
+                                                   type="text"
+                                                   class="form-control" placeholder="0 */1 * * * ?"
+                                                   aria-describedby="basic-addon3">
+                                        </div>
+                                        <div id="alert_message_crontab" style="display: none"
+                                             class="alert alert-danger">
+                                            <label> Oops! The expression cannot be empty.</label>
+                                        </div>
+                                        <div id="alert_message_crontab_error" style="display: none"
+                                             class="alert alert-danger">
+                                            <label> Oops! Incorrect expression validation.</label>
+                                        </div>
+                                    </fieldset>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Cancle
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="create-modify">Submit
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- More then detail -->
                 <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_alarm_cluster_detail"
                      tabindex="-1" role="dialog">
@@ -242,6 +292,7 @@
 <jsp:include page="../public/plus/script.jsp">
     <jsp:param value="main/alarm/history.js" name="loader"/>
     <jsp:param value="plugins/select2/select2.min.js" name="loader"/>
+    <jsp:param value="plugins/crontab/cron.util.js" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>
 <script type="text/javascript">
@@ -255,6 +306,28 @@
             $("#alert_message_modify").show();
             setTimeout(function () {
                 $("#alert_message_modify").hide()
+            }, 3000);
+            return false;
+        }
+
+        return true;
+    }
+
+    function contextCrontabFormValid() {
+        var ke_alarm_cluster_name_crontab = $("#ke_alarm_cluster_name_crontab").val();
+
+        if (ke_alarm_cluster_name_crontab.length == 0) {
+            $("#alert_message_crontab").show();
+            setTimeout(function () {
+                $("#alert_message_crontab").hide()
+            }, 3000);
+            return false;
+        }
+
+        if (!cronValidate(ke_alarm_cluster_name_crontab)) {
+            $("#alert_message_crontab_error").show();
+            setTimeout(function () {
+                $("#alert_message_crontab_error").hide()
             }, 3000);
             return false;
         }

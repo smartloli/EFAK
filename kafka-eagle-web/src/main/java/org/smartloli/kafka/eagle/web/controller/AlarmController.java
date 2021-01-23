@@ -22,15 +22,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.api.util.AlertUtils;
-import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
-import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
-import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
-import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmEmailMockInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.protocol.alarm.*;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
-import org.smartloli.kafka.eagle.common.util.StrUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -585,7 +579,7 @@ public class AlarmController {
             obj.put("modify", clustersInfo.getModify());
             obj.put("operate",
                     "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='alarm_cluster_modify' href='#"
-                            + id + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + id
+                            + id + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' name='alarm_cluster_crontab' href='#" + id + "#" + clustersInfo.getType() + "'><i class='fas fa-clock fa-sm fa-fw mr-1'></i>Crontab</a><a class='dropdown-item' href='#" + id
                             + "' name='alarm_cluster_remove'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Delete</a></div>");
             aaDatas.add(obj);
         }
@@ -696,6 +690,32 @@ public class AlarmController {
         cluster.setAlarmLevel(level);
         cluster.setModify(CalendarUtils.getDate());
         if (alertService.modifyClusterAlertById(cluster) > 0) {
+            return "redirect:/alarm/history";
+        } else {
+            return "redirect:/errors/500";
+        }
+    }
+
+    /**
+     * Modify consumer topic crontab alert info.
+     */
+    @RequestMapping(value = "/alarm/history/modify/crontab/", method = RequestMethod.POST)
+    public String modifyClusterCrontabAlertInfo(HttpSession session, HttpServletRequest request) {
+        String id = request.getParameter("ke_alarm_cluster_id_crontab");
+        String type = request.getParameter("ke_alarm_cluster_id_type");
+        String crontab = request.getParameter("ke_alarm_cluster_name_crontab");
+
+        AlarmCrontabInfo alarmCrontabInfo = new AlarmCrontabInfo();
+        try {
+            alarmCrontabInfo.setId(Integer.parseInt(id));
+        } catch (Exception e) {
+            ErrorUtils.print(this.getClass()).error("Parse id[" + id + "] has error, msg is ", e);
+            return "redirect:/errors/500";
+        }
+        alarmCrontabInfo.setType(type);
+        alarmCrontabInfo.setCrontab(crontab);
+
+        if (alertService.insertAlarmCrontab(alarmCrontabInfo) > 0) {
             return "redirect:/alarm/history";
         } else {
             return "redirect:/errors/500";
@@ -920,6 +940,30 @@ public class AlarmController {
             } else if ("modify".equals(type)) {
                 object.put("url", alertService.getAlarmConfigByGroupName(params).getAlarmUrl());
                 object.put("address", alertService.getAlarmConfigByGroupName(params).getAlarmAddress());
+            }
+            byte[] output = object.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Get crontab information by id.
+     */
+    @RequestMapping(value = "/alarm/crontab/get/{id}/{type}/ajax", method = RequestMethod.GET)
+    public void getCrontabInfByIdAjax(@PathVariable("id") int id, @PathVariable("type") String type, HttpServletResponse response, HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession();
+            String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+            Map<String, Object> params = new HashMap<>();
+            params.put("cluster", clusterAlias);
+            params.put("id", id);
+            params.put("type", type);
+            JSONObject object = new JSONObject();
+            AlarmCrontabInfo alarmCrontabInfo = alertService.getAlarmCrontab(params);
+            if (alarmCrontabInfo != null) {
+                object.put("crontab", alarmCrontabInfo.getCrontab());
             }
             byte[] output = object.toJSONString().getBytes();
             BaseController.response(output, response);

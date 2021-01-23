@@ -48,6 +48,11 @@ public interface AlertService {
     public int insertAlarmCrontab(AlarmCrontabInfo alarmCrontab);
 
     /**
+     * Get crontab information.
+     */
+    public AlarmCrontabInfo getAlarmCrontab(Map<String, Object> params);
+
+    /**
      * Get consumer group alarm.
      */
     public String getAlarmConsumerGroup(String clusterAlias, String formatter, String search);

@@ -44,14 +44,15 @@ import java.util.regex.Pattern;
  * Alarm implements service to get configure info.
  *
  * @Author smartloli.
- *
- *         Created by Oct 27, 2018.
- *
+ * <p>
+ * Created by Oct 27, 2018.
  */
 @Service
 public class AlertServiceImpl implements AlertService {
 
-    /** Kafka service interface. */
+    /**
+     * Kafka service interface.
+     */
     private KafkaService kafkaService = new KafkaFactory().create();
 
     @Autowired
@@ -69,7 +70,14 @@ public class AlertServiceImpl implements AlertService {
         return alertDao.insertAlarmCrontab(alarmCrontab);
     }
 
-    /** Get consumer group to alert. */
+    @Override
+    public AlarmCrontabInfo getAlarmCrontab(Map<String, Object> params) {
+        return alertDao.getAlarmCrontab(params);
+    }
+
+    /**
+     * Get consumer group to alert.
+     */
     public String getAlarmConsumerGroup(String clusterAlias, String formatter, String search) {
         if ("kafka".equals(formatter)) {
             return getAlarmConsumerGroupKafka(clusterAlias, search);
@@ -78,7 +86,9 @@ public class AlertServiceImpl implements AlertService {
         }
     }
 
-    /** Get consumer topic to alert. */
+    /**
+     * Get consumer topic to alert.
+     */
     public String getAlarmConsumerTopic(String clusterAlias, String formatter, String group, String search) {
         if ("kafka".equals(formatter)) {
             return getAlarmConsumerTopicKafka(clusterAlias, group, search);
@@ -248,7 +258,9 @@ public class AlertServiceImpl implements AlertService {
         return alertDao.getAllAlarmClusterTasks();
     }
 
-    /** Get alert type list. */
+    /**
+     * Get alert type list.
+     */
     public String getAlertTypeList() {
         int offset = 0;
         JSONArray typeList = new JSONArray();

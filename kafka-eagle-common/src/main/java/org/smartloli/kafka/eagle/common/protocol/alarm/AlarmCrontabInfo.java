@@ -30,9 +30,6 @@ public class AlarmCrontabInfo extends BaseProtocol {
     private long id;
     private String type;
     private String crontab;
-    private String isEnable;
-    private String create;
-    private String modify;
 
     public long getId() {
         return id;
@@ -58,27 +55,4 @@ public class AlarmCrontabInfo extends BaseProtocol {
         this.crontab = crontab;
     }
 
-    public String getIsEnable() {
-        return isEnable;
-    }
-
-    public void setIsEnable(String isEnable) {
-        this.isEnable = isEnable;
-    }
-
-    public String getCreate() {
-        return create;
-    }
-
-    public void setCreate(String create) {
-        this.create = create;
-    }
-
-    public String getModify() {
-        return modify;
-    }
-
-    public void setModify(String modify) {
-        this.modify = modify;
-    }
 }

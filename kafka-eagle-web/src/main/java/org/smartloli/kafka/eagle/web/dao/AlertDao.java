@@ -45,6 +45,11 @@ public interface AlertDao {
     public int insertAlarmCrontab(AlarmCrontabInfo alarmCrontab);
 
     /**
+     * Get crontab information.
+     */
+    public AlarmCrontabInfo getAlarmCrontab(Map<String, Object> params);
+
+    /**
      * Get alarm consumer application list.
      */
     public List<AlarmConsumerInfo> getAlarmConsumerAppList(Map<String, Object> params);

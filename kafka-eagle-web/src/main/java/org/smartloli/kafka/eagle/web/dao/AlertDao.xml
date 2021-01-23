@@ -45,6 +45,12 @@
         <result property="modify" column="modify"/>
     </resultMap>
 
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmCrontabInfo" id="alarmCron">
+        <result property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="crontab" column="crontab"/>
+    </resultMap>
+
     <insert id="insertOrUpdateAlarmConfig"
             parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo">
         replace into
@@ -65,6 +71,13 @@
             </if>
         </where>
         limit #{start},#{size}
+    </select>
+
+    <select id="getAlarmCrontab" parameterType="map" resultMap="alarmCron">
+        select * from ke_alarm_crontab
+        <where>
+            `id`=#{id} and `type`=#{type}
+        </where>
     </select>
 
     <select id="getAlarmConfigByGroupName" parameterType="map" resultMap="alarmConfig">
@@ -90,9 +103,9 @@
     </insert>
 
     <insert id="insertAlarmCrontab" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmCrontabInfo">
-        insert into
-        ke_alarm_crontab(`id`,`type`,`crontab`,`is_enable`,`created`,`modify`)
-        values(#{id},#{type},#{crontab},#{isEnable},#{created},#{modify})
+        replace into
+        ke_alarm_crontab(`id`,`type`,`crontab`)
+        values(#{id},#{type},#{crontab})
     </insert>
 
     <select id="getAlarmConsumerAppList" parameterType="map" resultMap="alarmConsumer">
