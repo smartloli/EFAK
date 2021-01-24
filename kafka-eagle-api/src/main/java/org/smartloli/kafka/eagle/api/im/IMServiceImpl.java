@@ -21,6 +21,7 @@ import org.smartloli.kafka.eagle.api.im.queue.DingDingJob;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmCrontabInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
+import org.smartloli.kafka.eagle.common.protocol.quartz.QuartzStateInfo;
 import org.smartloli.kafka.eagle.common.util.QuartzManagerUtils;
 
 /**
@@ -32,30 +33,51 @@ import org.smartloli.kafka.eagle.common.util.QuartzManagerUtils;
  */
 public class IMServiceImpl implements IMService {
 
-    private static final String KE_JOB_ID = "ke_job_id_";
-    private static final String KE_TRIGGER_ID = "ke_trigger_id_";
+    private static final String KE_JOB_GROUP_ID = "KE_JOB_GROUP_ID_";
+    private static final String KE_JOB_NAME = "KE_JOB_NAME_";
+    private static final String KE_TRIGGER_GROUP_ID = "KE_TRIGGER_GROUP_ID";
+    private static final String KE_TRIGGER_NAME = "KE_TRIGGER_NAME_";
 
     /**
      * Send Json msg by dingding.
      */
     @Override
     public void sendPostMsgByDingDing(AlarmMessageInfo alarmMessageInfo, String url, AlarmCrontabInfo alarmCrontabInfo, String isNormal) {
-        BaseJobContext jobContext = new BaseJobContext();
-        jobContext.setAlarmMessageInfo(alarmMessageInfo);
-        jobContext.setUrl(url);
-        String jobName = KE_JOB_ID + alarmCrontabInfo.getType() + "_" + isNormal + "_" + alarmCrontabInfo.getId();
-        String triggerName = KE_TRIGGER_ID + alarmCrontabInfo.getType() + "_" + isNormal + "_" + alarmCrontabInfo.getId();
+//        BaseJobContext jobContext = new BaseJobContext();
+//        jobContext.setAlarmMessageInfo(alarmMessageInfo);
+//        jobContext.setUrl(url);
+
         // QuartzManagerUtils.addJob(jobContext, KE_JOB_ID + new Date().getTime(), DingDingJob.class, QuartzManagerUtils.getCron(new Date(), 5));
         if (alarmCrontabInfo != null) {
-            QuartzManagerUtils.replaceJob(jobContext, jobName, triggerName, DingDingJob.class, alarmCrontabInfo.getCrontab());
+            String jobGroup = KE_JOB_GROUP_ID + alarmCrontabInfo.getType() + "_" + isNormal + "_" + alarmCrontabInfo.getId();
+            String jobName = KE_JOB_NAME + alarmCrontabInfo.getType() + "_" + isNormal + "_" + alarmCrontabInfo.getId();
+            String triggerGroup = KE_TRIGGER_GROUP_ID + alarmCrontabInfo.getType() + "_" + isNormal + "_" + alarmCrontabInfo.getId();
+            String triggerName = KE_TRIGGER_NAME + alarmCrontabInfo.getType() + "_" + isNormal + "_" + alarmCrontabInfo.getId();
+            QuartzStateInfo qsi = new QuartzStateInfo();
+            qsi.setCron(alarmCrontabInfo.getCrontab());
+            qsi.setAlarmMessageInfo(alarmMessageInfo);
+            qsi.setJobClass(DingDingJob.class);
+            qsi.setKeJobGroup(jobGroup);
+            qsi.setKeJobName(jobName);
+            qsi.setKeTriggerGroup(triggerGroup);
+            qsi.setKeTriggerName(triggerName);
+            qsi.setUrl(url);
+            QuartzManagerUtils.replaceJob(qsi);
         }
     }
 
     @Override
-    public void removePostMsgByIM(AlarmCrontabInfo alarmCrontabInfo, String isNormal) {
-        String jobName = KE_JOB_ID + alarmCrontabInfo.getType() + "_" + isNormal + "_" + alarmCrontabInfo.getId();
-        String triggerName = KE_TRIGGER_ID + alarmCrontabInfo.getType() + "_" + isNormal + "_" + alarmCrontabInfo.getId();
-        QuartzManagerUtils.removeJob(jobName, triggerName);
+    public void removePostMsgByIM(String id, String type, String isNormal) {
+        String jobGroup = KE_JOB_GROUP_ID + type + "_" + isNormal + "_" + id;
+        String jobName = KE_JOB_NAME + type + "_" + isNormal + "_" + id;
+        String triggerGroup = KE_TRIGGER_GROUP_ID + type + "_" + isNormal + "_" + id;
+        String triggerName = KE_TRIGGER_NAME + type + "_" + isNormal + "_" + id;
+        QuartzStateInfo qsi = new QuartzStateInfo();
+        qsi.setKeJobGroup(jobGroup);
+        qsi.setKeJobName(jobName);
+        qsi.setKeTriggerGroup(triggerGroup);
+        qsi.setKeTriggerName(triggerName);
+        QuartzManagerUtils.removeJob(qsi);
     }
 
     @Override

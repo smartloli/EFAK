@@ -192,13 +192,7 @@ public class AlertQuartz {
             AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
             for (AlarmClusterInfo cluster : alertService.getAllAlarmClusterTasks()) {
                 if (AlarmType.DISABLE.equals(cluster.getIsEnable())) {
-                    Map<String, Object> cronParams = new HashMap<>();
-                    cronParams.put("id", cluster.getId());
-                    cronParams.put("type", cluster.getType());
-                    AlarmCrontabInfo alarmCrontabInfo = alertService.getAlarmCrontab(cronParams);
-                    if (alarmCrontabInfo != null) {
-                        imService.removePostMsgByIM(alarmCrontabInfo, cluster.getType());
-                    }
+                    imService.removePostMsgByIM(cluster.getId() + "", cluster.getType(), cluster.getIsEnable());
                     break;
                 }
                 String alarmGroup = cluster.getAlarmGroup();
@@ -524,7 +518,7 @@ public class AlertQuartz {
             }
             // Remove the abnormal alarm after returning to normal
             if (alarmCron != null) {
-                imService.removePostMsgByIM(alarmCron, "Y");
+                imService.removePostMsgByIM(cluster.getId() + "", cluster.getType(), "Y");
             }
         }
     }

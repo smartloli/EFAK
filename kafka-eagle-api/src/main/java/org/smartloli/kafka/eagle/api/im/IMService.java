@@ -37,7 +37,7 @@ public interface IMService {
     /**
      * Stop IM quartz tasks.
      */
-    public void removePostMsgByIM(AlarmCrontabInfo alarmCrontabInfo, String isNormal);
+    public void removePostMsgByIM(String id, String type, String isNormal);
 
     /**
      * Send alert message by wechat.

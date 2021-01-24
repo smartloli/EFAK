@@ -21,7 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
+import org.smartloli.kafka.eagle.common.protocol.quartz.QuartzStateInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
@@ -44,9 +44,9 @@ public class DingDingJob implements Job {
      * Send alarm information by dingding.
      */
     public void execute(JobExecutionContext jobContext) throws JobExecutionException {
-        BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
-        bjc.getAlarmMessageInfo().setAlarmDate(CalendarUtils.getDate());
-        sendMsg(bjc.getAlarmMessageInfo().toDingDingMarkDown(), bjc.getUrl());
+        QuartzStateInfo qsi = (QuartzStateInfo) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
+        qsi.getAlarmMessageInfo().setAlarmDate(CalendarUtils.getDate());
+        sendMsg(qsi.getAlarmMessageInfo().toDingDingMarkDown(), qsi.getUrl());
     }
 
     private int sendMsg(String data, String url) {

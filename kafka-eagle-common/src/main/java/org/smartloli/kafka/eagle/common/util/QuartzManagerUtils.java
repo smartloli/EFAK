@@ -19,7 +19,7 @@ package org.smartloli.kafka.eagle.common.util;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
-import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
+import org.smartloli.kafka.eagle.common.protocol.quartz.QuartzStateInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
 
 import java.text.SimpleDateFormat;
@@ -41,16 +41,34 @@ public class QuartzManagerUtils {
     /**
      * Add new job.
      */
-    public static void addJob(BaseJobContext jobContext, String jobName, String triggerName, Class<? extends Job> jobClass, String cron) {
+//    public static void addJob(BaseJobContext jobContext, String jobName, String triggerName, Class<? extends Job> jobClass, String cron) {
+//        try {
+//            Scheduler sched = schedulerFactory.getScheduler();
+//            JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, KE_JOB_GROUP_NAME).build();
+//            jobDetail.getJobDataMap().put(AlarmQueue.JOB_PARAMS, jobContext);
+//            TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+//            // triggerBuilder.withIdentity("ke_trigger_name_" + new Date().getTime(), "ke_trigger_group_" + new Date().getTime());
+//            triggerBuilder.withIdentity(triggerName, KE_JOB_GROUP_NAME);
+//            triggerBuilder.startNow();
+//            triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron));
+//            CronTrigger trigger = (CronTrigger) triggerBuilder.build();
+//            sched.scheduleJob(jobDetail, trigger);
+//            if (!sched.isShutdown()) {
+//                sched.start();
+//            }
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+    public static void addJob(QuartzStateInfo quartzStateInfo) {
         try {
             Scheduler sched = schedulerFactory.getScheduler();
-            JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, KE_JOB_GROUP_NAME).build();
-            jobDetail.getJobDataMap().put(AlarmQueue.JOB_PARAMS, jobContext);
+            JobDetail jobDetail = JobBuilder.newJob(quartzStateInfo.getJobClass()).withIdentity(quartzStateInfo.getKeJobName(), quartzStateInfo.getKeJobGroup()).build();
+            jobDetail.getJobDataMap().put(AlarmQueue.JOB_PARAMS, quartzStateInfo);
             TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
-            // triggerBuilder.withIdentity("ke_trigger_name_" + new Date().getTime(), "ke_trigger_group_" + new Date().getTime());
-            triggerBuilder.withIdentity(triggerName, KE_JOB_GROUP_NAME);
+            triggerBuilder.withIdentity(quartzStateInfo.getKeTriggerName(), quartzStateInfo.getKeTriggerGroup());
             triggerBuilder.startNow();
-            triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron));
+            triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(quartzStateInfo.getCron()));
             CronTrigger trigger = (CronTrigger) triggerBuilder.build();
             sched.scheduleJob(jobDetail, trigger);
             if (!sched.isShutdown()) {
@@ -61,15 +79,15 @@ public class QuartzManagerUtils {
         }
     }
 
-    public static void replaceJob(BaseJobContext jobContext, String jobName, String triggerName, Class<? extends Job> jobClass, String cron) {
+    public static void replaceJob(QuartzStateInfo quartzStateInfo) {
         try {
             Scheduler sched = schedulerFactory.getScheduler();
-            TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, KE_JOB_GROUP_NAME);
+            TriggerKey triggerKey = TriggerKey.triggerKey(quartzStateInfo.getKeTriggerName(), quartzStateInfo.getKeTriggerGroup());
             CronTrigger trigger = (CronTrigger) sched.getTrigger(triggerKey);
             if (trigger == null) {
-                addJob(jobContext, jobName, triggerName, jobClass, cron);
+                addJob(quartzStateInfo);
             } else {
-                modifyJobTime(triggerName, cron);
+                modifyJobTime(quartzStateInfo);
             }
         } catch (Exception e) {
             ErrorUtils.print(QuartzManagerUtils.class).error("Add or modify crontab task has error, msg is ", e);
@@ -79,21 +97,21 @@ public class QuartzManagerUtils {
     /**
      * Modify job.
      */
-    public static void modifyJobTime(String triggerName, String cron) {
+    public static void modifyJobTime(QuartzStateInfo quartzStateInfo) {
         try {
             Scheduler sched = schedulerFactory.getScheduler();
-            TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, KE_JOB_GROUP_NAME);
+            TriggerKey triggerKey = TriggerKey.triggerKey(quartzStateInfo.getKeTriggerName(), quartzStateInfo.getKeTriggerGroup());
             CronTrigger trigger = (CronTrigger) sched.getTrigger(triggerKey);
             if (trigger == null) {
                 return;
             }
 
             String oldTime = trigger.getCronExpression();
-            if (!oldTime.equalsIgnoreCase(cron)) {
+            if (!oldTime.equalsIgnoreCase(quartzStateInfo.getCron())) {
                 TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
-                triggerBuilder.withIdentity(triggerName, KE_JOB_GROUP_NAME);
+                triggerBuilder.withIdentity(quartzStateInfo.getKeTriggerName(), quartzStateInfo.getKeTriggerGroup());
                 triggerBuilder.startNow();
-                triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron));
+                triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(quartzStateInfo.getCron()));
                 trigger = (CronTrigger) triggerBuilder.build();
                 sched.rescheduleJob(triggerKey, trigger);
             }
@@ -105,13 +123,13 @@ public class QuartzManagerUtils {
     /**
      * Remove job.
      */
-    public static void removeJob(String jobName, String triggerName) {
+    public static void removeJob(QuartzStateInfo quartzStateInfo) {
         try {
             Scheduler sched = schedulerFactory.getScheduler();
-            TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, KE_JOB_GROUP_NAME);
+            TriggerKey triggerKey = TriggerKey.triggerKey(quartzStateInfo.getKeTriggerName(), quartzStateInfo.getKeTriggerGroup());
             sched.pauseTrigger(triggerKey);
             sched.unscheduleJob(triggerKey);
-            sched.deleteJob(JobKey.jobKey(jobName, KE_JOB_GROUP_NAME));
+            sched.deleteJob(JobKey.jobKey(quartzStateInfo.getKeJobName(), quartzStateInfo.getKeJobGroup()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

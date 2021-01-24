@@ -37,7 +37,7 @@ public class TestQuartzManagerUtils {
         BaseJobContext bjc = new BaseJobContext();
         bjc.setData("test");
         bjc.setUrl("http://www.kafka-eagle.org");
-        QuartzManagerUtils.addJob(bjc, jobName, jobName, TestJob.class, "*/10 * * * * ?");
+        // QuartzManagerUtils.addJob(bjc, jobName, jobName, TestJob.class, "*/10 * * * * ?");
 //        QuartzManagerUtils.addJob(bjc, jobName2, TestJob.class, QuartzManagerUtils.getCron(new Date(), 10));
 
         // QuartzManagerUtils.addJob("ke_job_id_" + new Date().getTime(),
