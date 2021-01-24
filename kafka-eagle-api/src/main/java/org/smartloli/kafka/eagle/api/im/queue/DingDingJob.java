@@ -22,6 +22,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
@@ -34,15 +35,18 @@ import java.util.Map;
  * Add alarm message to dingding job queue.
  *
  * @author smartloli.
- *
- *         Created by Oct 27, 2019
+ * <p>
+ * Created by Oct 27, 2019
  */
 public class DingDingJob implements Job {
 
-    /** Send alarm information by dingding. */
+    /**
+     * Send alarm information by dingding.
+     */
     public void execute(JobExecutionContext jobContext) throws JobExecutionException {
         BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
-        sendMsg(bjc.getData(), bjc.getUrl());
+        bjc.getAlarmMessageInfo().setAlarmDate(CalendarUtils.getDate());
+        sendMsg(bjc.getAlarmMessageInfo().toDingDingMarkDown(), bjc.getUrl());
     }
 
     private int sendMsg(String data, String url) {

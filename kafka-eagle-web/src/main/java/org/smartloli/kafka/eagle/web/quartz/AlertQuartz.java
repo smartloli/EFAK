@@ -22,10 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.api.im.IMFactory;
 import org.smartloli.kafka.eagle.api.im.IMService;
 import org.smartloli.kafka.eagle.api.im.IMServiceImpl;
-import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
-import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
-import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
-import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
+import org.smartloli.kafka.eagle.common.protocol.alarm.*;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmType;
@@ -52,6 +49,7 @@ public class AlertQuartz {
      * Kafka topic config service interface.
      */
     private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
+    private IMService imService = new IMFactory().create();
 
     public void alertJobQuartz() {
         // Run consumer job
@@ -147,7 +145,7 @@ public class AlertQuartz {
                 alarmMsg.setAlarmContent("<font color=\"#FF0000\">lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
                 alarmMsg.setAlarmStatus("<font color=\"#FF0000\">PROBLEM</font>");
                 IMService im = new IMFactory().create();
-                im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
+                // im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
                 alarmMsg.setTitle("`Kafka Eagle Alarm Consumer Notice`\n");
                 alarmMsg.setAlarmContent("<font color=\"warning\">lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
@@ -177,7 +175,7 @@ public class AlertQuartz {
                 alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
                 alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
                 IMService im = new IMFactory().create();
-                im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
+                // im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
                 alarmMsg.setTitle("`Kafka Eagle Alarm Consumer Cancel`\n");
                 alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
@@ -194,6 +192,13 @@ public class AlertQuartz {
             AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
             for (AlarmClusterInfo cluster : alertService.getAllAlarmClusterTasks()) {
                 if (AlarmType.DISABLE.equals(cluster.getIsEnable())) {
+                    Map<String, Object> cronParams = new HashMap<>();
+                    cronParams.put("id", cluster.getId());
+                    cronParams.put("type", cluster.getType());
+                    AlarmCrontabInfo alarmCrontabInfo = alertService.getAlarmCrontab(cronParams);
+                    if (alarmCrontabInfo != null) {
+                        imService.removePostMsgByIM(alarmCrontabInfo, cluster.getType());
+                    }
                     break;
                 }
                 String alarmGroup = cluster.getAlarmGroup();
@@ -220,7 +225,7 @@ public class AlertQuartz {
                         cluster.setIsNormal("N");
                         alertService.modifyClusterStatusAlertById(cluster);
                         try {
-                            sendAlarmClusterError(alarmConfig, cluster, alarmTopicMsg.toJSONString());
+                            sendAlarmClusterError(alertService, alarmConfig, cluster, alarmTopicMsg.toJSONString());
                         } catch (Exception e) {
                             ErrorUtils.print(this.getClass()).error("Send alarm cluser exception has error, msg is ", e);
                         }
@@ -232,7 +237,7 @@ public class AlertQuartz {
                             // notify the cancel of the alarm
                             alertService.modifyClusterStatusAlertById(cluster);
                             try {
-                                sendAlarmClusterNormal(alarmConfig, cluster, alarmTopicMsg.toJSONString());
+                                sendAlarmClusterNormal(alertService, alarmConfig, cluster, alarmTopicMsg.toJSONString());
                             } catch (Exception e) {
                                 ErrorUtils.print(this.getClass()).error("Send alarm cluser normal has error, msg is ", e);
                             }
@@ -267,7 +272,7 @@ public class AlertQuartz {
                         cluster.setIsNormal("N");
                         alertService.modifyClusterStatusAlertById(cluster);
                         try {
-                            sendAlarmClusterError(alarmConfig, cluster, alarmTopicMsg.toJSONString());
+                            sendAlarmClusterError(alertService, alarmConfig, cluster, alarmTopicMsg.toJSONString());
                         } catch (Exception e) {
                             ErrorUtils.print(this.getClass()).error("Send alarm cluser exception has error, msg is ", e);
                         }
@@ -279,7 +284,7 @@ public class AlertQuartz {
                             // notify the cancel of the alarm
                             alertService.modifyClusterStatusAlertById(cluster);
                             try {
-                                sendAlarmClusterNormal(alarmConfig, cluster, alarmTopicMsg.toJSONString());
+                                sendAlarmClusterNormal(alertService, alarmConfig, cluster, alarmTopicMsg.toJSONString());
                             } catch (Exception e) {
                                 ErrorUtils.print(this.getClass()).error("Send alarm cluser normal has error, msg is ", e);
                             }
@@ -309,7 +314,7 @@ public class AlertQuartz {
                         cluster.setIsNormal("N");
                         alertService.modifyClusterStatusAlertById(cluster);
                         try {
-                            sendAlarmClusterError(alarmConfig, cluster, errorServers.toString());
+                            sendAlarmClusterError(alertService, alarmConfig, cluster, errorServers.toString());
                         } catch (Exception e) {
                             ErrorUtils.print(this.getClass()).error("Send alarm cluster exception has error, msg is ", e);
                         }
@@ -321,7 +326,7 @@ public class AlertQuartz {
                             // notify the cancel of the alarm
                             alertService.modifyClusterStatusAlertById(cluster);
                             try {
-                                sendAlarmClusterNormal(alarmConfig, cluster, normalServers.toString());
+                                sendAlarmClusterNormal(alertService, alarmConfig, cluster, normalServers.toString());
                             } catch (Exception e) {
                                 ErrorUtils.print(this.getClass()).error("Send alarm cluster normal has error, msg is ", e);
                             }
@@ -331,7 +336,11 @@ public class AlertQuartz {
             }
         }
 
-        private void sendAlarmClusterError(AlarmConfigInfo alarmConfing, AlarmClusterInfo cluster, String server) {
+        private void sendAlarmClusterError(AlertServiceImpl alertService, AlarmConfigInfo alarmConfing, AlarmClusterInfo cluster, String server) {
+            Map<String, Object> cronParams = new HashMap<>();
+            cronParams.put("id", cluster.getId());
+            cronParams.put("type", cluster.getType());
+            AlarmCrontabInfo alarmCron = alertService.getAlarmCrontab(cronParams);
             if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
@@ -357,7 +366,6 @@ public class AlertQuartz {
                 alarmMsg.setAlarmProject(cluster.getType());
                 alarmMsg.setAlarmStatus("PROBLEM");
                 alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
-                IMService im = new IMFactory().create();
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
                 if (JSONUtils.isJsonObject(alarmConfing.getAlarmUrl())) {
@@ -366,7 +374,7 @@ public class AlertQuartz {
                     object.put("msg", alarmMsg.toMail());
                 }
                 object.put("title", alarmMsg.getTitle());
-                im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
+                imService.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
@@ -392,8 +400,7 @@ public class AlertQuartz {
                 alarmMsg.setAlarmProject(cluster.getType());
                 alarmMsg.setAlarmStatus("<font color=\"#FF0000\">PROBLEM</font>");
                 alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
-                IMService im = new IMFactory().create();
-                im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
+                imService.sendPostMsgByDingDing(alarmMsg, alarmConfing.getAlarmUrl(), alarmCron, "N");
             } else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
@@ -419,12 +426,15 @@ public class AlertQuartz {
                 alarmMsg.setAlarmProject(cluster.getType());
                 alarmMsg.setAlarmStatus("<font color=\"warning\">PROBLEM</font>");
                 alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
-                IMServiceImpl im = new IMServiceImpl();
-                im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+                imService.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
             }
         }
 
-        private void sendAlarmClusterNormal(AlarmConfigInfo alarmConfing, AlarmClusterInfo cluster, String server) {
+        private void sendAlarmClusterNormal(AlertServiceImpl alertService, AlarmConfigInfo alarmConfing, AlarmClusterInfo cluster, String server) {
+            Map<String, Object> cronParams = new HashMap<>();
+            cronParams.put("id", cluster.getId());
+            cronParams.put("type", cluster.getType());
+            AlarmCrontabInfo alarmCron = alertService.getAlarmCrontab(cronParams);
             if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
@@ -450,7 +460,6 @@ public class AlertQuartz {
                 alarmMsg.setAlarmProject(cluster.getType());
                 alarmMsg.setAlarmStatus("NORMAL");
                 alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
-                IMService im = new IMFactory().create();
                 JSONObject object = new JSONObject();
                 object.put("address", alarmConfing.getAlarmAddress());
                 object.put("title", alarmMsg.getTitle());
@@ -459,7 +468,7 @@ public class AlertQuartz {
                 } else {
                     object.put("msg", alarmMsg.toMail());
                 }
-                im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
+                imService.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
@@ -485,8 +494,7 @@ public class AlertQuartz {
                 alarmMsg.setAlarmProject(cluster.getType());
                 alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
                 alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
-                IMService im = new IMFactory().create();
-                im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
+                imService.sendPostMsgByDingDing(alarmMsg, alarmConfing.getAlarmUrl(), alarmCron, "Y");
             } else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
@@ -512,8 +520,11 @@ public class AlertQuartz {
                 alarmMsg.setAlarmProject(cluster.getType());
                 alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
                 alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
-                IMServiceImpl im = new IMServiceImpl();
-                im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+                imService.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+            }
+            // Remove the abnormal alarm after returning to normal
+            if (alarmCron != null) {
+                imService.removePostMsgByIM(alarmCron, "Y");
             }
         }
     }

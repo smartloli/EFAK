@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,33 +18,43 @@
 package org.smartloli.kafka.eagle.common.protocol.alarm.queue;
 
 import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
 
 /**
  * Defind quartz job context schema.
- * 
- * @author smartloli.
  *
- *         Created by Oct 27, 2019
+ * @author smartloli.
+ * <p>
+ * Created by Oct 27, 2019
  */
 public class BaseJobContext extends BaseProtocol {
 
-	private String data;
-	private String url;
+    private String data;
+    private String url;
+    public AlarmMessageInfo alarmMessageInfo;
 
-	public String getData() {
-		return data;
-	}
+    public String getData() {
+        return data;
+    }
 
-	public void setData(String data) {
-		this.data = data;
-	}
+    public AlarmMessageInfo getAlarmMessageInfo() {
+        return alarmMessageInfo;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public void setAlarmMessageInfo(AlarmMessageInfo alarmMessageInfo) {
+        this.alarmMessageInfo = alarmMessageInfo;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
 }

@@ -20,7 +20,10 @@ package org.smartloli.kafka.eagle.api.sms;
 import org.smartloli.kafka.eagle.api.im.IMFactory;
 import org.smartloli.kafka.eagle.api.im.IMService;
 import org.smartloli.kafka.eagle.api.im.IMServiceImpl;
+import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmCrontabInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
+
+import java.util.Date;
 
 /**
  * TODO
@@ -67,15 +70,19 @@ public class TestIM {
         alarmMsg.setAlarmContent("<font color=\"#FF0000\">node.shutdown [ localhost:9092 ]</font>");
         // alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [
         // localhost:9092 ]</font>");
-        alarmMsg.setAlarmDate("2020-09-18 13:50:00");
+        alarmMsg.setAlarmDate(new Date().toString());
         alarmMsg.setAlarmLevel("P0");
         alarmMsg.setAlarmProject("Kafka");
         alarmMsg.setAlarmStatus("<font color=\"#FF0000\">PROBLEM</font>");
         // alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
         alarmMsg.setAlarmTimes("current(1), max(7)");
 
+        AlarmCrontabInfo alarmCrontab = new AlarmCrontabInfo();
+        alarmCrontab.setId(1);
+        alarmCrontab.setType("Kafka");
+        alarmCrontab.setCrontab("10 */1 * * * ?");
         IMService im = new IMFactory().create();
-        im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), "https://oapi.dingtalk.com/robot/send?access_token=3b7b59d17db0145549b1f65f62921b44bacd1701e635e797da45318a94339060");
+        im.sendPostMsgByDingDing(alarmMsg, "https://oapi.dingtalk.com/robot/send?access_token=3b7b59d17db0145549b1f65f62921b44bacd1701e635e797da45318a94339060", alarmCrontab, "N");
         //IMServiceImpl im = new IMServiceImpl();
         //im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(),"https://oapi.dingtalk.com/robot/send?access_token=3b7b59d17db0145549b1f65f62921b44bacd1701e635e797da45318a94339060");
     }
