@@ -1256,7 +1256,7 @@ public class KafkaServiceImpl implements KafkaService {
     public String getKafkaVersion(String host, int port, String ids, String clusterAlias) {
         JMXConnector connector = null;
         String version = "-";
-        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri");
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
             connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
@@ -1400,7 +1400,7 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public long getLogSize(String clusterAlias, String topic, int partitionid) {
         JMXConnector connector = null;
-        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri");
         List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
         for (BrokersInfo broker : brokers) {
             try {
@@ -1439,7 +1439,7 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public long getLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
         JMXConnector connector = null;
-        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri");
         List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
         for (BrokersInfo broker : brokers) {
             try {
@@ -1480,7 +1480,7 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public long getRealLogSize(String clusterAlias, String topic, int partitionid) {
         JMXConnector connector = null;
-        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri");
         List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
         for (BrokersInfo broker : brokers) {
             try {
@@ -1521,7 +1521,7 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public long getRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
         JMXConnector connector = null;
-        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri");
         List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
         for (BrokersInfo broker : brokers) {
             try {
@@ -1604,7 +1604,7 @@ public class KafkaServiceImpl implements KafkaService {
     public long getOSMemory(String clusterAlias, String host, int port, String property) {
         JMXConnector connector = null;
         long memory = 0L;
-        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri");
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
             connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
@@ -1636,7 +1636,7 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public String getUsedCpu(String clusterAlias, String host, int port) {
         JMXConnector connector = null;
-        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri");
         String cpu = "<span class='badge badge-danger'>NULL</span>";
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
@@ -1672,7 +1672,7 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public double getUsedCpuValue(String clusterAlias, String host, int port) {
         JMXConnector connector = null;
-        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri");
         double cpu = 0.00;
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));
@@ -1701,7 +1701,7 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public String getUsedMemory(String clusterAlias, String host, int port) {
         JMXConnector connector = null;
-        String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri");
         String memory = "<span class='badge badge-danger'>NULL</span>";
         try {
             JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, host + ":" + port));

@@ -26,6 +26,7 @@ import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.util.JMXFactoryUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
+import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -46,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 public class Mx4jServiceImpl implements Mx4jService {
 
     private Logger LOG = LoggerFactory.getLogger(Mx4jServiceImpl.class);
-    private static final String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+    // private static final String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
     private static final String TOPIC_CONCAT_CHARACTER = ",topic=";
 
     /** Get brokers all topics bytes in per sec. */
@@ -121,7 +122,7 @@ public class Mx4jServiceImpl implements Mx4jService {
         JMXConnector connector = null;
         Map<Integer, Long> endOffsets = new HashMap<>();
         try {
-            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, uri));
+            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri"), uri));
             connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
             MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
             Set<ObjectName> objectNames = mbeanConnection.queryNames(new ObjectName(mbean), null);
@@ -217,12 +218,13 @@ public class Mx4jServiceImpl implements Mx4jService {
     /**
      * Before Kafka 0.11.x, some exceptions are thrown, such as
      * <p>ReplicationBytesOutPerSec</p> Exception.
+     * @param uri ip:jmx_port
      */
     private MBeanInfo common(String clusterAlias, String uri, String mbean) {
         JMXConnector connector = null;
         MBeanInfo mbeanInfo = new MBeanInfo();
         try {
-            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, uri));
+            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri"), uri));
             connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
             MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
             if (mbeanConnection.isRegistered(new ObjectName(mbean))) {

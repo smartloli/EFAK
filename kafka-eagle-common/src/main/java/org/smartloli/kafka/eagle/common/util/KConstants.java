@@ -250,6 +250,8 @@ public class KConstants {
         public static final String PRODUCER_THREADS_KEY = "producer_threads_key";
         public static final String PRODUCER_THREADS = "producer_threads";
         public static final String LOGSIZE = "logsize";
+        public static final String BYTE_IN = "byte_in";
+        public static final String BYTE_OUT = "byte_out";
         public static final String CAPACITY = "capacity";
         public static final String BROKER_SPREAD = "spread";
         public static final String BROKER_SKEWED = "skewed";

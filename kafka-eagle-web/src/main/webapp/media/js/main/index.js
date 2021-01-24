@@ -64,9 +64,9 @@ $(document).ready(function () {
     dashPanel();
 
     $("#ke_dash_brokers_graph").resize(function () {
-        var optKeBrokerTree=keBrokerTree.getOption();
+        var optKeBrokerTree = keBrokerTree.getOption();
         keBrokerTree.clear();
-        keBrokerTree.resize({width:$("#ke_dash_brokers_graph").css('width')});
+        keBrokerTree.resize({width: $("#ke_dash_brokers_graph").css('width')});
         keBrokerTree.setOption(optKeBrokerTree);
     });
 
@@ -180,6 +180,52 @@ $(document).ready(function () {
                 }
                 tbody += tr + "</tbody>"
                 $("#topic_capacity").append(tbody);
+            }
+        }
+    });
+
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/dash/byte_in/table/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#topic_byte_in").html("")
+                var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
+                $("#topic_byte_in").append(thead);
+                var tbody = "<tbody>";
+                var tr = '';
+                for (var i = 0; i < datas.length; i++) {
+                    var id = datas[i].id;
+                    var topic = datas[i].topic;
+                    var byte_in = datas[i].byte_in;
+                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_in + "</td></tr>"
+                }
+                tbody += tr + "</tbody>"
+                $("#topic_byte_in").append(tbody);
+            }
+        }
+    });
+
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/dash/byte_out/table/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#topic_byte_out").html("")
+                var thead = "<thead><tr><th>RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
+                $("#topic_byte_out").append(thead);
+                var tbody = "<tbody>";
+                var tr = '';
+                for (var i = 0; i < datas.length; i++) {
+                    var id = datas[i].id;
+                    var topic = datas[i].topic;
+                    var byte_out = datas[i].byte_out;
+                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_out + "</td></tr>"
+                }
+                tbody += tr + "</tbody>"
+                $("#topic_byte_out").append(tbody);
             }
         }
     });

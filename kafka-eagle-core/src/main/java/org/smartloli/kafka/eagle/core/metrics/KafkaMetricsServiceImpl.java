@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
     private Logger LOG = LoggerFactory.getLogger(Mx4jServiceImpl.class);
-    private String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
+    // private String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
 
     /**
      * Kafka service interface.
@@ -136,7 +136,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
         long tpSize = 0L;
         for (MetadataInfo leader : leaders) {
             String jni = kafkaService.getBrokerJMXFromIds(clusterAlias, leader.getLeader());
-            jmx = String.format(JMX, jni);
+            jmx = String.format(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri"), jni);
             try {
                 JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
                 connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
@@ -300,7 +300,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
         long tpSize = 0L;
         for (MetadataInfo leader : leaders) {
             String jni = kafkaService.getBrokerJMXFromIds(clusterAlias, leader.getLeader());
-            jmx = String.format(JMX, jni);
+            jmx = String.format(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri"), jni);
             try {
                 JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
                 connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
