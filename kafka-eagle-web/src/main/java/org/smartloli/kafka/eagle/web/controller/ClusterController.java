@@ -128,10 +128,10 @@ public class ClusterController {
             if (search.length() > 0 && search.equals(cluster.getString("host"))) {
                 JSONObject obj = new JSONObject();
                 obj.put("id", cluster.getInteger("id"));
-                obj.put("brokerId", "<a href='/metrics/brokers/" + cluster.getString("ids") + "/' target='_blank'>" + cluster.getString("ids") + "</a>");
                 obj.put("port", cluster.getInteger("port"));
                 obj.put("ip", cluster.getString("host"));
                 if ("kafka".equals(type)) {
+                    obj.put("brokerId", "<a href='/metrics/brokers/" + cluster.getString("ids") + "/' target='_blank'>" + cluster.getString("ids") + "</a>");
                     obj.put("jmxPort", cluster.getInteger("jmxPort"));
                     obj.put("memory", clusterService.getUsedMemory(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
                     obj.put("cpu", clusterService.getUsedCpu(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
@@ -181,10 +181,10 @@ public class ClusterController {
                 if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
                     JSONObject obj = new JSONObject();
                     obj.put("id", cluster.getInteger("id"));
-                    obj.put("brokerId", "<a href='/metrics/brokers/" + cluster.getString("ids") + "/' target='_blank'>" + cluster.getString("ids") + "</a>");
                     obj.put("port", cluster.getInteger("port"));
                     obj.put("ip", cluster.getString("host"));
                     if ("kafka".equals(type)) {
+                        obj.put("brokerId", "<a href='/metrics/brokers/" + cluster.getString("ids") + "/' target='_blank'>" + cluster.getString("ids") + "</a>");
                         obj.put("jmxPort", cluster.getInteger("jmxPort"));
                         obj.put("memory", clusterService.getUsedMemory(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
                         obj.put("cpu", clusterService.getUsedCpu(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
