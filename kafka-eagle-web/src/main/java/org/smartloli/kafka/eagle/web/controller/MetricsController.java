@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.web.controller;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -77,6 +79,37 @@ public class MetricsController {
 		try {
 			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 			String target = metricsService.getAllBrokersMBean(clusterAlias);
+
+			byte[] output = target.getBytes();
+			BaseController.response(output, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/**
+	 * Broker data viewer.
+	 */
+	@RequestMapping(value = "/metrics/brokers/{brokerId}/", method = RequestMethod.GET)
+	public ModelAndView topicMetaView(@PathVariable("brokerId") String brokerId, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		HttpSession session = request.getSession();
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		if (metricsService.hasBrokerId(clusterAlias, brokerId)) {
+			mav.setViewName("/metrics/brokersIds");
+		} else {
+			mav.setViewName("/error/404");
+		}
+
+		return mav;
+	}
+
+	/** Get broker data by ajax. */
+	@RequestMapping(value = "/metrics/brokers/{brokerId}/mbean/ajax", method = RequestMethod.GET)
+	public void brokerAjax(@PathVariable("brokerId") String brokerId, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+		try {
+			String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+			String target = metricsService.getBrokersMBeanByIds(clusterAlias, Collections.singletonList(brokerId));
 
 			byte[] output = target.getBytes();
 			BaseController.response(output, response);

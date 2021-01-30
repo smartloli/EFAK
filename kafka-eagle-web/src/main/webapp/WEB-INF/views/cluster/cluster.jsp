@@ -65,6 +65,7 @@
                                         <thead>
                                         <tr>
                                             <th>ID</th>
+                                            <th>BrokerID</th>
                                             <th>IP</th>
                                             <th>Port</th>
                                             <th>JMX Port</th>

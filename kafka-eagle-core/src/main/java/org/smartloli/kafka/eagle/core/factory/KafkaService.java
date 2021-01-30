@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.core.factory;
 
+import kafka.zk.KafkaZkClient;
 import org.apache.kafka.common.TopicPartition;
 import org.smartloli.kafka.eagle.common.protocol.*;
 
@@ -60,6 +61,11 @@ public interface KafkaService {
      * Get all broker list from zookeeper.
      */
     public List<BrokersInfo> getAllBrokersInfo(String clusterAlias);
+
+    /**
+     * Get broker list for given brokerIds from zookeeper.
+     */
+    public List<BrokersInfo> getBrokersInfoByIds(String clusterAlias, KafkaZkClient zkc, List<String> brokerIds);
 
     /**
      * Get broker host info from ids.

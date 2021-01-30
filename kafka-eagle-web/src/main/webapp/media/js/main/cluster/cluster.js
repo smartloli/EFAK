@@ -10,6 +10,8 @@ $(document).ready(function () {
         "aoColumns": [{
             "mData": 'id'
         }, {
+            "mData": 'brokerId'
+        }, {
             "mData": 'ip'
         }, {
             "mData": 'port'

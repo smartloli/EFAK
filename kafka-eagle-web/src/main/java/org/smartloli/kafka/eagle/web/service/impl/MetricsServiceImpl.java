@@ -97,6 +97,15 @@ public class MetricsServiceImpl implements MetricsService {
     }
 
     /**
+     * Gets summary monitoring data for given brokerIds
+     */
+    public String getBrokersMBeanByIds(String clusterAlias, List<String> brokerIds) {
+        List<BrokersInfo> brokersInfoByIds = kafkaService.getBrokersInfoByIds(clusterAlias, null, brokerIds);
+        return getOnlineAllBrokersMBean(clusterAlias, brokersInfoByIds);
+
+    }
+
+    /**
      * Gets summary offline monitoring data for all broker.
      */
     private String getOfflineAllBrokersMBean(Map<String, Object> params) {
@@ -427,6 +436,17 @@ public class MetricsServiceImpl implements MetricsService {
     @Override
     public int modifyConnectConfigStatusById(ConnectConfigInfo connectConfig) {
         return brokerDao.modifyConnectConfigStatusById(connectConfig);
+    }
+
+    @Override
+    public boolean hasBrokerId(String clusterAlias, String brokerId) {
+        List<BrokersInfo> allBrokersInfo = kafkaService.getAllBrokersInfo(clusterAlias);
+        for (BrokersInfo brokerInfo : allBrokersInfo) {
+            if (brokerInfo.getIds().equals(brokerId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

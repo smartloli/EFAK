@@ -43,6 +43,11 @@ public interface MetricsService {
     public String getAllBrokersMBean(String clusterAlias);
 
     /**
+     * Gets summary monitoring data for given brokerIds.
+     */
+    public String getBrokersMBeanByIds(String clusterAlias, List<String> brokerIds);
+
+    /**
      * Collection statistics data from kafka jmx & insert into table.
      */
     public int insert(List<KpiInfo> kpi);
@@ -136,6 +141,11 @@ public interface MetricsService {
      * Modify kafka connect uri config status(alive or shutdown) by id.
      */
     public int modifyConnectConfigStatusById(ConnectConfigInfo connectConfig);
+
+    /**
+     * If broker exists for a given brokerId
+     */
+    public boolean hasBrokerId(String clusterAlias, String brokerId);
 
 
 }

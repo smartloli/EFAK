@@ -218,58 +218,7 @@ public class KafkaServiceImpl implements KafkaService {
             if (zkc.pathExists(BROKER_IDS_PATH)) {
                 Seq<String> subBrokerIdsPaths = zkc.getChildren(BROKER_IDS_PATH);
                 List<String> brokerIdss = JavaConversions.seqAsJavaList(subBrokerIdsPaths);
-                int id = 0;
-                for (String ids : brokerIdss) {
-                    try {
-                        Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
-                        BrokersInfo broker = new BrokersInfo();
-                        broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
-                        broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
-                        String tupleString = new String(tuple._1.get());
-                        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
-                            String endpoints = JSON.parseObject(tupleString).getString("endpoints");
-                            List<String> endpointsList = JSON.parseArray(endpoints, String.class);
-                            String host = "";
-                            int port = 0;
-                            if (endpointsList.size() > 1) {
-                                String protocol = "";
-                                if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
-                                    protocol = Kafka.SASL_PLAINTEXT;
-                                }
-                                if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
-                                    protocol = Kafka.SSL;
-                                }
-                                for (String endpointsStr : endpointsList) {
-                                    if (endpointsStr.contains(protocol)) {
-                                        String tmp = endpointsStr.split("//")[1];
-                                        host = tmp.split(":")[0];
-                                        port = Integer.parseInt(tmp.split(":")[1]);
-                                        break;
-                                    }
-                                }
-                            } else {
-                                if (endpointsList.size() > 0) {
-                                    String tmp = endpointsList.get(0).split("//")[1];
-                                    host = tmp.split(":")[0];
-                                    port = Integer.parseInt(tmp.split(":")[1]);
-                                }
-                            }
-                            broker.setHost(host);
-                            broker.setPort(port);
-                        } else {
-                            String host = JSON.parseObject(tupleString).getString("host");
-                            int port = JSON.parseObject(tupleString).getInteger("port");
-                            broker.setHost(host);
-                            broker.setPort(port);
-                        }
-                        broker.setJmxPort(JSON.parseObject(tupleString).getInteger("jmx_port"));
-                        broker.setId(++id);
-                        broker.setIds(ids);
-                        targets.add(broker);
-                    } catch (Exception ex) {
-                        LOG.error(ex.getMessage());
-                    }
-                }
+                targets = getBrokersInfoByIds(clusterAlias, zkc, brokerIdss);
             }
         } catch (Exception e) {
             ErrorUtils.print(this.getClass()).error("Get all brokers info has error,msg is ", e);
@@ -278,6 +227,74 @@ public class KafkaServiceImpl implements KafkaService {
                 kafkaZKPool.release(clusterAlias, zkc);
                 zkc = null;
             }
+        }
+        return targets;
+    }
+
+    /**
+     * Get broker list for given brokerIds from zookeeper.
+     */
+    public List<BrokersInfo> getBrokersInfoByIds(String clusterAlias, KafkaZkClient zkc, List<String> brokerIds) {
+        if (zkc == null) {
+            zkc = kafkaZKPool.getZkClient(clusterAlias);
+        }
+        int id = 0;
+        List<BrokersInfo> targets = new ArrayList<BrokersInfo>();
+        for (String ids : brokerIds) {
+            try {
+                Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
+                BrokersInfo broker = new BrokersInfo();
+                broker.setCreated(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
+                broker.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
+                String tupleString = new String(tuple._1.get());
+                if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+                    String endpoints = JSON.parseObject(tupleString).getString("endpoints");
+                    List<String> endpointsList = JSON.parseArray(endpoints, String.class);
+                    String host = "";
+                    int port = 0;
+                    if (endpointsList.size() > 1) {
+                        String protocol = "";
+                        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+                            protocol = Kafka.SASL_PLAINTEXT;
+                        }
+                        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+                            protocol = Kafka.SSL;
+                        }
+                        for (String endpointsStr : endpointsList) {
+                            if (endpointsStr.contains(protocol)) {
+                                String tmp = endpointsStr.split("//")[1];
+                                host = tmp.split(":")[0];
+                                port = Integer.parseInt(tmp.split(":")[1]);
+                                break;
+                            }
+                        }
+                    } else {
+                        if (endpointsList.size() > 0) {
+                            String tmp = endpointsList.get(0).split("//")[1];
+                            host = tmp.split(":")[0];
+                            port = Integer.parseInt(tmp.split(":")[1]);
+                        }
+                    }
+                    broker.setHost(host);
+                    broker.setPort(port);
+                } else {
+                    String host = JSON.parseObject(tupleString).getString("host");
+                    int port = JSON.parseObject(tupleString).getInteger("port");
+                    broker.setHost(host);
+                    broker.setPort(port);
+                }
+                broker.setJmxPort(JSON.parseObject(tupleString).getInteger("jmx_port"));
+                broker.setId(++id);
+                broker.setIds(ids);
+                targets.add(broker);
+            } catch (Exception ex) {
+                LOG.error(ex.getMessage());
+            }
+        }
+
+        if (zkc != null) {
+            kafkaZKPool.release(clusterAlias, zkc);
+            zkc = null;
         }
         return targets;
     }
