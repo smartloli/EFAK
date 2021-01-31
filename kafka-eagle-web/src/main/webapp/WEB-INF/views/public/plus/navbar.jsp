@@ -45,6 +45,7 @@
                             class="fas fa-cube fa-sm fa-fw mr-1"></i>Hub</a>
                 </nav>
             </div>
+            <!--
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLog"
                aria-expanded="false" aria-controls="collapseLog">
                 <div class="sb-nav-link-icon">
@@ -61,6 +62,7 @@
                             class="fab fa-buffer fa-sm fa-fw mr-1"></i>Task</a>
                 </nav>
             </div>
+            -->
             <a id="ke_navbar_consumers" class="nav-link" href="/consumers">
                 <div class="sb-nav-link-icon">
                     <i class="fas fa-fw fa-users"></i>

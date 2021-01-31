@@ -170,7 +170,7 @@
                     <div class="col-lg-6">
                         <div class="card mb-4">
                             <div class="card-header">
-                                <i class="fas fa-file-alt"></i> Topic ByteIn Top10
+                                <i class="fas fa-sign-in-alt"></i> Topic ByteIn Top10
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -186,7 +186,7 @@
                     <div class="col-lg-6">
                         <div class="card mb-4">
                             <div class="card-header">
-                                <i class="fas fa-database"></i> Topic ByteOut Top10
+                                <i class="fas fa-sign-out-alt"></i> Topic ByteOut Top10
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
