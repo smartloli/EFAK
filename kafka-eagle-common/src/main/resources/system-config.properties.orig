@@ -2,14 +2,24 @@
 # multi zookeeper & kafka cluster list
 ######################################
 kafka.eagle.zk.cluster.alias=cluster1
-cluster1.zk.list=10.100.172.147:2181
+<<<<<<< HEAD
+cluster1.zk.list=10.100.172.147:2181,10.100.172.171:2181,10.100.172.173:2181
+=======
+cluster1.zk.list=127.0.0.1:2181
+cluster1_0_1.zk.list=127.0.0.1:2181/v_1_0_1
+cluster2.zk.list=127.0.0.1:2181/plain
+cluster3.zk.list=127.0.0.1:2181/scram
+cluster4.zk.list=127.0.0.1:2182
 
+######################################
 # zookeeper enable acl
 ######################################
-cluster1.zk.acl.enable=false
-cluster1.zk.acl.schema=digest
-cluster1.zk.acl.username=kafka
-cluster1.zk.acl.password=kafkapasswd
+cluster4.zk.acl.enable=false
+cluster4.zk.acl.schema=digest
+cluster4.zk.acl.username=test
+cluster4.zk.acl.password=test123
+>>>>>>> bb39f8fca4bf158986bf8928cd7ee702afef5d71
+
 ######################################
 # broker size online list
 ######################################
@@ -18,7 +28,7 @@ cluster1.kafka.eagle.broker.size=10
 ######################################
 # zk client thread limit
 ######################################
-kafka.zk.limit.size=1
+kafka.zk.limit.size=32
 
 ######################################
 # kafka eagle webui port
@@ -39,12 +49,6 @@ cluster1.kafka.eagle.jmx.truststore.password=ke123456
 # kafka offset storage
 ######################################
 cluster1.kafka.eagle.offset.storage=kafka
-
-
-######################################
-# kafka jmx uri
-######################################
-cluster1.kafka.eagle.jmx.uri=service:jmx:rmi:///jndi/rmi://%s/jmxrmi
 
 
 ######################################
@@ -78,20 +82,24 @@ kafka.eagle.topic.token=keadmin
 ######################################
 # kafka sasl authenticate
 ######################################
-cluster1.kafka.eagle.sasl.enable=true
+cluster1.kafka.eagle.sasl.enable=false
 cluster1.kafka.eagle.sasl.protocol=SASL_PLAINTEXT
 cluster1.kafka.eagle.sasl.mechanism=SCRAM-SHA-256
+#cluster1.kafka.eagle.sasl.mechanism=PLAIN
 cluster1.kafka.eagle.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="kafkaadmin" password="kafkaadmin";
 cluster1.kafka.eagle.sasl.client.id=
 cluster1.kafka.eagle.blacklist.topics=
 cluster1.kafka.eagle.sasl.cgroup.enable=false
+<<<<<<< HEAD
+cluster1.kafka.eagle.sasl.cgroup.topics=
+=======
 cluster1.kafka.eagle.sasl.cgroup.topics=kafka20191230,kafka20191217
-
 cluster4.kafka.eagle.sasl.enable=false
 cluster4.kafka.eagle.sasl.protocol=SASL_PLAINTEXT
 cluster4.kafka.eagle.sasl.mechanism=PLAIN
 cluster4.kafka.eagle.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";
 cluster4.kafka.eagle.sasl.client.id=
+>>>>>>> bb39f8fca4bf158986bf8928cd7ee702afef5d71
 
 ######################################
 # kafka ssl authenticate
@@ -109,12 +117,23 @@ cluster1.kafka.eagle.ssl.cgroup.topics=
 ######################################
 # kafka jdbc driver address
 ######################################
+<<<<<<< HEAD
 #kafka.eagle.driver=com.mysql.jdbc.Driver
-#kafka.eagle.url=jdbc:mysql://127.0.0.1:3306/ke?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
-#kafka.eagle.username=root
+#kafka.eagle.url=jdbc:mysql://10.100.172.33:3306/ke?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+#kafka.eagle.username=dev
 #kafka.eagle.password=123456
 
 kafka.eagle.driver=org.sqlite.JDBC
-kafka.eagle.url=jdbc:sqlite:/Users/jefffeng/kenew.db
+kafka.eagle.url=jdbc:sqlite:/Users/jefffeng/ke.db
 kafka.eagle.username=root
 kafka.eagle.password=root
+=======
+kafka.eagle.driver=com.mysql.jdbc.Driver
+kafka.eagle.url=jdbc:mysql://127.0.0.1:3306/ke?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+kafka.eagle.username=root
+kafka.eagle.password=123456
+#kafka.eagle.driver=org.sqlite.JDBC
+#kafka.eagle.url=jdbc:sqlite:/Users/dengjie/webserver/hadoop/sqlite/ke.db
+#kafka.eagle.username=root
+#kafka.eagle.password=root
+>>>>>>> bb39f8fca4bf158986bf8928cd7ee702afef5d71
