@@ -10,6 +10,7 @@
         <fileSet>
             <directory>src/main/resources/bash/</directory>
             <outputDirectory>/bin</outputDirectory>
+            <lineEnding>unix</lineEnding>
             <includes>
                 <include>ke.sh</include>
             </includes>
