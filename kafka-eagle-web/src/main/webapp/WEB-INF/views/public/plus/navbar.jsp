@@ -88,8 +88,10 @@
                             class="fab fa-maxcdn fa-sm fa-fw mr-1"></i>Multi-Clusters</a>
                     <a id="ke_navbar_cluster_zkcli" class="nav-link" href="/cluster/zkcli"><i
                             class="fas fa-terminal fa-code fa-sm fa-fw mr-1"></i>ZkCli</a>
+                    <!--
                     <a id="ke_navbar_cluster_worknodes" class="nav-link" href="/cluster/worknodes"><i
                             class="fas fa-bezier-curve fa-sm fa-fw mr-1"></i>WorkNodes</a>
+                    -->
                 </nav>
             </div>
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMetrics"

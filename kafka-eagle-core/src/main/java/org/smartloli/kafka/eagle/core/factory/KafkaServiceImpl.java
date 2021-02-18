@@ -620,6 +620,9 @@ public class KafkaServiceImpl implements KafkaService {
         props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.keystore.password"));
         props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.key.password"));
 
+        // ssl handshake failed
+        props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.endpoint.identification.algorithm"));
+
     }
 
     private KafkaSqlInfo segments(String clusterAlias, String sql) {

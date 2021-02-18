@@ -54,7 +54,8 @@ public interface JConstants {
     /**
      * MySql driver name.
      */
-    public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
+    public static final String MYSQL_DRIVER_V5 = "com.mysql.jdbc.Driver";
+    public static final String MYSQL_DRIVER_V8 = "com.mysql.cj.jdbc.Driver";
 
     /**
      * Sqlite type.
@@ -105,7 +106,17 @@ public interface JConstants {
 
     static String CREATE_TABLE_KE_LOGSIZE = "CREATE TABLE IF NOT EXISTS `ke_logsize` (`cluster` varchar(64) DEFAULT NULL,`topic` varchar(64) DEFAULT NULL,`logsize` bigint(20) DEFAULT NULL,`diffval` bigint(20) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
+    static String CREATE_TABLE_KE_LOGSIZE_INDEX = "ALTER TABLE `ke_logsize` ADD INDEX `idx_timespan` (`timespan`);";
+
+    static String CREATE_TABLE_KE_LOGSIZE_INDEX_TM = "ALTER TABLE `ke_logsize` ADD INDEX `idx_tm_topic` (`tm`, `topic`);";
+
+    static String CREATE_TABLE_KE_LOGSIZE_INDEX_TM_CLUSTER = "ALTER TABLE `ke_logsize` ADD INDEX `idx_tm_cluster_diffval` (`tm`, `cluster`, `diffval`);";
+
     static String CREATE_TABLE_KE_CONSUMER_BSCREEN = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen` (`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(64) DEFAULT NULL,`logsize` bigint(20) DEFAULT NULL,`difflogsize` bigint(20) DEFAULT NULL,`offsets` bigint(20) DEFAULT NULL,`diffoffsets` bigint(20) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+    static String CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX = "ALTER TABLE `ke_consumer_bscreen` ADD INDEX `idx_timespan` (`timespan`);";
+
+    static String CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX_TM = "ALTER TABLE `ke_consumer_bscreen` ADD INDEX `idx_tm_cluster_diffoffsets` (`tm`, `cluster`, `diffoffsets`);";
 
     static String CREATE_TABLE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic` varchar(128) NOT NULL,`status` int(11) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`,`topic`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -149,7 +160,17 @@ public interface JConstants {
 
     static String CREATE_TABLE_SQLITE_KE_LOGSIZE = "CREATE TABLE IF NOT EXISTS `ke_logsize` (`cluster` varchar(64) ,`topic` varchar(64) ,`logsize` bigint(20) ,`diffval` bigint(20) ,`timespan` bigint(20) ,`tm` varchar(16))";
 
+    static String CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX = "CREATE INDEX idx_timespan ON `ke_logsize` (`timespan`);";
+
+    static String CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM = "CREATE INDEX idx_tm_topic ON `ke_logsize` (`tm`, `topic`);";
+
+    static String CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM_CLUSTER = "CREATE INDEX idx_tm_cluster_diffval ON `ke_logsize` (`tm`, `cluster`, `diffval`);";
+
     static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(64) ,`logsize` bigint(20) ,`difflogsize` bigint(20) ,`offsets` bigint(20) ,`diffoffsets` bigint(20) ,`lag` bigint(20) ,`timespan` bigint(20) ,`tm` varchar(16))";
+
+    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX = "CREATE INDEX idx_timespan ON `ke_consumer_bscreen` (`timespan`);";
+
+    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX_TM = "CREATE INDEX idx_tm_cluster_diffoffsets ON `ke_consumer_bscreen` (`tm`, `cluster`, `diffoffsets`);";
 
     static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(128) ,`status` int(11), primary key (`cluster`,`group`,`topic`))";
 
@@ -188,7 +209,12 @@ public interface JConstants {
             put("CREATE_TABLE_KE_TOPIC_RANK", CREATE_TABLE_KE_TOPIC_RANK);
             put("CREATE_TABLE_KE_SQL_HISTORY", CREATE_TABLE_KE_SQL_HISTORY);
             put("CREATE_TABLE_KE_LOGSIZE", CREATE_TABLE_KE_LOGSIZE);
+            put("CREATE_TABLE_KE_LOGSIZE_INDEX", CREATE_TABLE_KE_LOGSIZE_INDEX);
+            put("CREATE_TABLE_KE_LOGSIZE_INDEX_TM", CREATE_TABLE_KE_LOGSIZE_INDEX_TM);
+            put("CREATE_TABLE_KE_LOGSIZE_INDEX_TM_CLUSTER", CREATE_TABLE_KE_LOGSIZE_INDEX_TM_CLUSTER);
             put("CREATE_TABLE_KE_CONSUMER_BSCREEN", CREATE_TABLE_KE_CONSUMER_BSCREEN);
+            put("CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX", CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX);
+            put("CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX_TM", CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX_TM);
             put("CREATE_TABLE_KE_USER_ROLE", CREATE_TABLE_KE_USER_ROLE);
             put("CREATE_TABLE_KE_USER_ROLE_INSERT", CREATE_TABLE_KE_USER_ROLE_INSERT);
             put("CREATE_TABLE_KE_USERS", CREATE_TABLE_KE_USERS);
@@ -212,7 +238,12 @@ public interface JConstants {
             put("CREATE_TABLE_SQLITE_KE_TOPIC_RANK", CREATE_TABLE_SQLITE_KE_TOPIC_RANK);
             put("CREATE_TABLE_SQLITE_KE_SQL_HISTORY", CREATE_TABLE_SQLITE_KE_SQL_HISTORY);
             put("CREATE_TABLE_SQLITE_KE_LOGSIZE", CREATE_TABLE_SQLITE_KE_LOGSIZE);
+            put("CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX", CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX);
+            put("CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM", CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM);
+            put("CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM_CLUSTER", CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM_CLUSTER);
             put("CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN", CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN);
+            put("CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX", CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX);
+            put("CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX_TM", CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX_TM);
             put("CREATE_TABLE_SQLITE_KE_USER_ROLE", CREATE_TABLE_SQLITE_KE_USER_ROLE);
             put("CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT", CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT);
             put("CREATE_TABLE_SQLITE_KE_USERS", CREATE_TABLE_SQLITE_KE_USERS);

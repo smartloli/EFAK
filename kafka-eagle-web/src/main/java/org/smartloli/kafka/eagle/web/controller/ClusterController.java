@@ -131,6 +131,7 @@ public class ClusterController {
                 obj.put("port", cluster.getInteger("port"));
                 obj.put("ip", cluster.getString("host"));
                 if ("kafka".equals(type)) {
+                    obj.put("brokerId", cluster.getString("ids"));
                     obj.put("jmxPort", cluster.getInteger("jmxPort"));
                     obj.put("memory", clusterService.getUsedMemory(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
                     obj.put("cpu", clusterService.getUsedCpu(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
@@ -183,6 +184,7 @@ public class ClusterController {
                     obj.put("port", cluster.getInteger("port"));
                     obj.put("ip", cluster.getString("host"));
                     if ("kafka".equals(type)) {
+                        obj.put("brokerId", cluster.getString("ids"));
                         obj.put("jmxPort", cluster.getInteger("jmxPort"));
                         obj.put("memory", clusterService.getUsedMemory(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
                         obj.put("cpu", clusterService.getUsedCpu(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));

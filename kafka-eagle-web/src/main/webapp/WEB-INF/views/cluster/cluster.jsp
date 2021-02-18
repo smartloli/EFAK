@@ -33,16 +33,15 @@
                 </ol>
                 <div class="alert alert-info alert-dismissable">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <i class="fas fa-info-circle"></i> <strong>Cluster
-                    information, in the form of tables to demonstrate the Kafka and
-                    Zookeeper cluster node IP, port, and its version number</strong> If you
-                    don't know the usage of Kafka and Zookeeper, you can visit the
-                    website of <a href="http://kafka.apache.org/" target="_blank"
-                                  class="alert-link">Kafka</a> and <a
-                        href="http://zookeeper.apache.org/" target="_blank"
-                        class="alert-link">Zookeeper</a> to view the relevant usage.<br/>
-                    <i class="fas fa-info-circle"></i><strong>Note</strong>:&nbsp;Kafka version is <strong>"-"</strong>
+                    <i class="fas fa-info-circle"></i> <strong>Note</strong>:&nbsp;Kafka version is <strong>"-"</strong>
                     or JMX Port is <strong>"-1"</strong> maybe kafka broker jmxport disable.<br/>
+                    <i class="fas fa-info-circle"></i> <strong>Note</strong>:&nbsp;Zookeeper version is
+                    <strong>"3.5+"</strong>
+                    or version is <strong>"-"</strong> maybe zookeeper client command disable.<br/>
+                    <i class="fas fa-info-circle"></i> <strong>Note</strong>: When you encounter one of
+                    the above problems. You can visit the <a
+                        href="http://www.kafka-eagle.org/articles/docs/quickstart/metrics.html" target="_blank">Kafka
+                    Eagle</a> document to see the opening steps.<br/>
                 </div>
                 <!-- content body -->
                 <!-- Kafka -->
@@ -65,6 +64,7 @@
                                         <thead>
                                         <tr>
                                             <th>ID</th>
+                                            <th>BrokerId</th>
                                             <th>IP</th>
                                             <th>Port</th>
                                             <th>JMX Port</th>
