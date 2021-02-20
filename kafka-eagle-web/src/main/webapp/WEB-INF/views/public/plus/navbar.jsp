@@ -67,6 +67,13 @@
                 </div>
                 Consumers
             </a>
+            <a id="ke_navbar_acls" class="nav-link" href="/acls">
+                <div class="sb-nav-link-icon">
+                    <i class="fas fa-fw fa-list"></i>
+                </div>
+                ACL
+            </a>
+            
             <div class="sb-sidenav-menu-heading">Performance</div>
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCluster"
                aria-expanded="false" aria-controls="collapseCluster">

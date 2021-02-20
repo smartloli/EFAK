@@ -40,13 +40,16 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.acl.AccessControlEntry;
+import org.apache.kafka.common.acl.AccessControlEntryFilter;
 import org.apache.kafka.common.acl.AclBinding;
+import org.apache.kafka.common.acl.AclBindingFilter;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourcePattern;
+import org.apache.kafka.common.resource.ResourcePatternFilter;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -1781,6 +1784,69 @@ public class KafkaServiceImpl implements KafkaService {
             }
         }
         return memory;
+    }
+    
+    
+    /**
+     * Get kafka 0.10.x, 1.x, 2.x acl metadata.
+     */
+    public JSONArray getKafkaAcl(String clusterAlias) {
+    	
+        Properties prop = new Properties();
+        JSONArray acls = new JSONArray();
+        prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+            sasl(prop, clusterAlias);
+        }
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+            ssl(prop, clusterAlias);
+        }
+
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(prop);
+            
+            AclBindingFilter aclBindingFilter = new AclBindingFilter(
+                    ResourcePatternFilter.ANY,
+                    new AccessControlEntryFilter(
+                            null,
+                            "*",
+                            AclOperation.ANY,
+                            AclPermissionType.ANY
+                    )
+            );
+            
+            java.util.Iterator<AclBinding> itorA = adminClient.describeAcls(aclBindingFilter).values().get().iterator();
+            while (itorA.hasNext()) {
+            	AclBinding ab = itorA.next();
+            	AccessControlEntry e = ab.entry();
+            	JSONObject entry = new JSONObject();
+            	entry.put("host", e.host());
+            	entry.put("operation",e.operation().name());
+            	entry.put("principal", e.principal());
+            	entry.put("permissionType",e.permissionType().name());
+            	
+            	ResourcePattern p = ab.pattern();
+            	JSONObject pattern = new JSONObject();
+            	pattern.put("name", p.name());
+            	pattern.put("patternType", p.patternType().name());
+            	pattern.put("resourceType", p.resourceType().name());
+            
+            	JSONObject acl = new JSONObject();
+            	acl.put("entry", entry);
+            	acl.put("pattern", pattern);
+            	acls.add(acl);
+            }
+            
+        } catch (Exception e) {
+            LOG.error("Get kafka consumer has error,msg is " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            adminClient.close();
+        }
+        
+        return acls;
     }
 
 }

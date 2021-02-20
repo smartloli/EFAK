@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.core.factory;
 import org.apache.kafka.common.TopicPartition;
 import org.smartloli.kafka.eagle.common.protocol.*;
 
+import com.alibaba.fastjson.JSONArray;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -257,5 +259,11 @@ public interface KafkaService {
      * Set kafka ssl acl.
      */
     public void ssl(Properties props, String clusterAlias);
+    
+    /**
+     * Get kafka acls .
+     */
+    public JSONArray getKafkaAcl(String clusterAlias);
+
 
 }

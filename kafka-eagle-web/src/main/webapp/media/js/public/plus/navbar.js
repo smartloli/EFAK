@@ -23,6 +23,8 @@
         $("#ke_navbar_topic_tasks").addClass("active");
     } else if (url.indexOf("/consumers") > -1) {
         $("#ke_navbar_consumers").addClass("active");
+    } else if (url.indexOf("/acls") > -1) {
+        $("#ke_navbar_acls").addClass("active");
     } else if ((url.indexOf("/cluster") > -1)) {
         $("#collapseCluster").addClass('show')
         if (url.indexOf("/cluster/info") > -1) {
