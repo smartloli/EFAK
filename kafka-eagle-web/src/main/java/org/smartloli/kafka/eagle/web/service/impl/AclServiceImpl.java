@@ -43,6 +43,13 @@ public class AclServiceImpl implements AclService {
 		return activeTopics;
 	}
 
+	@Override
+	public JSONArray getTopicAcls(String clusterAlias, String topicname) {
+		JSONArray acls = kafkaService.getKafkaAclBYTopicName(clusterAlias, topicname);
+
+		return acls;
+	}
+	
 }
 
 

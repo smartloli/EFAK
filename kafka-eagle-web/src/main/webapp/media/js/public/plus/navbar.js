@@ -19,11 +19,12 @@
             $("#ke_navbar_topic_hub").addClass("active");
         }
     } else if (url.indexOf("/log") > -1) {
-        $("#collapseLog").addClass('show')
+        $("#collapseLog").addClass('show');
         $("#ke_navbar_topic_tasks").addClass("active");
     } else if (url.indexOf("/consumers") > -1) {
         $("#ke_navbar_consumers").addClass("active");
     } else if (url.indexOf("/acls") > -1) {
+     	$("#acls").addClass('show');
         $("#ke_navbar_acls").addClass("active");
     } else if ((url.indexOf("/cluster") > -1)) {
         $("#collapseCluster").addClass('show')

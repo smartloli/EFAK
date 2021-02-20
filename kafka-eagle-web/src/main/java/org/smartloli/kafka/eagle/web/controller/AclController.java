@@ -25,6 +25,7 @@ import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.service.AclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -57,12 +58,23 @@ public class AclController {
 	/** Get acl data by ajax. */
 	@RequestMapping(value = "/acls/list", method = RequestMethod.GET)
 	@ResponseBody
-	public JSONArray consumersGraphAjax(HttpServletResponse response, HttpServletRequest request) {
+	public JSONArray aclslist(HttpServletResponse response, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		JSONArray result = aclService.getAcls(clusterAlias);
 		
 		return result;
 	}
+	
+	
+    @RequestMapping(value = "/acls/topic/{tname}", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONArray aclstopic(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		JSONArray result = aclService.getTopicAcls(clusterAlias, tname);
+
+		return result;
+    }	
+	
 
 }

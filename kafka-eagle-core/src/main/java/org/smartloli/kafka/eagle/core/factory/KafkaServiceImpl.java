@@ -79,6 +79,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -1791,7 +1792,6 @@ public class KafkaServiceImpl implements KafkaService {
      * Get kafka 0.10.x, 1.x, 2.x acl metadata.
      */
     public JSONArray getKafkaAcl(String clusterAlias) {
-    	
         Properties prop = new Properties();
         JSONArray acls = new JSONArray();
         prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
@@ -1811,42 +1811,87 @@ public class KafkaServiceImpl implements KafkaService {
                     ResourcePatternFilter.ANY,
                     new AccessControlEntryFilter(
                             null,
-                            "*",
+                            null,
                             AclOperation.ANY,
                             AclPermissionType.ANY
                     )
             );
-            
-            java.util.Iterator<AclBinding> itorA = adminClient.describeAcls(aclBindingFilter).values().get().iterator();
-            while (itorA.hasNext()) {
-            	AclBinding ab = itorA.next();
-            	AccessControlEntry e = ab.entry();
-            	JSONObject entry = new JSONObject();
-            	entry.put("host", e.host());
-            	entry.put("operation",e.operation().name());
-            	entry.put("principal", e.principal());
-            	entry.put("permissionType",e.permissionType().name());
-            	
-            	ResourcePattern p = ab.pattern();
-            	JSONObject pattern = new JSONObject();
-            	pattern.put("name", p.name());
-            	pattern.put("patternType", p.patternType().name());
-            	pattern.put("resourceType", p.resourceType().name());
-            
-            	JSONObject acl = new JSONObject();
-            	acl.put("entry", entry);
-            	acl.put("pattern", pattern);
-            	acls.add(acl);
-            }
-            
+            acls = _getACL(adminClient, aclBindingFilter);
         } catch (Exception e) {
-            LOG.error("Get kafka consumer has error,msg is " + e.getMessage());
+            LOG.error("Get kafka acl has error,msg is " + e.getMessage());
             e.printStackTrace();
         } finally {
             adminClient.close();
         }
         
         return acls;
+    }
+    
+    
+    /**
+     * Get kafka 0.10.x, 1.x, 2.x acl metadata.
+     */
+    public JSONArray getKafkaAclBYTopicName(String clusterAlias, String topicname) {
+        Properties prop = new Properties();
+        JSONArray acls = new JSONArray();
+        prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+            sasl(prop, clusterAlias);
+        }
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+            ssl(prop, clusterAlias);
+        }
+
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(prop);
+            
+            AclBindingFilter aclBindingFilter = new AclBindingFilter(
+                    new ResourcePatternFilter(
+                    		ResourceType.TOPIC,
+                    		topicname,
+                    		PatternType.ANY
+                    ),
+                    AccessControlEntryFilter.ANY
+            );
+            acls = _getACL(adminClient, aclBindingFilter);
+        } catch (Exception e) {
+            LOG.error("Get kafka acl has error,msg is " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            adminClient.close();
+        }
+        
+        return acls;
+    }    
+    
+    
+    
+    public JSONArray _getACL(AdminClient adminClient, AclBindingFilter aclBindingFilter) throws InterruptedException, ExecutionException {
+    	 JSONArray acls = new JSONArray();
+    	 java.util.Iterator<AclBinding> itorA = adminClient.describeAcls(aclBindingFilter).values().get().iterator();
+         while (itorA.hasNext()) {
+         	AclBinding ab = itorA.next();
+         	AccessControlEntry e = ab.entry();
+         	JSONObject entry = new JSONObject();
+         	entry.put("host", e.host());
+         	entry.put("operation",e.operation().name());
+         	entry.put("principal", e.principal());
+         	entry.put("permissionType",e.permissionType().name());
+         	
+         	ResourcePattern p = ab.pattern();
+         	JSONObject pattern = new JSONObject();
+         	pattern.put("name", p.name());
+         	pattern.put("patternType", p.patternType().name());
+         	pattern.put("resourceType", p.resourceType().name());
+         
+         	JSONObject acl = new JSONObject();
+         	acl.put("entry", entry);
+         	acl.put("pattern", pattern);
+         	acls.add(acl);
+         }    	 
+    	 return acls;
     }
 
 }

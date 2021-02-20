@@ -242,5 +242,39 @@ $(document).ready(function() {
 		data.y = datay;
 		return data;
 	}
+	
+	
+	function showTables(rows) {
+		var columns = [
+			           	{"data": "entry.principal" },
+			           	{"data": "entry.host" },
+			           	{"data": "entry.operation" },
+			           	{"data": "entry.permissionType" },
+	    			   ];
+
+		var table = $('#resultACL').DataTable({
+			"aaSorting":[
+			             [0, "desc"]
+		                ],	
+			"data": rows,
+			"columns": columns,
+		});		
+	
+	}
+	
+	function getData(topicName) {
+		$.ajax({
+			"type" : "get",
+			"contentType" : "application/json",
+			"url" : "/acls/topic/" + topicName,
+			"dataType" : "json",
+			"success" : function(data) {
+				console.dir(data);
+				showTables(data);
+			}
+		});		
+	}
+	
+	getData(topicName);	
 
 });

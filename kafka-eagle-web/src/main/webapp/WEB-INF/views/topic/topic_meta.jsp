@@ -123,6 +123,30 @@
                     <div class="col-lg-12">
                         <div class="card mb-4">
                             <div class="card-header">
+                                <i class="fas fa-server"></i> Topic ACL Info
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="resultACL" class="table table-bordered table-condensed" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>principal</th>
+                                            <th>host</th>
+                                            <th>operation</th>
+                                            <th>permissionType</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
                                 <i class="fas fa-server"></i> Topic Meta Info
                             </div>
                             <div class="card-body">
@@ -146,6 +170,8 @@
                         </div>
                     </div>
                 </div>
+                
+                
                 <!-- MBean -->
                 <div class="row">
                     <div class="col-lg-12">

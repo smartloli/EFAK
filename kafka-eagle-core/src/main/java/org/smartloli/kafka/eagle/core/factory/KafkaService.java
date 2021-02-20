@@ -265,5 +265,7 @@ public interface KafkaService {
      */
     public JSONArray getKafkaAcl(String clusterAlias);
 
+	public JSONArray getKafkaAclBYTopicName(String clusterAlias, String topicname);
+
 
 }

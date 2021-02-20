@@ -45,6 +45,7 @@
                             class="fas fa-cube fa-sm fa-fw mr-1"></i>Hub</a>
                 </nav>
             </div>
+            
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLog"
                aria-expanded="false" aria-controls="collapseLog">
                 <div class="sb-nav-link-icon">
@@ -61,18 +62,33 @@
                             class="fab fa-buffer fa-sm fa-fw mr-1"></i>Task</a>
                 </nav>
             </div>
+            
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#acls"
+               aria-expanded="false" aria-controls="acls">
+                <div class="sb-nav-link-icon">
+                    <i class="fas fa-list-alt"></i>
+                </div>
+                ACL
+                <div class="sb-sidenav-collapse-arrow">
+                    <i class="fas fa-angle-down"></i>
+                </div>
+            </a>
+            <div class="collapse" id="acls" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+                <nav class="sb-sidenav-menu-nested nav">
+                    <a id="ke_navbar_acls" class="nav-link" href="/acls"><i 
+                    class="fas fa-fw fa-list mr-1"></i>List</a>
+                </nav>
+            </div>
+
+            
             <a id="ke_navbar_consumers" class="nav-link" href="/consumers">
                 <div class="sb-nav-link-icon">
                     <i class="fas fa-fw fa-users"></i>
                 </div>
                 Consumers
-            </a>
-            <a id="ke_navbar_acls" class="nav-link" href="/acls">
-                <div class="sb-nav-link-icon">
-                    <i class="fas fa-fw fa-list"></i>
-                </div>
-                ACL
-            </a>
+            </a>            
+            
+            
             
             <div class="sb-sidenav-menu-heading">Performance</div>
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCluster"

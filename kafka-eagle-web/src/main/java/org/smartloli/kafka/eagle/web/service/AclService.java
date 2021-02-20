@@ -30,4 +30,8 @@ public interface AclService {
 
 	/** Get acl data interface. */
 	public JSONArray getAcls(String clusterAlias);
+	
+	/** Get acl data interface. */
+	public JSONArray getTopicAcls(String clusterAlias, String topicname);
+	
 }
