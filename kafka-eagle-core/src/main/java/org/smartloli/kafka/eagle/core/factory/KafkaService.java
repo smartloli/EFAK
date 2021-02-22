@@ -267,5 +267,7 @@ public interface KafkaService {
 
 	public JSONArray getKafkaAclBYTopicName(String clusterAlias, String topicname);
 
+	Map<String, Object> createGroup(String clusterAlias, String userName, String groupName);
+
 
 }

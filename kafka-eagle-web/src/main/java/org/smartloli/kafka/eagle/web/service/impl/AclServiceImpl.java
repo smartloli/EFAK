@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
+import java.util.Map;
+
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.service.AclService;
@@ -49,6 +51,13 @@ public class AclServiceImpl implements AclService {
 
 		return acls;
 	}
+	
+	@Override
+	public Map<String, Object> createGroup(String clusterAlias, String userName, String groupName) {
+		return  kafkaService.createGroup(clusterAlias, userName,  "group_" + userName + "_" + groupName);
+	}
+	
+	
 	
 }
 

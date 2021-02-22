@@ -577,7 +577,49 @@ public class KafkaServiceImpl implements KafkaService {
 			LOG.info("Error creating acl for topic " + topicName, e);
 			e.printStackTrace();
 		}
-	}	
+	}
+	
+	
+	@Override
+	public Map<String, Object> createGroup(String clusterAlias, String userName, String groupName) {
+		Map<String, Object> targets = new HashMap<String, Object>();
+		
+		Properties prop = new Properties();
+		prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+        	if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+            		sasl(prop, clusterAlias);
+        	}
+        	if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+            		ssl(prop, clusterAlias);
+        	}
+
+		AdminClient adminClient = null;
+		try {
+			adminClient = AdminClient.create(prop);
+			String principal = "User:" + userName;
+			String host = "*";
+			ArrayList<AclBinding> as = new ArrayList<>();
+			//group
+			ResourcePattern resourcePatternGroup = new ResourcePattern(ResourceType.GROUP, groupName, PatternType.LITERAL);
+			AclBinding aclBindingG = new AclBinding(resourcePatternGroup, new AccessControlEntry(principal, host, AclOperation.READ, AclPermissionType.ALLOW));
+			as.add(aclBindingG);
+			
+			adminClient.createAcls(as);
+		} catch (Exception e) {
+			LOG.info("Create kafka topic has error, msg is " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			adminClient.close();
+		}
+
+		targets.put("status", "success");
+		targets.put("info", "Create Group[" + groupName + "] has successed" );
+		return targets;
+	}
+	
+	
+	
 
 	/** Delete topic to kafka cluster. */
 	public Map<String, Object> delete(String clusterAlias, String topicName) {

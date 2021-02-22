@@ -17,10 +17,13 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.service.AclService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +77,65 @@ public class AclController {
 		JSONArray result = aclService.getTopicAcls(clusterAlias, tname);
 
 		return result;
-    }	
+    }
+    
+    
+    /**
+     * Topic create viewer.
+     */
+    @RequiresPermissions("/topic/create")
+    @RequestMapping(value = "/acls/createGroup", method = RequestMethod.GET)
+    public ModelAndView topicCreateView(HttpSession session) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/acls/createGroup");
+        return mav;
+    }
+    
+    
+	/** Create topic form. */
+	@RequestMapping(value = "/acls/createGroup/form", method = RequestMethod.POST)
+	public ModelAndView topicAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		String ke_user_name = request.getParameter("ke_user_name");
+		String ke_group_name = request.getParameter("ke_group_name");
+
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		
+		Map<String, Object> respons = aclService.createGroup(clusterAlias, ke_user_name, ke_group_name);
+
+
+
+		if ("success".equals(respons.get("status"))) {
+			session.removeAttribute("Submit_Status");
+			session.setAttribute("Submit_Status", respons.get("info"));
+			mav.setViewName("redirect:/acls/create/success");
+		} else {
+			session.removeAttribute("Submit_Status");
+			session.setAttribute("Submit_Status", respons.get("info"));
+			mav.setViewName("redirect:/topic/create/failed");
+		}
+		return mav;
+	}    
 	
+	
+    /**
+     * Create topic success viewer.
+     */
+    @RequestMapping(value = "/acls/create/success", method = RequestMethod.GET)
+    public ModelAndView successView(HttpSession session) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/acls/add_success");
+        return mav;
+    }
+
+    /**
+     * Create topic failed viewer.
+     */
+    @RequestMapping(value = "/acls/create/failed", method = RequestMethod.GET)
+    public ModelAndView failedView(HttpSession session) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/acls/add_failed");
+        return mav;
+    }
 
 }

@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.web.service;
 
+import java.util.Map;
+
 import com.alibaba.fastjson.JSONArray;
 
 /**
@@ -33,5 +35,7 @@ public interface AclService {
 	
 	/** Get acl data interface. */
 	public JSONArray getTopicAcls(String clusterAlias, String topicname);
+
+	Map<String, Object> createGroup(String clusterAlias, String userName, String groupName);
 	
 }

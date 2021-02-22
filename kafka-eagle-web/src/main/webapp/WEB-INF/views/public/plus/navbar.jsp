@@ -76,7 +76,9 @@
             <div class="collapse" id="acls" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav">
                     <a id="ke_navbar_acls" class="nav-link" href="/acls"><i 
-                    class="fas fa-fw fa-list mr-1"></i>List</a>
+                    		class="fas fa-list fa-sm fa-fw mr-1"></i>List</a>
+                    <a id="ke_navbar_acls_createGroup" class="nav-link" href="/acls/createGroup"><i
+                            class="fas fa-edit fa-sm fa-fw mr-1"></i>CreateGroup</a>
                 </nav>
             </div>
 
