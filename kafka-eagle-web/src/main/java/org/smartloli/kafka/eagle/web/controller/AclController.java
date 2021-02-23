@@ -29,12 +29,14 @@ import org.smartloli.kafka.eagle.web.service.AclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Kafka acl controller to viewer data.
@@ -137,5 +139,14 @@ public class AclController {
         mav.setViewName("/acls/add_failed");
         return mav;
     }
+    
+    
+	@RequestMapping(value = "/acls/delete", method = RequestMethod.POST)
+	@ResponseBody
+	public String delete(@RequestBody JSONObject ob,
+			HttpSession session) throws Exception {
+		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+		return aclService.delete(clusterAlias, ob);
+	}
 
 }

@@ -21,6 +21,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.smartloli.kafka.eagle.common.protocol.*;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -268,6 +269,8 @@ public interface KafkaService {
 	public JSONArray getKafkaAclBYTopicName(String clusterAlias, String topicname);
 
 	Map<String, Object> createGroup(String clusterAlias, String userName, String groupName);
+
+	String deleteAcl(String clusterAlias, JSONObject jsonObject);
 
 
 }

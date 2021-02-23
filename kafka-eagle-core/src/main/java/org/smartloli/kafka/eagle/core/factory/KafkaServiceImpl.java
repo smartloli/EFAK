@@ -25,6 +25,8 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.admin.CreateAclsResult;
+import org.apache.kafka.clients.admin.DeleteAclsResult;
+import org.apache.kafka.clients.admin.DeleteAclsResult.FilterResults;
 import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsOptions;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
@@ -37,6 +39,7 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.acl.AccessControlEntry;
@@ -1907,9 +1910,8 @@ public class KafkaServiceImpl implements KafkaService {
         
         return acls;
     }    
-    
-    
-    
+
+
     public JSONArray _getACL(AdminClient adminClient, AclBindingFilter aclBindingFilter) throws InterruptedException, ExecutionException {
     	 JSONArray acls = new JSONArray();
     	 java.util.Iterator<AclBinding> itorA = adminClient.describeAcls(aclBindingFilter).values().get().iterator();
@@ -1934,6 +1936,56 @@ public class KafkaServiceImpl implements KafkaService {
          	acls.add(acl);
          }    	 
     	 return acls;
+    }
+    
+    @Override
+    public String deleteAcl(String clusterAlias, JSONObject jsonObject) {
+        Properties prop = new Properties();
+        
+        String reString  = "";
+        prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+            sasl(prop, clusterAlias);
+        }
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+            ssl(prop, clusterAlias);
+        }
+
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(prop);
+            
+            ArrayList<AclBindingFilter> filters = new ArrayList<AclBindingFilter>(); 
+            
+            JSONObject pattern = jsonObject.getJSONObject("pattern");
+            ResourcePatternFilter rpFilter = new ResourcePatternFilter(
+            		ResourceType.valueOf(pattern.getString("resourceType")),
+            		pattern.getString("name"), 
+            		PatternType.valueOf(pattern.getString("patternType"))
+            		);
+            
+            JSONObject entry = jsonObject.getJSONObject("entry");
+            AccessControlEntryFilter arFilter = new AccessControlEntryFilter(
+            		entry.getString("principal"), 
+            		entry.getString("host"),
+            		AclOperation.valueOf(entry.getString("operation")),
+            		AclPermissionType.valueOf(entry.getString("permissionType"))
+            		);
+            
+            AclBindingFilter aclBindingFilter = new AclBindingFilter(rpFilter, arFilter);
+            filters.add(aclBindingFilter);
+            DeleteAclsResult result = adminClient.deleteAcls(filters);
+            KafkaFuture<FilterResults> kf = result.values().get(aclBindingFilter);
+            reString =  kf.toString();;
+        } catch (Exception e) {
+            LOG.error("Get kafka acl has error,msg is " + e.getMessage());
+            reString = e.getMessage();
+        } finally {
+            adminClient.close();
+        } 
+        
+        return reString;
     }
 
 }

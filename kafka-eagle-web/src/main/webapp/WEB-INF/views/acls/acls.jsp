@@ -52,7 +52,7 @@
                 </ol>
                 <div class="alert alert-info alert-dismissable">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <i class="fas fa-info-circle"></i> <strong>List all Acls.</strong>
+                    <i class="fas fa-info-circle"></i> <strong>List all ACL.</strong>
                 </div>
                 <!-- content body -->
                 <div class="row">
@@ -72,6 +72,7 @@
                                             <th>host</th>
                                             <th>operation</th>
                                             <th>permissionType</th>
+                                            <th>Operate</th>
                                         </tr>
                                         </thead>
                                     </table>

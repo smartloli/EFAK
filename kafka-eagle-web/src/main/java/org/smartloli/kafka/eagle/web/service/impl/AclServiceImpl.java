@@ -25,6 +25,7 @@ import org.smartloli.kafka.eagle.web.service.AclService;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Kafka acl data interface, and set up the return data set.
@@ -57,12 +58,13 @@ public class AclServiceImpl implements AclService {
 		return  kafkaService.createGroup(clusterAlias, userName,  "group_" + userName + "_" + groupName);
 	}
 	
+	@Override
+	public String delete(String clusterAlias, JSONObject jsonObject) {
+		return  kafkaService.deleteAcl(clusterAlias, jsonObject);
+	}
 	
 	
 }
-
-
-
 
 
 
