@@ -25,6 +25,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.core.factory.v2.ConfigFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.ConfigService;
 import org.smartloli.kafka.eagle.web.service.AclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,11 +52,21 @@ public class AclController {
 	/** Kafka acl service interface. */
 	@Autowired
 	private AclService aclService;
+	
+	
+    /**
+     * Broker service interface.
+     */
+    private static ConfigService configService = new ConfigFactory().create();
+    
+
 
 	/** acls viewer. */
 	@RequestMapping(value = "/acls", method = RequestMethod.GET)
 	public ModelAndView aclsView(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
+		
+		
 		mav.setViewName("/acls/acls");
 		return mav;
 	}
@@ -67,7 +79,7 @@ public class AclController {
 		HttpSession session = request.getSession();
 		String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
 		JSONArray result = aclService.getAcls(clusterAlias);
-		
+		configService.getUserList(clusterAlias);
 		return result;
 	}
 	

@@ -45,6 +45,8 @@ import org.smartloli.kafka.eagle.core.factory.hub.KafkaHubFactory;
 import org.smartloli.kafka.eagle.core.factory.hub.KafkaHubService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
+import org.smartloli.kafka.eagle.core.factory.v2.ConfigFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.ConfigService;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsFactory;
 import org.smartloli.kafka.eagle.core.metrics.KafkaMetricsService;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
@@ -88,6 +90,7 @@ public class TopicServiceImpl implements TopicService {
      * Broker service interface.
      */
     private static BrokerService brokerService = new BrokerFactory().create();
+    
 
     /**
      * Mx4j service interface.
