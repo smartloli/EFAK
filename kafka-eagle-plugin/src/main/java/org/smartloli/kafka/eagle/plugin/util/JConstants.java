@@ -160,7 +160,7 @@ public interface JConstants {
 
     static String CREATE_TABLE_SQLITE_KE_LOGSIZE = "CREATE TABLE IF NOT EXISTS `ke_logsize` (`cluster` varchar(64) ,`topic` varchar(64) ,`logsize` bigint(20) ,`diffval` bigint(20) ,`timespan` bigint(20) ,`tm` varchar(16))";
 
-    static String CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX = "CREATE INDEX idx_timespan ON `ke_logsize` (`timespan`);";
+    static String CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX = "CREATE INDEX idx_timespan_logsize ON `ke_logsize` (`timespan`);";
 
     static String CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM = "CREATE INDEX idx_tm_topic ON `ke_logsize` (`tm`, `topic`);";
 
@@ -168,7 +168,7 @@ public interface JConstants {
 
     static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(64) ,`logsize` bigint(20) ,`difflogsize` bigint(20) ,`offsets` bigint(20) ,`diffoffsets` bigint(20) ,`lag` bigint(20) ,`timespan` bigint(20) ,`tm` varchar(16))";
 
-    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX = "CREATE INDEX idx_timespan ON `ke_consumer_bscreen` (`timespan`);";
+    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX = "CREATE INDEX idx_timespan_bscreen ON `ke_consumer_bscreen` (`timespan`);";
 
     static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX_TM = "CREATE INDEX idx_tm_cluster_diffoffsets ON `ke_consumer_bscreen` (`tm`, `cluster`, `diffoffsets`);";
 
