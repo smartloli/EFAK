@@ -10,6 +10,7 @@
     <url>https://repo1.maven.org/maven2/</url>
 
     <properties>
+        <java.version>11</java.version>
         <project.version>2.0.5</project.version>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
