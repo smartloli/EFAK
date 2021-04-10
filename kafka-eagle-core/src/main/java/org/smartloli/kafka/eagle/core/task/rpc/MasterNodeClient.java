@@ -18,11 +18,13 @@
 package org.smartloli.kafka.eagle.core.task.rpc;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.thrift.TConfiguration;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
+import org.apache.thrift.transport.TTransportException;
+import org.apache.thrift.transport.layered.TFramedTransport;
 import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
@@ -46,7 +48,13 @@ public class MasterNodeClient {
      */
     public static String getResult(String host, int port, JSONObject object) {
         int timeout = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.rpc.timeout");
-        TTransport transport = new TFramedTransport(new TSocket(host, port, timeout));
+        TTransport transport = null;
+        try {
+            transport = new TFramedTransport(new TSocket(new TConfiguration(), host, port, timeout));
+        } catch (TTransportException e) {
+            e.printStackTrace();
+            ErrorUtils.print(MasterNodeClient.class).error("TSocket connect from worknode[" + host + ":" + port + "] has error, msg is ", e);
+        }
         TProtocol protocol = new TCompactProtocol(transport);
         WorkNodeService.Client client = new WorkNodeService.Client(protocol);
         String result = "";
