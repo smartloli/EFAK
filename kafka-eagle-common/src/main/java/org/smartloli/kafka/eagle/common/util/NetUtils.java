@@ -89,7 +89,6 @@ public class NetUtils {
         try {
             ip = InetAddress.getLocalHost().getHostAddress();
         } catch (Exception e) {
-            e.printStackTrace();
             ErrorUtils.print(NetUtils.class).error("Get local server ip has error, msg is " + e.getMessage());
         }
         return ip;
@@ -103,7 +102,6 @@ public class NetUtils {
         try {
             ip = InetAddress.getLocalHost().getHostName();
         } catch (Exception e) {
-            e.printStackTrace();
             ErrorUtils.print(NetUtils.class).error("Get local server ip has error, msg is " + e.getMessage());
         }
         return ip;

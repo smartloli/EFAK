@@ -15,27 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.common.exception;
+package org.smartloli.kafka.eagle.common.util;
 
 /**
- * Collect common exception.
+ * // NOTE
  *
  * @author smartloli.
  * <p>
- * Created by Apr 02, 2021
+ * Created by Apr 10, 2021
  */
-public class KeCommonException extends KeRuntimeException {
+public class TestException {
+    public static void main(String[] args) {
+        int a = 1;
+        Integer b = null;
+        try {
+            if (a == b) {
 
-    public KeCommonException(String message, Throwable cause) {
-        super(message, cause);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            ErrorUtils.print(TestException.class).error("Error is ,", e);
+            throw new RuntimeException(e);
+        }
     }
-
-    public KeCommonException(String message) {
-        super(message);
-    }
-
-    public KeCommonException(Throwable cause) {
-        super(cause);
-    }
-
 }

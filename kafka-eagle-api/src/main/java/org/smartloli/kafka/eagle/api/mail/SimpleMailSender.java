@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.api.mail;
 
+import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.mail.*;
@@ -62,7 +64,7 @@ public class SimpleMailSender {
             Transport.send(mailMessage);
             return true;
         } catch (MessagingException ex) {
-            ex.printStackTrace();
+            ErrorUtils.print(this.getClass()).error("Send text mail has error, msg is ", ex);
         }
         return false;
     }

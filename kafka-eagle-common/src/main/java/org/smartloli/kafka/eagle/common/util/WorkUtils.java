@@ -49,7 +49,6 @@ public class WorkUtils {
                 lines = Files.readLines(new File(System.getProperty("user.dir") + "/conf/" + workNodesName), Charsets.UTF_8);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             ErrorUtils.print(WorkUtils.class).error("Get kafka eagle work node has error, msg is ", ex);
         }
         return lines;
