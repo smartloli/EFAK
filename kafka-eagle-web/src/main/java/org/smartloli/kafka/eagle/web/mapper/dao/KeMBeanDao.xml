@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.smartloli.kafka.eagle.web.mapper.dao.KeMBeanDao">
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.KpiInfo" id="kpi">
+        <result property="cluster" column="cluster"/>
+        <result property="broker" column="broker"/>
+        <result property="type" column="type"/>
+        <result property="key" column="key"/>
+        <result property="value" column="value"/>
+        <result property="timespan" column="timespan"/>
+        <result property="tm" column="tm"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.MBeanOfflineInfo" id="kpiOffline">
+        <result property="cluster" column="cluster"/>
+        <result property="key" column="key"/>
+        <result property="oneMinute" column="one"/>
+        <result property="meanRate" column="mean"/>
+        <result property="fiveMinute" column="five"/>
+        <result property="fifteenMinute" column="fifteen"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo" id="topicOffsets">
+        <result property="cluster" column="cluster"/>
+        <result property="group" column="group"/>
+        <result property="topic" column="topic"/>
+        <result property="logsize" column="logsize"/>
+        <result property="offsets" column="offsets"/>
+        <result property="lag" column="lag"/>
+        <result property="timespan" column="timespan"/>
+        <result property="tm" column="tm"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo" id="topicConsumerOffsets">
+        <result property="cluster" column="cluster"/>
+        <result property="group" column="group"/>
+        <result property="topic" column="topic"/>
+        <result property="logsize" column="logsize"/>
+        <result property="difflogsize" column="difflogsize"/>
+        <result property="offsets" column="offsets"/>
+        <result property="diffoffsets" column="diffoffsets"/>
+        <result property="lag" column="lag"/>
+        <result property="timespan" column="timespan"/>
+        <result property="tm" column="tm"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="java.util.List">
+        insert into
+        ke_metrics(`cluster`,`broker`,`type`,`key`,`value`,`timespan`,`tm`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.cluster},#{item.broker},#{item.type},#{item.key},#{item.value},#{item.timespan},#{item.tm})
+        </foreach>
+    </insert>
+
+    <insert id="mbeanOfflineInsert" parameterType="java.util.List">
+        replace into
+        ke_metrics_offline(`cluster`,`key`,`one`,`mean`,`five`,`fifteen`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.cluster},#{item.key},#{item.oneMinute},#{item.meanRate},#{item.fiveMinute},#{item.fifteenMinute})
+        </foreach>
+    </insert>
+
+    <delete id="remove" parameterType="int">
+        delete from ke_metrics where tm&lt;=#{tm}
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="kpi">
+        select `broker`,`key`,`value`,`timespan` from ke_metrics
+        where `cluster`=#{cluster} and `type` =#{type}
+        <if test="modules != null and modules.size > 0">
+            and `key` in (
+            <foreach collection="modules" item="item" index="index" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        and tm between #{stime} and #{etime}
+    </select>
+
+    <select id="getMBeanOffline" parameterType="map" resultMap="kpiOffline">
+        select `cluster`,`key`,`one`,`mean`,`five`,`fifteen` from ke_metrics_offline where `cluster`=#{cluster}
+    </select>
+
+    <select id="getBrokersKpi" parameterType="map" resultMap="kpi">
+        select `key`,`value` from ke_metrics
+        where `cluster`=#{cluster} and `type` =#{type}
+        and `key`=#{key}
+        and tm=#{tday} order by timespan desc limit 1
+    </select>
+
+    <select id="getOsMem" parameterType="map" resultMap="kpi">
+        select `value` from ke_metrics where `cluster`=#{cluster} and `key` like #{key} order by `timespan` desc limit 2
+    </select>
+
+    <select id="getUsedCPU" parameterType="map" resultMap="kpi">
+        select `value` from ke_metrics where `cluster`=#{cluster} and `key`=#{key} order by `timespan` desc limit 1
+    </select>
+
+    <select id="getConsumerRateTopic" parameterType="map" resultMap="topicOffsets">
+        select logsize,offsets,timespan from ke_consumer_bscreen
+        where `cluster`=#{cluster} and `group`=#{group}
+        and `topic`=#{topic} order by `timespan` desc limit 2
+    </select>
+
+    <select id="getConsumerOffsetsTopic" parameterType="map" resultMap="topicConsumerOffsets">
+        select `difflogsize`,`diffoffsets`,`lag`,`timespan`
+        from ke_consumer_bscreen
+        where `cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
+        and tm between #{stime} and #{etime}
+    </select>
+
+</mapper>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.smartloli.kafka.eagle.web.mapper.dao.KeAlertDao">
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo" id="alarmConsumer">
+        <result property="id" column="id"/>
+        <result property="cluster" column="cluster"/>
+        <result property="group" column="group"/>
+        <result property="topic" column="topic"/>
+        <result property="lag" column="lag"/>
+        <result property="alarmGroup" column="alarm_group"/>
+        <result property="alarmTimes" column="alarm_times"/>
+        <result property="alarmMaxTimes" column="alarm_max_times"/>
+        <result property="alarmMaxTimes" column="alarm_max_times"/>
+        <result property="alarmLevel" column="alarm_level"/>
+        <result property="isNormal" column="is_normal"/>
+        <result property="isEnable" column="is_enable"/>
+        <result property="created" column="created"/>
+        <result property="modify" column="modify"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo" id="clustersInfo">
+        <result property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="cluster" column="cluster"/>
+        <result property="server" column="server"/>
+        <result property="alarmGroup" column="alarm_group"/>
+        <result property="alarmTimes" column="alarm_times"/>
+        <result property="alarmMaxTimes" column="alarm_max_times"/>
+        <result property="alarmLevel" column="alarm_level"/>
+        <result property="isNormal" column="is_normal"/>
+        <result property="isEnable" column="is_enable"/>
+        <result property="created" column="created"/>
+        <result property="modify" column="modify"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo" id="alarmConfig">
+        <result property="cluster" column="cluster"/>
+        <result property="alarmGroup" column="alarm_group"/>
+        <result property="alarmType" column="alarm_type"/>
+        <result property="alarmUrl" column="alarm_url"/>
+        <result property="httpMethod" column="http_method"/>
+        <result property="alarmAddress" column="alarm_address"/>
+        <result property="created" column="created"/>
+        <result property="modify" column="modify"/>
+    </resultMap>
+
+    <insert id="insertOrUpdateAlarmConfig"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo">
+        replace into
+        ke_alarm_config(`cluster`,`alarm_group`,`alarm_type`,`alarm_url`,`http_method`,`alarm_address`,`created`,`modify`)
+        values(#{cluster},#{alarmGroup},#{alarmType},#{alarmUrl},#{httpMethod},#{alarmAddress},#{created},#{modify})
+    </insert>
+
+    <select id="findAlarmConfigByGroupName" parameterType="map" resultType="Integer">
+        select count(*) from ke_alarm_config where `cluster`=#{cluster} and `alarm_group`=#{alarmGroup}
+    </select>
+
+    <select id="getAlarmConfigList" parameterType="map" resultMap="alarmConfig">
+        select * from ke_alarm_config
+        <where>
+            `cluster`=#{cluster}
+            <if test="search!=null and search!=''">
+                and `alarm_group` like #{search}
+            </if>
+        </where>
+        limit #{start},#{size}
+    </select>
+
+    <select id="getAlarmConfigByGroupName" parameterType="map" resultMap="alarmConfig">
+        select * from ke_alarm_config
+        <where>
+            `cluster`=#{cluster}
+            and `alarm_group`=#{alarmGroup}
+        </where>
+    </select>
+
+    <select id="alarmConfigCount" parameterType="map" resultType="Integer">
+        select count(*) from ke_alarm_config where `cluster`=#{cluster}
+    </select>
+
+    <delete id="deleteAlertByGroupName" parameterType="map">
+        delete from ke_alarm_config where `cluster`=#{cluster} and `alarm_group`=#{alarmGroup}
+    </delete>
+
+    <insert id="insertAlarmConsumer" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
+        insert into
+        ke_alarm_consumer(`cluster`,`group`,`topic`,`lag`,`alarm_group`,`alarm_times`,`alarm_max_times`,`alarm_level`,`is_normal`,`is_enable`,`created`,`modify`)
+        values(#{cluster},#{group},#{topic},#{lag},#{alarmGroup},#{alarmTimes},#{alarmMaxTimes},#{alarmLevel},#{isNormal},#{isEnable},#{created},#{modify})
+    </insert>
+
+    <insert id="insertAlarmCrontab" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmCrontabInfo">
+        insert into
+        ke_alarm_crontab(`id`,`type`,`crontab`,`is_enable`,`created`,`modify`)
+        values(#{id},#{type},#{crontab},#{isEnable},#{created},#{modify})
+    </insert>
+
+    <select id="getAlarmConsumerAppList" parameterType="map" resultMap="alarmConsumer">
+        select * from ke_alarm_consumer
+        <where>
+            `cluster`=#{cluster}
+            <if test="search!=null and search!=''">
+                and (`id`=#{search} or `group`=#{search} or `topic`=#{search})
+            </if>
+        </where>
+        limit #{start},#{size}
+    </select>
+
+    <select id="alertConsumerAppCount" parameterType="map" resultType="Integer">
+        select count(*) from ke_alarm_consumer where `cluster`=#{cluster}
+    </select>
+
+    <update id="modifyConsumerAlertSwitchById"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
+        update ke_alarm_consumer set `is_enable`=#{isEnable},`modify`=#{modify} where `id`=#{id}
+    </update>
+
+    <select id="findAlarmConsumerAlertById" parameterType="Integer" resultMap="alarmConsumer">
+        select * from ke_alarm_consumer where `id`=#{id}
+    </select>
+
+    <delete id="deleteAlarmConsumerById" parameterType="Integer">
+        delete from ke_alarm_consumer where `id`=#{id}
+    </delete>
+
+    <select id="getAllAlarmConsumerTasks" resultMap="alarmConsumer">
+        select * from ke_alarm_consumer where `is_enable`='Y'
+    </select>
+
+    <update id="modifyAlarmConsumerById"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
+        update ke_alarm_consumer set
+        `lag`=#{lag},`alarm_group`=#{alarmGroup},`alarm_max_times`=#{alarmMaxTimes},`alarm_level`=#{alarmLevel},`modify`=#{modify}
+        where `id`=#{id}
+    </update>
+
+    <update id="modifyConsumerStatusAlertById"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo">
+        update ke_alarm_consumer set `alarm_times`=#{alarmTimes},`is_normal`=#{isNormal},`modify`=#{modify} where
+        `id`=#{id}
+    </update>
+
+    <insert id="insertAlarmCluster" parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
+        insert into
+        ke_alarm_clusters(`type`,`cluster`,`server`,`alarm_group`,`alarm_times`,`alarm_max_times`,`alarm_level`,`is_normal`,`is_enable`,`created`,`modify`)
+        values(#{type},#{cluster},#{server},#{alarmGroup},#{alarmTimes},#{alarmMaxTimes},#{alarmLevel},#{isNormal},#{isEnable},#{created},#{modify})
+    </insert>
+
+    <select id="getAlarmClusterList" parameterType="map" resultMap="clustersInfo">
+        select * from ke_alarm_clusters
+        <where>
+            `cluster`=#{cluster}
+            <if test="search!=null and search!=''">
+                and (`id`=#{search} or `type`=#{search})
+            </if>
+        </where>
+        order by `id` asc limit #{start},#{size}
+    </select>
+
+    <select id="getAlarmClusterCount" parameterType="map" resultType="Integer">
+        select count(*) from ke_alarm_clusters
+        <where>
+            `cluster`=#{cluster}
+        </where>
+    </select>
+
+    <delete id="deleteAlarmClusterAlertById" parameterType="Integer">
+        delete from ke_alarm_clusters where `id`=#{id}
+    </delete>
+
+    <select id="findAlarmClusterAlertById" parameterType="Integer" resultMap="clustersInfo">
+        select * from ke_alarm_clusters where `id`=#{id}
+    </select>
+
+    <update id="modifyClusterAlertById"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
+        update ke_alarm_clusters set
+        `server`=#{server},`alarm_group`=#{alarmGroup},`alarm_max_times`=#{alarmMaxTimes},`alarm_level`=#{alarmLevel},`modify`=#{modify}
+        where `id`=#{id}
+    </update>
+
+    <update id="modifyClusterStatusAlertById"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
+        update ke_alarm_clusters set `alarm_times`=#{alarmTimes},`is_normal`=#{isNormal},`modify`=#{modify} where
+        `id`=#{id}
+    </update>
+
+    <select id="getAllAlarmClusterTasks" resultMap="clustersInfo">
+        select * from ke_alarm_clusters where `is_enable`='Y'
+    </select>
+
+    <update id="modifyClusterAlertSwitchById"
+            parameterType="org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo">
+        update ke_alarm_clusters set `is_enable`=#{isEnable},`modify`=#{modify} where `id`=#{id}
+    </update>
+
+</mapper>

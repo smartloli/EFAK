@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="system-config.properties"></properties>
+    <environments default="default">
+        <environment id="default">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${kafka.eagle.driver}"/>
+                <property name="url" value="${kafka.eagle.url}"/>
+                <property name="username" value="${kafka.eagle.username}"/>
+                <property name="password" value="${kafka.eagle.password}"/>
+            </dataSource>
+        </environment>
+
+    </environments>
+    <mappers>
+        <mapper resource="org/smartloli/kafka/eagle/web/mapper/dao/KeAlertDao.xml"/>
+        <mapper resource="org/smartloli/kafka/eagle/web/mapper/dao/KeBrokerDao.xml"/>
+        <mapper resource="org/smartloli/kafka/eagle/web/mapper/dao/KeMBeanDao.xml"/>
+        <mapper resource="org/smartloli/kafka/eagle/web/mapper/dao/KeTopicDao.xml"/>
+    </mappers>
+</configuration>

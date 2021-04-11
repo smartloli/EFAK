@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.smartloli.kafka.eagle.web.mapper.dao.KeTopicDao">
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory" id="tsql">
+        <result property="id" column="id"/>
+        <result property="cluster" column="cluster"/>
+        <result property="username" column="username"/>
+        <result property="host" column="host"/>
+        <result property="ksql" column="ksql"/>
+        <result property="status" column="status"/>
+        <result property="spendTime" column="spend_time"/>
+        <result property="created" column="created"/>
+        <result property="tm" column="tm"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicRank" id="trank">
+        <result property="cluster" column="cluster"/>
+        <result property="topic" column="topic"/>
+        <result property="tkey" column="tkey"/>
+        <result property="tvalue" column="tvalue"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize" id="tlogsize">
+        <result property="cluster" column="cluster"/>
+        <result property="topic" column="topic"/>
+        <result property="logsize" column="logsize"/>
+        <result property="diffval" column="diffval"/>
+        <result property="timespan" column="timespan"/>
+        <result property="tm" column="tm"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.ProducersInfo" id="tproducers">
+        <result property="topic" column="topic"/>
+        <result property="diffval" column="diffval"/>
+        <result property="timespan" column="timespan"/>
+        <result property="rownum" column="rownum"/>
+        <result property="rank" column="rank"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo" id="bsbar">
+        <result property="tm" column="tm"/>
+        <result property="value" column="total"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo" id="bsconsumer">
+        <result property="cluster" column="cluster"/>
+        <result property="group" column="group"/>
+        <result property="topic" column="topic"/>
+        <result property="logsize" column="logsize"/>
+        <result property="difflogsize" column="difflogsize"/>
+        <result property="offsets" column="offsets"/>
+        <result property="diffoffsets" column="diffoffsets"/>
+        <result property="lag" column="lag"/>
+        <result property="timespan" column="timespan"/>
+        <result property="tm" column="tm"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo" id="cgi">
+        <result property="cluster" column="cluster"/>
+        <result property="group" column="group"/>
+        <result property="topic" column="topic"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo" id="csi">
+        <result property="cluster" column="cluster"/>
+        <result property="group" column="group"/>
+        <result property="topicNumbers" column="topic_number"/>
+        <result property="coordinator" column="coordinator"/>
+        <result property="activeTopic" column="active_topic"/>
+        <result property="activeThread" column="active_thread_total"/>
+    </resultMap>
+
+    <!-- TopicRank -->
+    <select id="readTopicRank" parameterType="map" resultMap="trank">
+        select `topic`,`tvalue` from ke_topic_rank
+        where `cluster`=#{cluster} and `tkey`=#{tkey}
+        order by `tvalue` desc limit 10
+    </select>
+
+    <!-- Get all topic rank -->
+    <select id="getAllTopicRank" parameterType="map" resultMap="trank">
+        select * from ke_topic_rank where `cluster`=#{cluster} and `tkey`=#{tkey}
+    </select>
+
+    <!-- Remove topic rank -->
+    <delete id="removeTopicRank" parameterType="map">
+        delete from ke_topic_rank where `cluster`=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
+    </delete>
+
+    <!-- Get clean topic state -->
+    <select id="getCleanTopicState" parameterType="map" resultMap="trank">
+        select `tvalue` from ke_topic_rank
+        where `cluster`=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
+    </select>
+
+    <!-- Get all clean topic list -->
+    <select id="getCleanTopicList" parameterType="map" resultMap="trank">
+        select `cluster`,`topic`,`tkey` from ke_topic_rank
+        where `cluster`=#{cluster} and `tkey`='truncate' and `tvalue`=0
+    </select>
+
+    <!-- Topic broker spread, skew, leader skewed -->
+    <select id="readBrokerPerformance" parameterType="map" resultMap="trank">
+        select `topic`,`tvalue` from ke_topic_rank where cluster=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
+    </select>
+
+    <!-- Topic producer threads data -->
+    <select id="readProducerThreads" parameterType="map" resultMap="trank">
+        select `topic`,`tvalue` from ke_topic_rank where cluster=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
+    </select>
+
+    <!-- TopicCapacity -->
+    <select id="getTopicCapacity" parameterType="map" resultType="long">
+        select ifnull(sum(`tvalue`),0) from ke_topic_rank
+        where `cluster` =#{cluster} and `tkey`=#{tkey}
+    </select>
+
+    <insert id="writeTopicRank" parameterType="java.util.List">
+        replace into
+        ke_topic_rank(`cluster`,`topic`,`tkey`,`tvalue`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.cluster},#{item.topic},#{item.tkey},#{item.tvalue})
+        </foreach>
+    </insert>
+
+    <!-- TopicLogSize -->
+    <insert id="writeTopicLogSize" parameterType="java.util.List">
+        insert into
+        ke_logsize(`cluster`,`topic`,`logsize`,`diffval`,`timespan`,`tm`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.cluster},#{item.topic},#{item.logsize},#{item.diffval},#{item.timespan},#{item.tm})
+        </foreach>
+    </insert>
+
+    <select id="readLastTopicLogSize" parameterType="map" resultMap="tlogsize">
+        select `cluster`,`topic`,`logsize`,`diffval` from ke_logsize
+        where `cluster` =#{cluster} and `topic`=#{topic}
+        order by `timespan` desc limit 1
+    </select>
+
+    <select id="queryTopicProducerChart" parameterType="map" resultMap="tlogsize">
+        select `cluster`,`topic`,`logsize`,`diffval`,`timespan` from ke_logsize
+        where `cluster`=#{cluster} and `topic`=#{topic}
+        and tm between #{stime} and #{etime}
+    </select>
+
+    <select id="queryTopicProducerByAlarm" parameterType="map" resultMap="tlogsize">
+        select `cluster`,`topic`,`logsize`,`diffval`,`timespan` from ke_logsize
+        where `cluster`=#{cluster} and `topic`=#{topic}
+        and tm=#{stime} order by `timespan` desc
+        limit 1
+    </select>
+
+    <select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
+        select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster}
+        <if test="topics != null and topics.size > 0">
+            and `topic` in (
+            <foreach collection="topics" item="item" index="index" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        and tm between #{stime} and #{etime} group by tm
+    </select>
+
+    <!-- TopicSqlHistory -->
+    <select id="readTopicSqlHistory" parameterType="map" resultMap="tsql">
+        select * from ke_sql_history
+        <where>
+            `cluster`=#{cluster} and `username`=#{username}
+            <if test="search!=null and search!=''">
+                and `id`=#{search}
+            </if>
+        </where>
+        order by created desc limit #{start},#{size}
+    </select>
+
+    <select id="readTopicSqlHistoryByAdmin" parameterType="map" resultMap="tsql">
+        select * from ke_sql_history
+        <where>
+            `cluster`=#{cluster}
+            <if test="search!=null and search!=''">
+                and (`id`=#{search} or `username`=#{search} or `host`=#{search})
+            </if>
+        </where>
+        order by created desc limit #{start},#{size}
+    </select>
+
+    <select id="findTopicSqlByID" parameterType="map" resultMap="tsql">
+        select * from ke_sql_history where `id`=#{id}
+    </select>
+
+    <insert id="writeTopicSqlHistory" parameterType="java.util.List">
+        insert into
+        ke_sql_history(`cluster`,`username`,`host`,`ksql`,`status`,`spend_time`,`created`,`tm`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.cluster},#{item.username},#{item.host},#{item.ksql},#{item.status},#{item.spendTime},#{item.created},#{item.tm})
+        </foreach>
+    </insert>
+
+    <select id="countTopicSqlHistory" parameterType="map" resultType="long">
+        select count(*) from ke_sql_history
+        <where>
+            `cluster`=#{cluster} and `username`=#{username}
+            <if test="search!=null and search!=''">
+                and `id`=#{search}
+            </if>
+        </where>
+    </select>
+
+    <select id="countTopicSqlHistoryByAdmin" parameterType="map" resultType="long">
+        select count(*) from ke_sql_history
+        <where>
+            `cluster`=#{cluster}
+            <if test="search!=null and search!=''">
+                and (`id`=#{search} or `username`=#{search} or `host`=#{search})
+            </if>
+        </where>
+    </select>
+
+    <!-- Clean -->
+    <delete id="cleanTopicSqlHistory" parameterType="int">
+        delete from ke_sql_history where tm&lt;=#{tm}
+    </delete>
+
+    <delete id="cleanTopicRank" parameterType="int">
+        delete from ke_topic_rank where tm&lt;=#{tm}
+    </delete>
+
+    <delete id="cleanTopicLogSize" parameterType="int">
+        delete from ke_logsize where tm&lt;=#{tm}
+    </delete>
+
+    <delete id="cleanBScreenConsumerTopic" parameterType="int">
+        delete from ke_consumer_bscreen where tm&lt;=#{tm}
+    </delete>
+
+    <select id="getBScreenTotalRecords" parameterType="map" resultType="long">
+        select ifnull(sum(a.logsize),0) from (select `logsize` from ke_logsize
+        where `cluster`=#{cluster}
+        <if test="topics != null and topics.size > 0">
+            and `topic` in (
+            <foreach collection="topics" item="item" index="index" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        and tm=#{tday} order by `timespan` desc limit #{size}) a
+    </select>
+
+    <!-- BScreen Topic -->
+    <insert id="writeBSreenConsumerTopic" parameterType="java.util.List">
+        insert into
+        ke_consumer_bscreen(`cluster`,`group`,`topic`,`logsize`,`difflogsize`,`offsets`,`diffoffsets`,`lag`,`timespan`,`tm`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.cluster},#{item.group},#{item.topic},#{item.logsize},#{item.difflogsize},#{item.offsets},#{item.diffoffsets},#{item.lag},#{item.timespan},#{item.tm})
+        </foreach>
+    </insert>
+
+    <select id="readBScreenLastTopic" parameterType="map" resultMap="bsconsumer">
+        select `cluster`,`group`,`topic`,`logsize`,`difflogsize`,`offsets`,`diffoffsets`,`lag` from ke_consumer_bscreen
+        where `cluster` =#{cluster} and
+        `group`=#{group} and
+        `topic`=#{topic}
+        order by `timespan` desc limit 1
+    </select>
+
+    <select id="queryConsumerHistoryBar" parameterType="map" resultMap="bsbar">
+        select tm,sum(diffoffsets) as total from ke_consumer_bscreen where cluster=#{cluster} and tm between #{stime}
+        and #{etime} group by tm
+    </select>
+
+    <select id="queryTodayBScreenConsumer" parameterType="map" resultMap="bsconsumer">
+        select `difflogsize`,`diffoffsets`,`lag`,`timespan` from ke_consumer_bscreen
+        where `cluster`=#{cluster} and tm=#{tday}
+    </select>
+
+    <select id="queryLastestLag" parameterType="map" resultType="long">
+        select ifnull((
+        select ifnull(`lag`,0) from ke_consumer_bscreen
+        where `cluster`=#{cluster} and tm=#{tday}
+        and `group`=#{group} and `topic`=#{topic}
+        order by `timespan` desc
+        limit 1)
+        ,0)
+    </select>
+
+    <insert id="writeConsumerGroupTopics" parameterType="java.util.List">
+        replace into
+        ke_consumer_group(`cluster`,`group`,`topic`,`status`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.cluster},#{item.group},#{item.topic},#{item.status})
+        </foreach>
+    </insert>
+
+    <insert id="writeConsumerSummaryTopics" parameterType="java.util.List">
+        replace into
+        ke_consumer_group_summary(`cluster`,`group`,`topic_number`,`coordinator`,`active_topic`,`active_thread_total`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.cluster},#{item.group},#{item.topicNumbers},#{item.coordinator},#{item.activeTopic},#{item.activeThread})
+        </foreach>
+    </insert>
+
+    <delete id="cleanConsumerGroupTopic" parameterType="map">
+        delete from ke_consumer_group where `cluster`=#{cluster} and `group`=#{group}
+        <if test="topic != null and topic != ''">
+            and `topic`=#{topic}
+        </if>
+    </delete>
+
+    <delete id="cleanConsumerSummaryTopic" parameterType="map">
+        delete from ke_consumer_group_summary where `cluster`=#{cluster} and `group`=#{group}
+    </delete>
+
+    <select id="getAllConsumerGroups" parameterType="map" resultMap="cgi">
+        select * from ke_consumer_group
+        <where>
+            `cluster`=#{cluster}
+        </where>
+    </select>
+
+    <select id="getAllConsumerSummary" parameterType="map" resultMap="csi">
+        select * from ke_consumer_group_summary
+        <where>
+            `cluster`=#{cluster}
+        </where>
+    </select>
+
+    <select id="getConsumerGroupPages" parameterType="map" resultMap="cgi">
+        select * from ke_consumer_group
+        <where>
+            `cluster`=#{cluster} and `group`=#{group}
+            <if test="search != null and search != ''">
+                and `topic` like #{search}
+            </if>
+            <if test="status != null and status != ''">
+                and `status`=#{status}
+            </if>
+        </where>
+        limit #{start},#{size}
+    </select>
+
+    <select id="getConsumerSummaryPages" parameterType="map" resultMap="csi">
+        select * from ke_consumer_group_summary
+        <where>
+            `cluster`=#{cluster}
+            <if test="search != null and search != ''">
+                and `group` like #{search}
+            </if>
+        </where>
+        limit #{start},#{size}
+    </select>
+
+    <select id="countConsumerGroupPages" parameterType="map" resultType="long">
+        select count(1) from ke_consumer_group
+        <where>
+            `cluster`=#{cluster} and `group`=#{group}
+            <if test="search != null and search != ''">
+                and `topic` like #{search}
+            </if>
+        </where>
+    </select>
+
+    <select id="countConsumerSummaryPages" parameterType="map" resultType="long">
+        select count(1) from ke_consumer_group_summary
+        <where>
+            `cluster`=#{cluster}
+            <if test="search != null and search != ''">
+                and `group` like #{search}
+            </if>
+        </where>
+    </select>
+
+</mapper>
