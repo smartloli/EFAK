@@ -22,7 +22,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.thrift.TException;
 import org.smartloli.kafka.eagle.common.util.AppUtils;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.JSONUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.task.cache.LogCacheFactory;
@@ -48,7 +48,7 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
 
     @Override
     public String getResult(String jsonObject) throws TException {
-        if (isJson(jsonObject)) {
+        if (JSONUtils.isJsonObject(jsonObject)) {
             JSONObject object = JSON.parseObject(jsonObject);
             if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.HEART_BEAT)) {
                 this.type = KConstants.Protocol.HEART_BEAT;
@@ -106,19 +106,5 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
             }
         }
         return result;
-    }
-
-    public boolean isJson(String rev) {
-        return isJsonObject(rev);
-    }
-
-    private boolean isJsonObject(String text) {
-        try {
-            JSON.parseObject(text);
-            return true;
-        } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Verify that the string[" + text + "] is JSONObject has error, msg is ", e);
-            return false;
-        }
     }
 }
