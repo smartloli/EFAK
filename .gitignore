@@ -1,3 +1,5 @@
 .history/
 .idea/
 **/*.iml
+**/*.class
+**/target/
