@@ -464,4 +464,9 @@ public class TopicServiceImpl implements TopicService {
         return kafkaHubService.verify(clusterAlias, reassignTopicsJson);
     }
 
+    @Override
+    public String getPreviewTopicPartitionMsg(String clusterAlias, JSONObject tp) {
+        return kafkaService.getPreviewTopicPartitionMsg(clusterAlias, tp);
+    }
+
 }

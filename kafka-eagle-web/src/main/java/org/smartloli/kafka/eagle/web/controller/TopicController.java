@@ -227,6 +227,7 @@ public class TopicController {
             } else {
                 object.put("under_replicated", "<span class='badge badge-success btn-xs'>false</span>");
             }
+            object.put("preview", "<a name='preview' topic='" + tname + "' partition='" + metadata.getPartitionId() + "' href='#' class='badge badge-primary'>Preview</a>");
             aaDatas.add(object);
         }
 
@@ -237,6 +238,24 @@ public class TopicController {
         target.put("aaData", aaDatas);
         try {
             byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Get topic message preview by ajax.
+     */
+    @RequestMapping(value = "/topic/meta/preview/msg/ajax", method = RequestMethod.GET)
+    public void previewTopicPartitionMsgAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+        try {
+            String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+            JSONObject tp = new JSONObject();
+            tp.put("topic", request.getParameter("topic"));
+            tp.put("partition", request.getParameter("partition"));
+            String target = topicService.getPreviewTopicPartitionMsg(clusterAlias, tp);
+            byte[] output = target.getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
             ex.printStackTrace();

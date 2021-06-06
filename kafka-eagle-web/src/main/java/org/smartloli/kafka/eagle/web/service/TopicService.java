@@ -182,4 +182,9 @@ public interface TopicService {
      * Verify topics.
      */
     public String setBalanceVerify(String clusterAlias, String reassignTopicsJson);
+
+    /**
+     * Preview topic and partition message.
+     */
+    public String getPreviewTopicPartitionMsg(String clusterAlias, JSONObject tp);
 }

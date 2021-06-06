@@ -45,10 +45,18 @@
             width: 100%;
             height: 400px;
         }
+
+        .CodeMirror {
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            border-left: 1px solid #ddd;
+        }
     </style>
 
     <title>Topic Meta - KafkaEagle</title>
     <jsp:include page="../public/plus/css.jsp">
+        <jsp:param value="plugins/codemirror/codemirror.css" name="css"/>
         <jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css"/>
     </jsp:include>
     <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
@@ -138,6 +146,7 @@
                                             <th>In Sync Replicas</th>
                                             <th>Preferred Leader</th>
                                             <th>Under Replicated</th>
+                                            <th>Preview</th>
                                         </tr>
                                         </thead>
                                     </table>
@@ -173,6 +182,28 @@
                         </div>
                     </div>
                 </div>
+                <!-- Preview -->
+                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_topic_preview"
+                     tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="keModalLabel">Message</h4>
+                                <button class="close" type="button" data-dismiss="modal">x</button>
+                            </div>
+                            <!-- /.row -->
+                            <div class="modal-body">
+                                <div>
+                                    <form>
+                                        <textarea id="ke_tp_preview_message" name="ke_tp_message"></textarea>
+                                    </form>
+                                </div>
+                            </div>
+                            <div id="remove_div" class="modal-footer">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
         <jsp:include page="../public/plus/footer.jsp"></jsp:include>
@@ -180,11 +211,15 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="main/topic/topic.meta.js?v=1.4.9" name="loader"/>
+    <jsp:param value="main/topic/topic.meta.js?v=2.0.6" name="loader"/>
     <jsp:param value="plugins/echart/echarts.min.js" name="loader"/>
     <jsp:param value="plugins/echart/macarons.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/moment.min.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/daterangepicker.js" name="loader"/>
+    <jsp:param value="plugins/codemirror/codemirror.js" name="loader"/>
+    <jsp:param value="plugins/codemirror/sql.js" name="loader"/>
+    <jsp:param value="plugins/codemirror/show-hint.js" name="loader"/>
+    <jsp:param value="plugins/codemirror/sql-hint.js" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>
 </html>

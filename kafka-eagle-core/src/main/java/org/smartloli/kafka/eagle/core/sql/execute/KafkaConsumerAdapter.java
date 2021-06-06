@@ -124,4 +124,60 @@ public class KafkaConsumerAdapter {
         return messages;
     }
 
+    /**
+     * Get preview topic message.
+     */
+    public static List<JSONArray> preview(KafkaSqlInfo kafkaSql) {
+        List<JSONArray> messages = new ArrayList<>();
+        Properties props = new Properties();
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+        props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(kafkaSql.getClusterAlias()));
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, Kafka.EARLIEST);
+        if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.enable")) {
+            kafkaService.sasl(props, kafkaSql.getClusterAlias());
+        }
+        if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.ssl.enable")) {
+            kafkaService.ssl(props, kafkaSql.getClusterAlias());
+        }
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+        List<TopicPartition> topics = new ArrayList<>();
+        for (Integer partition : kafkaSql.getPartition()) {
+            TopicPartition tp = new TopicPartition(kafkaSql.getTableName(), partition);
+            topics.add(tp);
+        }
+        consumer.assign(topics);
+
+        for (TopicPartition tp : topics) {
+            Map<TopicPartition, Long> offsets = consumer.endOffsets(Collections.singleton(tp));
+            long position = Kafka.PREVIEW;
+            if (offsets.get(tp).longValue() > position) {
+                consumer.seek(tp, offsets.get(tp).longValue() - Kafka.PREVIEW);
+            } else {
+                consumer.seek(tp, 0);
+            }
+        }
+        JSONArray datasets = new JSONArray();
+        boolean flag = true;
+        while (flag) {
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Kafka.TIME_OUT));
+            for (ConsumerRecord<String, String> record : records) {
+                JSONObject object = new JSONObject(new LinkedHashMap<>());
+                object.put(TopicSchema.PARTITION, record.partition());
+                object.put(TopicSchema.OFFSET, record.offset());
+                object.put(TopicSchema.MSG, record.value());
+                object.put(TopicSchema.TIMESPAN, record.timestamp());
+                object.put(TopicSchema.DATE, CalendarUtils.convertUnixTime(record.timestamp()));
+                datasets.add(object);
+            }
+            if (records.isEmpty()) {
+                flag = false;
+            }
+        }
+        consumer.close();
+        messages.add(datasets);
+        return messages;
+    }
+
 }

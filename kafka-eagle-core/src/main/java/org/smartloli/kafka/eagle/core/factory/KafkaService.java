@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.core.factory;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.kafka.common.TopicPartition;
 import org.smartloli.kafka.eagle.common.protocol.*;
 
@@ -259,5 +260,10 @@ public interface KafkaService {
      * Set kafka ssl acl.
      */
     public void ssl(Properties props, String clusterAlias);
+
+    /**
+     * Preview topic and partition message.
+     */
+    public String getPreviewTopicPartitionMsg(String clusterAlias, JSONObject tp);
 
 }

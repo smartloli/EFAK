@@ -71,6 +71,7 @@ public class KConstants {
         public static final String JAVA_SECURITY = "java.security.auth.login.config";
         public static final int TIME_OUT = 100;
         public static final long POSITION = SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max") == 0 ? 5000 : SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max");
+        public static final long PREVIEW = SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.preview.records.max") == 0 ? 10 : SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.preview.records.max");
         public static final String PARTITION_CLASS = "partitioner.class";
         public static final String KEY_SERIALIZER = "key.serializer";
         public static final String VALUE_SERIALIZER = "value.serializer";

@@ -47,6 +47,7 @@ import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.core.sql.execute.KafkaConsumerAdapter;
 import scala.Option;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
@@ -623,6 +624,20 @@ public class KafkaServiceImpl implements KafkaService {
         // ssl handshake failed
         props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.endpoint.identification.algorithm"));
 
+    }
+
+    /***
+     * Get preview topic message.
+     * @param clusterAlias
+     * @param tp
+     * @return
+     */
+    public String getPreviewTopicPartitionMsg(String clusterAlias, JSONObject tp) {
+        KafkaSqlInfo ksql = new KafkaSqlInfo();
+        ksql.setClusterAlias(clusterAlias);
+        ksql.setTableName(tp.getString("topic"));
+        ksql.setPartition(Arrays.asList(tp.getInteger("partition")));
+        return KafkaConsumerAdapter.preview(ksql).toString();
     }
 
     private KafkaSqlInfo segments(String clusterAlias, String sql) {
