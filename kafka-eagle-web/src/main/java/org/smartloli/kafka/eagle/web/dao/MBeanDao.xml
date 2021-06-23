@@ -109,7 +109,7 @@
 		select `difflogsize`,`diffoffsets`,`lag`,`timespan`
 		from ke_consumer_bscreen
 		where `cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
-		and tm between #{stime} and #{etime}
+		and tm between #{stime} and #{etime} order by `timespan`
 	</select>
 
 </mapper>

@@ -145,7 +145,7 @@
     <select id="queryTopicProducerChart" parameterType="map" resultMap="tlogsize">
         select `cluster`,`topic`,`logsize`,`diffval`,`timespan` from ke_logsize
         where `cluster`=#{cluster} and `topic`=#{topic}
-        and tm between #{stime} and #{etime}
+        and tm between #{stime} and #{etime} order by `timespan`
     </select>
 
     <select id="queryTopicProducerByAlarm" parameterType="map" resultMap="tlogsize">
