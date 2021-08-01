@@ -134,13 +134,13 @@ public class Mx4jServiceImpl implements Mx4jService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("JMX service url[" + uri + "] create has error,msg is " + e.getMessage());
+            LOG.error("JMX service url[" + uri + "] create has error,msg is ", e);
         } finally {
             if (connector != null) {
                 try {
                     connector.close();
                 } catch (Exception e) {
-                    LOG.error("Close JMXConnector[" + uri + "] has error,msg is " + e.getMessage());
+                    LOG.error("Close JMXConnector[" + uri + "] has error,msg is ", e);
                 }
             }
         }
@@ -243,8 +243,7 @@ public class Mx4jServiceImpl implements Mx4jService {
                 mbeanInfo.setOneMinute("0.0");
             }
         } catch (Exception e) {
-            LOG.error("JMX service url[" + uri + "] create has error,msg is " + e.getMessage());
-            e.printStackTrace();
+            LOG.error("JMX service url[" + uri + "] create has error,msg is ", e);
             mbeanInfo.setFifteenMinute("0.0");
             mbeanInfo.setFiveMinute("0.0");
             mbeanInfo.setMeanRate("0.0");
@@ -254,8 +253,7 @@ public class Mx4jServiceImpl implements Mx4jService {
                 try {
                     connector.close();
                 } catch (Exception e) {
-                    LOG.error("Close JMXConnector[" + uri + "] has error,msg is " + e.getMessage());
-                    e.printStackTrace();
+                    LOG.error("Close JMXConnector[" + uri + "] has error,msg is ", e);
                 }
             }
         }

@@ -21,6 +21,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
@@ -48,6 +50,8 @@ import javax.servlet.http.HttpSession;
  */
 @Controller
 public class ClusterController {
+
+    private Logger LOG = LoggerFactory.getLogger(ClusterController.class);
 
     @Autowired
     private ClusterService clusterService;
@@ -133,6 +137,16 @@ public class ClusterController {
                 if ("kafka".equals(type)) {
                     obj.put("brokerId", cluster.getString("ids"));
                     obj.put("jmxPort", cluster.getInteger("jmxPort"));
+                    boolean jmxPortStatus = cluster.getBoolean("jmxPortStatus");
+                    try {
+                        if (jmxPortStatus) {
+                            obj.put("jmxPortStatus", "<span class='badge badge-success'>Online</span>");
+                        } else {
+                            obj.put("jmxPortStatus", "<span class='badge badge-danger'>Offline</span>");
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Get jmx port[" + cluster.getString("host") + ":" + cluster.getInteger("jmxPort") + "] has error, msg is ", e);
+                    }
                     obj.put("memory", clusterService.getUsedMemory(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
                     obj.put("cpu", clusterService.getUsedCpu(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
                     obj.put("created", cluster.getString("created"));
@@ -186,6 +200,16 @@ public class ClusterController {
                     if ("kafka".equals(type)) {
                         obj.put("brokerId", cluster.getString("ids"));
                         obj.put("jmxPort", cluster.getInteger("jmxPort"));
+                        boolean jmxPortStatus = cluster.getBoolean("jmxPortStatus");
+                        try {
+                            if (jmxPortStatus) {
+                                obj.put("jmxPortStatus", "<span class='badge badge-success'>Online</span>");
+                            } else {
+                                obj.put("jmxPortStatus", "<span class='badge badge-danger'>Offline</span>");
+                            }
+                        } catch (Exception e) {
+                            LOG.error("Get jmx port[" + cluster.getString("host") + ":" + cluster.getInteger("jmxPort") + "] has error, msg is ", e);
+                        }
                         obj.put("memory", clusterService.getUsedMemory(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
                         obj.put("cpu", clusterService.getUsedCpu(clusterAlias, cluster.getString("host"), cluster.getInteger("jmxPort")));
                         obj.put("created", cluster.getString("created"));

@@ -18,6 +18,8 @@ $(document).ready(function () {
         }, {
             "mData": 'jmxPort'
         }, {
+            "mData": 'jmxPortStatus'
+        }, {
             "mData": 'memory'
         }, {
             "mData": 'cpu'

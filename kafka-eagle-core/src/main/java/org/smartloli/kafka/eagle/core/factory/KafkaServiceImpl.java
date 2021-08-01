@@ -266,6 +266,11 @@ public class KafkaServiceImpl implements KafkaService {
                         broker.setJmxPort(JSON.parseObject(tupleString).getInteger("jmx_port"));
                         broker.setId(++id);
                         broker.setIds(ids);
+                        try {
+                            broker.setJmxPortStatus(NetUtils.telnet(broker.getHost(), broker.getJmxPort()));
+                        } catch (Exception e) {
+                            LOG.error("Telnet [" + broker.getHost() + ":" + broker.getJmxPort() + "] has error, msg is ", e);
+                        }
                         targets.add(broker);
                     } catch (Exception ex) {
                         LOG.error(ex.getMessage());

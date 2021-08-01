@@ -32,8 +32,17 @@ public class BrokersInfo extends BaseProtocol {
     private String created = "";
     private String modify = "";
     private int jmxPort = 0;
+    private boolean jmxPortStatus = false;
     private String version = "";
     private String ids = "";
+
+    public boolean isJmxPortStatus() {
+        return jmxPortStatus;
+    }
+
+    public void setJmxPortStatus(boolean jmxPortStatus) {
+        this.jmxPortStatus = jmxPortStatus;
+    }
 
     public String getIds() {
         return ids;
