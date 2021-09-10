@@ -5,7 +5,7 @@
 
 [![Stargazers over time](https://starchart.cc/smartloli/kafka-eagle.svg)](https://starchart.cc/smartloli/kafka-eagle)
 
-# Kafka Eagle
+# EFAK (Eagle for Apache Kafka, previously known as Kafka Eagle)
 
 This is an monitor system and monitor your kafka clusters, and visual consumer thread,offsets,owners etc.
 
