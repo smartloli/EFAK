@@ -172,8 +172,8 @@ public class KConstants {
         public static final String PRODUCEMESSAGECONVERSIONS = "produce_message_conversions";
         public static final String TOTALFETCHREQUESTSPERSEC = "total_fetch_requests";
         public static final String TOTALPRODUCEREQUESTSPERSEC = "total_produce_requests";
-        public static final String REPLICATIONBYTESINPERSEC = "replication_bytes_out";
-        public static final String REPLICATIONBYTESOUTPERSEC = "replication_bytes_in";
+        public static final String REPLICATIONBYTESINPERSEC = "replication_bytes_in";
+        public static final String REPLICATIONBYTESOUTPERSEC = "replication_bytes_out";
         public static final String OSTOTALMEMORY = "os_total_memory";
         public static final String OSFREEMEMORY = "os_free_memory";
         public static final String CPUUSED = "cpu_used";
