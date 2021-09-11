@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.smartloli.kafka.eagle</groupId>
-        <artifactId>kafka-eagle</artifactId>
+        <artifactId>efak</artifactId>
         <version>2.0.7</version>
     </parent>
-    <artifactId>kafka-eagle-common</artifactId>
+    <artifactId>efak-common</artifactId>
 
     <properties>
         <fasterxml.version>2.8.4</fasterxml.version>

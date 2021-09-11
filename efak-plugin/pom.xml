@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.smartloli.kafka.eagle</groupId>
-        <artifactId>kafka-eagle</artifactId>
+        <artifactId>efak</artifactId>
         <version>2.0.7</version>
     </parent>
-    <artifactId>kafka-eagle-plugin</artifactId>
+    <artifactId>efak-plugin</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.smartloli.kafka.eagle</groupId>
-            <artifactId>kafka-eagle-common</artifactId>
+            <artifactId>efak-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
