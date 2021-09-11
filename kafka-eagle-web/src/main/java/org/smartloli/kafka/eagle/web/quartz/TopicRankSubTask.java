@@ -45,6 +45,9 @@ import java.util.*;
  * @author smartloli.
  * <p>
  * Created by Jul 27, 2019
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class TopicRankSubTask extends Thread {
 
@@ -118,7 +121,7 @@ public class TopicRankSubTask extends Thread {
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
-            String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+            String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             for (String clusterAlias : clusterAliass) {
                 List<String> topics = brokerService.topicList(clusterAlias);
                 List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
@@ -188,7 +191,7 @@ public class TopicRankSubTask extends Thread {
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
-            String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+            String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             for (String clusterAlias : clusterAliass) {
                 List<String> topics = brokerService.topicList(clusterAlias);
                 List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
@@ -268,7 +271,7 @@ public class TopicRankSubTask extends Thread {
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
-            String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+            String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             for (String clusterAlias : clusterAliass) {
                 List<String> topics = brokerService.topicList(clusterAlias);
 
@@ -339,7 +342,7 @@ public class TopicRankSubTask extends Thread {
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
-            String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+            String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             for (String clusterAlias : clusterAliass) {
                 List<String> topics = brokerService.topicList(clusterAlias);
 
@@ -417,7 +420,7 @@ public class TopicRankSubTask extends Thread {
 
             List<TopicRank> topicRanks = new ArrayList<>();
             List<TopicLogSize> topicLogSizes = new ArrayList<>();
-            String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+            String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             for (String clusterAlias : clusterAliass) {
                 long producerThreads = 0L;
                 List<String> topics = brokerService.topicList(clusterAlias);
@@ -513,7 +516,7 @@ public class TopicRankSubTask extends Thread {
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
-            String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+            String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             for (String clusterAlias : clusterAliass) {
                 List<String> topics = brokerService.topicList(clusterAlias);
 
@@ -594,7 +597,7 @@ public class TopicRankSubTask extends Thread {
             } catch (Exception e) {
                 ErrorUtils.print(this.getClass()).error("Get dashboardServiceImpl bean has error, msg is ", e);
             }
-            String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+            String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             for (String clusterAlias : clusterAliass) {
                 Map<String, Object> params = new HashMap<>();
                 params.put("cluster", clusterAlias);

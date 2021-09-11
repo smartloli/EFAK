@@ -43,6 +43,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author smartloli.
  * <p>
  * Created by Sep 11, 2020
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class JobClient {
 
@@ -217,7 +220,7 @@ public class JobClient {
         for (int partitionId : ksql.getPartitions()) {
             long endLogSize = 0L;
             long endRealLogSize = 0L;
-            if ("kafka".equals(SystemConfigUtils.getProperty(cluster + ".kafka.eagle.offset.storage"))) {
+            if ("kafka".equals(SystemConfigUtils.getProperty(cluster + ".efak.offset.storage"))) {
                 endLogSize = kafkaService.getKafkaLogSize(cluster, ksql.getTopic(), partitionId);
                 endRealLogSize = kafkaService.getKafkaRealLogSize(cluster, ksql.getTopic(), partitionId);
             } else {
@@ -261,7 +264,7 @@ public class JobClient {
     private static List<WorkNodeStrategy> getWorkNodes() {
         List<WorkNodeStrategy> nodes = new ArrayList<>();
         List<String> hosts = WorkUtils.getWorkNodes();
-        int port = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.port");
+        int port = SystemConfigUtils.getIntProperty("efak.sql.worknode.port");
         for (String host : hosts) {
             WorkNodeStrategy wns = new WorkNodeStrategy();
             wns.setHost(host);
@@ -274,7 +277,7 @@ public class JobClient {
     private static List<WorkNodeStrategy> getWorkNodesAlive() {
         List<WorkNodeStrategy> nodes = new ArrayList<>();
         List<String> hosts = WorkUtils.getWorkNodes();
-        int port = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.port");
+        int port = SystemConfigUtils.getIntProperty("efak.sql.worknode.port");
         for (String host : hosts) {
             WorkNodeStrategy wns = new WorkNodeStrategy();
             wns.setHost(host);

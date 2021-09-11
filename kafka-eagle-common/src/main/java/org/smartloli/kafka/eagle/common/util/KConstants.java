@@ -64,14 +64,14 @@ public class KConstants {
         }
 
         public static final String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
-        public static final String KAFKA_EAGLE_SYSTEM_GROUP = "kafka.eagle.system.group";
+        public static final String KAFKA_EAGLE_SYSTEM_GROUP = "efak.system.group";
         public static final String AUTO_COMMIT = "true";
         public static final String AUTO_COMMIT_MS = "1000";
         public static final String EARLIEST = "earliest";
         public static final String JAVA_SECURITY = "java.security.auth.login.config";
         public static final int TIME_OUT = 100;
-        public static final long POSITION = SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max") == 0 ? 5000 : SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.records.max");
-        public static final long PREVIEW = SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.preview.records.max") == 0 ? 10 : SystemConfigUtils.getLongProperty("kafka.eagle.sql.topic.preview.records.max");
+        public static final long POSITION = SystemConfigUtils.getLongProperty("efak.sql.topic.records.max") == 0 ? 5000 : SystemConfigUtils.getLongProperty("efak.sql.topic.records.max");
+        public static final long PREVIEW = SystemConfigUtils.getLongProperty("efak.sql.topic.preview.records.max") == 0 ? 10 : SystemConfigUtils.getLongProperty("efak.sql.topic.preview.records.max");
         public static final String PARTITION_CLASS = "partitioner.class";
         public static final String KEY_SERIALIZER = "key.serializer";
         public static final String VALUE_SERIALIZER = "value.serializer";
@@ -210,7 +210,7 @@ public class KConstants {
         private IM() {
         }
 
-        public static final String TITLE = "Kafka Eagle Alert";
+        public static final String TITLE = "EFAK Alert";
     }
 
     public final class WeChat {

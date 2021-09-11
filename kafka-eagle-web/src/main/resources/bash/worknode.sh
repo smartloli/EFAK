@@ -47,7 +47,7 @@ isexit()
 start()
 {
  echo -n [$stime] INFO:  $"Starting $prog "
- echo "kafka eagle environment check ..."
+ echo "EFAK ( Eagle For Apache Kafka ) environment check ..."
  
  if [ "$KE_HOME" = "" ]; then
   echo "[$stime] Error: The KE_HOME environment variable is not defined correctly."

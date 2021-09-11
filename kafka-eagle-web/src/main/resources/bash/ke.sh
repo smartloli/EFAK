@@ -49,7 +49,7 @@ DIALUP_PID=$KE_HOME/bin/ke.pid
 start()
 {
  echo -n [$stime] INFO:  $"Starting $prog "
- echo "kafka eagle environment check ..."
+ echo "EFAK( Eagle For Apache Kafka ) environment check ..."
  
  if [ "$KE_HOME" = "" ]; then
   echo "[$stime] Error: The KE_HOME environment variable is not defined correctly."
@@ -66,7 +66,7 @@ start()
  PID=`ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}'`
      
  if [ -n "$PID" ]; then
-  echo "[$stime] Error: The Kafka Eagle[$PID] has started."
+  echo "[$stime] Error: The EFAK[$PID] has started."
   exit 1
  fi
  
@@ -242,18 +242,18 @@ status()
   SPID=`cat $KE_HOME/bin/ke.pid`
   CheckProcessStata $SPID >/dev/null
   if [ $? != 0 ];then
-   echo "[$stime] INFO : Kafka Eagle has stopped, [$SPID] ."
+   echo "[$stime] INFO : EFAK has stopped, [$SPID] ."
   else
-   echo "[$stime] INFO : Kafka Eagle is running, [$SPID] ."
+   echo "[$stime] INFO : EFAK is running, [$SPID] ."
   fi
 
 }
 
 restart()
 {
-  echo "[$stime] INFO : Kafka Eagle is stoping ... "
+  echo "[$stime] INFO : EFAK is stoping ... "
   stop
-  echo "[$stime] INFO : Kafka Eagle is starting ..."
+  echo "[$stime] INFO : EFAK is starting ..."
   start
 }
 
@@ -262,7 +262,7 @@ gc()
   if [ -f $KE_HOME/bin/ke.pid ];then
    SPID=`cat $KE_HOME/bin/ke.pid`
    if [ "$SPID" != "" ];then
-    echo "[$stime] INFO : Kafka Eagle Process[$SPID] GC."
+    echo "[$stime] INFO : EFAK Process[$SPID] GC."
     ${JAVA_HOME}/bin/jstat -gcutil $SPID 1000
    fi
   fi
@@ -290,7 +290,7 @@ version()
     JCLASS=org.smartloli.kafka.eagle.plugin.font.KafkaEagleVersion
     ${JAVA_HOME}/bin/java -classpath "$JCLASSPATH" $JCLASS 2>&1
   else
-    echo "[$stime] ERROR: Kafka Eagle has stopped."
+    echo "[$stime] ERROR: EFAK has stopped."
   fi
  fi
 }
@@ -300,7 +300,7 @@ sdate()
   if [ -f $KE_HOME/bin/ke.pid ];then
    SPID=`cat $KE_HOME/bin/ke.pid`
    if [ "$SPID" != "" ];then
-    echo "[$stime] INFO : Kafka Eagle Process[$SPID] Runtime."
+    echo "[$stime] INFO : EFAK Process[$SPID] Runtime."
     ps -eo pid,user,lstart | grep $SPID
    fi
   fi

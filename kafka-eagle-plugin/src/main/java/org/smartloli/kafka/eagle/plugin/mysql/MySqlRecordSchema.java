@@ -32,6 +32,9 @@ import java.util.List;
  * @author smartloli.
  * <p>
  * Created by Aug 7, 2017
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class MySqlRecordSchema {
 
@@ -41,9 +44,9 @@ public class MySqlRecordSchema {
      * Load database schema script.
      */
     public static void schema() {
-        String url = SystemConfigUtils.getProperty("kafka.eagle.url");
-        String username = SystemConfigUtils.getProperty("kafka.eagle.username");
-        String password = SystemConfigUtils.getProperty("kafka.eagle.password");
+        String url = SystemConfigUtils.getProperty("efak.url");
+        String username = SystemConfigUtils.getProperty("efak.username");
+        String password = SystemConfigUtils.getProperty("efak.password");
         String host = url.split("//")[1].split("/")[0].split(":")[0];
         String port = url.split("//")[1].split("/")[0].split(":")[1];
         String db = url.split("//")[1].split("/")[1].split("\\?")[0];

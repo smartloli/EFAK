@@ -30,8 +30,11 @@ import java.util.List;
  * Initializing database scripts.
  *
  * @author smartloli.
- *
- *         Created by Aug 7, 2017
+ * <p>
+ * Created by Aug 7, 2017
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class SqliteRecordSchema {
 
@@ -41,11 +44,13 @@ public class SqliteRecordSchema {
         schema();
     }
 
-    /** Load database schema script. */
+    /**
+     * Load database schema script.
+     */
     public static void schema() {
-        String url = SystemConfigUtils.getProperty("kafka.eagle.url");
-        String username = SystemConfigUtils.getProperty("kafka.eagle.username");
-        String password = SystemConfigUtils.getProperty("kafka.eagle.password");
+        String url = SystemConfigUtils.getProperty("efak.url");
+        String username = SystemConfigUtils.getProperty("efak.username");
+        String password = SystemConfigUtils.getProperty("efak.password");
         tables(url, username, password);
     }
 

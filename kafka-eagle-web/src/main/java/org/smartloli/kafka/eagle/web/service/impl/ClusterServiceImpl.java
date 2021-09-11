@@ -41,6 +41,9 @@ import java.util.List;
  * Created by Aug 12, 2016.
  * <p>
  * Update by hexiang 20170216
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 
 @Service
@@ -57,7 +60,7 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override
     public JSONArray clusterAliass() {
-        String[] multiClusters = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+        String[] multiClusters = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
         JSONArray aliass = new JSONArray();
         int i = 1;
         for (String cluster : multiClusters) {
@@ -127,7 +130,7 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override
     public boolean hasClusterAlias(String clusterAlias) {
-        String[] multiClusters = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+        String[] multiClusters = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
         for (String cluster : multiClusters) {
             if (cluster.equals(clusterAlias)) {
                 return true;

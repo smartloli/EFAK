@@ -49,6 +49,9 @@ import java.util.Map.Entry;
  * @author smartloli.
  * <p>
  * Created by Jun 13, 2019
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class BrokerServiceImpl implements BrokerService {
 
@@ -81,7 +84,7 @@ public class BrokerServiceImpl implements BrokerService {
         if (topics.contains(Kafka.CONSUMER_OFFSET_TOPIC)) {
             topics.remove(Kafka.CONSUMER_OFFSET_TOPIC);
         }
-        String[] blackListTopics = SystemConfigUtils.getPropertyArray(clusterAlias + ".kafka.eagle.blacklist.topics", ",");
+        String[] blackListTopics = SystemConfigUtils.getPropertyArray(clusterAlias + ".efak.blacklist.topics", ",");
         if (!StrUtils.isNull(blackListTopics)) {
             for (String blackListTopic : blackListTopics) {
                 if (topics.contains(blackListTopic)) {
@@ -359,10 +362,10 @@ public class BrokerServiceImpl implements BrokerService {
      */
     public List<String> topicList(String clusterAlias) {
         List<String> topics = new ArrayList<>();
-        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.cgroup.enable")) {
-            topics = SystemConfigUtils.getPropertyArrayList(clusterAlias + ".kafka.eagle.sasl.cgroup.topics", ",");
-        } else if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.cgroup.enable")) {
-            topics = SystemConfigUtils.getPropertyArrayList(clusterAlias + ".kafka.eagle.ssl.cgroup.topics", ",");
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.cgroup.enable")) {
+            topics = SystemConfigUtils.getPropertyArrayList(clusterAlias + ".efak.sasl.cgroup.topics", ",");
+        } else if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.cgroup.enable")) {
+            topics = SystemConfigUtils.getPropertyArrayList(clusterAlias + ".efak.ssl.cgroup.topics", ",");
         } else {
             KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
             try {
@@ -469,7 +472,7 @@ public class BrokerServiceImpl implements BrokerService {
                             metadate.setPartitionId(partition);
                             metadate.setReplicas(kafkaService.getReplicasIsr(clusterAlias, topic, partition));
                             long logSize = 0L;
-                            if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+                            if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage"))) {
                                 logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partition);
                             } else {
                                 logSize = kafkaService.getRealLogSize(clusterAlias, topic, partition);
@@ -576,7 +579,7 @@ public class BrokerServiceImpl implements BrokerService {
                         e.printStackTrace();
                     }
                 }
-                if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+                if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage"))) {
                     logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partitions);
                 } else {
                     logSize = kafkaService.getLogSize(clusterAlias, topic, partitions);
@@ -615,7 +618,7 @@ public class BrokerServiceImpl implements BrokerService {
                         LOG.error("Convert partition string to integer has error, msg is ", e);
                     }
                 }
-                if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+                if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage"))) {
                     logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partitions);
                 } else {
                     logSize = kafkaService.getRealLogSize(clusterAlias, topic, partitions);
@@ -655,7 +658,7 @@ public class BrokerServiceImpl implements BrokerService {
                         e.printStackTrace();
                     }
                 }
-                if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+                if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage"))) {
                     logSize = kafkaService.getKafkaProducerLogSize(clusterAlias, topic, partitions);
                 } else {
                     logSize = kafkaService.getLogSize(clusterAlias, topic, partitions);
@@ -681,10 +684,10 @@ public class BrokerServiceImpl implements BrokerService {
         Properties prop = new Properties();
         prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(clusterAlias));
 
-        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable")) {
             kafkaService.sasl(prop, clusterAlias);
         }
-        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
             kafkaService.ssl(prop, clusterAlias);
         }
 

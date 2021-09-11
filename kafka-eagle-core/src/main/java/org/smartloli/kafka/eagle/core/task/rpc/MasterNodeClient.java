@@ -47,7 +47,7 @@ public class MasterNodeClient {
      * Get worknode server metrics result.
      */
     public static String getResult(String host, int port, JSONObject object) {
-        int timeout = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.rpc.timeout");
+        int timeout = SystemConfigUtils.getIntProperty("efak.sql.worknode.rpc.timeout");
         TTransport transport = null;
         try {
             transport = new TFramedTransport(new TSocket(new TConfiguration(), host, port, timeout));

@@ -47,9 +47,9 @@ public class MasterQuartz {
 
     public void clean() {
         ErrorUtils.print(this.getClass()).info("Master node starts cleaning up expired data.");
-        if (SystemConfigUtils.getBooleanProperty("kafka.eagle.metrics.charts")) {
+        if (SystemConfigUtils.getBooleanProperty("efak.metrics.charts")) {
             MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
-            int retain = SystemConfigUtils.getIntProperty("kafka.eagle.metrics.retain");
+            int retain = SystemConfigUtils.getIntProperty("efak.metrics.retain");
             metrics.remove(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
             metrics.cleanTopicLogSize(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
             metrics.cleanBScreenConsumerTopic(Integer.valueOf(CalendarUtils.getCustomLastDay(retain == 0 ? 30 : retain)));
@@ -59,7 +59,7 @@ public class MasterQuartz {
 
     public void masterJobQuartz() {
         // whether is enable distributed
-        if (SystemConfigUtils.getBooleanProperty("kafka.eagle.distributed.enable")) {
+        if (SystemConfigUtils.getBooleanProperty("efak.distributed.enable")) {
             // jobForDistributedAllTasks();
         } else {
             jobForStandaloneAllTasks();
@@ -67,7 +67,7 @@ public class MasterQuartz {
     }
 
     private void jobForDistributedAllTasks() {
-        String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+        String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
         // get all kafka eagle work node
         List<String> workNodes = WorkUtils.getWorkNodes();
         for (String clusterAlias : clusterAliass) {

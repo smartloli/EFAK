@@ -40,6 +40,9 @@ import java.util.concurrent.*;
  * @author smartloli.
  * <p>
  * Created by Feb 25, 2019
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class JMXFactoryUtils {
 
@@ -56,17 +59,17 @@ public class JMXFactoryUtils {
             public void run() {
                 try {
                     JMXConnector connector = null;
-                    if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.jmx.acl")) {
+                    if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.jmx.acl")) {
                         Map<String, Object> envs = new HashMap<>();
-                        String user = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.user");
-                        String passwd = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.password");
+                        String user = SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.user");
+                        String passwd = SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.password");
                         String[] credentials = new String[]{user, passwd};
                         envs.put(JMXConnector.CREDENTIALS, credentials);
-                        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.jmx.ssl")) {
+                        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.jmx.ssl")) {
                             envs.put(Context.SECURITY_PROTOCOL, "ssl");
                             envs.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, new SslRMIClientSocketFactory());
-                            String truststoreLocation = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.truststore.location");
-                            String truststorePassword = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.truststore.password");
+                            String truststoreLocation = SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.truststore.location");
+                            String truststorePassword = SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.truststore.password");
                             TrustManager[] tms = getTrustManagers(truststoreLocation, truststorePassword);
                             SSLContext sslContext = SSLContext.getInstance("TLS");
                             sslContext.init(null, tms, null);

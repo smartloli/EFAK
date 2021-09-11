@@ -43,6 +43,9 @@ import java.util.concurrent.TimeUnit;
  * @author smartloli.
  *
  *         Created by Jul 14, 2017
+ *
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class Mx4jServiceImpl implements Mx4jService {
 
@@ -122,7 +125,7 @@ public class Mx4jServiceImpl implements Mx4jService {
         JMXConnector connector = null;
         Map<Integer, Long> endOffsets = new HashMap<>();
         try {
-            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri"), uri));
+            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.uri"), uri));
             connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
             MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
             Set<ObjectName> objectNames = mbeanConnection.queryNames(new ObjectName(mbean), null);
@@ -224,7 +227,7 @@ public class Mx4jServiceImpl implements Mx4jService {
         JMXConnector connector = null;
         MBeanInfo mbeanInfo = new MBeanInfo();
         try {
-            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri"), uri));
+            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.uri"), uri));
             connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
             MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
             if (mbeanConnection.isRegistered(new ObjectName(mbean))) {

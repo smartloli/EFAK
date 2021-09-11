@@ -56,6 +56,9 @@ import java.util.Map.Entry;
  * @author smartloli.
  * <p>
  * Created by Jul 17, 2017 Update by No 3, 2018 by cocodroid
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 @Service
 public class MetricsServiceImpl implements MetricsService {
@@ -85,7 +88,7 @@ public class MetricsServiceImpl implements MetricsService {
     public String getAllBrokersMBean(String clusterAlias) {
         String result = "";
         List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
-        int brokerSize = SystemConfigUtils.getIntProperty(clusterAlias + ".kafka.eagle.broker.size");
+        int brokerSize = SystemConfigUtils.getIntProperty(clusterAlias + ".efak.broker.size");
         if (brokers.size() <= brokerSize) {
             result = getOnlineAllBrokersMBean(clusterAlias, brokers);
         } else {

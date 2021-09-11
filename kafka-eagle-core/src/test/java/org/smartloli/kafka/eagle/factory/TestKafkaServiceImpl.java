@@ -58,7 +58,7 @@ public class TestKafkaServiceImpl {
     public static void main(String[] args) {
         // System.out.println(kafkaService.getAllBrokersInfo("cluster1"));
         String clusterAlias = "cluster1";
-        System.out.println(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.ssl.endpoint.identification.algorithm"));
+        System.out.println(SystemConfigUtils.getProperty(clusterAlias + ".efak.ssl.endpoint.identification.algorithm"));
     }
 
     public Map<TopicPartition, Long> getKafkaLogSize(String topic, Set<Integer> partitionids) {

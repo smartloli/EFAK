@@ -30,8 +30,11 @@ import java.sql.SQLException;
  * accessing MySql database.
  *
  * @author smartloli.
- *
- *         Created by Nov 23, 2016
+ * <p>
+ * Created by Nov 23, 2016
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class MySqlStoragePlugin {
 
@@ -39,14 +42,16 @@ public class MySqlStoragePlugin {
 
     static {
         try {
-            String mysqlDriver = SystemConfigUtils.getProperty("kafka.eagle.driver");
+            String mysqlDriver = SystemConfigUtils.getProperty("efak.driver");
             Class.forName(mysqlDriver);
         } catch (Exception e) {
             LOG.error("Initialization MySql Driver has error,msg is " + e.getMessage());
         }
     }
 
-    /** Get mysql connection object. */
+    /**
+     * Get mysql connection object.
+     */
     public static Connection getInstance(String address, String username, String password) {
         Connection connection = null;
         try {
@@ -57,7 +62,9 @@ public class MySqlStoragePlugin {
         return connection;
     }
 
-    /** Close mysql. */
+    /**
+     * Close mysql.
+     */
     public static void close(Connection connection) {
         if (connection != null) {
             try {

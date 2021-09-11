@@ -54,6 +54,9 @@ import java.util.concurrent.RecursiveTask;
  * @author smartloli.
  * <p>
  * Created by Sep 10, 2020
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class ShardSubScan {
 
@@ -63,8 +66,8 @@ public class ShardSubScan {
     private class SubScanTask extends RecursiveTask<List<JSONArray>> {
 
         private final Logger LOG = LoggerFactory.getLogger(SubScanTask.class);
-        private final int THRESHOLD = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.fetch.threshold");
-        private final long TIMEOUT = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.fetch.timeout");
+        private final int THRESHOLD = SystemConfigUtils.getIntProperty("efak.sql.worknode.fetch.threshold");
+        private final long TIMEOUT = SystemConfigUtils.getIntProperty("efak.sql.worknode.fetch.timeout");
 
         private KSqlStrategy ksql;
         private String topic;
@@ -110,10 +113,10 @@ public class ShardSubScan {
             props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
             props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
             props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, KConstants.Kafka.EARLIEST);
-            if (SystemConfigUtils.getBooleanProperty(ksql.getCluster() + ".kafka.eagle.sasl.enable")) {
+            if (SystemConfigUtils.getBooleanProperty(ksql.getCluster() + ".efak.sasl.enable")) {
                 kafkaService.sasl(props, ksql.getCluster());
             }
-            if (SystemConfigUtils.getBooleanProperty(ksql.getCluster() + ".kafka.eagle.ssl.enable")) {
+            if (SystemConfigUtils.getBooleanProperty(ksql.getCluster() + ".efak.ssl.enable")) {
                 kafkaService.ssl(props, ksql.getCluster());
             }
             KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);

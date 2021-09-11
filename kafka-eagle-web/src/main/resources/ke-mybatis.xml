@@ -7,10 +7,10 @@
         <environment id="default">
             <transactionManager type="JDBC"/>
             <dataSource type="POOLED">
-                <property name="driver" value="${kafka.eagle.driver}"/>
-                <property name="url" value="${kafka.eagle.url}"/>
-                <property name="username" value="${kafka.eagle.username}"/>
-                <property name="password" value="${kafka.eagle.password}"/>
+                <property name="driver" value="${efak.driver}"/>
+                <property name="url" value="${efak.url}"/>
+                <property name="username" value="${efak.username}"/>
+                <property name="password" value="${efak.password}"/>
             </dataSource>
         </environment>
 

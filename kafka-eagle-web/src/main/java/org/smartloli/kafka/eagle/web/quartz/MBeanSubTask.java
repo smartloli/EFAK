@@ -41,6 +41,9 @@ import java.util.Map;
  * @author smartloli.
  * <p>
  * Created by Jul 19, 2017
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class MBeanSubTask extends Thread {
 
@@ -70,8 +73,8 @@ public class MBeanSubTask extends Thread {
     }
 
     private void mbeanQuartz() {
-        if (SystemConfigUtils.getBooleanProperty("kafka.eagle.metrics.charts")) {
-            String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+        if (SystemConfigUtils.getBooleanProperty("efak.metrics.charts")) {
+            String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             for (String clusterAlias : clusterAliass) {
                 // kafka cluster
                 new KafkaClusterSubThread(clusterAlias).start();

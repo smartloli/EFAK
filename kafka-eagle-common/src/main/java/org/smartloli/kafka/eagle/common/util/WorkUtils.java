@@ -26,6 +26,8 @@ import java.util.List;
 
 /**
  * A utility class for reading text files. Get kafka eagle work node.
+ * <p>
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  *
  * @author smartloli.
  * <p>
@@ -39,7 +41,7 @@ public class WorkUtils {
         String workNodesName = "works";
         try {
             if (osName.contains("Mac") || osName.contains("Win")) {
-                String path = SystemConfigUtils.getProperty("kafka.eagle.sql.worknode.server.path");
+                String path = SystemConfigUtils.getProperty("efak.sql.worknode.server.path");
                 if (StrUtils.isNull(path)) {
                     lines = Files.readLines(new File(WorkUtils.class.getClassLoader().getResource(workNodesName).getFile()), Charsets.UTF_8);
                 } else {

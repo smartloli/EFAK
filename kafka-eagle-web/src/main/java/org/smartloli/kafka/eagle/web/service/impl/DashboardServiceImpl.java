@@ -46,18 +46,25 @@ import java.util.Map.Entry;
  * Kafka Eagle dashboard data generator.
  *
  * @author smartloli.
- *
- *         Created by Aug 12, 2016.
- *
- *         Update by hexiang 20170216
+ * <p>
+ * Created by Aug 12, 2016.
+ * <p>
+ * Update by hexiang 20170216
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 @Service
 public class DashboardServiceImpl implements DashboardService {
 
-    /** Kafka service interface. */
+    /**
+     * Kafka service interface.
+     */
     private KafkaService kafkaService = new KafkaFactory().create();
 
-    /** Broker service interface. */
+    /**
+     * Broker service interface.
+     */
     private static BrokerService brokerService = new BrokerFactory().create();
 
     @Autowired
@@ -66,7 +73,9 @@ public class DashboardServiceImpl implements DashboardService {
     @Autowired
     private MBeanDao mbeanDao;
 
-    /** Get consumer number from zookeeper. */
+    /**
+     * Get consumer number from zookeeper.
+     */
     private int getConsumerNumbers(String clusterAlias) {
         Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
         int count = 0;
@@ -76,7 +85,9 @@ public class DashboardServiceImpl implements DashboardService {
         return count;
     }
 
-    /** Get kafka & dashboard dataset. */
+    /**
+     * Get kafka & dashboard dataset.
+     */
     public String getDashboard(String clusterAlias) {
         JSONObject target = new JSONObject();
         target.put("kafka", kafkaBrokersGraph(clusterAlias));
@@ -84,7 +95,9 @@ public class DashboardServiceImpl implements DashboardService {
         return target.toJSONString();
     }
 
-    /** Get kafka data. */
+    /**
+     * Get kafka data.
+     */
     private String kafkaBrokersGraph(String clusterAlias) {
         List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
         JSONObject target = new JSONObject();
@@ -108,14 +121,16 @@ public class DashboardServiceImpl implements DashboardService {
         return target.toJSONString();
     }
 
-    /** Get dashboard data. */
+    /**
+     * Get dashboard data.
+     */
     private String panel(String clusterAlias) {
         int zks = SystemConfigUtils.getPropertyArray(clusterAlias + ".zk.list", ",").length;
         DashboardInfo dashboard = new DashboardInfo();
         dashboard.setBrokers(brokerService.brokerNumbers(clusterAlias));
         dashboard.setTopics(brokerService.topicNumbers(clusterAlias));
         dashboard.setZks(zks);
-        String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+        String formatter = SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage");
         if ("kafka".equals(formatter)) {
             dashboard.setConsumers(kafkaService.getKafkaConsumerGroups(clusterAlias));
         } else {
@@ -124,7 +139,9 @@ public class DashboardServiceImpl implements DashboardService {
         return dashboard.toString();
     }
 
-    /** Get topic rank data,such as logsize and topic capacity. */
+    /**
+     * Get topic rank data,such as logsize and topic capacity.
+     */
     public JSONArray getTopicRank(Map<String, Object> params) {
         List<TopicRank> topicRank = topicDao.readTopicRank(params);
         JSONArray array = new JSONArray();
@@ -196,7 +213,9 @@ public class DashboardServiceImpl implements DashboardService {
         return array;
     }
 
-    /** Write statistics topic rank data from kafka jmx & insert into table. */
+    /**
+     * Write statistics topic rank data from kafka jmx & insert into table.
+     */
     public int writeTopicRank(List<TopicRank> topicRanks) {
         return topicDao.writeTopicRank(topicRanks);
     }
@@ -208,7 +227,9 @@ public class DashboardServiceImpl implements DashboardService {
         return topicDao.writeTopicLogSize(topicLogSize);
     }
 
-    /** Get os memory data. */
+    /**
+     * Get os memory data.
+     */
     public String getOSMem(Map<String, Object> params) {
         List<KpiInfo> kpis = mbeanDao.getOsMem(params);
         JSONObject object = new JSONObject();
@@ -226,7 +247,9 @@ public class DashboardServiceImpl implements DashboardService {
         return object.toJSONString();
     }
 
-    /** Get used cpu data. */
+    /**
+     * Get used cpu data.
+     */
     public String getUsedCPU(Map<String, Object> params) {
         List<KpiInfo> kpis = mbeanDao.getUsedCPU(params);
         JSONObject object = new JSONObject();
@@ -238,12 +261,16 @@ public class DashboardServiceImpl implements DashboardService {
         return object.toJSONString();
     }
 
-    /** Read topic lastest logsize diffval data. */
+    /**
+     * Read topic lastest logsize diffval data.
+     */
     public TopicLogSize readLastTopicLogSize(Map<String, Object> params) {
         return topicDao.readLastTopicLogSize(params);
     }
 
-    /** Get all clean topic list. */
+    /**
+     * Get all clean topic list.
+     */
     public List<TopicRank> getCleanTopicList(Map<String, Object> params) {
         return topicDao.getCleanTopicList(params);
     }

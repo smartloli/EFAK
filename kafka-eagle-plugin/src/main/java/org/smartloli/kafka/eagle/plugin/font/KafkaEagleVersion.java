@@ -32,9 +32,9 @@ public class KafkaEagleVersion {
     public static void main(String[] args) throws IOException {
         String name = System.getProperty("user.dir") + "/font/slant.flf";
         File file = new File(name);
-        String asciiArt = FigletFont.convertOneLine(file, "KAfKA EAGLE");
+        String asciiArt = FigletFont.convertOneLine(file, "EFAK");
         System.out.println("Welcome to");
-        System.out.println(asciiArt);
+        System.out.println(asciiArt + "( Eagle For Apache Kafka® )\n");
         System.out.println("Version 2.0.7 -- Copyright 2016-2021");
     }
 

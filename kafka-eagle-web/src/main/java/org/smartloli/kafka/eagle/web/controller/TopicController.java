@@ -59,6 +59,9 @@ import java.util.*;
  * Created by Sep 6, 2016.
  * <p>
  * Update by hexiang 20170216
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 @Controller
 public class TopicController {
@@ -699,7 +702,7 @@ public class TopicController {
     @RequestMapping(value = "/topic/{topicName}/{token}/delete", method = RequestMethod.GET)
     public ModelAndView topicDelete(@PathVariable("topicName") String topicName, @PathVariable("token") String token, HttpSession session, HttpServletResponse response, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
-        if (SystemConfigUtils.getProperty("kafka.eagle.topic.token").equals(token) && !Kafka.CONSUMER_OFFSET_TOPIC.equals(topicName)) {
+        if (SystemConfigUtils.getProperty("efak.topic.token").equals(token) && !Kafka.CONSUMER_OFFSET_TOPIC.equals(topicName)) {
             String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
             Map<String, Object> respons = kafkaService.delete(clusterAlias, topicName);
             if ("success".equals(respons.get("status"))) {

@@ -33,6 +33,9 @@ import org.springframework.web.context.ContextLoader;
  * @author smartloli.
  * <p>
  * Created by May 22, 2017
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 @Component
 public class StartupListener implements ApplicationContextAware {
@@ -58,7 +61,7 @@ public class StartupListener implements ApplicationContextAware {
 
     class ContextSchema extends Thread {
         public void run() {
-            String jdbc = SystemConfigUtils.getProperty("kafka.eagle.driver");
+            String jdbc = SystemConfigUtils.getProperty("efak.driver");
             if (JConstants.MYSQL_DRIVER_V5.equals(jdbc) || JConstants.MYSQL_DRIVER_V8.equals(jdbc)) {
                 MySqlRecordSchema.schema();
             } else if (JConstants.SQLITE_DRIVER.equals(jdbc)) {

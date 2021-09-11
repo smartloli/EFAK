@@ -46,6 +46,9 @@ import java.util.Map.Entry;
  * @author smartloli.
  * <p>
  * Created by Jan 15, 2019
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class MetricsSubTask extends Thread {
 
@@ -93,7 +96,7 @@ public class MetricsSubTask extends Thread {
         List<BScreenConsumerInfo> bscreenConsumers = new ArrayList<>();
         List<ConsumerSummaryInfo> consumerSummarys = new ArrayList<>();
         List<ConsumerGroupsInfo> consumerGroupTopics = new ArrayList<>();
-        String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+        String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
         for (String clusterAlias : clusterAliass) {
 
             // get all consumer summary from database
@@ -106,7 +109,7 @@ public class MetricsSubTask extends Thread {
             paramsGroup.put("cluster", clusterAlias);
             List<ConsumerGroupsInfo> allConsumerGroups = metricsServiceImpl.getAllConsumerGroups(paramsGroup);
 
-            if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+            if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage"))) {
                 JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
 
                 // clean offline consumer summary

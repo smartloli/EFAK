@@ -24,12 +24,12 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
  * Print kafka eagle system startup url.
  *
  * @author smartloli.
- *
- *         Created by Jun 10, 2019
+ * <p>
+ * Created by Jun 10, 2019
  */
 public class KafkaEagleNet {
     public static void main(String[] args) {
-        System.out.println("* Kafka Eagle Service has started success.");
-        System.out.println("* Welcome, Now you can visit 'http://" + NetUtils.ip() + ":" + SystemConfigUtils.getIntProperty("kafka.eagle.webui.port") + "'");
+        System.out.println("* EFAK Service has started success.");
+        System.out.println("* Welcome, Now you can visit 'http://" + NetUtils.ip() + ":" + SystemConfigUtils.getIntProperty("efak.webui.port") + "'");
     }
 }

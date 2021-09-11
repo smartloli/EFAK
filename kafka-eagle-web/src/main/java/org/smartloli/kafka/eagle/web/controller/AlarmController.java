@@ -55,6 +55,9 @@ import java.util.Map;
  * Created by Sep 6, 2016.
  * <p>
  * Update by hexiang 20170216
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 @Controller
 public class AlarmController {
@@ -200,7 +203,7 @@ public class AlarmController {
         String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
         String search = StrUtils.convertNull(request.getParameter("name"));
 
-        String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+        String formatter = SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage");
         try {
             JSONObject object = new JSONObject();
             object.put("items", JSON.parseArray(alertService.getAlarmConsumerGroup(clusterAlias, formatter, search)));
@@ -221,7 +224,7 @@ public class AlarmController {
         String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
         String search = StrUtils.convertNull(request.getParameter("name"));
 
-        String formatter = SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage");
+        String formatter = SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage");
         try {
             JSONObject object = new JSONObject();
             object.put("items", JSON.parseArray(alertService.getAlarmConsumerTopic(clusterAlias, formatter, group, search)));

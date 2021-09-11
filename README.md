@@ -19,13 +19,13 @@ Supported platform: ```Mac OS X```,```Linux```,```Windows```.
 
 Supported JDK: ```JDK8+```
 
-Here are a few Kafka Eagle system screenshots:
+Here are a few `EFAK` system screenshots:
 
 # Big Screen Support
 ![BScreen Data](http://www.kafka-eagle.org/images/docs/bscreen@2x.jpg)
 
 # Alert Support
-In addition to supporting ```email``` alerts, Kafka Eagle also supports im alerts, such as ```DingDing``` and ```WeChat```.
+In addition to supporting ```email``` alerts, `EFAK` also supports im alerts, such as ```DingDing``` and ```WeChat```.
 ![DingDing Alert](http://www.kafka-eagle.org/images/docs/dingding_alert@2x.png)
 ![WeChat Alert](http://www.kafka-eagle.org/images/docs/wechat_alert@2x.png)
 
@@ -38,27 +38,27 @@ In addition to supporting ```email``` alerts, Kafka Eagle also supports im alert
 # Consumer & Producer Rate Chart
 ![Rate Chart](http://www.kafka-eagle.org/images/docs/consumer_rate_graph@2x.png)
 
-# Start Kafka Eagle
+# Start EFAK
 ![KE Script](http://www.kafka-eagle.org/images/docs/startup_v2@2x.png)
 
 # Kafka Offset Types
 
-Kafka is designed to be flexible on how the offsets are managed. Consumer can choose arbitrary storage and format to persist kafka offsets. Kafka Eagle currently support following popular storage format:
+Kafka is designed to be flexible on how the offsets are managed. Consumer can choose arbitrary storage and format to persist kafka offsets. `EFAK` currently support following popular storage format:
   * Zookeeper. Old version of Kafka (0.8.2 before) default storage in Zookeeper.
   * Kafka. New version of Kafka (0.10.0 in the future) default recommend storage in Kafka Topic(__consumer_offsets).
   
-Kafka Eagle supports multiple offset storage paths. If you store them in Zookeeper and Kafka, you can configure them like this.
+`EFAK` supports multiple offset storage paths. If you store them in Zookeeper and Kafka, you can configure them like this.
 ```
 # Set kafka cluster alias
-kafka.eagle.zk.cluster.alias=cluster1,cluster2
+efak.zk.cluster.alias=cluster1,cluster2
 
 # Set kafka cluster zookeeper address
 cluster1.zk.list=xdn1:2181,xdn2:2181,xdn3:2181
 cluster2.zk.list=tdn1:2181,tdn2:2181,tdn3:2181
 
 # Set kafka cluster offset storage path
-cluster1.kafka.eagle.offset.storage=kafka
-cluster2.kafka.eagle.offset.storage=zookeeper
+cluster1.efak.offset.storage=kafka
+cluster2.efak.offset.storage=zookeeper
 ```
 
 # Kafka SQL
@@ -74,7 +74,7 @@ select * from ke_p3_r2 where `partition` in (0,1,2) limit 10
 
 # Quickstart
 
-Please read [Kafka Eagle Install](http://www.kafka-eagle.org/articles/docs/installation/linux-macos.html) for setting up and running Kafka Eagle.
+Please read [EFAK Install](http://www.kafka-eagle.org/articles/docs/installation/linux-macos.html) for setting up and running `EFAK`.
 
 # Deploy
 
@@ -84,21 +84,21 @@ The project is a maven project that uses the Maven command to pack the deploymen
 ```
 # More Information
 
-Please see the [Kafka Eagle Manual](http://www.kafka-eagle.org/articles/docs/documentation.html) for for more information including:
+Please see the [EFAK Manual](http://www.kafka-eagle.org/articles/docs/documentation.html) for for more information including:
   * System environment settings and installation instructions.
   * Information about how to use script command.
-  * Visual group,topic,offset metadata information etc.
+  * Visual kafka consumer group,topic,offset metadata information etc.
   * Metadata collection and log change information.
  
 # Contributing
 
-The Kafka Eagle is released under the Apache License and we welcome any contributions within this license. Any pull request is welcome and will be reviewed and merged as quickly as possible.
+The `EFAK` is released under the Apache License and we welcome any contributions within this license. Any pull request is welcome and will be reviewed and merged as quickly as possible.
 
 Since this is an open source tool, please comply with the relevant laws and regulations, the use of civilization.
 
-# Kafka Eagle PDF
+# Project Name and Management
 
-[Kafka Eagle Architecture PDF](http://www.kafka-eagle.org/articles/docs/architecture/pdf.html)
+`EFAK` was renamed from its previous name due to [this issue](https://github.com/smartloli/kafka-eagle/issues/525). `EFAK` is designed to be used with Apache Kafka and is offered to support the needs of the Kafka community. The project is open source by [Smartloli](https://www.kafka-eagle.org/articles/about/me.html) and maintained and managed in Github.
 
 # Contributors
 

@@ -56,7 +56,7 @@ public class WorkNodeServer {
 
     public static void main(String[] args) {
         try {
-            int port = SystemConfigUtils.getIntProperty("kafka.eagle.sql.worknode.port");
+            int port = SystemConfigUtils.getIntProperty("efak.sql.worknode.port");
             ErrorUtils.print(WorkNodeServer.class).info(WorkNodeServer.class.getSimpleName() + " started and listening from master task, port is [" + port + "].");
             WorkNodeServer rpc = new WorkNodeServer();
             rpc.start(port);

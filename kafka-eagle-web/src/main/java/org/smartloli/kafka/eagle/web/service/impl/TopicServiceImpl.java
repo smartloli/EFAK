@@ -67,6 +67,9 @@ import java.util.Map.Entry;
  * Created by Aug 14, 2016.
  * <p>
  * Update by hexiang 20170216
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 @Service
 public class TopicServiceImpl implements TopicService {
@@ -118,7 +121,7 @@ public class TopicServiceImpl implements TopicService {
      */
     public String execute(String clusterAlias, String sql, String jobId, String type) {
         String result = "";
-        if (SystemConfigUtils.getBooleanProperty("kafka.eagle.sql.distributed.enable")) {
+        if (SystemConfigUtils.getBooleanProperty("efak.sql.distributed.enable")) {
             if (KConstants.Protocol.KSQL_LOGICAL.equals(type)) {
                 result = JobClient.logicalSubmit(clusterAlias, sql, jobId);
             } else if (KConstants.Protocol.KSQL_PHYSICS.equals(type)) {
@@ -310,7 +313,7 @@ public class TopicServiceImpl implements TopicService {
         JSONObject object = new JSONObject();
         long logSize = brokerService.getTopicRealLogSize(clusterAlias, topic);
         JSONObject topicSize;
-        if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.offset.storage"))) {
+        if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage"))) {
             topicSize = kafkaMetricsService.topicSize(clusterAlias, topic);
         } else {
             topicSize = kafkaMetricsService.topicSize(clusterAlias, topic);

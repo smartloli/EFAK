@@ -47,6 +47,9 @@ import javax.servlet.http.HttpSession;
  * Created by Sep 6, 2016.
  * <p>
  * Update by hexiang 20170216
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 @Controller
 public class ClusterController {
@@ -282,7 +285,7 @@ public class ClusterController {
         } else {
             session.removeAttribute(KConstants.SessionAlias.CLUSTER_ALIAS);
             session.setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, clusterAlias);
-            String[] clusterAliass = SystemConfigUtils.getPropertyArray("kafka.eagle.zk.cluster.alias", ",");
+            String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             String dropList = "<div class='dropdown-menu dropdown-menu-right' aria-labelledby='clusterDropdown'>";
             int i = 0;
             for (String clusterAliasStr : clusterAliass) {

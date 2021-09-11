@@ -42,7 +42,7 @@ public class MasterQuartzListen {
             } else {
                 xml = System.getProperty("user.dir") + "/kms/webapps/ke/WEB-INF/classes/master-quartz.xml";
             }
-            String quartz = SystemConfigUtils.getProperty("kafka.eagle.quartz.master.time");
+            String quartz = SystemConfigUtils.getProperty("efak.quartz.master.time");
             DomUtils.setMasterQuartzXML(xml, quartz);
         } catch (Exception ex) {
             ex.printStackTrace();

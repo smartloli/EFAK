@@ -55,6 +55,9 @@ import java.util.concurrent.TimeUnit;
  * @author smartloli.
  * <p>
  * Created by Oct 26, 2018
+ * <p>
+ * Update by smartloli Sep 12, 2021
+ * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
@@ -83,10 +86,10 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
         Properties prop = new Properties();
         prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
 
-        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable")) {
             kafkaService.sasl(prop, clusterAlias);
         }
-        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
             kafkaService.ssl(prop, clusterAlias);
         }
         long sum = 0L;
@@ -136,7 +139,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
         long tpSize = 0L;
         for (MetadataInfo leader : leaders) {
             String jni = kafkaService.getBrokerJMXFromIds(clusterAlias, leader.getLeader());
-            jmx = String.format(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri"), jni);
+            jmx = String.format(SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.uri"), jni);
             try {
                 JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
                 connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
@@ -168,10 +171,10 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
         JSONObject object = new JSONObject();
         Properties prop = new Properties();
         prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
-        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.sasl.enable")) {
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable")) {
             kafkaService.sasl(prop, clusterAlias);
         }
-        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".kafka.eagle.ssl.enable")) {
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
             kafkaService.ssl(prop, clusterAlias);
         }
         try {
@@ -300,7 +303,7 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
         long tpSize = 0L;
         for (MetadataInfo leader : leaders) {
             String jni = kafkaService.getBrokerJMXFromIds(clusterAlias, leader.getLeader());
-            jmx = String.format(SystemConfigUtils.getProperty(clusterAlias + ".kafka.eagle.jmx.uri"), jni);
+            jmx = String.format(SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.uri"), jni);
             try {
                 JMXServiceURL jmxSeriverUrl = new JMXServiceURL(jmx);
                 connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
