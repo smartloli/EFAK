@@ -5,7 +5,8 @@
 <!-- Navigation -->
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
     <a class="navbar-brand" href="/"><img src="/media/img/ke_login.png"
-                                          style="width: 25px; border: 2px solid #fff; border-radius: 50%;"/> Kafka Eagle<sup>+</sup></a>
+                                          style="width: 25px; border: 2px solid #fff; border-radius: 50%;"/> EFAK
+        <sup>&copy;</sup></a>
     <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#">
         <i class="fas fa-bars"></i>
     </button>

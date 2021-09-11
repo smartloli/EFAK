@@ -50,7 +50,9 @@
         }
     </style>
 
-    <title>Kafka - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Kafka" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css"/>
     </jsp:include>

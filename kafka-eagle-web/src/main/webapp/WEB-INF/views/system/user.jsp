@@ -13,7 +13,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>User - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="User" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp"></jsp:include>
     <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>

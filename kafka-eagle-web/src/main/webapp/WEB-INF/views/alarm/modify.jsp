@@ -12,7 +12,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Alarm - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Alarm" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/select2/select2.min.css" name="css"/>
     </jsp:include>

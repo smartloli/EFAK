@@ -9,7 +9,7 @@
 
 This is an monitor system and monitor your kafka clusters, and visual consumer thread,offsets,owners etc.
 
-When you install [Kafka Eagle](https://www.kafka-eagle.org/), you can see the current consumer group,for each group the topics that they are consuming and the offsets, lag, logsize position of the group in each topic. This is useful to understand how fast you are consuming from a message queue and how quick the message queue is increase. This will help you debuging kafka producers and consumers or just to have an idea of what is going on in your system.
+When you install [EFAK](https://www.kafka-eagle.org/), you can see the current consumer group,for each group the topics that they are consuming and the offsets, lag, logsize position of the group in each topic. This is useful to understand how fast you are consuming from a message queue and how quick the message queue is increase. This will help you debuging kafka producers and consumers or just to have an idea of what is going on in your system.
 
 The system shows the trend of consumer and producer trends on the same day, so you can see what happened that day.
 

@@ -45,7 +45,9 @@
         }
     </style>
 
-    <title>Offsets - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Offsets" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css"/>
     </jsp:include>
@@ -84,7 +86,9 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Producer (msg/min)</div>
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Producer
+                                            (msg/min)
+                                        </div>
                                         <a id="producer_rate" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
                                     </div>
                                     <div class="col-auto">
@@ -99,7 +103,9 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Consumer (msg/min)</div>
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Consumer
+                                            (msg/min)
+                                        </div>
                                         <a id="consumer_rate" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
                                     </div>
                                     <div class="col-auto">

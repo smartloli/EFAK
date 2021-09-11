@@ -12,7 +12,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Topic Message - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="KSQL" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/codemirror/codemirror.css" name="css"/>
         <jsp:param value="plugins/codemirror/show-hint.css" name="css"/>

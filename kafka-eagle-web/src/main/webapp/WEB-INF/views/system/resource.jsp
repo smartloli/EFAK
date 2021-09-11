@@ -13,7 +13,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Resource - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Resource" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp"></jsp:include>
 </head>
 <style type="text/css">
@@ -261,7 +263,7 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="plugins/echart/echarts.min.js" name="loader" />
+    <jsp:param value="plugins/echart/echarts.min.js" name="loader"/>
     <jsp:param value="main/system/resource.js" name="loader"/>
 </jsp:include>
 <script type="text/javascript">

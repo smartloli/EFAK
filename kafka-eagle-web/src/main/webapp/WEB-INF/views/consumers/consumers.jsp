@@ -12,7 +12,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Consumers - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Consumers" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp"></jsp:include>
     <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>
@@ -123,7 +125,7 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="plugins/echart/echarts.min.js" name="loader" />
+    <jsp:param value="plugins/echart/echarts.min.js" name="loader"/>
     <jsp:param value="main/consumer/consumers.js?v=1.4.5" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>

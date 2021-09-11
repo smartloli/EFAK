@@ -12,9 +12,11 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Zookeeper Cli - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="ZkClient" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp">
-        <jsp:param value="plugins/terminal/jquery.terminal.min.css" name="css" />
+        <jsp:param value="plugins/terminal/jquery.terminal.min.css" name="css"/>
     </jsp:include>
 </head>
 

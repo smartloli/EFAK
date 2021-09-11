@@ -8,7 +8,9 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Login - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Login" name="loader"/>
+    </jsp:include>
     <meta name="description" content="">
     <link rel="shortcut icon" href="/media/img/favicon.ico"/>
     <style type="text/css">
@@ -37,7 +39,8 @@
             <img class="user-avatar" src="/media/img/ke_login.png"
                  width="150px">
 
-            <h1>Kafka Eagle</h1>
+            <h1>EFAK</h1>
+            <h5>( Eagle For Apache Kafka<sup>®</sup> )</h5>
 
             <form role="form" action="/account/signin/action/" method="post"
                   onsubmit="return contextFormValid();return false;">

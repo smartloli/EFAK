@@ -12,7 +12,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Add - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Add" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/codemirror/codemirror.css" name="css"/>
         <jsp:param value="plugins/codemirror/show-hint.css" name="css"/>

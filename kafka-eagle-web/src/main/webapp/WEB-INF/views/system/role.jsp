@@ -13,7 +13,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Role - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Role" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/treeview/ke-btreeview.min.css" name="css"/>
         <jsp:param value="plugins/treeview/bootstrap-treeview.min.css" name="css"/>

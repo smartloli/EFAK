@@ -12,7 +12,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>ZK & Kafka - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Cluster" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp"></jsp:include>
     <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>

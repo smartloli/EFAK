@@ -11,11 +11,13 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Topic Hub - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Hub" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/select2/select2.min.css" name="css"/>
-        <jsp:param value="plugins/codemirror/codemirror.css" name="css" />
-        <jsp:param value="plugins/codemirror/show-hint.css" name="css" />
+        <jsp:param value="plugins/codemirror/codemirror.css" name="css"/>
+        <jsp:param value="plugins/codemirror/show-hint.css" name="css"/>
     </jsp:include>
     <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>

@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="d-flex align-items-center justify-content-between small">
             <div class="text-muted">Copyright &copy; <a href="http://www.kafka-eagle.org/"
-                                                        target="_blank">KafkaEagle</a> 2021
+                                                        target="_blank">Smartloli</a> 2021
             </div>
             <div>
                 <a href="https://github.com/smartloli/kafka-eagle" target="_blank">Open Source</a> &middot; <a

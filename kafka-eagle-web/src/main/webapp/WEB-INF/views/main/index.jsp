@@ -10,7 +10,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Dashboard - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Dashboard" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp"></jsp:include>
 </head>
 <style type="text/css">

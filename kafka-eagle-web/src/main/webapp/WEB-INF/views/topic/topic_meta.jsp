@@ -54,7 +54,9 @@
         }
     </style>
 
-    <title>Topic Meta - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Meta" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/codemirror/codemirror.css" name="css"/>
         <jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css"/>

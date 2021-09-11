@@ -6,7 +6,9 @@
 <html lang="zh">
 
 <head>
-    <title>Success - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Success" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp"></jsp:include>
 </head>
 
@@ -38,6 +40,6 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="main/topic/add.result.js" name="loader" />
+    <jsp:param value="main/topic/add.result.js" name="loader"/>
 </jsp:include>
 </html>

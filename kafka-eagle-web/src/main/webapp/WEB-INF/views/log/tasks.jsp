@@ -13,7 +13,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Tasks - KafkaEagle</title>
+    <jsp:include page="../public/plus/title.jsp">
+        <jsp:param value="Tasks" name="loader"/>
+    </jsp:include>
     <jsp:include page="../public/plus/css.jsp"></jsp:include>
     <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>
