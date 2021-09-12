@@ -39,7 +39,7 @@ Here are a few `EFAK` system screenshots:
 ![Rate Chart](http://www.kafka-eagle.org/images/docs/consumer_rate_graph@2x.png)
 
 # Start EFAK
-![KE Script](http://www.kafka-eagle.org/images/docs/startup_v2@2x.png)
+![KE Script](http://www.kafka-eagle.org/images/docs/startup@2x.png)
 
 # Kafka Offset Types
 
@@ -70,7 +70,7 @@ select * from ke_p3_r2 where `partition` in (0,1,2) limit 10
 ```
 
 ![ksql](http://www.kafka-eagle.org/images/docs/kafka_ksql_v2@2x.png)
-![ksql_result](http://www.kafka-eagle.org/images/docs/startup@2x.png)
+![ksql_result](http://www.kafka-eagle.org/images/docs/kafka_ksql_result_v2@2x.png)
 
 # Quickstart
 
