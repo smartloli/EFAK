@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/smartloli/kafka-eagle.svg?branch=master)](https://travis-ci.org/smartloli/kafka-eagle)
+[![Build Status](https://app.travis-ci.com/smartloli/EFAK.svg?branch=master)](https://app.travis-ci.com/smartloli/EFAK)
 ![](https://img.shields.io/badge/language-java-orange.svg)
-[![codebeat badge](https://codebeat.co/badges/bf22a7b2-76ac-4aba-b840-00328841d9e3)](https://codebeat.co/projects/github-com-smartloli-kafka-eagle-master)
-[![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/smartloli/kafka-eagle/blob/master/LICENSE)
+[![codebeat badge](https://codebeat.co/badges/4c141093-e55d-464d-87ce-7431cde81398)](https://codebeat.co/projects/github-com-smartloli-efak-master)
+[![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/smartloli/EFAK/blob/master/LICENSE)
 
 [![Stargazers over time](https://starchart.cc/smartloli/kafka-eagle.svg)](https://starchart.cc/smartloli/kafka-eagle)
 
