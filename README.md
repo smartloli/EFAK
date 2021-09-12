@@ -25,9 +25,12 @@ Here are a few `EFAK` system screenshots:
 ![BScreen Data](http://www.kafka-eagle.org/images/docs/bscreen@2x.jpg)
 
 # Alert Support
-In addition to supporting ```email``` alerts, `EFAK` also supports im alerts, such as ```DingDing``` and ```WeChat```.
-![DingDing Alert](http://www.kafka-eagle.org/images/docs/dingding_alert@2x.png)
-![WeChat Alert](http://www.kafka-eagle.org/images/docs/wechat_alert@2x.png)
+`EFAK` supports currently popular IM alarm systems, such as:
+* DingDing
+* WeChat
+* Webhook
+* Email
+* ...
 
 # List of Consumer Groups & Active Group Graph
 ![Consumer & Active Graph](http://www.kafka-eagle.org/images/docs/consumer@2x.png)
