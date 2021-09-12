@@ -1,3 +1,9 @@
 language: java
 jdk:
-  - oraclejdk11
+  - oraclejdk14
+before_install:
+  - "echo skipped"
+install:
+  - "echo skipped"
+script:
+  - "echo skipped"
