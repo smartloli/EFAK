@@ -21,9 +21,6 @@ Supported JDK: ```JDK8+```
 
 Here are a few `EFAK` system screenshots:
 
-# Big Screen Support
-![BScreen Data](http://www.kafka-eagle.org/images/docs/bscreen@2x.jpg)
-
 # Alert Support
 `EFAK` supports currently popular IM alarm systems, such as:
 * DingDing
