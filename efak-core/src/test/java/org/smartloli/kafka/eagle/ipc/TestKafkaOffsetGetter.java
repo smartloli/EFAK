@@ -52,23 +52,31 @@ import java.util.concurrent.ConcurrentHashMap;
  * New offset storage formats: kafka
  *
  * @author smartloli.
- *
- *         Created by Jan 3, 2017
+ * <p>
+ * Created by Jan 3, 2017
  */
 public class TestKafkaOffsetGetter extends Thread {
 
     private final static Logger LOG = LoggerFactory.getLogger(TestKafkaOffsetGetter.class);
 
-    /** Consumer offsets in kafka topic. */
+    /**
+     * Consumer offsets in kafka topic.
+     */
     private final static String CONSUMER_OFFSET_TOPIC = KConstants.Kafka.CONSUMER_OFFSET_TOPIC;
 
-    /** Add LRCCache. */
+    /**
+     * Add LRCCache.
+     */
     public static Map<String, Map<GroupTopicPartition, OffsetAndMetadata>> multiKafkaConsumerOffsets = new LRUCacheUtils<>();
 
-    /** Kafka brokers */
+    /**
+     * Kafka brokers
+     */
     private KafkaService kafkaService = new KafkaFactory().create();
 
-    /** ============================ Start Filter ========================= */
+    /**
+     * ============================ Start Filter =========================
+     */
     private static Schema OFFSET_COMMIT_KEY_SCHEMA_V0 = new Schema(new Field("group", Type.STRING), new Field("topic", Type.STRING), new Field("partition", Type.INT32));
     private static BoundField KEY_GROUP_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("group");
     private static BoundField KEY_TOPIC_FIELD = OFFSET_COMMIT_KEY_SCHEMA_V0.get("topic");
@@ -80,7 +88,9 @@ public class TestKafkaOffsetGetter extends Thread {
 
     private static Schema OFFSET_COMMIT_VALUE_SCHEMA_V2 = new Schema(new Field("offset", Type.INT64), new Field("metadata", Type.STRING, "Associated metadata.", ""), new Field("commit_timestamp", Type.INT64));
 
-    /** GroupMetadataManager . */
+    /**
+     * GroupMetadataManager .
+     */
     private static Schema OFFSET_COMMIT_VALUE_SCHEMA_V3 = new Schema(new Field("offset", Type.INT64), new Field("leader_epoch", Type.INT32), new Field("metadata", Type.STRING, "Associated metadata.", ""), new Field("commit_timestamp", Type.INT64));
 
     private static BoundField VALUE_OFFSET_FIELD_V0 = OFFSET_COMMIT_VALUE_SCHEMA_V0.get("offset");
@@ -101,7 +111,9 @@ public class TestKafkaOffsetGetter extends Thread {
     private static BoundField VALUE_COMMIT_TIMESTAMP_FIELD_V3 = OFFSET_COMMIT_VALUE_SCHEMA_V3.get("commit_timestamp");
     /** ============================ End Filter ========================= */
 
-    /** Kafka offset memory in schema. */
+    /**
+     * Kafka offset memory in schema.
+     */
     @SuppressWarnings("serial")
     private static Map<Integer, KeyAndValueSchemasInfo> OFFSET_SCHEMAS = new HashMap<Integer, KeyAndValueSchemasInfo>() {
         {
@@ -165,12 +177,16 @@ public class TestKafkaOffsetGetter extends Thread {
         }
     }
 
-    /** Get instance K&V schema. */
+    /**
+     * Get instance K&V schema.
+     */
     private static KeyAndValueSchemasInfo schemaFor(int version) {
         return OFFSET_SCHEMAS.get(version);
     }
 
-    /** Analysis of Kafka data in topic in buffer. */
+    /**
+     * Analysis of Kafka data in topic in buffer.
+     */
     private static GroupTopicPartition readMessageKey(ByteBuffer buffer) {
         short version = buffer.getShort();
         Schema keySchema = schemaFor(version).getKeySchema();
@@ -192,7 +208,9 @@ public class TestKafkaOffsetGetter extends Thread {
 
     }
 
-    /** Analysis of buffer data in metadata in Kafka. */
+    /**
+     * Analysis of buffer data in metadata in Kafka.
+     */
     private static OffsetAndMetadata readOffsetMessageValue(ByteBuffer buffer) {
         MessageValueStructAndVersionInfo structAndVersion = readMessageValueStruct(buffer);
         if (structAndVersion.getValue() == null) {
@@ -225,7 +243,9 @@ public class TestKafkaOffsetGetter extends Thread {
         }
     }
 
-    /** Analysis of struct data structure in metadata in Kafka. */
+    /**
+     * Analysis of struct data structure in metadata in Kafka.
+     */
     private static MessageValueStructAndVersionInfo readMessageValueStruct(ByteBuffer buffer) {
         MessageValueStructAndVersionInfo mvs = new MessageValueStructAndVersionInfo();
         if (buffer == null) {
@@ -247,7 +267,9 @@ public class TestKafkaOffsetGetter extends Thread {
         kafka.start();
     }
 
-    /** Instance KafkaOffsetGetter clazz. */
+    /**
+     * Instance KafkaOffsetGetter clazz.
+     */
     public static void getInstance() {
         LOG.info(TestKafkaOffsetGetter.class.getName());
     }
@@ -256,7 +278,9 @@ public class TestKafkaOffsetGetter extends Thread {
 
     }
 
-    /** Run method for running thread. */
+    /**
+     * Run method for running thread.
+     */
     @Override
     public void run() {
         String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
@@ -296,7 +320,7 @@ public class TestKafkaOffsetGetter extends Thread {
             // startOffsetListener(clusterAlias, consumer);
             // }
 
-            props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+            props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.EFAK_SYSTEM_GROUP);
             props.put(ConsumerConfig.EXCLUDE_INTERNAL_TOPICS_CONFIG, "false");
             props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(clusterAlias));
             props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());

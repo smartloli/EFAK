@@ -1100,7 +1100,7 @@ public class KafkaServiceImpl implements KafkaService {
     public long getKafkaLogSize(String clusterAlias, String topic, int partitionid) {
         long histyLogSize = 0L;
         Properties props = new Properties();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.EFAK_SYSTEM_GROUP);
         props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
@@ -1132,7 +1132,7 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public Map<TopicPartition, Long> getKafkaLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
         Properties props = new Properties();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.EFAK_SYSTEM_GROUP);
         props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
@@ -1163,7 +1163,7 @@ public class KafkaServiceImpl implements KafkaService {
     public long getKafkaRealLogSize(String clusterAlias, String topic, int partitionid) {
         long realLogSize = 0L;
         Properties props = new Properties();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.EFAK_SYSTEM_GROUP);
         props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
@@ -1197,7 +1197,7 @@ public class KafkaServiceImpl implements KafkaService {
     public long getKafkaRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
         long realLogSize = 0L;
         Properties props = new Properties();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.EFAK_SYSTEM_GROUP);
         props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
@@ -1243,7 +1243,7 @@ public class KafkaServiceImpl implements KafkaService {
     public long getKafkaProducerLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
         long producerLogSize = 0L;
         Properties props = new Properties();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, Kafka.EFAK_SYSTEM_GROUP);
         props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, getKafkaBrokerServer(clusterAlias));
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());

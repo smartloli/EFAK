@@ -64,7 +64,7 @@ public class KConstants {
         }
 
         public static final String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
-        public static final String KAFKA_EAGLE_SYSTEM_GROUP = "efak.system.group";
+        public static final String EFAK_SYSTEM_GROUP = "efak.system.group";
         public static final String AUTO_COMMIT = "true";
         public static final String AUTO_COMMIT_MS = "1000";
         public static final String EARLIEST = "earliest";

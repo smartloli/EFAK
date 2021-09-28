@@ -39,7 +39,7 @@ public class TestKSql {
         // calcite();
         // String sql = "select * from \"k20200326_1\" where \"partition\" in
         // (0) and \"msg\" like 's1%' limit 10";
-        String sql = "select * from k20210607 where `partition` in (0) limit 10";
+        String sql = "select * from efak01 where `partition` in (0) limit 10";
 
         String result = KafkaSqlParser.execute("cluster1", sql);
         System.out.println("result: " + result);

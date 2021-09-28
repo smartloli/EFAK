@@ -108,7 +108,7 @@ public class ShardSubScan {
         private List<JSONArray> executor(KSqlStrategy ksql, long start, long end) {
             List<JSONArray> messages = new ArrayList<>();
             Properties props = new Properties();
-            props.put(ConsumerConfig.GROUP_ID_CONFIG, KConstants.Kafka.KAFKA_EAGLE_SYSTEM_GROUP);
+            props.put(ConsumerConfig.GROUP_ID_CONFIG, KConstants.Kafka.EFAK_SYSTEM_GROUP);
             props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaService.getKafkaBrokerServer(ksql.getCluster()));
             props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
             props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
