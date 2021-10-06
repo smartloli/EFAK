@@ -81,6 +81,14 @@ public class KConstants {
         public static final String SSL = "SSL";
     }
 
+    public final class Common {
+        private Common() {
+        }
+
+        public static final String EFAK_VERSION = "2.0.8";
+        public static final String EFAK_VERSION_DOC = "efakVersion";
+    }
+
     /**
      * Zookeeper session.
      */

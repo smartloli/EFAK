@@ -53,7 +53,8 @@
                 class="fas fa-sitemap fa-sm fa-fw mr-1"></i>${clusterAlias}</a>${clusterAliasList}</li>
     </ul>
     <ul class="navbar-nav ml-auto ml-md-0">
-        <li class="nav-item dropdown"><a class="nav-link"><i class="fas fa-bookmark fa-sm fa-fw mr-1"></i>V2.0.7</a>
+        <li class="nav-item dropdown"><a class="nav-link"><i class="fas fa-bookmark fa-sm fa-fw mr-1"></i>${efakVersion}
+        </a>
         </li>
     </ul>
     <!-- Navtop Login -->

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.smartloli.kafka.eagle</groupId>
         <artifactId>efak</artifactId>
-        <version>2.0.7</version>
+        <version>${project.version}</version>
     </parent>
     <artifactId>efak-core</artifactId>
 
