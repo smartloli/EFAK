@@ -22,9 +22,9 @@ import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -102,7 +102,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 this.throughput();
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Stats topic throughput has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Stats topic throughput has error, msg is ", e);
             }
         }
 
@@ -117,7 +117,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic rank byte in has error,msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic rank byte in has error,msg is ", e);
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
@@ -141,7 +141,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.removeTopicRank(clean);
                         }
                     } catch (Exception e) {
-                        ErrorUtils.print(this.getClass()).error("Byte in failed to clean up nonexistent topic, msg is ", e);
+                        LoggerUtils.print(this.getClass()).error("Byte in failed to clean up nonexistent topic, msg is ", e);
                     }
                 }
 
@@ -152,7 +152,7 @@ public class TopicRankSubTask extends Thread {
                         try {
                             byteIn += new Double(Double.parseDouble(meanRate)).longValue();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Byte in parse string to long has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Byte in parse string to long has error, msg is ", e);
                         }
                     }
                     TopicRank topicRank = new TopicRank();
@@ -166,7 +166,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.writeTopicRank(topicRanks);
                             topicRanks.clear();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Storage topic rank byte in has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage topic rank byte in has error, msg is ", e);
                         }
                     }
                 }
@@ -177,7 +177,7 @@ public class TopicRankSubTask extends Thread {
                     topicRanks.clear();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Storage topic rank byte in end data has error,msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Storage topic rank byte in end data has error,msg is ", e);
             }
         }
 
@@ -187,7 +187,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic rank byte out has error,msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic rank byte out has error,msg is ", e);
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
@@ -211,7 +211,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.removeTopicRank(clean);
                         }
                     } catch (Exception e) {
-                        ErrorUtils.print(this.getClass()).error("Byte out failed to clean up nonexistent topic, msg is ", e);
+                        LoggerUtils.print(this.getClass()).error("Byte out failed to clean up nonexistent topic, msg is ", e);
                     }
                 }
 
@@ -222,7 +222,7 @@ public class TopicRankSubTask extends Thread {
                         try {
                             byteOut += new Double(Double.parseDouble(meanRate)).longValue();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Byte out parse string to long has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Byte out parse string to long has error, msg is ", e);
                         }
                     }
                     TopicRank topicRank = new TopicRank();
@@ -236,7 +236,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.writeTopicRank(topicRanks);
                             topicRanks.clear();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Storage topic rank byte out has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage topic rank byte out has error, msg is ", e);
                         }
                     }
                 }
@@ -247,7 +247,7 @@ public class TopicRankSubTask extends Thread {
                     topicRanks.clear();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Storage topic rank byte out end data has error,msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Storage topic rank byte out end data has error,msg is ", e);
             }
         }
     }
@@ -258,7 +258,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 this.topicLogsizeStats();
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Collector topic logsize has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Collector topic logsize has error, msg is ", e);
             }
         }
 
@@ -267,7 +267,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic rank logsize has error,msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic rank logsize has error,msg is ", e);
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
@@ -290,7 +290,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.removeTopicRank(clean);
                         }
                     } catch (Exception e) {
-                        ErrorUtils.print(this.getClass()).error("Failed to clean up nonexistent topic, msg is ", e);
+                        LoggerUtils.print(this.getClass()).error("Failed to clean up nonexistent topic, msg is ", e);
                     }
                 }
 
@@ -307,7 +307,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.writeTopicRank(topicRanks);
                             topicRanks.clear();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Storage topic rank logsize has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage topic rank logsize has error, msg is ", e);
                         }
                     }
                 }
@@ -318,7 +318,7 @@ public class TopicRankSubTask extends Thread {
                     topicRanks.clear();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Storage topic rank logsize end data has error,msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Storage topic rank logsize end data has error,msg is ", e);
             }
         }
     }
@@ -329,7 +329,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 this.topicCapacityStats();
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Collector topic capacity has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Collector topic capacity has error, msg is ", e);
             }
         }
 
@@ -338,7 +338,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic rank capacity has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic rank capacity has error, msg is ", e);
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
@@ -361,7 +361,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.removeTopicRank(clean);
                         }
                     } catch (Exception e) {
-                        ErrorUtils.print(this.getClass()).error("Failed to clean up nonexistent topic, msg is ", e);
+                        LoggerUtils.print(this.getClass()).error("Failed to clean up nonexistent topic, msg is ", e);
                     }
                 }
 
@@ -370,7 +370,7 @@ public class TopicRankSubTask extends Thread {
                     try {
                         capacity = kafkaMetricsService.topicCapacity(clusterAlias, topic);
                     } catch (Exception e) {
-                        ErrorUtils.print(this.getClass()).error("Get topic capacity has error, msg is ", e);
+                        LoggerUtils.print(this.getClass()).error("Get topic capacity has error, msg is ", e);
                     }
                     TopicRank topicRank = new TopicRank();
                     topicRank.setCluster(clusterAlias);
@@ -383,7 +383,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.writeTopicRank(topicRanks);
                             topicRanks.clear();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Storage topic rank capacity has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage topic rank capacity has error, msg is ", e);
                         }
                     }
                 }
@@ -394,7 +394,7 @@ public class TopicRankSubTask extends Thread {
                     topicRanks.clear();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Storage topic rank capacity end data has error,msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Storage topic rank capacity end data has error,msg is ", e);
             }
 
         }
@@ -406,7 +406,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 this.topicProducerLogSizeStats();
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Collector topic logsize has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Collector topic logsize has error, msg is ", e);
             }
         }
 
@@ -415,7 +415,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic producer logsize has error,msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for topic producer logsize has error,msg is ", e);
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
@@ -452,7 +452,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.writeTopicLogSize(topicLogSizes);
                             topicLogSizes.clear();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Storage topic producer logsize has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage topic producer logsize has error, msg is ", e);
                         }
                     }
                 }
@@ -469,11 +469,11 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.writeTopicRank(topicRanks);
                             topicRanks.clear();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Storage topic producers has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage topic producers has error, msg is ", e);
                         }
                     }
                 } catch (Exception e) {
-                    ErrorUtils.print(this.getClass()).error("Stats producers thread has error, msg is ", e);
+                    LoggerUtils.print(this.getClass()).error("Stats producers thread has error, msg is ", e);
                 }
             }
             try {
@@ -482,7 +482,7 @@ public class TopicRankSubTask extends Thread {
                     topicLogSizes.clear();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Storage topic producer logsize end data has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Storage topic producer logsize end data has error, msg is ", e);
             }
             try {
                 if (topicRanks.size() > 0) {
@@ -490,7 +490,7 @@ public class TopicRankSubTask extends Thread {
                     topicRanks.clear();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Storage topic producer threads end data has error,msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Storage topic producer threads end data has error,msg is ", e);
             }
         }
     }
@@ -503,7 +503,7 @@ public class TopicRankSubTask extends Thread {
                     this.brokerPerformanceByTopicStats(bType);
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Collector broker spread by topic has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Collector broker spread by topic has error, msg is ", e);
             }
         }
 
@@ -512,7 +512,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for (spread, skewed, leader skewed) has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get dashboardServiceImpl bean be used for (spread, skewed, leader skewed) has error, msg is ", e);
             }
 
             List<TopicRank> topicRanks = new ArrayList<>();
@@ -543,7 +543,7 @@ public class TopicRankSubTask extends Thread {
                             dashboardServiceImpl.writeTopicRank(topicRanks);
                             topicRanks.clear();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Storage topic [" + bType + "] has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage topic [" + bType + "] has error, msg is ", e);
                         }
                     }
                 }
@@ -554,7 +554,7 @@ public class TopicRankSubTask extends Thread {
                     topicRanks.clear();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Storage topic [" + bType + "] end data has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Storage topic [" + bType + "] end data has error, msg is ", e);
             }
         }
 
@@ -574,7 +574,7 @@ public class TopicRankSubTask extends Thread {
                         dashboardServiceImpl.removeTopicRank(clean);
                     }
                 } catch (Exception e) {
-                    ErrorUtils.print(this.getClass()).error("Failed to clean up nonexistent performance topic, msg is ", e);
+                    LoggerUtils.print(this.getClass()).error("Failed to clean up nonexistent performance topic, msg is ", e);
                 }
             }
         }
@@ -586,7 +586,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 this.topicCleanTask();
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Clean topic logsize has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Clean topic logsize has error, msg is ", e);
             }
         }
 
@@ -595,7 +595,7 @@ public class TopicRankSubTask extends Thread {
             try {
                 dashboardServiceImpl = StartupListener.getBean("dashboardServiceImpl", DashboardServiceImpl.class);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get dashboardServiceImpl bean has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get dashboardServiceImpl bean has error, msg is ", e);
             }
             String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             for (String clusterAlias : clusterAliass) {
@@ -608,14 +608,14 @@ public class TopicRankSubTask extends Thread {
                         if (logSize > 0) {
                             String cleanUpPolicyLog = kafkaMetricsService.changeTopicConfig(clusterAlias, tr.getTopic(), Topic.ADD, new ConfigEntry(Topic.CLEANUP_POLICY_KEY, Topic.CLEANUP_POLICY_VALUE));
                             String retentionMsLog = kafkaMetricsService.changeTopicConfig(clusterAlias, tr.getTopic(), Topic.ADD, new ConfigEntry(Topic.RETENTION_MS_KEY, Topic.RETENTION_MS_VALUE));
-                            ErrorUtils.print(this.getClass()).info("Add [" + Topic.CLEANUP_POLICY_KEY + "] topic[" + tr.getTopic() + "] property result," + cleanUpPolicyLog);
-                            ErrorUtils.print(this.getClass()).info("Add [" + Topic.RETENTION_MS_KEY + "] topic[" + tr.getTopic() + "] property result," + retentionMsLog);
+                            LoggerUtils.print(this.getClass()).info("Add [" + Topic.CLEANUP_POLICY_KEY + "] topic[" + tr.getTopic() + "] property result," + cleanUpPolicyLog);
+                            LoggerUtils.print(this.getClass()).info("Add [" + Topic.RETENTION_MS_KEY + "] topic[" + tr.getTopic() + "] property result," + retentionMsLog);
                         } else {
                             // delete znode
                             String cleanUpPolicyLog = kafkaMetricsService.changeTopicConfig(clusterAlias, tr.getTopic(), Topic.DELETE, new ConfigEntry(Topic.CLEANUP_POLICY_KEY, ""));
                             String retentionMsLog = kafkaMetricsService.changeTopicConfig(clusterAlias, tr.getTopic(), Topic.DELETE, new ConfigEntry(Topic.RETENTION_MS_KEY, ""));
-                            ErrorUtils.print(this.getClass()).info("Delete [" + Topic.CLEANUP_POLICY_KEY + "] topic[" + tr.getTopic() + "] property result," + cleanUpPolicyLog);
-                            ErrorUtils.print(this.getClass()).info("Delete [" + KConstants.Topic.RETENTION_MS_KEY + "] topic[" + tr.getTopic() + "] property result," + retentionMsLog);
+                            LoggerUtils.print(this.getClass()).info("Delete [" + Topic.CLEANUP_POLICY_KEY + "] topic[" + tr.getTopic() + "] property result," + cleanUpPolicyLog);
+                            LoggerUtils.print(this.getClass()).info("Delete [" + KConstants.Topic.RETENTION_MS_KEY + "] topic[" + tr.getTopic() + "] property result," + retentionMsLog);
                             // update db state
                             tr.setTvalue(1);
                             dashboardServiceImpl.writeTopicRank(Arrays.asList(tr));

@@ -95,7 +95,7 @@ public class AlertQuartz {
                         alarmMsg.setAlarmProject("Consumer");
                         alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
                     } catch (Exception e) {
-                        ErrorUtils.print(this.getClass()).error("Alert message load common information has error, msg is ", e);
+                        LoggerUtils.print(this.getClass()).error("Alert message load common information has error, msg is ", e);
                     }
                     if (lag > alarmConsumer.getLag() && (alarmConsumer.getAlarmTimes() < alarmConsumer.getAlarmMaxTimes() || alarmConsumer.getAlarmMaxTimes() == -1)) {
                         // alarm consumer
@@ -105,7 +105,7 @@ public class AlertQuartz {
                         try {
                             sendAlarmConsumerError(alarmConfing, alarmConsumer, lag, alarmMsg);
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Send alarm consumer exception has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Send alarm consumer exception has error, msg is ", e);
                         }
                     } else if (lag <= alarmConsumer.getLag()) {
                         if (alarmConsumer.getIsNormal().equals("N")) {
@@ -117,13 +117,13 @@ public class AlertQuartz {
                             try {
                                 sendAlarmConsumerNormal(alarmConfing, alarmConsumer, lag, alarmMsg);
                             } catch (Exception e) {
-                                ErrorUtils.print(this.getClass()).error("Send alarm consumer normal has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Send alarm consumer normal has error, msg is ", e);
                             }
                         }
                     }
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Alarm consumer lag has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Alarm consumer lag has error, msg is ", e);
             }
         }
 
@@ -209,7 +209,7 @@ public class AlertQuartz {
                     try {
                         realCapacity = kafkaMetricsService.topicCapacity(cluster.getCluster(), topic);
                     } catch (Exception e) {
-                        ErrorUtils.print(this.getClass()).error("Get topic capacity has error, msg is ", e);
+                        LoggerUtils.print(this.getClass()).error("Get topic capacity has error, msg is ", e);
                     }
                     JSONObject alarmTopicMsg = new JSONObject();
                     alarmTopicMsg.put("topic", topic);
@@ -222,7 +222,7 @@ public class AlertQuartz {
                         try {
                             sendAlarmClusterError(alarmConfig, cluster, alarmTopicMsg.toJSONString());
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Send alarm cluser exception has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Send alarm cluser exception has error, msg is ", e);
                         }
                     } else if (realCapacity < alarmCapacity) {
                         if (cluster.getIsNormal().equals("N")) {
@@ -234,7 +234,7 @@ public class AlertQuartz {
                             try {
                                 sendAlarmClusterNormal(alarmConfig, cluster, alarmTopicMsg.toJSONString());
                             } catch (Exception e) {
-                                ErrorUtils.print(this.getClass()).error("Send alarm cluser normal has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Send alarm cluser normal has error, msg is ", e);
                             }
                         }
                     }
@@ -269,7 +269,7 @@ public class AlertQuartz {
                         try {
                             sendAlarmClusterError(alarmConfig, cluster, alarmTopicMsg.toJSONString());
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Send alarm cluser exception has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Send alarm cluser exception has error, msg is ", e);
                         }
                     } else if (realSpeed >= startSpeed && realSpeed <= endSpeed) {
                         if (cluster.getIsNormal().equals("N")) {
@@ -281,7 +281,7 @@ public class AlertQuartz {
                             try {
                                 sendAlarmClusterNormal(alarmConfig, cluster, alarmTopicMsg.toJSONString());
                             } catch (Exception e) {
-                                ErrorUtils.print(this.getClass()).error("Send alarm cluser normal has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Send alarm cluser normal has error, msg is ", e);
                             }
                         }
                     }
@@ -301,7 +301,7 @@ public class AlertQuartz {
                                 normalServers.add(server);
                             }
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Alarm cluster has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Alarm cluster has error, msg is ", e);
                         }
                     }
                     if (errorServers.size() > 0 && (cluster.getAlarmTimes() < cluster.getAlarmMaxTimes() || cluster.getAlarmMaxTimes() == -1)) {
@@ -311,7 +311,7 @@ public class AlertQuartz {
                         try {
                             sendAlarmClusterError(alarmConfig, cluster, errorServers.toString());
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Send alarm cluster exception has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Send alarm cluster exception has error, msg is ", e);
                         }
                     } else if (errorServers.size() == 0) {
                         if (cluster.getIsNormal().equals("N")) {
@@ -323,7 +323,7 @@ public class AlertQuartz {
                             try {
                                 sendAlarmClusterNormal(alarmConfig, cluster, normalServers.toString());
                             } catch (Exception e) {
-                                ErrorUtils.print(this.getClass()).error("Send alarm cluster normal has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Send alarm cluster normal has error, msg is ", e);
                             }
                         }
                     }

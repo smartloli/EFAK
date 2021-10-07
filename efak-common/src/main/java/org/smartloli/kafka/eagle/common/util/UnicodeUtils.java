@@ -91,7 +91,7 @@ public class UnicodeUtils {
                     string.append(hex[i]);
                 }
             } catch (NumberFormatException e) {
-                ErrorUtils.print(UnicodeUtils.class).error("Unicode to zh_CN has error, msg is ", e);
+                LoggerUtils.print(UnicodeUtils.class).error("Unicode to zh_CN has error, msg is ", e);
                 string.append(hex[i]);
             }
         }

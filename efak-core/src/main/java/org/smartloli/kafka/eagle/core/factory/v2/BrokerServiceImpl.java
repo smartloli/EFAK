@@ -63,7 +63,8 @@ public class BrokerServiceImpl implements BrokerService {
     /**
      * Instance Kafka Zookeeper client pool.
      */
-    private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    // private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    private KafkaZKPoolUtils kafkaZKPool = KafkaZKSingletonUtils.create();
 
     /**
      * Kafka service interface.
@@ -375,7 +376,7 @@ public class BrokerServiceImpl implements BrokerService {
                     excludeTopic(clusterAlias, topics);
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get topic list has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get topic list has error, msg is ", e);
             } finally {
                 if (zkc != null) {
                     kafkaZKPool.release(clusterAlias, zkc);
@@ -625,7 +626,7 @@ public class BrokerServiceImpl implements BrokerService {
                 }
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get topic real logsize has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get topic real logsize has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);

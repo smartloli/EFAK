@@ -28,6 +28,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
+import org.smartloli.kafka.eagle.common.util.KafkaZKSingletonUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
@@ -43,8 +44,8 @@ import java.util.Map.Entry;
  * Implements {@link KafkaHubService} all method.
  *
  * @author smartloli.
- *
- *         Created by May 21, 2020
+ * <p>
+ * Created by May 21, 2020
  */
 public class KafkaHubServiceImpl implements KafkaHubService {
 
@@ -52,8 +53,11 @@ public class KafkaHubServiceImpl implements KafkaHubService {
     private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     private final PrintStream pStream = new PrintStream(baos);
 
-    /** Instance Kafka Zookeeper client pool. */
-    private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    /**
+     * Instance Kafka Zookeeper client pool.
+     */
+    // private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    private KafkaZKPoolUtils kafkaZKPool = KafkaZKSingletonUtils.create();
 
     private File createKafkaTempJson(Map<TopicPartition, Seq<Object>> tuple) throws IOException {
         JSONObject object = new JSONObject();
@@ -88,13 +92,8 @@ public class KafkaHubServiceImpl implements KafkaHubService {
     /**
      * Generate reassign topics json
      *
-     * @param reassignTopicsJson
-     *            {"topics":[{"topic":"k20200326"}],"version":1}
-     *
-     * @param brokerIdList
-     *            0,1,2 ...
-     *
-     *
+     * @param reassignTopicsJson {"topics":[{"topic":"k20200326"}],"version":1}
+     * @param brokerIdList       0,1,2 ...
      */
     public JSONObject generate(String clusterAlias, String reassignTopicsJson, List<Object> brokerIdList) {
         JSONObject object = new JSONObject();
@@ -140,7 +139,9 @@ public class KafkaHubServiceImpl implements KafkaHubService {
         return object;
     }
 
-    /** Execute reassign topics json. */
+    /**
+     * Execute reassign topics json.
+     */
     public String execute(String clusterAlias, String reassignTopicsJson) {
         JSONObject object = new JSONObject();
         String zkServerAddress = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
@@ -159,7 +160,9 @@ public class KafkaHubServiceImpl implements KafkaHubService {
         return object.toJSONString();
     }
 
-    /** Verify reassign topics json. */
+    /**
+     * Verify reassign topics json.
+     */
     public String verify(String clusterAlias, String reassignTopicsJson) {
         JSONObject object = new JSONObject();
         String zkServerAddress = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");

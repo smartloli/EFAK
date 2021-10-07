@@ -19,8 +19,8 @@ package org.smartloli.kafka.eagle.web.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.plugins.ConnectConfigInfo;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.web.dao.BrokerDao;
@@ -117,17 +117,17 @@ public class ConnectServiceImpl implements ConnectService {
         try {
             status = HttpClientUtils.doGet(uriStr + "connectors/" + connector + "/status");
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get connector[" + uriStr + connector + "] status has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get connector[" + uriStr + connector + "] status has error, msg is ", e);
         }
         try {
             config = HttpClientUtils.doGet(uriStr + "connectors/" + connector + "/config");
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get connector[" + uriStr + connector + "] config has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get connector[" + uriStr + connector + "] config has error, msg is ", e);
         }
         try {
             tasks = HttpClientUtils.doGet(uriStr + "connectors/" + connector + "/tasks");
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get connector[" + uriStr + connector + "] tasks has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get connector[" + uriStr + connector + "] tasks has error, msg is ", e);
         }
         object.put("status", status);
         object.put("config", config);

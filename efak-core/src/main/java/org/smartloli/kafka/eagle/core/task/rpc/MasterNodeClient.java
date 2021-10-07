@@ -25,7 +25,7 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
 /**
@@ -53,7 +53,7 @@ public class MasterNodeClient {
             transport = new TFramedTransport(new TSocket(new TConfiguration(), host, port, timeout));
         } catch (TTransportException e) {
             e.printStackTrace();
-            ErrorUtils.print(MasterNodeClient.class).error("TSocket connect from worknode[" + host + ":" + port + "] has error, msg is ", e);
+            LoggerUtils.print(MasterNodeClient.class).error("TSocket connect from worknode[" + host + ":" + port + "] has error, msg is ", e);
         }
         TProtocol protocol = new TCompactProtocol(transport);
         WorkNodeService.Client client = new WorkNodeService.Client(protocol);
@@ -62,7 +62,7 @@ public class MasterNodeClient {
             transport.open();
             result = client.getResult(object.toJSONString());
         } catch (Exception e) {
-            ErrorUtils.print(MasterNodeClient.class).error("Get result from worknode[" + host + ":" + port + "] has error, msg is ", e);
+            LoggerUtils.print(MasterNodeClient.class).error("Get result from worknode[" + host + ":" + port + "] has error, msg is ", e);
         } finally {
             transport.close();
         }

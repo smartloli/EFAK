@@ -137,7 +137,7 @@ public class QuartzManagerUtils {
             try {
                 formatTimeStr = sdf.format(sdf.parse(sdf.format(date.getTime() + delaySecond * 1000)));
             } catch (Exception e) {
-                ErrorUtils.print(QuartzManagerUtils.class).error("Get crontab has error, msg is ", e);
+                LoggerUtils.print(QuartzManagerUtils.class).error("Get crontab has error, msg is ", e);
             }
         }
         return formatTimeStr;

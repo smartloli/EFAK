@@ -18,8 +18,8 @@
 package org.smartloli.kafka.eagle.web.quartz;
 
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.WorkUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -46,7 +46,7 @@ public class MasterQuartz {
     private static final String[] MBEAN_TASK_KEYS = new String[]{MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS, MBean.OSTOTALMEMORY, MBean.OSFREEMEMORY, MBean.CPUUSED};
 
     public void clean() {
-        ErrorUtils.print(this.getClass()).info("Master node starts cleaning up expired data.");
+        LoggerUtils.print(this.getClass()).info("Master node starts cleaning up expired data.");
         if (SystemConfigUtils.getBooleanProperty("efak.metrics.charts")) {
             MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
             int retain = SystemConfigUtils.getIntProperty("efak.metrics.retain");

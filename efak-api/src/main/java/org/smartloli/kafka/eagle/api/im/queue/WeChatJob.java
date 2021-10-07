@@ -22,10 +22,10 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
 import org.smartloli.kafka.eagle.common.util.KConstants.WeChat;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,9 +51,9 @@ public class WeChatJob implements Job {
         try {
             Map<String, Object> wechatMarkdownMessage = getWeChatMarkdownMessage(data);
             String result = HttpClientUtils.doPostJson(url, JSONObject.toJSONString(wechatMarkdownMessage));
-            ErrorUtils.print(this.getClass()).info("DingDing SendMsg Result: " + result);
+            LoggerUtils.print(this.getClass()).info("DingDing SendMsg Result: " + result);
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Send alarm message has error by wechat, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Send alarm message has error by wechat, msg is ", e);
             return 0;
         }
         return 1;

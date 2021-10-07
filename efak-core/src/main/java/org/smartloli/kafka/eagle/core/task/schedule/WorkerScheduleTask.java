@@ -20,8 +20,8 @@ package org.smartloli.kafka.eagle.core.task.schedule;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.core.task.rpc.MasterNodeClient;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
@@ -51,7 +51,7 @@ public class WorkerScheduleTask {
                 return JSON.parseArray(result, JSONArray.class);
             }
         } catch (Exception e) {
-            ErrorUtils.print(WorkerScheduleTask.class).error("Deserialize result by [" + worknode.toString() + "] has error, msg is ", e);
+            LoggerUtils.print(WorkerScheduleTask.class).error("Deserialize result by [" + worknode.toString() + "] has error, msg is ", e);
         }
         return null;
     }

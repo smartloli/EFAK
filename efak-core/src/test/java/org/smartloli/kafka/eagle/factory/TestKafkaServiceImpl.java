@@ -28,6 +28,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
+import org.smartloli.kafka.eagle.common.util.KafkaZKSingletonUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -47,7 +48,7 @@ import java.util.*;
  */
 public class TestKafkaServiceImpl {
 
-    private KafkaZKPoolUtils zkPool = KafkaZKPoolUtils.getInstance();
+    private KafkaZKPoolUtils zkPool = KafkaZKSingletonUtils.create();
 
     private final String BROKER_TOPICS_PATH = "/brokers/topics";
 

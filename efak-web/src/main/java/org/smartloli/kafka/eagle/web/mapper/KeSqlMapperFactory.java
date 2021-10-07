@@ -22,7 +22,7 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.web.mapper.dao.KeBaseMapper;
 
 import java.io.IOException;
@@ -118,7 +118,7 @@ public class KeSqlMapperFactory {
                 sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream, environment);
             } catch (IOException e) {
                 e.printStackTrace();
-                ErrorUtils.print(KeSqlMapperFactory.class).error(String.format("KeSqlMapper execute sql has error, msg is %s.", e));
+                LoggerUtils.print(KeSqlMapperFactory.class).error(String.format("KeSqlMapper execute sql has error, msg is %s.", e));
             } finally {
                 IOUtils.closeQuietly(inputStream);
             }

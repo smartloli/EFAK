@@ -26,8 +26,8 @@ import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -72,7 +72,7 @@ public class MetricsSubTask extends Thread {
         try {
             bscreenConsumerTopicStats();
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Collector consumer topic data has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Collector consumer topic data has error, msg is ", e);
         }
     }
 
@@ -81,7 +81,7 @@ public class MetricsSubTask extends Thread {
         try {
             metricsServiceImpl = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get metricsServiceImpl bean has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get metricsServiceImpl bean has error, msg is ", e);
             return;
         }
 
@@ -89,7 +89,7 @@ public class MetricsSubTask extends Thread {
         try {
             consumerServiceImpl = StartupListener.getBean("consumerServiceImpl", ConsumerServiceImpl.class);
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get consumerServiceImpl bean has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get consumerServiceImpl bean has error, msg is ", e);
             return;
         }
 
@@ -137,7 +137,7 @@ public class MetricsSubTask extends Thread {
                             metricsServiceImpl.writeConsumerSummaryTopics(consumerSummarys);
                             consumerSummarys.clear();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Storage kafka topic consumer summary has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage kafka topic consumer summary has error, msg is ", e);
                         }
                     }
 
@@ -155,7 +155,7 @@ public class MetricsSubTask extends Thread {
                                 metricsServiceImpl.writeConsumerGroupTopics(consumerGroupTopics);
                                 consumerGroupTopics.clear();
                             } catch (Exception e) {
-                                ErrorUtils.print(this.getClass()).error("Storage kafka consumer group topic has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Storage kafka consumer group topic has error, msg is ", e);
                             }
                         }
 
@@ -171,7 +171,7 @@ public class MetricsSubTask extends Thread {
                             try {
                                 partitionsInts.add(Integer.parseInt(partition));
                             } catch (Exception e) {
-                                ErrorUtils.print(this.getClass()).error("Parse partitionid string to integer has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Parse partitionid string to integer has error, msg is ", e);
                             }
                         }
 
@@ -185,7 +185,7 @@ public class MetricsSubTask extends Thread {
                                     logsize += entrySet.getValue();
                                     offsets += partitionOffset.get(entrySet.getKey().partition());
                                 } catch (Exception e) {
-                                    ErrorUtils.print(this.getClass()).error("Get logsize and offsets has error, msg is ", e);
+                                    LoggerUtils.print(this.getClass()).error("Get logsize and offsets has error, msg is ", e);
                                 }
                             }
                         }
@@ -218,7 +218,7 @@ public class MetricsSubTask extends Thread {
                                 metricsServiceImpl.writeBSreenConsumerTopic(bscreenConsumers);
                                 bscreenConsumers.clear();
                             } catch (Exception e) {
-                                ErrorUtils.print(this.getClass()).error("Storage bsreen kafka topic consumer has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Storage bsreen kafka topic consumer has error, msg is ", e);
                             }
                         }
                     }
@@ -249,7 +249,7 @@ public class MetricsSubTask extends Thread {
                             metricsServiceImpl.writeConsumerSummaryTopics(consumerSummarys);
                             consumerSummarys.clear();
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Storage topic consumer summary has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage topic consumer summary has error, msg is ", e);
                         }
                     }
 
@@ -267,7 +267,7 @@ public class MetricsSubTask extends Thread {
                                 metricsServiceImpl.writeConsumerGroupTopics(consumerGroupTopics);
                                 consumerGroupTopics.clear();
                             } catch (Exception e) {
-                                ErrorUtils.print(this.getClass()).error("Storage kafka consumer group topic has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Storage kafka consumer group topic has error, msg is ", e);
                             }
                         }
 
@@ -305,7 +305,7 @@ public class MetricsSubTask extends Thread {
                                 metricsServiceImpl.writeBSreenConsumerTopic(bscreenConsumers);
                                 bscreenConsumers.clear();
                             } catch (Exception e) {
-                                ErrorUtils.print(this.getClass()).error("Storage bscreen topic consumer has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Storage bscreen topic consumer has error, msg is ", e);
                             }
                         }
                     }
@@ -318,7 +318,7 @@ public class MetricsSubTask extends Thread {
                     metricsServiceImpl.writeBSreenConsumerTopic(bscreenConsumers);
                     bscreenConsumers.clear();
                 } catch (Exception e) {
-                    ErrorUtils.print(this.getClass()).error("Storage bscreen final topic consumer has error, msg is ", e);
+                    LoggerUtils.print(this.getClass()).error("Storage bscreen final topic consumer has error, msg is ", e);
                 }
             }
             if (consumerSummarys.size() > 0) {
@@ -326,7 +326,7 @@ public class MetricsSubTask extends Thread {
                     metricsServiceImpl.writeConsumerSummaryTopics(consumerSummarys);
                     consumerSummarys.clear();
                 } catch (Exception e) {
-                    ErrorUtils.print(this.getClass()).error("Storage kafka final topic consumer summary has error, msg is ", e);
+                    LoggerUtils.print(this.getClass()).error("Storage kafka final topic consumer summary has error, msg is ", e);
                 }
             }
             if (consumerGroupTopics.size() > 0) {
@@ -334,11 +334,11 @@ public class MetricsSubTask extends Thread {
                     metricsServiceImpl.writeConsumerGroupTopics(consumerGroupTopics);
                     consumerGroupTopics.clear();
                 } catch (Exception e) {
-                    ErrorUtils.print(this.getClass()).error("Storage kafka final consumer group topic has error, msg is ", e);
+                    LoggerUtils.print(this.getClass()).error("Storage kafka final consumer group topic has error, msg is ", e);
                 }
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Collector consumer lag data has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Collector consumer lag data has error, msg is ", e);
         }
     }
 
@@ -429,7 +429,7 @@ public class MetricsSubTask extends Thread {
                                 try {
                                     metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
                                 } catch (Exception e) {
-                                    ErrorUtils.print(this.getClass()).error("Clean kafka consumer cluster[" + cluster + "] group[" + group.getKey() + "] has error, msg is ", e);
+                                    LoggerUtils.print(this.getClass()).error("Clean kafka consumer cluster[" + cluster + "] group[" + group.getKey() + "] has error, msg is ", e);
                                 }
                             }
                         }
@@ -440,12 +440,12 @@ public class MetricsSubTask extends Thread {
                         try {
                             metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Clean kafka consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Clean kafka consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
                         }
                     }
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Clean kafka consumer final has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Clean kafka consumer final has error, msg is ", e);
             }
         }
     }
@@ -468,7 +468,7 @@ public class MetricsSubTask extends Thread {
                     }
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Clean kafka consumer summary final has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Clean kafka consumer summary final has error, msg is ", e);
             }
         }
     }
@@ -501,7 +501,7 @@ public class MetricsSubTask extends Thread {
                                 try {
                                     metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
                                 } catch (Exception e) {
-                                    ErrorUtils.print(this.getClass()).error("Clean consumer cluster[" + cluster + "] group[" + group.getKey() + "] has error, msg is ", e);
+                                    LoggerUtils.print(this.getClass()).error("Clean consumer cluster[" + cluster + "] group[" + group.getKey() + "] has error, msg is ", e);
                                 }
                             }
                         }
@@ -512,12 +512,12 @@ public class MetricsSubTask extends Thread {
                         try {
                             metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
                         } catch (Exception e) {
-                            ErrorUtils.print(this.getClass()).error("Clean consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Clean consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
                         }
                     }
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Clean kafka consumer group final has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Clean kafka consumer group final has error, msg is ", e);
             }
         }
     }
@@ -540,7 +540,7 @@ public class MetricsSubTask extends Thread {
                     }
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Cleam kafka consumer summary final has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Cleam kafka consumer summary final has error, msg is ", e);
             }
         }
     }

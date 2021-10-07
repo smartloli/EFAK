@@ -61,7 +61,7 @@ public class HttpClientUtils {
             HttpEntity entity = response.getEntity();
             result = EntityUtils.toString(entity);
         } catch (Exception e) {
-            ErrorUtils.print(HttpClientUtils.class).error("Do get request has error, msg is ", e);
+            LoggerUtils.print(HttpClientUtils.class).error("Do get request has error, msg is ", e);
         } finally {
             try {
                 if (response != null) {
@@ -71,7 +71,7 @@ public class HttpClientUtils {
                     client.close();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(HttpClientUtils.class).error("Release get httpclient request has error, msg is ", e);
+                LoggerUtils.print(HttpClientUtils.class).error("Release get httpclient request has error, msg is ", e);
             }
         }
         return result;
@@ -97,7 +97,7 @@ public class HttpClientUtils {
             HttpEntity entity = response.getEntity();
             result = EntityUtils.toString(entity);
         } catch (Exception e) {
-            ErrorUtils.print(HttpClientUtils.class).error("Do post form request has error, msg is ", e);
+            LoggerUtils.print(HttpClientUtils.class).error("Do post form request has error, msg is ", e);
         } finally {
             try {
                 if (response != null) {
@@ -107,7 +107,7 @@ public class HttpClientUtils {
                     client.close();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(HttpClientUtils.class).error("Release post httpclient request has error, msg is ", e);
+                LoggerUtils.print(HttpClientUtils.class).error("Release post httpclient request has error, msg is ", e);
             }
         }
         return result;
@@ -131,7 +131,7 @@ public class HttpClientUtils {
             HttpEntity entity = response.getEntity();
             result = EntityUtils.toString(entity);
         } catch (Exception e) {
-            ErrorUtils.print(HttpClientUtils.class).error("Do post json request has error, msg is ", e);
+            LoggerUtils.print(HttpClientUtils.class).error("Do post json request has error, msg is ", e);
         } finally {
             try {
                 if (response != null) {
@@ -141,7 +141,7 @@ public class HttpClientUtils {
                     client.close();
                 }
             } catch (Exception e) {
-                ErrorUtils.print(HttpClientUtils.class).error("Release post json request has error, msg is ", e);
+                LoggerUtils.print(HttpClientUtils.class).error("Release post json request has error, msg is ", e);
             }
         }
         return result;

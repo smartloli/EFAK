@@ -60,7 +60,7 @@ public class JobClient {
 
     public static String physicsSubmit(String cluster, String sql, String jobId) {
         JSONObject status = new JSONObject();
-        ErrorUtils.print(JobClient.class).info("JobClient - Physics KSQL[" + sql + "]");
+        LoggerUtils.print(JobClient.class).info("JobClient - Physics KSQL[" + sql + "]");
         long start = System.currentTimeMillis();
         JSONObject resultObject = query(jobId, sql, cluster);
         String results = resultObject.getString("result");
@@ -75,7 +75,7 @@ public class JobClient {
 
     public static String logicalSubmit(String cluster, String sql, String jobId) {
         JSONObject status = new JSONObject();
-        ErrorUtils.print(JobClient.class).info("JobClient - Logical KSQL[" + sql + "]");
+        LoggerUtils.print(JobClient.class).info("JobClient - Logical KSQL[" + sql + "]");
         if (validForSql(sql)) {
             KSqlStrategy ksql = KSqlParser.parseQueryKSql(sql, cluster);
             if (!validForTopic(cluster, ksql.getTopic())) {
@@ -124,7 +124,7 @@ public class JobClient {
                         results = JSON.parseArray(resultStr, JSONArray.class);
                     }
                 } catch (Exception e) {
-                    ErrorUtils.print(JobClient.class).error("Deserialize result by [" + workNode.getHost() + ":" + workNode.getPort() + "] has error, msg is ", e);
+                    LoggerUtils.print(JobClient.class).error("Deserialize result by [" + workNode.getHost() + ":" + workNode.getPort() + "] has error, msg is ", e);
                 }
                 if (results.size() > 0) {
                     if (results.get(0).size() > 0) {
@@ -158,7 +158,7 @@ public class JobClient {
                         results = JSON.parseArray(resultStr, JSONArray.class);
                     }
                 } catch (Exception e) {
-                    ErrorUtils.print(JobClient.class).error("Deserialize result by [" + workNode.getHost() + ":" + workNode.getPort() + "] has error, msg is ", e);
+                    LoggerUtils.print(JobClient.class).error("Deserialize result by [" + workNode.getHost() + ":" + workNode.getPort() + "] has error, msg is ", e);
                 }
                 if (results.size() > 0) {
                     if (results.get(0).size() > 0) {
@@ -195,7 +195,7 @@ public class JobClient {
 
     public static List<JSONArray> submit(String jobId, String sql, String cluster) {
         Map<WorkNodeStrategy, List<KSqlStrategy>> tasks = getTaskStrategy(sql, cluster);
-        ErrorUtils.print(JobClient.class).info("KSqlStrategy: " + new Gson().toJson(tasks));
+        LoggerUtils.print(JobClient.class).info("KSqlStrategy: " + new Gson().toJson(tasks));
         List<JSONArray> parentResult = new ArrayList<>();
         for (Map.Entry<WorkNodeStrategy, List<KSqlStrategy>> task : tasks.entrySet()) {
             for (KSqlStrategy ksql : task.getValue()) {

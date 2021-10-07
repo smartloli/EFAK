@@ -20,10 +20,10 @@ package org.smartloli.kafka.eagle.api.util;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.api.im.IMFactory;
 import org.smartloli.kafka.eagle.api.im.IMService;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.IM;
 import org.smartloli.kafka.eagle.common.util.KConstants.WeChat;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -109,7 +109,7 @@ public class AlertUtils {
             im.sendPostMsgByMail(data.toJSONString(), url);
             status = true;
         } catch (Exception e) {
-            ErrorUtils.print(AlertUtils.class).error("Send test message by post email has error, msg is ", e);
+            LoggerUtils.print(AlertUtils.class).error("Send test message by post email has error, msg is ", e);
             status = false;
         }
         if (status) {

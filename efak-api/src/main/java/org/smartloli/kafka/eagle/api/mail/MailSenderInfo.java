@@ -18,7 +18,7 @@
 package org.smartloli.kafka.eagle.api.mail;
 
 import com.sun.mail.util.MailSSLSocketFactory;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 
 import java.io.File;
 import java.util.List;
@@ -75,7 +75,7 @@ public class MailSenderInfo {
                 sf = new MailSSLSocketFactory();
                 sf.setTrustAllHosts(true);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Open mail ssl has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Open mail ssl has error, msg is ", e);
             }
             p.put("mail.smtp.ssl.enable", "true");
             p.put("mail.smtp.ssl.socketFactory", sf);

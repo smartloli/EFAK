@@ -174,7 +174,7 @@ public class ConnectController {
         try {
             uri = URLDecoder.decode(request.getParameter("uri"), "UTF-8");
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get uri has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get uri has error, msg is ", e);
         }
 
         for (Object object : params) {
@@ -249,7 +249,7 @@ public class ConnectController {
             version = resultJson.getString("version");
             commit = resultJson.getString("commit");
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get kafka connect version and commit has error: ", e);
+            LoggerUtils.print(this.getClass()).error("Get kafka connect version and commit has error: ", e);
         }
         connectConfig.setVersion(version);
         connectConfig.setAlive(KConstants.BrokerSever.CONNECT_URI_ALIVE);
@@ -261,7 +261,7 @@ public class ConnectController {
                 return "redirect:/errors/500";
             }
         } catch (Exception ex) {
-            ErrorUtils.print(this.getClass()).error("Add kafka connect config schema has error: ", ex);
+            LoggerUtils.print(this.getClass()).error("Add kafka connect config schema has error: ", ex);
             return "redirect:/errors/500";
         }
     }
@@ -279,7 +279,7 @@ public class ConnectController {
         try {
             configInfo.setId(Integer.parseInt(idStr));
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get kafka connect uri id has error: ", e);
+            LoggerUtils.print(this.getClass()).error("Get kafka connect uri id has error: ", e);
             return "redirect:/errors/500";
         }
         configInfo.setConnectUri(connectUri);
@@ -330,7 +330,7 @@ public class ConnectController {
             uri = URLDecoder.decode(request.getParameter("uri"), "UTF-8");
             connector = URLDecoder.decode(request.getParameter("connector"), "UTF-8");
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get uri and connector has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get uri and connector has error, msg is ", e);
         }
         try {
             byte[] output = connectService.getConnectorPluginsSummary(uri, connector).getBytes();

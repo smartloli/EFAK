@@ -26,10 +26,10 @@ import org.quartz.JobExecutionException;
 import org.smartloli.kafka.eagle.api.util.MailFactoryUtils;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmEmailJsonInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
 import org.smartloli.kafka.eagle.common.util.JSONUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 
 import java.util.Arrays;
 
@@ -56,7 +56,7 @@ public class MailJob implements Job {
                 AlarmEmailJsonInfo email = JSON.parseObject(url, AlarmEmailJsonInfo.class);
                 MailFactoryUtils.send(email, data);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Send alarm message has error by mail address, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Send alarm message has error by mail address, msg is ", e);
                 return 0;
             }
         } else {
@@ -66,7 +66,7 @@ public class MailJob implements Job {
                 BasicNameValuePair msg = new BasicNameValuePair("msg", object.getString("msg"));
                 HttpClientUtils.doPostForm(url, Arrays.asList(address, msg));
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Send alarm message has error by mail, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Send alarm message has error by mail, msg is ", e);
                 return 0;
             }
         }

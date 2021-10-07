@@ -18,24 +18,33 @@
 package org.smartloli.kafka.eagle.common.util;
 
 /**
- * // NOTE
+ * Kafka zkclient object instance.
  *
  * @author smartloli.
  * <p>
- * Created by Apr 10, 2021
+ * Created by Oct 07, 2021
  */
-public class TestException {
-    public static void main(String[] args) {
-        int a = 1;
-        Integer b = null;
-        try {
-            if (a == b) {
+public class KafkaZKSingletonUtils {
 
+    private static class ZkClientHolder {
+        private static KafkaZKPoolUtils kafkaZKPool = null;
+
+        static {
+            try {
+                if (kafkaZKPool == null) {
+                    kafkaZKPool = KafkaZKPoolUtils.getInstance();
+                }
+            } catch (Exception e) {
+                LoggerUtils.print(KafkaZKSingletonUtils.class).error("Failure to initialize zkclient pool object, msg is {}", e);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            LoggerUtils.print(TestException.class).error("Error is ,", e);
-            throw new RuntimeException(e);
         }
+    }
+
+    public static KafkaZKPoolUtils create() {
+        return ZkClientHolder.kafkaZKPool;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(create().getZkClient("cluster1").getBroker(0));
     }
 }

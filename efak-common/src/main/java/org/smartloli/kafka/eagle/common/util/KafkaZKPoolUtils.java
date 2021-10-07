@@ -77,13 +77,13 @@ public final class KafkaZKPoolUtils {
                             try {
                                 zkc.currentZooKeeper().addAuthInfo(schema, (username + ":" + password).getBytes());
                             } catch (Exception e) {
-                                ErrorUtils.print(KafkaZKPoolUtils.class).error("ClusterAlias[" + entry.getKey() + "] add acl has error, msg is ", e);
+                                LoggerUtils.print(KafkaZKPoolUtils.class).error("ClusterAlias[" + entry.getKey() + "] add acl has error, msg is ", e);
                             }
                         }
                         zkCliPool.add(zkc);
                     }
                 } catch (Exception e) {
-                    ErrorUtils.print(KafkaZKPoolUtils.class).error("Error initializing zookeeper, msg is ", e);
+                    LoggerUtils.print(KafkaZKPoolUtils.class).error("Error initializing zookeeper, msg is ", e);
                 }
             }
             zkCliPools.put(entry.getKey(), zkCliPool);
@@ -113,9 +113,9 @@ public final class KafkaZKPoolUtils {
                 zkCliPool.remove(0);
                 String osName = System.getProperties().getProperty(OperateSystem.OS_NAME.getValue());
                 if (osName.contains(OperateSystem.LINUX.getValue())) {
-                    ErrorUtils.print(KafkaZKPoolUtils.class).debug(errorMessageByZookeeper, zkCliPool.size());
+                    LoggerUtils.print(KafkaZKPoolUtils.class).debug(errorMessageByZookeeper, zkCliPool.size());
                 } else {
-                    ErrorUtils.print(KafkaZKPoolUtils.class).info(errorMessageByZookeeper, zkCliPool.size());
+                    LoggerUtils.print(KafkaZKPoolUtils.class).info(errorMessageByZookeeper, zkCliPool.size());
                 }
             } else {
                 for (int i = 0; i < zkCliPoolSize; i++) {
@@ -129,14 +129,14 @@ public final class KafkaZKPoolUtils {
                 zkCliPool.remove(0);
                 String osName = System.getProperties().getProperty(OperateSystem.OS_NAME.getValue());
                 if (osName.contains(OperateSystem.LINUX.getValue())) {
-                    ErrorUtils.print(KafkaZKPoolUtils.class).debug(errorMessageByZookeeper, zkCliPool.size());
+                    LoggerUtils.print(KafkaZKPoolUtils.class).debug(errorMessageByZookeeper, zkCliPool.size());
                 } else {
-                    ErrorUtils.print(KafkaZKPoolUtils.class).warn(errorMessageByZookeeper, zkCliPool.size());
+                    LoggerUtils.print(KafkaZKPoolUtils.class).warn(errorMessageByZookeeper, zkCliPool.size());
                 }
             }
         } catch (Exception e) {
-            ErrorUtils.print(KafkaZKPoolUtils.class).error("Error initializing zookeeper, msg is ", e);
-            ErrorUtils.print(KafkaZKPoolUtils.class).error("Kafka cluster[" + clusterAlias + ".zk.list] address has null.");
+            LoggerUtils.print(KafkaZKPoolUtils.class).error("Error initializing zookeeper, msg is ", e);
+            LoggerUtils.print(KafkaZKPoolUtils.class).error("Kafka cluster[" + clusterAlias + ".zk.list] address has null.");
         }
         return zkc;
     }
@@ -151,9 +151,9 @@ public final class KafkaZKPoolUtils {
         }
         String osName = System.getProperties().getProperty(OperateSystem.OS_NAME.getValue());
         if (osName.contains(OperateSystem.LINUX.getValue())) {
-            ErrorUtils.print(KafkaZKPoolUtils.class).debug(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
+            LoggerUtils.print(KafkaZKPoolUtils.class).debug(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
         } else {
-            ErrorUtils.print(KafkaZKPoolUtils.class).info(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
+            LoggerUtils.print(KafkaZKPoolUtils.class).info(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
         }
     }
 

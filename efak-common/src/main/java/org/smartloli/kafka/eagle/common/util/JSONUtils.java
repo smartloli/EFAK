@@ -36,7 +36,7 @@ public class JSONUtils {
             JSON.parseObject(text);
             return true;
         } catch (Exception e) {
-            ErrorUtils.print(JSONUtils.class).error("Verify that the string[" + text + "] is JSONObject has error, msg is ", e);
+            LoggerUtils.print(JSONUtils.class).error("Verify that the string[" + text + "] is JSONObject has error, msg is ", e);
             return false;
         }
     }
@@ -49,7 +49,7 @@ public class JSONUtils {
             JSON.parseArray(text);
             return true;
         } catch (Exception e) {
-            ErrorUtils.print(JSONUtils.class).error("Verify that the string[" + text + "] is JSONArray has error, msg is ", e);
+            LoggerUtils.print(JSONUtils.class).error("Verify that the string[" + text + "] is JSONArray has error, msg is ", e);
             return false;
         }
     }

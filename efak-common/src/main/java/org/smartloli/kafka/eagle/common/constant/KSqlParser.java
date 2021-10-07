@@ -21,7 +21,7 @@ import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.parser.SqlParser;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicPartitionSchema;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 
 /**
@@ -48,7 +48,7 @@ public class KSqlParser {
             SqlNode sqlNode = sqlParser.parseStmt();
             parseNode(sqlNode, tps);
         } catch (Exception e) {
-            ErrorUtils.print(KSqlParser.class).error("Parser kafka sql has error, msg is ", e);
+            LoggerUtils.print(KSqlParser.class).error("Parser kafka sql has error, msg is ", e);
         }
         return tps;
     }
@@ -138,7 +138,7 @@ public class KSqlParser {
                     try {
                         limit = Long.parseLong(sqlOrderBy.fetch.toString());
                     } catch (Exception e) {
-                        ErrorUtils.print(KSqlParser.class).error("Parser limit string to long has error, msg is ", e);
+                        LoggerUtils.print(KSqlParser.class).error("Parser limit string to long has error, msg is ", e);
                     }
                     tps.setLimit(limit);
                 }

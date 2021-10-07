@@ -89,7 +89,8 @@ public class KafkaServiceImpl implements KafkaService {
     /**
      * Instance Kafka Zookeeper client pool.
      */
-    private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    // private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    private KafkaZKPoolUtils kafkaZKPool = KafkaZKSingletonUtils.create();
 
     /**
      * Zookeeper service interface.
@@ -110,7 +111,7 @@ public class KafkaServiceImpl implements KafkaService {
         try {
             status = zkc.pathExists(ownersPath);
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Find topic and group exist has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Find topic and group exist has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -134,7 +135,7 @@ public class KafkaServiceImpl implements KafkaService {
             brokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
             topicAndPartitions = JavaConversions.seqAsJavaList(brokerTopicsPaths);
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Find topic partition has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Find topic partition has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -180,7 +181,7 @@ public class KafkaServiceImpl implements KafkaService {
                 }
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get active topic has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get active topic has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -281,7 +282,7 @@ public class KafkaServiceImpl implements KafkaService {
                 }
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get all brokers info has error,msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get all brokers info has error,msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -414,7 +415,7 @@ public class KafkaServiceImpl implements KafkaService {
             offsetZk.setCreate(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
             offsetZk.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get consumer offsets from zookeeper has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get consumer offsets from zookeeper has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -435,7 +436,7 @@ public class KafkaServiceImpl implements KafkaService {
             Seq<Object> replis = zkc.getReplicasForPartition(tp);
             targets = JavaConversions.seqAsJavaList(replis);
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get topic replicas isr has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get topic replicas isr has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -478,7 +479,7 @@ public class KafkaServiceImpl implements KafkaService {
                 target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get zookeeper client status has error,msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get zookeeper client status has error,msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -1334,7 +1335,7 @@ public class KafkaServiceImpl implements KafkaService {
                 }
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Find kafka partition leader has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Find kafka partition leader has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -1614,7 +1615,7 @@ public class KafkaServiceImpl implements KafkaService {
                 }
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get broker jmx info from ids has error,msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get broker jmx info from ids has error,msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);

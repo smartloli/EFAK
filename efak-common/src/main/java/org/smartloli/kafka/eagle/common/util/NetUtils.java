@@ -40,21 +40,21 @@ public class NetUtils {
             socket.setReceiveBufferSize(ServerDevice.BUFFER_SIZE);
             socket.setSoTimeout(ServerDevice.TIME_OUT);
         } catch (Exception ex) {
-            ErrorUtils.print(NetUtils.class).error("Socket create failed.");
+            LoggerUtils.print(NetUtils.class).error("Socket create failed.");
         }
         SocketAddress address = new InetSocketAddress(host, port);
         try {
             socket.connect(address, ServerDevice.TIME_OUT);
             return true;
         } catch (IOException e) {
-            ErrorUtils.print(NetUtils.class).error("Telnet [" + host + ":" + port + "] has crash, please check it.");
+            LoggerUtils.print(NetUtils.class).error("Telnet [" + host + ":" + port + "] has crash, please check it.");
             return false;
         } finally {
             if (socket != null) {
                 try {
                     socket.close();
                 } catch (IOException e) {
-                    ErrorUtils.print(NetUtils.class).error("Close socket [" + host + ":" + port + "] has error.");
+                    LoggerUtils.print(NetUtils.class).error("Close socket [" + host + ":" + port + "] has error.");
                 }
             }
         }
@@ -76,7 +76,7 @@ public class NetUtils {
             InetAddress address = InetAddress.getByName(host);
             return address.isReachable(ServerDevice.TIME_OUT);
         } catch (Exception e) {
-            ErrorUtils.print(NetUtils.class).error("Ping [" + host + "] server has crash or not exist.");
+            LoggerUtils.print(NetUtils.class).error("Ping [" + host + "] server has crash or not exist.");
             return false;
         }
     }
@@ -89,7 +89,7 @@ public class NetUtils {
         try {
             ip = InetAddress.getLocalHost().getHostAddress();
         } catch (Exception e) {
-            ErrorUtils.print(NetUtils.class).error("Get local server ip has error, msg is " + e.getMessage());
+            LoggerUtils.print(NetUtils.class).error("Get local server ip has error, msg is " + e.getMessage());
         }
         return ip;
     }
@@ -102,7 +102,7 @@ public class NetUtils {
         try {
             ip = InetAddress.getLocalHost().getHostName();
         } catch (Exception e) {
-            ErrorUtils.print(NetUtils.class).error("Get local server ip has error, msg is " + e.getMessage());
+            LoggerUtils.print(NetUtils.class).error("Get local server ip has error, msg is " + e.getMessage());
         }
         return ip;
     }

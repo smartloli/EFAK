@@ -24,7 +24,7 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.task.rpc.WorkNodeService;
 import org.smartloli.kafka.eagle.core.task.rpc.handler.WorkNodeServiceHandler;
@@ -57,11 +57,11 @@ public class WorkNodeServer {
     public static void main(String[] args) {
         try {
             int port = SystemConfigUtils.getIntProperty("efak.sql.worknode.port");
-            ErrorUtils.print(WorkNodeServer.class).info(WorkNodeServer.class.getSimpleName() + " started and listening from master task, port is [" + port + "].");
+            LoggerUtils.print(WorkNodeServer.class).info(WorkNodeServer.class.getSimpleName() + " started and listening from master task, port is [" + port + "].");
             WorkNodeServer rpc = new WorkNodeServer();
             rpc.start(port);
         } catch (Exception e) {
-            ErrorUtils.print(WorkNodeServer.class).error("Start WorkNodeServer has error, msg is ", e);
+            LoggerUtils.print(WorkNodeServer.class).error("Start WorkNodeServer has error, msg is ", e);
         }
     }
 }

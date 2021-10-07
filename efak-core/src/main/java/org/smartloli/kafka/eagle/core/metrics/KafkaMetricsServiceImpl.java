@@ -72,7 +72,8 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
     /**
      * Instance Kafka Zookeeper client pool.
      */
-    private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    // private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    private KafkaZKPoolUtils kafkaZKPool = KafkaZKSingletonUtils.create();
 
     /**
      * Get topic config path in zookeeper.

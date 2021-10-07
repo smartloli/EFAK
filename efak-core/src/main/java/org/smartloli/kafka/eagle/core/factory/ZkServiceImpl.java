@@ -23,9 +23,10 @@ import kafka.zk.KafkaZkClient;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smartloli.kafka.eagle.common.util.ErrorUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants.Zookeeper;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
+import org.smartloli.kafka.eagle.common.util.KafkaZKSingletonUtils;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import scala.Option;
 import scala.Tuple2;
@@ -54,7 +55,8 @@ public class ZkServiceImpl implements ZkService {
     /**
      * Instance Kafka Zookeeper client pool.
      */
-    private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    // private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
+    private KafkaZKPoolUtils kafkaZKPool = KafkaZKSingletonUtils.create();
 
     /**
      * Zookeeper delete command.
@@ -73,7 +75,7 @@ public class ZkServiceImpl implements ZkService {
                 }
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Delete znode data has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Delete znode data has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -106,7 +108,7 @@ public class ZkServiceImpl implements ZkService {
                 ret += "numChildren = " + tuple2._2.getNumChildren() + "\n";
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get znode data has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get znode data has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -130,7 +132,7 @@ public class ZkServiceImpl implements ZkService {
                 target = JavaConversions.seqAsJavaList(seq).toString();
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("List znode data has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("List znode data has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);
@@ -287,7 +289,7 @@ public class ZkServiceImpl implements ZkService {
                 target.put("list", SystemConfigUtils.getProperty(clusterAlias + ".zk.list"));
             }
         } catch (Exception e) {
-            ErrorUtils.print(this.getClass()).error("Get zkcli status has error, msg is ", e);
+            LoggerUtils.print(this.getClass()).error("Get zkcli status has error, msg is ", e);
         } finally {
             if (zkc != null) {
                 kafkaZKPool.release(clusterAlias, zkc);

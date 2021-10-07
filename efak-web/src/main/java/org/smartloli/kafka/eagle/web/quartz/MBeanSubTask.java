@@ -103,7 +103,7 @@ public class MBeanSubTask extends Thread {
             try {
                 this.kafkaCluster(this.cluster);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get kafka cluster metrics has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get kafka cluster metrics has error, msg is ", e);
             }
         }
 
@@ -129,7 +129,7 @@ public class MBeanSubTask extends Thread {
             try {
                 metrics.insert(list);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Collector mbean data has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Collector mbean data has error, msg is ", e);
             }
         }
 
@@ -232,7 +232,7 @@ public class MBeanSubTask extends Thread {
             try {
                 this.zkCluster(this.cluster);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get zookeeper cluster metrics has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get zookeeper cluster metrics has error, msg is ", e);
             }
         }
 
@@ -258,7 +258,7 @@ public class MBeanSubTask extends Thread {
                         ZkClusterInfo zkInfo = ZKMetricsUtils.zkClusterMntrInfo(ip, Integer.parseInt(port));
                         this.zkAssembly(zkInfo, kpi, kpiInfo);
                     } catch (Exception ex) {
-                        ErrorUtils.print(this.getClass()).error("Transcation string[" + port + "] to int has error, msg is ", ex);
+                        LoggerUtils.print(this.getClass()).error("Transcation string[" + port + "] to int has error, msg is ", ex);
                     }
                 }
                 kpiInfo.setBroker(broker.length() == 0 ? "unkowns" : broker.substring(0, broker.length() - 1));
@@ -270,7 +270,7 @@ public class MBeanSubTask extends Thread {
             try {
                 metrics.insert(list);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Collector zookeeper data has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Collector zookeeper data has error, msg is ", e);
             }
         }
 
@@ -307,7 +307,7 @@ public class MBeanSubTask extends Thread {
             try {
                 this.brokerMbeanOffline(this.cluster);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get broker mbean metrics has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get broker mbean metrics has error, msg is ", e);
             }
         }
 
@@ -328,7 +328,7 @@ public class MBeanSubTask extends Thread {
             try {
                 metrics.mbeanOfflineInsert(list);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Collector mbean offline data has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Collector mbean offline data has error, msg is ", e);
             }
         }
 
@@ -453,7 +453,7 @@ public class MBeanSubTask extends Thread {
             try {
                 this.detectConnectUri(this.cluster);
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Get kafka connect uri has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Get kafka connect uri has error, msg is ", e);
             }
         }
 
@@ -473,13 +473,13 @@ public class MBeanSubTask extends Thread {
                         configInfo.setAlive(KConstants.BrokerSever.CONNECT_URI_SHUTDOWN);
                     }
                 } catch (Exception e) {
-                    ErrorUtils.print(this.getClass()).error("Get kafka connect uri alive or shutdown has error, msg is ", e);
+                    LoggerUtils.print(this.getClass()).error("Get kafka connect uri alive or shutdown has error, msg is ", e);
                 }
                 configInfo.setModify(CalendarUtils.getDate());
                 try {
                     metrics.modifyConnectConfigStatusById(configInfo);
                 } catch (Exception e) {
-                    ErrorUtils.print(this.getClass()).error("Update kafka connect uri alive or shutdown has error, msg is ", e);
+                    LoggerUtils.print(this.getClass()).error("Update kafka connect uri alive or shutdown has error, msg is ", e);
                 }
             }
         }

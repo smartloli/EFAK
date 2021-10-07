@@ -95,7 +95,7 @@ public class ShardSubScan {
                 return submit();
             } else {
                 long middle = (start + end) / 2;
-                ErrorUtils.print(this.getClass()).info("Split: [" + start + "," + end + "]");
+                LoggerUtils.print(this.getClass()).info("Split: [" + start + "," + end + "]");
                 SubScanTask left = new SubScanTask(ksql, start, middle);
                 SubScanTask right = new SubScanTask(ksql, middle, end);
                 invokeAll(left, right);
@@ -197,7 +197,7 @@ public class ShardSubScan {
                     LogCacheFactory.LOG_RECORDS.put(ksql.getJobId(), lastestLog);
                 }
             } catch (Exception e) {
-                ErrorUtils.print(this.getClass()).error("Store shard sub scan task log has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).error("Store shard sub scan task log has error, msg is ", e);
             }
             return messages;
         }
