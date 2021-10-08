@@ -135,10 +135,10 @@ public class KafkaConsumerAdapter {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, Kafka.EARLIEST);
-        if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.sasl.enable")) {
+        if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".efak.sasl.enable")) {
             kafkaService.sasl(props, kafkaSql.getClusterAlias());
         }
-        if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".kafka.eagle.ssl.enable")) {
+        if (SystemConfigUtils.getBooleanProperty(kafkaSql.getClusterAlias() + ".efak.ssl.enable")) {
             kafkaService.ssl(props, kafkaSql.getClusterAlias());
         }
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
