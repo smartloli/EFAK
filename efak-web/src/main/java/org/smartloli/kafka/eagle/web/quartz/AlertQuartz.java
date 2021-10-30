@@ -129,7 +129,7 @@ public class AlertQuartz {
 
         private void sendAlarmConsumerError(AlarmConfigInfo alarmConfing, AlarmConsumerInfo alarmConsumer, long lag, AlarmMessageInfo alarmMsg) {
             if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
-                alarmMsg.setTitle("EFAK Alarm Consumer Notice");
+                alarmMsg.setTitle("EFAK - Alert Consumer Notice");
                 alarmMsg.setAlarmStatus("PROBLEM");
                 alarmMsg.setAlarmContent("lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
                 IMService im = new IMFactory().create();
@@ -143,13 +143,13 @@ public class AlertQuartz {
                 object.put("title", alarmMsg.getTitle());
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
-                alarmMsg.setTitle("**<font color=\"#FF0000\">EFAK Alarm Consumer Notice</font>** \n\n");
-                alarmMsg.setAlarmContent("<font color=\"#FF0000\">lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
-                alarmMsg.setAlarmStatus("<font color=\"#FF0000\">PROBLEM</font>");
+                alarmMsg.setTitle("EFAK - Alert Consumer Notice");
+                alarmMsg.setAlarmContent("lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+                alarmMsg.setAlarmStatus("PROBLEM");
                 IMService im = new IMFactory().create();
                 im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
-                alarmMsg.setTitle("`EFAK Alarm Consumer Notice`\n");
+                alarmMsg.setTitle("`EFAK - Alert Consumer Notice`\n");
                 alarmMsg.setAlarmContent("<font color=\"warning\">lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
                 alarmMsg.setAlarmStatus("<font color=\"warning\">PROBLEM</font>");
                 IMServiceImpl im = new IMServiceImpl();
@@ -159,7 +159,7 @@ public class AlertQuartz {
 
         private void sendAlarmConsumerNormal(AlarmConfigInfo alarmConfing, AlarmConsumerInfo alarmConsumer, long lag, AlarmMessageInfo alarmMsg) {
             if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
-                alarmMsg.setTitle("EFAK Alarm Consumer Cancel");
+                alarmMsg.setTitle("EFAK - Alert Consumer Cancel");
                 alarmMsg.setAlarmContent("lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
                 alarmMsg.setAlarmStatus("NORMAL");
                 IMService im = new IMFactory().create();
@@ -173,13 +173,13 @@ public class AlertQuartz {
                 object.put("title", alarmMsg.getTitle());
                 im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
-                alarmMsg.setTitle("**<font color=\"#008000\">EFAK Alarm Consumer Cancel</font>** \n\n");
-                alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
-                alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
+                alarmMsg.setTitle("EFAK - Alert Consumer Notice");
+                alarmMsg.setAlarmContent("lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+                alarmMsg.setAlarmStatus("NORMAL");
                 IMService im = new IMFactory().create();
                 im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
             } else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
-                alarmMsg.setTitle("`EFAK Alarm Consumer Cancel`\n");
+                alarmMsg.setTitle("`EFAK - Alert Consumer Notice`\n");
                 alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
                 alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
                 IMServiceImpl im = new IMServiceImpl();
@@ -336,7 +336,7 @@ public class AlertQuartz {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
                 alarmMsg.setAlarmCluster(alarmConfing.getCluster());
-                alarmMsg.setTitle("EFAK Alarm Cluster Notice");
+                alarmMsg.setTitle("EFAK - Alert Cluster Error");
                 if (AlarmType.TOPIC.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");
@@ -371,26 +371,26 @@ public class AlertQuartz {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
                 alarmMsg.setAlarmCluster(alarmConfing.getCluster());
-                alarmMsg.setTitle("**<font color=\"#FF0000\">EFAK Alarm Cluster Notice</font>** \n\n");
+                alarmMsg.setTitle("EFAK - Alert Cluster Error");
                 if (AlarmType.TOPIC.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");
                     long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
                     long realCapacity = alarmTopicMsg.getLong("realCapacity");
-                    alarmMsg.setAlarmContent("<font color=\"#FF0000\">topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
+                    alarmMsg.setAlarmContent("topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]");
                 } else if (AlarmType.PRODUCER.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");
                     String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
                     long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
-                    alarmMsg.setAlarmContent("<font color=\"#FF0000\">producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]</font>");
+                    alarmMsg.setAlarmContent("producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]");
                 } else {
-                    alarmMsg.setAlarmContent("<font color=\"#FF0000\">node.shutdown [ " + server + " ]</font>");
+                    alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
                 }
                 alarmMsg.setAlarmDate(CalendarUtils.getDate());
                 alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
                 alarmMsg.setAlarmProject(cluster.getType());
-                alarmMsg.setAlarmStatus("<font color=\"#FF0000\">PROBLEM</font>");
+                alarmMsg.setAlarmStatus("PROBLEM");
                 alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
                 IMService im = new IMFactory().create();
                 im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
@@ -398,7 +398,7 @@ public class AlertQuartz {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
                 alarmMsg.setAlarmCluster(alarmConfing.getCluster());
-                alarmMsg.setTitle("`EFAK Alarm Cluster Notice`\n");
+                alarmMsg.setTitle("`EFAK - Alert Cluster Error`\n");
                 if (AlarmType.TOPIC.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");
@@ -429,7 +429,7 @@ public class AlertQuartz {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
                 alarmMsg.setAlarmCluster(alarmConfing.getCluster());
-                alarmMsg.setTitle("EFAK Alarm Cluster Cancel");
+                alarmMsg.setTitle("EFAK - Alert Cluster Notice");
                 if (AlarmType.TOPIC.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");
@@ -464,26 +464,26 @@ public class AlertQuartz {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
                 alarmMsg.setAlarmCluster(alarmConfing.getCluster());
-                alarmMsg.setTitle("**<font color=\"#008000\">EFAK Alarm Cluster Cancel</font>** \n\n");
+                alarmMsg.setTitle("EFAK - Alert Cluster Notice");
                 if (AlarmType.TOPIC.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");
                     long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
                     long realCapacity = alarmTopicMsg.getLong("realCapacity");
-                    alarmMsg.setAlarmContent("<font color=\"#008000\">topic.capacity.normal [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]</font>");
+                    alarmMsg.setAlarmContent("topic.capacity.normal [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]");
                 } else if (AlarmType.PRODUCER.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");
                     String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
                     long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
-                    alarmMsg.setAlarmContent("<font color=\"#008000\">producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]</font>");
+                    alarmMsg.setAlarmContent("producer.speed.normal [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]");
                 } else {
-                    alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [ " + server + " ]</font>");
+                    alarmMsg.setAlarmContent("node.alive [ " + server + " ]");
                 }
                 alarmMsg.setAlarmDate(CalendarUtils.getDate());
                 alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
                 alarmMsg.setAlarmProject(cluster.getType());
-                alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
+                alarmMsg.setAlarmStatus("NORMAL");
                 alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
                 IMService im = new IMFactory().create();
                 im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
@@ -491,7 +491,7 @@ public class AlertQuartz {
                 AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
                 alarmMsg.setAlarmId(cluster.getId());
                 alarmMsg.setAlarmCluster(alarmConfing.getCluster());
-                alarmMsg.setTitle("`EFAK Alarm Cluster Cancel`\n");
+                alarmMsg.setTitle("`EFAK - Alert Cluster Notice`\n");
                 if (AlarmType.TOPIC.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");

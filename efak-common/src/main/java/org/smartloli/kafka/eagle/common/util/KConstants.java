@@ -338,6 +338,11 @@ public class KConstants {
         public static String PRODUCER = "Producer";
     }
 
+    public interface AlarmStatus {
+        public static String NORMAL = "NORMAL";
+        public static String PROBLEM = "PROBLEM";
+    }
+
     public final class AlarmQueue {
         private AlarmQueue() {
         }

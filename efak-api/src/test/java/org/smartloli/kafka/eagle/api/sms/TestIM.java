@@ -31,7 +31,8 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
  */
 public class TestIM {
     public static void main(String[] args) {
-        testAlarmClusterByDingDingMarkDown();
+        testAlarmClusterByDingDingMarkDownNewStyle();
+//        testAlarmClusterByDingDingMarkDown();
 //		testAlarmClusterByWeChatMarkDown();
 
     }
@@ -78,6 +79,25 @@ public class TestIM {
         im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), "https://oapi.dingtalk.com/robot/send?access_token=3b7b59d17db0145549b1f65f62921b44bacd1701e635e797da45318a94339060");
         //IMServiceImpl im = new IMServiceImpl();
         //im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(),"https://oapi.dingtalk.com/robot/send?access_token=3b7b59d17db0145549b1f65f62921b44bacd1701e635e797da45318a94339060");
+    }
+
+    private static void testAlarmClusterByDingDingMarkDownNewStyle() {
+        AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+        // FF0000 (red), 008000(green), FFA500(yellow)
+        alarmMsg.setTitle("EFAK - Alarm Notice");
+//        alarmMsg.setAlarmContent("node.shutdown [ localhost:9092 ]");
+        alarmMsg.setAlarmContent("node.alive [ localhost:9092 ]");
+        alarmMsg.setAlarmDate("2021-10-30 13:50:00");
+        alarmMsg.setAlarmLevel("P0");
+        alarmMsg.setAlarmId(1);
+        alarmMsg.setAlarmCluster("cluster1");
+        alarmMsg.setAlarmProject("Kafka");
+        // alarmMsg.setAlarmStatus("PROBLEM");
+        alarmMsg.setAlarmStatus("NORMAL");
+        // alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
+        alarmMsg.setAlarmTimes("current(1), max(7)");
+        IMService im = new IMFactory().create();
+        im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), "https://oapi.dingtalk.com/robot/send?access_token=3b7b59d17db0145549b1f65f62921b44bacd1701e635e797da45318a94339060");
     }
 
 }

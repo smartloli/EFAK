@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.common.protocol.alarm;
 
 import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 
 /**
  * Alarm message info.
@@ -57,8 +58,29 @@ public class AlarmMessageInfo extends BaseProtocol {
     private String alarmCluster;
 
     public String toDingDingMarkDown() {
-        return title + " \n\n>#### AlarmID : [ **" + alarmId + "** ]\n> #### AlarmCluster : [ **" + alarmCluster + "** ]\n> #### AlarmStatus : [ **" + alarmStatus + "** ]\n> #### AlarmLevel : [ " + alarmLevel + " ]\n" + "> #### AlarmProject : [ " + alarmProject + " ]\n"
-                + "> #### AlarmTimes : [ " + alarmTimes + " ]\n" + "> #### AlarmDate : [ " + alarmDate + " ]\n" + "> #### AlarmContent : [ " + alarmContent + " ]";
+        String titleType = "";
+        String color = "";
+        if (KConstants.AlarmStatus.NORMAL.equals(alarmStatus)) {
+            titleType = "Notice";
+            color = "#2a9d8f";
+        } else {
+            titleType = "Alert";
+            color = "#FF0000";
+        }
+        String error = String.format("<font color='" + color + "'>[" + titleType + "] </font>" + title + " \n\n" +
+                " --- \n\n " +
+                "<font color='#708090' size=2>Alert ID: " + alarmId + "</font> \n\n " +
+                "<font color='#778899' size=2>Alert Cluster: " + alarmCluster + "</font> \n\n " +
+                " --- \n\n  " +
+                "<font color='#708090' size=2>Alert Project: " + alarmProject + "</font> \n\n " +
+                "<font color='#708090' size=2>Alert Status: " + alarmStatus + "</font> \n\n " +
+                " --- \n\n  " +
+                "<font color='#708090' size=2>Alert Level: " + alarmLevel + "</font> \n\n " +
+                "<font color='#708090' size=2>Alert Times: " + alarmTimes + "</font> \n\n " +
+                "<font color='#708090' size=2>Alert Content: " + alarmContent + "</font> \n\n " +
+                " --- \n\n  " +
+                "**Alert Date：" + alarmDate + "**");
+        return error;
     }
 
     public String toWeChatMarkDown() {
