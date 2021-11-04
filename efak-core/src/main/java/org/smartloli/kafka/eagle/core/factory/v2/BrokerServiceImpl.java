@@ -29,10 +29,14 @@ import org.apache.kafka.clients.admin.NewPartitions;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.common.util.kraft.KafkaSchemaFactory;
+import org.smartloli.kafka.eagle.common.util.kraft.KafkaStoragePlugin;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import scala.Option;
@@ -339,22 +343,26 @@ public class BrokerServiceImpl implements BrokerService {
      * Get kafka broker numbers from zookeeper.
      */
     public long brokerNumbers(String clusterAlias) {
+        List<BrokersInfo> brokersInfos = BrokerCache.META_CACHE.get(clusterAlias);
         long count = 0;
-        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        try {
-            if (zkc.pathExists(BROKER_IDS_PATH)) {
-                Seq<String> subBrokerIdsPaths = zkc.getChildren(BROKER_IDS_PATH);
-                count = JavaConversions.seqAsJavaList(subBrokerIdsPaths).size();
-            }
-        } catch (Exception e) {
-            LOG.error("Get kafka broker numbers has error, msg is " + e.getCause().getMessage());
-            e.printStackTrace();
-        } finally {
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
-            }
+        if (brokersInfos != null) {
+            count = brokersInfos.size();
         }
+//        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+//        try {
+//            if (zkc.pathExists(BROKER_IDS_PATH)) {
+//                Seq<String> subBrokerIdsPaths = zkc.getChildren(BROKER_IDS_PATH);
+//                count = JavaConversions.seqAsJavaList(subBrokerIdsPaths).size();
+//            }
+//        } catch (Exception e) {
+//            LOG.error("Get kafka broker numbers has error, msg is " + e.getCause().getMessage());
+//            e.printStackTrace();
+//        } finally {
+//            if (zkc != null) {
+//                kafkaZKPool.release(clusterAlias, zkc);
+//                zkc = null;
+//            }
+//        }
         return count;
     }
 
@@ -368,21 +376,24 @@ public class BrokerServiceImpl implements BrokerService {
         } else if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.cgroup.enable")) {
             topics = SystemConfigUtils.getPropertyArrayList(clusterAlias + ".efak.ssl.cgroup.topics", ",");
         } else {
-            KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-            try {
-                if (zkc.pathExists(BROKER_TOPICS_PATH)) {
-                    Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
-                    topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
-                    excludeTopic(clusterAlias, topics);
-                }
-            } catch (Exception e) {
-                LoggerUtils.print(this.getClass()).error("Get topic list has error, msg is ", e);
-            } finally {
-                if (zkc != null) {
-                    kafkaZKPool.release(clusterAlias, zkc);
-                    zkc = null;
-                }
-            }
+            KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+            topics.addAll(ksf.getTableNames(clusterAlias));
+            excludeTopic(clusterAlias, topics);
+//            KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+//            try {
+//                if (zkc.pathExists(BROKER_TOPICS_PATH)) {
+//                    Seq<String> subBrokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH);
+//                    topics = JavaConversions.seqAsJavaList(subBrokerTopicsPaths);
+//                    excludeTopic(clusterAlias, topics);
+//                }
+//            } catch (Exception e) {
+//                LoggerUtils.print(this.getClass()).error("Get topic list has error, msg is ", e);
+//            } finally {
+//                if (zkc != null) {
+//                    kafkaZKPool.release(clusterAlias, zkc);
+//                    zkc = null;
+//                }
+//            }
         }
         return topics;
     }

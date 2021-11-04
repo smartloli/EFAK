@@ -40,6 +40,13 @@ public class KConstants {
         public static final int CHILD_SIZE = 5;
     }
 
+    public final class CharSet {
+        private CharSet() {
+        }
+
+        public static final String UTF_8 = "utf-8";
+    }
+
     public enum OperateSystem {
         OS_NAME("os.name"),
         LINUX("Linux");
@@ -63,6 +70,8 @@ public class KConstants {
         private Kafka() {
         }
 
+        public static final String BROKER_IDS_PATH = "/brokers/ids";
+        public static final String BROKER = "broker";
         public static final String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
         public static final String EFAK_SYSTEM_GROUP = "efak.system.group";
         public static final String AUTO_COMMIT = "true";

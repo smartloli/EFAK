@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.web.controller;
 
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.common.util.ZKFactoryUtils;
 import org.smartloli.kafka.eagle.plugin.mysql.MySqlRecordSchema;
 import org.smartloli.kafka.eagle.plugin.sqlite.SqliteRecordSchema;
 import org.smartloli.kafka.eagle.plugin.util.JConstants;
@@ -67,6 +68,13 @@ public class StartupListener implements ApplicationContextAware {
             } else if (JConstants.SQLITE_DRIVER.equals(jdbc)) {
                 SqliteRecordSchema.schema();
             }
+
+            // load cache
+            initKafkaMetaData();
+        }
+
+        private void initKafkaMetaData() {
+            ZKFactoryUtils.initKafkaMetaData();
         }
     }
 
