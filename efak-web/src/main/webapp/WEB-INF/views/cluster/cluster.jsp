@@ -65,7 +65,6 @@
                                     <table id="kafka_tab" class="table table-bordered table-hover">
                                         <thead>
                                         <tr>
-                                            <th>ID</th>
                                             <th>BrokerId</th>
                                             <th>IP</th>
                                             <th>Port</th>
@@ -96,7 +95,6 @@
                                     <table id="zk_tab" class="table table-bordered table-hover">
                                         <thead>
                                         <tr>
-                                            <th>ID</th>
                                             <th>IP</th>
                                             <th>Port</th>
                                             <th>Mode</th>
@@ -181,7 +179,7 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="main/cluster/cluster.js?v2.0.7" name="loader"/>
+    <jsp:param value="main/cluster/cluster.js?v2.0.9" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>
 <script type="text/javascript">

@@ -42,6 +42,7 @@ import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer8;
 import org.smartloli.kafka.eagle.common.constant.KSqlParser;
 import org.smartloli.kafka.eagle.common.protocol.*;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicPartitionSchema;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
@@ -323,51 +324,6 @@ public class KafkaServiceImpl implements KafkaService {
     }
 
     /**
-     * Obtaining kafka consumer page information from zookeeper.
-     */
-    public Map<String, List<String>> getConsumers(String clusterAlias, DisplayInfo page) {
-        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        Map<String, List<String>> consumers = new HashMap<String, List<String>>();
-        try {
-            if (page.getSearch().length() > 0) {
-                String path = CONSUMERS_PATH + "/" + page.getSearch() + "/owners";
-                if (zkc.pathExists(path)) {
-                    Seq<String> owners = zkc.getChildren(path);
-                    List<String> ownersSerialize = JavaConversions.seqAsJavaList(owners);
-                    consumers.put(page.getSearch(), ownersSerialize);
-                } else {
-                    LOG.error("Consumer Path[" + path + "] is not exist.");
-                }
-            } else {
-                Seq<String> subConsumersPaths = zkc.getChildren(CONSUMERS_PATH);
-                List<String> groups = JavaConversions.seqAsJavaList(subConsumersPaths);
-                int offset = 0;
-                for (String group : groups) {
-                    if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
-                        String path = CONSUMERS_PATH + "/" + group + "/owners";
-                        if (zkc.pathExists(path)) {
-                            Seq<String> owners = zkc.getChildren(path);
-                            List<String> ownersSerialize = JavaConversions.seqAsJavaList(owners);
-                            consumers.put(group, ownersSerialize);
-                        } else {
-                            LOG.error("Consumer Path[" + path + "] is not exist.");
-                        }
-                    }
-                    offset++;
-                }
-            }
-        } catch (Exception ex) {
-            LOG.error(ex.getMessage());
-        } finally {
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
-            }
-        }
-        return consumers;
-    }
-
-    /**
      * According to group, topic and partition to get offset from zookeeper.
      *
      * @param topic     Filter topic.
@@ -580,7 +536,7 @@ public class KafkaServiceImpl implements KafkaService {
 
     private String parseBrokerServer(String clusterAlias) {
         String brokerServer = "";
-        List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+        List<BrokersInfo> brokers = BrokerCache.META_CACHE.get(clusterAlias);
         for (BrokersInfo broker : brokers) {
             brokerServer += broker.getHost() + ":" + broker.getPort() + ",";
         }

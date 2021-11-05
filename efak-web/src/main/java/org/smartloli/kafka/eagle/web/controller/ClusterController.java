@@ -134,7 +134,6 @@ public class ClusterController {
             JSONObject cluster = (JSONObject) object;
             if (search.length() > 0 && search.equals(cluster.getString("host"))) {
                 JSONObject obj = new JSONObject();
-                obj.put("id", cluster.getInteger("id"));
                 obj.put("port", cluster.getInteger("port"));
                 obj.put("ip", cluster.getString("host"));
                 if ("kafka".equals(type)) {
@@ -197,7 +196,6 @@ public class ClusterController {
             } else if (search.length() == 0) {
                 if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
                     JSONObject obj = new JSONObject();
-                    obj.put("id", cluster.getInteger("id"));
                     obj.put("port", cluster.getInteger("port"));
                     obj.put("ip", cluster.getString("host"));
                     if ("kafka".equals(type)) {

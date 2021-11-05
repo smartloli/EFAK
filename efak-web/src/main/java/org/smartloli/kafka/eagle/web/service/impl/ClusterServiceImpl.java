@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -114,7 +115,7 @@ public class ClusterServiceImpl implements ClusterService {
             String zkCluster = zkService.zkCluster(clusterAlias);
             target.put("zk", JSON.parseArray(zkCluster));
         } else if ("kafka".equals(type)) {
-            List<BrokersInfo> kafkaBrokers = kafkaService.getAllBrokersInfo(clusterAlias);
+            List<BrokersInfo> kafkaBrokers = BrokerCache.META_CACHE.get(clusterAlias);
             target.put("kafka", JSON.parseArray(kafkaBrokers.toString()));
         } else if ("worknodes".equals(type)) {
             List<WorkNodeMetrics> metrics = JobClient.getWorkNodeMetrics();

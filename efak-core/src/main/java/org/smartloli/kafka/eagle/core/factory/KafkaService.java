@@ -73,11 +73,6 @@ public interface KafkaService {
     public Map<String, List<String>> getConsumers(String clusterAlias);
 
     /**
-     * Obtaining kafka consumer page information from zookeeper.
-     */
-    public Map<String, List<String>> getConsumers(String clusterAlias, DisplayInfo page);
-
-    /**
      * According to group, topic and partition to get offset from zookeeper.
      */
     public OffsetZkInfo getOffset(String clusterAlias, String topic, String group, int partition);
