@@ -27,7 +27,6 @@ import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.offsets.TopicOffsetInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
@@ -77,34 +76,6 @@ public class OffsetServiceImpl implements OffsetService {
             }
         }
         return targetOffset;
-    }
-
-    /**
-     * Get logsize from zookeeper.
-     */
-    private List<OffsetInfo> getLogSize(String clusterAlias, String topic, String group) {
-        List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
-        List<OffsetInfo> targets = new ArrayList<OffsetInfo>();
-        for (String partition : partitions) {
-            int partitionInt = Integer.parseInt(partition);
-            OffsetZkInfo offsetZk = kafkaService.getOffset(clusterAlias, topic, group, partitionInt);
-            OffsetInfo offset = new OffsetInfo();
-            long logSize = 0L;
-            if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage"))) {
-                logSize = kafkaService.getKafkaLogSize(clusterAlias, topic, partitionInt);
-            } else {
-                logSize = kafkaService.getLogSize(clusterAlias, topic, partitionInt);
-            }
-            offset.setPartition(partitionInt);
-            offset.setLogSize(logSize);
-            offset.setCreate(offsetZk.getCreate());
-            offset.setModify(offsetZk.getModify());
-            offset.setOffset(offsetZk.getOffset());
-            offset.setLag(offsetZk.getOffset() == -1 ? 0 : logSize - offsetZk.getOffset());
-            offset.setOwner(offsetZk.getOwners());
-            targets.add(offset);
-        }
-        return targets;
     }
 
     /**
@@ -209,11 +180,7 @@ public class OffsetServiceImpl implements OffsetService {
      * Get consumer logsize, offset, lag etc.
      */
     public List<OffsetInfo> getConsumerOffsets(TopicOffsetInfo topicOffset) {
-        if ("kafka".equals(topicOffset.getFormatter())) {
-            return getKafkaLogSize(topicOffset);
-        } else {
-            return getLogSize(topicOffset.getCluster(), topicOffset.getTopic(), topicOffset.getGroup());
-        }
+        return getKafkaLogSize(topicOffset);
     }
 
     private List<OffsetInfo> getKafkaLogSize(TopicOffsetInfo topicOffset) {

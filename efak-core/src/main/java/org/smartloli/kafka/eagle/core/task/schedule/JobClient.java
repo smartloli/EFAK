@@ -218,15 +218,8 @@ public class JobClient {
             return workNodeTasks;
         }
         for (int partitionId : ksql.getPartitions()) {
-            long endLogSize = 0L;
-            long endRealLogSize = 0L;
-            if ("kafka".equals(SystemConfigUtils.getProperty(cluster + ".efak.offset.storage"))) {
-                endLogSize = kafkaService.getKafkaLogSize(cluster, ksql.getTopic(), partitionId);
-                endRealLogSize = kafkaService.getKafkaRealLogSize(cluster, ksql.getTopic(), partitionId);
-            } else {
-                endLogSize = kafkaService.getLogSize(cluster, ksql.getTopic(), partitionId);
-                endRealLogSize = kafkaService.getRealLogSize(cluster, ksql.getTopic(), partitionId);
-            }
+            long endLogSize = kafkaService.getKafkaLogSize(cluster, ksql.getTopic(), partitionId);
+            long endRealLogSize = kafkaService.getKafkaRealLogSize(cluster, ksql.getTopic(), partitionId);
 
             long startLogSize = endLogSize - endRealLogSize;
             long numberPer = endRealLogSize / workNodes.size();

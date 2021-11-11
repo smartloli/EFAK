@@ -67,6 +67,19 @@ public class KafkaStoragePlugin {
         return brokerServer.substring(0, brokerServer.length() - 1);
     }
 
+    public Properties getKafkaAdminClientProps(String clusterAlias) {
+        // props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+        props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable")) {
+            sasl(props, clusterAlias);
+        }
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
+            ssl(props, clusterAlias);
+        }
+        return props;
+    }
+
     public Properties getKafkaConsumerProps(String clusterAlias) {
         String brokers = SystemConfigUtils.getProperty(clusterAlias + ".efak.bootstrap.servers");
         if (StrUtils.isNull(brokers)) {

@@ -160,7 +160,7 @@ public class ZKFactoryUtils {
             LoggerUtils.print(ZKFactoryUtils.class).error("Telnet [" + broker.getHost() + ":" + broker.getJmxPort() + "] has error, msg is ", e);
         }
 
-        // lrucache key: cluster_broker_id
+        // lrucache key: clusterAlias
         targets.add(broker);
         BrokerCache.META_CACHE.put(clusterAlias, targets);
     }

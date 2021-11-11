@@ -109,204 +109,115 @@ public class MetricsSubTask extends Thread {
             paramsGroup.put("cluster", clusterAlias);
             List<ConsumerGroupsInfo> allConsumerGroups = metricsServiceImpl.getAllConsumerGroups(paramsGroup);
 
-            if ("kafka".equals(SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage"))) {
-                JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+            JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
 
-                // clean offline consumer summary
-                cleanUnExistKafkaConsumerSummary(clusterAlias, allConsumerSummary, consumerGroups, metricsServiceImpl);
+            // clean offline consumer summary
+            cleanUnExistKafkaConsumerSummary(clusterAlias, allConsumerSummary, consumerGroups, metricsServiceImpl);
 
-                // clean offline consumer group
-                cleanUnExistKafkaConsumerGroup(clusterAlias, allConsumerGroups, consumerGroups, metricsServiceImpl);
+            // clean offline consumer group
+            cleanUnExistKafkaConsumerGroup(clusterAlias, allConsumerGroups, consumerGroups, metricsServiceImpl);
 
-                for (Object object : consumerGroups) {
-                    JSONObject consumerGroup = (JSONObject) object;
-                    String group = consumerGroup.getString("group");
+            for (Object object : consumerGroups) {
+                JSONObject consumerGroup = (JSONObject) object;
+                String group = consumerGroup.getString("group");
 
-                    // storage offline consumer summary
-                    OwnerInfo ownerInfo = kafkaService.getKafkaActiverNotOwners(clusterAlias, group);
-                    ConsumerSummaryInfo csi = new ConsumerSummaryInfo();
-                    csi.setCluster(clusterAlias);
-                    csi.setGroup(group);
-                    csi.setTopicNumbers(ownerInfo.getTopicSets().size());
-                    csi.setCoordinator(consumerGroup.getString("node"));
-                    csi.setActiveTopic(getKafkaActiveTopicNumbers(clusterAlias, group, consumerServiceImpl));
-                    csi.setActiveThread(ownerInfo.getActiveSize());
-                    consumerSummarys.add(csi);
-                    if (consumerSummarys.size() > Topic.BATCH_SIZE) {
-                        try {
-                            metricsServiceImpl.writeConsumerSummaryTopics(consumerSummarys);
-                            consumerSummarys.clear();
-                        } catch (Exception e) {
-                            LoggerUtils.print(this.getClass()).error("Storage kafka topic consumer summary has error, msg is ", e);
-                        }
-                    }
-
-                    for (String topic : kafkaService.getKafkaConsumerTopics(clusterAlias, group)) {
-                        // storage offline consumer group
-                        ConsumerGroupsInfo consumerGroupTopic = new ConsumerGroupsInfo();
-                        consumerGroupTopic.setCluster(clusterAlias);
-                        consumerGroupTopic.setGroup(group);
-                        consumerGroupTopic.setTopic(topic);
-                        consumerGroupTopic.setStatus(getKafkaConsumerTopicStatus(clusterAlias, group, topic, consumerServiceImpl));
-
-                        consumerGroupTopics.add(consumerGroupTopic);
-                        if (consumerGroupTopics.size() > Topic.BATCH_SIZE) {
-                            try {
-                                metricsServiceImpl.writeConsumerGroupTopics(consumerGroupTopics);
-                                consumerGroupTopics.clear();
-                            } catch (Exception e) {
-                                LoggerUtils.print(this.getClass()).error("Storage kafka consumer group topic has error, msg is ", e);
-                            }
-                        }
-
-                        // kafka eagle bscreen datasets
-                        BScreenConsumerInfo bscreenConsumer = new BScreenConsumerInfo();
-                        bscreenConsumer.setCluster(clusterAlias);
-                        bscreenConsumer.setGroup(group);
-                        bscreenConsumer.setTopic(topic);
-
-                        List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
-                        Set<Integer> partitionsInts = new HashSet<>();
-                        for (String partition : partitions) {
-                            try {
-                                partitionsInts.add(Integer.parseInt(partition));
-                            } catch (Exception e) {
-                                LoggerUtils.print(this.getClass()).error("Parse partitionid string to integer has error, msg is ", e);
-                            }
-                        }
-
-                        Map<Integer, Long> partitionOffset = kafkaService.getKafkaOffset(bscreenConsumer.getCluster(), bscreenConsumer.getGroup(), bscreenConsumer.getTopic(), partitionsInts);
-                        Map<TopicPartition, Long> tps = kafkaService.getKafkaLogSize(bscreenConsumer.getCluster(), bscreenConsumer.getTopic(), partitionsInts);
-                        long logsize = 0L;
-                        long offsets = 0L;
-                        if (tps != null && partitionOffset != null) {
-                            for (Entry<TopicPartition, Long> entrySet : tps.entrySet()) {
-                                try {
-                                    logsize += entrySet.getValue();
-                                    offsets += partitionOffset.get(entrySet.getKey().partition());
-                                } catch (Exception e) {
-                                    LoggerUtils.print(this.getClass()).error("Get logsize and offsets has error, msg is ", e);
-                                }
-                            }
-                        }
-
-                        Map<String, Object> params = new HashMap<String, Object>();
-                        params.put("cluster", clusterAlias);
-                        params.put("group", group);
-                        params.put("topic", topic);
-                        BScreenConsumerInfo lastBScreenConsumerTopic = metricsServiceImpl.readBScreenLastTopic(params);
-                        if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getLogsize() == 0) {
-                            bscreenConsumer.setDifflogsize(0);
-                        } else {
-                            // maybe server timespan is not synchronized.
-                            bscreenConsumer.setDifflogsize(Math.abs(logsize - lastBScreenConsumerTopic.getLogsize()));
-                        }
-                        if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getOffsets() == 0) {
-                            bscreenConsumer.setDiffoffsets(0);
-                        } else {
-                            // maybe server timespan is not synchronized.
-                            bscreenConsumer.setDiffoffsets(Math.abs(offsets - lastBScreenConsumerTopic.getOffsets()));
-                        }
-                        bscreenConsumer.setLogsize(logsize);
-                        bscreenConsumer.setOffsets(offsets);
-                        bscreenConsumer.setLag(Math.abs(logsize - offsets));
-                        bscreenConsumer.setTimespan(CalendarUtils.getTimeSpan());
-                        bscreenConsumer.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-                        bscreenConsumers.add(bscreenConsumer);
-                        if (bscreenConsumers.size() > Topic.BATCH_SIZE) {
-                            try {
-                                metricsServiceImpl.writeBSreenConsumerTopic(bscreenConsumers);
-                                bscreenConsumers.clear();
-                            } catch (Exception e) {
-                                LoggerUtils.print(this.getClass()).error("Storage bsreen kafka topic consumer has error, msg is ", e);
-                            }
-                        }
+                // storage offline consumer summary
+                OwnerInfo ownerInfo = kafkaService.getKafkaActiverNotOwners(clusterAlias, group);
+                ConsumerSummaryInfo csi = new ConsumerSummaryInfo();
+                csi.setCluster(clusterAlias);
+                csi.setGroup(group);
+                csi.setTopicNumbers(ownerInfo.getTopicSets().size());
+                csi.setCoordinator(consumerGroup.getString("node"));
+                csi.setActiveTopic(getKafkaActiveTopicNumbers(clusterAlias, group, consumerServiceImpl));
+                csi.setActiveThread(ownerInfo.getActiveSize());
+                consumerSummarys.add(csi);
+                if (consumerSummarys.size() > Topic.BATCH_SIZE) {
+                    try {
+                        metricsServiceImpl.writeConsumerSummaryTopics(consumerSummarys);
+                        consumerSummarys.clear();
+                    } catch (Exception e) {
+                        LoggerUtils.print(this.getClass()).error("Storage kafka topic consumer summary has error, msg is ", e);
                     }
                 }
-            } else {
-                Map<String, List<String>> consumerGroups = kafkaService.getConsumers(clusterAlias);
 
-                // clean offline consumer summary
-                cleanUnExistConsumerSummary(clusterAlias, allConsumerSummary, consumerGroups, metricsServiceImpl);
+                for (String topic : kafkaService.getKafkaConsumerTopics(clusterAlias, group)) {
+                    // storage offline consumer group
+                    ConsumerGroupsInfo consumerGroupTopic = new ConsumerGroupsInfo();
+                    consumerGroupTopic.setCluster(clusterAlias);
+                    consumerGroupTopic.setGroup(group);
+                    consumerGroupTopic.setTopic(topic);
+                    consumerGroupTopic.setStatus(getKafkaConsumerTopicStatus(clusterAlias, group, topic, consumerServiceImpl));
 
-                // clean offline consumer group
-                cleanUnExistConsumerGroup(clusterAlias, allConsumerGroups, consumerGroups, metricsServiceImpl);
-
-                for (Entry<String, List<String>> entry : consumerGroups.entrySet()) {
-                    String group = entry.getKey();
-
-                    // storage offline consumer summary
-                    ConsumerSummaryInfo csi = new ConsumerSummaryInfo();
-                    csi.setCluster(clusterAlias);
-                    csi.setGroup(group);
-                    csi.setTopicNumbers(entry.getValue().size());
-                    csi.setCoordinator("");
-                    csi.setActiveTopic(getActiveNumber(clusterAlias, group, entry.getValue()));
-                    csi.setActiveThread(getActiveNumber(clusterAlias, group, entry.getValue()));
-                    consumerSummarys.add(csi);
-                    if (consumerSummarys.size() > Topic.BATCH_SIZE) {
+                    consumerGroupTopics.add(consumerGroupTopic);
+                    if (consumerGroupTopics.size() > Topic.BATCH_SIZE) {
                         try {
-                            metricsServiceImpl.writeConsumerSummaryTopics(consumerSummarys);
-                            consumerSummarys.clear();
+                            metricsServiceImpl.writeConsumerGroupTopics(consumerGroupTopics);
+                            consumerGroupTopics.clear();
                         } catch (Exception e) {
-                            LoggerUtils.print(this.getClass()).error("Storage topic consumer summary has error, msg is ", e);
+                            LoggerUtils.print(this.getClass()).error("Storage kafka consumer group topic has error, msg is ", e);
                         }
                     }
 
-                    for (String topic : kafkaService.getActiveTopic(clusterAlias, group)) {
-                        // storage offline consumer group
-                        ConsumerGroupsInfo consumerGroupTopic = new ConsumerGroupsInfo();
-                        consumerGroupTopic.setCluster(clusterAlias);
-                        consumerGroupTopic.setGroup(group);
-                        consumerGroupTopic.setTopic(topic);
-                        consumerGroupTopic.setStatus(getConsumerTopicStatus(clusterAlias, group, topic));
+                    // kafka eagle bscreen datasets
+                    BScreenConsumerInfo bscreenConsumer = new BScreenConsumerInfo();
+                    bscreenConsumer.setCluster(clusterAlias);
+                    bscreenConsumer.setGroup(group);
+                    bscreenConsumer.setTopic(topic);
 
-                        consumerGroupTopics.add(consumerGroupTopic);
-                        if (consumerGroupTopics.size() > Topic.BATCH_SIZE) {
+                    List<String> partitions = kafkaService.findTopicPartition(clusterAlias, topic);
+                    Set<Integer> partitionsInts = new HashSet<>();
+                    for (String partition : partitions) {
+                        try {
+                            partitionsInts.add(Integer.parseInt(partition));
+                        } catch (Exception e) {
+                            LoggerUtils.print(this.getClass()).error("Parse partitionid string to integer has error, msg is ", e);
+                        }
+                    }
+
+                    Map<Integer, Long> partitionOffset = kafkaService.getKafkaOffset(bscreenConsumer.getCluster(), bscreenConsumer.getGroup(), bscreenConsumer.getTopic(), partitionsInts);
+                    Map<TopicPartition, Long> tps = kafkaService.getKafkaLogSize(bscreenConsumer.getCluster(), bscreenConsumer.getTopic(), partitionsInts);
+                    long logsize = 0L;
+                    long offsets = 0L;
+                    if (tps != null && partitionOffset != null) {
+                        for (Entry<TopicPartition, Long> entrySet : tps.entrySet()) {
                             try {
-                                metricsServiceImpl.writeConsumerGroupTopics(consumerGroupTopics);
-                                consumerGroupTopics.clear();
+                                logsize += entrySet.getValue();
+                                offsets += partitionOffset.get(entrySet.getKey().partition());
                             } catch (Exception e) {
-                                LoggerUtils.print(this.getClass()).error("Storage kafka consumer group topic has error, msg is ", e);
+                                LoggerUtils.print(this.getClass()).error("Get logsize and offsets has error, msg is ", e);
                             }
                         }
+                    }
 
-                        // kafka eagle bscreen datasets
-                        BScreenConsumerInfo bscreenConsumer = new BScreenConsumerInfo();
-                        bscreenConsumer.setCluster(clusterAlias);
-                        bscreenConsumer.setGroup(group);
-                        bscreenConsumer.setTopic(topic);
-                        long logsize = brokerService.getTopicLogSizeTotal(clusterAlias, topic);
-                        bscreenConsumer.setLogsize(logsize);
-                        long lag = kafkaService.getLag(clusterAlias, group, topic);
-
-                        Map<String, Object> params = new HashMap<String, Object>();
-                        params.put("cluster", clusterAlias);
-                        params.put("group", group);
-                        params.put("topic", topic);
-                        BScreenConsumerInfo lastBScreenConsumerTopic = metricsServiceImpl.readBScreenLastTopic(params);
-                        if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getLogsize() == 0) {
-                            bscreenConsumer.setDifflogsize(0);
-                        } else {
-                            bscreenConsumer.setDifflogsize(logsize - lastBScreenConsumerTopic.getLogsize());
-                        }
-                        if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getOffsets() == 0) {
-                            bscreenConsumer.setDiffoffsets(0);
-                        } else {
-                            bscreenConsumer.setDiffoffsets((logsize - lag) - lastBScreenConsumerTopic.getOffsets());
-                        }
-                        bscreenConsumer.setLag(lag);
-                        bscreenConsumer.setOffsets(logsize - lag);
-                        bscreenConsumer.setTimespan(CalendarUtils.getTimeSpan());
-                        bscreenConsumer.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
-                        bscreenConsumers.add(bscreenConsumer);
-                        if (bscreenConsumers.size() > Topic.BATCH_SIZE) {
-                            try {
-                                metricsServiceImpl.writeBSreenConsumerTopic(bscreenConsumers);
-                                bscreenConsumers.clear();
-                            } catch (Exception e) {
-                                LoggerUtils.print(this.getClass()).error("Storage bscreen topic consumer has error, msg is ", e);
-                            }
+                    Map<String, Object> params = new HashMap<String, Object>();
+                    params.put("cluster", clusterAlias);
+                    params.put("group", group);
+                    params.put("topic", topic);
+                    BScreenConsumerInfo lastBScreenConsumerTopic = metricsServiceImpl.readBScreenLastTopic(params);
+                    if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getLogsize() == 0) {
+                        bscreenConsumer.setDifflogsize(0);
+                    } else {
+                        // maybe server timespan is not synchronized.
+                        bscreenConsumer.setDifflogsize(Math.abs(logsize - lastBScreenConsumerTopic.getLogsize()));
+                    }
+                    if (lastBScreenConsumerTopic == null || lastBScreenConsumerTopic.getOffsets() == 0) {
+                        bscreenConsumer.setDiffoffsets(0);
+                    } else {
+                        // maybe server timespan is not synchronized.
+                        bscreenConsumer.setDiffoffsets(Math.abs(offsets - lastBScreenConsumerTopic.getOffsets()));
+                    }
+                    bscreenConsumer.setLogsize(logsize);
+                    bscreenConsumer.setOffsets(offsets);
+                    bscreenConsumer.setLag(Math.abs(logsize - offsets));
+                    bscreenConsumer.setTimespan(CalendarUtils.getTimeSpan());
+                    bscreenConsumer.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
+                    bscreenConsumers.add(bscreenConsumer);
+                    if (bscreenConsumers.size() > Topic.BATCH_SIZE) {
+                        try {
+                            metricsServiceImpl.writeBSreenConsumerTopic(bscreenConsumers);
+                            bscreenConsumers.clear();
+                        } catch (Exception e) {
+                            LoggerUtils.print(this.getClass()).error("Storage bsreen kafka topic consumer has error, msg is ", e);
                         }
                     }
                 }
