@@ -111,6 +111,16 @@ public class KConstants {
     }
 
     /**
+     * EFAK Mode.
+     */
+    public final class EFAK {
+        private EFAK() {
+        }
+
+        public static final String MODE_STATUS = "master";
+    }
+
+    /**
      * Login session.
      */
     public final class Login {
