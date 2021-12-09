@@ -23,7 +23,6 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.web.quartz.shard.task.strategy.ThreadConstantsStrategy;
 import org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanChartSubTask;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -68,11 +67,13 @@ public class ScheduleShardSubTask {
     // if efak is standalone mode
     private void jobForStandaloneAllTasks() {
         for (Map.Entry<Class<?>, Integer> entry : ThreadConstantsStrategy.SUB_TASK_MAP.entrySet()) {
-            Class<?> taskThreadName = entry.getKey();
-
-            Method[] mm = taskThreadName.getMethods();
-
-            System.out.println(mm.getClass());
+            try {
+                Class subThreadClass = Class.forName(entry.getKey().getName().toString());
+                Thread thread = (Thread) subThreadClass.newInstance();
+                thread.start();
+            } catch (Exception e) {
+                LoggerUtils.print(this.getClass()).info("Standalone node start thread sub task has error, msg is ", e);
+            }
         }
     }
 
