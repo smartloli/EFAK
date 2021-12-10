@@ -117,7 +117,8 @@ public class KConstants {
         private EFAK() {
         }
 
-        public static final String MODE_STATUS = "master";
+        public static final String MODE_MASTER = "master";
+        public static final String MODE_SLAVE = "slave";
     }
 
     /**
@@ -402,6 +403,7 @@ public class KConstants {
         public static final String VALUE = "VALUE";
         public static final String JOB_ID = "JOB_ID";
         public static final String HEART_BEAT = "HEART_BEAT";
+        public static final String SHARD_TASK = "SHARD_TASK";
         public static final String KSQL_QUERY = "KSQL_QUERY";
         public static final String KSQL_QUERY_LOG = "KSQL_QUERY_LOG";
 

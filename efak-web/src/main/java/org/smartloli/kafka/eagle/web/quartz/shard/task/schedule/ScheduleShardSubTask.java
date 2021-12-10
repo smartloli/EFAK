@@ -17,10 +17,10 @@
  */
 package org.smartloli.kafka.eagle.web.quartz.shard.task.schedule;
 
+import org.smartloli.kafka.eagle.common.constant.ThreadConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.web.quartz.shard.task.strategy.ThreadConstantsStrategy;
 import org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanChartSubTask;
 
 import java.util.Map;
@@ -36,12 +36,9 @@ import java.util.Map;
  */
 public class ScheduleShardSubTask {
 
-//    private List<String> SUB_TASK = Arrays.asList("");
-
-
     public void cleanCharts() {
         try {
-            if (KConstants.EFAK.MODE_STATUS.equals(SystemConfigUtils.getBooleanProperty("efak.cluster.mode.status"))) {
+            if (KConstants.EFAK.MODE_MASTER.equals(SystemConfigUtils.getBooleanProperty("efak.cluster.mode.status"))) {
                 new CleanChartSubTask().start();
             }
         } catch (Exception e) {
@@ -60,15 +57,18 @@ public class ScheduleShardSubTask {
 
     // if efak is distributed mode
     private void jobForDistributedAllTasks() {
+        if (KConstants.EFAK.MODE_SLAVE.equals(SystemConfigUtils.getBooleanProperty("efak.cluster.mode.status"))) {
 
+        }
 
     }
 
+
     // if efak is standalone mode
     private void jobForStandaloneAllTasks() {
-        for (Map.Entry<Class<?>, Integer> entry : ThreadConstantsStrategy.SUB_TASK_MAP.entrySet()) {
+        for (Map.Entry<String, Integer> entry : ThreadConstants.SUB_TASK_MAP.entrySet()) {
             try {
-                Class subThreadClass = Class.forName(entry.getKey().getName().toString());
+                Class subThreadClass = Class.forName(entry.getKey());
                 Thread thread = (Thread) subThreadClass.newInstance();
                 thread.start();
             } catch (Exception e) {

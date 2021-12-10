@@ -21,17 +21,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.thrift.TException;
-import org.smartloli.kafka.eagle.common.util.AppUtils;
-import org.smartloli.kafka.eagle.common.util.JSONUtils;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.common.constant.ThreadConstants;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.task.cache.LogCacheFactory;
 import org.smartloli.kafka.eagle.core.task.rpc.WorkNodeService;
 import org.smartloli.kafka.eagle.core.task.shard.ShardSubScan;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
+import org.smartloli.kafka.eagle.core.task.strategy.WorkNodeStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Receive and execute the assigned tasks of master.
@@ -58,6 +58,8 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
             } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.KSQL_QUERY_LOG)) {
                 this.type = KConstants.Protocol.KSQL_QUERY_LOG;
                 this.jobId = object.getString(KConstants.Protocol.JOB_ID);
+            } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.SHARD_TASK)) {
+                this.type = KConstants.Protocol.SHARD_TASK;
             }
             return handler();
         }
@@ -104,6 +106,25 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
                     result = results.toString();
                 }
             }
+        } else if (KConstants.Protocol.SHARD_TASK.equals(this.type)) {
+            List<String> hosts = WorkUtils.getWorkNodes();
+            int port = SystemConfigUtils.getIntProperty("efak.sql.worknode.port");
+            List<WorkNodeStrategy> nodes = new ArrayList<>();
+            for (String host : hosts) {
+                if (NetUtils.telnet(host, port)) {// node is alive
+                    WorkNodeStrategy wns = new WorkNodeStrategy();
+                    wns.setHost(host);
+                    wns.setPort(port);
+                    nodes.add(wns);
+                }
+            }
+
+            int threadTaskSize = ThreadConstants.SUB_TASK_MAP.size();
+            for (Map.Entry<String, Integer> entry : ThreadConstants.SUB_TASK_MAP.entrySet()) {
+                
+            }
+
+
         }
         return result;
     }
