@@ -20,7 +20,6 @@ package org.smartloli.kafka.eagle.web.quartz.shard.task.sub;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.ZkClusterInfo;
 import org.smartloli.kafka.eagle.common.util.*;
-import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
@@ -40,15 +39,11 @@ import java.util.List;
  */
 public class ZookeeperClusterSubTask extends Thread {
 
-    private static final String zk_packets_received = "zk_packets_received";
-    private static final String zk_packets_sent = "zk_packets_sent";
-    private static final String zk_num_alive_connections = "zk_num_alive_connections";
-    private static final String zk_outstanding_requests = "zk_outstanding_requests";
-    private static final String[] zk_kpis = new String[]{zk_packets_received, zk_packets_sent, zk_num_alive_connections, zk_outstanding_requests};
-
-    private static final String[] broker_kpis = new String[]{KConstants.MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS,
-            KConstants.MBean.OSTOTALMEMORY, MBean.OSFREEMEMORY, MBean.CPUUSED};
-    private static final String[] BROKER_KPIS_OFFLINE = new String[]{MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS};
+    private static final String ZK_PACKETS_RECEIVED = "zk_packets_received";
+    private static final String ZK_PACKETS_SENT = "zk_packets_sent";
+    private static final String ZK_NUM_ALIVE_CONNECTIONS = "zk_num_alive_connections";
+    private static final String ZK_OUTSTANDING_REQUESTS = "zk_outstanding_requests";
+    private static final String[] ZK_KPIS = new String[]{ZK_PACKETS_RECEIVED, ZK_PACKETS_SENT, ZK_NUM_ALIVE_CONNECTIONS, ZK_OUTSTANDING_REQUESTS};
 
     /**
      * Kafka service interface.
@@ -78,7 +73,7 @@ public class ZookeeperClusterSubTask extends Thread {
         List<KpiInfo> list = new ArrayList<>();
         String zkList = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
         String[] zks = zkList.split(",");
-        for (String kpi : zk_kpis) {
+        for (String kpi : ZK_KPIS) {
             KpiInfo kpiInfo = new KpiInfo();
             kpiInfo.setCluster(clusterAlias);
             kpiInfo.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));
@@ -114,16 +109,16 @@ public class ZookeeperClusterSubTask extends Thread {
 
     private void zkAssembly(ZkClusterInfo zkInfo, String type, KpiInfo kpiInfo) {
         switch (type) {
-            case zk_packets_received:
+            case ZK_PACKETS_RECEIVED:
                 kpiInfo.setValue(Long.parseLong(StrUtils.isNull(kpiInfo.getValue()) == true ? "0" : kpiInfo.getValue()) + Long.parseLong(StrUtils.isNull(zkInfo.getZkPacketsReceived()) == true ? "0" : zkInfo.getZkPacketsReceived()) + "");
                 break;
-            case zk_packets_sent:
+            case ZK_PACKETS_SENT:
                 kpiInfo.setValue(Long.parseLong(StrUtils.isNull(kpiInfo.getValue()) == true ? "0" : kpiInfo.getValue()) + Long.parseLong(StrUtils.isNull(zkInfo.getZkPacketsSent()) == true ? "0" : zkInfo.getZkPacketsSent()) + "");
                 break;
-            case zk_num_alive_connections:
+            case ZK_NUM_ALIVE_CONNECTIONS:
                 kpiInfo.setValue(Long.parseLong(StrUtils.isNull(kpiInfo.getValue()) == true ? "0" : kpiInfo.getValue()) + Long.parseLong(StrUtils.isNull(zkInfo.getZkNumAliveConnections()) == true ? "0" : zkInfo.getZkNumAliveConnections()) + "");
                 break;
-            case zk_outstanding_requests:
+            case ZK_OUTSTANDING_REQUESTS:
                 kpiInfo.setValue(Long.parseLong(StrUtils.isNull(kpiInfo.getValue()) == true ? "0" : kpiInfo.getValue()) + Long.parseLong(StrUtils.isNull(zkInfo.getZkOutstandingRequests()) == true ? "0" : zkInfo.getZkOutstandingRequests()) + "");
                 break;
             default:

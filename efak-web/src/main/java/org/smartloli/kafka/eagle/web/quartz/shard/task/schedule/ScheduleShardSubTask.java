@@ -64,6 +64,7 @@ public class ScheduleShardSubTask {
             List<String> shardTasks = JobClient.getWorkNodeShardTask();
             if (shardTasks != null) {
                 for (String shardTask : shardTasks) {
+                    LoggerUtils.print(this.getClass()).info("Task thread [" + shardTask + "]");
                     try {
                         Class subThreadClass = Class.forName(shardTask);
                         Thread thread = (Thread) subThreadClass.newInstance();

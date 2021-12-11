@@ -42,7 +42,6 @@ public class ThreadConstants {
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.DetectConnectUriSubTask", WEIGHT_VIP1);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.KafkaClusterSubTask", WEIGHT_VIP2);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.LogsizeStatsSubTask", WEIGHT_VIP2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.MbeanOfflineSubTask", WEIGHT_VIP2);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.MetricsConsumerSubTask", WEIGHT_VIP2);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.PerformanceByTopicStatsSubTask", WEIGHT_VIP2);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.ProducerLogSizeStatsSubTask", WEIGHT_VIP2);

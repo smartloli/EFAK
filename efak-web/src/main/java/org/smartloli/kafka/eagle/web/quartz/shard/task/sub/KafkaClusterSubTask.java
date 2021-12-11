@@ -42,15 +42,9 @@ import java.util.List;
  */
 public class KafkaClusterSubTask extends Thread {
 
-    private static final String zk_packets_received = "zk_packets_received";
-    private static final String zk_packets_sent = "zk_packets_sent";
-    private static final String zk_num_alive_connections = "zk_num_alive_connections";
-    private static final String zk_outstanding_requests = "zk_outstanding_requests";
-    private static final String[] zk_kpis = new String[]{zk_packets_received, zk_packets_sent, zk_num_alive_connections, zk_outstanding_requests};
 
-    private static final String[] broker_kpis = new String[]{MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS,
+    private static final String[] BROKER_KPIS = new String[]{MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS,
             KConstants.MBean.OSTOTALMEMORY, MBean.OSFREEMEMORY, MBean.CPUUSED};
-    private static final String[] BROKER_KPIS_OFFLINE = new String[]{MBean.MESSAGEIN, MBean.BYTEIN, MBean.BYTEOUT, MBean.BYTESREJECTED, MBean.FAILEDFETCHREQUEST, MBean.FAILEDPRODUCEREQUEST, MBean.TOTALFETCHREQUESTSPERSEC, MBean.TOTALPRODUCEREQUESTSPERSEC, MBean.REPLICATIONBYTESINPERSEC, MBean.REPLICATIONBYTESOUTPERSEC, MBean.PRODUCEMESSAGECONVERSIONS};
 
     /**
      * Kafka service interface.
@@ -81,7 +75,7 @@ public class KafkaClusterSubTask extends Thread {
         List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
         List<KpiInfo> list = new ArrayList<>();
 
-        for (String kpi : broker_kpis) {
+        for (String kpi : BROKER_KPIS) {
             KpiInfo kpiInfo = new KpiInfo();
             kpiInfo.setCluster(clusterAlias);
             kpiInfo.setTm(CalendarUtils.getCustomDate("yyyyMMdd"));

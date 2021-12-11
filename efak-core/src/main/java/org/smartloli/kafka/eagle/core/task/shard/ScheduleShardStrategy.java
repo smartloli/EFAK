@@ -51,7 +51,10 @@ public class ScheduleShardStrategy {
                 WorkNodeStrategy wns = new WorkNodeStrategy();
                 wns.setPort(port);
                 wns.setHost(host);
-                nodes.add(wns);
+                String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+                if (!masterHost.equals(host)) {
+                    nodes.add(wns);
+                }
             }
         }
 
