@@ -21,6 +21,7 @@
 #
 # Author smartloli.
 # Update by Jul 27, 2019
+# Update by Dec 11, 2021 -- add grep WorkNodeServer
 
 export MALLOC_ARENA_MAX=1
 export KE_JAVA_OPTS="-server -Xmx2g -Xms2g -XX:MaxGCPauseMillis=20 -XX:+UseG1GC -XX:MetaspaceSize=128m -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80"
@@ -61,43 +62,35 @@ start()
   exit 1
  fi
  
- PID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
+ PID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | grep WorkNodeServer | awk '{print $2}'`
      
  if [ -n "$PID" ]; then
-  echo "[$stime] Error: The WorkNode Server[$PID] has started."
+  echo "[$stime] Error: The WorkNodeServer[$PID] has started."
   exit 1
  fi
  
  bin=`dirname "$0"`
- export KE_HOME=`cd $bin/../; pwd`
+ export KE_HOME_WNS=`cd $bin/../; pwd`
  
- KE_HOME_CONF_DIR=$KE_HOME/conf
- CLASSPATH="${KE_HOME_CONF_DIR}"
- 
- rm -rf $KE_HOME/kms/webapps/ke
- rm -rf $KE_HOME/kms/ROOT
- rm -rf $KE_HOME/kms/work
- mkdir -p $KE_HOME/kms/webapps/ke
- mkdir -p $KE_HOME/kms/ROOT
- cd $KE_HOME/kms/webapps/ke
- ${JAVA_HOME}/bin/jar -xvf $KE_HOME/kms/webapps/ke.war
+ KE_HOME_WNS_CONF_DIR=$KE_HOME_WNS/conf
+ WNS_CLASSPATH="${KE_HOME_WNS_CONF_DIR}"
  
  sleep 2
  
  for f in $KE_HOME/kms/webapps/ke/WEB-INF/lib/*.jar; do
-  CLASSPATH=${CLASSPATH}:$f;
+  WNS_CLASSPATH=${WNS_CLASSPATH}:$f;
  done
  
- LOG_DIR=${KE_HOME}/logs
+ WNS_LOG_DIR=${KE_HOME}/logs
  
  cd ${KE_HOME}
- CLASS=org.smartloli.kafka.eagle.core.task.rpc.server.WorkNodeServer
- ${JAVA_HOME}/bin/java -classpath "$CLASSPATH" $CLASS > ${LOG_DIR}/worknode.log 2>&1
+ WNS_CLASS=org.smartloli.kafka.eagle.core.task.rpc.server.WorkNodeServer
+ ${JAVA_HOME}/bin/java -classpath "$WNS_CLASSPATH" $WNS_CLASS > ${WNS_LOG_DIR}/worknode.log 2>&1
 }
 
 stop()
 {
- SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
+ SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | grep WorkNodeServer | awk '{print $2}'`
  if [ "$SPID" != "" ];then
   kill -9  $SPID
   echo "[$stime] INFO: WorkNodeServer_`hostname` Stop Success."
@@ -106,7 +99,7 @@ stop()
 
 status()
 {
-  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
+  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | grep WorkNodeServer | awk '{print $2}'`
   HOSTNAME=`hostname`
   if [ "$SPID" = "" ] ;then
     echo "[$stime] INFO : WorkNodeServer-$HOSTNAME has stopped, [$SPID] ."
@@ -122,17 +115,17 @@ status()
 
 restart()
 {
-  echo "[$stime] INFO : WorkNode Server is stoping ... "
+  echo "[$stime] INFO : WorkNodeServer is stoping ... "
   stop
-  echo "[$stime] INFO : WorkNode Server is starting ..."
+  echo "[$stime] INFO : WorkNodeServer is starting ..."
   start
 }
 
 gc()
 {	
-  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
+  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | grep WorkNodeServer | awk '{print $2}'`
   if [ "$SPID" != "" ];then
-   echo "[$stime] INFO : WorkNode Server Process[$SPID] GC."
+   echo "[$stime] INFO : WorkNodeServer Process[$SPID] GC."
    ${JAVA_HOME}/bin/jstat -gcutil $SPID 1000
   fi
 }
@@ -149,9 +142,9 @@ jdk()
 
 sdate()
 {	
-  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | awk '{print $2}'`
+  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | grep WorkNodeServer | awk '{print $2}'`
   if [ "$SPID" != "" ];then
-   echo "[$stime] INFO : WorkNode Server Process[$SPID] Runtime."
+   echo "[$stime] INFO : WorkNodeServer Process[$SPID] Runtime."
    ps -eo pid,user,lstart | grep $SPID
   fi
 }

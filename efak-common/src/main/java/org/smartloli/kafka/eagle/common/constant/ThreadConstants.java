@@ -29,23 +29,26 @@ import java.util.Map;
  */
 public class ThreadConstants {
 
+    public static final int WEIGHT_VIP1 = 1;
+    public static final int WEIGHT_VIP2 = 2;
+
     public static final Map<String, Integer> SUB_TASK_MAP = new HashMap<String, Integer>() {
         {
             // key: thread class name, value: weight
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.AlertClusterSubTask", 1);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.AlertConsumerSubTask", 1);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CapacityStatsSubTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanTopicSubTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.DetectConnectUriSubTask", 1);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.KafkaClusterSubTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.LogsizeStatsSubTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.MbeanOfflineSubTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.MetricsConsumerSubTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.PerformanceByTopicStatsSubTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.ProducerLogSizeStatsSubTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.TopicThroughputByteInTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.TopicThroughputByteOutTask", 2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.ZookeeperClusterSubTask", 1);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.AlertClusterSubTask", WEIGHT_VIP1);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.AlertConsumerSubTask", WEIGHT_VIP1);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CapacityStatsSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanTopicSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.DetectConnectUriSubTask", WEIGHT_VIP1);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.KafkaClusterSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.LogsizeStatsSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.MbeanOfflineSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.MetricsConsumerSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.PerformanceByTopicStatsSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.ProducerLogSizeStatsSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.TopicThroughputByteInTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.TopicThroughputByteOutTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.ZookeeperClusterSubTask", WEIGHT_VIP1);
         }
     };
 }

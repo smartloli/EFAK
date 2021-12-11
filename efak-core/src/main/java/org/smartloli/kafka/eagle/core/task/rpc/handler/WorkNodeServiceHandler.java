@@ -21,13 +21,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.thrift.TException;
-import org.smartloli.kafka.eagle.common.constant.ThreadConstants;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.task.cache.LogCacheFactory;
 import org.smartloli.kafka.eagle.core.task.rpc.WorkNodeService;
+import org.smartloli.kafka.eagle.core.task.shard.ScheduleShardStrategy;
 import org.smartloli.kafka.eagle.core.task.shard.ShardSubScan;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
-import org.smartloli.kafka.eagle.core.task.strategy.WorkNodeStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +44,7 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
     private KSqlStrategy ksql;
     private String type;
     private String jobId;
+    private String key; // used by quartz ip key
 
     @Override
     public String getResult(String jsonObject) throws TException {
@@ -60,6 +60,7 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
                 this.jobId = object.getString(KConstants.Protocol.JOB_ID);
             } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.SHARD_TASK)) {
                 this.type = KConstants.Protocol.SHARD_TASK;
+                this.key = object.getString(KConstants.Protocol.KEY_BY_IP);
             }
             return handler();
         }
@@ -107,24 +108,13 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
                 }
             }
         } else if (KConstants.Protocol.SHARD_TASK.equals(this.type)) {
-            List<String> hosts = WorkUtils.getWorkNodes();
-            int port = SystemConfigUtils.getIntProperty("efak.sql.worknode.port");
-            List<WorkNodeStrategy> nodes = new ArrayList<>();
-            for (String host : hosts) {
-                if (NetUtils.telnet(host, port)) {// node is alive
-                    WorkNodeStrategy wns = new WorkNodeStrategy();
-                    wns.setHost(host);
-                    wns.setPort(port);
-                    nodes.add(wns);
-                }
+            long stime = System.currentTimeMillis();
+            Map<String, List<String>> shardTasks = ScheduleShardStrategy.getScheduleShardTask();
+            LoggerUtils.print(this.getClass()).info("All shard task strategy, result: " + JSON.toJSONString(shardTasks));
+            if (shardTasks.containsKey(this.key)) {
+                result = JSON.toJSONString(ScheduleShardStrategy.getScheduleShardTask().get(this.key));
             }
-
-            int threadTaskSize = ThreadConstants.SUB_TASK_MAP.size();
-            for (Map.Entry<String, Integer> entry : ThreadConstants.SUB_TASK_MAP.entrySet()) {
-                
-            }
-
-
+            LoggerUtils.print(this.getClass()).info("Spent time [" + (System.currentTimeMillis() - stime) + "]ms, worknode[" + this.key + "] task: " + result);
         }
         return result;
     }

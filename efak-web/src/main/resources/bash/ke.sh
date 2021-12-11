@@ -21,6 +21,7 @@
 #
 # Author smartloli.
 # Update by Jul 27, 2019
+# Update by Dec 11, 2021 -- add grep KafkaEagle
 
 export MALLOC_ARENA_MAX=1
 export KE_JAVA_OPTS="-server -Xmx2g -Xms2g -XX:MaxGCPauseMillis=20 -XX:+UseG1GC -XX:MetaspaceSize=128m -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80"
@@ -63,7 +64,7 @@ start()
   exit 1
  fi
  
- PID=`ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | awk '{print $2}'`
+ PID=`ps -ef | grep ${KE_HOME}/kms/bin/ | grep -v grep | grep KafkaEagle | awk '{print $2}'`
      
  if [ -n "$PID" ]; then
   echo "[$stime] Error: The EFAK[$PID] has started."
@@ -306,20 +307,90 @@ sdate()
   fi
 }
 
-worknode()
+start_cluster()
+{
+ for i in `cat ${KE_HOME}/conf/works`
+ do
+  ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/ke.sh start>/dev/null" &
+  echo "[$stime] INFO: EFAK-Node-$i Start Success."
+  sleep 1
+ done
+ sleep 1
+ startup
+}
+
+status_cluster()
+{
+ for i in `cat ${KE_HOME}/conf/works`
+ do
+  ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/ke.sh status>/dev/null" &
+  echo "[$stime] INFO: EFAK-Node-$i status."
+  sleep 1
+ done
+ sleep 1
+ list
+}
+
+stop_cluster()
+{
+ for i in `cat ${KE_HOME}/conf/works`
+ do
+  ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/ke.sh stop>/dev/null" &
+  echo "[$stime] INFO: EFAK-Node-$i stop."
+  sleep 1
+ done
+ sleep 1
+ shutdown
+}
+
+restart_cluster()
+{
+ for i in `cat ${KE_HOME}/conf/works`
+ do
+  ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/ke.sh restart>/dev/null" &
+  echo "[$stime] INFO: EFAK-Node-$i stop."
+  sleep 1
+ done
+ sleep 1
+ shutdown
+ sleep 1
+ startup
+}
+
+#worknode()
+#{
+#  case "$1" in
+#  startup)
+#      startup
+#      ;;
+#  shutdown)
+#      shutdown
+#      ;;
+#  list)
+#      list
+#      ;;
+#  *)
+#      echo $"Usage: $0 {startup|shutdown|list}"
+#esac
+#}
+
+cluster()
 {
   case "$1" in
-  startup)
-      startup
+  start)
+      start_cluster
       ;;
-  shutdown)
-      shutdown
+  stop)
+      stop_cluster
       ;;
-  list)
-      list
+  status)
+      status_cluster
+      ;;
+  restart)
+      restart_cluster
       ;;
   *)
-      echo $"Usage: $0 {startup|shutdown|list}"
+      echo $"Usage: $0 {start|stop|status|restart}"
 esac
 }
 
@@ -354,11 +425,11 @@ case "$1" in
   sdate)
       sdate
       ;;
-  worknode)
-      worknode $2
+  cluster)
+      cluster $2
       ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate|worknode}"
+      echo $"Usage: $0 {start|stop|restart|status|stats|find|gc|jdk|version|sdate|cluster}"
       RETVAL=1
 esac
 exit $RETVAL

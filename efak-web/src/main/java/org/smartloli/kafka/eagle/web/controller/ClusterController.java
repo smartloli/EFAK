@@ -179,6 +179,12 @@ public class ClusterController {
                         obj.put("cpu", cluster.getString("cpu"));
                         obj.put("created", cluster.getString("startTime"));
                         obj.put("status", "<span class='badge badge-success'>" + KConstants.WorkNode.ALIVE + "</span>");
+                        String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+                        if (cluster.getString("host").equals(masterHost)) {
+                            obj.put("role", "<span class='badge badge-primary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
+                        } else {
+                            obj.put("role", "<span class='badge badge-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
+                        }
 //                        obj.put("operate",
 //                                "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_worknodes_start' href='#?ip="
 //                                        + obj.getString("ip") + "&port=" + obj.getInteger("port") + "'><i class='far fa-play-circle fa-sm fa-fw mr-1'></i>Start</a><a class='dropdown-item' href='#?ip=" + obj.getString("ip") + "&port=" + obj.getInteger("port") + "' name='ke_worknodes_shutdown'><i class='far fa-stop-circle fa-sm fa-fw mr-1'></i>Shutdown</a></div>");
@@ -187,6 +193,12 @@ public class ClusterController {
                         obj.put("cpu", "<span class='badge badge-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
                         obj.put("created", "<span class='badge badge-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
                         obj.put("status", "<span class='badge badge-danger'>" + KConstants.WorkNode.SHUTDOWN + "</span>");
+                        String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+                        if (cluster.getString("host").equals(masterHost)) {
+                            obj.put("role", "<span class='badge badge-secondary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
+                        } else {
+                            obj.put("role", "<span class='badge badge-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
+                        }
 //                        obj.put("operate",
 //                                "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_worknodes_start' href='#?ip="
 //                                        + obj.getString("ip") + "&port=" + obj.getInteger("port") + "'><i class='far fa-play-circle fa-sm fa-fw mr-1'></i>Start</a><a class='dropdown-item' href='#?ip=" + obj.getString("ip") + "&port=" + obj.getInteger("port") + "' name='ke_worknodes_shutdown'><i class='far fa-stop-circle fa-sm fa-fw mr-1'></i>Shutdown</a></div>");
@@ -241,6 +253,12 @@ public class ClusterController {
                             obj.put("cpu", cluster.getString("cpu"));
                             obj.put("created", cluster.getString("startTime"));
                             obj.put("status", "<span class='badge badge-success'>" + KConstants.WorkNode.ALIVE + "</span>");
+                            String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+                            if (cluster.getString("host").equals(masterHost)) {
+                                obj.put("role", "<span class='badge badge-primary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
+                            } else {
+                                obj.put("role", "<span class='badge badge-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
+                            }
 //                            obj.put("operate",
 //                                    "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_worknodes_start' href='#?ip="
 //                                            + obj.getString("ip") + "&port=" + obj.getInteger("port") + "'><i class='far fa-play-circle fa-sm fa-fw mr-1'></i>Start</a><a class='dropdown-item' href='#?ip=" + obj.getString("ip") + "&port=" + obj.getInteger("port") + "' name='ke_worknodes_shutdown'><i class='far fa-stop-circle fa-sm fa-fw mr-1'></i>Shutdown</a></div>");
@@ -249,6 +267,12 @@ public class ClusterController {
                             obj.put("cpu", "<span class='badge badge-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
                             obj.put("created", "<span class='badge badge-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
                             obj.put("status", "<span class='badge badge-danger'>" + KConstants.WorkNode.SHUTDOWN + "</span>");
+                            String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+                            if (cluster.getString("host").equals(masterHost)) {
+                                obj.put("role", "<span class='badge badge-secondary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
+                            } else {
+                                obj.put("role", "<span class='badge badge-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
+                            }
 //                            obj.put("operate",
 //                                    "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_worknodes_start' href='#?ip="
 //                                            + obj.getString("ip") + "&port=" + obj.getInteger("port") + "'><i class='far fa-play-circle fa-sm fa-fw mr-1'></i>Start</a><a class='dropdown-item' href='#?ip=" + obj.getString("ip") + "&port=" + obj.getInteger("port") + "' name='ke_worknodes_shutdown'><i class='far fa-stop-circle fa-sm fa-fw mr-1'></i>Stop</a></div>");

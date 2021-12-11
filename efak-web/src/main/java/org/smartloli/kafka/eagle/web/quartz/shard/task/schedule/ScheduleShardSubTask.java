@@ -21,8 +21,10 @@ import org.smartloli.kafka.eagle.common.constant.ThreadConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
+import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
 import org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanChartSubTask;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,8 +59,20 @@ public class ScheduleShardSubTask {
 
     // if efak is distributed mode
     private void jobForDistributedAllTasks() {
-        if (KConstants.EFAK.MODE_SLAVE.equals(SystemConfigUtils.getBooleanProperty("efak.cluster.mode.status"))) {
-
+        LoggerUtils.print(this.getClass()).info("Distributed mode start thread on cluster.");
+        if (KConstants.EFAK.MODE_SLAVE.equals(SystemConfigUtils.getProperty("efak.cluster.mode.status"))) {
+            List<String> shardTasks = JobClient.getWorkNodeShardTask();
+            if (shardTasks != null) {
+                for (String shardTask : shardTasks) {
+                    try {
+                        Class subThreadClass = Class.forName(shardTask);
+                        Thread thread = (Thread) subThreadClass.newInstance();
+                        thread.start();
+                    } catch (Exception e) {
+                        LoggerUtils.print(this.getClass()).info("Distributed node start thread sub task has error, msg is ", e);
+                    }
+                }
+            }
         }
 
     }
@@ -66,20 +80,16 @@ public class ScheduleShardSubTask {
 
     // if efak is standalone mode
     private void jobForStandaloneAllTasks() {
+        LoggerUtils.print(this.getClass()).info("Standalone mode start thread on one node.");
         for (Map.Entry<String, Integer> entry : ThreadConstants.SUB_TASK_MAP.entrySet()) {
             try {
                 Class subThreadClass = Class.forName(entry.getKey());
                 Thread thread = (Thread) subThreadClass.newInstance();
                 thread.start();
             } catch (Exception e) {
-                LoggerUtils.print(this.getClass()).info("Standalone node start thread sub task has error, msg is ", e);
+                LoggerUtils.print(this.getClass()).info("Standalone mode start thread sub task has error, msg is ", e);
             }
         }
-    }
-
-    public static void main(String[] args) {
-        ScheduleShardSubTask ss = new ScheduleShardSubTask();
-        ss.allocateTask();
     }
 
 }
