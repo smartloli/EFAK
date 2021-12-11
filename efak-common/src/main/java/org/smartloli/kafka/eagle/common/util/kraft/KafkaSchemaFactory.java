@@ -17,11 +17,16 @@
  */
 package org.smartloli.kafka.eagle.common.util.kraft;
 
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.DescribeTopicsResult;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,7 +53,7 @@ public class KafkaSchemaFactory {
                 kafkaConsumer = new KafkaConsumer<>(plugin.getKafkaConsumerProps(clusterAlias));
                 tableNames = kafkaConsumer.listTopics().keySet();
             } catch (Exception e) {
-                LOGGER.error("Failure while loading table names for database '{}': {}", clusterAlias, e);
+                LoggerUtils.print(this.getClass()).error("Failure while loading table names for database '{}': {}", clusterAlias, e);
             } finally {
                 plugin.registerToClose(kafkaConsumer);
             }
@@ -56,13 +61,24 @@ public class KafkaSchemaFactory {
         return tableNames;
     }
 
+    public void getTopicMetaData(String clusterAlias, List<String> topics) {
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(clusterAlias));
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(topics);
+            System.out.println(describeTopicsResult.all().get());
+        } catch (Exception e) {
+            LoggerUtils.print(this.getClass()).error("Failure while loading topic meta for kafka '{}': {}", clusterAlias, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+    }
+
     public static void main(String[] args) {
         String[] kafkaClusters = SystemConfigUtils.getPropertyArray("efak.kafka.cluster.alias", ",");
         for (String kafkaCluster : kafkaClusters) {
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
-            Set<String> tableNames = ksf.getTableNames(kafkaCluster);
-            System.out.println("Kafka Cluster [" + kafkaCluster + "], topic list follow:");
-            System.out.println(tableNames);
+            ksf.getTopicMetaData(kafkaCluster, Arrays.asList("test16", "lb_te"));
         }
     }
 }

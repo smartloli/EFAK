@@ -12,6 +12,7 @@
             <outputDirectory>/bin</outputDirectory>
             <includes>
                 <include>ke.sh</include>
+                <include>worknode.sh</include>
             </includes>
             <fileMode>0755</fileMode>
         </fileSet>

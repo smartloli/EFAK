@@ -26,10 +26,14 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KafkaPartitioner;
+import org.smartloli.kafka.eagle.common.util.StrUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -51,9 +55,38 @@ public class KafkaStoragePlugin {
         this.closer = new KafkaAsyncCloser();
     }
 
+    private String parseBrokerServer(String clusterAlias) {
+        String brokerServer = "";
+        List<BrokersInfo> brokers = BrokerCache.META_CACHE.get(clusterAlias);
+        for (BrokersInfo broker : brokers) {
+            brokerServer += broker.getHost() + ":" + broker.getPort() + ",";
+        }
+        if ("".equals(brokerServer)) {
+            return "";
+        }
+        return brokerServer.substring(0, brokerServer.length() - 1);
+    }
+
+    public Properties getKafkaAdminClientProps(String clusterAlias) {
+        // props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+        props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable")) {
+            sasl(props, clusterAlias);
+        }
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
+            ssl(props, clusterAlias);
+        }
+        return props;
+    }
+
     public Properties getKafkaConsumerProps(String clusterAlias) {
+        String brokers = SystemConfigUtils.getProperty(clusterAlias + ".efak.bootstrap.servers");
+        if (StrUtils.isNull(brokers)) {
+            brokers = parseBrokerServer(clusterAlias);
+        }
         props.put(ConsumerConfig.GROUP_ID_CONFIG, KConstants.Kafka.EFAK_SYSTEM_GROUP);
-        props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, SystemConfigUtils.getProperty(clusterAlias + ".efak.bootstrap.servers"));
+        props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokers);
         String key = SystemConfigUtils.getProperty(clusterAlias + ".efak.consumer.key.deserializer");
         String value = SystemConfigUtils.getProperty(clusterAlias + ".efak.consumer.value.deserializer");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, key == null ? StringDeserializer.class.getCanonicalName() : key);

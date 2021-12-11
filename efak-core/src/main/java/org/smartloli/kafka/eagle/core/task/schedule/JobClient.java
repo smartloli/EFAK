@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.core.task.schedule;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.google.gson.Gson;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -104,6 +105,26 @@ public class JobClient {
 
     private static boolean validForTopic(String clusterAlias, String topic) {
         return brokerService.findKafkaTopic(clusterAlias, topic);
+    }
+
+    public static List<String> getWorkNodeShardTask() {
+        String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+        int port = SystemConfigUtils.getIntProperty("efak.worknode.port");
+        JSONObject object = new JSONObject();
+        object.put(KConstants.Protocol.KEY, KConstants.Protocol.SHARD_TASK);
+        object.put(KConstants.Protocol.KEY_BY_IP, NetUtils.ip());
+        List<JSONArray> results = new ArrayList<>();
+        try {
+            String resultStr = MasterNodeClient.getResult(masterHost, port, object);
+            if (StrUtils.isNull(resultStr)) {
+                return null;
+            }
+            return JSON.parseObject(resultStr, new TypeReference<List<String>>() {
+            });
+        } catch (Exception e) {
+            LoggerUtils.print(JobClient.class).error("Get worknode shard task has error, msg is ", e);
+        }
+        return null;
     }
 
     public static List<WorkNodeMetrics> getWorkNodeMetrics() {
@@ -218,15 +239,8 @@ public class JobClient {
             return workNodeTasks;
         }
         for (int partitionId : ksql.getPartitions()) {
-            long endLogSize = 0L;
-            long endRealLogSize = 0L;
-            if ("kafka".equals(SystemConfigUtils.getProperty(cluster + ".efak.offset.storage"))) {
-                endLogSize = kafkaService.getKafkaLogSize(cluster, ksql.getTopic(), partitionId);
-                endRealLogSize = kafkaService.getKafkaRealLogSize(cluster, ksql.getTopic(), partitionId);
-            } else {
-                endLogSize = kafkaService.getLogSize(cluster, ksql.getTopic(), partitionId);
-                endRealLogSize = kafkaService.getRealLogSize(cluster, ksql.getTopic(), partitionId);
-            }
+            long endLogSize = kafkaService.getKafkaLogSize(cluster, ksql.getTopic(), partitionId);
+            long endRealLogSize = kafkaService.getKafkaRealLogSize(cluster, ksql.getTopic(), partitionId);
 
             long startLogSize = endLogSize - endRealLogSize;
             long numberPer = endRealLogSize / workNodes.size();
@@ -264,7 +278,7 @@ public class JobClient {
     private static List<WorkNodeStrategy> getWorkNodes() {
         List<WorkNodeStrategy> nodes = new ArrayList<>();
         List<String> hosts = WorkUtils.getWorkNodes();
-        int port = SystemConfigUtils.getIntProperty("efak.sql.worknode.port");
+        int port = SystemConfigUtils.getIntProperty("efak.worknode.port");
         for (String host : hosts) {
             WorkNodeStrategy wns = new WorkNodeStrategy();
             wns.setHost(host);
@@ -277,7 +291,7 @@ public class JobClient {
     private static List<WorkNodeStrategy> getWorkNodesAlive() {
         List<WorkNodeStrategy> nodes = new ArrayList<>();
         List<String> hosts = WorkUtils.getWorkNodes();
-        int port = SystemConfigUtils.getIntProperty("efak.sql.worknode.port");
+        int port = SystemConfigUtils.getIntProperty("efak.worknode.port");
         for (String host : hosts) {
             WorkNodeStrategy wns = new WorkNodeStrategy();
             wns.setHost(host);

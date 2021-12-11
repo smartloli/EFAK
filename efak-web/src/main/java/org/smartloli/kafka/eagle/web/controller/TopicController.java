@@ -679,11 +679,11 @@ public class TopicController {
     @RequestMapping(value = "/topic/create/form", method = RequestMethod.POST)
     public ModelAndView topicAddForm(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
-        String ke_topic_name = request.getParameter("ke_topic_name");
-        String ke_topic_partition = request.getParameter("ke_topic_partition");
-        String ke_topic_repli = request.getParameter("ke_topic_repli");
+        String keTopicName = request.getParameter("ke_topic_name");
+        String keTopicPartition = request.getParameter("ke_topic_partition");
+        String keTopicRepli = request.getParameter("ke_topic_repli");
         String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
-        Map<String, Object> respons = kafkaService.create(clusterAlias, ke_topic_name, ke_topic_partition, ke_topic_repli);
+        Map<String, Object> respons = kafkaService.create(clusterAlias, keTopicName, keTopicPartition, keTopicRepli);
         if ("success".equals(respons.get("status"))) {
             session.removeAttribute("Submit_Status");
             session.setAttribute("Submit_Status", respons.get("info"));

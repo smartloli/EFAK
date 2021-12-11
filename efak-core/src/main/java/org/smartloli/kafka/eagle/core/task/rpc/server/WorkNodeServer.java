@@ -56,8 +56,8 @@ public class WorkNodeServer {
 
     public static void main(String[] args) {
         try {
-            int port = SystemConfigUtils.getIntProperty("efak.sql.worknode.port");
-            LoggerUtils.print(WorkNodeServer.class).info(WorkNodeServer.class.getSimpleName() + " started and listening from master task, port is [" + port + "].");
+            int port = SystemConfigUtils.getIntProperty("efak.worknode.port");
+            LoggerUtils.print(WorkNodeServer.class).info(WorkNodeServer.class.getSimpleName() + " started and listening from efak cluster, port is [" + port + "].");
             WorkNodeServer rpc = new WorkNodeServer();
             rpc.start(port);
         } catch (Exception e) {

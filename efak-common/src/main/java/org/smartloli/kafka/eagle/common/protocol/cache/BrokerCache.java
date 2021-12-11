@@ -15,17 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.quartz;
+package org.smartloli.kafka.eagle.common.protocol.cache;
+
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
+import org.smartloli.kafka.eagle.common.util.LRUCacheUtils;
+
+import java.util.List;
 
 /**
- * Test AlertQuartz clazz.
+ * Initialize the Kafka metadata stored in zookeeper and cache it in memory.
  *
  * @author smartloli.
  * <p>
- * Created by Oct 29, 2018
+ * Created by Nov 03, 2021
  */
-public class TestAlertQuartz {
-    public static void main(String[] args) {
-        
-    }
+public class BrokerCache {
+    public static LRUCacheUtils<String, List<BrokersInfo>> META_CACHE = new LRUCacheUtils();
 }

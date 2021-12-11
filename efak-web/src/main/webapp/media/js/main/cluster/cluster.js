@@ -8,8 +8,6 @@ $(document).ready(function () {
         "fnServerData": retrieveData,
         "sAjaxSource": "/cluster/info/kafka/ajax",
         "aoColumns": [{
-            "mData": 'id'
-        }, {
             "mData": 'brokerId'
         }, {
             "mData": 'ip'
@@ -41,8 +39,6 @@ $(document).ready(function () {
         "fnServerData": retrieveData,
         "sAjaxSource": "/cluster/info/zk/ajax",
         "aoColumns": [{
-            "mData": 'id'
-        }, {
             "mData": 'ip'
         }, {
             "mData": 'port'

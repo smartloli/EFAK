@@ -73,16 +73,6 @@ public interface KafkaService {
     public Map<String, List<String>> getConsumers(String clusterAlias);
 
     /**
-     * Obtaining kafka consumer page information from zookeeper.
-     */
-    public Map<String, List<String>> getConsumers(String clusterAlias, DisplayInfo page);
-
-    /**
-     * According to group, topic and partition to get offset from zookeeper.
-     */
-    public OffsetZkInfo getOffset(String clusterAlias, String topic, String group, int partition);
-
-    /**
      * Get kafka 0.10.x offset from topic.
      */
     public String getKafkaOffset(String clusterAlias);
@@ -195,31 +185,6 @@ public interface KafkaService {
      * Get kafka consumer group all topics lag.
      */
     public long getKafkaLag(String clusterAlias, String group, String topic);
-
-    /**
-     * Get consumer group all topics lag.
-     */
-    public long getLag(String clusterAlias, String group, String topic);
-
-    /**
-     * Get kafka history logsize by old version.
-     */
-    public long getLogSize(String clusterAlias, String topic, int partitionid);
-
-    /**
-     * Get kafka history logsize by old version.
-     */
-    public long getLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
-
-    /**
-     * Get kafka real logsize by old version partition set.
-     */
-    public long getRealLogSize(String clusterAlias, String topic, int partitionid);
-
-    /**
-     * Get kafka real logsize by old version partition set.
-     */
-    public long getRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids);
 
     /**
      * Get topic metadata.

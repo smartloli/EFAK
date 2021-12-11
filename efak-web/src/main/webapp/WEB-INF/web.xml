@@ -6,7 +6,7 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath:spring-mybatis.xml,classpath:spring-shiro.xml,classpath:alert-quartz.xml,classpath:master-quartz.xml
+            classpath:spring-mybatis.xml,classpath:spring-shiro.xml,classpath:schedule-quartz.xml
         </param-value>
     </context-param>
     <filter>

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.smartloli.kafka.eagle.web.quartz;
+package org.smartloli.kafka.eagle.web.quartz.shard.task.sub;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -24,7 +24,6 @@ import org.smartloli.kafka.eagle.api.im.IMService;
 import org.smartloli.kafka.eagle.api.im.IMServiceImpl;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmClusterInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConfigInfo;
-import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.util.*;
@@ -40,152 +39,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Alert consumer topic & cluster heathy.
+ * Alert cluster metrics sub task.
  *
  * @author smartloli.
  * <p>
- * Created by Oct 28, 2018
+ * Created by Dec 09, 2021
  */
-public class AlertQuartz {
+public class AlertClusterSubTask extends Thread {
 
-    /**
-     * Kafka topic config service interface.
-     */
+    // get kafka metrics dataset
     private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
 
-    public void alertJobQuartz() {
-        // Run consumer job
-        Consumer consumer = new Consumer();
-        consumer.consumer();
-
-        // Run cluster job
+    @Override
+    public void run() {
+        // run cluster metrics job
         Cluster cluster = new Cluster();
         cluster.cluster();
-    }
-
-    class Consumer {
-        public void consumer() {
-            try {
-                AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
-                List<AlarmConsumerInfo> alarmConsumers = alertService.getAllAlarmConsumerTasks();
-                for (AlarmConsumerInfo alarmConsumer : alarmConsumers) {
-                    if (AlarmType.DISABLE.equals(alarmConsumer.getIsEnable())) {
-                        break;
-                    }
-
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("cluster", alarmConsumer.getCluster());
-                    map.put("alarmGroup", alarmConsumer.getAlarmGroup());
-                    AlarmConfigInfo alarmConfing = alertService.getAlarmConfigByGroupName(map);
-
-                    Map<String, Object> params = new HashMap<>();
-                    params.put("cluster", alarmConsumer.getCluster());
-                    params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
-                    params.put("group", alarmConsumer.getGroup());
-                    params.put("topic", alarmConsumer.getTopic());
-                    // real consumer lag
-                    long lag = alertService.queryLastestLag(params);
-                    // alert common info
-                    AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
-                    try {
-                        alarmMsg.setAlarmId(alarmConsumer.getId());
-                        alarmMsg.setAlarmCluster(alarmConfing.getCluster());
-                        alarmMsg.setAlarmDate(CalendarUtils.getDate());
-                        alarmMsg.setAlarmLevel(alarmConsumer.getAlarmLevel());
-                        alarmMsg.setAlarmProject("Consumer");
-                        alarmMsg.setAlarmTimes("current(" + alarmConsumer.getAlarmTimes() + "), max(" + alarmConsumer.getAlarmMaxTimes() + ")");
-                    } catch (Exception e) {
-                        LoggerUtils.print(this.getClass()).error("Alert message load common information has error, msg is ", e);
-                    }
-                    if (lag > alarmConsumer.getLag() && (alarmConsumer.getAlarmTimes() < alarmConsumer.getAlarmMaxTimes() || alarmConsumer.getAlarmMaxTimes() == -1)) {
-                        // alarm consumer
-                        alarmConsumer.setAlarmTimes(alarmConsumer.getAlarmTimes() + 1);
-                        alarmConsumer.setIsNormal("N");
-                        alertService.modifyConsumerStatusAlertById(alarmConsumer);
-                        try {
-                            sendAlarmConsumerError(alarmConfing, alarmConsumer, lag, alarmMsg);
-                        } catch (Exception e) {
-                            LoggerUtils.print(this.getClass()).error("Send alarm consumer exception has error, msg is ", e);
-                        }
-                    } else if (lag <= alarmConsumer.getLag()) {
-                        if (alarmConsumer.getIsNormal().equals("N")) {
-                            alarmConsumer.setIsNormal("Y");
-                            // clear error alarm and reset
-                            alarmConsumer.setAlarmTimes(0);
-                            // notify the cancel of the alarm
-                            alertService.modifyConsumerStatusAlertById(alarmConsumer);
-                            try {
-                                sendAlarmConsumerNormal(alarmConfing, alarmConsumer, lag, alarmMsg);
-                            } catch (Exception e) {
-                                LoggerUtils.print(this.getClass()).error("Send alarm consumer normal has error, msg is ", e);
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                LoggerUtils.print(this.getClass()).error("Alarm consumer lag has error, msg is ", e);
-            }
-        }
-
-        private void sendAlarmConsumerError(AlarmConfigInfo alarmConfing, AlarmConsumerInfo alarmConsumer, long lag, AlarmMessageInfo alarmMsg) {
-            if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
-                alarmMsg.setTitle("EFAK - Alert Consumer Notice");
-                alarmMsg.setAlarmStatus("PROBLEM");
-                alarmMsg.setAlarmContent("lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
-                IMService im = new IMFactory().create();
-                JSONObject object = new JSONObject();
-                object.put("address", alarmConfing.getAlarmAddress());
-                if (JSONUtils.isJsonObject(alarmConfing.getAlarmUrl())) {
-                    object.put("msg", alarmMsg.toMailJSON());
-                } else {
-                    object.put("msg", alarmMsg.toMail());
-                }
-                object.put("title", alarmMsg.getTitle());
-                im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
-            } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
-                alarmMsg.setTitle("EFAK - Alert Consumer Notice");
-                alarmMsg.setAlarmContent("lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
-                alarmMsg.setAlarmStatus("PROBLEM");
-                IMService im = new IMFactory().create();
-                im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
-            } else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
-                alarmMsg.setTitle("`EFAK - Alert Consumer Notice`\n");
-                alarmMsg.setAlarmContent("<font color=\"warning\">lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
-                alarmMsg.setAlarmStatus("<font color=\"warning\">PROBLEM</font>");
-                IMServiceImpl im = new IMServiceImpl();
-                im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
-            }
-        }
-
-        private void sendAlarmConsumerNormal(AlarmConfigInfo alarmConfing, AlarmConsumerInfo alarmConsumer, long lag, AlarmMessageInfo alarmMsg) {
-            if (alarmConfing.getAlarmType().equals(AlarmType.EMAIL)) {
-                alarmMsg.setTitle("EFAK - Alert Consumer Cancel");
-                alarmMsg.setAlarmContent("lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
-                alarmMsg.setAlarmStatus("NORMAL");
-                IMService im = new IMFactory().create();
-                JSONObject object = new JSONObject();
-                object.put("address", alarmConfing.getAlarmAddress());
-                if (JSONUtils.isJsonObject(alarmConfing.getAlarmUrl())) {
-                    object.put("msg", alarmMsg.toMailJSON());
-                } else {
-                    object.put("msg", alarmMsg.toMail());
-                }
-                object.put("title", alarmMsg.getTitle());
-                im.sendPostMsgByMail(object.toJSONString(), alarmConfing.getAlarmUrl());
-            } else if (alarmConfing.getAlarmType().equals(AlarmType.DingDing)) {
-                alarmMsg.setTitle("EFAK - Alert Consumer Notice");
-                alarmMsg.setAlarmContent("lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
-                alarmMsg.setAlarmStatus("NORMAL");
-                IMService im = new IMFactory().create();
-                im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), alarmConfing.getAlarmUrl());
-            } else if (alarmConfing.getAlarmType().equals(AlarmType.WeChat)) {
-                alarmMsg.setTitle("`EFAK - Alert Consumer Notice`\n");
-                alarmMsg.setAlarmContent("<font color=\"#008000\">lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]</font>");
-                alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
-                IMServiceImpl im = new IMServiceImpl();
-                im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
-            }
-        }
     }
 
     class Cluster {
@@ -193,7 +62,7 @@ public class AlertQuartz {
         public void cluster() {
             AlertServiceImpl alertService = StartupListener.getBean("alertServiceImpl", AlertServiceImpl.class);
             for (AlarmClusterInfo cluster : alertService.getAllAlarmClusterTasks()) {
-                if (AlarmType.DISABLE.equals(cluster.getIsEnable())) {
+                if (KConstants.AlarmType.DISABLE.equals(cluster.getIsEnable())) {
                     break;
                 }
                 String alarmGroup = cluster.getAlarmGroup();
@@ -337,13 +206,13 @@ public class AlertQuartz {
                 alarmMsg.setAlarmId(cluster.getId());
                 alarmMsg.setAlarmCluster(alarmConfing.getCluster());
                 alarmMsg.setTitle("EFAK - Alert Cluster Error");
-                if (AlarmType.TOPIC.equals(cluster.getType())) {
+                if (KConstants.AlarmType.TOPIC.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");
                     long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
                     long realCapacity = alarmTopicMsg.getLong("realCapacity");
                     alarmMsg.setAlarmContent("topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]");
-                } else if (AlarmType.PRODUCER.equals(cluster.getType())) {
+                } else if (KConstants.AlarmType.PRODUCER.equals(cluster.getType())) {
                     JSONObject alarmTopicMsg = JSON.parseObject(server);
                     String topic = alarmTopicMsg.getString("topic");
                     String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");

@@ -21,17 +21,16 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.thrift.TException;
-import org.smartloli.kafka.eagle.common.util.AppUtils;
-import org.smartloli.kafka.eagle.common.util.JSONUtils;
-import org.smartloli.kafka.eagle.common.util.KConstants;
-import org.smartloli.kafka.eagle.common.util.StrUtils;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.task.cache.LogCacheFactory;
 import org.smartloli.kafka.eagle.core.task.rpc.WorkNodeService;
+import org.smartloli.kafka.eagle.core.task.shard.ScheduleShardStrategy;
 import org.smartloli.kafka.eagle.core.task.shard.ShardSubScan;
 import org.smartloli.kafka.eagle.core.task.strategy.KSqlStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Receive and execute the assigned tasks of master.
@@ -45,6 +44,7 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
     private KSqlStrategy ksql;
     private String type;
     private String jobId;
+    private String key; // used by quartz ip key
 
     @Override
     public String getResult(String jsonObject) throws TException {
@@ -58,6 +58,9 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
             } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.KSQL_QUERY_LOG)) {
                 this.type = KConstants.Protocol.KSQL_QUERY_LOG;
                 this.jobId = object.getString(KConstants.Protocol.JOB_ID);
+            } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.SHARD_TASK)) {
+                this.type = KConstants.Protocol.SHARD_TASK;
+                this.key = object.getString(KConstants.Protocol.KEY_BY_IP);
             }
             return handler();
         }
@@ -104,6 +107,14 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
                     result = results.toString();
                 }
             }
+        } else if (KConstants.Protocol.SHARD_TASK.equals(this.type)) {
+            long stime = System.currentTimeMillis();
+            Map<String, List<String>> shardTasks = ScheduleShardStrategy.getScheduleShardTask();
+            LoggerUtils.print(this.getClass()).info("All shard task strategy, result: " + JSON.toJSONString(shardTasks));
+            if (shardTasks.containsKey(this.key)) {
+                result = JSON.toJSONString(ScheduleShardStrategy.getScheduleShardTask().get(this.key));
+            }
+            LoggerUtils.print(this.getClass()).info("Spent time [" + (System.currentTimeMillis() - stime) + "]ms, worknode[" + this.key + "] task: " + result);
         }
         return result;
     }

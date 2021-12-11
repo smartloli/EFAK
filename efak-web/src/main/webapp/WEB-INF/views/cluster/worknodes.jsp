@@ -50,12 +50,12 @@
                                     <table id="cluster_tab" class="table table-bordered table-hover">
                                         <thead>
                                         <tr>
-                                            <th>ID</th>
                                             <th>IP</th>
                                             <th>Port</th>
                                             <th>Memory(Used | Percent)</th>
                                             <th>CPU</th>
                                             <th>Status</th>
+                                            <th>Role</th>
                                             <th>Created</th>
                                             <!--
                                             <th>Operate</th>

@@ -39,6 +39,9 @@ import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
  * Created by Sep 16, 2020
  */
 public class MasterNodeClient {
+
+    private static final int DEFAULT_TIME_OUT = 30 * 1000;
+
     private MasterNodeClient() {
 
     }
@@ -47,7 +50,7 @@ public class MasterNodeClient {
      * Get worknode server metrics result.
      */
     public static String getResult(String host, int port, JSONObject object) {
-        int timeout = SystemConfigUtils.getIntProperty("efak.sql.worknode.rpc.timeout");
+        int timeout = SystemConfigUtils.getIntProperty("efak.worknode.rpc.timeout", DEFAULT_TIME_OUT);
         TTransport transport = null;
         try {
             transport = new TFramedTransport(new TSocket(new TConfiguration(), host, port, timeout));

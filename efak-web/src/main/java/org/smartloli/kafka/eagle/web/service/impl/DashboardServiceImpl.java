@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DashboardInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.util.KConstants;
@@ -40,7 +41,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Kafka Eagle dashboard data generator.
@@ -74,18 +74,6 @@ public class DashboardServiceImpl implements DashboardService {
     private MBeanDao mbeanDao;
 
     /**
-     * Get consumer number from zookeeper.
-     */
-    private int getConsumerNumbers(String clusterAlias) {
-        Map<String, List<String>> consumers = kafkaService.getConsumers(clusterAlias);
-        int count = 0;
-        for (Entry<String, List<String>> entry : consumers.entrySet()) {
-            count += entry.getValue().size();
-        }
-        return count;
-    }
-
-    /**
      * Get kafka & dashboard dataset.
      */
     public String getDashboard(String clusterAlias) {
@@ -99,7 +87,7 @@ public class DashboardServiceImpl implements DashboardService {
      * Get kafka data.
      */
     private String kafkaBrokersGraph(String clusterAlias) {
-        List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+        List<BrokersInfo> brokers = BrokerCache.META_CACHE.get(clusterAlias);
         JSONObject target = new JSONObject();
         target.put("name", "Kafka Brokers");
         JSONArray targets = new JSONArray();
@@ -130,12 +118,7 @@ public class DashboardServiceImpl implements DashboardService {
         dashboard.setBrokers(brokerService.brokerNumbers(clusterAlias));
         dashboard.setTopics(brokerService.topicNumbers(clusterAlias));
         dashboard.setZks(zks);
-        String formatter = SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage");
-        if ("kafka".equals(formatter)) {
-            dashboard.setConsumers(kafkaService.getKafkaConsumerGroups(clusterAlias));
-        } else {
-            dashboard.setConsumers(getConsumerNumbers(clusterAlias));
-        }
+        dashboard.setConsumers(kafkaService.getKafkaConsumerGroups(clusterAlias));
         return dashboard.toString();
     }
 

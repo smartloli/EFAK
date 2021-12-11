@@ -42,6 +42,7 @@ import org.smartloli.kafka.eagle.common.constant.JmxConstants.BrokerServer;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaServer8;
 import org.smartloli.kafka.eagle.common.constant.KSqlParser;
 import org.smartloli.kafka.eagle.common.protocol.*;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicPartitionSchema;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
@@ -323,109 +324,6 @@ public class KafkaServiceImpl implements KafkaService {
     }
 
     /**
-     * Obtaining kafka consumer page information from zookeeper.
-     */
-    public Map<String, List<String>> getConsumers(String clusterAlias, DisplayInfo page) {
-        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        Map<String, List<String>> consumers = new HashMap<String, List<String>>();
-        try {
-            if (page.getSearch().length() > 0) {
-                String path = CONSUMERS_PATH + "/" + page.getSearch() + "/owners";
-                if (zkc.pathExists(path)) {
-                    Seq<String> owners = zkc.getChildren(path);
-                    List<String> ownersSerialize = JavaConversions.seqAsJavaList(owners);
-                    consumers.put(page.getSearch(), ownersSerialize);
-                } else {
-                    LOG.error("Consumer Path[" + path + "] is not exist.");
-                }
-            } else {
-                Seq<String> subConsumersPaths = zkc.getChildren(CONSUMERS_PATH);
-                List<String> groups = JavaConversions.seqAsJavaList(subConsumersPaths);
-                int offset = 0;
-                for (String group : groups) {
-                    if (offset < (page.getiDisplayLength() + page.getiDisplayStart()) && offset >= page.getiDisplayStart()) {
-                        String path = CONSUMERS_PATH + "/" + group + "/owners";
-                        if (zkc.pathExists(path)) {
-                            Seq<String> owners = zkc.getChildren(path);
-                            List<String> ownersSerialize = JavaConversions.seqAsJavaList(owners);
-                            consumers.put(group, ownersSerialize);
-                        } else {
-                            LOG.error("Consumer Path[" + path + "] is not exist.");
-                        }
-                    }
-                    offset++;
-                }
-            }
-        } catch (Exception ex) {
-            LOG.error(ex.getMessage());
-        } finally {
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
-            }
-        }
-        return consumers;
-    }
-
-    /**
-     * According to group, topic and partition to get offset from zookeeper.
-     *
-     * @param topic     Filter topic.
-     * @param group     Filter group.
-     * @param partition Filter partition.
-     * @return OffsetZkInfo.
-     * @see org.smartloli.efak.common.protocol.OffsetZkInfo
-     */
-    public OffsetZkInfo getOffset(String clusterAlias, String topic, String group, int partition) {
-        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        OffsetZkInfo offsetZk = new OffsetZkInfo();
-        String offsetPath = CONSUMERS_PATH + "/" + group + "/offsets/" + topic + "/" + partition;
-        String ownersPath = CONSUMERS_PATH + "/" + group + "/owners/" + topic + "/" + partition;
-        Tuple2<Option<byte[]>, Stat> tuple = null;
-        try {
-            if (zkc.pathExists(offsetPath)) {
-                tuple = zkc.getDataAndStat(offsetPath);
-            } else {
-                LOG.info("Partition[" + partition + "],OffsetPath[" + offsetPath + "] is not exist!");
-                if (zkc != null) {
-                    kafkaZKPool.release(clusterAlias, zkc);
-                    zkc = null;
-                }
-                return offsetZk;
-            }
-        } catch (Exception ex) {
-            LOG.error("Partition[" + partition + "],get offset has error,msg is " + ex.getMessage());
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
-            }
-            return offsetZk;
-        }
-        try {
-            String tupleString = new String(tuple._1.get());
-            long offsetSize = Long.parseLong(tupleString);
-            if (zkc.pathExists(ownersPath)) {
-                Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(ownersPath);
-                String tupleString2 = new String(tuple2._1.get());
-                offsetZk.setOwners(tupleString2 == null ? "" : tupleString2);
-            } else {
-                offsetZk.setOwners("");
-            }
-            offsetZk.setOffset(offsetSize);
-            offsetZk.setCreate(CalendarUtils.convertUnixTime2Date(tuple._2.getCtime()));
-            offsetZk.setModify(CalendarUtils.convertUnixTime2Date(tuple._2.getMtime()));
-        } catch (Exception e) {
-            LoggerUtils.print(this.getClass()).error("Get consumer offsets from zookeeper has error, msg is ", e);
-        } finally {
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
-            }
-        }
-        return offsetZk;
-    }
-
-    /**
      * According to topic and partition to obtain Replicas & Isr.
      */
     public String getReplicasIsr(String clusterAlias, String topic, int partitionid) {
@@ -500,7 +398,11 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic) {
         Map<String, Object> targets = new HashMap<String, Object>();
-        int brokers = getAllBrokersInfo(clusterAlias).size();
+        List<BrokersInfo> brokerLists = BrokerCache.META_CACHE.get(clusterAlias);
+        int brokers = 0;
+        if (brokerLists != null) {
+            brokers = brokerLists.size();
+        }
         if (Integer.parseInt(replic) > brokers) {
             targets.put("status", "error");
             targets.put("info", "replication factor: " + replic + " larger than available brokers: " + brokers);
@@ -522,8 +424,7 @@ public class KafkaServiceImpl implements KafkaService {
             NewTopic newTopic = new NewTopic(topicName, Integer.valueOf(partitions), Short.valueOf(replic));
             adminClient.createTopics(Collections.singleton(newTopic)).all().get();
         } catch (Exception e) {
-            LOG.info("Create kafka topic has error, msg is " + e.getMessage());
-            e.printStackTrace();
+            LoggerUtils.print(this.getClass()).error("Create kafka topic has error, msg is ", e);
         } finally {
             adminClient.close();
         }
@@ -580,7 +481,7 @@ public class KafkaServiceImpl implements KafkaService {
 
     private String parseBrokerServer(String clusterAlias) {
         String brokerServer = "";
-        List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
+        List<BrokersInfo> brokers = BrokerCache.META_CACHE.get(clusterAlias);
         for (BrokersInfo broker : brokers) {
             brokerServer += broker.getHost() + ":" + broker.getPort() + ",";
         }
@@ -835,6 +736,40 @@ public class KafkaServiceImpl implements KafkaService {
             adminClient.close();
         }
         return consumerGroups.toJSONString();
+    }
+
+    /**
+     * Get kafka group consumer all topics lags.
+     */
+    public long getKafkaLag(String clusterAlias, String group, String ketopic) {
+        long lag = 0L;
+
+        Properties prop = new Properties();
+        prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable")) {
+            sasl(prop, clusterAlias);
+        }
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
+            ssl(prop, clusterAlias);
+        }
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(prop);
+            ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(group);
+            for (Entry<TopicPartition, OffsetAndMetadata> entry : offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
+                if (ketopic.equals(entry.getKey().topic())) {
+                    long logSize = getKafkaLogSize(clusterAlias, entry.getKey().topic(), entry.getKey().partition());
+                    lag += logSize - entry.getValue().offset();
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("Get cluster[" + clusterAlias + "] group[" + group + "] topic[" + ketopic + "] consumer lag has error, msg is " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            adminClient.close();
+        }
+        return lag;
     }
 
     /**
@@ -1366,226 +1301,6 @@ public class KafkaServiceImpl implements KafkaService {
         producer.close();
 
         return true;
-    }
-
-    /**
-     * Get group consumer all topics lags.
-     */
-    public long getLag(String clusterAlias, String group, String topic) {
-        long lag = 0L;
-        try {
-            List<String> partitions = findTopicPartition(clusterAlias, topic);
-            for (String partition : partitions) {
-                int partitionInt = Integer.parseInt(partition);
-                OffsetZkInfo offsetZk = getOffset(clusterAlias, topic, group, partitionInt);
-                long logSize = getLogSize(clusterAlias, topic, partitionInt);
-                lag += logSize - offsetZk.getOffset();
-            }
-        } catch (Exception e) {
-            LOG.error("Get cluser[" + clusterAlias + "] active group[" + group + "] topic[" + topic + "] lag has error, msg is " + e.getMessage());
-            e.printStackTrace();
-        }
-        return lag;
-    }
-
-    /**
-     * Get kafka group consumer all topics lags.
-     */
-    public long getKafkaLag(String clusterAlias, String group, String ketopic) {
-        long lag = 0L;
-
-        Properties prop = new Properties();
-        prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
-
-        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable")) {
-            sasl(prop, clusterAlias);
-        }
-        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
-            ssl(prop, clusterAlias);
-        }
-        AdminClient adminClient = null;
-        try {
-            adminClient = AdminClient.create(prop);
-            ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(group);
-            for (Entry<TopicPartition, OffsetAndMetadata> entry : offsets.partitionsToOffsetAndMetadata().get().entrySet()) {
-                if (ketopic.equals(entry.getKey().topic())) {
-                    long logSize = getKafkaLogSize(clusterAlias, entry.getKey().topic(), entry.getKey().partition());
-                    lag += logSize - entry.getValue().offset();
-                }
-            }
-        } catch (Exception e) {
-            LOG.error("Get cluster[" + clusterAlias + "] group[" + group + "] topic[" + ketopic + "] consumer lag has error, msg is " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            adminClient.close();
-        }
-        return lag;
-    }
-
-    /**
-     * Get kafka old version topic history logsize.
-     */
-    public long getLogSize(String clusterAlias, String topic, int partitionid) {
-        JMXConnector connector = null;
-        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.uri");
-        List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
-        for (BrokersInfo broker : brokers) {
-            try {
-                JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
-                connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
-                if (connector != null) {
-                    break;
-                }
-            } catch (Exception e) {
-                LOG.error("Get kafka old version logsize has error, msg is " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        long logSize = 0L;
-        try {
-            MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-            logSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.END_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
-        } catch (Exception ex) {
-            LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
-            ex.printStackTrace();
-        } finally {
-            if (connector != null) {
-                try {
-                    connector.close();
-                } catch (IOException e) {
-                    LOG.error("Close jmx connector has error, msg is " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }
-        return logSize;
-    }
-
-    /**
-     * Get kafka old version topic history logsize by partition set.
-     */
-    public long getLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
-        JMXConnector connector = null;
-        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.uri");
-        List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
-        for (BrokersInfo broker : brokers) {
-            try {
-                JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
-                connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
-                if (connector != null) {
-                    break;
-                }
-            } catch (Exception e) {
-                LOG.error("Get kafka old version logsize has error, msg is " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        long logSize = 0L;
-        try {
-            MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-            for (int partitionid : partitionids) {
-                logSize += Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.END_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
-            }
-        } catch (Exception ex) {
-            LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
-            ex.printStackTrace();
-        } finally {
-            if (connector != null) {
-                try {
-                    connector.close();
-                } catch (IOException e) {
-                    LOG.error("Close jmx connector has error, msg is " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }
-        return logSize;
-    }
-
-    /**
-     * Get kafka old version real topic logsize.
-     */
-    public long getRealLogSize(String clusterAlias, String topic, int partitionid) {
-        JMXConnector connector = null;
-        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.uri");
-        List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
-        for (BrokersInfo broker : brokers) {
-            try {
-                JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
-                connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
-                if (connector != null) {
-                    break;
-                }
-            } catch (Exception e) {
-                LOG.error("Get kafka old version logsize has error, msg is " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        long logSize = 0L;
-        try {
-            MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-            long endLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.END_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
-            long startLogSize = Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.START_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
-            logSize = endLogSize - startLogSize;
-        } catch (Exception ex) {
-            LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
-            ex.printStackTrace();
-        } finally {
-            if (connector != null) {
-                try {
-                    connector.close();
-                } catch (IOException e) {
-                    LOG.error("Close jmx connector has error, msg is " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }
-        return logSize;
-    }
-
-    /**
-     * Get kafka old version real topic logsize.
-     */
-    public long getRealLogSize(String clusterAlias, String topic, Set<Integer> partitionids) {
-        JMXConnector connector = null;
-        String JMX = SystemConfigUtils.getProperty(clusterAlias + ".efak.jmx.uri");
-        List<BrokersInfo> brokers = getAllBrokersInfo(clusterAlias);
-        for (BrokersInfo broker : brokers) {
-            try {
-                JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, broker.getHost() + ":" + broker.getJmxPort()));
-                connector = JMXFactoryUtils.connectWithTimeout(clusterAlias, jmxSeriverUrl, 30, TimeUnit.SECONDS);
-                if (connector != null) {
-                    break;
-                }
-            } catch (Exception e) {
-                LOG.error("Get kafka old version logsize has error, msg is " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        long logSize = 0L;
-        try {
-            MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-            long endLogSize = 0L;
-            long startLogSize = 0L;
-            for (int partitionid : partitionids) {
-                endLogSize += Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.END_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
-                startLogSize += Long.parseLong(mbeanConnection.getAttribute(new ObjectName(String.format(KafkaServer8.START_LOG_SIZE.getValue(), topic, partitionid)), KafkaServer8.VALUE.getValue()).toString());
-            }
-            logSize = endLogSize - startLogSize;
-        } catch (Exception ex) {
-            LOG.error("Get kafka old version logsize & parse has error, msg is " + ex.getMessage());
-            ex.printStackTrace();
-        } finally {
-            if (connector != null) {
-                try {
-                    connector.close();
-                } catch (IOException e) {
-                    LOG.error("Close jmx connector has error, msg is " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }
-        return logSize;
     }
 
     /**

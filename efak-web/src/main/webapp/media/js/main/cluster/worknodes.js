@@ -8,8 +8,6 @@ $(document).ready(function () {
         "fnServerData": retrieveData,
         "sAjaxSource": "/cluster/info/worknodes/ajax",
         "aoColumns": [{
-            "mData": 'id'
-        }, {
             "mData": 'ip'
         }, {
             "mData": 'port'
@@ -19,6 +17,8 @@ $(document).ready(function () {
             "mData": 'cpu'
         }, {
             "mData": 'status'
+        }, {
+            "mData": 'role'
         }, {
             "mData": 'created'
         }]

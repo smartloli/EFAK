@@ -40,6 +40,13 @@ public class KConstants {
         public static final int CHILD_SIZE = 5;
     }
 
+    public final class CharSet {
+        private CharSet() {
+        }
+
+        public static final String UTF_8 = "utf-8";
+    }
+
     public enum OperateSystem {
         OS_NAME("os.name"),
         LINUX("Linux");
@@ -63,6 +70,8 @@ public class KConstants {
         private Kafka() {
         }
 
+        public static final String BROKER_IDS_PATH = "/brokers/ids";
+        public static final String BROKER = "broker";
         public static final String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
         public static final String EFAK_SYSTEM_GROUP = "efak.system.group";
         public static final String AUTO_COMMIT = "true";
@@ -99,6 +108,17 @@ public class KConstants {
         public static final String CLUSTER_ALIAS = "clusterAlias";
         public static final String CLUSTER_ALIAS_LIST = "clusterAliasList";
         public static final int CLUSTER_ALIAS_LIST_LIMIT = 5;
+    }
+
+    /**
+     * EFAK Mode.
+     */
+    public final class EFAK {
+        private EFAK() {
+        }
+
+        public static final String MODE_MASTER = "master";
+        public static final String MODE_SLAVE = "slave";
     }
 
     /**
@@ -382,7 +402,9 @@ public class KConstants {
         public static final String KEY = "KEY";
         public static final String VALUE = "VALUE";
         public static final String JOB_ID = "JOB_ID";
+        public static final String KEY_BY_IP = "KEY_BY_IP";
         public static final String HEART_BEAT = "HEART_BEAT";
+        public static final String SHARD_TASK = "SHARD_TASK";
         public static final String KSQL_QUERY = "KSQL_QUERY";
         public static final String KSQL_QUERY_LOG = "KSQL_QUERY_LOG";
 
