@@ -42,11 +42,6 @@ public class ScheduleShardStrategy {
         int port = SystemConfigUtils.getIntProperty("efak.worknode.port");
         List<WorkNodeStrategy> nodes = new ArrayList<>();
         for (String host : hosts) {
-//            WorkNodeStrategy wns = new WorkNodeStrategy();
-//            wns.setPort(port);
-//            wns.setHost(host);
-//            nodes.add(wns);
-
             if (NetUtils.telnet(host, port)) {
                 WorkNodeStrategy wns = new WorkNodeStrategy();
                 wns.setPort(port);

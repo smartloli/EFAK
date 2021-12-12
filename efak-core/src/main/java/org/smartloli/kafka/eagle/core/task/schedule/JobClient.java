@@ -287,6 +287,12 @@ public class JobClient {
             wns.setPort(port);
             nodes.add(wns);
         }
+
+        String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+        WorkNodeStrategy masterWns = new WorkNodeStrategy();
+        masterWns.setHost(masterHost);
+        masterWns.setPort(port);
+        nodes.add(masterWns);
         return nodes;
     }
 
