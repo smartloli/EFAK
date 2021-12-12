@@ -93,14 +93,14 @@ stop()
  SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | grep WorkNodeServer | awk '{print $2}'`
  if [ "$SPID" != "" ];then
   kill -9  $SPID
-  echo "[$stime] INFO: WorkNodeServer_`hostname` Stop Success."
+  echo "[$stime] INFO: WorkNodeServer-`hostname -i` Stop Success."
  fi
 }
 
 status()
 {
   SPID=`ps -ef | grep ${KE_HOME}/kms | grep -v grep | grep WorkNodeServer | awk '{print $2}'`
-  HOSTNAME=`hostname`
+  HOSTNAME=`hostname -i`
   if [ "$SPID" = "" ] ;then
     echo "[$stime] INFO : WorkNodeServer-$HOSTNAME has stopped, [$SPID] ."
   else

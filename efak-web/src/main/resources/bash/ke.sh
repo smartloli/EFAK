@@ -146,8 +146,10 @@ shutdown()
 {
  for i in `cat ${KE_HOME}/conf/works`
  do
-  log=`ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh stop" &`
-  echo $log
+  efak_stime=`date "+%Y-%m-%d %H:%M:%S"`
+  ssh $i -q "source /etc/profile;source ~/.bash_profile;${KE_HOME}/bin/worknode.sh stop>/dev/null" &
+  echo "[$efak_stime] INFO: EFAK Slave WorkNodeServer-$i Stop Success."
+  sleep 1
  done
 }
 
@@ -170,10 +172,10 @@ stop()
  if [ -f $KE_HOME/bin/ke.pid ];then
   SPID=`cat $KE_HOME/bin/ke.pid`
   if [ "$SPID" != "" ];then
-   ${KE_HOME}/kms/bin/shutdown.sh
+   ${KE_HOME}/kms/bin/shutdown.sh>/dev/null
     kill -9  $SPID
     echo > $DIALUP_PID
-   echo "[$stime] INFO: Stop Success."
+   echo "[$stime] INFO: EFAK-`hostname -i` Stop Success."
   fi
  fi
 }
@@ -242,7 +244,7 @@ CheckProcessStata()
 status()
 {
   SPID=`cat $KE_HOME/bin/ke.pid`
-  HOSTNAME=`hostname`
+  HOSTNAME=`hostname -i`
   CheckProcessStata $SPID >/dev/null
   if [ $? != 0 ];then
    echo "[$stime] INFO : EFAK-$HOSTNAME has stopped, [$SPID] ."
@@ -312,7 +314,7 @@ sdate()
 start_cluster()
 {
  start
- HOSTNAME=`hostname`
+ HOSTNAME=`hostname -i`
  efak_stime=`date "+%Y-%m-%d %H:%M:%S"`
  echo "[$efak_stime] INFO: EFAK Master-$HOSTNAME WebConsole Start Success."
  sleep 1
@@ -353,9 +355,9 @@ status_cluster()
 
 stop_cluster()
 {
+ stop
  efak_stime=`date "+%Y-%m-%d %H:%M:%S"`
  echo "[$efak_stime] INFO: EFAK WebConsole has stopped ."
- stop
  sleep 1
  for i in `cat ${KE_HOME}/conf/works`
  do
@@ -366,7 +368,7 @@ stop_cluster()
  sleep 1
  source /etc/profile
  source ~/.bash_profile
- ${KE_HOME}/bin/worknode.sh stop &
+ ${KE_HOME}/bin/worknode.sh stop>/dev/null &
  echo "[$efak_stime] INFO: EFAK WorkNodeServer Stop Success."
  sleep 1
  shutdown
