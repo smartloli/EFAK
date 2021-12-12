@@ -119,6 +119,7 @@ public class KConstants {
 
         public static final String MODE_MASTER = "master";
         public static final String MODE_SLAVE = "slave";
+        public static final String MODE_STANDALONE = "standalone";
     }
 
     /**
@@ -404,6 +405,7 @@ public class KConstants {
         public static final String JOB_ID = "JOB_ID";
         public static final String KEY_BY_IP = "KEY_BY_IP";
         public static final String HEART_BEAT = "HEART_BEAT";
+        public static final String CLUSTER_NAME = "CLUSTER_NAME";
         public static final String SHARD_TASK = "SHARD_TASK";
         public static final String KSQL_QUERY = "KSQL_QUERY";
         public static final String KSQL_QUERY_LOG = "KSQL_QUERY_LOG";

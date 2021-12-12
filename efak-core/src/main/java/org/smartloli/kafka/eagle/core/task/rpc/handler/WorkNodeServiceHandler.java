@@ -45,6 +45,7 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
     private String type;
     private String jobId;
     private String key; // used by quartz ip key
+    private String cluster;
 
     @Override
     public String getResult(String jsonObject) throws TException {
@@ -52,6 +53,7 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
             JSONObject object = JSON.parseObject(jsonObject);
             if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.HEART_BEAT)) {
                 this.type = KConstants.Protocol.HEART_BEAT;
+                this.cluster = object.getString(KConstants.Protocol.CLUSTER_NAME);
             } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.KSQL_QUERY)) {
                 this.type = KConstants.Protocol.KSQL_QUERY;
                 this.ksql = object.getObject(KConstants.Protocol.VALUE, KSqlStrategy.class);
@@ -83,6 +85,27 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
                 memory = "<span class='badge badge-danger'>" + percent + "</span>";
             }
             object.put("memory", memory);
+
+            // get zkclient pool size
+            int zkLimitSize = SystemConfigUtils.getIntProperty("kafka.zk.limit.size");
+            int zkCliPoolSize = KafkaZKSingletonUtils.getZkCliPoolSize(this.cluster);
+            int zkCliIdle = zkLimitSize - zkCliPoolSize;
+            String zkCliSize = "";
+            String zkCliStr = zkLimitSize + " | " + zkCliPoolSize;
+            if (zkCliIdle < 0) {
+                zkCliSize = "<span class='badge badge-danger'>" + zkCliStr + "</span>";
+            } else {
+                if ((zkCliIdle * 100.0) / zkLimitSize < KConstants.BrokerSever.MEM_NORMAL) {
+                    zkCliSize = "<span class='badge badge-success'>" + zkCliStr + "</span>";
+                } else if ((zkCliIdle * 100.0) / zkLimitSize >= KConstants.BrokerSever.MEM_NORMAL && (zkCliIdle * 100.0) / zkLimitSize < KConstants.BrokerSever.MEM_DANGER) {
+                    zkCliSize = "<span class='badge badge-warning'>" + zkCliStr + "</span>";
+                } else if ((zkCliIdle * 100.0) / zkLimitSize >= KConstants.BrokerSever.MEM_DANGER) {
+                    zkCliSize = "<span class='badge badge-danger'>" + zkCliStr + "</span>";
+                }
+            }
+
+            object.put("zkcli", zkCliSize);
+
             object.put("cpu", "<span class='badge badge-secondary'>" + AppUtils.getInstance().getProcessCpu() + "%</span>");
             object.put("created", AppUtils.getInstance().getStartTime());
             JSONArray array = new JSONArray();

@@ -51,7 +51,7 @@ public class WorkUtils {
                 lines = Files.readLines(new File(System.getProperty("user.dir") + "/conf/" + workNodesName), Charsets.UTF_8);
             }
         } catch (Exception ex) {
-            LoggerUtils.print(WorkUtils.class).error("Get kafka eagle work node has error, msg is ", ex);
+            LoggerUtils.print(WorkUtils.class).error("Get EFAK WorkNodeServer has error, msg is ", ex);
         }
         return lines;
     }

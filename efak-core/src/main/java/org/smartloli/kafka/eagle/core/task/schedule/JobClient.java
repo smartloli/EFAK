@@ -127,7 +127,7 @@ public class JobClient {
         return null;
     }
 
-    public static List<WorkNodeMetrics> getWorkNodeMetrics() {
+    public static List<WorkNodeMetrics> getWorkNodeMetrics(String clusterAlias) {
         List<WorkNodeMetrics> metrics = new ArrayList<>();
         int id = 1;
         for (WorkNodeStrategy workNode : getWorkNodes()) {
@@ -138,6 +138,7 @@ public class JobClient {
             if (NetUtils.telnet(workNode.getHost(), workNode.getPort())) {
                 JSONObject object = new JSONObject();
                 object.put(KConstants.Protocol.KEY, KConstants.Protocol.HEART_BEAT);
+                object.put(KConstants.Protocol.CLUSTER_NAME, clusterAlias);
                 List<JSONArray> results = new ArrayList<>();
                 String resultStr = MasterNodeClient.getResult(workNode.getHost(), workNode.getPort(), object);
                 try {
@@ -154,6 +155,7 @@ public class JobClient {
                         workNodeMetrics.setCpu(result.getString("cpu"));
                         workNodeMetrics.setMemory(result.getString("memory"));
                         workNodeMetrics.setStartTime(result.getString("created"));
+                        workNodeMetrics.setZkCli(result.getString("zkcli"));
                     }
                 }
             } else {

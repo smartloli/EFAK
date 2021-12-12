@@ -89,6 +89,18 @@ public final class KafkaZKPoolUtils {
             zkCliPools.put(entry.getKey(), zkCliPool);
         }
 
+        LoggerUtils.print(KafkaZKPoolUtils.class).info("Init ZkClient object.");
+
+    }
+
+    /**
+     * Get current unused zkclient object.
+     */
+    public static int getZkCliPoolSize(String cluster) {
+        if (zkCliPools.containsKey(cluster)) {
+            return zkCliPools.get(cluster).size();
+        }
+        return 0;
     }
 
     /**
@@ -115,9 +127,10 @@ public final class KafkaZKPoolUtils {
                 if (osName.contains(OperateSystem.LINUX.getValue())) {
                     LoggerUtils.print(KafkaZKPoolUtils.class).debug(errorMessageByZookeeper, zkCliPool.size());
                 } else {
-                    LoggerUtils.print(KafkaZKPoolUtils.class).info(errorMessageByZookeeper, zkCliPool.size());
+                    // LoggerUtils.print(KafkaZKPoolUtils.class).info(errorMessageByZookeeper, zkCliPool.size());
                 }
             } else {
+                LoggerUtils.print(KafkaZKPoolUtils.class).info("ZkClient is empty.");
                 for (int i = 0; i < zkCliPoolSize; i++) {
                     zkc = KafkaZkClient.apply(clusterAliass.get(clusterAlias), JaasUtils.isZkSecurityEnabled(), ZK_SESSION_TIMEOUT_MS, ZK_CONNECTION_TIMEOUT_MS, Integer.MAX_VALUE, Time.SYSTEM, METRIC_GROUP_NAME, "SessionExpireListener");
                     if (zkc != null) {
@@ -153,7 +166,7 @@ public final class KafkaZKPoolUtils {
         if (osName.contains(OperateSystem.LINUX.getValue())) {
             LoggerUtils.print(KafkaZKPoolUtils.class).debug(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
         } else {
-            LoggerUtils.print(KafkaZKPoolUtils.class).info(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
+//            LoggerUtils.print(KafkaZKPoolUtils.class).info(releaseMessageByZookeeper, (zkCliPool == null ? 0 : zkCliPool.size()));
         }
     }
 

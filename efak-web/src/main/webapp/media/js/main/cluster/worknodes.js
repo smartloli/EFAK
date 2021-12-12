@@ -20,6 +20,8 @@ $(document).ready(function () {
         }, {
             "mData": 'role'
         }, {
+            "mData": 'zkcli'
+        }, {
             "mData": 'created'
         }]
     });

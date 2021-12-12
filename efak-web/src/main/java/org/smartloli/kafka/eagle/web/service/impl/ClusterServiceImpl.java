@@ -118,7 +118,7 @@ public class ClusterServiceImpl implements ClusterService {
             List<BrokersInfo> kafkaBrokers = BrokerCache.META_CACHE.get(clusterAlias);
             target.put("kafka", JSON.parseArray(kafkaBrokers.toString()));
         } else if ("worknodes".equals(type)) {
-            List<WorkNodeMetrics> metrics = JobClient.getWorkNodeMetrics();
+            List<WorkNodeMetrics> metrics = JobClient.getWorkNodeMetrics(clusterAlias);
             target.put("worknodes", JSON.parseArray(metrics.toString()));
         }
         return target.toJSONString();

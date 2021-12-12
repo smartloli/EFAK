@@ -44,7 +44,8 @@ public class KafkaZKSingletonUtils {
         return ZkClientHolder.kafkaZKPool;
     }
 
-    public static void main(String[] args) {
-        System.out.println(create().getZkClient("cluster1").getBroker(0));
+    public static int getZkCliPoolSize(String cluster) {
+        return KafkaZKPoolUtils.getZkCliPoolSize(cluster);
     }
+    
 }

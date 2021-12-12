@@ -34,6 +34,15 @@ public class WorkNodeMetrics extends BaseProtocol {
     private String cpu;
     private boolean isAlive = false;
     private String startTime;
+    private String zkCli;
+
+    public String getZkCli() {
+        return zkCli;
+    }
+
+    public void setZkCli(String zkCli) {
+        this.zkCli = zkCli;
+    }
 
     public int getId() {
         return id;

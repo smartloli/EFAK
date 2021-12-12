@@ -56,6 +56,7 @@
                                             <th>CPU</th>
                                             <th>Status</th>
                                             <th>Role</th>
+                                            <th>ZKCli(Max | Idle)</th>
                                             <th>Created</th>
                                             <!--
                                             <th>Operate</th>

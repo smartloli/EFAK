@@ -17,9 +17,10 @@
  */
 package org.smartloli.kafka.eagle.ipc;
 
+import org.smartloli.kafka.eagle.core.task.metrics.WorkNodeMetrics;
 import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
 
-import java.util.Date;
+import java.util.List;
 
 /**
  * Test JobClient
@@ -30,11 +31,7 @@ import java.util.Date;
  */
 public class TestJobClient {
     public static void main(String[] args) {
-        // partition-0 -> 90
-//        String sql = "select * from test16 where `partition` in (0,1,2) and JSON(msg,'id')=1 limit 10";
-        String sql = "select * from ke1115 where `partition` in (0) limit 10";
-        String jobId = "job_id_" + new Date().getTime();
-        String result = JobClient.physicsSubmit("cluster1", sql, jobId);
-        System.out.println(result);
+        List<WorkNodeMetrics> wns = JobClient.getWorkNodeMetrics("cluster1");
+        System.out.println(wns.toString());
     }
 }
