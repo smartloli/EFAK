@@ -311,10 +311,10 @@ sdate()
 
 start_cluster()
 {
+ start
  HOSTNAME=`hostname`
  efak_stime=`date "+%Y-%m-%d %H:%M:%S"`
  echo "[$efak_stime] INFO: EFAK Master-$HOSTNAME WebConsole Start Success."
- start
  sleep 1
  for i in `cat ${KE_HOME}/conf/works`
  do
