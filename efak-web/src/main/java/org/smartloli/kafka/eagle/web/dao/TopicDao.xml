@@ -156,7 +156,8 @@
     </select>
 
     <select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
-        select tm,sum(diffval) as total from ke_logsize where cluster=#{cluster}
+        select tm,sum(new_diffval) as total from (
+        select tm,max(diffval) as new_diffval from ke_logsize where cluster=#{cluster}
         <if test="topics != null and topics.size > 0">
             and `topic` in (
             <foreach collection="topics" item="item" index="index" separator=",">
@@ -164,7 +165,8 @@
             </foreach>
             )
         </if>
-        and tm between #{stime} and #{etime} group by tm
+        and tm between #{stime} and #{etime} group by from_unixtime(`timespan`,'%Y-%m-%d %H:%i:%S')
+        )a group by tm
     </select>
 
     <!-- TopicSqlHistory -->
