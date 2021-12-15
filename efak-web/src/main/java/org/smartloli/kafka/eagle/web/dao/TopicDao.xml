@@ -165,7 +165,7 @@
             </foreach>
             )
         </if>
-        and tm between #{stime} and #{etime} group by from_unixtime(`timespan`,'%Y-%m-%d %H:%i:%S')
+        and tm between #{stime} and #{etime} group by from_unixtime(timespan/1000,'%Y-%m-%d %H:%i:%s')
         )a group by tm
     </select>
 
