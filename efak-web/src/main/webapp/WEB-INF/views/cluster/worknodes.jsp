@@ -52,8 +52,8 @@
                                         <tr>
                                             <th>IP</th>
                                             <th>Port</th>
-                                            <th>Memory(Used | Percent)</th>
-                                            <th>CPU</th>
+                                            <th>Heap Memory(Used | Percent)</th>
+                                            <th>Usage CPU</th>
                                             <th>Status</th>
                                             <th>Role</th>
                                             <th>ZKCli(Max | Idle)</th>
