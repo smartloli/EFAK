@@ -55,7 +55,7 @@ public class CleanTopicSubTask extends Thread {
     private static BrokerService brokerService = new BrokerFactory().create();
 
     @Override
-    public void run() {
+    public synchronized void run() {
         try {
             this.topicCleanTask();
         } catch (Exception e) {

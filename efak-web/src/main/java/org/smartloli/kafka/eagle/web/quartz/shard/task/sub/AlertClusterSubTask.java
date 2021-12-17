@@ -51,7 +51,7 @@ public class AlertClusterSubTask extends Thread {
     private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
 
     @Override
-    public void run() {
+    public synchronized void run() {
         // run cluster metrics job
         Cluster cluster = new Cluster();
         cluster.cluster();

@@ -26,6 +26,7 @@ import org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanChartSubTask;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Unified scheduling and allocation of thread tasks.
@@ -65,6 +66,12 @@ public class ScheduleShardSubTask {
     private void jobForDistributedAllTasks() {
         LoggerUtils.print(this.getClass()).info("Distributed mode start thread on cluster.");
         if (KConstants.EFAK.MODE_SLAVE.equals(SystemConfigUtils.getProperty("efak.cluster.mode.status"))) {
+            // sleep job client thread
+            try {
+                Thread.sleep(new Random().nextInt(KConstants.EFAK.THREAD_SLEEP_TIME_SEED));
+            } catch (Exception e) {
+                LoggerUtils.print(this.getClass()).error("Sleep job client thread has error, msg is ", e);
+            }
             List<String> shardTasks = JobClient.getWorkNodeShardTask();
             if (shardTasks != null) {
                 for (String shardTask : shardTasks) {

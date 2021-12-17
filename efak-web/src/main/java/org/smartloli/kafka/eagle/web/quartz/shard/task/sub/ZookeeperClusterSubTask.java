@@ -56,7 +56,7 @@ public class ZookeeperClusterSubTask extends Thread {
     private Mx4jService mx4jService = new Mx4jFactory().create();
 
     @Override
-    public void run() {
+    public synchronized void run() {
         try {
             if (SystemConfigUtils.getBooleanProperty("efak.metrics.charts")) {
                 String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");

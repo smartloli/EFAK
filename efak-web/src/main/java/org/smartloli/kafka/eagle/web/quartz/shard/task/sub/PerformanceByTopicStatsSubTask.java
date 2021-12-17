@@ -47,7 +47,7 @@ public class PerformanceByTopicStatsSubTask extends Thread {
     private static BrokerService brokerService = new BrokerFactory().create();
 
     @Override
-    public void run() {
+    public synchronized void run() {
         try {
             for (String bType : KConstants.Topic.BROKER_PERFORMANCE_LIST) {
                 this.brokerPerformanceByTopicStats(bType);

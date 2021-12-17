@@ -49,7 +49,7 @@ public class AlertConsumerSubTask extends Thread {
     private KafkaMetricsService kafkaMetricsService = new KafkaMetricsFactory().create();
 
     @Override
-    public void run() {
+    public synchronized void run() {
         // run consumer metrics job
         Consumer consumer = new Consumer();
         consumer.consumer();

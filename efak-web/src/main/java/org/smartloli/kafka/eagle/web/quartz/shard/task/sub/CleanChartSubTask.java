@@ -41,7 +41,7 @@ public class CleanChartSubTask extends Thread {
         }
     }
 
-    private void cleanCharts() {
+    private synchronized void cleanCharts() {
         if (SystemConfigUtils.getBooleanProperty("efak.metrics.charts")) {
             MetricsServiceImpl metrics = StartupListener.getBean("metricsServiceImpl", MetricsServiceImpl.class);
             int retain = SystemConfigUtils.getIntProperty("efak.metrics.retain");

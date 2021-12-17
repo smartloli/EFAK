@@ -36,7 +36,7 @@ import java.util.Map;
 public class DetectConnectUriSubTask extends Thread {
 
     @Override
-    public void run() {
+    public synchronized void run() {
         try {
             if (SystemConfigUtils.getBooleanProperty("efak.metrics.charts")) {
                 String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");

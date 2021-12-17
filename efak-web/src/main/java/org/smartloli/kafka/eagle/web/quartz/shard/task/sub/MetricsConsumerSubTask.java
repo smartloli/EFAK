@@ -64,7 +64,7 @@ public class MetricsConsumerSubTask extends Thread {
 
 
     @Override
-    public void run() {
+    public synchronized void run() {
         this.metricsConsumerTopicQuartz();
     }
 

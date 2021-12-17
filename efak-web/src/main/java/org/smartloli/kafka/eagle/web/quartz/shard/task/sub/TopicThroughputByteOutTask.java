@@ -62,7 +62,7 @@ public class TopicThroughputByteOutTask extends Thread {
     private static Mx4jService mx4jService = new Mx4jFactory().create();
 
     @Override
-    public void run() {
+    public synchronized void run() {
         try {
             this.throughput();
         } catch (Exception e) {
