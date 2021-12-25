@@ -139,7 +139,8 @@ $(document).ready(function() {
 		}
 	}
 	// tree option end
-	let keTopicTree = echarts.init(document.getElementById("active_topic_consumers"));
+	topic_div = document.getElementById("active_topic_consumers")
+	let keTopicTree = echarts.init(topic_div);
 	// topic comsumer tree
 	function topicTree() {
 		console.log("执行方法0");
