@@ -77,7 +77,6 @@
         <result property="topic" column="topic"/>
         <result property="groupNumbers" column="group_number"/>
         <result property="activeGroup" column="active_group"/>
-        <result property="activeThread" column="active_thread_total"/>
     </resultMap>
 
     <!-- TopicRank -->
@@ -389,9 +388,9 @@
         </where>
     </select>
 
-
     <select id="getTopicSummaryPages" parameterType="map" resultMap="tsi">
-        select * from ke_topic_consumers_summary
+        select *
+        from v_ke_topic_consumer_groups_summary
         <where>
             `cluster`=#{cluster}
             <if test="search != null and search != ''">

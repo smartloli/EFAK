@@ -30,9 +30,7 @@ public class TopicSummaryInfo extends BaseProtocol {
 	private String cluster;
 	private String topic;
 	private int groupNumbers;
-	// private String coordinator;
 	private int activeGroup;
-	private int activeThread;
 
 	public String getCluster() {
 		return cluster;
@@ -66,11 +64,4 @@ public class TopicSummaryInfo extends BaseProtocol {
 		this.activeGroup = activeGroup;
 	}
 
-	public int getActiveThread() {
-		return activeThread;
-	}
-
-	public void setActiveThread(int activeThread) {
-		this.activeThread = activeThread;
-	}
 }
