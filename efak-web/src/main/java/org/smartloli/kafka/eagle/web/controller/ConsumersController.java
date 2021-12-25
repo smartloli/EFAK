@@ -97,9 +97,9 @@ public class ConsumersController {
 
         try {
             String formatter = SystemConfigUtils.getProperty(clusterAlias + ".efak.offset.storage");
-            String result = consumerService.getKafkaTopicGraph(clusterAlias);// offline
+            String result = consumerService.getKafkaTopicGraph(clusterAlias);
             if (StrUtils.isListNull(JSON.parseObject(result).getJSONObject("active").getString("children"))) {
-                result = consumerService.getActiveTopic(clusterAlias, formatter);// online
+                // TODO
             }
             byte[] output = result.getBytes();
             BaseController.response(output, response);
