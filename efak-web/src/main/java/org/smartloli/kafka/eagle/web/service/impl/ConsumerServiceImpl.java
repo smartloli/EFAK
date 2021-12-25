@@ -27,6 +27,7 @@ import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicSummaryInfo;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.D3;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
@@ -460,14 +461,51 @@ public class ConsumerServiceImpl implements ConsumerService {
         Map<String, Object> params = new HashMap<>();
         params.put("cluster", clusterAlias);
         params.put("start", 0);
-        params.put("size", D3.SIZE + 1);
+        params.put("size", D3.SIZE + 1);  // 10 + 1
         List<ConsumerSummaryInfo> consumerSummarys = topicDao.getConsumerSummaryPages(params);
         if (consumerSummarys != null) {
+            // {
+            //    name : "Active Topics",
+            //    children : targets
+            // }
             JSONObject target = new JSONObject();
+            // targets :
+            // [
+            //     {
+            //         name : test-consumer-group2,
+            //         children : [
+            //              name : t1,
+            //              name : t2
+            //         ]
+            //     },
+            //     {
+            //         name : consumer30,
+            //         children : [
+            //              name : t3,
+            //              name : t4
+            //         ]
+            //     }
+            // ]
             JSONArray targets = new JSONArray();
             target.put("name", "Active Topics");
             int count = 1;
+/**
+ * cluster	group	        topic_number	coordinator	     active_topic active_thread_total
+ * cluster1	consumer30	            1	    cul-tourism-0008:8085	1	         1
+ * cluster1	consumer4	            1	    cul-tourism-0008:8085	1	         1
+ * cluster1	test-consumer-group2	2	    cul-tourism-0008:8085	2	         2
+ * cluster1	test-consumer-group5	1	    cul-tourism-0008:8085	1	         1
+ */
             for (ConsumerSummaryInfo consumerSummary : consumerSummarys) {
+                /**
+                 *  {
+                 *      name : consumer30,
+                 *      children : [
+                 *                      name : t1,
+                 *                      name : t2
+                 *                 ]
+                 *  }
+                 */
                 JSONObject subTarget = new JSONObject();
                 JSONArray subTargets = new JSONArray();
                 if (count > KConstants.D3.SIZE) {
@@ -484,10 +522,19 @@ public class ConsumerServiceImpl implements ConsumerService {
                     paramChilds.put("cluster", clusterAlias);
                     paramChilds.put("group", consumerSummary.getGroup());
                     paramChilds.put("start", 0);
-                    paramChilds.put("size", D3.CHILD_SIZE + 1);
+                    paramChilds.put("size", D3.CHILD_SIZE + 1); // 5 + 1
                     paramChilds.put("status", "0");// running
+                    /**
+                     * cluster	group	                topic	 status
+                     * cluster1	test-consumer-group2	topic_1	 0
+                     * cluster1	test-consumer-group2	topic_2	 0
+                     */
                     List<ConsumerGroupsInfo> consumerGroups = topicDao.getConsumerGroupPages(paramChilds);
                     int child = 1;
+                    /**
+                     *  cluster	    group	                topic	 status
+                     *  cluster1	test-consumer-group2	topic_1	 0
+                     */
                     for (ConsumerGroupsInfo consumerGroup : consumerGroups) {
                         JSONObject subInSubTarget = new JSONObject();
                         if (child > D3.CHILD_SIZE) {
@@ -506,6 +553,121 @@ public class ConsumerServiceImpl implements ConsumerService {
                 targets.add(subTarget);
             }
             target.put("children", targets);
+            // {
+            //      active : target
+            // }
+            JSONObject result = new JSONObject();
+            result.put("active", target.toJSONString());
+            return result.toJSONString();
+        } else {
+            return "";
+        }
+    }
+
+
+    /**
+     * Get active topic : consumers  .
+     * @param clusterAlias
+     * @return
+     */
+    @Override
+    public String getKafkaTopicGraph(String clusterAlias) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("cluster", clusterAlias);
+        params.put("start", 0);
+        params.put("size", D3.SIZE + 1);  // 10 + 1
+        List<TopicSummaryInfo> topicSummarys = topicDao.getTopicSummaryPages(params);
+        if (topicSummarys != null) {
+            // {
+            //    name : "Active Topics",
+            //    children : targets
+            // }
+            JSONObject target = new JSONObject();
+            // targets :
+            // [
+            //     {
+            //         name : t1,
+            //         children : [
+            //              name : test-consumer-group2,
+            //              name : consumer30
+            //         ]
+            //     },
+            //     {
+            //         name : t2,
+            //         children : [
+            //              name : consumer30,
+            //              name : consumer2
+            //         ]
+            //     }
+            // ]
+            JSONArray targets = new JSONArray();
+            target.put("name", "Active Topics");
+            int count = 1;
+/**
+ * cluster	 topic	    group_number	active_group	active_thread_total
+ * cluster1	 topic_1	 2	            2	            2
+ * cluster1	 topic_2	 3	            3	            3
+ */
+            for (TopicSummaryInfo topicSummary : topicSummarys) {
+                /**
+                 *  {
+                 *      name : 2,
+                 *      children : [
+                 *                      name : t1,
+                 *                      name : t2
+                 *                 ]
+                 *  }
+                 */
+                JSONObject subTarget = new JSONObject();
+                JSONArray subTargets = new JSONArray();
+                if (count > KConstants.D3.SIZE) {
+                    subTarget.put("name", "...");
+                    JSONObject subInSubTarget = new JSONObject();
+                    subInSubTarget.put("name", "...");
+                    subTargets.add(subInSubTarget);
+                    subTarget.put("children", subTargets);
+                    targets.add(subTarget);
+                    break;
+                } else {
+                    subTarget.put("name", topicSummary.getTopic());
+                    Map<String, Object> paramChilds = new HashMap<>();
+                    paramChilds.put("cluster", clusterAlias);
+                    paramChilds.put("topic", topicSummary.getTopic());
+                    paramChilds.put("start", 0);
+                    paramChilds.put("size", D3.CHILD_SIZE + 1); // 5 + 1
+                    paramChilds.put("status", "0");// running
+                    /**
+                     * cluster	group	                topic	 status
+                     * cluster1	test-consumer-group2	topic_1	 0
+                     * cluster1	test-consumer-group2	topic_2	 0
+                     */
+                    List<ConsumerGroupsInfo> consumerGroups = topicDao.getTopicPages(paramChilds);
+                    int child = 1;
+                    /**
+                     *  cluster	    group	                topic	 status
+                     *  cluster1	test-consumer-group2	topic_1	 0
+                     */
+                    for (ConsumerGroupsInfo consumerGroup : consumerGroups) {
+                        JSONObject subInSubTarget = new JSONObject();
+                        if (child > D3.CHILD_SIZE) {
+                            subInSubTarget.put("name", "...");
+                            subTargets.add(subInSubTarget);
+                            break;
+                        } else {
+                            subInSubTarget.put("name", consumerGroup.getGroup());
+                            subTargets.add(subInSubTarget);
+                        }
+                        child++;
+                    }
+                }
+                count++;
+                subTarget.put("children", subTargets);
+                targets.add(subTarget);
+            }
+            target.put("children", targets);
+            // {
+            //      active : target
+            // }
             JSONObject result = new JSONObject();
             result.put("active", target.toJSONString());
             return result.toJSONString();

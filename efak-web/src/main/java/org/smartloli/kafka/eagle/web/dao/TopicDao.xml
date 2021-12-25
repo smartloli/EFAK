@@ -72,6 +72,14 @@
         <result property="activeThread" column="active_thread_total"/>
     </resultMap>
 
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.topic.TopicSummaryInfo" id="tsi">
+        <result property="cluster" column="cluster"/>
+        <result property="topic" column="topic"/>
+        <result property="groupNumbers" column="group_number"/>
+        <result property="activeGroup" column="active_group"/>
+        <result property="activeThread" column="active_thread_total"/>
+    </resultMap>
+
     <!-- TopicRank -->
     <select id="readTopicRank" parameterType="map" resultMap="trank">
         select `topic`,`tvalue` from ke_topic_rank
@@ -379,6 +387,32 @@
                 and `group` like #{search}
             </if>
         </where>
+    </select>
+
+
+    <select id="getTopicSummaryPages" parameterType="map" resultMap="tsi">
+        select * from ke_topic_consumers_summary
+        <where>
+            `cluster`=#{cluster}
+            <if test="search != null and search != ''">
+                and `topic` like #{search}
+            </if>
+        </where>
+        limit #{start},#{size}
+    </select>
+
+    <select id="getTopicPages" parameterType="map" resultMap="cgi">
+        select * from ke_consumer_group
+        <where>
+            `cluster`=#{cluster} and `topic`=#{topic}
+            <if test="search != null and search != ''">
+                and `group` like #{search}
+            </if>
+            <if test="status != null and status != ''">
+                and `status`=#{status}
+            </if>
+        </where>
+        limit #{start},#{size}
     </select>
 
 </mapper>
