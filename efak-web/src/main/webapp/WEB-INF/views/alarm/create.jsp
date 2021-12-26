@@ -80,6 +80,7 @@
                                                     <i class="fa fa-info-circle"></i> Write topic and capacity alarm
                                                     value(unit is byte), such as
                                                     {"topic":"ke_alarm_topic","capacity":1024}.
+                                                    The value of topic is supported by regular expressions, for example: "ab","abc","ab.d","ab5e" can match regular expressions "ab.*", "acc" cannot
                                                 </label>
                                             </div>
                                             <div id="ke_alarm_producer_div" style="display: none" class="form-group">
