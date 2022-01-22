@@ -72,4 +72,7 @@ public interface ConsumerService {
 	/** Get kafka consumer active graph. */
 	public String getKafkaConsumerGraph(String clusterAlias);
 
+	/** Get kafka topic active graph.	 */
+	public String getKafkaTopicGraph(String clusterAlias);
+
 }

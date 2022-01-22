@@ -24,6 +24,7 @@ import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
+import org.smartloli.kafka.eagle.common.protocol.topic.TopicSummaryInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -236,5 +237,15 @@ public interface TopicDao {
      * Count consumer group summary pages.
      */
     public long countConsumerSummaryPages(Map<String, Object> params);
+
+    /**
+     * Get topic summary pages.
+     */
+    public List<TopicSummaryInfo> getTopicSummaryPages(Map<String, Object> params);
+
+    /**
+     * Get consumer group pages.
+     */
+    public List<ConsumerGroupsInfo> getTopicPages(Map<String, Object> params);
 
 }

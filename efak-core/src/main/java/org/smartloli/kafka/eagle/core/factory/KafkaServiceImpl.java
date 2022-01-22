@@ -152,15 +152,37 @@ public class KafkaServiceImpl implements KafkaService {
      */
     public Map<String, List<String>> getActiveTopic(String clusterAlias) {
         KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+        // k : v = group_topic : List<Topic>
+        // [
+        //    g1_t1 : {t1},
+        //    g1_t2 : {t2},
+        //    g1_t3 : {t3},
+        //    g2_t2 : {t2},
+        //    g2_t5 : {t5},
+        //    g2_t7 : {t7},
+        // ]
         Map<String, List<String>> actvTopics = new HashMap<String, List<String>>();
         try {
             Seq<String> subConsumerPaths = zkc.getChildren(CONSUMERS_PATH);
             List<String> groups = JavaConversions.seqAsJavaList(subConsumerPaths);
+            // groupsAndTopics :
+            // [
+            //    { topic :  t1 , group : g1}
+            //    { topic :  t2 , group : g1}
+            //    { topic :  t3 , group : g1}
+            //    { topic :  t2 , group : g2}
+            //    { topic :  t5 , group : g2}
+            //    { topic :  t7 , group : g2}
+            // ]
             JSONArray groupsAndTopics = new JSONArray();
+            // 遍历消费组
             for (String group : groups) {
                 Seq<String> topics = zkc.getChildren(CONSUMERS_PATH + "/" + group + OWNERS);
+                // 遍历某一消费组 所有主题
                 for (String topic : JavaConversions.seqAsJavaList(topics)) {
+                    // 获取消费组 某一主题下所有分区
                     Seq<String> partitionIds = zkc.getChildren(CONSUMERS_PATH + "/" + group + OWNERS + "/" + topic);
+                    // 分区数 大于0，则为active topic
                     if (JavaConversions.seqAsJavaList(partitionIds).size() > 0) {
                         JSONObject groupAndTopic = new JSONObject();
                         groupAndTopic.put("topic", topic);

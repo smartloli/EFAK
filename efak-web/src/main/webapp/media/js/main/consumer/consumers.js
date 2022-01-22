@@ -107,6 +107,74 @@ $(document).ready(function() {
 		keConsumerTree.setOption(optKeConsumerTree);
 	});
 
+	// tree option start
+	let keTopicTreeOption = {
+		series: {
+			type: 'tree',
+			data: [],
+			top: '1%',
+			left: '20%',
+			bottom: '1%',
+			right: '40%',
+			symbolSize: 10,
+			itemStyle: {
+				color: "rgb(176, 196, 222)", // fold color
+				borderColor: 'steelblue'
+			},
+			label: {
+				position: 'left',
+				verticalAlign: 'middle',
+				align: 'right',
+				fontSize: 14
+			},
+			leaves: {
+				label: {
+					normal: {
+						position: 'right',
+						verticalAlign: 'middle',
+						align: 'left',
+					}
+				}
+			}
+		}
+	}
+	// tree option end
+	topic_div = document.getElementById("active_topic_consumers")
+	let keTopicTree = echarts.init(topic_div);
+	// topic comsumer tree
+	function topicTree() {
+		console.log("执行方法0");
+		try {
+			console.log("执行方法1");
+			$.ajax({
+				type: 'get',
+				dataType: 'json',
+				url: '/topics/info/ajax',
+				success: function (data) {
+					console.log("请求成功！");
+					if (data != null) {
+						topicTree = JSON.parse(data.active);
+						var topicTreeData = new Array();
+						topicTreeData.push(topicTree);
+						keTopicTreeOption.series.data = topicTreeData;
+						keTopicTree.setOption(keTopicTreeOption);
+					}
+				}
+			});
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	topicTree();
+
+	$("#active_topic_consumers").resize(function () {
+		var optKeTopicTree=keTopicTree.getOption();
+		keTopicTree.clear();
+		keTopicTree.resize({width:$("#active_topic_consumers").css('width')});
+		keTopicTree.setOption(optKeTopicTree);
+	});
+
 	// Children div show details of the consumer group
 	var offset = 0;
 	$(document).on('click', 'a[class=link]', function() {

@@ -95,7 +95,22 @@
                         </div>
                     </div>
                 </div>
-                <!-- Consumer Topic Detail -->
+
+                <!-- Topic : Consumers -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-comments"></i> Active Topic Consumers
+                            </div>
+                            <div class="card-body">
+                                <div id="active_topic_consumers" style="width: 100%;height: 600px"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Consumer Topic Detail 模态框 -->
                 <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_consumer_topics_detail"
                      tabindex="-1" role="dialog">
                     <div class="modal-dialog modal-lg">
