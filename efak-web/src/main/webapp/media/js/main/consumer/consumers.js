@@ -1,226 +1,227 @@
-$(document).ready(function() {
-	try {
-		// Initialize consumer table list --start
-		$("#result").dataTable({
-			// "searching" : false,
-			"bSort" : false,
-			"bLengthChange" : false,
-			"bProcessing" : true,
-			"bServerSide" : true,
-			"fnServerData" : retrieveData,
-			"sAjaxSource" : "/consumer/list/table/ajax",
-			"aoColumns" : [ {
-				"mData" : 'id'
-			}, {
-				"mData" : 'group'
-			}, {
-				"mData" : 'topics'
-			}, {
-				"mData" : 'node'
-			}, {
-				"mData" : 'activeTopics'
-			}, {
-				"mData" : 'activeThreads'
-			} ]
-		});
+$(document).ready(function () {
+    try {
+        // Initialize consumer table list --start
+        $("#result").dataTable({
+            // "searching" : false,
+            "bSort": false,
+            "bLengthChange": false,
+            "bProcessing": true,
+            "bServerSide": true,
+            "fnServerData": retrieveData,
+            "sAjaxSource": "/consumer/list/table/ajax",
+            "aoColumns": [{
+                "mData": 'id'
+            }, {
+                "mData": 'group'
+            }, {
+                "mData": 'topics'
+            }, {
+                "mData": 'node'
+            }, {
+                "mData": 'activeTopics'
+            }, {
+                "mData": 'activeThreads'
+            }]
+        });
 
-		function retrieveData(sSource, aoData, fnCallback) {
-			$.ajax({
-				"type" : "get",
-				"contentType" : "application/json",
-				"url" : sSource,
-				"dataType" : "json",
-				"data" : {
-					aoData : JSON.stringify(aoData)
-				},
-				"success" : function(data) {
-					fnCallback(data)
-				}
-			});
-		}
-		// --end
-	} catch (e) {
-		console.log("Get consumer group has error, msg is " + e)
-	}
+        function retrieveData(sSource, aoData, fnCallback) {
+            $.ajax({
+                "type": "get",
+                "contentType": "application/json",
+                "url": sSource,
+                "dataType": "json",
+                "data": {
+                    aoData: JSON.stringify(aoData)
+                },
+                "success": function (data) {
+                    fnCallback(data)
+                }
+            });
+        }
 
-	// tree option start
-	keConsumerTreeOption = {
-		series: {
-			type: 'tree',
-			data: [],
-			top: '1%',
-			left: '20%',
-			bottom: '1%',
-			right: '40%',
-			symbolSize: 10,
-			itemStyle: {
-				color: "rgb(176, 196, 222)", // fold color
-				borderColor: 'steelblue'
-			},
-			label: {
-				position: 'left',
-				verticalAlign: 'middle',
-				align: 'right',
-				fontSize: 14
-			},
-			leaves: {
-				label: {
-					normal: {
-						position: 'right',
-						verticalAlign: 'middle',
-						align: 'left',
-					}
-				}
-			}
-		}
-	}
-	// tree option end
-	keConsumerTree = echarts.init(document.getElementById("active_topic"));
-	// consumer tree
-	function consumerTree() {
-		try {
-			$.ajax({
-				type: 'get',
-				dataType: 'json',
-				url: '/consumers/info/ajax',
-				success: function (datas) {
-					if (datas != null) {
-						consumerTree = JSON.parse(datas.active);
-						var consumerTreeData = new Array();
-						consumerTreeData.push(consumerTree);
-						keConsumerTreeOption.series.data = consumerTreeData;
-						keConsumerTree.setOption(keConsumerTreeOption);
-					}
-				}
-			});
-		} catch (e) {
-			console.log(e);
-		}
-	}
+        // --end
+    } catch (e) {
+        console.log("Get consumer group has error, msg is " + e)
+    }
 
-	consumerTree();
+    // tree option start
+    keConsumerTreeOption = {
+        series: {
+            type: 'tree',
+            data: [],
+            top: '1%',
+            left: '20%',
+            bottom: '1%',
+            right: '40%',
+            symbolSize: 10,
+            itemStyle: {
+                color: "rgb(176, 196, 222)", // fold color
+                borderColor: 'steelblue'
+            },
+            label: {
+                position: 'left',
+                verticalAlign: 'middle',
+                align: 'right',
+                fontSize: 14
+            },
+            leaves: {
+                label: {
+                    normal: {
+                        position: 'right',
+                        verticalAlign: 'middle',
+                        align: 'left',
+                    }
+                }
+            }
+        }
+    }
+    // tree option end
+    keConsumerTree = echarts.init(document.getElementById("active_topic"));
 
-	$("#active_topic").resize(function () {
-		var optKeConsumerTree=keConsumerTree.getOption();
-		keConsumerTree.clear();
-		keConsumerTree.resize({width:$("#active_topic").css('width')});
-		keConsumerTree.setOption(optKeConsumerTree);
-	});
+    // consumer tree
+    function consumerTree() {
+        try {
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/consumers/info/ajax',
+                success: function (datas) {
+                    if (datas != null) {
+                        consumerTree = JSON.parse(datas.active);
+                        var consumerTreeData = new Array();
+                        consumerTreeData.push(consumerTree);
+                        keConsumerTreeOption.series.data = consumerTreeData;
+                        keConsumerTree.setOption(keConsumerTreeOption);
+                    }
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
-	// tree option start
-	let keTopicTreeOption = {
-		series: {
-			type: 'tree',
-			data: [],
-			top: '1%',
-			left: '20%',
-			bottom: '1%',
-			right: '40%',
-			symbolSize: 10,
-			itemStyle: {
-				color: "rgb(176, 196, 222)", // fold color
-				borderColor: 'steelblue'
-			},
-			label: {
-				position: 'left',
-				verticalAlign: 'middle',
-				align: 'right',
-				fontSize: 14
-			},
-			leaves: {
-				label: {
-					normal: {
-						position: 'right',
-						verticalAlign: 'middle',
-						align: 'left',
-					}
-				}
-			}
-		}
-	}
-	// tree option end
-	topic_div = document.getElementById("active_topic_consumers")
-	let keTopicTree = echarts.init(topic_div);
-	// topic comsumer tree
-	function topicTree() {
-		console.log("执行方法0");
-		try {
-			console.log("执行方法1");
-			$.ajax({
-				type: 'get',
-				dataType: 'json',
-				url: '/topics/info/ajax',
-				success: function (data) {
-					console.log("请求成功！");
-					if (data != null) {
-						topicTree = JSON.parse(data.active);
-						var topicTreeData = new Array();
-						topicTreeData.push(topicTree);
-						keTopicTreeOption.series.data = topicTreeData;
-						keTopicTree.setOption(keTopicTreeOption);
-					}
-				}
-			});
-		} catch (e) {
-			console.log(e);
-		}
-	}
+    consumerTree();
 
-	topicTree();
+    $("#active_topic").resize(function () {
+        var optKeConsumerTree = keConsumerTree.getOption();
+        keConsumerTree.clear();
+        keConsumerTree.resize({width: $("#active_topic").css('width')});
+        keConsumerTree.setOption(optKeConsumerTree);
+    });
 
-	$("#active_topic_consumers").resize(function () {
-		var optKeTopicTree=keTopicTree.getOption();
-		keTopicTree.clear();
-		keTopicTree.resize({width:$("#active_topic_consumers").css('width')});
-		keTopicTree.setOption(optKeTopicTree);
-	});
+    // tree option start
+    let keTopicTreeOption = {
+        series: {
+            type: 'tree',
+            data: [],
+            top: '1%',
+            left: '20%',
+            bottom: '1%',
+            right: '40%',
+            symbolSize: 10,
+            itemStyle: {
+                color: "rgb(176, 196, 222)", // fold color
+                borderColor: 'steelblue'
+            },
+            label: {
+                position: 'left',
+                verticalAlign: 'middle',
+                align: 'right',
+                fontSize: 14
+            },
+            leaves: {
+                label: {
+                    normal: {
+                        position: 'right',
+                        verticalAlign: 'middle',
+                        align: 'left',
+                    }
+                }
+            }
+        }
+    }
+    // tree option end
+    topic_div = document.getElementById("active_topic_consumers")
+    let keTopicTree = echarts.init(topic_div);
 
-	// Children div show details of the consumer group
-	var offset = 0;
-	$(document).on('click', 'a[class=link]', function() {
-		var group = $(this).attr("group");
-		$('#ke_consumer_topics_detail').modal('show');
+    // topic comsumer tree
+    function topicTree() {
+        try {
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/topics/info/ajax',
+                success: function (data) {
+                    if (data != null) {
+                        topicTree = JSON.parse(data.active);
+                        var topicTreeData = new Array();
+                        topicTreeData.push(topicTree);
+                        keTopicTreeOption.series.data = topicTreeData;
+                        keTopicTree.setOption(keTopicTreeOption);
+                    }
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
-		$("#consumer_detail_children").append("<div class='table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-condensed' width='100%'><thead><tr><th>ID</th><th>Topic</th><th>Consumer Status</th></tr></thead></table></div>");
-		if (offset > 0) {
-			$("#div_children" + (offset - 1)).remove();
-		}
+    topicTree();
 
-		// Initialize consumer table list --start
-		$("#result_children" + offset).dataTable({
-			// "searching" : false,
-			"bSort" : false,
-			"bLengthChange" : false,
-			"bProcessing" : true,
-			"bServerSide" : true,
-			"fnServerData" : retrieveData,
-			"sAjaxSource" : "/consumer/group/table/ajax",
-			"aoColumns" : [ {
-				"mData" : 'id'
-			}, {
-				"mData" : 'topic'
-			}, {
-				"mData" : 'isConsumering'
-			} ]
-		});
+    $("#active_topic_consumers").resize(function () {
+        var optKeTopicTree = keTopicTree.getOption();
+        keTopicTree.clear();
+        keTopicTree.resize({width: $("#active_topic_consumers").css('width')});
+        keTopicTree.setOption(optKeTopicTree);
+    });
 
-		function retrieveData(sSource, aoData, fnCallback) {
-			$.ajax({
-				"type" : "get",
-				"contentType" : "application/json",
-				"url" : sSource,
-				"dataType" : "json",
-				"data" : {
-					aoData : JSON.stringify(aoData),
-					group : group
-				},
-				"success" : function(data) {
-					fnCallback(data)
-				}
-			});
-		}
-		// --end
+    // Children div show details of the consumer group
+    var offset = 0;
+    $(document).on('click', 'a[class=link]', function () {
+        var group = $(this).attr("group");
+        $('#ke_consumer_topics_detail').modal('show');
 
-		offset++;
-	});
+        $("#consumer_detail_children").append("<div class='table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-condensed' width='100%'><thead><tr><th>ID</th><th>Topic</th><th>Consumer Status</th></tr></thead></table></div>");
+        if (offset > 0) {
+            $("#div_children" + (offset - 1)).remove();
+        }
+
+        // Initialize consumer table list --start
+        $("#result_children" + offset).dataTable({
+            // "searching" : false,
+            "bSort": false,
+            "bLengthChange": false,
+            "bProcessing": true,
+            "bServerSide": true,
+            "fnServerData": retrieveData,
+            "sAjaxSource": "/consumer/group/table/ajax",
+            "aoColumns": [{
+                "mData": 'id'
+            }, {
+                "mData": 'topic'
+            }, {
+                "mData": 'isConsumering'
+            }]
+        });
+
+        function retrieveData(sSource, aoData, fnCallback) {
+            $.ajax({
+                "type": "get",
+                "contentType": "application/json",
+                "url": sSource,
+                "dataType": "json",
+                "data": {
+                    aoData: JSON.stringify(aoData),
+                    group: group
+                },
+                "success": function (data) {
+                    fnCallback(data)
+                }
+            });
+        }
+
+        // --end
+
+        offset++;
+    });
 });

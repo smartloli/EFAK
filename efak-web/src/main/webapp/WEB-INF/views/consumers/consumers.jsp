@@ -110,7 +110,7 @@
                     </div>
                 </div>
 
-                <!-- Consumer Topic Detail 模态框 -->
+                <!-- Consumer Topic Detail -->
                 <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_consumer_topics_detail"
                      tabindex="-1" role="dialog">
                     <div class="modal-dialog modal-lg">

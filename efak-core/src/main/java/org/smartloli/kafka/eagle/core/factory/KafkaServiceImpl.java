@@ -175,14 +175,10 @@ public class KafkaServiceImpl implements KafkaService {
             //    { topic :  t7 , group : g2}
             // ]
             JSONArray groupsAndTopics = new JSONArray();
-            // 遍历消费组
             for (String group : groups) {
                 Seq<String> topics = zkc.getChildren(CONSUMERS_PATH + "/" + group + OWNERS);
-                // 遍历某一消费组 所有主题
                 for (String topic : JavaConversions.seqAsJavaList(topics)) {
-                    // 获取消费组 某一主题下所有分区
                     Seq<String> partitionIds = zkc.getChildren(CONSUMERS_PATH + "/" + group + OWNERS + "/" + topic);
-                    // 分区数 大于0，则为active topic
                     if (JavaConversions.seqAsJavaList(partitionIds).size() > 0) {
                         JSONObject groupAndTopic = new JSONObject();
                         groupAndTopic.put("topic", topic);

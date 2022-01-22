@@ -38,7 +38,7 @@ public class KafkaEagleVersion {
         String asciiArt = FigletFont.convertOneLine(file, "EFAK");
         System.out.println("Welcome to");
         System.out.println(asciiArt + "( Eagle For Apache Kafka® )\n");
-        System.out.println("Version " + version + " -- Copyright 2016-2021");
+        System.out.println("Version " + version + " -- Copyright 2016-2022");
     }
 
 }

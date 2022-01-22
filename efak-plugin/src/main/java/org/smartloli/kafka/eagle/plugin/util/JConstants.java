@@ -75,7 +75,7 @@ public interface JConstants {
     /**
      * Automatically create databases and tables.
      */
-    public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen", "ke_alarm_config", "ke_consumer_group", "ke_consumer_group_summary", "v_ke_topic_consumer_groups_summary", "ke_connect_config", "ke_alarm_crontab");
+    public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen", "ke_alarm_config", "ke_consumer_group", "ke_consumer_group_summary", "ke_topic_consumer_group_summary_view", "ke_connect_config", "ke_alarm_crontab");
 
     static String CREATE_TABLE_KE_P_ROLE = "CREATE TABLE IF NOT EXISTS `ke_p_role` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`name` varchar(64) CHARACTER SET utf8 NOT NULL COMMENT 'role name',`seq` tinyint(4) NOT NULL COMMENT 'rank',`description` varchar(128) CHARACTER SET utf8 NOT NULL COMMENT 'role describe',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4";
     static String CREATE_TABLE_KE_P_ROLE_INSERT = "INSERT INTO `ke_p_role` VALUES ('1', 'Administrator', '1', 'Have all permissions'), ('2', 'Devs', '2', 'Own add or delete'), ('3', 'Tourist', '3', 'Only viewer')";
@@ -121,7 +121,7 @@ public interface JConstants {
     static String CREATE_TABLE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic` varchar(128) NOT NULL,`status` int(11) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`,`topic`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     static String CREATE_TABLE_KE_CONSUMER_GROUP_SUMMARY = "CREATE TABLE IF NOT EXISTS `ke_consumer_group_summary` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic_number` varchar(128) NOT NULL,`coordinator`varchar(128) DEFAULT NULL,`active_topic` int(11) DEFAULT NULL,`active_thread_total` int(11) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-    static String CREATE_VIEW_V_KE_TOPIC_CONSUMER_GROUPS_SUMMARY = "create or replace view v_ke_topic_consumer_groups_summary as select `cluster`, `topic`, count(distinct `group`) group_number , count(distinct `group`) active_group from `ke_consumer_group` where `status` = 0 group by `cluster`, `topic`";
+    static String CREATE_VIEW_KE_TOPIC_CONSUMER_GROUP_SUMMARY_VIEW = "CREATE OR REPLACE VIEW ke_topic_consumer_group_summary_view as select `cluster`, `topic`, count(distinct `group`) group_number , count(distinct `group`) active_group from `ke_consumer_group` where `status` = 0 group by `cluster`, `topic`";
 
     static String CREATE_TABLE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`user_id` int(11) NOT NULL,`role_id` tinyint(4) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4";
     static String CREATE_TABLE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1');";
@@ -176,7 +176,7 @@ public interface JConstants {
     static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(128) ,`status` int(11), primary key (`cluster`,`group`,`topic`))";
 
     static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP_SUMMARY = "CREATE TABLE IF NOT EXISTS `ke_consumer_group_summary` (`cluster` varchar(64) ,`group` varchar(128) ,`topic_number` varchar(128),`coordinator`varchar(128),`active_topic` int(11),`active_thread_total` int(11), primary key (`cluster`,`group`))";
-    static String CREATE_VIEW_SQLITE_V_KE_TOPIC_CONSUMER_GROUPS_SUMMARY = "CREATE OR REPLACE VIEW `v_ke_topic_consumer_groups_summary` AS SELECT `cluster`, `topic`, COUNT(DISTINCT `group`) group_number , COUNT(DISTINCT `group`) active_group FROM `ke_consumer_group` WHERE `status` = 0 GROUP BY `cluster`, `topic`";
+    static String CREATE_VIEW_SQLITE_KE_TOPIC_CONSUMER_GROUP_SUMMARY_VIEW = "CREATE OR REPLACE VIEW `ke_topic_consumer_group_summary_view` AS SELECT `cluster`, `topic`, COUNT(DISTINCT `group`) group_number , COUNT(DISTINCT `group`) active_group FROM `ke_consumer_group` WHERE `status` = 0 GROUP BY `cluster`, `topic`";
 
     static String CREATE_TABLE_SQLITE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` integer primary key autoincrement,`user_id` int(11),`role_id` tinyint(4))";
     static String CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1')";
@@ -208,7 +208,7 @@ public interface JConstants {
             put("CREATE_TABLE_KE_ALARM_CLUSTERS", CREATE_TABLE_KE_ALARM_CLUSTERS);
             put("CREATE_TABLE_KE_CONSUMER_GROUP", CREATE_TABLE_KE_CONSUMER_GROUP);
             put("CREATE_TABLE_KE_CONSUMER_GROUP_SUMMARY", CREATE_TABLE_KE_CONSUMER_GROUP_SUMMARY);
-            put("CREATE_VIEW_V_KE_TOPIC_CONSUMER_GROUPS_SUMMARY", CREATE_VIEW_V_KE_TOPIC_CONSUMER_GROUPS_SUMMARY);
+            put("CREATE_VIEW_KE_TOPIC_CONSUMER_GROUP_SUMMARY_VIEW", CREATE_VIEW_KE_TOPIC_CONSUMER_GROUP_SUMMARY_VIEW);
             put("CREATE_TABLE_KE_TOPIC_RANK", CREATE_TABLE_KE_TOPIC_RANK);
             put("CREATE_TABLE_KE_SQL_HISTORY", CREATE_TABLE_KE_SQL_HISTORY);
             put("CREATE_TABLE_KE_LOGSIZE", CREATE_TABLE_KE_LOGSIZE);
@@ -238,7 +238,7 @@ public interface JConstants {
             put("CREATE_TABLE_SQLITE_KE_ALARM_CLUSTERS", CREATE_TABLE_SQLITE_KE_ALARM_CLUSTERS);
             put("CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP", CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP);
             put("CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP_SUMMARY", CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP_SUMMARY);
-            put("CREATE_VIEW_SQLITE_V_KE_TOPIC_CONSUMER_GROUPS_SUMMARY", CREATE_VIEW_SQLITE_V_KE_TOPIC_CONSUMER_GROUPS_SUMMARY);
+            put("CREATE_VIEW_SQLITE_KE_TOPIC_CONSUMER_GROUP_SUMMARY_VIEW", CREATE_VIEW_SQLITE_KE_TOPIC_CONSUMER_GROUP_SUMMARY_VIEW);
             put("CREATE_TABLE_SQLITE_KE_TOPIC_RANK", CREATE_TABLE_SQLITE_KE_TOPIC_RANK);
             put("CREATE_TABLE_SQLITE_KE_SQL_HISTORY", CREATE_TABLE_SQLITE_KE_SQL_HISTORY);
             put("CREATE_TABLE_SQLITE_KE_LOGSIZE", CREATE_TABLE_SQLITE_KE_LOGSIZE);
