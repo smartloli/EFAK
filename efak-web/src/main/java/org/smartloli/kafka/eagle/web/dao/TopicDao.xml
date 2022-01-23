@@ -390,7 +390,7 @@
 
     <select id="getTopicSummaryPages" parameterType="map" resultMap="tsi">
         select *
-        from v_ke_topic_consumer_groups_summary
+        from ke_topic_consumer_group_summary_view
         <where>
             `cluster`=#{cluster}
             <if test="search != null and search != ''">

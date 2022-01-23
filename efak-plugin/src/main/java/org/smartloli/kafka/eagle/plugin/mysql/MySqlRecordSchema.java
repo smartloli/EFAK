@@ -76,28 +76,34 @@ public class MySqlRecordSchema {
                     LOG.info("The [" + tbl + "] table already exists. Do not need to create it.");
                 } else {
                     String key = "CREATE_TABLE_" + tbl.toUpperCase();
+                    String sql = "";
                     stmt = connection.createStatement();
                     if (JConstants.KEYS.containsKey(key)) {
                         stmt.addBatch(JConstants.KEYS.get(key).toString());
+                        sql = JConstants.KEYS.get(key).toString();
                     }
                     if (JConstants.KEYS.containsKey(key + "_INSERT")) {
                         stmt.addBatch(JConstants.KEYS.get(key + "_INSERT").toString());
+                        sql = JConstants.KEYS.get(key + "_INSERT").toString();
                     }
                     // add index
                     if (JConstants.KEYS.containsKey(key + "_INDEX")) {
                         stmt.addBatch(JConstants.KEYS.get(key + "_INDEX").toString());
+                        sql = JConstants.KEYS.get(key + "_INDEX").toString();
                     }
                     if (JConstants.KEYS.containsKey(key + "_INDEX_TM")) {
                         stmt.addBatch(JConstants.KEYS.get(key + "_INDEX_TM").toString());
+                        sql = JConstants.KEYS.get(key + "_INDEX_TM").toString();
                     }
                     if (JConstants.KEYS.containsKey(key + "_INDEX_TM_CLUSTER")) {
                         stmt.addBatch(JConstants.KEYS.get(key + "_INDEX_TM_CLUSTER").toString());
+                        sql = JConstants.KEYS.get(key + "_INDEX_TM_CLUSTER").toString();
                     }
                     int[] code = stmt.executeBatch();
                     if (code.length > 0) {
                         LOG.info("Create [" + tbl + "] has successed.");
                     } else {
-                        LOG.error("Create [" + tbl + "] has failed.");
+                        LOG.error("Create [" + tbl + "] has failed. Error sql is [" + sql + "]");
                     }
                 }
             }
