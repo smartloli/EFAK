@@ -111,3 +111,4 @@ Thanks to the following members for maintaining the project. If this project hel
 |cocodroid|[cocodroid](https://github.com/cocodroid)|sujunguang@gmail.com|
 |alisa|[alisa](https://github.com/zoumm)|alisazou1211@gmail.com|
 |iamwzt|[iamwzt](https://github.com/iamwzt)|981911861@qq.com|
+|JacobAP|[JacobAP](https://github.com/JacobAP)|jacobap@163.com|
