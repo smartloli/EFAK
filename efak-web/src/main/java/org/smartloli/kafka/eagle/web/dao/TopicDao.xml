@@ -414,4 +414,26 @@
         limit #{start},#{size}
     </select>
 
+    <select id="countTopicConsumerGroup" parameterType="map" resultType="long">
+        select
+        count( DISTINCT `group` ) group_cnt from ke_consumer_group
+        <where>
+            `cluster`=#{cluster} and `topic`=#{topic}
+            <if test="search != null and search != ''">
+                and `group` like #{search}
+            </if>
+        </where>
+    </select>
+
+    <select id="getTopicConsumerPages" parameterType="map" resultMap="cgi">
+        select * from ke_consumer_group
+        <where>
+            `cluster`=#{cluster} and `topic`=#{topic}
+            <if test="search != null and search != ''">
+                and `group` like #{search}
+            </if>
+        </where>
+        limit #{start},#{size}
+    </select>
+
 </mapper>

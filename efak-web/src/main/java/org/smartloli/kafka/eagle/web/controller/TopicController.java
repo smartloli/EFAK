@@ -27,6 +27,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.*;
 import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
@@ -231,6 +233,89 @@ public class TopicController {
                 object.put("under_replicated", "<span class='badge badge-success btn-xs'>false</span>");
             }
             object.put("preview", "<a name='preview' topic='" + tname + "' partition='" + metadata.getPartitionId() + "' href='#' class='badge badge-primary'>Preview</a>");
+            aaDatas.add(object);
+        }
+
+        JSONObject target = new JSONObject();
+        target.put("sEcho", sEcho);
+        target.put("iTotalRecords", count);
+        target.put("iTotalDisplayRecords", count);
+        target.put("aaData", aaDatas);
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Topic consumer group information.
+     */
+    @RequestMapping(value = "/topic/consumer/group/{tname}/ajax", method = RequestMethod.GET)
+    public void topicConsumerGroupAjax(@PathVariable("tname") String tname, HttpServletResponse response, HttpServletRequest request) {
+        String aoData = request.getParameter("aoData");
+        JSONArray params = JSON.parseArray(aoData);
+        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+        String search = "";
+        for (Object object : params) {
+            JSONObject param = (JSONObject) object;
+            if ("sEcho".equals(param.getString("name"))) {
+                sEcho = param.getIntValue("value");
+            } else if ("iDisplayStart".equals(param.getString("name"))) {
+                iDisplayStart = param.getIntValue("value");
+            } else if ("iDisplayLength".equals(param.getString("name"))) {
+                iDisplayLength = param.getIntValue("value");
+            } else if ("sSearch".equals(param.getString("name"))) {
+                search = param.getString("value");
+            }
+        }
+
+        HttpSession session = request.getSession();
+        String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+        Map<String, Object> param = new HashMap<>();
+        param.put("cluster", clusterAlias);
+        param.put("topic", tname);
+        param.put("search", "%" + search + "%");
+        long count = topicService.countTopicConsumerGroup(param);
+
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("cluster", clusterAlias);
+        map.put("topic", tname);
+        map.put("search", "%" + search + "%");
+        map.put("start", iDisplayStart);
+        map.put("size", iDisplayLength);
+
+        List<ConsumerGroupsInfo> topicConsumerPages = topicService.getTopicConsumerPages(map);
+
+        JSONArray aaDatas = new JSONArray();
+        for (ConsumerGroupsInfo cgi : topicConsumerPages) {
+            JSONObject object = new JSONObject();
+            String group = cgi.getGroup();
+            String topic = cgi.getTopic();
+            int status = cgi.getStatus();
+            object.put("group", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank'>" + group + "</a>");
+            object.put("topic", topic);
+            long lag = 0L;
+            Map<String, Object> paramLag = new HashMap<>();
+            paramLag.put("cluster", clusterAlias);
+            paramLag.put("group", group);
+            paramLag.put("topic", topic);
+            BScreenConsumerInfo bci = topicService.readBScreenLastTopic(paramLag);
+            if (bci != null) {
+                lag = bci.getLag();
+            }
+            object.put("lag", lag);
+
+            if (Topic.RUNNING == status) {
+                object.put("status", "<span class='badge badge-success'>Running</span>");
+            } else if (Topic.SHUTDOWN == status) {
+                object.put("status", "<span class='badge badge-danger'>Shutdown</span>");
+            } else if (Topic.PENDING == status) {
+                object.put("status", "<span class='badge badge-warning'>Pending</span>");
+            }
             aaDatas.add(object);
         }
 

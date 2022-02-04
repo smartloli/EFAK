@@ -129,6 +129,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- partitions information -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card mb-4">
@@ -149,6 +150,31 @@
                                             <th>Preferred Leader</th>
                                             <th>Under Replicated</th>
                                             <th>Preview</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- topic consumer group -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-server"></i> Topic Consumer Groups
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="topic_consumer_tab_result" class="table table-bordered table-condensed"
+                                           width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>Group</th>
+                                            <th>Topic</th>
+                                            <th>Lag</th>
+                                            <th>Status</th>
                                         </tr>
                                         </thead>
                                     </table>
@@ -213,7 +239,7 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="main/topic/topic.meta.js?v=2.0.6" name="loader"/>
+    <jsp:param value="main/topic/topic.meta.js?v=2.1.0" name="loader"/>
     <jsp:param value="plugins/echart/echarts.min.js" name="loader"/>
     <jsp:param value="plugins/echart/macarons.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/moment.min.js" name="loader"/>

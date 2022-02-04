@@ -150,7 +150,7 @@ $(document).ready(function () {
             $.ajax({
                 type: 'get',
                 dataType: 'json',
-                url: '/topics/info/ajax',
+                url: '/consumer/topics/info/ajax',
                 success: function (data) {
                     if (data != null) {
                         topicTree = JSON.parse(data.active);

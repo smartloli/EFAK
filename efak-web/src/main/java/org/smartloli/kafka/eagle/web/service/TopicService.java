@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.web.service;
 import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicSqlHistory;
@@ -187,4 +189,19 @@ public interface TopicService {
      * Preview topic and partition message.
      */
     public String getPreviewTopicPartitionMsg(String clusterAlias, JSONObject tp);
+
+    /**
+     * Count topic consumer group.
+     */
+    public long countTopicConsumerGroup(Map<String, Object> params);
+
+    /**
+     * Get  topic consumer group pages.
+     */
+    public List<ConsumerGroupsInfo> getTopicConsumerPages(Map<String, Object> params);
+
+    /**
+     * Read big screen topic lastest diffval data.
+     */
+    public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params);
 }

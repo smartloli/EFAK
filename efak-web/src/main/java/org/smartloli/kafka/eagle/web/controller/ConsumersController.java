@@ -47,22 +47,26 @@ import java.util.Map;
  * Kafka consumer controller to viewer data.
  *
  * @author smartloli.
- *
- *         Created by Sep 6, 2016.
- *
- *         Update by hexiang 20170216
- *
+ * <p>
+ * Created by Sep 6, 2016.
+ * <p>
+ * Update by hexiang 20170216
+ * <p>
  * Update by smartloli Sep 12, 2021
  * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 @Controller
 public class ConsumersController {
 
-    /** Kafka consumer service interface. */
+    /**
+     * Kafka consumer service interface.
+     */
     @Autowired
     private ConsumerService consumerService;
 
-    /** Consumer viewer. */
+    /**
+     * Consumer viewer.
+     */
     @RequestMapping(value = "/consumers", method = RequestMethod.GET)
     public ModelAndView consumersView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
@@ -70,7 +74,9 @@ public class ConsumersController {
         return mav;
     }
 
-    /** Get consumer data by ajax. */
+    /**
+     * Get consumer data by ajax.
+     */
     @RequestMapping(value = "/consumers/info/ajax", method = RequestMethod.GET)
     public void consumersGraphAjax(HttpServletResponse response, HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -89,8 +95,10 @@ public class ConsumersController {
         }
     }
 
-    /** Get topic consumers data by ajax. */
-    @RequestMapping(value = "/topics/info/ajax", method = RequestMethod.GET)
+    /**
+     * Get topic consumers data by ajax.
+     */
+    @RequestMapping(value = "/consumer/topics/info/ajax", method = RequestMethod.GET)
     public void topicsGraphAjax(HttpServletResponse response, HttpServletRequest request) {
         HttpSession session = request.getSession();
         String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
@@ -108,7 +116,9 @@ public class ConsumersController {
         }
     }
 
-    /** Get consumer datasets by ajax. */
+    /**
+     * Get consumer datasets by ajax.
+     */
     @RequestMapping(value = "/consumer/list/table/ajax", method = RequestMethod.GET)
     public void consumerTableAjax(HttpServletResponse response, HttpServletRequest request) {
         String aoData = request.getParameter("aoData");
@@ -223,7 +233,9 @@ public class ConsumersController {
         }
     }
 
-    /** Get consumer data through group by ajax. */
+    /**
+     * Get consumer data through group by ajax.
+     */
     @RequestMapping(value = "/consumer/group/table/ajax", method = RequestMethod.GET)
     public void consumerTableListAjax(HttpServletResponse response, HttpServletRequest request) {
         String aoData = request.getParameter("aoData");

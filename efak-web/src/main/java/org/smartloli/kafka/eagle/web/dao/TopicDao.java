@@ -248,4 +248,14 @@ public interface TopicDao {
      */
     public List<ConsumerGroupsInfo> getTopicPages(Map<String, Object> params);
 
+    /**
+     * Count topic consumer group.
+     */
+    public long countTopicConsumerGroup(Map<String, Object> params);
+
+    /**
+     * Get  topic consumer group pages.
+     */
+    public List<ConsumerGroupsInfo> getTopicConsumerPages(Map<String, Object> params);
+
 }

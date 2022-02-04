@@ -23,6 +23,7 @@ $(document).ready(function () {
         console.info(e.message);
     }
 
+    // topic meta
     $("#result").dataTable({
         "searching": false,
         "bSort": false,
@@ -49,6 +50,26 @@ $(document).ready(function () {
             "mData": 'under_replicated'
         }, {
             "mData": 'preview'
+        }]
+    });
+
+    // topic consumer group
+    $("#topic_consumer_tab_result").dataTable({
+        // "searching": false,
+        "bSort": false,
+        "bLengthChange": false,
+        "bProcessing": true,
+        "bServerSide": true,
+        "fnServerData": retrieveData,
+        "sAjaxSource": "/topic/consumer/group/" + topicName + "/ajax",
+        "aoColumns": [{
+            "mData": 'group'
+        }, {
+            "mData": 'topic'
+        }, {
+            "mData": 'lag'
+        }, {
+            "mData": 'status'
         }]
     });
 

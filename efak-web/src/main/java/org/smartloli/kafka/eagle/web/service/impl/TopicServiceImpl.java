@@ -25,6 +25,8 @@ import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
 import org.smartloli.kafka.eagle.common.protocol.PartitionsInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
+import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicConfig;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
@@ -472,4 +474,18 @@ public class TopicServiceImpl implements TopicService {
         return kafkaService.getPreviewTopicPartitionMsg(clusterAlias, tp);
     }
 
+    @Override
+    public long countTopicConsumerGroup(Map<String, Object> params) {
+        return topicDao.countTopicConsumerGroup(params);
+    }
+
+    @Override
+    public List<ConsumerGroupsInfo> getTopicConsumerPages(Map<String, Object> params) {
+        return topicDao.getTopicConsumerPages(params);
+    }
+
+    @Override
+    public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params) {
+        return topicDao.readBScreenLastTopic(params);
+    }
 }
