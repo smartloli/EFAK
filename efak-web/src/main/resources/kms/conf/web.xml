@@ -104,6 +104,11 @@
   <!--   showServerInfo      Should server information be presented in the  -->
   <!--                       response sent to clients when directory        -->
   <!--                       listings is enabled? [true]                    -->
+  <!--                                                                      -->
+  <!--   allowPartialPut     Should the server treat an HTTP PUT request    -->
+  <!--                       with a Range header as a partial PUT? Note     -->
+  <!--                       that RFC 7233 clarified that Range headers are -->
+  <!--                       only valid for GET requests. [true]            -->
 
     <servlet>
         <servlet-name>default</servlet-name>
@@ -346,6 +351,28 @@
   <!--                        If not set, then webAppRootDir is used.       -->
   <!--                        Recommended value: WEB-INF/cgi                -->
   <!--                                                                      -->
+  <!--  cmdLineArgumentsDecoded                                             -->
+  <!--                        Only used when enableCmdLineArguments is      -->
+  <!--                        true. The pattern that individual decoded     -->
+  <!--                        command line arguments must match else the    -->
+  <!--                        request will be rejected. This is to          -->
+  <!--                        work-around various issues when Java passes   -->
+  <!--                        the arguments to the OS. See the CGI How-To   -->
+  <!--                        for more details. The default varies by       -->
+  <!--                        platform.                                     -->
+  <!--                        Windows: [[a-zA-Z0-9\Q-_.\\/:\E]+]            -->
+  <!--                        Others:  [.*]                                 -->
+  <!--                        Note that internally the CGI Servlet treats   -->
+  <!--                        [.*] as a special case to improve performance -->
+  <!--                                                                      -->
+  <!--   cmdLineArgumentsEncoded                                            -->
+  <!--                        Only used when enableCmdLineArguments is      -->
+  <!--                        true. The pattern that individual encoded     -->
+  <!--                        command line arguments must match else the    -->
+  <!--                        request will be rejected. The default matches -->
+  <!--                        the allowed values defined by RFC3875.        -->
+  <!--                        [[a-zA-Z0-9\Q%;/?:@&,$-_.!~*'()\E]+]          -->
+  <!--                                                                      -->
   <!--   enableCmdLineArguments                                             -->
   <!--                        Are command line parameters generated from    -->
   <!--                        the query string as per section 4.4 of 3875   -->
@@ -516,7 +543,7 @@
   <!-- this to work you will need to uncomment the .shtml mime type         -->
   <!-- definition towards the bottom of this file.                          -->
   <!-- The contentType init param allows you to apply SSI processing to JSP -->
-  <!-- pages, javascript, or any other content you wish.  This filter       -->
+  <!-- pages, JavaScript, or any other content you wish.  This filter       -->
   <!-- supports the following initialization parameters (default values are -->
   <!-- in square brackets):                                                 -->
   <!--                                                                      -->
@@ -4226,6 +4253,10 @@
         <mime-type>application/x-doom</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>wasm</extension>
+        <mime-type>application/wasm</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>wav</extension>
         <mime-type>audio/x-wav</mime-type>
     </mime-mapping>
@@ -4628,10 +4659,6 @@
     </mime-mapping>
     <mime-mapping>
         <extension>z</extension>
-        <mime-type>application/x-compress</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>Z</extension>
         <mime-type>application/x-compress</mime-type>
     </mime-mapping>
     <mime-mapping>

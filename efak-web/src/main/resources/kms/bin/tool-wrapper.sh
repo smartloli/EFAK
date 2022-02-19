@@ -127,7 +127,7 @@ if $cygwin; then
   JRE_HOME=`cygpath --absolute --windows "$JRE_HOME"`
   CATALINA_HOME=`cygpath --absolute --windows "$CATALINA_HOME"`
   CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
-  JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
+  [ -n "$JAVA_ENDORSED_DIRS" ] && JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
 
 # Java 9 no longer supports the java.endorsed.dirs
@@ -146,8 +146,8 @@ JAVA_OPTS="$JAVA_OPTS -Djava.util.logging.manager=org.apache.juli.ClassLoaderLog
 
 # ----- Execute The Requested Command -----------------------------------------
 
-exec "$_RUNJAVA" $JAVA_OPTS $TOOL_OPTS \
-  -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
-  -classpath "$CLASSPATH" \
-  -Dcatalina.home="$CATALINA_HOME" \
+eval exec "\"$_RUNJAVA\"" "$JAVA_OPTS" "$TOOL_OPTS" \
+  -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+  -classpath "\"$CLASSPATH\"" \
+  -Dcatalina.home="\"$CATALINA_HOME\"" \
   org.apache.catalina.startup.Tool "$@"
