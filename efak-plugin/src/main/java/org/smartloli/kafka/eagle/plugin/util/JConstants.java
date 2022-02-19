@@ -176,7 +176,7 @@ public interface JConstants {
     static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(128) ,`status` int(11), primary key (`cluster`,`group`,`topic`))";
 
     static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP_SUMMARY = "CREATE TABLE IF NOT EXISTS `ke_consumer_group_summary` (`cluster` varchar(64) ,`group` varchar(128) ,`topic_number` varchar(128),`coordinator`varchar(128),`active_topic` int(11),`active_thread_total` int(11), primary key (`cluster`,`group`))";
-    static String CREATE_TABLE_SQLITE_KE_TOPIC_CONSUMER_GROUP_SUMMARY_VIEW = "CREATE OR REPLACE VIEW `ke_topic_consumer_group_summary_view` AS SELECT `cluster`, `topic`, COUNT(DISTINCT `group`) group_number , COUNT(DISTINCT `group`) active_group FROM `ke_consumer_group` WHERE `status` = 0 GROUP BY `cluster`, `topic`";
+    static String CREATE_TABLE_SQLITE_KE_TOPIC_CONSUMER_GROUP_SUMMARY_VIEW = "DROP VIEW IF EXISTS `ke_topic_consumer_group_summary_view`;CREATE VIEW `ke_topic_consumer_group_summary_view` AS SELECT `cluster`, `topic`, COUNT(DISTINCT `group`) group_number , COUNT(DISTINCT `group`) active_group FROM `ke_consumer_group` WHERE `status` = 0 GROUP BY `cluster`, `topic`;";
 
     static String CREATE_TABLE_SQLITE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` integer primary key autoincrement,`user_id` int(11),`role_id` tinyint(4))";
     static String CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT = "INSERT INTO `ke_user_role` VALUES ('1', '1', '1')";
