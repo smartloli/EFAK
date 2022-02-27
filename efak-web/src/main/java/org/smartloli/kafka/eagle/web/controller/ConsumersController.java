@@ -170,7 +170,7 @@ public class ConsumersController {
                     e.printStackTrace();
                 }
                 obj.put("group", "<a class='link' group='" + group + "' href='#'>" + consumer.getString("group") + "</a>");
-                obj.put("topics", consumer.getInteger("topics"));
+                obj.put("topics", consumer.getString("topics"));
                 obj.put("node", consumer.getString("node"));
                 int activeTopics = consumer.getInteger("activeTopics");
                 int activeThreads = consumer.getInteger("activeThreads");
@@ -200,7 +200,7 @@ public class ConsumersController {
                     e.printStackTrace();
                 }
                 obj.put("group", "<a class='link' group='" + group + "' href='#'>" + group + "</a>");
-                obj.put("topics", consumerSummary.getTopicNumbers());
+                obj.put("topics", consumerSummary.getTopics());
                 obj.put("node", consumerSummary.getCoordinator());
                 int activeTopics = consumerSummary.getActiveTopic();
                 int activeThreads = consumerSummary.getActiveThread();

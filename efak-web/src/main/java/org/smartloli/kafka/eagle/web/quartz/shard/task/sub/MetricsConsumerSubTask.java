@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.web.quartz.shard.task.sub;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import joptsimple.internal.Strings;
 import org.apache.kafka.common.TopicPartition;
 import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
@@ -126,7 +127,7 @@ public class MetricsConsumerSubTask extends Thread {
                 ConsumerSummaryInfo csi = new ConsumerSummaryInfo();
                 csi.setCluster(clusterAlias);
                 csi.setGroup(group);
-                csi.setTopicNumbers(ownerInfo.getTopicSets().size());
+                csi.setTopics(Strings.join(ownerInfo.getTopicSets(), ","));
                 csi.setCoordinator(consumerGroup.getString("node"));
                 csi.setActiveTopic(getKafkaActiveTopicNumbers(clusterAlias, group, consumerServiceImpl));
                 csi.setActiveThread(ownerInfo.getActiveSize());

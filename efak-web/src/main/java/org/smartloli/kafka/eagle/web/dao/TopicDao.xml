@@ -66,7 +66,7 @@
     <resultMap type="org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo" id="csi">
         <result property="cluster" column="cluster"/>
         <result property="group" column="group"/>
-        <result property="topicNumbers" column="topic_number"/>
+        <result property="topics" column="topics"/>
         <result property="coordinator" column="coordinator"/>
         <result property="activeTopic" column="active_topic"/>
         <result property="activeThread" column="active_thread_total"/>
@@ -311,10 +311,10 @@
 
     <insert id="writeConsumerSummaryTopics" parameterType="java.util.List">
         replace into
-        ke_consumer_group_summary(`cluster`,`group`,`topic_number`,`coordinator`,`active_topic`,`active_thread_total`)
+        ke_consumer_group_summary(`cluster`,`group`,`topics`,`coordinator`,`active_topic`,`active_thread_total`)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.cluster},#{item.group},#{item.topicNumbers},#{item.coordinator},#{item.activeTopic},#{item.activeThread})
+            (#{item.cluster},#{item.group},#{item.topics},#{item.coordinator},#{item.activeTopic},#{item.activeThread})
         </foreach>
     </insert>
 
@@ -362,7 +362,7 @@
         <where>
             `cluster`=#{cluster}
             <if test="search != null and search != ''">
-                and `group` like #{search}
+                and (`group` like #{search} or `topics` like #{search})
             </if>
         </where>
         limit #{start},#{size}

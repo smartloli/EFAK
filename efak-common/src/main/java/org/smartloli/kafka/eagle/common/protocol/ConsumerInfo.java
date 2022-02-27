@@ -28,7 +28,7 @@ public class ConsumerInfo extends BaseProtocol {
 
 	private int id;
 	private String group;
-	private int topics;
+	private String topics;
 	private String node;
 	private int activeTopics;
 	private int activeThreads;
@@ -65,11 +65,11 @@ public class ConsumerInfo extends BaseProtocol {
 		this.group = group;
 	}
 
-	public int getTopics() {
+	public String getTopics() {
 		return topics;
 	}
 
-	public void setTopics(int topics) {
+	public void setTopics(String topics) {
 		this.topics = topics;
 	}
 

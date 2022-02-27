@@ -29,7 +29,7 @@ import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 public class ConsumerSummaryInfo extends BaseProtocol {
 	private String cluster;
 	private String group;
-	private int topicNumbers;
+	private String topics;
 	private String coordinator;
 	private int activeTopic;
 	private int activeThread;
@@ -74,12 +74,12 @@ public class ConsumerSummaryInfo extends BaseProtocol {
 		this.group = group;
 	}
 
-	public int getTopicNumbers() {
-		return topicNumbers;
+	public String getTopics() {
+		return topics;
 	}
 
-	public void setTopicNumbers(int topicNumbers) {
-		this.topicNumbers = topicNumbers;
+	public void setTopics(String topics) {
+		this.topics = topics;
 	}
 
 }
