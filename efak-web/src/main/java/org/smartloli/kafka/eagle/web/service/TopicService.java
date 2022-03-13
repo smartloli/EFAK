@@ -71,6 +71,11 @@ public interface TopicService {
     public List<PartitionsInfo> list(String clusterAlias, Map<String, Object> params);
 
     /**
+     * Get topic name.
+     */
+    public List<String> listTopic(String clusterAlias);
+
+    /**
      * Execute kafka query sql.
      */
     public String execute(String clusterAlias, String sql, String jobId, String type);

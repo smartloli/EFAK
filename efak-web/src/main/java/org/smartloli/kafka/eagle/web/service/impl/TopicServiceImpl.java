@@ -240,6 +240,14 @@ public class TopicServiceImpl implements TopicService {
     }
 
     /**
+     * Get topic name.
+     */
+    public List<String> listTopic(String clusterAlias) {
+        List<String> topicNameList = brokerService.topicList(clusterAlias);
+        return topicNameList;
+    }
+
+    /**
      * Get topic partition numbers.
      */
     public long getPartitionNumbers(String clusterAlias, String topic) {
