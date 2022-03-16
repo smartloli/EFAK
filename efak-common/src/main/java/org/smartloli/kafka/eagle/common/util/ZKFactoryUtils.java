@@ -39,9 +39,10 @@ import java.util.stream.IntStream;
 public class ZKFactoryUtils {
 
     public static void initKafkaMetaData() {
-        List<BrokersInfo> targets = new ArrayList<BrokersInfo>();
+
         try {
             for (String clusterAlias : SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",")) {
+                List<BrokersInfo> targets = new ArrayList<BrokersInfo>();
                 String zkServers = SystemConfigUtils.getProperty(clusterAlias + ".zk.list");
                 ZkClient zkClient = null;
                 try {
@@ -80,15 +81,6 @@ public class ZKFactoryUtils {
 
                                 }
                             });
-//                            synchronized (ZKFactoryUtils.class) {
-//                                while (true) {
-//                                    try {
-//                                        ZKFactoryUtils.class.wait();
-//                                    } catch (Exception e) {
-//                                        LoggerUtils.print(ZKFactoryUtils.class).error("Subscribe znode data has error, msg is ", e);
-//                                    }
-//                                }
-//                            }
                         }
                     }
 
