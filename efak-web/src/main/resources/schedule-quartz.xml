@@ -11,8 +11,7 @@
         <property name="concurrent" value="false"/>
     </bean>
     <!-- task2 -->
-    <bean id="shardSubCleanDetail"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+    <bean id="shardSubCleanDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="shardSubSchedule"/>
         <property name="targetMethod" value="cleanCharts"/>
         <property name="concurrent" value="false"/>
