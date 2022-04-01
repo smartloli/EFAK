@@ -35,6 +35,7 @@ public class CleanChartSubTask extends Thread {
     @Override
     public void run() {
         try {
+            LoggerUtils.print(this.getClass()).info("Clean EFAK history data task has started.");
             this.cleanCharts();
         } catch (Exception e) {
             LoggerUtils.print(this.getClass()).error("Clean efak charts dataset has error, msg is ", e);

@@ -42,7 +42,7 @@ public class ScheduleShardSubTask {
     public void cleanCharts() {
         try {
             if (SystemConfigUtils.getBooleanProperty("efak.distributed.enable")) {
-                if (KConstants.EFAK.MODE_MASTER.equals(SystemConfigUtils.getBooleanProperty("efak.cluster.mode.status"))) {
+                if (KConstants.EFAK.MODE_MASTER.equals(SystemConfigUtils.getProperty("efak.cluster.mode.status"))) {
                     new CleanChartSubTask().start();
                 }
             } else {
