@@ -70,6 +70,8 @@ $(document).ready(function () {
             "mData": 'lag'
         }, {
             "mData": 'status'
+        }, {
+            "mData": 'operate'
         }]
     });
 
@@ -317,4 +319,111 @@ $(document).ready(function () {
         }
     });
 
+    // reset offset result
+    var topicResetOffsets = CodeMirror.fromTextArea(document.getElementById('ke_reset_offset_result'), {
+        mode: mime,
+        indentWithTabs: true,
+        smartIndent: true,
+        lineNumbers: false,
+        matchBrackets: true,
+        autofocus: true,
+        readOnly: true
+    });
+
+    // reset offsets
+    $(document).on('click', 'a[name=topic_reset_offsets]', function () {
+        $("#ke_reset_offset_value").hide();
+        $('#ke_reset_offsets').modal('show');
+        var group = $(this).attr("group");
+        var topic = $(this).attr("topic");
+        $("#select2val").select2({
+            placeholder: "Reset Type",
+            ajax: {
+                url: "/topic/reset/offset/type/list/ajax",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    params.offset = 10;
+                    params.page = params.page || 1;
+                    return {
+                        name: params.term,
+                        page: params.page,
+                        offset: params.offset
+                    };
+                },
+                cache: true,
+                processResults: function (data, params) {
+                    if (data.items.length > 0) {
+                        var datas = new Array();
+                        $.each(data.items, function (index, e) {
+                            var s = {};
+                            s.id = index + 1;
+                            s.text = e.text;
+                            datas[index] = s;
+                        });
+                        return {
+                            results: datas,
+                            pagination: {
+                                more: (params.page * params.offset) < data.total
+                            }
+                        };
+                    } else {
+                        return {
+                            results: []
+                        }
+                    }
+                },
+                escapeMarkup: function (markup) {
+                    return markup;
+                },
+                minimumInputLength: 1
+            }
+        });
+
+        var text = "";
+        $('#select2val').on('select2:select', function (evt) {
+            text = evt.params.data.text;
+            $("#select2val").val(text);
+            if (text.indexOf("--to-earliest") > -1 || text.indexOf("--to-latest") > -1 || text.indexOf("--to-current") > -1) {
+                $("#ke_reset_offset_value").hide();
+            } else {
+                $("#ke_reset_offset_value").show();
+            }
+        });
+
+        // get reset offset result
+        $("#ke_reset_offset_btn").on('click', function () {
+            if (text.indexOf("--to-earliest") > -1 || text.indexOf("--to-latest") > -1 || text.indexOf("--to-current") > -1) {
+                var json = {"group": group, "topic": topic, "cmd": text};
+                execute(JSON.stringify(json));
+            } else {
+                var json = {"group": group, "topic": topic, "cmd": text, "value": $("#ke_reset_offset_val").val()};
+                execute(JSON.stringify(json));
+            }
+        });
+    });
+
+    function execute(json) {
+        console.log(json)
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json;charset=UTF-8',
+            data: JSON.stringify({
+                "json": json
+            }),
+            url: '/topic/reset/offsets/execute/result/ajax',
+            success: function (datas) {
+                if (datas != null) {
+                    console.log(datas)
+                    if (datas.hasOwnProperty("success") && datas.success) {
+                        topicResetOffsets.setValue(datas.result);
+                    }
+                    if (datas.hasOwnProperty("error")) {
+                        topicResetOffsets.setValue(datas.error);
+                    }
+                }
+            }
+        });
+    }
 });

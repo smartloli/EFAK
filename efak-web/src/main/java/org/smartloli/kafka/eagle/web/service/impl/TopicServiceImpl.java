@@ -473,6 +473,11 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
+    public String setResetExecute(String clusterAlias, String json) {
+        return kafkaHubService.reset(clusterAlias, json);
+    }
+
+    @Override
     public String setBalanceVerify(String clusterAlias, String reassignTopicsJson) {
         return kafkaHubService.verify(clusterAlias, reassignTopicsJson);
     }
@@ -495,5 +500,19 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params) {
         return topicDao.readBScreenLastTopic(params);
+    }
+
+    @Override
+    public String getResetOffsetTypeList() {
+        int offset = 0;
+        JSONArray typeList = new JSONArray();
+        for (String type : KConstants.TopicOffsetReset.STRATEGYS) {
+            JSONObject object = new JSONObject();
+            object.put("text", type);
+            object.put("id", offset);
+            typeList.add(object);
+            offset++;
+        }
+        return typeList.toJSONString();
     }
 }

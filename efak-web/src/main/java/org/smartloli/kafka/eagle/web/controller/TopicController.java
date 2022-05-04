@@ -316,6 +316,12 @@ public class TopicController {
             } else if (Topic.PENDING == status) {
                 object.put("status", "<span class='badge badge-warning'>Pending</span>");
             }
+
+            if (Topic.RUNNING == status) {
+                object.put("operate", "<a value='disable' name='topic_reset_offsets' group='" + group + "' topic='" + topic + "' href='#' class='badge badge-secondary'>Reset</a>");
+            } else {
+                object.put("operate", "<a value='enable' name='topic_reset_offsets' group='" + group + "' topic='" + topic + "' href='#' class='badge badge-primary'>Reset</a>");
+            }
             aaDatas.add(object);
         }
 
@@ -344,6 +350,21 @@ public class TopicController {
             tp.put("partition", request.getParameter("partition"));
             String target = topicService.getPreviewTopicPartitionMsg(clusterAlias, tp);
             byte[] output = target.getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Get reset type list, such as --to-earliest, --to-latest, --to-current and so on.
+     */
+    @RequestMapping(value = "/topic/reset/offset/type/list/ajax", method = RequestMethod.GET)
+    public void getResetOffsetsTypeListAjax(HttpServletResponse response, HttpServletRequest request) {
+        try {
+            JSONObject object = new JSONObject();
+            object.put("items", JSON.parseArray(topicService.getResetOffsetTypeList()));
+            byte[] output = object.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -466,6 +487,21 @@ public class TopicController {
             HttpSession session = request.getSession();
             String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
             byte[] output = topicService.setBalanceExecute(clusterAlias, topicBalanceJson.getJson()).getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Execute Reset offset by ajax.
+     */
+    @RequestMapping(value = "/topic/reset/offsets/execute/result/ajax", method = RequestMethod.POST)
+    public void topicResetExecuteAjax(@RequestBody TopicBalanceJson topicBalanceJson, HttpServletResponse response, HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession();
+            String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+            byte[] output = topicService.setResetExecute(clusterAlias, topicBalanceJson.getJson()).getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
             ex.printStackTrace();

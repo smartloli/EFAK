@@ -60,6 +60,7 @@
     <jsp:include page="../public/plus/css.jsp">
         <jsp:param value="plugins/codemirror/codemirror.css" name="css"/>
         <jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css"/>
+        <jsp:param value="plugins/select2/select2.min.css" name="css"/>
     </jsp:include>
     <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
 </head>
@@ -175,10 +176,60 @@
                                             <th>Topic</th>
                                             <th>Lag</th>
                                             <th>Status</th>
+                                            <th>Operate</th>
                                         </tr>
                                         </thead>
                                     </table>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Reset offsets -->
+                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_reset_offsets"
+                     tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="keModalLabel">Notify</h4>
+                                <button class="close" type="button" data-dismiss="modal">x</button>
+                            </div>
+                            <!-- /.row -->
+                            <div class="modal-body">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-comments"></i> Reset Consumer Topic
+                                    </div>
+                                    <div id="ke_topic_reset_offsets" class="card-body">
+                                        <div class="form-group">
+                                            <label>Reset Type (*)</label> <select id="select2val"
+                                                                                  name="select2val" tabindex="-1"
+                                                                                  style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+                                            <label for="inputError" class="control-label text-danger"><i
+                                                    class="fa fa-info-circle"></i> Select the type you need to
+                                                reset offsets .</label>
+                                        </div>
+                                        <div id="ke_reset_offset_value" class="form-group">
+                                            <label>Reset Offsets Value (*)</label> <input
+                                                id="ke_reset_offset_val" name="ke_reset_offset_val"
+                                                class="form-control"
+                                                placeholder="Input content must be number" maxlength="64">
+                                            <label for="inputError" class="control-label text-danger"><i
+                                                    class="fa fa-info-circle"></i> Input the reset offset value
+                                                .</label>
+                                        </div>
+                                        <div>
+                                            <form>
+                                                <textarea id="ke_reset_offset_result"
+                                                          name="ke_reset_offset_result"></textarea>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="ke_reset_offset_btn_div" class="modal-footer">
+                                <button type="button" class="btn btn-primary" id="ke_reset_offset_btn">Execute
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -239,7 +290,7 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="main/topic/topic.meta.js?v=2.1.0" name="loader"/>
+    <jsp:param value="main/topic/topic.meta.js?v=2.2.0" name="loader"/>
     <jsp:param value="plugins/echart/echarts.min.js" name="loader"/>
     <jsp:param value="plugins/echart/macarons.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/moment.min.js" name="loader"/>
@@ -248,6 +299,7 @@
     <jsp:param value="plugins/codemirror/sql.js" name="loader"/>
     <jsp:param value="plugins/codemirror/show-hint.js" name="loader"/>
     <jsp:param value="plugins/codemirror/sql-hint.js" name="loader"/>
+    <jsp:param value="plugins/select2/select2.min.js" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>
 </html>

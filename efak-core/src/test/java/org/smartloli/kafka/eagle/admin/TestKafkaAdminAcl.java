@@ -17,8 +17,6 @@
  */
 package org.smartloli.kafka.eagle.admin;
 
-import kafka.admin.ConfigCommand;
-
 /**
  * TODO
  *
@@ -29,6 +27,8 @@ import kafka.admin.ConfigCommand;
 public class TestKafkaAdminAcl {
     public static void main(String[] args) {
         // ConfigCommand cc;
-        ConfigCommand.main(args);
+        // ConfigCommand.main(args);
+        // ConsumerGroupCommand cgc = new ConsumerGroupCommand();
+
     }
 }

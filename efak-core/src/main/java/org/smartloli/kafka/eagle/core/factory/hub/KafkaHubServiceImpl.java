@@ -22,11 +22,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import kafka.admin.ConsumerGroupCommand;
 import kafka.admin.ReassignPartitionsCommand;
 import kafka.zk.KafkaZkClient;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.KafkaZKSingletonUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
@@ -180,4 +183,44 @@ public class KafkaHubServiceImpl implements KafkaHubService {
         return object.toJSONString();
     }
 
+    /**
+     * Reset offsets.
+     */
+    public String reset(String clusterAlias, String cmdStrJson) {
+        JSONObject parmas = JSON.parseObject(cmdStrJson);
+        JSONObject object = new JSONObject();
+        // no acl
+        String bootstrapServer = parseBrokerServer(clusterAlias);
+        PrintStream oldPStream = System.out;
+        System.setOut(pStream);
+        try {
+            if ("--to-earliest".equals(parmas.getString("cmd")) || "--to-latest".equals(parmas.getString("cmd")) || "--to-current".equals(parmas.getString("cmd"))) {
+                ConsumerGroupCommand.main(new String[]{"--bootstrap-server", bootstrapServer, "--group", parmas.getString("group"), "--reset-offsets", "--topic", parmas.getString("topic"), parmas.getString("cmd"), "--execute"});
+            } else if ("--to-offset".equals(parmas.getString("cmd")) || "--shift-by".equals(parmas.getString("cmd"))) {
+                ConsumerGroupCommand.main(new String[]{"--bootstrap-server", bootstrapServer, "--group", parmas.getString("group"), "--reset-offsets", "--topic", parmas.getString("topic"), parmas.getString("cmd"), parmas.getString("value"), "--execute"});
+            } else {
+                ConsumerGroupCommand.main(new String[]{"--bootstrap-server", bootstrapServer, "--group", parmas.getString("group"), "--reset-offsets", "--topic", parmas.getString("topic"), parmas.getString("cmd"), parmas.getString("value")});
+            }
+            object.put("success", true);
+        } catch (Exception e) {
+            object.put("error", "Execute reset command has error, msg is " + e.getCause().getMessage());
+            LOG.error("Execute reset command has error, msg is ", e);
+        }
+        System.out.flush();
+        System.setOut(oldPStream);
+        object.put("result", baos.toString());
+        return object.toJSONString();
+    }
+
+    private String parseBrokerServer(String clusterAlias) {
+        String brokerServer = "";
+        List<BrokersInfo> brokers = BrokerCache.META_CACHE.get(clusterAlias);
+        for (BrokersInfo broker : brokers) {
+            brokerServer += broker.getHost() + ":" + broker.getPort() + ",";
+        }
+        if ("".equals(brokerServer)) {
+            return "";
+        }
+        return brokerServer.substring(0, brokerServer.length() - 1);
+    }
 }

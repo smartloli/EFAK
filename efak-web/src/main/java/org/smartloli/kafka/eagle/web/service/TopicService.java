@@ -209,4 +209,14 @@ public interface TopicService {
      * Read big screen topic lastest diffval data.
      */
     public BScreenConsumerInfo readBScreenLastTopic(Map<String, Object> params);
+
+    /**
+     * Get reset type list, such as --to-earliest, --to-latest, --to-current and so on.
+     */
+    public String getResetOffsetTypeList();
+
+    /**
+     * Execute reset offsets.
+     */
+    public String setResetExecute(String clusterAlias, String json);
 }

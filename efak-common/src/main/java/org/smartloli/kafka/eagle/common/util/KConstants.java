@@ -94,7 +94,7 @@ public class KConstants {
         private Common() {
         }
 
-        public static final String EFAK_VERSION = "2.1.0";
+        public static final String EFAK_VERSION = "2.2.0";
         public static final String EFAK_VERSION_DOC = "efakVersion";
     }
 
@@ -419,6 +419,10 @@ public class KConstants {
         public static final String ALIVE = "Alive";
         public static final String SHUTDOWN = "Shutdown";
         public static final String UNKOWN = "Unkown";
+    }
+
+    public interface TopicOffsetReset {
+        public static final String[] STRATEGYS = new String[]{"--to-earliest", "--to-latest", "--to-current", "--to-offset", "--shift-by", "--to-datetime", "--by-duration"};
     }
 
 }
