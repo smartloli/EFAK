@@ -1,5 +1,5 @@
-html.dark-theme body{
-  
+html.dark-theme body {
+
     color: #fcfcfc;
     background-color: #1a2232;
 
@@ -20,7 +20,7 @@ html.dark-theme .sidebar-wrapper .sidebar-header {
 
 }
 
-html.dark-theme .sidebar-wrapper, 
+html.dark-theme .sidebar-wrapper,
 html.dark-theme .sidebar-wrapper .sidebar-header {
 
     border-right: 1px solid rgb(255 255 255 / 12%);
@@ -40,7 +40,7 @@ html.dark-theme .sidebar-wrapper .sidebar-header .toggle-icon {
 }
 
 
-html.dark-theme .sidebar-wrapper .metismenu .mm-active>a, html.dark-theme .sidebar-wrapper .metismenu a:active, html.dark-theme .sidebar-wrapper .metismenu a:focus, html.dark-theme .sidebar-wrapper .metismenu a:hover {
+html.dark-theme .sidebar-wrapper .metismenu .mm-active > a, html.dark-theme .sidebar-wrapper .metismenu a:active, html.dark-theme .sidebar-wrapper .metismenu a:focus, html.dark-theme .sidebar-wrapper .metismenu a:hover {
     color: #fff;
     text-decoration: none;
     background: rgb(46 57 78);
@@ -60,13 +60,13 @@ html.dark-theme .sidebar-wrapper .sidebar-header img {
 }
 
 html.dark-theme .sidebar-wrapper .simplebar-scrollbar:before {
-	background: rgba(255, 255, 255, .4)
+    background: rgba(255, 255, 255, .4)
 }
 
 /* Header */
 
 html.dark-theme .top-header .navbar {
-  
+
     color: #fcfcfc;
     background-color: #1a2232;
     border-bottom: 1px solid rgb(255 255 255 / 12%);
@@ -137,7 +137,7 @@ html.dark-theme .picker__holder {
 }
 
 
-html.dark-theme  .picker__button--today, html.dark-theme  .picker__button--clear, html.dark-theme  .picker__button--close {
+html.dark-theme .picker__button--today, html.dark-theme .picker__button--clear, html.dark-theme .picker__button--close {
 
     border: 1px solid rgb(255 255 255 / 12%);
     background: #1a2232;
@@ -146,34 +146,35 @@ html.dark-theme  .picker__button--today, html.dark-theme  .picker__button--clear
 
 
 html.dark-theme .select2-container--bootstrap4 .select2-selection {
-	background-color: #1a2232;
-	border: 1px solid rgb(255 255 255 / .35)
+    background-color: #1a2232;
+    border: 1px solid rgb(255 255 255 / .35)
 }
+
 html.dark-theme .select2-dropdown {
-	background-color: #1a2232;
-	border: 1px solid rgb(255 255 255 / 38%)
+    background-color: #1a2232;
+    border: 1px solid rgb(255 255 255 / 38%)
 }
+
 html.dark-theme .select2-search--dropdown .select2-search__field {
-	border: 1px solid rgb(255 255 255 / 34%);
-	background-color: #1a2232;
-	color: #e3dfdf
+    border: 1px solid rgb(255 255 255 / 34%);
+    background-color: #1a2232;
+    color: #e3dfdf
 }
+
 html.dark-theme .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice {
-	color: #dee1e5;
-	border: 1px solid rgb(255 255 255 / 55%);
-	background: #171717
+    color: #dee1e5;
+    border: 1px solid rgb(255 255 255 / 55%);
+    background: #171717
 }
+
 html.dark-theme .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__rendered .select2-search__field {
-	background: 0 0;
-	color: #e6e1e1
+    background: 0 0;
+    color: #e6e1e1
 }
+
 html.dark-theme .select2-container--bootstrap4 .select2-dropdown .select2-results__option[aria-selected=true] {
-	background-color: #1a2232;
+    background-color: #1a2232;
 }
-
-
-
-
 
 
 html.dark-theme .modal-content {
@@ -242,7 +243,7 @@ html.dark-theme .page-link {
 
 }
 
-html.dark-theme  .page-item.disabled .page-link {
+html.dark-theme .page-item.disabled .page-link {
 
     color: #ffffff;
     background-color: #181f2e;
@@ -251,7 +252,7 @@ html.dark-theme  .page-item.disabled .page-link {
 }
 
 
-html.dark-theme  .productlist .product-box {
+html.dark-theme .productlist .product-box {
 
     border: 1px solid rgb(255 255 255 / 12%);
     background-color: #1a2232;
@@ -275,7 +276,7 @@ html.dark-theme .form-control:disabled, html.dark-theme .form-control[readonly] 
 }
 
 
-html.dark-theme  .form-select:disabled {
+html.dark-theme .form-select:disabled {
 
     background-color: #2c364a;
 
@@ -299,8 +300,6 @@ html.dark-theme .input-group-text {
 }
 
 
-
-
 html.dark-theme .chip {
 
     color: #ffffff;
@@ -309,7 +308,7 @@ html.dark-theme .chip {
 }
 
 html.dark-theme .card {
-  
+
     background-color: #202a40;
 
 }
@@ -321,16 +320,16 @@ html.dark-theme .card-footer {
 
 }
 
-html.dark-theme .bg-dark{
-  
-    background-color: #101821!important;
+html.dark-theme .bg-dark {
+
+    background-color: #101821 !important;
 }
 
 
 html.dark-theme .text-secondary {
 
-    color: #8c949c!important;
-    
+    color: #8c949c !important;
+
 }
 
 html.dark-theme .border {
@@ -341,9 +340,9 @@ html.dark-theme .border {
 
 
 html.dark-theme .border-start {
-    
+
     border-left: 1px solid rgb(255 255 255 / 12%) !important;
-} 
+}
 
 html.dark-theme .border-end {
 
@@ -365,16 +364,16 @@ html.dark-theme .border-bottom {
 
 
 html.dark-theme .text-option {
-    color: #fcfcfc!important;
+    color: #fcfcfc !important;
 }
 
 html.dark-theme .offcanvas {
     background-color: #1a2232;
-    
+
 }
 
 html.dark-theme .btn-close {
-  
+
     filter: invert(1) grayscale(100%) brightness(200%);
 
 }
@@ -388,9 +387,9 @@ html.dark-theme .w_percent {
 
 html.dark-theme .bg-light {
 
-    background-color: #1b2336!important;
+    background-color: #1b2336 !important;
 
-} 
+}
 
 
 html.dark-theme .list-group-item {
@@ -402,27 +401,28 @@ html.dark-theme .list-group-item {
 }
 
 
-html.dark-theme .list-group-flush>.list-group-item {
+html.dark-theme .list-group-flush > .list-group-item {
 
     border-width: 0 0 1px;
-    
+
 }
 
 html.dark-theme .new-customer-list .customer-list-item:hover {
 
-	background-color: #1b2436;
+    background-color: #1b2436;
 
 }
 
 html.dark-theme .best-product-item {
 
-	background-color: #202a40;
+    background-color: #202a40;
 
 }
+
 html.dark-theme .best-product-item:hover,
 html.dark-theme .sellers-list-item:hover {
 
-	background-color: #1b2436;
+    background-color: #1b2436;
 
 }
 
@@ -465,7 +465,7 @@ html.dark-theme .dropdown-menu {
 
 }
 
-html.dark-theme  .dropdown-item {
+html.dark-theme .dropdown-item {
 
     color: #fcfcfc;
 
@@ -498,7 +498,7 @@ html.dark-theme .top-header .navbar .dropdown-user-setting .dropdown-item:hover 
 
     border-radius: 10px;
     color: #fcfcfc;
-	background-color: #2e384e
+    background-color: #2e384e
 }
 
 html.dark-theme .top-header .navbar .dropdown-menu .notification-box {
@@ -515,22 +515,9 @@ html.dark-theme .top-header .navbar .dropdown-menu .apps:hover {
 }
 
 
-
 html.dark-theme .top-header .navbar .dropdown-menu .apps .apps-name {
     color: #fcfcfc;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 html.dark-theme .table {
@@ -548,7 +535,7 @@ html.dark-theme .table {
     color: #fcfcfc;
     vertical-align: top;
     border-color: rgb(255 255 255 / 12%);
-    
+
 }
 
 html.dark-theme .table-light {
@@ -570,176 +557,223 @@ html.dark-theme .table-light {
 
 
 html.dark-theme .email-wrapper {
-	background-color: #202a40;
-	box-shadow: 0 .1rem .7rem rgb(0 0 0 / 24%)
+    background-color: #202a40;
+    box-shadow: 0 .1rem .7rem rgb(0 0 0 / 24%)
 }
+
 html.dark-theme .email-sidebar {
-	background-color: #202a40;
-	border-right: 1px solid rgb(255 255 255 / .12)
+    background-color: #202a40;
+    border-right: 1px solid rgb(255 255 255 / .12)
 }
+
 html.dark-theme .email-sidebar-header {
-	background-color: #202a40;
-	border-bottom: 1px solid rgb(255 255 255 / .12);
-	border-right: 0 solid rgb(255 255 255 / 12%)
+    background-color: #202a40;
+    border-bottom: 1px solid rgb(255 255 255 / .12);
+    border-right: 0 solid rgb(255 255 255 / 12%)
 }
+
 html.dark-theme .email-navigation {
-	border-bottom: 1px solid rgb(255 255 255 / 13%)
+    border-bottom: 1px solid rgb(255 255 255 / 13%)
 }
+
 html.dark-theme .email-navigation a.list-group-item {
-	color: #e4e5e6;
-	background-color: #202a40;
-	border-bottom: 1px solid rgb(0 0 0 / 0%)
+    color: #e4e5e6;
+    background-color: #202a40;
+    border-bottom: 1px solid rgb(0 0 0 / 0%)
 }
+
 html.dark-theme .email-navigation a.list-group-item:hover {
-	background-color: rgb(255 255 255 / 14%);
+    background-color: rgb(255 255 255 / 14%);
 }
+
 html.dark-theme .email-meeting a.list-group-item {
-	color: #e4e5e6;
-	background-color: #202a40;
-	border-bottom: 1px solid rgb(0 0 0 / 0%)
+    color: #e4e5e6;
+    background-color: #202a40;
+    border-bottom: 1px solid rgb(0 0 0 / 0%)
 }
+
 html.dark-theme .email-meeting a.list-group-item:hover {
-	background-color: rgb(255 255 255 / 14%);
+    background-color: rgb(255 255 255 / 14%);
 }
+
 html.dark-theme .list-group-item {
-	background-color: #202a40;
-	border: 1px solid rgb(255 255 255 / 13%)
+    background-color: #202a40;
+    border: 1px solid rgb(255 255 255 / 13%)
 }
+
 html.dark-theme .email-navigation a.list-group-item.active {
-	color: #ffffff;
+    color: #ffffff;
     font-weight: 600;
     background-color: rgb(255 255 255 / 14%);
 }
-html.dark-theme .list-group-flush>.list-group-item {
-	border-width: 0 0 1px
+
+html.dark-theme .list-group-flush > .list-group-item {
+    border-width: 0 0 1px
 }
+
 html.dark-theme .border-top {
-	border-top: 1px solid rgb(255 255 255 / 13%)!important
+    border-top: 1px solid rgb(255 255 255 / 13%) !important
 }
+
 html.dark-theme .email-header {
-	background-color: #202a40;
-	border-bottom: 1px solid rgb(255 255 255 / 13%)
+    background-color: #202a40;
+    border-bottom: 1px solid rgb(255 255 255 / 13%)
 }
+
 html.dark-theme .email-content {
-	background: #202a40
+    background: #202a40
 }
+
 html.dark-theme .email-list div.email-message {
-	background-color: #202a40;
-	border-bottom: 1px solid rgb(255 255 255 / 12%);
-	color: #e4e5e6
+    background-color: #202a40;
+    border-bottom: 1px solid rgb(255 255 255 / 12%);
+    color: #e4e5e6
 }
+
 html.dark-theme .email-list div.email-message:hover {
-	transition: all .2s ease-out;
-	background: #434a50
+    transition: all .2s ease-out;
+    background: #434a50
 }
 
 
 html.dark-theme .email-time {
-	font-size: 13px;
-	color: #8c969e
+    font-size: 13px;
+    color: #8c969e
 }
 
 
-/* Chatbox */ 
+/* Chatbox */
 
 
 html.dark-theme .chat-wrapper {
-	background-color: #202a40;
-	box-shadow: 0 .1rem .7rem rgb(0 0 0 / 22%)
+    background-color: #202a40;
+    box-shadow: 0 .1rem .7rem rgb(0 0 0 / 22%)
 }
+
 html.dark-theme .chat-sidebar {
-	background-color: #202a40;
-	border-right: 1px solid rgb(255 255 255 / 13%)
+    background-color: #202a40;
+    border-right: 1px solid rgb(255 255 255 / 13%)
 }
+
 html.dark-theme .chat-sidebar-header {
-	background-color: #202a40;
-	border-bottom: 1px solid rgb(255 255 255 / 13%);
-	border-right: 0 solid rgb(255 255 255 / 13%)
+    background-color: #202a40;
+    border-bottom: 1px solid rgb(255 255 255 / 13%);
+    border-right: 0 solid rgb(255 255 255 / 13%)
 }
+
 html.dark-theme .chat-header {
-	background-color: #202a40;
-	border-bottom: 1px solid rgb(255 255 255 / 13%)
+    background-color: #202a40;
+    border-bottom: 1px solid rgb(255 255 255 / 13%)
 }
+
 html.dark-theme .chat-tab-menu li a.nav-link {
-	color: #c3c5c8
+    color: #c3c5c8
 }
+
 html.dark-theme .chat-title {
-	color: #e4e5e6
+    color: #e4e5e6
 }
+
 html.dark-theme .chat-msg {
-	font-size: 14px;
-	color: #848992
+    font-size: 14px;
+    color: #848992
 }
+
 html.dark-theme .chat-time {
-	font-size: 13px;
-	color: #8c969e
+    font-size: 13px;
+    color: #8c969e
 }
+
 html.dark-theme .chat-top-header-menu a {
-	color: #c3c5c8;
-	background-color: #202a40;
-	border: 1px solid rgb(255 255 255 / 15%)
+    color: #c3c5c8;
+    background-color: #202a40;
+    border: 1px solid rgb(255 255 255 / 15%)
 }
+
 html.dark-theme .chat-content-leftside .chat-left-msg {
-	background-color: #202a40
+    background-color: #202a40
 }
+
 html.dark-theme .chat-content-rightside .chat-right-msg {
-	background-color: #41484e
+    background-color: #41484e
 }
+
 html.dark-theme .chat-footer {
-	background-color: #202a40;
-	border-top: 1px solid rgb(255 255 255 / 13%)
+    background-color: #202a40;
+    border-top: 1px solid rgb(255 255 255 / 13%)
 }
+
 html.dark-theme .chat-footer-menu a {
-	color: #c3c5c8;
-	background-color: #202a40;
-	border: 1px solid rgb(255 255 255 / 15%)
+    color: #c3c5c8;
+    background-color: #202a40;
+    border: 1px solid rgb(255 255 255 / 15%)
+}
+
+html.dark-theme .page-footer {
+    bottom: 0;
+    padding: 20px calc(24px / 2);
+    position: absolute;
+    right: 0;
+    color: #ffffff;
+    left: 250px;
+    height: 60px;
+    -webkit-box-shadow: 0 2px 4px rgb(0 0 0 / 8%);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 8%);
+    background-color: #212734;
 }
 
 
 html.dark-theme .fm-menu .list-group a {
-	color: #c3c5c8
+    color: #c3c5c8
 }
+
 html.dark-theme .fm-icon-box {
-	background: #202a40;
-	color: #fff
+    background: #202a40;
+    color: #fff
 }
+
 html.dark-theme .contacts-social a {
-	background: #202a40;
-	color: #fff
+    background: #202a40;
+    color: #fff
 }
 
 
 html.dark-theme .fc-theme-standard td, html.dark-theme .fc-theme-standard th {
-	border: 1px solid rgb(255 255 255 / .12)
+    border: 1px solid rgb(255 255 255 / .12)
 }
+
 html.dark-theme .fc-theme-standard .fc-scrollgrid {
-	border: 1px solid rgb(255 255 255 / 12%)
+    border: 1px solid rgb(255 255 255 / 12%)
 }
+
 html.dark-theme .fc .fc-col-header-cell-cushion {
-	color: #fff
+    color: #fff
 }
+
 html.dark-theme .fc .fc-daygrid-day-number {
-	color: #fff
+    color: #fff
 }
 
 html.dark-theme .breadcrumb {
-	background-color: rgb(32 42 64 / 0%);
+    background-color: rgb(32 42 64 / 0%);
 }
+
 html.dark-theme .breadcrumb-item.active {
-	color: #8b969f
+    color: #8b969f
 }
+
 html.dark-theme .breadcrumb-title {
-	border-right: 1.5px solid rgb(255 255 255 / 18%)
+    border-right: 1.5px solid rgb(255 255 255 / 18%)
 }
 
 html.dark-theme .bg-body {
-	background-color: #202a40!important
+    background-color: #202a40 !important
 }
 
 
 html.dark-theme .apexcharts-pie-label,
 html.dark-theme .apexcharts-datalabels,
-html.dark-theme .apexcharts-datalabel, 
+html.dark-theme .apexcharts-datalabel,
 html.dark-theme .apexcharts-datalabel-label,
 html.dark-theme .apexcharts-datalabel-value {
     fill: #fff;
@@ -751,10 +785,9 @@ html.dark-theme .apexcharts-text tspan {
 }
 
 
-
 /* Responsive */
 
-@media screen and (max-width:1024px)  {
+@media screen and (max-width: 1024px) {
 
     html.dark-theme .top-header .navbar .full-searchbar {
         background-color: #1a2232;
