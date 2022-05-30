@@ -8,7 +8,7 @@
             <img src="/media/img/ke_login.png" class="logo-icon" alt="efak icon">
         </div>
         <div>
-            <h4 class="logo-text">EFAK</h4>
+            <h4 class="logo-text">EFAK&nbsp;&nbsp;<span class="efak-header-version">v3.0.0</span></h4>
         </div>
         <div class="toggle-icon ms-auto"><i class="bi bi-list"></i>
         </div>

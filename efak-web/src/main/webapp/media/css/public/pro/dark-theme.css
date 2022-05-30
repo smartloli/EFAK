@@ -47,6 +47,11 @@ html.dark-theme .sidebar-wrapper .metismenu .mm-active > a, html.dark-theme .sid
     border-left: 4px solid #ffffff;
 }
 
+.efak-header-version {
+    font-size: 12px;
+    color: #a0a0a0;
+}
+
 html.dark-theme .sidebar-wrapper .metismenu a {
     color: #9ea4aa;
 }
@@ -709,14 +714,15 @@ html.dark-theme .chat-footer-menu a {
     border: 1px solid rgb(255 255 255 / 15%)
 }
 
-html.dark-theme .page-footer {
-    bottom: 0;
+.page-footer {
+    bottom: -20px;
+    width: 100%;
     padding: 20px calc(24px / 2);
     position: absolute;
-    right: 0;
     color: #ffffff;
+    font-family: Roboto, sans-serif;
     left: 250px;
-    height: 60px;
+    height: 50px;
     -webkit-box-shadow: 0 2px 4px rgb(0 0 0 / 8%);
     box-shadow: 0 2px 4px rgb(0 0 0 / 8%);
     background-color: #212734;

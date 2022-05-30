@@ -20,7 +20,7 @@
                 <li class="nav-item dropdown dropdown-user-setting">
                     <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                         <div class="user-setting d-flex align-items-center">
-                            <img src="assets/images/avatars/avatar-1.png" class="user-img" alt="">
+                            <img src="/media/img/efak-logo.png" class="user-img" alt="">
                         </div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
