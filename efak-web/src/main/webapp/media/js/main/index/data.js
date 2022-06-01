@@ -545,7 +545,7 @@ $(function () {
             lineCap: 'round',
             //dashArray: 4
         },
-        labels: ['Total Traffic'],
+        labels: ['Consumer'],
         responsive: [
             {
                 breakpoint: 1281,
