@@ -5,10 +5,10 @@
             <div class="col-sm-9">Copyright &copy; <a href="http://www.kafka-eagle.org/"
                                                       target="_blank">Smartloli</a> 2022
             </div>
-            <div class="col-sm-3">
-                <a href="https://github.com/smartloli/EFAK" target="_blank">Open Source</a> &middot; <a
-                    href="http://www.kafka-eagle.org/articles/docs/documentation.html">Documentation</a>
-            </div>
+            <%--            <div class="col-sm-4">--%>
+            <%--                <a href="https://github.com/smartloli/EFAK" target="_blank">Open Source</a> &middot; <a--%>
+            <%--                    href="http://www.kafka-eagle.org/articles/docs/documentation.html">Documentation</a>--%>
+            <%--            </div>--%>
         </div>
     </div>
 </footer>
