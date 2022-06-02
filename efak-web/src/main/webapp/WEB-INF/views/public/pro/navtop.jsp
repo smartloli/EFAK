@@ -171,6 +171,68 @@
                 </li>
                 <li class="nav-item dropdown dropdown-large">
                     <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
+                        <div class="messages">
+                            <i class="bx bx-cube"></i>
+                        </div>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end p-0">
+                        <div class="p-2 border-bottom m-2">
+                            <h5 class="h5 mb-0">Cluster List</h5>
+                        </div>
+                        <div class="header-message-list p-2">
+                            <a class="dropdown-item" href="#">
+                                <div class="d-flex align-items-center">
+                                    <div class="notification-box bg-light-success text-success"><i
+                                            class="bx bx-video"></i></div>
+                                    <div class="ms-3 flex-grow-1">
+                                        <h6 class="mb-0 dropdown-msg-user">${clusterAlias}</h6>
+                                        <small class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">Active</small>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <div class="d-flex align-items-center">
+                                    <div class="notification-box bg-light-danger text-danger"><i
+                                            class="bx bx-video-off"></i></div>
+                                    <div class="ms-3 flex-grow-1">
+                                        <h6 class="mb-0 dropdown-msg-user">Cluster002</h6>
+                                        <small class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">Standby</small>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <div class="d-flex align-items-center">
+                                    <div class="notification-box bg-light-danger text-danger"><i
+                                            class="bx bx-video-off"></i></div>
+                                    <div class="ms-3 flex-grow-1">
+                                        <h6 class="mb-0 dropdown-msg-user">Cluster003</h6>
+                                        <small class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">Standby</small>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <div class="d-flex align-items-center">
+                                    <div class="notification-box bg-light-danger text-danger"><i
+                                            class="bx bx-video-off"></i></div>
+                                    <div class="ms-3 flex-grow-1">
+                                        <h6 class="mb-0 dropdown-msg-user">Cluster004</h6>
+                                        <small class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">Standby</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="p-2">
+                            <div>
+                                <hr class="dropdown-divider">
+                            </div>
+                            <a class="dropdown-item" href="/cluster/multi">
+                                <div class="text-center">View All Clusters</div>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item dropdown dropdown-large">
+                    <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                         <div class="notifications">
                             <%-- <span class="notify-badge">8</span>--%>
                             <i class="bi bi-question-lg"></i>

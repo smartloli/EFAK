@@ -99,7 +99,7 @@ public class AccountController {
      */
     private void setKafkaAlias(Subject subject) {
         // Set EFAK Version
-        subject.getSession().setAttribute(KConstants.Common.EFAK_VERSION_DOC, "V" + KConstants.Common.EFAK_VERSION);
+        subject.getSession().setAttribute(KConstants.Common.EFAK_VERSION_DOC, KConstants.Common.EFAK_VERSION);
         Object object = subject.getSession().getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS);
         if (object == null) {
             String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");

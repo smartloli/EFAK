@@ -35,10 +35,11 @@
                         <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                             <div class="w-50">
                                 <p>Brokers</p>
-                                <h4 class="">10</h4>
+                                <h4 id="efak_dashboard_panel_brokers" class="">0</h4>
                             </div>
                             <div class="w-50">
-                                <p class="mb-3 float-end text-success">+ 16% <i class="bi bi-arrow-up"></i></p>
+                                <p class="mb-3 float-end text-success"><span>+ 16%</span> <i class="bi bi-arrow-up"></i>
+                                </p>
                                 <div id="chart1"></div>
                             </div>
                         </div>
@@ -51,7 +52,7 @@
                         <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                             <div class="w-50">
                                 <p>Topics</p>
-                                <h4 class="">120</h4>
+                                <h4 id="efak_dashboard_panel_topics" class="">0</h4>
                             </div>
                             <div class="w-50">
                                 <p class="mb-3 float-end text-danger">- 3.4% <i class="bi bi-arrow-down"></i></p>
@@ -67,7 +68,7 @@
                         <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                             <div class="w-50">
                                 <p>Zookeeper</p>
-                                <h4 class="">3</h4>
+                                <h4 id="efak_dashboard_panel_zookeepers" class="">0</h4>
                             </div>
                             <div class="w-50">
                                 <p class="mb-3 float-end text-success">+ 24% <i class="bi bi-arrow-up"></i></p>
@@ -83,7 +84,7 @@
                         <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                             <div class="w-50">
                                 <p>Consumers</p>
-                                <h4 class="">25</h4>
+                                <h4 id="efak_dashboard_panel_consumers" class="">0</h4>
                             </div>
                             <div class="w-50">
                                 <p class="mb-3 float-end text-success">+ 8.2% <i class="bi bi-arrow-up"></i></p>

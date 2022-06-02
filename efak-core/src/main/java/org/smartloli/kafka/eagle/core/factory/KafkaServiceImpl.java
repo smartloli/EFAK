@@ -900,7 +900,7 @@ public class KafkaServiceImpl implements KafkaService {
     }
 
     /**
-     * Get kafka 0.10.x, 1.x, 2.x consumer groups.
+     * Get kafka 0.10.x, 1.x, 2.x, 3.x consumer groups.
      */
     public int getKafkaConsumerGroups(String clusterAlias) {
         Properties prop = new Properties();

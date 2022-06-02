@@ -43,16 +43,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Kafka Eagle dashboard data generator.
+ * Monitoring panel realizes data interface calling logic.
  *
  * @author smartloli.
  * <p>
- * Created by Aug 12, 2016.
- * <p>
- * Update by hexiang 20170216
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 02, 2022.
  */
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -76,9 +71,10 @@ public class DashboardServiceImpl implements DashboardService {
     /**
      * Get kafka & dashboard dataset.
      */
-    public String getDashboard(String clusterAlias) {
+    @Override
+    public String getDashboardPanel(String clusterAlias) {
         JSONObject target = new JSONObject();
-        target.put("kafka", kafkaBrokersGraph(clusterAlias));
+        // target.put("kafka", kafkaBrokersGraph(clusterAlias));
         target.put("dashboard", panel(clusterAlias));
         return target.toJSONString();
     }

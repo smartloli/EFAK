@@ -30,13 +30,13 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 /**
- * // NOTE
+ * Cache the Kafka metadata information in zookeeper into memory.
  *
  * @author smartloli.
  * <p>
- * Created by Nov 05, 2021
+ * Created by Jun 02, 2022
  */
-public class ZKFactoryUtils {
+public class KafkaCacheUtils {
 
     public static void initKafkaMetaData() {
 
@@ -85,7 +85,7 @@ public class ZKFactoryUtils {
                     }
 
                 } catch (Exception ex) {
-                    LoggerUtils.print(ZKFactoryUtils.class).error("Get broker info for zookeeper has error, msg is ", ex);
+                    LoggerUtils.print(KafkaCacheUtils.class).error("Get broker info for zookeeper has error, msg is ", ex);
                 } finally {
                     if (zkClient != null) {
                         zkClient.close();
@@ -93,7 +93,7 @@ public class ZKFactoryUtils {
                 }
             }
         } catch (Exception e) {
-            LoggerUtils.print(ZKFactoryUtils.class).error("Load kafka metadata into cache has error, msg is ", e);
+            LoggerUtils.print(KafkaCacheUtils.class).error("Load kafka metadata into cache has error, msg is ", e);
         }
     }
 
@@ -149,7 +149,7 @@ public class ZKFactoryUtils {
         try {
             broker.setJmxPortStatus(NetUtils.telnet(broker.getHost(), broker.getJmxPort()));
         } catch (Exception e) {
-            LoggerUtils.print(ZKFactoryUtils.class).error("Telnet [" + broker.getHost() + ":" + broker.getJmxPort() + "] has error, msg is ", e);
+            LoggerUtils.print(KafkaCacheUtils.class).error("Telnet [" + broker.getHost() + ":" + broker.getJmxPort() + "] has error, msg is ", e);
         }
 
         // lrucache key: clusterAlias

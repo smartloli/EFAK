@@ -88,6 +88,9 @@ public interface JConstants {
 
     static String CREATE_TABLE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64) DEFAULT NULL,`broker` text DEFAULT NULL,`type` varchar(32) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(128) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
+    static String CREATE_TABLE_KE_METRICS_INDEX_TM_CLUSTER = "ALTER TABLE `ke_metrics` ADD INDEX `idx_tm_cluster_key` (`cluster`, `type`, `key`,`tm`);";
+    static String CREATE_TABLE_KE_METRICS_INDEX = "ALTER TABLE `ke_metrics` ADD INDEX `idx_tm_cluster_all` (`cluster`, `type`, `key`,`timespan` , `tm`);";
+
     static String CREATE_TABLE_KE_METRICS_OFFLINE = "CREATE TABLE IF NOT EXISTS `ke_metrics_offline` (`cluster` varchar(64) NOT NULL,`key` varchar(128) NOT NULL,`one` varchar(128) DEFAULT NULL,`mean` varchar(128) DEFAULT NULL,`five` varchar(128) DEFAULT NULL,`fifteen` varchar(128) DEFAULT NULL, PRIMARY KEY (`cluster`,`key`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     static String CREATE_TABLE_KE_CONNECT_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_connect_config` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`cluster` varchar(64),`connect_uri` varchar(128),`version` varchar(32),`alive` varchar(16),`created` varchar(32) DEFAULT NULL,`modify` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
@@ -142,6 +145,9 @@ public interface JConstants {
     static String CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16'), ('19', '1', '18'), ('20', '1', '19'), ('21', '1', '20'), ('22', '1', '21'), ('23', '1', '22'), ('24', '1', '23'), ('25', '1', '24')";
 
     static String CREATE_TABLE_SQLITE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64),`broker` text,`type` varchar(32),`key` varchar(64),`value` varchar(128),`timespan` bigint(20),`tm` varchar(16))";
+
+    static String CREATE_TABLE_SQLITE_KE_METRICS_INDEX_TM_CLUSTER = "CREATE INDEX idx_tm_cluster_key on `ke_metrics` (`cluster`, `type`, `key`,`tm`);";
+    static String CREATE_TABLE_SQLITE_KE_METRICS_INDEX = "CREATE INDEX idx_tm_cluster_all on `ke_metrics` (`cluster`, `type`, `key`,`timespan` , `tm`);";
 
     static String CREATE_TABLE_SQLITE_KE_METRICS_OFFLINE = "CREATE TABLE IF NOT EXISTS `ke_metrics_offline` (`cluster` varchar(64) ,`key` varchar(128) ,`one` varchar(128) ,`mean` varchar(128) ,`five` varchar(128) ,`fifteen` varchar(128) , PRIMARY KEY (`cluster`,`key`))";
 
@@ -200,6 +206,8 @@ public interface JConstants {
             put("CREATE_TABLE_KE_ROLE_RESOURCE", CREATE_TABLE_KE_ROLE_RESOURCE);
             put("CREATE_TABLE_KE_ROLE_RESOURCE_INSERT", CREATE_TABLE_KE_ROLE_RESOURCE_INSERT);
             put("CREATE_TABLE_KE_METRICS", CREATE_TABLE_KE_METRICS);
+            put("CREATE_TABLE_KE_METRICS_INDEX", CREATE_TABLE_KE_METRICS_INDEX);
+            put("CREATE_TABLE_KE_METRICS_INDEX_TM_CLUSTER", CREATE_TABLE_KE_METRICS_INDEX_TM_CLUSTER);
             put("CREATE_TABLE_KE_METRICS_OFFLINE", CREATE_TABLE_KE_METRICS_OFFLINE);
             put("CREATE_TABLE_KE_CONNECT_CONFIG", CREATE_TABLE_KE_CONNECT_CONFIG);
             put("CREATE_TABLE_KE_ALARM_CONSUMER", CREATE_TABLE_KE_ALARM_CONSUMER);
@@ -230,6 +238,8 @@ public interface JConstants {
             put("CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE", CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE);
             put("CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT", CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT);
             put("CREATE_TABLE_SQLITE_KE_METRICS", CREATE_TABLE_SQLITE_KE_METRICS);
+            put("CREATE_TABLE_SQLITE_KE_METRICS_INDEX", CREATE_TABLE_SQLITE_KE_METRICS_INDEX);
+            put("CREATE_TABLE_SQLITE_KE_METRICS_INDEX_TM_CLUSTER", CREATE_TABLE_SQLITE_KE_METRICS_INDEX_TM_CLUSTER);
             put("CREATE_TABLE_SQLITE_KE_METRICS_OFFLINE", CREATE_TABLE_SQLITE_KE_METRICS_OFFLINE);
             put("CREATE_TABLE_SQLITE_KE_CONNECT_CONFIG", CREATE_TABLE_SQLITE_KE_CONNECT_CONFIG);
             put("CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER", CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER);

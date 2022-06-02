@@ -78,6 +78,7 @@ public class BrokerServiceImpl implements BrokerService {
     /**
      * Statistics topic total used as page.
      */
+    @Override
     public long topicNumbers(String clusterAlias) {
         return topicList(clusterAlias).size();
     }
@@ -342,6 +343,7 @@ public class BrokerServiceImpl implements BrokerService {
     /**
      * Get kafka broker numbers from zookeeper.
      */
+    @Override
     public long brokerNumbers(String clusterAlias) {
         List<BrokersInfo> brokersInfos = BrokerCache.META_CACHE.get(clusterAlias);
         long count = 0;

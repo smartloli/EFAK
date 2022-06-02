@@ -1,5 +1,30 @@
 $(function () {
 
+    // load panel
+    getDashboardPanel();
+
+    function getDashboardPanel() {
+        try {
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/get/dashboard/panel/ajax',
+                success: function (datas) {
+                    if (datas != null) {
+                        dashboard = JSON.parse(datas.dashboard);
+                        $("#efak_dashboard_panel_brokers").text(dashboard.brokers);
+                        $("#efak_dashboard_panel_topics").text(dashboard.topics);
+                        $("#efak_dashboard_panel_zookeepers").text(dashboard.zks);
+                        $("#efak_dashboard_panel_consumers").text(dashboard.consumers);
+                    }
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+
 // chart 1
     var options = {
         series: [{
