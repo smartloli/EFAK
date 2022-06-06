@@ -22,9 +22,9 @@
                 <div class="menu-title">Dashboard</div>
             </a>
             <ul>
-                <li><a href="index.html"><i class="bx bx-laptop"></i>Overview</a>
+                <li><a href="/"><i class="bx bx-laptop"></i>Overview</a>
                 </li>
-                <li><a href="index2.html"><i class="bx bx-desktop"></i>TV Dashboard</a>
+                <li><a href="/tv"><i class="bx bx-desktop"></i>TV Dashboard</a>
                 </li>
             </ul>
         </li>

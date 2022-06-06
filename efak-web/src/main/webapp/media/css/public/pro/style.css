@@ -316,6 +316,13 @@ a {
     font-size: 13px;
 }
 
+.font-weight-bold {
+    font-weight: 700 !important;
+}
+
+.text-uppercase {
+    text-transform: uppercase !important;
+}
 
 .header-message-list {
     position: relative;

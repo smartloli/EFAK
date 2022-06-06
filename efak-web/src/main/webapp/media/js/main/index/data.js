@@ -28,8 +28,9 @@ $(function () {
 // chart 1
     var options = {
         series: [{
-            name: "Total Orders",
-            data: [240, 160, 671, 414, 555, 257]
+            name: "Message In",
+            // data: [240, 160, 671, 414, 555, 257]
+            data: [0.00, 1.10, 0.00, 2.00, 0.00, 5.00]
         }],
         chart: {
             type: "line",
@@ -79,7 +80,7 @@ $(function () {
         },
         colors: ["#3461ff"],
         xaxis: {
-            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            // categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         },
         fill: {
             opacity: 1

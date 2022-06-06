@@ -25,6 +25,7 @@ import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
@@ -39,6 +40,7 @@ import org.smartloli.kafka.eagle.web.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +79,28 @@ public class DashboardServiceImpl implements DashboardService {
         // target.put("kafka", kafkaBrokersGraph(clusterAlias));
         target.put("dashboard", panel(clusterAlias));
         return target.toJSONString();
+    }
+
+    private String chart(String clusterAlias, String flag) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("cluster", clusterAlias);
+        params.put("type", KConstants.CollectorType.KAFKA);
+        params.put("key", KConstants.MBean.MESSAGEIN);
+        params.put("tm", CalendarUtils.getCustomLastDay(0));
+        if ("broker_chart".equals(flag)) {
+            params.put("size", 6);// display broker lastest 6 minutes
+            List<KpiInfo> kpis = mbeanDao.getDashboradPanelBrokerChart(params);
+            for (KpiInfo kpi : kpis) {
+
+            }
+        } else if ("broker_chart_rate".equals(flag)) {
+            params.put("size", 12);// cacl broker rate
+        } else if ("broker_chart_msg".equals(flag)) {
+            params.put("size", 10); // Broker MessageIn
+
+        }
+
+        return "";
     }
 
     /**
