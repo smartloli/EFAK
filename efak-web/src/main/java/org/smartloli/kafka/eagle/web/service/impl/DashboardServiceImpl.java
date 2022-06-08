@@ -87,6 +87,7 @@ public class DashboardServiceImpl implements DashboardService {
         params.put("type", KConstants.CollectorType.KAFKA);
         params.put("key", KConstants.MBean.MESSAGEIN);
         params.put("tm", CalendarUtils.getCustomLastDay(0));
+
         if ("broker_chart".equals(flag)) {
             params.put("size", 6);// display broker lastest 6 minutes
             List<KpiInfo> kpis = mbeanDao.getDashboradPanelBrokerChart(params);

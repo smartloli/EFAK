@@ -102,13 +102,12 @@
                             <h6 class="mb-0">Broker MessageIn</h6>
                             <div class="fs-5 ms-auto dropdown">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                     data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></div>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Detail</a></li>
-                                </ul>
+                                     data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                        class="bi bi-three-dots"></i></a>
+                                </div>
                             </div>
                         </div>
-                        <div id="chart5"></div>
+                        <div id="efak_dashboard_msg_in_chart"></div>
                     </div>
                 </div>
             </div>
@@ -119,10 +118,8 @@
                             <h6 class="mb-0">Topic Capacity Ratio</h6>
                             <div class="fs-5 ms-auto dropdown">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                     data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></div>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Detail</a></li>
-                                </ul>
+                                     data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                        class="bi bi-three-dots"></i></a></div>
                             </div>
                         </div>
                         <div class="row row-cols-1 row-cols-md-2 g-3 mt-2 align-items-center">
@@ -172,10 +169,8 @@
                             <h6 class="mb-0">Consumer Application</h6>
                             <div class="fs-5 ms-auto dropdown">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                     data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></div>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Detail</a></li>
-                                </ul>
+                                     data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                        class="bi bi-three-dots"></i></a></div>
                             </div>
                         </div>
                         <div id="chart7" class=""></div>
@@ -210,19 +205,16 @@
                                 <div class="d-flex align-items-center">
                                     <div class="">
                                         <p class="mb-1">Byte In</p>
-                                        <h4 class="mb-0 text-primary">289</h4>
+                                        <h4 id="efak_dashboard_byte_in_lastest" class="mb-0 text-primary">0</h4>
                                     </div>
                                     <div class="dropdown ms-auto">
                                         <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                             data-bs-toggle="dropdown"><i class="bi bi-three-dots fs-4"></i>
+                                             data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                                class="bi bi-three-dots fs-4"></i></a>
                                         </div>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="javascript:;">Action</a>
-                                            </li>
-                                        </ul>
                                     </div>
                                 </div>
-                                <div id="chart8"></div>
+                                <div id="efak_dashboard_byte_in_chart"></div>
                             </div>
                         </div>
                         <div class="card radius-10 border shadow-none mb-3">
@@ -230,39 +222,33 @@
                                 <div class="d-flex align-items-center">
                                     <div class="">
                                         <p class="mb-1">Byte Out</p>
-                                        <h4 class="mb-0 text-primary">489</h4>
+                                        <h4 id="efak_dashboard_byte_out_lastest" class="mb-0 text-primary">0</h4>
                                     </div>
                                     <div class="dropdown ms-auto">
                                         <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                             data-bs-toggle="dropdown"><i class="bi bi-three-dots fs-4"></i>
+                                             data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                                class="bi bi-three-dots fs-4"></i></a>
                                         </div>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="javascript:;">Action</a>
-                                            </li>
-                                        </ul>
                                     </div>
                                 </div>
-                                <div id="chart9"></div>
+                                <div id="efak_dashboard_byte_out_chart"></div>
                             </div>
                         </div>
                         <div class="card radius-10 border shadow-none mb-0">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="">
-                                        <p class="mb-1">Zookeeper Connections</p>
-                                        <h4 class="mb-0 text-primary">149</h4>
+                                        <p class="mb-1">FreePhysicalMemory</p>
+                                        <h4 id="efak_dashboard_osfreememory_lastest" class="mb-0 text-primary">0</h4>
                                     </div>
                                     <div class="dropdown ms-auto">
                                         <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                             data-bs-toggle="dropdown"><i class="bi bi-three-dots fs-4"></i>
+                                             data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                                class="bi bi-three-dots fs-4"></i></a>
                                         </div>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="javascript:;">Action</a>
-                                            </li>
-                                        </ul>
                                     </div>
                                 </div>
-                                <div id="chart10"></div>
+                                <div id="efak_dashboard_osfree_memory_chart"></div>
                             </div>
                         </div>
                     </div>
@@ -275,10 +261,8 @@
                             <h6 class="mb-0">Topic Message</h6>
                             <div class="fs-5 ms-auto dropdown">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                     data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></div>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Action</a></li>
-                                </ul>
+                                     data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                        class="bi bi-three-dots"></i></a></div>
                             </div>
                         </div>
                         <div id="chart11" class=""></div>
@@ -306,10 +290,8 @@
                             <h6 class="mb-0">Topic LogSize Top10</h6>
                             <div class="fs-5 ms-auto dropdown">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                     data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></div>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Action</a></li>
-                                </ul>
+                                     data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                        class="bi bi-three-dots"></i></a></div>
                             </div>
                         </div>
                         <div class="table-responsive mt-2">
@@ -385,10 +367,8 @@
                             <h6 class="mb-0">Topic Capacity Top10</h6>
                             <div class="fs-5 ms-auto dropdown">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                     data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></div>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Action</a></li>
-                                </ul>
+                                     data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                        class="bi bi-three-dots"></i></a></div>
                             </div>
                         </div>
                         <div class="table-responsive mt-2">
@@ -490,7 +470,6 @@
     <jsp:param value="plugins/chartjs/Chart.extension.js" name="loader"/>
     <jsp:param value="plugins/apexcharts-bundle/apexcharts.min.js" name="loader"/>
     <jsp:param value="main/index/index.js" name="loader"/>
-    <jsp:param value="main/index/data.js" name="loader"/>
 </jsp:include>
 </body>
 

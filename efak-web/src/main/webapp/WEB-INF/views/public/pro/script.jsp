@@ -10,6 +10,9 @@
 <script src="/media/js/plugins/perfect-scrollbar/perfect-scrollbar.js"></script>
 <script src="/media/js/public/pro/pace.min.js"></script>
 
+<!-- Dark theme -->
+<script src="/media/js/public/pro/navbar.js"></script>
+
 <%
     String[] loader = request.getParameterValues("loader");
     if (loader == null) {

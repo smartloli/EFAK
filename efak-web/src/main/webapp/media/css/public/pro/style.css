@@ -329,6 +329,9 @@ a {
     /*height: 400px*/
 }
 
+.panel-detail-a {
+    color: white;
+}
 
 .header-notifications-list {
     position: relative;

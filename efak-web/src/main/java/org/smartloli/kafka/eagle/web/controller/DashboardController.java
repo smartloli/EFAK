@@ -17,8 +17,11 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import org.apache.commons.lang3.StringUtils;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
+import org.smartloli.kafka.eagle.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +51,9 @@ public class DashboardController {
      */
     @Autowired
     private DashboardService dashboradService;
+
+    @Autowired
+    private MetricsService metricsService;
 
     /**
      * Index viewer.
@@ -68,6 +75,28 @@ public class DashboardController {
 
         try {
             byte[] output = dashboradService.getDashboardPanel(clusterAlias).getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/get/dashboard/areachart/ajax", method = RequestMethod.GET)
+    public void getDashboardAreaChartAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+        try {
+            String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+            Map<String, Object> param = new HashMap<>();
+            param.put("cluster", clusterAlias);
+            param.put("stime", CalendarUtils.getCustomLastDay(0));
+            param.put("etime", CalendarUtils.getCustomLastDay(0));
+            param.put("type", KConstants.CollectorType.KAFKA);
+            param.put("modules", Arrays.asList(KConstants.MBean.MESSAGEIN, KConstants.MBean.BYTEIN, KConstants.MBean.BYTEOUT, KConstants.MBean.OSFREEMEMORY));
+            String target = metricsService.query(param);
+            if (StringUtils.isEmpty(target)) {
+                target = "";
+            }
+            byte[] output = target.getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
             ex.printStackTrace();
