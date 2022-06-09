@@ -115,7 +115,7 @@
                 <div class="card radius-10 w-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
-                            <h6 class="mb-0">Topic Capacity Ratio</h6>
+                            <h6 class="mb-0">Kafka OS</h6>
                             <div class="fs-5 ms-auto dropdown">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
                                      data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
@@ -123,35 +123,22 @@
                             </div>
                         </div>
                         <div class="row row-cols-1 row-cols-md-2 g-3 mt-2 align-items-center">
-                            <div class="col-lg-7 col-xl-7 col-xxl-8">
+                            <div class="col-lg-6 col-xl-6 col-xxl-6">
                                 <div class="by-device-container">
                                     <div class="piechart-legend">
                                         <h2 class="mb-1">85%</h2>
-                                        <h6 class="mb-0">Total Capacity</h6>
+                                        <h6 class="mb-0">Memory</h6>
                                     </div>
                                     <canvas id="chart6"></canvas>
                                 </div>
                             </div>
-                            <div class="col-lg-5 col-xl-5 col-xxl-4">
-                                <div class="">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item d-flex align-items-center justify-content-between border-0">
-                                            <i class="bi bi-tablet-landscape-fill me-2 text-primary"></i>
-                                            <span>0B~1M - </span> <span>20%</span>
-                                        </li>
-                                        <li class="list-group-item d-flex align-items-center justify-content-between border-0">
-                                            <i class="bi bi-phone-fill me-2 text-primary-2"></i>
-                                            <span>1M~1G - </span> <span>40%</span>
-                                        </li>
-                                        <li class="list-group-item d-flex align-items-center justify-content-between border-0">
-                                            <i class="bi bi-display-fill me-2 text-primary-3"></i>
-                                            <span>1G~1T - </span> <span>30%</span>
-                                        </li>
-                                        <li class="list-group-item d-flex align-items-center justify-content-between border-0">
-                                            <i class="bi bi-display-fill me-2 text-primary-4"></i>
-                                            <span>1T~1P - </span> <span>10%</span>
-                                        </li>
-                                    </ul>
+                            <div class="col-lg-6 col-xl-6 col-xxl-6">
+                                <div class="by-device-container">
+                                    <div class="piechart-legend">
+                                        <h2 class="mb-1">15%</h2>
+                                        <h6 class="mb-0">CPU</h6>
+                                    </div>
+                                    <canvas id="chart16"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -166,7 +153,7 @@
                 <div class="card radius-10 w-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
-                            <h6 class="mb-0">Consumer Application</h6>
+                            <h6 class="mb-0">Active Topics</h6>
                             <div class="fs-5 ms-auto dropdown">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
                                      data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
@@ -176,19 +163,19 @@
                         <div id="chart7" class=""></div>
                         <div class="traffic-widget">
                             <div class="progress-wrapper mb-3">
-                                <p class="mb-1">Running <span class="float-end">100</span></p>
+                                <p class="mb-1">0B-1MB <span class="float-end">100</span></p>
                                 <div class="progress rounded-0" style="height: 8px;">
                                     <div class="progress-bar bg-primary" role="progressbar" style="width: 80%;"></div>
                                 </div>
                             </div>
                             <div class="progress-wrapper mb-3">
-                                <p class="mb-1">Shutdown <span class="float-end">20</span></p>
+                                <p class="mb-1">1MB-1GB <span class="float-end">20</span></p>
                                 <div class="progress rounded-0" style="height: 8px;">
                                     <div class="progress-bar bg-primary" role="progressbar" style="width: 65%;"></div>
                                 </div>
                             </div>
                             <div class="progress-wrapper mb-0">
-                                <p class="mb-1">Pending <span class="float-end">40</span></p>
+                                <p class="mb-1">1GB+ <span class="float-end">40</span></p>
                                 <div class="progress rounded-0" style="height: 8px;">
                                     <div class="progress-bar bg-primary" role="progressbar" style="width: 50%;"></div>
                                 </div>

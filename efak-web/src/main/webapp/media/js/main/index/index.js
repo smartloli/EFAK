@@ -455,11 +455,11 @@ $(function () {
         var chart = new Chart(document.getElementById('chart6'), {
             type: 'doughnut',
             data: {
-                labels: ["Mobile", "Desktop", "Tablet"],
+                labels: ["Free", "Used"],
                 datasets: [{
-                    label: "Device Users",
-                    backgroundColor: ["#8ea8fd", "#3461ff", "#c1cfff"],
-                    data: [2478, 5267, 1834]
+                    label: "Kafka Memory",
+                    backgroundColor: ["#8ea8fd", "#3461ff"],
+                    data: [2478, 5267]
                 }]
             },
             options: {
@@ -472,6 +472,25 @@ $(function () {
             }
         });
 
+        var chart = new Chart(document.getElementById('chart16'), {
+            type: 'doughnut',
+            data: {
+                labels: ["Free", "Used"],
+                datasets: [{
+                    label: "Kafka CPU",
+                    backgroundColor: ["#8ea8fd", "#3461ff"],
+                    data: [10000, 1000]
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                cutoutPercentage: 85,
+                responsive: true,
+                legend: {
+                    display: false
+                }
+            }
+        });
 
         // chart 7
 
@@ -556,7 +575,7 @@ $(function () {
                 lineCap: 'round',
                 //dashArray: 4
             },
-            labels: ['Consumer'],
+            labels: ['Active'],
             responsive: [
                 {
                     breakpoint: 1281,
