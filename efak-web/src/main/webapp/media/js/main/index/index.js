@@ -449,17 +449,15 @@ $(function () {
             }
         }
 
-
-// chart6
-
-        var chart = new Chart(document.getElementById('chart6'), {
+        // mem and cpu rate
+        var kafkaOsMemOption = {
             type: 'doughnut',
             data: {
                 labels: ["Free", "Used"],
                 datasets: [{
-                    label: "Kafka Memory",
+                    label: "",
                     backgroundColor: ["#8ea8fd", "#3461ff"],
-                    data: [2478, 5267]
+                    data: []
                 }]
             },
             options: {
@@ -470,16 +468,17 @@ $(function () {
                     display: false
                 }
             }
-        });
+        }
+        var efak_dashboard_mem_chart = new Chart(document.getElementById('efak_dashboard_mem_chart'), kafkaOsMemOption);
 
-        var chart = new Chart(document.getElementById('chart16'), {
+        var kafkaOsCpuOption = {
             type: 'doughnut',
             data: {
                 labels: ["Free", "Used"],
                 datasets: [{
-                    label: "Kafka CPU",
+                    label: "",
                     backgroundColor: ["#8ea8fd", "#3461ff"],
-                    data: [10000, 1000]
+                    data: []
                 }]
             },
             options: {
@@ -490,7 +489,65 @@ $(function () {
                     display: false
                 }
             }
-        });
+        }
+        var efak_dashboard_cpu_chart = new Chart(document.getElementById('efak_dashboard_cpu_chart'), kafkaOsCpuOption);
+
+        function getDashboardMem() {
+            try {
+                $.ajax({
+                    type: 'get',
+                    dataType: 'json',
+                    url: '/get/dashboard/mem/ajax',
+                    success: function (datas) {
+                        if (datas != null) {
+                            console.log(datas)
+                            $("#efak_dashboard_mem_chart_id").text(datas.mem + "%");
+                            refreshMemOrCpu(efak_dashboard_mem_chart, "mem", datas.mem);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        function getDashboardCpu() {
+            try {
+                $.ajax({
+                    type: 'get',
+                    dataType: 'json',
+                    url: '/get/dashboard/cpu/ajax',
+                    success: function (datas) {
+                        if (datas != null) {
+                            $("#efak_dashboard_cpu_chart_id").text(datas.cpu + "%");
+                            refreshMemOrCpu(efak_dashboard_cpu_chart, "cpu", datas.cpu);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        function refreshMemOrCpu(chartObject, type, value) {
+            switch (type) {
+                case "mem":
+                    kafkaOsMemOption.data.datasets[0].label = "Kafka Memory";
+                    kafkaOsMemOption.data.datasets[0].data = [100 - value, value];
+                    chartObject.update();
+                    break;
+                case "cpu":
+                    kafkaOsCpuOption.data.datasets[0].label = "Kafka CPU";
+                    kafkaOsCpuOption.data.datasets[0].data = [100 - value, value];
+                    chartObject.update();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        getDashboardMem();
+        getDashboardCpu();
 
         // chart 7
 

@@ -126,19 +126,19 @@
                             <div class="col-lg-6 col-xl-6 col-xxl-6">
                                 <div class="by-device-container">
                                     <div class="piechart-legend">
-                                        <h2 class="mb-1">85%</h2>
+                                        <h2 id="efak_dashboard_mem_chart_id" class="mb-1">0.0%</h2>
                                         <h6 class="mb-0">Memory</h6>
                                     </div>
-                                    <canvas id="chart6"></canvas>
+                                    <canvas id="efak_dashboard_mem_chart"></canvas>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-xl-6 col-xxl-6">
                                 <div class="by-device-container">
                                     <div class="piechart-legend">
-                                        <h2 class="mb-1">15%</h2>
+                                        <h2 id="efak_dashboard_cpu_chart_id" class="mb-1">0.0%</h2>
                                         <h6 class="mb-0">CPU</h6>
                                     </div>
-                                    <canvas id="chart16"></canvas>
+                                    <canvas id="efak_dashboard_cpu_chart"></canvas>
                                 </div>
                             </div>
                         </div>
