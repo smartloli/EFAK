@@ -808,4 +808,97 @@ $(function () {
 
     getDashboardTopicLogSize();
 
+    // table topic by byte in , byte out , logsize and capacity
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/get/dashboard/rank/logsize/table/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#efak_dashboard_logsize_table").html("")
+                var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>LogSize</th></tr></thead>";
+                $("#efak_dashboard_logsize_table").append(thead);
+                var tbody = "<tbody>";
+                var tr = '';
+                for (var i = 0; i < datas.length; i++) {
+                    var id = datas[i].id;
+                    var topic = datas[i].topic;
+                    var logsize = datas[i].logsize;
+                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + logsize + "</td></tr>"
+                }
+                tbody += tr + "</tbody>"
+                $("#efak_dashboard_logsize_table").append(tbody);
+            }
+        }
+    });
+
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/get/dashboard/rank/capacity/table/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#efak_dashboard_capacity_table").html("")
+                var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Capacity</th></tr></thead>";
+                $("#efak_dashboard_capacity_table").append(thead);
+                var tbody = "<tbody>";
+                var tr = '';
+                for (var i = 0; i < datas.length; i++) {
+                    var id = datas[i].id;
+                    var topic = datas[i].topic;
+                    var capacity = datas[i].capacity;
+                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + capacity + "</td></tr>"
+                }
+                tbody += tr + "</tbody>"
+                $("#efak_dashboard_capacity_table").append(tbody);
+            }
+        }
+    });
+
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/get/dashboard/rank/byte_in/table/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#efak_dashboard_bytein_table").html("")
+                var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
+                $("#efak_dashboard_bytein_table").append(thead);
+                var tbody = "<tbody>";
+                var tr = '';
+                for (var i = 0; i < datas.length; i++) {
+                    var id = datas[i].id;
+                    var topic = datas[i].topic;
+                    var byte_in = datas[i].byte_in;
+                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_in + "</td></tr>"
+                }
+                tbody += tr + "</tbody>"
+                $("#efak_dashboard_bytein_table").append(tbody);
+            }
+        }
+    });
+
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/get/dashboard/rank/byte_out/table/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#efak_dashboard_byteout_table").html("")
+                var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
+                $("#efak_dashboard_byteout_table").append(thead);
+                var tbody = "<tbody>";
+                var tr = '';
+                for (var i = 0; i < datas.length; i++) {
+                    var id = datas[i].id;
+                    var topic = datas[i].topic;
+                    var byte_out = datas[i].byte_out;
+                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_out + "</td></tr>"
+                }
+                tbody += tr + "</tbody>"
+                $("#efak_dashboard_byteout_table").append(tbody);
+            }
+        }
+    });
+
 });

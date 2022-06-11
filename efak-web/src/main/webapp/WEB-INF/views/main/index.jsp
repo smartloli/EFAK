@@ -288,66 +288,7 @@
                             </div>
                         </div>
                         <div class="table-responsive mt-2">
-                            <table class="table align-middle mb-0">
-                                <thead class="table-light">
-                                <tr>
-                                    <th>RankID</th>
-                                    <th>Topic Name</th>
-                                    <th>LogSize</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td><a href="#">topic001</a></td>
-                                    <td>2</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td><a href="#">topic002</a></td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td><a href="#">topic003</a></td>
-                                    <td>3</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td><a href="#">topic004</a></td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td><a href="#">topic005</a></td>
-                                    <td>2</td>
-                                </tr>
-                                <tr>
-                                    <td>6</td>
-                                    <td><a href="#">topic006</a></td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>7</td>
-                                    <td><a href="#">topic007</a></td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>8</td>
-                                    <td><a href="#">topic001</a></td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>9</td>
-                                    <td><a href="#">topic009</a></td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>10</td>
-                                    <td><a href="#">topic010</a></td>
-                                    <td>1</td>
-                                </tr>
-                                </tbody>
+                            <table id="efak_dashboard_logsize_table" class="table align-middle mb-0">
                             </table>
                         </div>
                     </div>
@@ -365,66 +306,46 @@
                             </div>
                         </div>
                         <div class="table-responsive mt-2">
-                            <table class="table align-middle mb-0">
-                                <thead class="table-light">
-                                <tr>
-                                    <th>RankID</th>
-                                    <th>Topic Name</th>
-                                    <th>Capacity</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td><a href="#">topic001</a></td>
-                                    <td>2MB</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td><a href="#">topic002</a></td>
-                                    <td>1MB</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td><a href="#">topic003</a></td>
-                                    <td>3MB</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td><a href="#">topic004</a></td>
-                                    <td>1MB</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td><a href="#">topic005</a></td>
-                                    <td>2MB</td>
-                                </tr>
-                                <tr>
-                                    <td>6</td>
-                                    <td><a href="#">topic006</a></td>
-                                    <td>1MB</td>
-                                </tr>
-                                <tr>
-                                    <td>7</td>
-                                    <td><a href="#">topic007</a></td>
-                                    <td>1MB</td>
-                                </tr>
-                                <tr>
-                                    <td>8</td>
-                                    <td><a href="#">topic008</a></td>
-                                    <td>1MB</td>
-                                </tr>
-                                <tr>
-                                    <td>9</td>
-                                    <td><a href="#">topic009</a></td>
-                                    <td>1MB</td>
-                                </tr>
-                                <tr>
-                                    <td>10</td>
-                                    <td><a href="#">topic010</a></td>
-                                    <td>1MB</td>
-                                </tr>
-                                </tbody>
+                            <table id="efak_dashboard_capacity_table" class="table align-middle mb-0">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--end row-->
+
+        <div class="row">
+            <div class="col-12 col-lg-12 col-xl-6 d-flex">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">Topic ByteIn Top10</h6>
+                            <div class="fs-5 ms-auto dropdown">
+                                <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
+                                     data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                        class="bi bi-three-dots"></i></a></div>
+                            </div>
+                        </div>
+                        <div class="table-responsive mt-2">
+                            <table id="efak_dashboard_bytein_table" class="table align-middle mb-0">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-12 col-xl-6 d-flex">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">Topic ByteOut Top10</h6>
+                            <div class="fs-5 ms-auto dropdown">
+                                <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
+                                     data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
+                                        class="bi bi-three-dots"></i></a></div>
+                            </div>
+                        </div>
+                        <div class="table-responsive mt-2">
+                            <table id="efak_dashboard_byteout_table" class="table align-middle mb-0">
                             </table>
                         </div>
                     </div>

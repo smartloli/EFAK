@@ -180,7 +180,7 @@ public class DashboardController {
     /**
      * Get data from Kafka in dashboard by ajax.
      */
-    @RequestMapping(value = "/dash/{tkey}/table/ajax", method = RequestMethod.GET)
+    @RequestMapping(value = "/get/dashboard/rank/{tkey}/table/ajax", method = RequestMethod.GET)
     public void dashTopicRankAjax(@PathVariable("tkey") String tkey, HttpServletResponse response, HttpServletRequest request) {
         HttpSession session = request.getSession();
         String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
