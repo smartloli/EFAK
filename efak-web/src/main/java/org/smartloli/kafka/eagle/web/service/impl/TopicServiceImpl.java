@@ -66,12 +66,7 @@ import java.util.Map.Entry;
  *
  * @author smartloli.
  * <p>
- * Created by Aug 14, 2016.
- * <p>
- * Update by hexiang 20170216
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 11, 2022.
  */
 @Service
 public class TopicServiceImpl implements TopicService {
@@ -476,6 +471,11 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public String setResetExecute(String clusterAlias, String json) {
         return kafkaHubService.reset(clusterAlias, json);
+    }
+
+    @Override
+    public long getActiveTopicNumbers(Map<String, Object> params) {
+        return topicDao.getActiveTopicNumbers(params);
     }
 
     @Override

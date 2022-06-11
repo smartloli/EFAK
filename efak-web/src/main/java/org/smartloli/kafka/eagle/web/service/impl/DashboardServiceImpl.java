@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DashboardInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.TopicCapacityInfo;
 import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
@@ -146,6 +147,7 @@ public class DashboardServiceImpl implements DashboardService {
     /**
      * Get topic rank data,such as logsize and topic capacity.
      */
+    @Override
     public JSONArray getTopicRank(Map<String, Object> params) {
         List<TopicRank> topicRank = topicDao.readTopicRank(params);
         JSONArray array = new JSONArray();
@@ -261,6 +263,26 @@ public class DashboardServiceImpl implements DashboardService {
             object.put("cpu", StrUtils.numberic(kpis.get(0).getValue()) / brokerService.brokerNumbers(params.get("cluster").toString()));
         } else {
             object.put("cpu", "0.0");
+        }
+        return object.toJSONString();
+    }
+
+    @Override
+    public String getActiveTopicNumbers(String clusterAlias, Map<String, Object> params) {
+        long activeNums = topicDao.getActiveTopicNumbers(params);
+        TopicCapacityInfo topicCapacityInfo = topicDao.getTopicCapacityScatter(params);
+        JSONObject object = new JSONObject();
+        object.put("active", activeNums);
+        object.put("standby", brokerService.topicList(clusterAlias).size() - activeNums);
+        object.put("total", brokerService.topicList(clusterAlias).size());
+        if (topicCapacityInfo != null) {
+            object.put("mb", topicCapacityInfo.getMb());
+            object.put("gb", topicCapacityInfo.getGb());
+            object.put("tb", topicCapacityInfo.getTb());
+        } else {
+            object.put("mb", 0);
+            object.put("gb", 0);
+            object.put("tb", 0);
         }
         return object.toJSONString();
     }

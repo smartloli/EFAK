@@ -160,24 +160,30 @@
                                         class="bi bi-three-dots"></i></a></div>
                             </div>
                         </div>
-                        <div id="chart7" class=""></div>
+                        <div id="efak_dashboard_active_topic_chart" class=""></div>
                         <div class="traffic-widget">
                             <div class="progress-wrapper mb-3">
-                                <p class="mb-1">0B-1MB <span class="float-end">100</span></p>
+                                <p class="mb-1">0B-100MB <span id="efak_dashboard_active_topic_mb"
+                                                               class="float-end">0</span></p>
                                 <div class="progress rounded-0" style="height: 8px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 80%;"></div>
+                                    <div id="efak_dashboard_active_topic_mb_div" class="progress-bar bg-primary"
+                                         role="progressbar" style=""></div>
                                 </div>
                             </div>
                             <div class="progress-wrapper mb-3">
-                                <p class="mb-1">1MB-1GB <span class="float-end">20</span></p>
+                                <p class="mb-1">100MB-10GB <span id="efak_dashboard_active_topic_gb"
+                                                                 class="float-end">0</span></p>
                                 <div class="progress rounded-0" style="height: 8px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 65%;"></div>
+                                    <div id="efak_dashboard_active_topic_gb_div" class="progress-bar bg-primary"
+                                         role="progressbar" style=""></div>
                                 </div>
                             </div>
                             <div class="progress-wrapper mb-0">
-                                <p class="mb-1">1GB+ <span class="float-end">40</span></p>
+                                <p class="mb-1">10GB+ <span id="efak_dashboard_active_topic_tb"
+                                                            class="float-end">0</span></p>
                                 <div class="progress rounded-0" style="height: 8px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 50%;"></div>
+                                    <div id="efak_dashboard_active_topic_tb_div" class="progress-bar bg-primary"
+                                         role="progressbar" style=""></div>
                                 </div>
                             </div>
                         </div>
@@ -255,12 +261,12 @@
                         <div id="efak_dashboard_logsize_chart" class=""></div>
                         <div class="d-flex align-items-center gap-5 justify-content-center mt-3 p-2 radius-10 border">
                             <div class="text-center">
-                                <h3 class="mb-2 text-primary">8,546</h3>
+                                <h3 id="efak_dashboard_active_topic_nums" class="mb-2 text-primary">0</h3>
                                 <p class="mb-0">Active Topics</p>
                             </div>
                             <div class="border-end sepration"></div>
                             <div class="text-center">
-                                <h3 class="mb-2 text-primary-2">3,723</h3>
+                                <h3 id="efak_dashboard_standby_topic_nums" class="mb-2 text-primary-2">0</h3>
                                 <p class="mb-0">Standby Topics</p>
                             </div>
                         </div>

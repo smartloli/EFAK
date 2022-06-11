@@ -160,6 +160,23 @@ public class DashboardController {
         }
     }
 
+    @RequestMapping(value = "/get/dashboard/active/topic/ajax", method = RequestMethod.GET)
+    public void getDashboardActiveTopicsAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+        try {
+            String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("cluster", clusterAlias);
+            params.put("stime", CalendarUtils.getCustomLastDay(2));
+            params.put("etime", CalendarUtils.getCustomLastDay(0));
+
+            byte[] output = dashboradService.getActiveTopicNumbers(clusterAlias, params).getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     /**
      * Get data from Kafka in dashboard by ajax.
      */

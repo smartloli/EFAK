@@ -85,4 +85,9 @@ public interface DashboardService {
      */
     public String getUsedCPU(Map<String, Object> params);
 
+    /**
+     * Get active topic numbers.
+     */
+    public String getActiveTopicNumbers(String clusterAlias, Map<String, Object> params);
+
 }

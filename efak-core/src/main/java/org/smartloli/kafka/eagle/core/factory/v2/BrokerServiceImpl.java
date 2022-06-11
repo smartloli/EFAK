@@ -356,6 +356,7 @@ public class BrokerServiceImpl implements BrokerService {
     /**
      * Get topic list include cgroups from zookeeper.
      */
+    @Override
     public List<String> topicList(String clusterAlias) {
         List<String> topics = new ArrayList<>();
         if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.cgroup.enable")) {

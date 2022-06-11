@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.web.dao;
 
+import org.smartloli.kafka.eagle.common.protocol.TopicCapacityInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
@@ -257,5 +258,15 @@ public interface TopicDao {
      * Get  topic consumer group pages.
      */
     public List<ConsumerGroupsInfo> getTopicConsumerPages(Map<String, Object> params);
+
+    /**
+     * Get active topic numbers.
+     */
+    public long getActiveTopicNumbers(Map<String, Object> params);
+
+    /**
+     * Get topic capacity scatter.
+     */
+    public TopicCapacityInfo getTopicCapacityScatter(Map<String, Object> params);
 
 }

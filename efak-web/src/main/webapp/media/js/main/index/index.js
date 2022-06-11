@@ -555,9 +555,8 @@ $(function () {
     getDashboardMem();
     getDashboardCpu();
 
-    // chart 7
-
-    var options = {
+    // get active topic scatter
+    var activeTopicOptions = {
         chart: {
             height: 300,
             type: 'radialBar',
@@ -633,7 +632,7 @@ $(function () {
             }
         },
         colors: ["#3461ff"],
-        series: [78],
+        series: [],
         stroke: {
             lineCap: 'round',
             //dashArray: 4
@@ -652,12 +651,52 @@ $(function () {
 
     }
 
-    var chart = new ApexCharts(
-        document.querySelector("#chart7"),
-        options
+    var efak_dashboard_active_topic_chart = new ApexCharts(
+        document.querySelector("#efak_dashboard_active_topic_chart"),
+        activeTopicOptions
     );
 
-    chart.render();
+    efak_dashboard_active_topic_chart.render();
+
+
+    function getDashboardTopicActive() {
+        try {
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/get/dashboard/active/topic/ajax',
+                success: function (datas) {
+                    if (datas != null) {
+                        $("#efak_dashboard_active_topic_nums").text(datas.active);
+                        $("#efak_dashboard_standby_topic_nums").text(datas.standby);
+                        $("#efak_dashboard_active_topic_mb").text(datas.mb);
+                        $("#efak_dashboard_active_topic_gb").text(datas.gb);
+                        $("#efak_dashboard_active_topic_tb").text(datas.tb);
+                        activeTopicOptions.series = [(datas.active * 100.0 / datas.total).toFixed(2)];
+                        var mb = (datas.mb * 100.0 / datas.active).toFixed(0) + "%";
+                        var gb = (datas.gb * 100.0 / datas.active).toFixed(0) + "%";
+                        var tb = (datas.tb * 100.0 / datas.active).toFixed(0) + "%";
+
+                        $("#efak_dashboard_active_topic_mb_div").css({
+                            width: mb
+                        });
+                        $("#efak_dashboard_active_topic_gb_div").css({
+                            width: gb
+                        });
+                        $("#efak_dashboard_active_topic_tb_div").css({
+                            width: tb
+                        });
+                        efak_dashboard_active_topic_chart.updateOptions(activeTopicOptions);
+                    }
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    getDashboardTopicActive();
+
 
     // Topic logsize
     var efakTopicLogSizeOptions = {

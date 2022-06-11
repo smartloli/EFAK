@@ -43,6 +43,12 @@
         <result property="value" column="total"/>
     </resultMap>
 
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.TopicCapacityInfo" id="tpc">
+        <result property="mb" column="mb"/>
+        <result property="gb" column="gb"/>
+        <result property="tb" column="tb"/>
+    </resultMap>
+
     <resultMap type="org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo" id="bsconsumer">
         <result property="cluster" column="cluster"/>
         <result property="group" column="group"/>
@@ -113,6 +119,22 @@
         select `topic`,`tvalue` from ke_topic_rank where cluster=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
     </select>
 
+    <!-- Topic capacity scatter -->
+    <select id="getTopicCapacityScatter" parameterType="map" resultMap="tpc">
+        select
+        count(case when a.`tvalue` between 0 and 104857600 then a.`tvalue` end) as `mb`
+        ,count(case when a.`tvalue` between 104857600 and 10737418240 then a.`tvalue` end) as `gb`
+        ,count(case when a.`tvalue` > 10737418240 then a.`tvalue` end) as `tb`
+        from (
+        select topic,`tvalue` from ke_topic_rank where `cluster`=#{cluster} and `tkey`='capacity'
+        )a
+        join (
+        select topic from ke_logsize where `cluster`=#{cluster} and tm between #{stime} and #{etime} and diffval>0 group
+        by topic
+        )b
+        on a.topic=b.topic
+    </select>
+
     <!-- Topic producer threads data -->
     <select id="readProducerThreads" parameterType="map" resultMap="trank">
         select `topic`,`tvalue` from ke_topic_rank where cluster=#{cluster} and `topic`=#{topic} and `tkey`=#{tkey}
@@ -122,6 +144,13 @@
     <select id="getTopicCapacity" parameterType="map" resultType="long">
         select ifnull(sum(`tvalue`),0) from ke_topic_rank
         where `cluster` =#{cluster} and `tkey`=#{tkey}
+    </select>
+
+    <select id="getActiveTopicNumbers" parameterType="map" resultType="long">
+        select ifnull(count(1),0) from (
+        select topic from ke_logsize where `cluster`=#{cluster} and tm between #{stime} and #{etime} and diffval>0
+        group by topic
+        )a
     </select>
 
     <insert id="writeTopicRank" parameterType="java.util.List">
