@@ -245,14 +245,14 @@
                 <div class="card radius-10 w-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
-                            <h6 class="mb-0">Topic Message</h6>
+                            <h6 class="mb-0">Topic LogSize</h6>
                             <div class="fs-5 ms-auto dropdown">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
                                      data-bs-toggle="dropdown"><a href="" class="panel-detail-a"><i
                                         class="bi bi-three-dots"></i></a></div>
                             </div>
                         </div>
-                        <div id="chart11" class=""></div>
+                        <div id="efak_dashboard_logsize_chart" class=""></div>
                         <div class="d-flex align-items-center gap-5 justify-content-center mt-3 p-2 radius-10 border">
                             <div class="text-center">
                                 <h3 class="mb-2 text-primary">8,546</h3>

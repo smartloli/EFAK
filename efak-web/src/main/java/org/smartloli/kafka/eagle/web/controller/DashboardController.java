@@ -22,6 +22,7 @@ import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.web.service.DashboardService;
 import org.smartloli.kafka.eagle.web.service.MetricsService;
+import org.smartloli.kafka.eagle.web.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +55,9 @@ public class DashboardController {
 
     @Autowired
     private MetricsService metricsService;
+
+    @Autowired
+    private TopicService topicService;
 
     /**
      * Index viewer.
@@ -133,6 +137,23 @@ public class DashboardController {
             params.put("cluster", clusterAlias);
             params.put("key", "cpu_used");
             byte[] output = dashboradService.getUsedCPU(params).getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/get/dashboard/topic/logsize/ajax", method = RequestMethod.GET)
+    public void getDashboardTopicLogSizeAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+        try {
+            String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("cluster", clusterAlias);
+            params.put("stime", CalendarUtils.getCustomLastDay(6));
+            params.put("etime", CalendarUtils.getCustomLastDay(0));
+
+            byte[] output = topicService.getSelectTopicsLogSize(clusterAlias, params).getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
             ex.printStackTrace();

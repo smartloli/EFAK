@@ -379,7 +379,8 @@ public class TopicServiceImpl implements TopicService {
                 array.add(object);
             } else {
                 JSONObject object = new JSONObject();
-                object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+//                object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+                object.put("x", CalendarUtils.getCustomLastDay("yyyy-MM-dd", i));
                 object.put("y", 0);
                 array.add(object);
             }
