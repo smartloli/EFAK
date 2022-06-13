@@ -36,7 +36,7 @@
                 <div class="menu-title">Topics</div>
             </a>
             <ul>
-                <li><a href="#"><i class="bi bi-circle"></i>Create</a>
+                <li><a href="/topic/create"><i class="bx bx-message-square-edit"></i>Create</a>
                 </li>
                 <li><a href="#"><i class="bi bi-circle"></i>List</a>
                 </li>

@@ -369,9 +369,6 @@
     <%--    <jsp:include page="../public/pro/switch.jsp"></jsp:include>--%>
     <!--end switcher-->
 
-    <!-- start footer -->
-    <jsp:include page="../public/pro/footer.jsp"></jsp:include>
-    <!-- end footer -->
 </div>
 <!--end wrapper-->
 
@@ -383,7 +380,7 @@
     <jsp:param value="plugins/chartjs/Chart.min.js" name="loader"/>
     <jsp:param value="plugins/chartjs/Chart.extension.js" name="loader"/>
     <jsp:param value="plugins/apexcharts-bundle/apexcharts.min.js" name="loader"/>
-    <jsp:param value="main/index/index.js" name="loader"/>
+    <jsp:param value="main/index/index.js?v=3.0.0" name="loader"/>
 </jsp:include>
 </body>
 
