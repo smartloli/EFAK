@@ -10,7 +10,9 @@
     </jsp:include>
 
     <!-- Required common css -->
-    <jsp:include page="../public/pro/css.jsp"></jsp:include>
+    <jsp:include page="../public/pro/css.jsp">
+        <jsp:param value="plugins/notifications/lobibox.min.css" name="css"/>
+    </jsp:include>
 </head>
 
 <body>
@@ -111,9 +113,8 @@
 
 <!-- import js and plugins -->
 <jsp:include page="../public/pro/script.jsp">
-    <jsp:param value="plugins/notifications/messageboxes.js" name="loader"/>
-    <jsp:param value="plugins/notifications/lobibox.js" name="loader"/>
-    <jsp:param value="plugins/notifications/notifications.js" name="loader"/>
+    <jsp:param value="plugins/notifications/lobibox.min.js" name="loader"/>
+    <jsp:param value="plugins/notifications/notifications.min.js" name="loader"/>
     <jsp:param value="main/topic/create.js?v=3.0.0" name="loader"/>
 </jsp:include>
 </body>
@@ -128,8 +129,12 @@
             error_noti("Topic name input does not conform to naming conventions.")
             return false;
         }
-        if (isNaN(ke_topic_partition) || isNaN(ke_topic_repli)) {
-            error_noti("Topic partitions and replication is not null.")
+        if (ke_topic_partition.length == 0 || !digit.test(ke_topic_partition)) {
+            error_noti("Topic partitions is not null or must be number.")
+            return false;
+        }
+        if (ke_topic_repli.length == 0 || !digit.test(ke_topic_repli)) {
+            error_noti("Topic replication is not null or must be number.")
             return false;
         }
         return true;
