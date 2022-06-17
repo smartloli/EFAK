@@ -70,7 +70,7 @@ $(document).ready(function () {
         topic = href.split("#")[1];
         var token = $("#ke_admin_token").val();
         $("#remove_div").html("");
-        $("#remove_div").append("<a id='ke_del_topic' href='#' class='btn btn-danger'>Remove</a>");
+        $("#remove_div").append("<a id='ke_del_topic' href='#' class='btn btn-danger'>Delete</a>");
         $('#ke_topic_delete').modal({
             backdrop: 'static',
             keyboard: false
@@ -116,11 +116,10 @@ $(document).ready(function () {
     $(document).on('click', 'a[name=efak_topic_clean]', function () {
         var href = $(this).attr("href");
         var topic = href.split("#")[1];
-        console.log(topic);
         $("#ke_topic_clean_content").html("");
-        $("#ke_topic_clean_content").append("<p class='alert alert-danger alert-dismissable'>Are you sure to truncate the data of topic [ <strong>" + topic + "</strong> ] ?</p>");
+        $("#ke_topic_clean_content").append("<div class='alert border-0 bg-light-warning alert-dismissable'><div class='text-warning'>Are you sure to truncate the data of topic [ <strong>" + topic + "</strong> ] ?</div></div>");
         $("#ke_topic_clean_data_div").html("");
-        $("#ke_topic_clean_data_div").append("<a id='ke_del_topic' href='/topic/clean/data/" + topic + "/' class='btn btn-danger'>Submit</a>");
+        $("#ke_topic_clean_data_div").append("<a id='ke_del_topic' href='/topic/clean/data/" + topic + "/' class='btn btn-warning'>Submit</a>");
         $('#ke_topic_clean').modal({
             backdrop: 'static',
             keyboard: false

@@ -124,6 +124,63 @@
             </div>
         </div>
 
+        <!-- add partition modal -->
+        <div class="modal fade" id="ke_topic_modify" tabindex="-1" aria-labelledby="keModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">Add Partition</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group mb-3"><span class="input-group-text">+</span>
+                            <input id="ke_modify_topic_partition" name="ke_modify_topic_partition" type="text"
+                                   class="form-control" placeholder="Enter Partitions (Number >= 1)" aria-label=""
+                                   aria-describedby="">
+                        </div>
+                    </div>
+                    <div id="ke_topic_submit_div" class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- truncate topic -->
+        <div class="modal fade" id="ke_topic_clean" tabindex="-1" aria-labelledby="keModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">Truncate Topic</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div id="ke_topic_clean_content" class="modal-body"></div>
+                    <div id="ke_topic_clean_data_div" class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- delete topic -->
+        <div class="modal fade" id="ke_topic_delete" tabindex="-1" aria-labelledby="keModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">Delete Topic</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group mb-3"><span class="input-group-text"><i
+                                class="bx bx-lock-alt"></i></span>
+                            <input id="ke_admin_token" name="ke_admin_token" type="text"
+                                   class="form-control" placeholder="Enter Admin Token" aria-label=""
+                                   aria-describedby="">
+                        </div>
+                    </div>
+                    <div id="remove_div" class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
     <!--end page main-->
 

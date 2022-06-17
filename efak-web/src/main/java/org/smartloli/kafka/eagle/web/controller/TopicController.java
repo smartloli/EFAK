@@ -632,35 +632,35 @@ public class TopicController {
             try {
                 long brokerSpread = partition.getBrokersSpread();
                 if (brokerSpread < Topic.TOPIC_BROKER_SPREAD_ERROR) {
-                    object.put("brokerSpread", "<span class='badge badge-danger'>" + brokerSpread + "%</span>");
+                    object.put("brokerSpread", "<span class='badge bg-light-danger text-danger'>" + brokerSpread + "%</span>");
                 } else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_ERROR && brokerSpread < Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-                    object.put("brokerSpread", "<span class='badge badge-warning'>" + brokerSpread + "%</span>");
+                    object.put("brokerSpread", "<span class='badge bg-light-warning text-warning'>" + brokerSpread + "%</span>");
                 } else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-                    object.put("brokerSpread", "<span class='badge badge-success'>" + brokerSpread + "%</span>");
+                    object.put("brokerSpread", "<span class='badge bg-light-success text-success'>" + brokerSpread + "%</span>");
                 } else {
-                    object.put("brokerSpread", "<span class='badge badge-primary'>" + brokerSpread + "%</span>");
+                    object.put("brokerSpread", "<span class='badge bg-light-primary text-primary'>" + brokerSpread + "%</span>");
                 }
 
                 long brokerSkewed = partition.getBrokersSkewed();
                 if (brokerSkewed >= Topic.TOPIC_BROKER_SKEW_ERROR) {
-                    object.put("brokerSkewed", "<span class='badge badge-danger'>" + brokerSkewed + "%</span>");
+                    object.put("brokerSkewed", "<span class='badge bg-light-danger text-danger'>" + brokerSkewed + "%</span>");
                 } else if (brokerSkewed > Topic.TOPIC_BROKER_SKEW_NORMAL && brokerSkewed < Topic.TOPIC_BROKER_SKEW_ERROR) {
-                    object.put("brokerSkewed", "<span class='badge badge-warning'>" + brokerSkewed + "%</span>");
+                    object.put("brokerSkewed", "<span class='badge bg-light-warning text-warning'>" + brokerSkewed + "%</span>");
                 } else if (brokerSkewed <= Topic.TOPIC_BROKER_SKEW_NORMAL) {
-                    object.put("brokerSkewed", "<span class='badge badge-success'>" + brokerSkewed + "%</span>");
+                    object.put("brokerSkewed", "<span class='badge bg-light-success text-success'>" + brokerSkewed + "%</span>");
                 } else {
-                    object.put("brokerSkewed", "<span class='badge badge-primary'>" + brokerSkewed + "%</span>");
+                    object.put("brokerSkewed", "<span class='badge bg-light-primary text-primary'>" + brokerSkewed + "%</span>");
                 }
 
                 long brokerLeaderSkewed = partition.getBrokersLeaderSkewed();
                 if (brokerLeaderSkewed >= Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
-                    object.put("brokerLeaderSkewed", "<span class='badge badge-danger'>" + brokerLeaderSkewed + "%</span>");
+                    object.put("brokerLeaderSkewed", "<span class='badge bg-light-danger text-danger'>" + brokerLeaderSkewed + "%</span>");
                 } else if (brokerLeaderSkewed > Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL && brokerLeaderSkewed < Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
-                    object.put("brokerLeaderSkewed", "<span class='badge badge-warning'>" + brokerLeaderSkewed + "%</span>");
+                    object.put("brokerLeaderSkewed", "<span class='badge bg-light-warning text-warning'>" + brokerLeaderSkewed + "%</span>");
                 } else if (brokerLeaderSkewed <= Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL) {
-                    object.put("brokerLeaderSkewed", "<span class='badge badge-success'>" + brokerLeaderSkewed + "%</span>");
+                    object.put("brokerLeaderSkewed", "<span class='badge bg-light-success text-success'>" + brokerLeaderSkewed + "%</span>");
                 } else {
-                    object.put("brokerLeaderSkewed", "<span class='badge badge-primary'>" + brokerLeaderSkewed + "%</span>");
+                    object.put("brokerLeaderSkewed", "<span class='badge bg-light-primary text-primary'>" + brokerLeaderSkewed + "%</span>");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
