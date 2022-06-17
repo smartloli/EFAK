@@ -1,5 +1,24 @@
 $(document).ready(function () {
-    $("#result").dataTable({
+
+    // part1: produce and capacity
+    try {
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/topic/list/total/jmx/ajax',
+            success: function (datas) {
+                if (datas != null) {
+                    $("#efak_topic_producer_number").text(datas.producerSize + " (APP)");
+                    $("#efak_topic_producer_total_capacity").text(datas.topicCapacity + " (" + datas.capacityType + ")");
+                }
+            }
+        });
+    } catch (e) {
+        console.log(e.message);
+    }
+
+    // part2: topic table list
+    $("#efak_topic_table_result").dataTable({
         // "searching" : false,
         "bSort": false,
         "bLengthChange": false,
@@ -43,8 +62,10 @@ $(document).ready(function () {
         });
     }
 
+    // part3: topic admin operate
     var topic = "";
-    $(document).on('click', 'a[name=topic_remove]', function () {
+    // delete topic
+    $(document).on('click', 'a[name=efak_topic_remove]', function () {
         var href = $(this).attr("href");
         topic = href.split("#")[1];
         var token = $("#ke_admin_token").val();
@@ -67,18 +88,8 @@ $(document).ready(function () {
         }
     });
 
-    $("#ke_admin_token").on('input', function (e) {
-        var token = $("#ke_admin_token").val();
-        if (token.length == 0) {
-            $("#ke_del_topic").attr("disabled", true);
-            $("#ke_del_topic").attr("href", "#");
-        } else {
-            $("#ke_del_topic").attr("disabled", false);
-            $("#ke_del_topic").attr("href", "/topic/" + topic + "/" + token + "/delete");
-        }
-    });
-
-    $(document).on('click', 'a[name=topic_modify]', function () {
+    // add partition
+    $(document).on('click', 'a[name=efak_topic_modify]', function () {
         var href = $(this).attr("href");
         topic = href.split("#")[1];
         var partitions = $("#ke_modify_topic_partition").val();
@@ -101,7 +112,8 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', 'a[name=topic_clean]', function () {
+    // truncate topic
+    $(document).on('click', 'a[name=efak_topic_clean]', function () {
         var href = $(this).attr("href");
         var topic = href.split("#")[1];
         console.log(topic);
@@ -120,6 +132,18 @@ $(document).ready(function () {
             transform: 'translateX(-50%) translateY(-50%)'
         });
     });
+
+    $("#ke_admin_token").on('input', function (e) {
+        var token = $("#ke_admin_token").val();
+        if (token.length == 0) {
+            $("#ke_del_topic").attr("disabled", true);
+            $("#ke_del_topic").attr("href", "#");
+        } else {
+            $("#ke_del_topic").attr("disabled", false);
+            $("#ke_del_topic").attr("href", "/topic/" + topic + "/" + token + "/delete");
+        }
+    });
+
 
     $("#ke_modify_topic_partition").on('input', function (e) {
         var partitions = $("#ke_modify_topic_partition").val();
@@ -353,22 +377,6 @@ $(document).ready(function () {
                 }
             }
         });
-    }
-
-    try {
-        $.ajax({
-            type: 'get',
-            dataType: 'json',
-            url: '/topic/list/total/jmx/ajax',
-            success: function (datas) {
-                if (datas != null) {
-                    $("#producer_number").text(datas.producerSize + " (APP)");
-                    $("#producer_total_capacity").text(datas.topicCapacity + " (" + datas.capacityType + ")");
-                }
-            }
-        });
-    } catch (e) {
-        console.log(e.message);
     }
 
 });

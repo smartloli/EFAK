@@ -38,7 +38,7 @@
             <ul>
                 <li><a href="/topic/create"><i class="bx bx-message-square-edit"></i>Create</a>
                 </li>
-                <li><a href="#"><i class="bi bi-circle"></i>List</a>
+                <li><a href="/topic/list"><i class="bx bx-collection"></i>List</a>
                 </li>
                 <li><a href="#"><i class="bi bi-circle"></i>KSQL</a>
                 </li>

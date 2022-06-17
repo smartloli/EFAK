@@ -675,29 +675,32 @@ public class TopicController {
             if (topicStates != null && topicStates.size() > 0) {
                 if (topicStates.get(0).getTvalue() == 0) {
                     if (Role.ADMIN.equals(signiner.getUsername())) {
-                        object.put("operate",
-                                "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
-                                        + partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
-                                        + "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
+                        object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_modify'  class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Edit'><i class='bi bi-pencil-fill'></i></a>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_clean' class='text-warning' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Truncate'><i class='bx bx-brush-alt'></i></a>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_remove' class='text-danger' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Delete'><i class='bi bi-trash-fill'></i></a>" +
+                                "</div>");
                     } else {
                         object.put("operate", "");
                     }
                 } else {
                     if (Role.ADMIN.equals(signiner.getUsername())) {
-                        object.put("operate",
-                                "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
-                                        + partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
-                                        + "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
+                        object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_modify'  class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Edit'><i class='bi bi-pencil-fill'></i></a>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_clean' class='text-warning' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Truncate'><i class='bx bx-brush-alt'></i></a>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_remove' class='text-danger' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Delete'><i class='bi bi-trash-fill'></i></a>" +
+                                "</div>");
                     } else {
                         object.put("operate", "");
                     }
                 }
             } else {
                 if (Role.ADMIN.equals(signiner.getUsername())) {
-                    object.put("operate",
-                            "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
-                                    + partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
-                                    + "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
+                    object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                            "<a href='#" + partition.getTopic() + "' name='efak_topic_modify'  class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Edit'><i class='bi bi-pencil-fill'></i></a>" +
+                            "<a href='#" + partition.getTopic() + "' name='efak_topic_clean' class='text-warning' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Truncate'><i class='bx bx-brush-alt'></i></a>" +
+                            "<a href='#" + partition.getTopic() + "' name='efak_topic_remove' class='text-danger' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Delete'><i class='bi bi-trash-fill'></i></a>" +
+                            "</div>");
                 } else {
                     object.put("operate", "");
                 }
