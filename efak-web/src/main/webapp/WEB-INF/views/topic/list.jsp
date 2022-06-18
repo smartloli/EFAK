@@ -225,7 +225,7 @@
                         </div>
                         <hr/>
                         <div class="row">
-                            <div id="topic_producer_agg" class="charttopicdiv"></div>
+                            <div id="efak_topic_producer_logsize_chart" class=""></div>
                         </div>
                     </div>
                 </div>
@@ -245,8 +245,7 @@
 <!-- import js -->
 <jsp:include page="../public/pro/script.jsp">
     <jsp:param value="main/topic/list.js?v=3.0.0" name="loader"/>
-    <jsp:param value="plugins/echart/echarts.min.js" name="loader"/>
-    <jsp:param value="plugins/echart/macarons.js" name="loader"/>
+    <jsp:param value="plugins/apexcharts-bundle/apexcharts.min.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/moment.min.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/daterangepicker.js" name="loader"/>
     <jsp:param value="plugins/select2/select2.min.js" name="loader"/>

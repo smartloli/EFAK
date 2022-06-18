@@ -213,49 +213,6 @@ $(document).ready(function () {
         $("#ke_topic_aggrate").val(arrs);
     });
 
-    // Init chart common
-    try {
-        chartCommonOption = {
-            backgroundColor: "#fff",
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    label: {
-                        backgroundColor: '#6a7985'
-                    }
-                }
-            },
-            legend: {
-                data: []
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: true,
-                data: []
-            },
-            grid: {
-                bottom: "70px",
-                left: "90px",
-                right: "90px"
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: {
-                type: 'bar',
-                symbol: "none",
-                smooth: true,
-                areaStyle: {
-                    opacity: 0.1
-                },
-                data: []
-            }
-        };
-    } catch (e) {
-        console.log(e.message);
-    }
-
     // Add daterangepicker
     try {
 
@@ -292,24 +249,98 @@ $(document).ready(function () {
         console.log(e.message);
     }
 
-    try {
-        function morrisBarInit(elment) {
-            lagChart = echarts.init(document.getElementById(elment), 'macarons');
-            lagChart.setOption(chartCommonOption);
-            return lagChart;
+    // topic produce logsize common options
+    var efakTopicLogSizeOptions = {
+        series: [{
+            name: "",
+            data: []
+        }],
+        chart: {
+            foreColor: '#9a9797',
+            type: "bar",
+            //width: 130,
+            stacked: true,
+            height: 280,
+            toolbar: {
+                show: !1
+            },
+            zoom: {
+                enabled: !1
+            },
+            dropShadow: {
+                enabled: 0,
+                top: 3,
+                left: 15,
+                blur: 4,
+                opacity: .12,
+                color: "#3461ff"
+            },
+            sparkline: {
+                enabled: !1
+            }
+        },
+        markers: {
+            size: 0,
+            colors: ["#3461ff"],
+            strokeColors: "#fff",
+            strokeWidth: 2,
+            hover: {
+                size: 7
+            }
+        },
+        plotOptions: {
+            bar: {
+                // horizontal: !1,
+                columnWidth: "35%",
+                //endingShape: "rounded"
+            }
+        },
+        dataLabels: {
+            enabled: !1
+        },
+        legend: {
+            show: false,
+        },
+        stroke: {
+            show: !0,
+            width: 0,
+            curve: "smooth"
+        },
+        colors: ["#3461ff"],
+        xaxis: {
+            // type: 'datetime',
+            labels: {
+                datetimeUTC: false,
+                format: "yyyy-MM-dd"
+            },
+            categories: []
+        },
+        yaxis: [{
+            labels: {
+                // fixed number less than 10
+                formatter: function (val) {
+                    if (window.isNaN(val) || Math.floor(val) != val) {
+                        return val;
+                    }
+                    try {
+                        return val.toFixed(0);
+                    } catch (e) {
+                        return val;
+                    }
+                }
+            }
+        }],
+        tooltip: {
+            theme: "dark",
+            x: {
+                format: "yyyy-MM-dd"
+            }
         }
-    } catch (e) {
-        console.log(e.message);
-    }
+    };
 
-    var topic_producer_agg = morrisBarInit('topic_producer_agg');
-
-    $("#topic_producer_agg").resize(function () {
-        var opt_topic_producer_agg = topic_producer_agg.getOption();
-        topic_producer_agg.clear();
-        topic_producer_agg.resize({width: $("#topic_producer_agg").css('width')});
-        topic_producer_agg.setOption(opt_topic_producer_agg);
-    });
+    // topic produce logsize
+    var efak_topic_producer_logsize_chart = new ApexCharts(document.querySelector("#efak_topic_producer_logsize_chart"), efakTopicLogSizeOptions);
+    efak_topic_producer_logsize_chart.render();
 
     function producerMsg(stime, etime) {
         $.ajax({
@@ -322,7 +353,7 @@ $(document).ready(function () {
             },
             success: function (datas) {
                 if (datas != null) {
-                    setProducerBarData(topic_producer_agg, datas);
+                    setProducerBarData(efak_topic_producer_logsize_chart, datas);
                     datas = null;
                 }
             }
@@ -331,9 +362,10 @@ $(document).ready(function () {
 
     // set trend data
     function setProducerBarData(mbean, data) {
-        chartCommonOption.xAxis.data = filter(data).x;
-        chartCommonOption.series.data = filter(data).y;
-        mbean.setOption(chartCommonOption);
+        efakTopicLogSizeOptions.xaxis.categories = filter(data).x;
+        efakTopicLogSizeOptions.series[0].data = filter(data).y;
+        efakTopicLogSizeOptions.series[0].name = filter(data).name;
+        mbean.updateOptions(efakTopicLogSizeOptions);
     }
 
     // filter data
@@ -372,7 +404,7 @@ $(document).ready(function () {
             url: '/topic/list/filter/select/ajax?stime=' + stime + '&etime=' + etime + '&topics=' + topics,
             success: function (datas) {
                 if (datas != null) {
-                    setProducerBarData(topic_producer_agg, datas);
+                    setProducerBarData(efak_topic_producer_logsize_chart, datas);
                     datas = null;
                 }
             }

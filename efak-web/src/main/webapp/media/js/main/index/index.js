@@ -757,7 +757,7 @@ $(function () {
         },
         colors: ["#3461ff"],
         xaxis: {
-            type: 'datetime',
+            // type: 'datetime',
             labels: {
                 datetimeUTC: false,
             },
