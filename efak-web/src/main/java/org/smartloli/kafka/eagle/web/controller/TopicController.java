@@ -223,16 +223,18 @@ public class TopicController {
             object.put("replicas", metadata.getReplicas());
             object.put("isr", metadata.getIsr());
             if (metadata.isPreferredLeader()) {
-                object.put("preferred_leader", "<span class='badge badge-success'>true</span>");
+                object.put("preferred_leader", "<span class='badge bg-light-success text-success'>true</span>");
             } else {
-                object.put("preferred_leader", "<span class='badge badge-danger btn-xs'>false</span>");
+                object.put("preferred_leader", "<span class='badge bg-light-danger text-success'>false</span>");
             }
             if (metadata.isUnderReplicated()) {
-                object.put("under_replicated", "<span class='badge badge-danger btn-xs'>true</span>");
+                object.put("under_replicated", "<span class='badge bg-light-danger text-success'>true</span>");
             } else {
-                object.put("under_replicated", "<span class='badge badge-success btn-xs'>false</span>");
+                object.put("under_replicated", "<span class='badge bg-light-success text-success'>false</span>");
             }
-            object.put("preview", "<a name='preview' topic='" + tname + "' partition='" + metadata.getPartitionId() + "' href='#' class='badge badge-primary'>Preview</a>");
+            object.put("preview", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                    "<a href='#' name='efak_topic_preview' topic='" + tname + "' partition='" + metadata.getPartitionId() + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Preview'><i class='bi bi-eye-fill'></i></a>" +
+                    "</div>");
             aaDatas.add(object);
         }
 

@@ -3,28 +3,28 @@ $(document).ready(function () {
     var topicName = url.split("meta/")[1].split("/")[0];
 
     // add preview
-    var previewMsg;
-    try {
-        var mime = 'text/x-mariadb';
-        // get mime type
-        if (window.location.href.indexOf('mime=') > -1) {
-            mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
-        }
-        previewMsg = CodeMirror.fromTextArea(document.getElementById('ke_tp_preview_message'), {
-            mode: mime,
-            indentWithTabs: true,
-            smartIndent: true,
-            lineNumbers: false,
-            matchBrackets: true,
-            autofocus: true,
-            readOnly: true
-        });
-    } catch (e) {
-        console.info(e.message);
-    }
+    // var previewMsg;
+    // try {
+    //     var mime = 'text/x-mariadb';
+    //     // get mime type
+    //     if (window.location.href.indexOf('mime=') > -1) {
+    //         mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
+    //     }
+    //     previewMsg = CodeMirror.fromTextArea(document.getElementById('ke_tp_preview_message'), {
+    //         mode: mime,
+    //         indentWithTabs: true,
+    //         smartIndent: true,
+    //         lineNumbers: false,
+    //         matchBrackets: true,
+    //         autofocus: true,
+    //         readOnly: true
+    //     });
+    // } catch (e) {
+    //     console.info(e.message);
+    // }
 
     // topic meta
-    $("#result").dataTable({
+    $("#efak_topic_meta_table_result").dataTable({
         "searching": false,
         "bSort": false,
         "bLengthChange": false,
@@ -138,8 +138,8 @@ $(document).ready(function () {
         url: '/topic/meta/jmx/' + topicName + '/ajax',
         success: function (datas) {
             if (datas != null) {
-                $("#producer_logsize").text(datas.logsize);
-                $("#producer_topicsize").text(datas.topicsize + " (" + datas.sizetype + ")");
+                $("#efak_topic_producer_logsize").text(datas.logsize);
+                $("#efak_topic_producer_capacity").text(datas.topicsize + " (" + datas.sizetype + ")");
             }
         }
     });
@@ -231,25 +231,6 @@ $(document).ready(function () {
         console.log(e.message);
     }
 
-    try {
-        function morrisLineInit(elment) {
-            lagChart = echarts.init(document.getElementById(elment), 'macarons');
-            lagChart.setOption(chartCommonOption);
-            return lagChart;
-        }
-    } catch (e) {
-        console.log(e.message);
-    }
-
-    var topic_producer_msg = morrisLineInit('topic_producer_msg');
-
-    $("#topic_producer_msg").resize(function () {
-        var opt_topic_producer_msg = topic_producer_msg.getOption();
-        topic_producer_msg.clear();
-        topic_producer_msg.resize({width: $("#topic_producer_msg").css('width')});
-        topic_producer_msg.setOption(opt_topic_producer_msg);
-    });
-
     function producerMsg(stime, etime) {
         $.ajax({
             type: 'get',
@@ -261,7 +242,7 @@ $(document).ready(function () {
             },
             success: function (datas) {
                 if (datas != null) {
-                    setProducerChartData(topic_producer_msg, datas);
+                    // setProducerChartData(topic_producer_msg, datas);
                     datas = null;
                 }
             }
@@ -289,7 +270,7 @@ $(document).ready(function () {
         return data;
     }
 
-    $(document).on('click', 'a[name=preview]', function () {
+    $(document).on('click', 'a[name=efak_topic_preview]', function () {
         var topic = $(this).attr("topic");
         var partition = $(this).attr("partition");
         $('#ke_topic_preview').modal({
@@ -310,7 +291,8 @@ $(document).ready(function () {
                 url: '/topic/meta/preview/msg/ajax?topic=' + topic + '&partition=' + partition,
                 success: function (datas) {
                     if (datas != null) {
-                        previewMsg.setValue(JSON.stringify(datas, null, 2));
+                        // previewMsg.setValue(JSON.stringify(datas, null, 2));
+                        $("#ke_tp_preview_message").text(JSON.stringify(datas, null, 2));
                     }
                 }
             });
@@ -320,88 +302,88 @@ $(document).ready(function () {
     });
 
     // reset offset result
-    var topicResetOffsets = CodeMirror.fromTextArea(document.getElementById('ke_reset_offset_result'), {
-        mode: mime,
-        indentWithTabs: true,
-        smartIndent: true,
-        lineNumbers: false,
-        matchBrackets: true,
-        autofocus: true,
-        readOnly: true
-    });
+    // var topicResetOffsets = CodeMirror.fromTextArea(document.getElementById('ke_reset_offset_result'), {
+    //     mode: mime,
+    //     indentWithTabs: true,
+    //     smartIndent: true,
+    //     lineNumbers: false,
+    //     matchBrackets: true,
+    //     autofocus: true,
+    //     readOnly: true
+    // });
 
     // reset offsets
-    $(document).on('click', 'a[name=topic_reset_offsets]', function () {
-        $("#ke_reset_offset_value").hide();
-        $('#ke_reset_offsets').modal('show');
-        var group = $(this).attr("group");
-        var topic = $(this).attr("topic");
-        $("#select2val").select2({
-            placeholder: "Reset Type",
-            ajax: {
-                url: "/topic/reset/offset/type/list/ajax",
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    params.offset = 10;
-                    params.page = params.page || 1;
-                    return {
-                        name: params.term,
-                        page: params.page,
-                        offset: params.offset
-                    };
-                },
-                cache: true,
-                processResults: function (data, params) {
-                    if (data.items.length > 0) {
-                        var datas = new Array();
-                        $.each(data.items, function (index, e) {
-                            var s = {};
-                            s.id = index + 1;
-                            s.text = e.text;
-                            datas[index] = s;
-                        });
-                        return {
-                            results: datas,
-                            pagination: {
-                                more: (params.page * params.offset) < data.total
-                            }
-                        };
-                    } else {
-                        return {
-                            results: []
-                        }
-                    }
-                },
-                escapeMarkup: function (markup) {
-                    return markup;
-                },
-                minimumInputLength: 1
-            }
-        });
-
-        var text = "";
-        $('#select2val').on('select2:select', function (evt) {
-            text = evt.params.data.text;
-            $("#select2val").val(text);
-            if (text.indexOf("--to-earliest") > -1 || text.indexOf("--to-latest") > -1 || text.indexOf("--to-current") > -1) {
-                $("#ke_reset_offset_value").hide();
-            } else {
-                $("#ke_reset_offset_value").show();
-            }
-        });
-
-        // get reset offset result
-        $("#ke_reset_offset_btn").on('click', function () {
-            if (text.indexOf("--to-earliest") > -1 || text.indexOf("--to-latest") > -1 || text.indexOf("--to-current") > -1) {
-                var json = {"group": group, "topic": topic, "cmd": text};
-                execute(JSON.stringify(json));
-            } else {
-                var json = {"group": group, "topic": topic, "cmd": text, "value": $("#ke_reset_offset_val").val()};
-                execute(JSON.stringify(json));
-            }
-        });
-    });
+    // $(document).on('click', 'a[name=topic_reset_offsets]', function () {
+    //     $("#ke_reset_offset_value").hide();
+    //     $('#ke_reset_offsets').modal('show');
+    //     var group = $(this).attr("group");
+    //     var topic = $(this).attr("topic");
+    //     $("#select2val").select2({
+    //         placeholder: "Reset Type",
+    //         ajax: {
+    //             url: "/topic/reset/offset/type/list/ajax",
+    //             dataType: 'json',
+    //             delay: 250,
+    //             data: function (params) {
+    //                 params.offset = 10;
+    //                 params.page = params.page || 1;
+    //                 return {
+    //                     name: params.term,
+    //                     page: params.page,
+    //                     offset: params.offset
+    //                 };
+    //             },
+    //             cache: true,
+    //             processResults: function (data, params) {
+    //                 if (data.items.length > 0) {
+    //                     var datas = new Array();
+    //                     $.each(data.items, function (index, e) {
+    //                         var s = {};
+    //                         s.id = index + 1;
+    //                         s.text = e.text;
+    //                         datas[index] = s;
+    //                     });
+    //                     return {
+    //                         results: datas,
+    //                         pagination: {
+    //                             more: (params.page * params.offset) < data.total
+    //                         }
+    //                     };
+    //                 } else {
+    //                     return {
+    //                         results: []
+    //                     }
+    //                 }
+    //             },
+    //             escapeMarkup: function (markup) {
+    //                 return markup;
+    //             },
+    //             minimumInputLength: 1
+    //         }
+    //     });
+    //
+    //     var text = "";
+    //     // $('#select2val').on('select2:select', function (evt) {
+    //     //     text = evt.params.data.text;
+    //     //     $("#select2val").val(text);
+    //     //     if (text.indexOf("--to-earliest") > -1 || text.indexOf("--to-latest") > -1 || text.indexOf("--to-current") > -1) {
+    //     //         $("#ke_reset_offset_value").hide();
+    //     //     } else {
+    //     //         $("#ke_reset_offset_value").show();
+    //     //     }
+    //     // });
+    //     //
+    //     // // get reset offset result
+    //     // $("#ke_reset_offset_btn").on('click', function () {
+    //     //     if (text.indexOf("--to-earliest") > -1 || text.indexOf("--to-latest") > -1 || text.indexOf("--to-current") > -1) {
+    //     //         var json = {"group": group, "topic": topic, "cmd": text};
+    //     //         execute(JSON.stringify(json));
+    //     //     } else {
+    //     //         var json = {"group": group, "topic": topic, "cmd": text, "value": $("#ke_reset_offset_val").val()};
+    //     //         execute(JSON.stringify(json));
+    //     //     }
+    //     // });
+    // });
 
     function execute(json) {
         console.log(json)
