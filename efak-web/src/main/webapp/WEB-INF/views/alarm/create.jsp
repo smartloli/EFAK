@@ -80,7 +80,9 @@
                                                     <i class="fa fa-info-circle"></i> Write topic and capacity alarm
                                                     value(unit is byte), such as
                                                     {"topic":"ke_alarm_topic","capacity":1024}.
-                                                    The value of topic is supported by regular expressions, for example: "ab","abc","ab.d","ab5e" can match regular expressions "ab.*", "acc" cannot
+                                                    The value of topic is supported by regular expressions, for example:
+                                                    "ab","abc","ab.d","ab5e" can match regular expressions "ab.*", "acc"
+                                                    cannot
                                                 </label>
                                             </div>
                                             <div id="ke_alarm_producer_div" style="display: none" class="form-group">
@@ -145,7 +147,7 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="plugins/select2/select2.min.js" name="loader"/>
+    <jsp:param value="plugins/select2/select2.min_bak.js" name="loader"/>
     <jsp:param value="main/alarm/create.js" name="loader"/>
 </jsp:include>
 <script type="text/javascript">

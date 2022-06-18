@@ -299,7 +299,7 @@
     <jsp:param value="plugins/codemirror/sql.js" name="loader"/>
     <jsp:param value="plugins/codemirror/show-hint.js" name="loader"/>
     <jsp:param value="plugins/codemirror/sql-hint.js" name="loader"/>
-    <jsp:param value="plugins/select2/select2.min.js" name="loader"/>
+    <jsp:param value="plugins/select2/select2.min_bak.js" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>
 </html>

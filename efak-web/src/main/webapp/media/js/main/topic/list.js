@@ -158,6 +158,7 @@ $(document).ready(function () {
 
     $("#select2val").select2({
         placeholder: "Topic",
+        theme: 'bootstrap4',
         ajax: {
             url: "/topic/mock/list/ajax",
             dataType: 'json',
@@ -255,7 +256,7 @@ $(document).ready(function () {
         console.log(e.message);
     }
 
-    // Add data control
+    // Add daterangepicker
     try {
 
         var start = moment().subtract(6, 'days');

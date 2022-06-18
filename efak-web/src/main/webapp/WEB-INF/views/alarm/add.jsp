@@ -133,7 +133,7 @@
 </body>
 <jsp:include page="../public/plus/script.jsp">
     <jsp:param value="main/alarm/add.js" name="loader"/>
-    <jsp:param value="plugins/select2/select2.min.js" name="loader"/>
+    <jsp:param value="plugins/select2/select2.min_bak.js" name="loader"/>
 </jsp:include>
 <script type="text/javascript">
     function contextConsumerFormValid() {

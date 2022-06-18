@@ -13,6 +13,7 @@
     <jsp:include page="../public/pro/css.jsp">
         <jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css"/>
         <jsp:param value="plugins/select2/select2.min.css" name="css"/>
+        <jsp:param value="plugins/select2/select2-bootstrap4.css" name="css"/>
     </jsp:include>
 
     <!-- Required table css -->
@@ -46,6 +47,10 @@
                         <li class="breadcrumb-item active" aria-current="page">list</li>
                     </ol>
                 </nav>
+            </div>
+            <div id="reportrange" class="ms-auto" style="border: 1px solid #ccc;cursor: pointer; padding: 5px 10px;">
+                <i class="bx bx-calendar"></i> &nbsp; <span></span> <b
+                    class="caret"></b>
             </div>
         </div>
         <!--end breadcrumb-->
@@ -181,13 +186,54 @@
                 </div>
             </div>
         </div>
+
+        <!-- topic filter select -->
+        <div class="row">
+            <div class="col col-lg-12 mx-auto">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h6 class="mb-0 text-uppercase">Topic Filter</h6>
+                        </div>
+                        <hr/>
+                        <div class="row">
+                            <label class="form-label">Topic Name (*)</label>
+                            <select multiple="multiple" id="select2val" name="select2val" tabindex="-1"
+                                    style="width: 100%;"></select>
+                            <input id="ke_topic_aggrate" name="ke_topic_aggrate" type="hidden"/>
+                            <label for="inputError" class="control-label text-danger">
+                                <i class="bx bx-info-circle"></i> Choice the topic you want to aggregate .
+                            </label>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <button id="ke_topic_select_query" class="btn btn-primary">Query</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- topic producer chart -->
+        <div class="row">
+            <div class="col col-lg-12 mx-auto">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h6 class="mb-0 text-uppercase">Producer LogSize</h6>
+                        </div>
+                        <hr/>
+                        <div class="row">
+                            <div id="topic_producer_agg" class="charttopicdiv"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
     <!--end page main-->
-
-
-    <!--start overlay-->
-    <div class="overlay nav-toggle-icon"></div>
-    <!--end overlay-->
 
     <!--Start Back To Top Button-->
     <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
