@@ -159,6 +159,8 @@ $(document).ready(function () {
     $("#select2val").select2({
         placeholder: "Topic",
         theme: 'bootstrap4',
+        width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+        allowClear: true,
         ajax: {
             url: "/topic/mock/list/ajax",
             dataType: 'json',
@@ -197,8 +199,7 @@ $(document).ready(function () {
             escapeMarkup: function (markup) {
                 return markup;
             },
-            minimumInputLength: 0,
-            allowClear: true
+            minimumInputLength: 0
         }
     });
 

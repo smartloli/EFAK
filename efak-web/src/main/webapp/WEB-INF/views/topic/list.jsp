@@ -196,16 +196,17 @@
                             <h6 class="mb-0 text-uppercase">Topic Filter</h6>
                         </div>
                         <hr/>
-                        <div class="row">
+                        <div class="mb-3">
                             <label class="form-label">Topic Name (*)</label>
-                            <select multiple="multiple" id="select2val" name="select2val" tabindex="-1"
-                                    style="width: 100%;"></select>
+                            <select class="multiple-select" multiple="multiple" id="select2val" name="select2val"
+                                    tabindex="-1"
+                                    data-placeholder="Topic"></select>
                             <input id="ke_topic_aggrate" name="ke_topic_aggrate" type="hidden"/>
                             <label for="inputError" class="control-label text-danger">
                                 <i class="bx bx-info-circle"></i> Choice the topic you want to aggregate .
                             </label>
                         </div>
-                        <div class="row">
+                        <div class="mb-3">
                             <div class="col-sm-3">
                                 <button id="ke_topic_select_query" class="btn btn-primary">Query</button>
                             </div>

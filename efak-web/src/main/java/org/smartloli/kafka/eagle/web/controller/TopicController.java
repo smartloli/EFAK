@@ -225,10 +225,10 @@ public class TopicController {
             if (metadata.isPreferredLeader()) {
                 object.put("preferred_leader", "<span class='badge bg-light-success text-success'>true</span>");
             } else {
-                object.put("preferred_leader", "<span class='badge bg-light-danger text-success'>false</span>");
+                object.put("preferred_leader", "<span class='badge bg-light-danger text-danger'>false</span>");
             }
             if (metadata.isUnderReplicated()) {
-                object.put("under_replicated", "<span class='badge bg-light-danger text-success'>true</span>");
+                object.put("under_replicated", "<span class='badge bg-light-danger text-danger'>true</span>");
             } else {
                 object.put("under_replicated", "<span class='badge bg-light-success text-success'>false</span>");
             }
@@ -312,17 +312,21 @@ public class TopicController {
             object.put("lag", lag);
 
             if (Topic.RUNNING == status) {
-                object.put("status", "<span class='badge badge-success'>Running</span>");
+                object.put("status", "<span class='badge bg-light-success text-success'>Running</span>");
             } else if (Topic.SHUTDOWN == status) {
-                object.put("status", "<span class='badge badge-danger'>Shutdown</span>");
+                object.put("status", "<span class='badge bg-light-danger text-danger'>Shutdown</span>");
             } else if (Topic.PENDING == status) {
-                object.put("status", "<span class='badge badge-warning'>Pending</span>");
+                object.put("status", "<span class='badge bg-light-warning text-warning'>Pending</span>");
             }
 
             if (Topic.RUNNING == status) {
-                object.put("operate", "<a value='disable' name='topic_reset_offsets' group='" + group + "' topic='" + topic + "' href='#' class='badge badge-secondary'>Reset</a>");
+                object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                        "<a href='#' value='disable' name='topic_reset_offsets' topic='" + topic + "' group='" + group + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Reset'><i class='bx bx-reset'></i></a>" +
+                        "</div>");
             } else {
-                object.put("operate", "<a value='enable' name='topic_reset_offsets' group='" + group + "' topic='" + topic + "' href='#' class='badge badge-primary'>Reset</a>");
+                object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                        "<a href='#' value='enable' name='topic_reset_offsets' topic='" + topic + "' group='" + group + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Reset'><i class='bx bx-reset'></i></a>" +
+                        "</div>");
             }
             aaDatas.add(object);
         }

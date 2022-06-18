@@ -12,6 +12,8 @@
     <!-- Required common css -->
     <jsp:include page="../public/pro/css.jsp">
         <jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css"/>
+        <jsp:param value="plugins/select2/select2.min.css" name="css"/>
+        <jsp:param value="plugins/select2/select2-bootstrap4.css" name="css"/>
     </jsp:include>
 
     <!-- Required table css -->
@@ -139,6 +141,74 @@
             </div>
         </div>
 
+        <!-- topic consumer group list -->
+        <h6 class="mb-0 text-uppercase">Topic Consumer Groups</h6>
+        <hr/>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="efak_topic_consumer_tab_result" class="table table-striped table-bordered"
+                           style="width:100%">
+                        <thead>
+                        <tr>
+                            <th>Group</th>
+                            <th>Topic</th>
+                            <th>Lag</th>
+                            <th>Status</th>
+                            <th>Operate</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- modal reset consumer topic -->
+        <div class="modal fade" id="ke_reset_offsets" tabindex="-1" aria-labelledby="keModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">Reset Offsets</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="ke_topic_reset_offsets" class="card-body">
+                            <div class="mb-3">
+                                <label>Reset Type (*)</label>
+                                <select id="select2val"
+                                        name="select2val"
+                                        class="single-select"
+                                        tabindex="-1"></select>
+                                <label for="inputError" class="control-label text-danger"><i
+                                        class="bx bx-info-circle"></i> Select the type you need to
+                                    reset offsets .</label>
+                            </div>
+                            <div id="ke_reset_offset_value" class="mb-3">
+                                <label>Reset Offsets Value (*)</label> <input
+                                    id="ke_reset_offset_val" name="ke_reset_offset_val"
+                                    class="form-control"
+                                    placeholder="Input content must be number" maxlength="64">
+                                <label for="inputError" class="control-label text-danger"><i
+                                        class="bx bx-info-circle"></i> Input the reset offset value
+                                    .</label>
+                            </div>
+                            <div class="mb-3">
+                                <form>
+                                    <textarea id="ke_reset_offset_result" name="ke_reset_offset_result"
+                                              class="form-control" rows="10"
+                                              cols="10" placeholder="" readonly style="height: 420px;"></textarea>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ke_reset_offset_btn_div" class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="ke_reset_offset_btn">Execute
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- topic producer chart -->
         <div class="row">
             <div class="col col-lg-12 mx-auto">
@@ -172,6 +242,7 @@
     <jsp:param value="plugins/apexcharts-bundle/apexcharts.min.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/moment.min.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/daterangepicker.js" name="loader"/>
+    <jsp:param value="plugins/select2/select2.min.js" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/pro/tscript.jsp"></jsp:include>
 </body>
