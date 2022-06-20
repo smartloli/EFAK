@@ -99,7 +99,7 @@ public class TopicController {
      * Topic message viewer.
      */
     @RequiresPermissions("/topic/message")
-    @RequestMapping(value = "/topic/message", method = RequestMethod.GET)
+    @RequestMapping(value = "/topic/ksql", method = RequestMethod.GET)
     public ModelAndView topicMessageView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/topic/ksql");
@@ -319,15 +319,16 @@ public class TopicController {
                 object.put("status", "<span class='badge bg-light-warning text-warning'>Pending</span>");
             }
 
-            if (Topic.RUNNING == status) {
-                object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
-                        "<a href='#' value='disable' name='topic_reset_offsets' topic='" + topic + "' group='" + group + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Reset'><i class='bx bx-reset'></i></a>" +
-                        "</div>");
-            } else {
-                object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
-                        "<a href='#' value='enable' name='topic_reset_offsets' topic='" + topic + "' group='" + group + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Reset'><i class='bx bx-reset'></i></a>" +
-                        "</div>");
-            }
+            // deprecate
+//            if (Topic.RUNNING == status) {
+//                object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+//                        "<a href='#' value='disable' name='topic_reset_offsets' topic='" + topic + "' group='" + group + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Reset'><i class='bx bx-reset'></i></a>" +
+//                        "</div>");
+//            } else {
+//                object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+//                        "<a href='#' value='enable' name='topic_reset_offsets' topic='" + topic + "' group='" + group + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Reset'><i class='bx bx-reset'></i></a>" +
+//                        "</div>");
+//            }
             aaDatas.add(object);
         }
 

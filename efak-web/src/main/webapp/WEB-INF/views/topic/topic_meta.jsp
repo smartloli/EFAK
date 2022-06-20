@@ -155,7 +155,7 @@
                             <th>Topic</th>
                             <th>Lag</th>
                             <th>Status</th>
-                            <th>Operate</th>
+                            <%--  <th>Operate</th>--%>
                         </tr>
                         </thead>
                     </table>
@@ -209,6 +209,23 @@
             </div>
         </div>
 
+        <!-- topic mbean -->
+        <div class="row">
+            <div class="col-12 col-lg-12 col-xl-12 d-flex">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0 text-uppercase">Topic MBean</h6>
+                        </div>
+                        <div class="table-responsive mt-2">
+                            <table id="topic_metrics_tab" class="table align-middle mb-0">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- topic producer chart -->
         <div class="row">
             <div class="col col-lg-12 mx-auto">
@@ -219,7 +236,7 @@
                         </div>
                         <hr/>
                         <div class="row">
-                            <div id="efak_topic_producer_logsize_chart" class=""></div>
+                            <div id="efak_topic_producer_msg" class=""></div>
                         </div>
                     </div>
                 </div>

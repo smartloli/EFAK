@@ -70,8 +70,6 @@ $(document).ready(function () {
             "mData": 'lag'
         }, {
             "mData": 'status'
-        }, {
-            "mData": 'operate'
         }]
     });
 
@@ -124,9 +122,9 @@ $(document).ready(function () {
         }
 
         if (field.toUpperCase().indexOf("BYTE") > -1) {
-            tr += "<tr><td>" + field + "</td><td><span class='badge badge-secondary'>" + data.meanRate + "</span></td><td><span class='badge badge-secondary'>" + data.oneMinute + "</span></td><td><span class='badge badge-secondary'>" + data.fiveMinute + "</span></td><td><span class='badge badge-secondary'>" + data.fifteenMinute + "</span></td></tr>";
+            tr += "<tr><td>" + field + "</td><td><span class='badge bg-secondary'>" + data.meanRate + "</span></td><td><span class='badge bg-secondary'>" + data.oneMinute + "</span></td><td><span class='badge bg-secondary'>" + data.fiveMinute + "</span></td><td><span class='badge bg-secondary'>" + data.fifteenMinute + "</span></td></tr>";
         } else {
-            tr += "<tr><td>" + field + "</td><td><span class='badge badge-secondary'>" + data.meanRate.split("B")[0] + "</span></td><td><span class='badge badge-secondary'>" + data.oneMinute.split("B")[0] + "</span></td><td><span class='badge badge-secondary'>" + data.fiveMinute.split("B")[0] + "</span></td><td><span class='badge badge-secondary'>" + data.fifteenMinute.split("B")[0] + "</span></td></tr>";
+            tr += "<tr><td>" + field + "</td><td><span class='badge bg-secondary'>" + data.meanRate.split("B")[0] + "</span></td><td><span class='badge bg-secondary'>" + data.oneMinute.split("B")[0] + "</span></td><td><span class='badge bg-secondary'>" + data.fiveMinute.split("B")[0] + "</span></td><td><span class='badge bg-secondary'>" + data.fifteenMinute.split("B")[0] + "</span></td></tr>";
         }
 
         return tr;
@@ -183,6 +181,123 @@ $(document).ready(function () {
         console.log(e.message);
     }
 
+    // topic msg chart
+    var chartCommonOption = {
+        series: [{
+            name: '',
+            data: []
+        }],
+        chart: {
+            type: "area",
+            // width: 130,
+            stacked: true,
+            height: 280,
+            toolbar: {
+                show: true,
+                tools: {
+                    download: false,
+                    selection: true,
+                    zoom: true,
+                    zoomin: true,
+                    zoomout: true,
+                    pan: true,
+                    reset: true
+                }
+            },
+            zoom: {
+                enabled: true
+            },
+            dropShadow: {
+                enabled: 0,
+                top: 3,
+                left: 14,
+                blur: 4,
+                opacity: .12,
+                color: "#3461ff"
+            },
+            sparkline: {
+                enabled: !1
+            }
+        },
+        markers: {
+            size: 0,
+            colors: ["#3461ff"],
+            strokeColors: "#fff",
+            strokeWidth: 2,
+            hover: {
+                size: 7
+            }
+        },
+        grid: {
+            row: {
+                colors: ["transparent", "transparent"],
+                opacity: .2
+            },
+            borderColor: "#f1f1f1"
+        },
+        plotOptions: {
+            bar: {
+                horizontal: !1,
+                columnWidth: "25%",
+                //endingShape: "rounded"
+            }
+        },
+        dataLabels: {
+            enabled: !1
+        },
+        stroke: {
+            show: !0,
+            width: [2.5],
+            //colors: ["#3461ff"],
+            curve: "smooth"
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shade: 'light',
+                type: 'vertical',
+                shadeIntensity: 0.5,
+                gradientToColors: ['#3461ff'],
+                inverseColors: false,
+                opacityFrom: 0.5,
+                opacityTo: 0.1,
+                // stops: [0, 100]
+            }
+        },
+        colors: ["#3461ff"],
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                datetimeUTC: false,
+            },
+            categories: []
+        },
+        responsive: [
+            {
+                breakpoint: 1000,
+                options: {
+                    chart: {
+                        type: "area",
+                        // width: 130,
+                        stacked: true,
+                    }
+                }
+            }
+        ],
+        legend: {
+            show: false
+        },
+        tooltip: {
+            theme: "dark",
+            x: {
+                format: 'yyyy-MM-dd HH:mm'
+            }
+        }
+    };
+
+    var efak_topic_producer_msg = new ApexCharts(document.querySelector("#efak_topic_producer_msg"), chartCommonOption);
+    efak_topic_producer_msg.render();
+
     function producerMsg(stime, etime) {
         $.ajax({
             type: 'get',
@@ -194,7 +309,7 @@ $(document).ready(function () {
             },
             success: function (datas) {
                 if (datas != null) {
-                    // setProducerChartData(topic_producer_msg, datas);
+                    setProducerChartData(efak_topic_producer_msg, datas);
                     datas = null;
                 }
             }
@@ -203,9 +318,10 @@ $(document).ready(function () {
 
     // set trend data
     function setProducerChartData(mbean, data) {
-        chartCommonOption.xAxis.data = filter(data).x;
-        chartCommonOption.series.data = filter(data).y;
-        mbean.setOption(chartCommonOption);
+        chartCommonOption.xaxis.categories = filter(data).x;
+        chartCommonOption.series[0].data = filter(data).y;
+        chartCommonOption.series[0].name = filter(data).name;
+        mbean.updateOptions(chartCommonOption);
     }
 
     // filter data
@@ -243,7 +359,6 @@ $(document).ready(function () {
                 url: '/topic/meta/preview/msg/ajax?topic=' + topic + '&partition=' + partition,
                 success: function (datas) {
                     if (datas != null) {
-                        // previewMsg.setValue(JSON.stringify(datas, null, 2));
                         $("#ke_tp_preview_message").text(JSON.stringify(datas, null, 2));
                     }
                 }
