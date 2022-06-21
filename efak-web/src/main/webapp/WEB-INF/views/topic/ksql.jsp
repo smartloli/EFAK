@@ -163,6 +163,25 @@
                 </div>
             </div>
         </div>
+
+        <!-- ksql detail -->
+        <div class="modal fade" id="ke_sql_query_detail" tabindex="-1" aria-labelledby="keModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">KSQL Detail</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea id="ke_sql_query_content" name="ke_sql_query_content" class="form-control" rows="3"
+                                  cols="10" placeholder="" readonly style="height: 420px;"></textarea>
+                    </div>
+                    <div id="remove_div" class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
     <!--end page main-->
 

@@ -1041,9 +1041,9 @@ public class TopicController {
                 obj.put("host", "<a href='#" + id + "/host' name='ke_sql_query_detail'>" + (host.length() > 20 ? host.substring(0, 20) + "..." : host) + "</a>");
                 obj.put("ksql", "<a href='#" + id + "/ksql' name='ke_sql_query_detail'>" + (ksql.length() > 60 ? ksql.substring(0, 60) + "..." : ksql) + "</a>");
                 if (topicSql.getStatus().equals("SUCCESSED")) {
-                    obj.put("status", "<span class='badge badge-success'>" + topicSql.getStatus() + "</span>");
+                    obj.put("status", "<span class='badge bg-light-success text-success'>" + topicSql.getStatus() + "</span>");
                 } else {
-                    obj.put("status", "<span class='badge badge-danger'>" + topicSql.getStatus() + "</span>");
+                    obj.put("status", "<span class='badge bg-light-danger text-danger'>" + topicSql.getStatus() + "</span>");
                 }
                 obj.put("spendTime", topicSql.getSpendTime() / 1000.0 + "s");
                 obj.put("created", topicSql.getCreated());
