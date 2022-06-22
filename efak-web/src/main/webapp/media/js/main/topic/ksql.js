@@ -73,7 +73,7 @@ $(document).ready(function () {
 
     function viewerTopics(sql, dataSets, jobId) {
         var ret = JSON.parse(dataSets);
-        var tabHeader = "<div class='panel-body table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
+        var tabHeader = "<div class='panel-body table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-striped table-bordered' width='100%'><thead><tr>"
         var mData = [];
         var i = 0;
         for (var key in ret[0]) {

@@ -42,7 +42,7 @@
                 </li>
                 <li><a href="/topic/ksql"><i class="bx bx-code"></i>KSQL</a>
                 </li>
-                <li><a href="#"><i class="bi bi-circle"></i>Mock</a>
+                <li><a href="/topic/mock"><i class="bx bx-send"></i>Mock</a>
                 </li>
                 <li><a href="#"><i class="bi bi-circle"></i>Metadata</a>
                 </li>

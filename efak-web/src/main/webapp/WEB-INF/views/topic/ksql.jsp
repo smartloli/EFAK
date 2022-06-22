@@ -137,7 +137,7 @@
                                                 <div id="ksql_history_result0">
                                                     <div class="table-responsive">
                                                         <table id="ksql_history_result"
-                                                               class="table table-bordered table-condensed"
+                                                               class="table table-striped table-bordered"
                                                                width="100%">
                                                             <thead>
                                                             <tr>
