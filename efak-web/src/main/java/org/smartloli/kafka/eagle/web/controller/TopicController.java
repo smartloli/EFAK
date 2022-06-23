@@ -110,10 +110,10 @@ public class TopicController {
      * Topic message manager.
      */
     @RequiresPermissions("/topic/manager")
-    @RequestMapping(value = "/topic/manager", method = RequestMethod.GET)
+    @RequestMapping(value = "/topic/metadata", method = RequestMethod.GET)
     public ModelAndView topicManagerView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/topic/manager");
+        mav.setViewName("/topic/metadata");
         return mav;
     }
 

@@ -44,9 +44,9 @@
                 </li>
                 <li><a href="/topic/mock"><i class="bx bx-send"></i>Mock</a>
                 </li>
-                <li><a href="#"><i class="bi bi-circle"></i>Metadata</a>
+                <li><a href="/topic/metadata"><i class="bx bx-cylinder"></i>Metadata</a>
                 </li>
-                <li><a href="#"><i class="bi bi-circle"></i>Balance</a>
+                <li><a href="#"><i class="bx bx-cube-alt"></i>Balance</a>
                 </li>
             </ul>
         </li>
