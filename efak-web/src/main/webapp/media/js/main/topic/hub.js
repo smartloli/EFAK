@@ -10,6 +10,7 @@ $(document).ready(function () {
         smartIndent: true,
         lineNumbers: true,
         matchBrackets: true,
+        theme: "blackboard",
         autofocus: true
     });
 
@@ -20,6 +21,7 @@ $(document).ready(function () {
         lineNumbers: true,
         matchBrackets: true,
         autofocus: true,
+        theme: "blackboard",
         readOnly: true
     });
 
@@ -29,12 +31,14 @@ $(document).ready(function () {
         smartIndent: true,
         lineNumbers: true,
         matchBrackets: true,
+        theme: "blackboard",
         autofocus: true,
         readOnly: true
     });
 
     $("#select2val").select2({
         placeholder: "Topic",
+        theme: 'bootstrap4',
         ajax: {
             url: "/topic/mock/list/ajax",
             dataType: 'json',

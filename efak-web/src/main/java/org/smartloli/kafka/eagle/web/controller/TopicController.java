@@ -132,10 +132,10 @@ public class TopicController {
      * Topic mock viewer.
      */
     @RequiresPermissions("/topic/hub")
-    @RequestMapping(value = "/topic/hub", method = RequestMethod.GET)
+    @RequestMapping(value = "/topic/balance", method = RequestMethod.GET)
     public ModelAndView topicHubView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/topic/hub");
+        mav.setViewName("/topic/balance");
         return mav;
     }
 

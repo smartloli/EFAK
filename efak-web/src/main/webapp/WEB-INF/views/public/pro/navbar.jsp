@@ -46,7 +46,7 @@
                 </li>
                 <li><a href="/topic/metadata"><i class="bx bx-cylinder"></i>Metadata</a>
                 </li>
-                <li><a href="#"><i class="bx bx-cube-alt"></i>Balance</a>
+                <li><a href="/topic/balance"><i class="bx bx-cube-alt"></i>Balance</a>
                 </li>
             </ul>
         </li>
