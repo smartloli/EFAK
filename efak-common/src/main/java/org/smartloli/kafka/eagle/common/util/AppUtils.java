@@ -129,6 +129,14 @@ public class AppUtils {
         } catch (Exception e) {
             e.printStackTrace();
             LoggerUtils.print(AppUtils.class).error("Get cpu info has error, msg is ", e);
+            map.put("user", "-1");
+            map.put("nice", "-1");
+            map.put("system", "-1");
+            map.put("idle", "-1");
+            map.put("iowait", "-1");
+            map.put("irq", "-1");
+            map.put("softirq", "-1");
+            map.put("stealstolen", "-1");
         } finally {
             try {
                 buffer.close();
@@ -149,6 +157,10 @@ public class AppUtils {
             Thread.sleep(10);
             Map<?, ?> map2 = getCpuInfo();
 
+            if (map1 == null || map2 == null) {
+                return 0.00;
+            }
+
             long user1 = Long.parseLong(map1.get("user").toString());
             long nice1 = Long.parseLong(map1.get("nice").toString());
             long system1 = Long.parseLong(map1.get("system").toString());
@@ -166,9 +178,13 @@ public class AppUtils {
             long totalIdle1 = user1 + nice1 + system1 + idle1;
             long totalIdle2 = user2 + nice2 + system2 + idle2;
             float totalidle = totalIdle2 - totalIdle1;
-
-            double cpusage = (total * 1.0 / totalidle) * 100;
-            return cpusage;
+            double cpusage = 0.00;
+            if (totalidle <= 0) {
+                return cpusage;
+            } else {
+                cpusage = (total * 1.0 / totalidle) * 100;
+                return cpusage;
+            }
         } catch (InterruptedException e) {
             LoggerUtils.print(AppUtils.class).error("Get cpu usage percent has error, msg is ", e);
         }

@@ -91,10 +91,10 @@ public class ClusterController {
     /**
      * Cluster worknodes viewer.
      */
-    @RequestMapping(value = "/cluster/worknodes", method = RequestMethod.GET)
+    @RequestMapping(value = "/cluster/efakserver", method = RequestMethod.GET)
     public ModelAndView workNodesView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/cluster/worknodes");
+        mav.setViewName("/cluster/efakserver");
         return mav;
     }
 
@@ -183,7 +183,7 @@ public class ClusterController {
                             if (cluster.getString("host").equals(masterHost)) {
                                 obj.put("role", "<span class='badge bg-light-primary text-primary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
                             } else {
-                                obj.put("role", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
+                                obj.put("role", "<span class='badge bg-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
                             }
                         } else {
                             obj.put("role", "<span class='badge bg-light-primary text-primary'>" + KConstants.EFAK.MODE_STANDALONE + "</span>");
@@ -193,20 +193,20 @@ public class ClusterController {
 //                                "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_worknodes_start' href='#?ip="
 //                                        + obj.getString("ip") + "&port=" + obj.getInteger("port") + "'><i class='far fa-play-circle fa-sm fa-fw mr-1'></i>Start</a><a class='dropdown-item' href='#?ip=" + obj.getString("ip") + "&port=" + obj.getInteger("port") + "' name='ke_worknodes_shutdown'><i class='far fa-stop-circle fa-sm fa-fw mr-1'></i>Shutdown</a></div>");
                     } else {
-                        obj.put("memory", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
-                        obj.put("zkcli", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
-                        obj.put("cpu", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
-                        obj.put("created", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
+                        obj.put("memory", "<span class='badge bg-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
+                        obj.put("zkcli", "<span class='badge bg-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
+                        obj.put("cpu", "<span class='badge bg-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
+                        obj.put("created", "<span class='badge bg-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
                         obj.put("status", "<span class='badge bg-light-danger text-danger'>" + KConstants.WorkNode.SHUTDOWN + "</span>");
                         String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
                         if (SystemConfigUtils.getBooleanProperty("efak.distributed.enable")) {
                             if (cluster.getString("host").equals(masterHost)) {
-                                obj.put("role", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
+                                obj.put("role", "<span class='badge bg-secondary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
                             } else {
-                                obj.put("role", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
+                                obj.put("role", "<span class='badge bg-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
                             }
                         } else {
-                            obj.put("role", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.EFAK.MODE_STANDALONE + "</span>");
+                            obj.put("role", "<span class='badge bg-secondary'>" + KConstants.EFAK.MODE_STANDALONE + "</span>");
                         }
 
 //                        obj.put("operate",
@@ -269,30 +269,30 @@ public class ClusterController {
                                 if (cluster.getString("host").equals(masterHost)) {
                                     obj.put("role", "<span class='badge bg-light-primary text-primary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
                                 } else {
-                                    obj.put("role", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
+                                    obj.put("role", "<span class='badge bg-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
                                 }
                             } else {
-                                obj.put("role", "<span class='badge bg-light-primary text-secondary'>" + KConstants.EFAK.MODE_STANDALONE + "</span>");
+                                obj.put("role", "<span class='badge bg-light-primary text-primary'>" + KConstants.EFAK.MODE_STANDALONE + "</span>");
                             }
 
 //                            obj.put("operate",
 //                                    "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_worknodes_start' href='#?ip="
 //                                            + obj.getString("ip") + "&port=" + obj.getInteger("port") + "'><i class='far fa-play-circle fa-sm fa-fw mr-1'></i>Start</a><a class='dropdown-item' href='#?ip=" + obj.getString("ip") + "&port=" + obj.getInteger("port") + "' name='ke_worknodes_shutdown'><i class='far fa-stop-circle fa-sm fa-fw mr-1'></i>Shutdown</a></div>");
                         } else {
-                            obj.put("memory", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
-                            obj.put("zkcli", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
-                            obj.put("cpu", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
-                            obj.put("created", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
+                            obj.put("memory", "<span class='badge bg-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
+                            obj.put("zkcli", "<span class='badge bg-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
+                            obj.put("cpu", "<span class='badge bg-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
+                            obj.put("created", "<span class='badge bg-secondary'>" + KConstants.WorkNode.UNKOWN + "</span>");
                             obj.put("status", "<span class='badge bg-light-danger text-danger'>" + KConstants.WorkNode.SHUTDOWN + "</span>");
                             String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
                             if (SystemConfigUtils.getBooleanProperty("efak.distributed.enable")) {
                                 if (cluster.getString("host").equals(masterHost)) {
-                                    obj.put("role", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
+                                    obj.put("role", "<span class='badge bg-secondary'>" + KConstants.EFAK.MODE_MASTER + "</span>");
                                 } else {
-                                    obj.put("role", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
+                                    obj.put("role", "<span class='badge bg-secondary'>" + KConstants.EFAK.MODE_SLAVE + "</span>");
                                 }
                             } else {
-                                obj.put("role", "<span class='badge bg-light-secondary text-secondary'>" + KConstants.EFAK.MODE_STANDALONE + "</span>");
+                                obj.put("role", "<span class='badge bg-secondary'>" + KConstants.EFAK.MODE_STANDALONE + "</span>");
                             }
 
 //                            obj.put("operate",
