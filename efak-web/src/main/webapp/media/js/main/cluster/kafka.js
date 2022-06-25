@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#kafka_tab").dataTable({
+    $("#efak_cluster_kafka_tab").dataTable({
         // "searching" : false,
         "bSort": false,
         "bLengthChange": false,
@@ -30,25 +30,6 @@ $(document).ready(function () {
         }]
     });
 
-    $("#zk_tab").dataTable({
-        // "searching" : false,
-        "bSort": false,
-        "bLengthChange": false,
-        "bProcessing": true,
-        "bServerSide": true,
-        "fnServerData": retrieveData,
-        "sAjaxSource": "/cluster/info/zk/ajax",
-        "aoColumns": [{
-            "mData": 'ip'
-        }, {
-            "mData": 'port'
-        }, {
-            "mData": 'mode'
-        }, {
-            "mData": 'version'
-        }]
-    });
-
     function retrieveData(sSource, aoData, fnCallback) {
         $.ajax({
             "type": "get",
@@ -63,8 +44,4 @@ $(document).ready(function () {
             }
         });
     }
-
-    $("#ke-add-acl-user-btn").click(function () {
-        $('#ke_acl_add_dialog').modal('show');
-    });
 });
