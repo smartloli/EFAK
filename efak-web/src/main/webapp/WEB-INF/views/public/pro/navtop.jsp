@@ -40,18 +40,10 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a name="ke_account_reset" class="dropdown-item" href="#">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="bi bi-person-fill"></i></div>
-                                    <div class="ms-3"><span>Profile</span></div>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex align-items-center">
-                                    <div class=""><i class="bi bi-gear-fill"></i></div>
-                                    <div class="ms-3"><span>Setting</span></div>
+                                    <div class="ms-3"><span>Password</span></div>
                                 </div>
                             </a>
                         </li>
@@ -254,6 +246,52 @@
                 </li>
             </ul>
         </div>
+
+        <!-- add partition modal -->
+        <div class="modal fade" id="efak_account_reset_modal" tabindex="-1" aria-labelledby="keModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">Reset Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form role="form" action="/account/reset/" method="post"
+                          onsubmit="return contextPasswdFormValid();return false;">
+                        <div class="modal-body">
+                            <div class="input-group mb-3"><span class="input-group-text"><i
+                                    class="bx bx-lock"></i></span>
+                                <input id="ke_new_password_name" name="ke_new_password_name" type="text"
+                                       class="form-control" placeholder="Enter Your New Password" aria-label=""
+                                       aria-describedby="">
+                            </div>
+                            <div id="efak_account_alert_error_message" style="display: none" class="alert alert-danger">
+                                <label> Passwords can only be number and letters or special symbols .</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" id="create-btn">Submit</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
     </nav>
 </header>
 <!--end top header-->
+<script type="text/javascript">
+    function contextPasswdFormValid() {
+        var ke_new_password_name = $("#ke_new_password_name").val();
+        var resetRegular = /[\u4E00-\u9FA5]/;
+        if (ke_new_password_name.length == 0 || resetRegular.test(ke_new_password_name)) {
+            $("#efak_account_alert_error_message").show();
+            setTimeout(function () {
+                $("#efak_account_alert_error_message").hide()
+            }, 3000);
+            return false;
+        }
+
+        return true;
+    }
+</script>

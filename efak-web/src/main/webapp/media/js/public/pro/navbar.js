@@ -108,4 +108,10 @@ $(function () {
     new PerfectScrollbar(".header-notifications-list");
     // new PerfectScrollbar(".best-product");
 
+    // Reset account
+    $(document).on('click', 'a[name=ke_account_reset]', function () {
+        $('#efak_account_reset_modal').modal('show');
+        $(".modal-backdrop").remove();
+    });
+
 });
