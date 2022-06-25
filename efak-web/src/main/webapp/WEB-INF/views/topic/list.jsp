@@ -44,7 +44,7 @@
                     <ol class="breadcrumb mb-0 p-0">
                         <li class="breadcrumb-item"><a href="/"><i class="bx bx-home-alt"></i></a>
                         </li>
-                        <li class="breadcrumb-item active" aria-current="page">list</li>
+                        <li class="breadcrumb-item active" aria-current="page">List</li>
                     </ol>
                 </nav>
             </div>
@@ -113,7 +113,7 @@
                     <table id="efak_topic_table_result" class="table table-striped table-bordered" style="width:100%">
                         <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>#ID</th>
                             <th>Topic Name</th>
                             <th>Partitions</th>
                             <th>Broker Spread</th>

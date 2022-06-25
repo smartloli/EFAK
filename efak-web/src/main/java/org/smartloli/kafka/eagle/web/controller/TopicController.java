@@ -58,12 +58,7 @@ import java.util.*;
  *
  * @author smartloli.
  * <p>
- * Created by Sep 6, 2016.
- * <p>
- * Update by hexiang 20170216
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 12, 2022.
  */
 @Controller
 public class TopicController {

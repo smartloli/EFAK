@@ -69,6 +69,11 @@
         <result property="status" column="status"/>
     </resultMap>
 
+    <resultMap type="org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsCntInfo" id="cgc">
+        <result property="activeCnt" column="activeCnt"/>
+        <result property="standbyCnt" column="standbyCnt"/>
+    </resultMap>
+
     <resultMap type="org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo" id="csi">
         <result property="cluster" column="cluster"/>
         <result property="group" column="group"/>
@@ -384,6 +389,12 @@
             </if>
         </where>
         limit #{start},#{size}
+    </select>
+
+    <select id="getConsumerGroupsCnt" parameterType="map" resultMap="cgc">
+        select count(case when status=0 then status end) as activeCnt,count(case when status=1 then status end) as
+        standbyCnt from ke_consumer_group
+        where `cluster`=#{cluster}
     </select>
 
     <select id="getConsumerSummaryPages" parameterType="map" resultMap="csi">

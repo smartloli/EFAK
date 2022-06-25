@@ -24,6 +24,7 @@ import org.smartloli.kafka.eagle.common.protocol.ConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
 import org.smartloli.kafka.eagle.common.protocol.TopicConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsCntInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicOffsetsInfo;
@@ -48,9 +49,7 @@ import java.util.Map.Entry;
  *
  * @author smartloli.
  * <p>
- * Created by Aug 15, 2016.
- * <p>
- * Update by hexiang 20170216
+ * Created by Jun 25, 2022.
  */
 @Service
 public class ConsumerServiceImpl implements ConsumerService {
@@ -567,6 +566,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     /**
      * Get active topic : consumers  .
+     *
      * @param clusterAlias
      * @return
      */
@@ -674,6 +674,15 @@ public class ConsumerServiceImpl implements ConsumerService {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public String getConsumerGroupsCnt(Map<String, Object> params) {
+        ConsumerGroupsCntInfo cgc = topicDao.getConsumerGroupsCnt(params);
+        JSONObject object = new JSONObject();
+        object.put("active", cgc.getActiveCnt());
+        object.put("standby", cgc.getStandbyCnt());
+        return object.toJSONString();
     }
 
 }

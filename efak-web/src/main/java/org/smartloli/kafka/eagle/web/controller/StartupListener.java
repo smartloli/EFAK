@@ -33,10 +33,7 @@ import org.springframework.web.context.ContextLoader;
  *
  * @author smartloli.
  * <p>
- * Created by May 22, 2017
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 1, 2022.
  */
 @Component
 public class StartupListener implements ApplicationContextAware {

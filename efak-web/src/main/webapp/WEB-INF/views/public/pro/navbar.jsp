@@ -58,7 +58,7 @@
                 <div class="menu-title">Consumers</div>
             </a>
             <ul>
-                <li><a href="ecommerce-products-list.html"><i class="bi bi-circle"></i>Groups</a>
+                <li><a href="/consumers/groups"><i class="bx bx-group"></i>Groups</a>
                 </li>
                 <li><a href="ecommerce-products-grid.html"><i class="bi bi-circle"></i>StreamGraph</a>
                 </li>

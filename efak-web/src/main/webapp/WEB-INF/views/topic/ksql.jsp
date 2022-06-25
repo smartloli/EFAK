@@ -141,7 +141,7 @@
                                                                width="100%">
                                                             <thead>
                                                             <tr>
-                                                                <th>ID</th>
+                                                                <th>#ID</th>
                                                                 <th>User</th>
                                                                 <th>Host</th>
                                                                 <th>KSQL</th>
