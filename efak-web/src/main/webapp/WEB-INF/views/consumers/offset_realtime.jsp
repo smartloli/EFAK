@@ -3,170 +3,167 @@
 
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <style>
-        .box {
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
-            /* margin-top: 30px; */
-            overflow: hidden;
-        }
-
-        .box .left {
-            font-size: 36px;
-            float: left
-        }
-
-        .box .left small {
-            /* font-size: 24px;
-            color: #777 */
-
-        }
-
-        .box .right {
-            float: right;
-            width: 260px;
-            margin-top: -120px;
-            background: #fff;
-            cursor: pointer;
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-        }
-
-        .chartdiv {
-            width: 100%;
-            height: 500px;
-        }
-    </style>
-
-    <jsp:include page="../public/plus/title.jsp">
-        <jsp:param value="Offsets" name="loader"/>
+    <!-- Required meta tags -->
+    <jsp:include page="../public/pro/title.jsp">
+        <jsp:param value="Realtime" name="loader"/>
     </jsp:include>
-    <jsp:include page="../public/plus/css.jsp">
+
+    <!-- Required common css -->
+    <jsp:include page="../public/pro/css.jsp">
         <jsp:param value="plugins/datatimepicker/daterangepicker.css" name="css"/>
     </jsp:include>
+
+    <!-- Required table css -->
+    <jsp:include page="../public/pro/tcss.jsp"></jsp:include>
 </head>
+
 <body>
-<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
-<div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <jsp:include page="../public/plus/navbar.jsp"></jsp:include>
-    </div>
-    <div id="layoutSidenav_content">
-        <main>
-            <div class="container-fluid">
-                <div class="box">
-                    <h1 class="mt-4">Offsets Realtime</h1>
-                    <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item"><a href="#">Consumer</a></li>
-                        <li class="breadcrumb-item"><a href="/consumers">Groups</a></li>
-                        <li class="breadcrumb-item"><a id="ke_consumer_offsets_a" href="#">Offsets</a></li>
-                        <li class="breadcrumb-item active">Realtime</li>
+
+
+<!--start wrapper-->
+<div class="wrapper">
+
+    <!--start top header-->
+    <jsp:include page="../public/pro/navtop.jsp"></jsp:include>
+    <!--end top header-->
+
+    <!--start sidebar -->
+    <jsp:include page="../public/pro/navbar.jsp"></jsp:include>
+    <!--end sidebar -->
+
+    <!--start content-->
+    <main class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">Consumer</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="/"><i class="bx bx-home-alt"></i></a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Realtime</li>
                     </ol>
-                    <div id="reportrange" class="right">
-                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp; <span></span> <b
-                            class="caret"></b>
-                    </div>
+                </nav>
+            </div>
+            <div id="reportrange" class="ms-auto" style="border: 1px solid #ccc;cursor: pointer; padding: 5px 10px;">
+                <i class="bx bx-calendar"></i> &nbsp; <span></span> <b
+                    class="caret"></b>
+            </div>
+        </div>
+        <!--end breadcrumb-->
+        <hr/>
+        <div class="row">
+            <div class="container">
+                <div class="alert border-0 bg-light-info alert-dismissible fade show py-2 text-info">
+                    <i class="bx bx-info-circle"></i>&nbsp;<strong>List the current consumer topic chart.</strong>
+                    <br/> <i class="bx bx-info-circle"></i> <strong>Producer: the speed of writing messages for the
+                    current topic.</strong> <br/> <i class="bx bx-info-circle"></i> <strong>Consumer: the speed of
+                    reading messages for the
+                    current topic.</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div class="alert alert-info alert-dismissable">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <i class="fas fa-info-circle"></i> <strong>List the current consumers's application realtime offsets
-                    of topic. Observe whether there is blocking by the trend of lag value.</strong>
-                </div>
-                <!-- content body -->
-                <div class="row">
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-primary shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Producer
-                                            (msg/min)
-                                        </div>
-                                        <a id="producer_rate" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-sign-in-alt fa-4x text-primary-panel"></i>
-                                    </div>
-                                </div>
-                            </div>
+            </div>
+        </div>
+        <!--end row-->
+        <!-- content body -->
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 row-cols-xxl-6">
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body text-center">
+                        <div class="widget-icon mx-auto mb-3 bg-light-primary text-primary">
+                            <i class="bx bx-log-in"></i>
                         </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 mb-4 col-md-offset-6">
-                        <div class="card border-left-success shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Consumer
-                                            (msg/min)
-                                        </div>
-                                        <a id="consumer_rate" class="h3 mb-0 font-weight-bold text-gray-800">0</a>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-sign-out-alt fa-4x text-success-panel"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h3 id="efak_topic_producer_rate">0</h3>
+                        <p class="mb-0">PRODUCER (msg/min)</p>
                     </div>
                 </div>
-                <!-- charts -->
-                <!-- Lag -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card mb-4">
-                            <div id="topic_lag_name_header" class="card-header">
-                                <i class="fas fa-chart-bar"></i> <strong>{TopicName}</strong>
-                            </div>
-                            <div class="card-body">
-                                <div id="lag_chart" class="chartdiv"></div>
-                            </div>
+            </div>
+            <div class="col"></div>
+            <div class="col"></div>
+            <div class="col"></div>
+            <div class="col"></div>
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body text-center">
+                        <div class="widget-icon mx-auto mb-3 bg-light-success text-success">
+                            <i class="bx bx-log-out"></i>
                         </div>
+                        <h3 id="efak_topic_consumer_rate">0</h3>
+                        <p class="mb-0">CONSUMER (msg/min)</p>
                     </div>
                 </div>
-                <!-- Producer -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card mb-4">
-                            <div id="topic_producer_name_header" class="card-header">
-                                <i class="fas fa-chart-bar"></i> <strong>{TopicName}</strong>
-                            </div>
-                            <div class="card-body">
-                                <div id="producer_chart" class="chartdiv"></div>
-                            </div>
+            </div>
+        </div>
+        <hr/>
+        <!-- topic lag chart -->
+        <div class="row">
+            <div class="col col-lg-12 mx-auto">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h6 id="topic_lag_name_header" class="mb-0"><strong>{TopicName}</strong></h6>
                         </div>
-                    </div>
-                </div>
-                <!-- Consumer -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card mb-4">
-                            <div id="topic_consumer_name_header" class="card-header">
-                                <i class="fas fa-chart-bar"></i> <strong>{TopicName}</strong>
-                            </div>
-                            <div class="card-body">
-                                <div id="consumer_chart" class="chartdiv"></div>
-                            </div>
+                        <hr/>
+                        <div class="row">
+                            <div id="efak_topic_lag_chart" class=""></div>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
-        <jsp:include page="../public/plus/footer.jsp"></jsp:include>
-    </div>
+        </div>
+
+        <!-- topic producer chart -->
+        <div class="row">
+            <div class="col col-lg-12 mx-auto">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h6 id="topic_producer_name_header" class="mb-0"><strong>{TopicName}</strong></h6>
+                        </div>
+                        <hr/>
+                        <div class="row">
+                            <div id="efak_topic_producer_chart" class=""></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- topic consumer chart -->
+        <div class="row">
+            <div class="col col-lg-12 mx-auto">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h6 id="topic_consumer_name_header" class="mb-0"><strong>{TopicName}</strong></h6>
+                        </div>
+                        <hr/>
+                        <div class="row">
+                            <div id="efak_topic_consumer_chart" class=""></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <!--end page main-->
+
+    <!--Start Back To Top Button-->
+    <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+    <!--End Back To Top Button-->
+
 </div>
-</body>
-<jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="main/consumer/offset.realtime.js?v=1.4.9" name="loader"/>
-    <jsp:param value="plugins/echart/echarts.min.js" name="loader"/>
-    <jsp:param value="plugins/echart/macarons.js" name="loader"/>
+<!--end wrapper-->
+
+<!-- import js -->
+<jsp:include page="../public/pro/script.jsp">
+    <jsp:param value="main/consumer/offset.realtime.js?v=3.0.0" name="loader"/>
+    <jsp:param value="plugins/apexcharts-bundle/apexcharts.min.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/moment.min.js" name="loader"/>
     <jsp:param value="plugins/datatimepicker/daterangepicker.js" name="loader"/>
 </jsp:include>
+<jsp:include page="../public/pro/tscript.jsp"></jsp:include>
+</body>
 </html>

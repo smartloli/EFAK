@@ -60,25 +60,25 @@
             <ul>
                 <li><a href="/consumers/groups"><i class="bx bx-group"></i>Groups</a>
                 </li>
-                <li><a href="ecommerce-products-grid.html"><i class="bi bi-circle"></i>StreamGraph</a>
-                </li>
+                <%--                <li><a href="ecommerce-products-grid.html"><i class="bi bi-circle"></i>StreamGraph</a>--%>
+                <%--                </li>--%>
             </ul>
         </li>
         <li class="menu-label">Performance</li>
         <li>
             <a class="has-arrow" href="javascript:;">
-                <div class="parent-icon"><i class="bi bi-award-fill"></i>
+                <div class="parent-icon"><i class="bx bx-cloud-download"></i>
                 </div>
                 <div class="menu-title">Node</div>
             </a>
             <ul>
-                <li><a href="component-alerts.html"><i class="bi bi-circle"></i>Kafka</a>
+                <li><a href="/cluster/kafka"><i class="lni lni-ux"></i>Kafka</a>
                 </li>
-                <li><a href="component-accordions.html"><i class="bi bi-circle"></i>Zookeeper</a>
+                <li><a href="/cluster/zookeeper"><i class="bx bx-sitemap"></i>Zookeeper</a>
                 </li>
-                <li><a href="component-badges.html"><i class="bi bi-circle"></i>EfakServer</a>
+                <li><a href="/cluster/efakserver"><i class="bx bx-server"></i>EfakServer</a>
                 </li>
-                <li><a href="component-buttons.html"><i class="bi bi-circle"></i>Cluster Manage</a>
+                <li><a href="/cluster/manager"><i class="bx bx-cube"></i>Cluster Manager</a>
                 </li>
             </ul>
         </li>

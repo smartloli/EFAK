@@ -2,27 +2,6 @@ $(document).ready(function () {
     var url = window.location.href;
     var topicName = url.split("meta/")[1].split("/")[0];
 
-    // add preview
-    // var previewMsg;
-    // try {
-    //     var mime = 'text/x-mariadb';
-    //     // get mime type
-    //     if (window.location.href.indexOf('mime=') > -1) {
-    //         mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
-    //     }
-    //     previewMsg = CodeMirror.fromTextArea(document.getElementById('ke_tp_preview_message'), {
-    //         mode: mime,
-    //         indentWithTabs: true,
-    //         smartIndent: true,
-    //         lineNumbers: false,
-    //         matchBrackets: true,
-    //         autofocus: true,
-    //         readOnly: true
-    //     });
-    // } catch (e) {
-    //     console.info(e.message);
-    // }
-
     // topic meta
     $("#efak_topic_meta_table_result").dataTable({
         "searching": false,
