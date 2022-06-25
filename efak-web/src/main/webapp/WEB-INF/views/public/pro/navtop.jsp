@@ -97,7 +97,7 @@
                                 </a>
                             </div>
                             <div class="col">
-                                <a href="/consumers">
+                                <a href="/consumers/groups">
                                     <div class="apps p-2 radius-10 text-center">
                                         <div class="apps-icon-box mb-1 text-white bg-gradient-success">
                                             <i class="lni lni-users"></i>
@@ -107,7 +107,7 @@
                                 </a>
                             </div>
                             <div class="col">
-                                <a href="/cluster/info">
+                                <a href="/cluster/kafka">
                                     <div class="apps p-2 radius-10 text-center">
                                         <div class="apps-icon-box mb-1 text-white bg-gradient-danger">
                                             <i class="lni lni-ux"></i>
@@ -117,7 +117,7 @@
                                 </a>
                             </div>
                             <div class="col">
-                                <a href="/cluster/info">
+                                <a href="/cluster/zookeeper">
                                     <div class="apps p-2 radius-10 text-center">
                                         <div class="apps-icon-box mb-1 text-white bg-gradient-warning">
                                             <i class="bx bx-sitemap"></i>
@@ -157,12 +157,12 @@
                                 </a>
                             </div>
                             <div class="col">
-                                <a href="/cluster/multi">
+                                <a href="/cluster/management">
                                     <div class="apps p-2 radius-10 text-center">
                                         <div class="apps-icon-box mb-1 text-white bg-gradient-amour">
-                                            <i class="bx bx-cube"></i>
+                                            <i class="bx bx-server"></i>
                                         </div>
-                                        <p class="mb-0 apps-name">Cluster</p>
+                                        <p class="mb-0 apps-name">EfakServer</p>
                                     </div>
                                 </a>
                             </div>

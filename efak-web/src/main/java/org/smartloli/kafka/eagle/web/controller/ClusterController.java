@@ -81,10 +81,10 @@ public class ClusterController {
     /**
      * Cluster viewer.
      */
-    @RequestMapping(value = "/cluster/multi", method = RequestMethod.GET)
-    public ModelAndView clustersView(HttpSession session) {
+    @RequestMapping(value = "/cluster/management", method = RequestMethod.GET)
+    public ModelAndView clusterManagementView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/cluster/multicluster");
+        mav.setViewName("/cluster/management");
         return mav;
     }
 
@@ -377,7 +377,9 @@ public class ClusterController {
                 target.put("id", cluster.getInteger("id"));
                 target.put("clusterAlias", cluster.getString("clusterAlias"));
                 target.put("zkhost", cluster.getString("zkhost"));
-                target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='badge badge-primary'>Change</a>");
+                target.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                        "<a href='#" + cluster.getString("clusterAlias") + "' name='efak_cluster_switch' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Switch'><i class='lni lni-layers'></i></a>" +
+                        "</div>");
                 aaDatas.add(target);
             } else if (search.length() == 0) {
                 if (offset < (iDisplayLength + iDisplayStart) && offset >= iDisplayStart) {
@@ -385,7 +387,9 @@ public class ClusterController {
                     target.put("id", cluster.getInteger("id"));
                     target.put("clusterAlias", cluster.getString("clusterAlias"));
                     target.put("zkhost", cluster.getString("zkhost"));
-                    target.put("operate", "<a name='change' href='#" + cluster.getString("clusterAlias") + "' class='badge badge-primary'>Change</a>");
+                    target.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                            "<a href='#" + cluster.getString("clusterAlias") + "' name='efak_cluster_switch' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Switch'><i class='lni lni-layers'></i></a>" +
+                            "</div>");
                     aaDatas.add(target);
                 }
                 offset++;

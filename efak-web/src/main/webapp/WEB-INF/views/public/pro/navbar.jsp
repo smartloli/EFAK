@@ -78,7 +78,7 @@
                 </li>
                 <li><a href="/cluster/efakserver"><i class="bx bx-server"></i>EfakServer</a>
                 </li>
-                <li><a href="/cluster/manager"><i class="bx bx-cube"></i>Cluster Manager</a>
+                <li><a href="/cluster/management"><i class="bx bx-cube"></i>Management</a>
                 </li>
             </ul>
         </li>
