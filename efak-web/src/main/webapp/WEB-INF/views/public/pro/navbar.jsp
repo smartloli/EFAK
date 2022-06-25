@@ -60,7 +60,7 @@
             <ul>
                 <li><a href="/consumers/groups"><i class="bx bx-group"></i>Groups</a>
                 </li>
-                <%--                <li><a href="ecommerce-products-grid.html"><i class="bi bi-circle"></i>StreamGraph</a>--%>
+                <%--                <li><a href="#"><i class="bi bi-circle"></i>StreamGraph</a>--%>
                 <%--                </li>--%>
             </ul>
         </li>

@@ -30,8 +30,8 @@
                                     <img src="/media/img/efak-logo.png" alt="" class="rounded-circle"
                                          width="54" height="54">
                                     <div class="ms-3">
-                                        <h6 class="mb-0 dropdown-user-name">Admin</h6>
-                                        <small class="mb-0 dropdown-user-designation text-secondary">Administrator</small>
+                                        <h6 class="mb-0 dropdown-user-name">${LOGIN_USER_SESSION.username}</h6>
+                                        <small class="mb-0 dropdown-user-designation text-secondary">${LOGIN_USER_SESSION.realname}</small>
                                     </div>
                                 </div>
                             </a>
@@ -40,7 +40,7 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item" href="pages-user-profile.html">
+                            <a class="dropdown-item" href="#">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="bi bi-person-fill"></i></div>
                                     <div class="ms-3"><span>Profile</span></div>
@@ -59,7 +59,7 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item" href="authentication-signup-with-header-footer.html">
+                            <a class="dropdown-item" href="/account/signout">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="bi bi-lock-fill"></i></div>
                                     <div class="ms-3"><span>Logout</span></div>
@@ -180,52 +180,13 @@
                             <h5 class="h5 mb-0">Cluster List</h5>
                         </div>
                         <div class="header-message-list p-2">
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex align-items-center">
-                                    <div class="notification-box bg-light-success text-success"><i
-                                            class="bx bx-video"></i></div>
-                                    <div class="ms-3 flex-grow-1">
-                                        <h6 class="mb-0 dropdown-msg-user">${clusterAlias}</h6>
-                                        <small class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">Active</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex align-items-center">
-                                    <div class="notification-box bg-light-danger text-danger"><i
-                                            class="bx bx-video-off"></i></div>
-                                    <div class="ms-3 flex-grow-1">
-                                        <h6 class="mb-0 dropdown-msg-user">Cluster002</h6>
-                                        <small class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">Standby</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex align-items-center">
-                                    <div class="notification-box bg-light-danger text-danger"><i
-                                            class="bx bx-video-off"></i></div>
-                                    <div class="ms-3 flex-grow-1">
-                                        <h6 class="mb-0 dropdown-msg-user">Cluster003</h6>
-                                        <small class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">Standby</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex align-items-center">
-                                    <div class="notification-box bg-light-danger text-danger"><i
-                                            class="bx bx-video-off"></i></div>
-                                    <div class="ms-3 flex-grow-1">
-                                        <h6 class="mb-0 dropdown-msg-user">Cluster004</h6>
-                                        <small class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">Standby</small>
-                                    </div>
-                                </div>
-                            </a>
+                            ${clusterAliasList}
                         </div>
                         <div class="p-2">
                             <div>
                                 <hr class="dropdown-divider">
                             </div>
-                            <a class="dropdown-item" href="/cluster/multi">
+                            <a class="dropdown-item" href="/cluster/management">
                                 <div class="text-center">View All Clusters</div>
                             </a>
                         </div>
