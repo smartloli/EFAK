@@ -24,8 +24,8 @@
             <ul>
                 <li><a href="/"><i class="bx bx-laptop"></i>Overview</a>
                 </li>
-                <li><a href="/tv"><i class="bx bx-desktop"></i>TV Dashboard</a>
-                </li>
+                <%--                <li><a href="/tv"><i class="bx bx-desktop"></i>TV Dashboard</a>--%>
+                <%--                </li>--%>
             </ul>
         </li>
         <li class="menu-label">Message</li>
@@ -83,8 +83,8 @@
             </ul>
         </li>
         <li>
-            <a class="has-arrow" href="javascript:;">
-                <div class="parent-icon"><i class="bi bi-cloud-arrow-down-fill"></i>
+            <a class="has-arrow" href="#">
+                <div class="parent-icon"><i class="bx bx-chart"></i>
                 </div>
                 <div class="menu-title">Monitor</div>
             </a>
@@ -97,74 +97,76 @@
                 </li>
             </ul>
         </li>
-        <li class="menu-label">Plugins</li>
-        <li>
-            <a class="has-arrow" href="#">
-                <div class="parent-icon"><i class="bi bi-file-earmark-break-fill"></i>
-                </div>
-                <div class="menu-title">Connect</div>
-            </a>
-            <ul>
-                <li><a href="form-elements.html"><i class="bx bx-plug"></i>Config</a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-label">Notification</li>
-        <li>
-            <a class="has-arrow" href="javascript:;">
-                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>
-                </div>
-                <div class="menu-title">AlertChannel</div>
-            </a>
-            <ul>
-                <li><a href="table-basic-table.html"><i class="bi bi-circle"></i>Config</a>
-                </li>
-                <li><a href="table-advance-tables.html"><i class="bi bi-circle"></i>List</a>
-                </li>
-            </ul>
-        </li>
-        <li>
-            <a class="has-arrow" href="javascript:;">
-                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>
-                </div>
-                <div class="menu-title">AlertConsumer</div>
-            </a>
-            <ul>
-                <li><a href="table-basic-table.html"><i class="bi bi-circle"></i>Add</a>
-                </li>
-                <li><a href="table-advance-tables.html"><i class="bi bi-circle"></i>List</a>
-                </li>
-            </ul>
-        </li>
-        <li>
-            <a class="has-arrow" href="javascript:;">
-                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>
-                </div>
-                <div class="menu-title">AlertCommon</div>
-            </a>
-            <ul>
-                <li><a href="table-basic-table.html"><i class="bi bi-circle"></i>Add</a>
-                </li>
-                <li><a href="table-advance-tables.html"><i class="bi bi-circle"></i>List</a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-label">Administrator</li>
-        <li>
-            <a class="has-arrow" href="javascript:;">
-                <div class="parent-icon"><i class="bi bi-lock-fill"></i>
-                </div>
-                <div class="menu-title">System</div>
-            </a>
-            <ul>
-                <li><a href="#"><i class="bi bi-circle"></i>User</a>
-                </li>
-                <li><a href="#"><i class="bi bi-circle"></i>Role</a>
-                </li>
-                <li><a href="#"><i class="bi bi-circle"></i>Resource</a>
-                </li>
-            </ul>
-        </li>
+        <%--        <li class="menu-label">Plugins</li>--%>
+        <%--        <li>--%>
+        <%--            <a class="has-arrow" href="#">--%>
+        <%--                <div class="parent-icon"><i class="bi bi-file-earmark-break-fill"></i>--%>
+        <%--                </div>--%>
+        <%--                <div class="menu-title">Connect</div>--%>
+        <%--            </a>--%>
+        <%--            <ul>--%>
+        <%--                <li><a href="#"><i class="bx bx-plug"></i>Config</a>--%>
+        <%--                </li>--%>
+        <%--            </ul>--%>
+        <%--        </li>--%>
+        <%--        <li class="menu-label">Notification</li>--%>
+        <%--        <li>--%>
+        <%--            <a class="has-arrow" href="#">--%>
+        <%--                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>--%>
+        <%--                </div>--%>
+        <%--                <div class="menu-title">AlertChannel</div>--%>
+        <%--            </a>--%>
+        <%--            <ul>--%>
+        <%--                <li><a href="#"><i class="bi bi-circle"></i>Config</a>--%>
+        <%--                </li>--%>
+        <%--                <li><a href="#"><i class="bi bi-circle"></i>List</a>--%>
+        <%--                </li>--%>
+        <%--            </ul>--%>
+        <%--        </li>--%>
+        <%--        <li>--%>
+        <%--            <a class="has-arrow" href="#">--%>
+        <%--                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>--%>
+        <%--                </div>--%>
+        <%--                <div class="menu-title">AlertConsumer</div>--%>
+        <%--            </a>--%>
+        <%--            <ul>--%>
+        <%--                <li><a href="#"><i class="bi bi-circle"></i>Add</a>--%>
+        <%--                </li>--%>
+        <%--                <li><a href="#"><i class="bi bi-circle"></i>List</a>--%>
+        <%--                </li>--%>
+        <%--            </ul>--%>
+        <%--        </li>--%>
+        <%--        <li>--%>
+        <%--            <a class="has-arrow" href="javascript:;">--%>
+        <%--                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>--%>
+        <%--                </div>--%>
+        <%--                <div class="menu-title">AlertCommon</div>--%>
+        <%--            </a>--%>
+        <%--            <ul>--%>
+        <%--                <li><a href="#"><i class="bi bi-circle"></i>Add</a>--%>
+        <%--                </li>--%>
+        <%--                <li><a href="#"><i class="bi bi-circle"></i>List</a>--%>
+        <%--                </li>--%>
+        <%--            </ul>--%>
+        <%--        </li>--%>
+        <c:if test="${WHETHER_SYSTEM_ADMIN==1}">
+            <li class="menu-label">Administrator</li>
+            <li>
+                <a class="has-arrow" href="javascript:;">
+                    <div class="parent-icon"><i class="bi bi-lock-fill"></i>
+                    </div>
+                    <div class="menu-title">System</div>
+                </a>
+                <ul>
+                    <li><a href="/system/user"><i class="bi bi-circle"></i>User</a>
+                    </li>
+                    <li><a href="/system/role"><i class="bi bi-circle"></i>Role</a>
+                    </li>
+                    <li><a href="/system/resource"><i class="bi bi-circle"></i>Resource</a>
+                    </li>
+                </ul>
+            </li>
+        </c:if>
     </ul>
     <!--end navigation-->
 </aside>

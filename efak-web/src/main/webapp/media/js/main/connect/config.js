@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#result").dataTable({
+    $("#efak_connect_config_tab").dataTable({
         "bSort": false,
         "bLengthChange": false,
         "bProcessing": true,
