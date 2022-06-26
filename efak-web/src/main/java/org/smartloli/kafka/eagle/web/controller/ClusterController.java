@@ -43,12 +43,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author smartloli.
  * <p>
- * Created by Sep 6, 2016.
- * <p>
- * Update by hexiang 20170216
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 25, 2022.
  */
 @Controller
 public class ClusterController {

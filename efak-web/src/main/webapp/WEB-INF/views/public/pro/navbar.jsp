@@ -89,23 +89,23 @@
                 <div class="menu-title">Monitor</div>
             </a>
             <ul>
-                <li><a href="icons-line-icons.html"><i class="bi bi-circle"></i>MBean</a>
+                <li><a href="/metrics/mbean"><i class="bx bx-table"></i>MBean</a>
                 </li>
-                <li><a href="icons-boxicons.html"><i class="bi bi-circle"></i>Kafka</a>
+                <li><a href="/metrics/kafka"><i class="lni lni-ux"></i>Kafka</a>
                 </li>
-                <li><a href="icons-feather-icons.html"><i class="bi bi-circle"></i>Zookeeper</a>
+                <li><a href="/metrics/zookeeper"><i class="bx bx-sitemap"></i>Zookeeper</a>
                 </li>
             </ul>
         </li>
         <li class="menu-label">Plugins</li>
         <li>
-            <a class="has-arrow" href="javascript:;">
+            <a class="has-arrow" href="#">
                 <div class="parent-icon"><i class="bi bi-file-earmark-break-fill"></i>
                 </div>
                 <div class="menu-title">Connect</div>
             </a>
             <ul>
-                <li><a href="form-elements.html"><i class="bi bi-circle"></i>Config</a>
+                <li><a href="form-elements.html"><i class="bx bx-plug"></i>Config</a>
                 </li>
             </ul>
         </li>
