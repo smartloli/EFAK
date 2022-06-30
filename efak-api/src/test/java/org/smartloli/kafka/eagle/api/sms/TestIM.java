@@ -20,7 +20,10 @@ package org.smartloli.kafka.eagle.api.sms;
 import org.smartloli.kafka.eagle.api.im.IMFactory;
 import org.smartloli.kafka.eagle.api.im.IMService;
 import org.smartloli.kafka.eagle.api.im.IMServiceImpl;
+import org.smartloli.kafka.eagle.api.im.queue.AbstractJob;
 import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
+
+import java.text.MessageFormat;
 
 /**
  * TODO
@@ -31,10 +34,12 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
  */
 public class TestIM {
     public static void main(String[] args) {
-        testAlarmClusterByDingDingMarkDownNewStyle();
-//        testAlarmClusterByDingDingMarkDown();
-//		testAlarmClusterByWeChatMarkDown();
+        // testAlarmClusterByDingDingMarkDownNewStyle();
+        // testAlarmClusterByDingDingMarkDown();
+        testAlarmClusterByWeChatMarkDown();
 
+
+        testAbstractJobParseMessageFormat();
     }
 
     /**
@@ -100,4 +105,16 @@ public class TestIM {
         im.sendPostMsgByDingDing(alarmMsg.toDingDingMarkDown(), "https://oapi.dingtalk.com/robot/send?access_token=3b7b59d17db0145549b1f65f62921b44bacd1701e635e797da45318a94339060");
     }
 
+
+    private static void testAbstractJobParseMessageFormat() {
+        String simpleClassName = TestIM.class.getSimpleName();
+        String result = "{\"state\": 1, \"msg\": \"ok\"}";
+
+        String info = MessageFormat.format(AbstractJob.SEND_MSG, simpleClassName, result);
+        System.out.println(info);
+
+
+        info = MessageFormat.format(AbstractJob.SEND_ERROR_MSG, simpleClassName);
+        System.out.println(info);
+    }
 }

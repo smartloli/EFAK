@@ -17,15 +17,7 @@
  */
 package org.smartloli.kafka.eagle.api.im.queue;
 
-import com.alibaba.fastjson.JSONObject;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
-import org.smartloli.kafka.eagle.common.util.HttpClientUtils;
-import org.smartloli.kafka.eagle.common.util.KConstants.AlarmQueue;
 import org.smartloli.kafka.eagle.common.util.KConstants.WeChat;
-import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,27 +29,8 @@ import java.util.Map;
  * <p>
  * Created by Oct 27, 2019
  */
-public class WeChatJob implements Job {
+public class WeChatJob extends AbstractJob {
 
-    /**
-     * Send alarm information by wechat.
-     */
-    public void execute(JobExecutionContext jobContext) throws JobExecutionException {
-        BaseJobContext bjc = (BaseJobContext) jobContext.getJobDetail().getJobDataMap().get(AlarmQueue.JOB_PARAMS);
-        sendMsg(bjc.getData(), bjc.getUrl());
-    }
-
-    private int sendMsg(String data, String url) {
-        try {
-            Map<String, Object> wechatMarkdownMessage = getWeChatMarkdownMessage(data);
-            String result = HttpClientUtils.doPostJson(url, JSONObject.toJSONString(wechatMarkdownMessage));
-            LoggerUtils.print(this.getClass()).info("DingDing SendMsg Result: " + result);
-        } catch (Exception e) {
-            LoggerUtils.print(this.getClass()).error("Send alarm message has error by wechat, msg is ", e);
-            return 0;
-        }
-        return 1;
-    }
 
     private static Map<String, Object> getWeChatMarkdownMessage(String text) {
         Map<String, Object> map = new HashMap<>();
@@ -75,4 +48,8 @@ public class WeChatJob implements Job {
         return map;
     }
 
+    @Override
+    protected Map<String, Object> parseSendMessage(String data, String url) {
+        return getWeChatMarkdownMessage(data);
+    }
 }
