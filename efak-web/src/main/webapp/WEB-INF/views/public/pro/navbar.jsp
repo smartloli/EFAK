@@ -97,58 +97,58 @@
                 </li>
             </ul>
         </li>
-        <%--        <li class="menu-label">Plugins</li>--%>
-        <%--        <li>--%>
-        <%--            <a class="has-arrow" href="#">--%>
-        <%--                <div class="parent-icon"><i class="bi bi-file-earmark-break-fill"></i>--%>
-        <%--                </div>--%>
-        <%--                <div class="menu-title">Connect</div>--%>
-        <%--            </a>--%>
-        <%--            <ul>--%>
-        <%--                <li><a href="#"><i class="bx bx-plug"></i>Config</a>--%>
-        <%--                </li>--%>
-        <%--            </ul>--%>
-        <%--        </li>--%>
-        <%--        <li class="menu-label">Notification</li>--%>
-        <%--        <li>--%>
-        <%--            <a class="has-arrow" href="#">--%>
-        <%--                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>--%>
-        <%--                </div>--%>
-        <%--                <div class="menu-title">AlertChannel</div>--%>
-        <%--            </a>--%>
-        <%--            <ul>--%>
-        <%--                <li><a href="#"><i class="bi bi-circle"></i>Config</a>--%>
-        <%--                </li>--%>
-        <%--                <li><a href="#"><i class="bi bi-circle"></i>List</a>--%>
-        <%--                </li>--%>
-        <%--            </ul>--%>
-        <%--        </li>--%>
-        <%--        <li>--%>
-        <%--            <a class="has-arrow" href="#">--%>
-        <%--                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>--%>
-        <%--                </div>--%>
-        <%--                <div class="menu-title">AlertConsumer</div>--%>
-        <%--            </a>--%>
-        <%--            <ul>--%>
-        <%--                <li><a href="#"><i class="bi bi-circle"></i>Add</a>--%>
-        <%--                </li>--%>
-        <%--                <li><a href="#"><i class="bi bi-circle"></i>List</a>--%>
-        <%--                </li>--%>
-        <%--            </ul>--%>
-        <%--        </li>--%>
-        <%--        <li>--%>
-        <%--            <a class="has-arrow" href="javascript:;">--%>
-        <%--                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>--%>
-        <%--                </div>--%>
-        <%--                <div class="menu-title">AlertCommon</div>--%>
-        <%--            </a>--%>
-        <%--            <ul>--%>
-        <%--                <li><a href="#"><i class="bi bi-circle"></i>Add</a>--%>
-        <%--                </li>--%>
-        <%--                <li><a href="#"><i class="bi bi-circle"></i>List</a>--%>
-        <%--                </li>--%>
-        <%--            </ul>--%>
-        <%--        </li>--%>
+        <li class="menu-label">Plugins</li>
+        <li>
+            <a class="has-arrow" href="#">
+                <div class="parent-icon"><i class="bi bi-file-earmark-break-fill"></i>
+                </div>
+                <div class="menu-title">Connector</div>
+            </a>
+            <ul>
+                <li><a href="/connect/config"><i class="bx bx-plug"></i>Config</a>
+                </li>
+            </ul>
+        </li>
+        <li class="menu-label">Notification</li>
+        <li>
+            <a class="has-arrow" href="#">
+                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                </div>
+                <div class="menu-title">AlertChannel</div>
+            </a>
+            <ul>
+                <li><a href="#"><i class="bi bi-circle"></i>Config</a>
+                </li>
+                <li><a href="#"><i class="bi bi-circle"></i>List</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a class="has-arrow" href="#">
+                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                </div>
+                <div class="menu-title">AlertConsumer</div>
+            </a>
+            <ul>
+                <li><a href="#"><i class="bi bi-circle"></i>Add</a>
+                </li>
+                <li><a href="#"><i class="bi bi-circle"></i>List</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a class="has-arrow" href="javascript:;">
+                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                </div>
+                <div class="menu-title">AlertCommon</div>
+            </a>
+            <ul>
+                <li><a href="#"><i class="bi bi-circle"></i>Add</a>
+                </li>
+                <li><a href="#"><i class="bi bi-circle"></i>List</a>
+                </li>
+            </ul>
+        </li>
         <c:if test="${WHETHER_SYSTEM_ADMIN==1}">
             <li class="menu-label">Administrator</li>
             <li>

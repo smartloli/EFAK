@@ -525,8 +525,8 @@ $(function () {
                 url: '/get/dashboard/cpu/ajax',
                 success: function (datas) {
                     if (datas != null) {
-                        $("#efak_dashboard_cpu_chart_id").text(datas.cpu + "%");
-                        refreshMemOrCpu(efak_dashboard_cpu_chart, "cpu", datas.cpu);
+                        $("#efak_dashboard_cpu_chart_id").text(datas.cpu.toFixed(2) + "%");
+                        refreshMemOrCpu(efak_dashboard_cpu_chart, "cpu", datas.cpu.toFixed(2));
                     }
                 }
             });

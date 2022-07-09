@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var mime = 'text/x-mariadb';
+    var mime = 'text/x-sql';
     // get mime type
     if (window.location.href.indexOf('mime=') > -1) {
         mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
@@ -11,7 +11,8 @@ $(document).ready(function () {
         lineNumbers: true,
         matchBrackets: true,
         autofocus: true,
-        readOnly: true
+        readOnly: true,
+        theme: "blackboard"
     });
 
     var ke_connector_result_config = CodeMirror.fromTextArea(document.getElementById('ke_connect_result_config'), {
@@ -21,7 +22,8 @@ $(document).ready(function () {
         lineNumbers: true,
         matchBrackets: true,
         autofocus: true,
-        readOnly: true
+        readOnly: true,
+        theme: "blackboard"
     });
 
     var ke_connector_result_tasks = CodeMirror.fromTextArea(document.getElementById('ke_connect_result_tasks'), {
@@ -31,7 +33,8 @@ $(document).ready(function () {
         lineNumbers: true,
         matchBrackets: true,
         autofocus: true,
-        readOnly: true
+        readOnly: true,
+        theme: "blackboard"
     });
 
     function getQueryString(name) {
@@ -47,9 +50,6 @@ $(document).ready(function () {
 
     var uri = getQueryString("uri");
     var connector = getQueryString("connector");
-
-    console.log(uri);
-    console.log(connector);
 
     $.ajax({
         type: 'get',
