@@ -112,40 +112,40 @@
         <li class="menu-label">Notification</li>
         <li>
             <a class="has-arrow" href="#">
-                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                <div class="parent-icon"><i class="bx bx-alarm"></i>
                 </div>
                 <div class="menu-title">AlertChannel</div>
             </a>
             <ul>
-                <li><a href="#"><i class="bi bi-circle"></i>Config</a>
+                <li><a href="/alarm/config"><i class="bx bx-wrench"></i>Config</a>
                 </li>
-                <li><a href="#"><i class="bi bi-circle"></i>List</a>
+                <li><a href="/alarm/list"><i class="bx bx-list-ol"></i>List</a>
                 </li>
             </ul>
         </li>
         <li>
             <a class="has-arrow" href="#">
-                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                <div class="parent-icon"><i class="bx bx-user-voice"></i>
                 </div>
                 <div class="menu-title">AlertConsumer</div>
             </a>
             <ul>
-                <li><a href="#"><i class="bi bi-circle"></i>Add</a>
+                <li><a href="/alarm/add"><i class="bx bx-user-plus"></i>Add</a>
                 </li>
-                <li><a href="#"><i class="bi bi-circle"></i>List</a>
+                <li><a href="/alarm/modify"><i class="bx bx-list-ol"></i>List</a>
                 </li>
             </ul>
         </li>
         <li>
-            <a class="has-arrow" href="javascript:;">
-                <div class="parent-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i>
+            <a class="has-arrow" href="#">
+                <div class="parent-icon"><i class="bx bx-navigation"></i>
                 </div>
                 <div class="menu-title">AlertCommon</div>
             </a>
             <ul>
-                <li><a href="#"><i class="bi bi-circle"></i>Add</a>
+                <li><a href="/alarm/create"><i class="bx bx-user-plus"></i>Add</a>
                 </li>
-                <li><a href="#"><i class="bi bi-circle"></i>List</a>
+                <li><a href="/alarm/history"><i class="bx bx-list-ol"></i>List</a>
                 </li>
             </ul>
         </li>

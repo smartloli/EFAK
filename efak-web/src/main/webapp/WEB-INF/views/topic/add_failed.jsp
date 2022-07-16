@@ -37,7 +37,7 @@
                     <ol class="breadcrumb mb-0 p-0">
                         <li class="breadcrumb-item"><a href="/"><i class="bx bx-home-alt"></i></a>
                         </li>
-                        <li class="breadcrumb-item active" aria-current="page">failed</li>
+                        <li class="breadcrumb-item active" aria-current="page">Failed</li>
                     </ol>
                 </nav>
             </div>

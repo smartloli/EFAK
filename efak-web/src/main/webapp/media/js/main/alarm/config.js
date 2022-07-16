@@ -1,6 +1,7 @@
 $(document).ready(function () {
     $("#select2val").select2({
         placeholder: "Alarm Type",
+        theme: 'bootstrap4',
         ajax: {
             url: "/alarm/type/list/ajax",
             dataType: 'json',
@@ -66,16 +67,38 @@ $(document).ready(function () {
         }
     });
 
+    function errorNoti(errorMsg) {
+        console.log(errorMsg)
+        Lobibox.notify('error', {
+            pauseDelayOnHover: true,
+            continueDelayOnInactiveTab: false,
+            position: 'top right',
+            icon: 'bx bx-x-circle',
+            msg: errorMsg
+        });
+    }
+
+    function successNoti(successMsg) {
+        Lobibox.notify('success', {
+            pauseDelayOnHover: true,
+            continueDelayOnInactiveTab: false,
+            position: 'top right',
+            icon: 'bx bx-check-circle',
+            msg: successMsg
+        });
+    }
+
     $("#btn_send_test").click(function () {
         var type = $("#ke_alarm_type").val();
         var url = $("#ke_alarm_url").val();
         var address = $("#ke_alarm_address").val();
         var msg = $("#ke_test_msg").val();
-        if (type.length == 0 || url.length == 0 || msg.length == 0) {
-            $("#alert_msg_alarm_send").show();
-            setTimeout(function () {
-                $("#alert_msg_alarm_send").hide()
-            }, 3000);
+        if (type.length == 0) {
+            errorNoti("Alarm type cannot be empty.");
+        } else if (url.length == 0) {
+            errorNoti("Alarm url cannot be empty.");
+        } else if (msg.length == 0) {
+            errorNoti("Alarm msg cannot be empty.");
         } else {
             $.ajax({
                 type: 'post',
@@ -89,17 +112,12 @@ $(document).ready(function () {
                 }),
                 url: '/alarm/config/test/send/ajax',
                 success: function (datas) {
+                    console.log(datas)
                     if (type.indexOf("DingDing") > -1 || type.indexOf("WeChat") > -1 || type.indexOf("Email") > -1) {
                         if (datas.errcode == 0) {
-                            $("#success_mssage_alarm_config").show();
-                            setTimeout(function () {
-                                $("#success_mssage_alarm_config").hide()
-                            }, 5000);
+                            successNoti("Send test msg has successed.");
                         } else {
-                            $("#failed_mssage_alarm_config").show();
-                            setTimeout(function () {
-                                $("#failed_mssage_alarm_config").hide()
-                            }, 5000);
+                            errorNoti("Send test msg has failed.");
                         }
                     }
 

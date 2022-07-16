@@ -865,9 +865,10 @@ public class AlarmController {
             obj.put("alarmAddress", "<a name='ke_alarm_config_detail' href='#" + alarmGroup + "/address'>" + (address.length() > 16 ? address.substring(0, 16) + "..." : address) + "</a>");
             obj.put("created", config.getString("created"));
             obj.put("modify", config.getString("modify"));
-            obj.put("operate",
-                    "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='ke_alarm_config_modify' href='#"
-                            + alarmGroup + "/modify'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Modify</a><a class='dropdown-item' href='#" + alarmGroup + "' name='ke_alarm_config_remove'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Delete</a></div>");
+            obj.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                    "<a href='#" + alarmGroup + "/modify' val='" + config.getString("alarmType") + "' name='ke_alarm_config_modify'  class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Edit'><i class='bi bi-pencil-fill'></i></a>" +
+                    "<a href='#" + alarmGroup + "' name='ke_alarm_config_remove' class='text-danger' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Delete'><i class='bi bi-trash-fill'></i></a>" +
+                    "</div>");
             aaDatas.add(obj);
         }
 
