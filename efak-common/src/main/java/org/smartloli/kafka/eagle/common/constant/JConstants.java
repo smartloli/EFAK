@@ -17,6 +17,8 @@
  */
 package org.smartloli.kafka.eagle.common.constant;
 
+import org.apache.calcite.jdbc.Driver;
+
 /**
  * JDBC constants.
  *
@@ -60,7 +62,8 @@ public final class JConstants {
     /**
      * Kafka driver name.
      */
-    public static final String KAFKA_DRIVER = "org.apache.calcite.jdbc.Driver";
+    public static final String KAFKA_DRIVER = Driver.class.getName();
+    public static final String KAFKA_DRIVER_VERSION = "1.30.0";
 
     /**
      * Kafka table schema.

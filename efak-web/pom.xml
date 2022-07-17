@@ -14,11 +14,12 @@
         <junit.version>4.11</junit.version>
         <jdk.version>1.8</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>5.3.1</spring.version>
-        <mybatis.version>3.5.6</mybatis.version>
-        <mybatis.spring.version>2.0.6</mybatis.spring.version>
-        <shiro.version>1.8.0</shiro.version>
-        <jackson.version>2.10.0</jackson.version>
+        <spring.version>5.3.22</spring.version>
+        <mybatis.version>3.5.10</mybatis.version>
+        <mybatis.spring.version>2.0.7</mybatis.spring.version>
+        <shiro.version>1.9.1</shiro.version>
+        <jackson.version>2.13.3</jackson.version>
+        <aspectjrt.version>1.9.9.1</aspectjrt.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -77,11 +78,11 @@
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework</groupId>-->
+        <!--            <artifactId>spring-web</artifactId>-->
+        <!--            <version>${spring.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
@@ -115,7 +116,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.5</version>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>
@@ -135,17 +136,12 @@
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
-            <version>1.2.2</version>
+            <version>1.4</version>
         </dependency>
         <dependency>
             <groupId>jstl</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.0.31</version>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
@@ -170,12 +166,12 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.8.10</version>
+            <version>${aspectjrt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.8.10</version>
+            <version>${aspectjrt.version}</version>
         </dependency>
         <!-- add by MappingJackson2HttpMessageConverter -->
         <dependency>

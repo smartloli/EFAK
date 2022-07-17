@@ -377,7 +377,7 @@ public class KafkaServiceImpl implements KafkaService {
             object.put("mode", zkService.status(zk.split(":")[0], zk.split(":")[1]));
             targets.add(object);
         }
-        return targets.toJSONString();
+        return targets.toString();
     }
 
     /**
@@ -414,6 +414,7 @@ public class KafkaServiceImpl implements KafkaService {
      * @param replic     Replic numbers.
      * @return Map.
      */
+    @Override
     public Map<String, Object> create(String clusterAlias, String topicName, String partitions, String replic) {
         Map<String, Object> targets = new HashMap<String, Object>();
         List<BrokersInfo> brokerLists = BrokerCache.META_CACHE.get(clusterAlias);
@@ -667,7 +668,7 @@ public class KafkaServiceImpl implements KafkaService {
         } finally {
             adminClient.close();
         }
-        return consumerGroups.toJSONString();
+        return consumerGroups.toString();
     }
 
     /**
@@ -753,7 +754,7 @@ public class KafkaServiceImpl implements KafkaService {
         } finally {
             adminClient.close();
         }
-        return consumerGroups.toJSONString();
+        return consumerGroups.toString();
     }
 
     /**
@@ -873,7 +874,7 @@ public class KafkaServiceImpl implements KafkaService {
         JSONObject activerAndTopics = new JSONObject();
         activerAndTopics.put("activers", activerCounter);
         activerAndTopics.put("topics", topics.size());
-        return activerAndTopics.toJSONString();
+        return activerAndTopics.toString();
     }
 
     /**
@@ -954,7 +955,7 @@ public class KafkaServiceImpl implements KafkaService {
      * Get kafka 0.10.x consumer group and topic.
      */
     public String getKafkaConsumerGroupTopic(String clusterAlias, String group) {
-        return getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias).toJSONString();
+        return getKafkaMetadata(parseBrokerServer(clusterAlias), group, clusterAlias).toString();
     }
 
     /**
@@ -997,7 +998,7 @@ public class KafkaServiceImpl implements KafkaService {
         } finally {
             adminClient.close();
         }
-        return targets.toJSONString();
+        return targets.toString();
     }
 
     /**

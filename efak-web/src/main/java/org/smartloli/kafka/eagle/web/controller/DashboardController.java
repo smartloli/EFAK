@@ -188,7 +188,7 @@ public class DashboardController {
         try {
             params.put("cluster", clusterAlias);
             params.put("tkey", tkey);
-            byte[] output = dashboradService.getTopicRank(params).toJSONString().getBytes();
+            byte[] output = dashboradService.getTopicRank(params).toString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
             ex.printStackTrace();

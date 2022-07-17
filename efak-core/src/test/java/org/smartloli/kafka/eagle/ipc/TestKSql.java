@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.ipc;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.smartloli.kafka.eagle.common.util.KafkaCacheUtils;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaSqlParser;
 import org.smartloli.kafka.eagle.core.sql.tool.KSqlUtils;
 
@@ -39,8 +40,9 @@ public class TestKSql {
         // calcite();
         // String sql = "select * from \"k20200326_1\" where \"partition\" in
         // (0) and \"msg\" like 's1%' limit 10";
-        String sql = "select * from efak01 where `partition` in (0) limit 10";
+        String sql = "select * from `efak_cluster_003` where `partition` in (0) limit 10";
 
+        KafkaCacheUtils.initKafkaMetaData();
         String result = KafkaSqlParser.execute("cluster1", sql);
         System.out.println("result: " + result);
     }

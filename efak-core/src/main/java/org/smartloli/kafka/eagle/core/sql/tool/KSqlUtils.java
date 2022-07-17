@@ -20,6 +20,8 @@ package org.smartloli.kafka.eagle.core.sql.tool;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
+import org.apache.calcite.config.Lex;
+import org.apache.calcite.jdbc.Driver;
 import org.smartloli.kafka.eagle.common.constant.JConstants;
 import org.smartloli.kafka.eagle.common.util.UnicodeUtils;
 import org.smartloli.kafka.eagle.core.sql.common.JSqlMapData;
@@ -64,9 +66,9 @@ public class KSqlUtils {
 
         Class.forName(JConstants.KAFKA_DRIVER);
         Properties info = new Properties();
-        info.setProperty("lex", "JAVA");
+        info.setProperty("lex", Lex.JAVA.toString());
 
-        Connection connection = DriverManager.getConnection("jdbc:calcite:model=inline:" + model, info);
+        Connection connection = DriverManager.getConnection(Driver.CONNECT_STRING_PREFIX + "model=inline:" + model, info);
         Statement st = connection.createStatement();
         ResultSet result = st.executeQuery(UnicodeUtils.encodeForUnicode(sql));
         ResultSetMetaData rsmd = result.getMetaData();
@@ -106,7 +108,7 @@ public class KSqlUtils {
 
     private static String createTempJson() throws IOException {
         JSONObject object = new JSONObject();
-        object.put("version", "1.21.0");
+        object.put("version", JConstants.KAFKA_DRIVER_VERSION);
         object.put("defaultSchema", "db");
         JSONArray array = new JSONArray();
         JSONObject tmp = new JSONObject();
@@ -114,7 +116,7 @@ public class KSqlUtils {
         tmp.put("type", "custom");
         tmp.put("factory", "org.smartloli.kafka.eagle.core.sql.schema.JSqlSchemaFactory");
         JSONObject tmp2 = new JSONObject();
-        tmp.put("operand", tmp2.put("database", "ke_memory_db"));
+        tmp.put("operand", tmp2.put("database", "efak_memory_db"));
         array.add(tmp);
         object.put("schemas", array);
         return object.toJSONString();

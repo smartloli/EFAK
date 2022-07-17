@@ -161,7 +161,7 @@ public class TopicServiceImpl implements TopicService {
 
             offset++;
         }
-        return topics.toJSONString();
+        return topics.toString();
     }
 
     /**
@@ -193,7 +193,7 @@ public class TopicServiceImpl implements TopicService {
             }
             offset++;
         }
-        return topics.toJSONString();
+        return topics.toString();
     }
 
     /**
@@ -326,7 +326,7 @@ public class TopicServiceImpl implements TopicService {
         object.put("logsize", logSize);
         object.put("topicsize", topicSize.getString("size"));
         object.put("sizetype", topicSize.getString("type"));
-        return object.toJSONString();
+        return object.toString();
     }
 
     /**
@@ -341,7 +341,7 @@ public class TopicServiceImpl implements TopicService {
             object.put("y", topicLogSize.getDiffval());
             arrays.add(object);
         }
-        return arrays.toJSONString();
+        return arrays.toString();
     }
 
     @Override
@@ -380,7 +380,7 @@ public class TopicServiceImpl implements TopicService {
                 array.add(object);
             }
         }
-        return array.toJSONString();
+        return array.toString();
     }
 
     @Override
@@ -438,7 +438,7 @@ public class TopicServiceImpl implements TopicService {
         JSONObject capacity = StrUtils.stringifyByObject(topicDao.getTopicCapacity(capacityParams));
         object.put("topicCapacity", capacity.getString("size"));
         object.put("capacityType", capacity.getString("type"));
-        return object.toJSONString();
+        return object.toString();
     }
 
     @Override
@@ -460,7 +460,7 @@ public class TopicServiceImpl implements TopicService {
             }
         }
         object.put("topics", array);
-        return kafkaHubService.generate(clusterAlias, object.toJSONString(), brokerService.getBrokerIdList(clusterAlias));
+        return kafkaHubService.generate(clusterAlias, object.toString(), brokerService.getBrokerIdList(clusterAlias));
     }
 
     @Override
@@ -514,6 +514,6 @@ public class TopicServiceImpl implements TopicService {
             typeList.add(object);
             offset++;
         }
-        return typeList.toJSONString();
+        return typeList.toString();
     }
 }

@@ -99,8 +99,8 @@ public class KSqlParser {
                     topic = sqlFrom.toString();
                 } else {
                     SqlBasicCall sqlBasicCall = (SqlBasicCall) sqlFrom;
-                    if (sqlBasicCall.getKind() == SqlKind.AS && sqlBasicCall.operands.length > 0) {
-                        topic = sqlBasicCall.operands[0].toString();
+                    if (sqlBasicCall.getKind() == SqlKind.AS && sqlBasicCall.operandCount() > 0) {
+                        topic = sqlBasicCall.operand(0).toString();
                     }
                 }
                 ksql.setTopic(topic);
@@ -197,8 +197,8 @@ public class KSqlParser {
                 }
                 break;
             case UNION:
-                SqlNode unionLeft = ((SqlBasicCall) sqlNode).getOperands()[0];
-                SqlNode unionRight = ((SqlBasicCall) sqlNode).getOperands()[1];
+                SqlNode unionLeft = ((SqlBasicCall) sqlNode).operand(0);
+                SqlNode unionRight = ((SqlBasicCall) sqlNode).operand(1);
                 if (unionLeft.getKind() == SqlKind.IDENTIFIER) {
                     // reserved interface
                 } else {
@@ -235,7 +235,7 @@ public class KSqlParser {
                     if (sqlZNode instanceof SqlBasicCall) {
                         SqlBasicCall sqlBZNode = (SqlBasicCall) sqlZNode;
                         FieldSchemaStrategy field = new FieldSchemaStrategy();
-                        field.setKey(sqlBZNode.operands[0].toString());
+                        field.setKey(sqlBZNode.operand(0).toString());
                         field.setType(KConstants.KSQL.ORDER_BY);
                         field.setValue(sqlBZNode.getOperator().toString());
                         field.setJsonUdf(isJSON);

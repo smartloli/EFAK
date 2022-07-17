@@ -103,6 +103,7 @@ public class BrokerServiceImpl implements BrokerService {
     /**
      * Get search topic list numbers.
      */
+    @Override
     public long topicNumbers(String clusterAlias, String topic) {
         long count = 0L;
         List<String> topics = topicList(clusterAlias);
@@ -409,7 +410,7 @@ public class BrokerServiceImpl implements BrokerService {
             LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
             e.printStackTrace();
         }
-        return targets.toJSONString();
+        return targets.toString();
     }
 
     /**
