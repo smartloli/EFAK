@@ -42,8 +42,6 @@ $(document).ready(function () {
         return url;
     }
 
-    // <select id="select2consumertopic" name="select2consumertopic" tabindex="-1" style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
-
     function select2common(id, url, placeholder) {
         return $("#" + id).select2({
             placeholder: placeholder,

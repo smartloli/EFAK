@@ -325,29 +325,30 @@ public class AlarmController {
             obj.put("alarmTimes", alertConsumer.getAlarmTimes());
             obj.put("alarmMaxTimes", alertConsumer.getAlarmMaxTimes());
             if (alertConsumer.getAlarmLevel().equals("P0")) {
-                obj.put("alarmLevel", "<span class='badge badge-danger'>" + alertConsumer.getAlarmLevel() + "</span>");
+                obj.put("alarmLevel", "<span class='badge bg-light-danger text-danger'>" + alertConsumer.getAlarmLevel() + "</span>");
             } else if (alertConsumer.getAlarmLevel().equals("P1")) {
-                obj.put("alarmLevel", "<span class='badge badge-warning'>" + alertConsumer.getAlarmLevel() + "</span>");
+                obj.put("alarmLevel", "<span class='badge bg-light-warning text-warning'>" + alertConsumer.getAlarmLevel() + "</span>");
             } else if (alertConsumer.getAlarmLevel().equals("P2")) {
-                obj.put("alarmLevel", "<span class='badge badge-info'>" + alertConsumer.getAlarmLevel() + "</span>");
+                obj.put("alarmLevel", "<span class='badge bg-light-info text-info'>" + alertConsumer.getAlarmLevel() + "</span>");
             } else {
-                obj.put("alarmLevel", "<span class='badge badge-primary'>" + alertConsumer.getAlarmLevel() + "</span>");
+                obj.put("alarmLevel", "<span class='badge bg-light-primary text-primary'>" + alertConsumer.getAlarmLevel() + "</span>");
             }
             if (alertConsumer.getIsNormal().equals("Y")) {
-                obj.put("alarmIsNormal", "<span class='badge badge-success'>Y</span>");
+                obj.put("alarmIsNormal", "<span class='badge bg-light-success text-success'>Y</span>");
             } else {
-                obj.put("alarmIsNormal", "<span class='badge badge-danger'>N</span>");
+                obj.put("alarmIsNormal", "<span class='badge bg-light-danger text-danger'>N</span>");
             }
             if (alertConsumer.getIsEnable().equals("Y")) {
-                obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+                obj.put("alarmIsEnable", "<div class='form-check form-switch'><input class='form-check-input' name='is_enable_label' type='checkbox' val=" + id + " checked></div>");
             } else {
-                obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+                obj.put("alarmIsEnable", "<div class='form-check form-switch'><input class='form-check-input' name='is_enable_label' type='checkbox' val=" + id + "></div>");
             }
             obj.put("created", alertConsumer.getCreated());
             obj.put("modify", alertConsumer.getModify());
-            obj.put("operate",
-                    "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='alarm_consumer_modify' href='#"
-                            + id + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Modify</a><a class='dropdown-item' href='#" + id + "' name='alarm_consumer_remove'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Delete</a></div>");
+            obj.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                    "<a href='#" + id + "' name='alarm_consumer_modify'  class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Edit'><i class='bi bi-pencil-fill'></i></a>" +
+                    "<a href='#" + id + "' name='alarm_consumer_remove' class='text-danger' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Delete'><i class='bi bi-trash-fill'></i></a>" +
+                    "</div>");
             aaDatas.add(obj);
         }
 
