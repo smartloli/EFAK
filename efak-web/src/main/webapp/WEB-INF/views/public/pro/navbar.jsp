@@ -158,11 +158,11 @@
                     <div class="menu-title">System</div>
                 </a>
                 <ul>
-                    <li><a href="/system/user"><i class="bi bi-circle"></i>User</a>
+                    <li><a href="/system/user"><i class="bx bx-user"></i>User</a>
                     </li>
-                    <li><a href="/system/role"><i class="bi bi-circle"></i>Role</a>
+                    <li><a href="/system/role"><i class="bx bx-lock"></i>Role</a>
                     </li>
-                    <li><a href="/system/resource"><i class="bi bi-circle"></i>Resource</a>
+                    <li><a href="/system/resource"><i class="bx bx-file-find"></i>Resource</a>
                     </li>
                 </ul>
             </li>
