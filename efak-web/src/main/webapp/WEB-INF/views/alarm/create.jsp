@@ -3,154 +3,182 @@
 
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <jsp:include page="../public/plus/title.jsp">
-        <jsp:param value="Alarm" name="loader"/>
+    <!-- Required meta tags -->
+    <jsp:include page="../public/pro/title.jsp">
+        <jsp:param value="Create" name="loader"/>
     </jsp:include>
-    <jsp:include page="../public/plus/css.jsp">
+
+    <!-- Required common css -->
+    <jsp:include page="../public/pro/css.jsp">
+        <jsp:param value="plugins/notifications/lobibox.min.css" name="css"/>
         <jsp:param value="plugins/select2/select2.min.css" name="css"/>
+        <jsp:param value="plugins/select2/select2-bootstrap4.css" name="css"/>
     </jsp:include>
 </head>
 
 <body>
-<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
-<div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <jsp:include page="../public/plus/navbar.jsp"></jsp:include>
-    </div>
-    <div id="layoutSidenav_content">
-        <main>
-            <div class="container-fluid">
-                <h1 class="mt-4">AlarmCluster</h1>
-                <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item"><a href="#">AlarmCluster</a></li>
-                    <li class="breadcrumb-item active">Create</li>
-                </ol>
-                <div class="alert alert-info alert-dismissable">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <i class="fas fa-info-circle"></i> <strong>Set different alarm modes, such as DingDing, WeChat, Mail
-                    etc.</strong>
-                </div>
-                <!-- content body -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <i class="fas fa-server"></i> Mode Setting
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <form role="form" action="/alarm/create/form" method="post"
-                                              onsubmit="return contextAlarmAddFormValid();return false;">
-                                            <div class="form-group">
-                                                <label>Alarm Type (*)</label>
-                                                <select id="select2type" name="select2type" tabindex="-1"
-                                                        style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
-                                                <input id="ke_alarm_cluster_type" name="ke_alarm_cluster_type"
-                                                       type="hidden"/>
-                                                <label for="inputError" class="control-label text-danger">
-                                                    <i class="fa fa-info-circle"></i> Select the cluster type you need
-                                                    to alarm .
-                                                </label>
-                                            </div>
-                                            <div id="ke_alarm_server_div" class="form-group">
-                                                <label>Server (*)</label>
-                                                <textarea id="ke_server_alarm" name="ke_server_alarm"
-                                                          class="form-control" rows="3"
-                                                          placeholder="dn1:9092,dn2:9092,dn3:9092"></textarea>
-                                                <label for="inputError" class="control-label text-danger">
-                                                    <i class="fa fa-info-circle"></i> Such as
-                                                    kafka(dn1:9092,dn2:9092,dn3:9092) or
-                                                    zookeeper(dn1:2181,dn2:2181,dn3:2181) .
-                                                </label>
-                                            </div>
-                                            <div id="ke_alarm_topic_div" style="display: none" class="form-group">
-                                                <label>Topic (*)</label>
-                                                <textarea id="ke_topic_alarm" name="ke_topic_alarm" class="form-control"
-                                                          rows="3"></textarea>
-                                                <label for="inputError" class="control-label text-danger">
-                                                    <i class="fa fa-info-circle"></i> Write topic and capacity alarm
-                                                    value(unit is byte), such as
-                                                    {"topic":"ke_alarm_topic","capacity":1024}.
-                                                    The value of topic is supported by regular expressions, for example:
-                                                    "ab","abc","ab.d","ab5e" can match regular expressions "ab.*", "acc"
-                                                    cannot
-                                                </label>
-                                            </div>
-                                            <div id="ke_alarm_producer_div" style="display: none" class="form-group">
-                                                <label>Producer (*)</label>
-                                                <textarea id="ke_producer_alarm" name="ke_producer_alarm"
-                                                          class="form-control" rows="3"></textarea>
-                                                <label for="inputError" class="control-label text-danger">
-                                                    <i class="fa fa-info-circle"></i> Write topic and speed alarm
-                                                    value(unit is msg/min), such as
-                                                    {"topic":"ke_alarm_topic","speed":"10000,20000"}.
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Alarm Level (*)</label>
-                                                <select id="select2level" name="select2level" tabindex="-1"
-                                                        style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
-                                                <input id="ke_alarm_cluster_level" name="ke_alarm_cluster_level"
-                                                       type="hidden"/>
-                                                <label for="inputError" class="control-label text-danger">
-                                                    <i class="fa fa-info-circle"></i> Select the cluster level you need
-                                                    to alarm .
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Alarm Max Times (*)</label>
-                                                <select id="select2maxtimes" name="select2maxtimes" tabindex="-1"
-                                                        style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
-                                                <input id="ke_alarm_cluster_maxtimes" name="ke_alarm_cluster_maxtimes"
-                                                       type="hidden"/>
-                                                <label for="inputError" class="control-label text-danger">
-                                                    <i class="fa fa-info-circle"></i> Select the cluster alarm max times
-                                                    you need to alarm .
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Alarm Group (*)</label>
-                                                <select id="select2group" name="select2group" tabindex="-1"
-                                                        style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
-                                                <input id="ke_alarm_cluster_group" name="ke_alarm_cluster_group"
-                                                       type="hidden"/>
-                                                <label for="inputError" class="control-label text-danger">
-                                                    <i class="fa fa-info-circle"></i> Select the cluster alarm group you
-                                                    need to alarm .
-                                                </label>
-                                            </div>
-                                            <button type="submit" class="btn btn-success">Add</button>
-                                            <div id="alert_create_message" style="display: none"
-                                                 class="alert alert-danger">
-                                                <label>Oops! Please make some changes . (*) is required .</label>
-                                            </div>
-                                        </form>
-                                    </div>
+
+
+<!--start wrapper-->
+<div class="wrapper">
+
+    <!--start top header-->
+    <jsp:include page="../public/pro/navtop.jsp"></jsp:include>
+    <!--end top header-->
+
+    <!--start sidebar -->
+    <jsp:include page="../public/pro/navbar.jsp"></jsp:include>
+    <!--end sidebar -->
+
+    <!--start content-->
+    <main class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">AlarmCluster</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="/"><i class="bx bx-home-alt"></i></a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Create</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <!--end breadcrumb-->
+
+        <div class="row">
+            <div class="col-xl-6 mx-auto">
+
+                <div class="card">
+                    <form role="form" action="/alarm/create/form" method="post"
+                          onsubmit="return contextAlarmAddFormValid();return false;">
+                        <div class="card-body">
+                            <div class="border p-3 rounded">
+                                <h6 class="mb-0 text-uppercase">Configure Common Alert</h6>
+                                <hr/>
+                                <div class="col-12">
+                                    <label class="form-label">Alarm Type (*)</label>
+                                    <select id="select2type" name="select2type" tabindex="-1"
+                                            style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+                                    <input id="ke_alarm_cluster_type" name="ke_alarm_cluster_type" type="hidden"/>
+                                    <label for="inputError" class="control-label text-danger">
+                                        <i class="bx bx-info-circle"></i> Choice the common type you need to alarm .
+                                    </label>
                                 </div>
+                                <div id="ke_alarm_server_div" class="col-12">
+                                    <label class="form-label">Server (*)</label>
+                                    <textarea id="ke_server_alarm" name="ke_server_alarm"
+                                              class="form-control" rows="3"
+                                              placeholder="dn1:9092,dn2:9092,dn3:9092"></textarea>
+                                    <label for="inputError" class="control-label text-danger">
+                                        <i class="bx bx-info-circle"></i> Such as
+                                        kafka(dn1:9092,dn2:9092,dn3:9092) or
+                                        zookeeper(dn1:2181,dn2:2181,dn3:2181) .
+                                    </label>
+                                </div>
+                                <div id="ke_alarm_topic_div" style="display: none" class="col-12">
+                                    <label class="form-label">Topic (*)</label>
+                                    <textarea id="ke_topic_alarm" name="ke_topic_alarm"
+                                              class="form-control" rows="3"></textarea>
+                                    <label for="inputError" class="control-label text-danger">
+                                        <i class="bx bx-info-circle"></i> Write topic and capacity alarm
+                                        value(unit is byte), such as {"topic":"ke_alarm_topic","capacity":1024}.
+                                    </label>
+                                    <label for="inputError" class="control-label text-danger">
+                                        <i class="bx bx-info-circle"></i>
+                                        The value of topic is supported by regular expressions, for example:
+                                        "ab","abc","ab.d","ab5e" can match regular expressions "ab.*", "acc"
+                                        cannot .
+                                    </label>
+                                </div>
+                                <div id="ke_alarm_producer_div" style="display: none" class="col-12">
+                                    <label class="form-label">Producer (*)</label>
+                                    <textarea id="ke_producer_alarm" name="ke_producer_alarm"
+                                              class="form-control" rows="3"></textarea>
+                                    <label for="inputError" class="control-label text-danger">
+                                        <i class="bx bx-info-circle"></i> Write topic and speed alarm
+                                        value(unit is msg/min), such as
+                                        {"topic":"ke_alarm_topic","speed":"10000,20000"}.
+                                    </label>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Alarm Level (*)</label>
+                                    <select id="select2level" name="select2level" tabindex="-1"
+                                            style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+                                    <input id="ke_alarm_cluster_level" name="ke_alarm_cluster_level" type="hidden"/>
+                                    <label for="inputError" class="control-label text-danger">
+                                        <i class="bx bx-info-circle"></i> Choice the alarm level you need to alarm .
+                                    </label>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Alarm Max Times (*)</label>
+                                    <select id="select2maxtimes" name="select2maxtimes" tabindex="-1"
+                                            style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+                                    <input id="ke_alarm_cluster_maxtimes" name="ke_alarm_cluster_maxtimes"
+                                           type="hidden"/>
+                                    <label for="inputError" class="control-label text-danger">
+                                        <i class="bx bx-info-circle"></i> Choice the alarm max times you need to
+                                        alarm .
+                                    </label>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Alarm Group (*)</label>
+                                    <select id="select2group" name="select2group" tabindex="-1"
+                                            style="width: 100%; font-family: 'Microsoft Yahei', 'HelveticaNeue', Helvetica, Arial, sans-serif; font-size: 1px;"></select>
+                                    <input id="ke_alarm_cluster_group" name="ke_alarm_cluster_group"
+                                           type="hidden"/>
+                                    <label for="inputError" class="control-label text-danger">
+                                        <i class="bx bx-info-circle"></i> Choice the alarm alarm channel group you need
+                                        to
+                                        alarm .
+                                    </label>
+                                </div>
+                                <hr/>
+                                <button id="btn_send" type="submit" class="btn btn-primary">Save</button>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
-        </main>
-        <jsp:include page="../public/plus/footer.jsp"></jsp:include>
-    </div>
+        </div>
+        <!--end row-->
+    </main>
+    <!--end page main-->
+
+
+    <!--start overlay-->
+    <div class="overlay nav-toggle-icon"></div>
+    <!--end overlay-->
+
+    <!--Start Back To Top Button-->
+    <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+    <!--End Back To Top Button-->
+
 </div>
-</body>
-<jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="plugins/select2/select2.min_bak.js" name="loader"/>
-    <jsp:param value="main/alarm/create.js" name="loader"/>
+<!--end wrapper-->
+
+<!-- import js and plugins -->
+<jsp:include page="../public/pro/script.jsp">
+    <jsp:param value="plugins/notifications/lobibox.min.js" name="loader"/>
+    <jsp:param value="plugins/notifications/notifications.min.js" name="loader"/>
+    <jsp:param value="plugins/select2/select2.min.js" name="loader"/>
+    <jsp:param value="main/alarm/create.js?v=3.0.0" name="loader"/>
 </jsp:include>
+</body>
 <script type="text/javascript">
+    function errorNoti(errorMsg) {
+        console.log(errorMsg)
+        Lobibox.notify('error', {
+            pauseDelayOnHover: true,
+            continueDelayOnInactiveTab: false,
+            position: 'top right',
+            icon: 'bx bx-x-circle',
+            msg: errorMsg
+        });
+    }
+
     function contextAlarmAddFormValid() {
         var ke_alarm_cluster_type = $("#ke_alarm_cluster_type").val();
         var ke_server_alarm = $("#ke_server_alarm").val();
@@ -161,27 +189,33 @@
         var ke_alarm_cluster_maxtimes = $("#ke_alarm_cluster_maxtimes").val();
 
         if (ke_alarm_cluster_type.indexOf("Topic") > -1) {
-            if (ke_alarm_cluster_type.length == 0 || ke_topic_alarm.length == 0 || ke_alarm_cluster_level.length == 0 || ke_alarm_cluster_group.length == 0 || ke_alarm_cluster_maxtimes.length == 0) {
-                $("#alert_create_message").show();
-                setTimeout(function () {
-                    $("#alert_create_message").hide()
-                }, 3000);
+            if (ke_alarm_cluster_type.length == 0) {
+                errorNoti("Alarm common type cannot be empty.");
+                return false;
+            } else if (ke_topic_alarm.length == 0) {
+                errorNoti("Alarm consumer topic cannot be empty.");
+                return false;
+            } else if (ke_alarm_cluster_level.length == 0) {
+                errorNoti("Alarm level cannot be empty.");
+                return false;
+            } else if (ke_alarm_cluster_group.length == 0) {
+                errorNoti("Alarm channel group cannot be empty.");
+                return false;
+            } else if (ke_alarm_cluster_maxtimes.length == 0) {
+                errorNoti("Alarm maxtimes cannot be empty.");
                 return false;
             }
         } else if (ke_alarm_cluster_type.indexOf("Producer") > -1) {
-            if (ke_alarm_cluster_type.length == 0 || ke_producer_alarm.length == 0 || ke_alarm_cluster_level.length == 0 || ke_alarm_cluster_group.length == 0 || ke_alarm_cluster_maxtimes.length == 0) {
-                $("#alert_create_message").show();
-                setTimeout(function () {
-                    $("#alert_create_message").hide()
-                }, 3000);
+            if (ke_alarm_cluster_type.length == 0) {
+                errorNoti("Alarm common type cannot be empty.");
+                return false;
+            } else if (ke_producer_alarm.length == 0 || ke_alarm_cluster_level.length == 0 || ke_alarm_cluster_group.length == 0 || ke_alarm_cluster_maxtimes.length == 0) {
+                errorNoti("Alarm producer type cannot be empty.");
                 return false;
             }
         } else {
             if (ke_alarm_cluster_type.length == 0 || ke_server_alarm.length == 0 || ke_alarm_cluster_level.length == 0 || ke_alarm_cluster_group.length == 0 || ke_alarm_cluster_maxtimes.length == 0) {
-                $("#alert_create_message").show();
-                setTimeout(function () {
-                    $("#alert_create_message").hide()
-                }, 3000);
+                errorNoti("Alarm common server type cannot be empty.");
                 return false;
             }
         }

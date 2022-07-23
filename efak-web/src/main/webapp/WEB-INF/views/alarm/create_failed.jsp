@@ -1,44 +1,84 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
-    <jsp:include page="../public/plus/title.jsp">
+    <!-- Required meta tags -->
+    <jsp:include page="../public/pro/title.jsp">
         <jsp:param value="Failed" name="loader"/>
     </jsp:include>
-    <jsp:include page="../public/plus/css.jsp"></jsp:include>
+
+    <!-- Required common css -->
+    <jsp:include page="../public/pro/css.jsp"></jsp:include>
 </head>
 
 <body>
-<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
-<div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <jsp:include page="../public/plus/navbar.jsp"></jsp:include>
-    </div>
-    <div id="layoutSidenav_content">
-        <main>
-            <div class="container-fluid">
-                <h1 class="mt-4">AlarmCluster</h1>
-                <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item"><a href="#">AlarmCluster</a></li>
-                    <li class="breadcrumb-item active">Create</li>
-                </ol>
-                <div class="alert alert-danger alert-dismissable">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <i class="fa fa-info-circle"></i> <strong>${Alarm_Submit_Status}</strong> <a
-                        class="btn btn-large btn-primary" href="/alarm/create"> <span class="ui-button-text">Create Again</span>
-                </a>
+
+
+<!--start wrapper-->
+<div class="wrapper">
+
+    <!--start top header-->
+    <jsp:include page="../public/pro/navtop.jsp"></jsp:include>
+    <!--end top header-->
+
+    <!--start sidebar -->
+    <jsp:include page="../public/pro/navbar.jsp"></jsp:include>
+    <!--end sidebar -->
+
+    <!--start content-->
+    <main class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">AlarmCommon</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="/"><i class="bx bx-home-alt"></i></a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Failed</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <!--end breadcrumb-->
+
+        <div class="row">
+            <div class="container">
+                <div class="alert border-0 bg-light-danger alert-dismissible fade show py-2">
+                    <div class="d-flex align-items-center">
+                        <div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i>
+                        </div>
+                        <div class="ms-3">
+                            <div class="text-danger"><strong>${Alarm_Submit_Status}</strong>&nbsp;&nbsp;<a
+                                    class="btn btn-primary px-5 radius-30" href="/alarm/create"> <span
+                                    class="ui-button-text">Create Again</span></a></div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </div>
-        </main>
-        <jsp:include page="../public/plus/footer.jsp"></jsp:include>
-    </div>
+        </div>
+        <!--end row-->
+    </main>
+    <!--end page main-->
+
+
+    <!--start overlay-->
+    <div class="overlay nav-toggle-icon"></div>
+    <!--end overlay-->
+
+    <!--Start Back To Top Button-->
+    <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+    <!--End Back To Top Button-->
+
 </div>
-</body>
-<jsp:include page="../public/plus/script.jsp">
+<!--end wrapper-->
+
+<!-- import js -->
+<jsp:include page="../public/pro/script.jsp">
     <jsp:param value="main/topic/add.result.js" name="loader"/>
 </jsp:include>
+</body>
 </html>

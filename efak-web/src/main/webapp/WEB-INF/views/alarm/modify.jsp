@@ -219,18 +219,12 @@
         var ke_alarm_consumer_level = $("#ke_alarm_consumer_level").val();
 
         if (isNaN(ke_consumer_name_lag)) {
-            $("#alert_consumer_message_modify").show();
-            setTimeout(function () {
-                $("#alert_consumer_message_modify").hide()
-            }, 3000);
+            errorNoti("Alarm lag value edit cannot be empty.");
             return false;
         }
 
         if (ke_consumer_name_lag.length == 0 || ke_alarm_consumer_group.length == 0 || ke_alarm_consumer_maxtimes.length == 0 || ke_alarm_consumer_level.length == 0) {
-            $("#alert_consumer_message_modify").show();
-            setTimeout(function () {
-                $("#alert_consumer_message_modify").hide()
-            }, 3000);
+            errorNoti("Alarm consumer group edit cannot be empty.");
             return false;
         }
 

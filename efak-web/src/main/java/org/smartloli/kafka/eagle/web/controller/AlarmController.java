@@ -567,30 +567,31 @@ public class AlarmController {
             obj.put("alarmTimes", clustersInfo.getAlarmTimes());
             obj.put("alarmMaxTimes", clustersInfo.getAlarmMaxTimes());
             if (clustersInfo.getAlarmLevel().equals("P0")) {
-                obj.put("alarmLevel", "<span class='badge badge-danger'>" + clustersInfo.getAlarmLevel() + "</span>");
+                obj.put("alarmLevel", "<span class='badge bg-light-danger text-danger'>" + clustersInfo.getAlarmLevel() + "</span>");
             } else if (clustersInfo.getAlarmLevel().equals("P1")) {
-                obj.put("alarmLevel", "<span class='badge badge-warning'>" + clustersInfo.getAlarmLevel() + "</span>");
+                obj.put("alarmLevel", "<span class='badge bg-light-warning text-warning'>" + clustersInfo.getAlarmLevel() + "</span>");
             } else if (clustersInfo.getAlarmLevel().equals("P2")) {
-                obj.put("alarmLevel", "<span class='badge badge-info'>" + clustersInfo.getAlarmLevel() + "</span>");
+                obj.put("alarmLevel", "<span class='badge bg-light-info text-info'>" + clustersInfo.getAlarmLevel() + "</span>");
             } else {
-                obj.put("alarmLevel", "<span class='badge badge-primary'>" + clustersInfo.getAlarmLevel() + "</span>");
+                obj.put("alarmLevel", "<span class='badge bg-light-primary text-primary'>" + clustersInfo.getAlarmLevel() + "</span>");
             }
             if (clustersInfo.getIsNormal().equals("Y")) {
-                obj.put("alarmIsNormal", "<span class='badge badge-success'>Y</span>");
+                obj.put("alarmIsNormal", "<span class='badge bg-light-success text-success'>Y</span>");
             } else {
-                obj.put("alarmIsNormal", "<span class='badge badge-danger'>N</span>");
+                obj.put("alarmIsNormal", "<span class='badge bg-light-danger text-danger'>N</span>");
             }
             if (clustersInfo.getIsEnable().equals("Y")) {
-                obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' checked class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+                obj.put("alarmIsEnable", "<div class='form-check form-switch'><input class='form-check-input' name='is_enable_label' type='checkbox' val=" + id + " checked></div>");
             } else {
-                obj.put("alarmIsEnable", "<input type='checkbox' name='is_enable_chk' id='alarm_config_is_enable_" + id + "' class='chooseBtn' /><label id='is_enable_label_id' val=" + id + " name='is_enable_label' for='alarm_config_is_enable_" + id + "' class='choose-label'></label>");
+                obj.put("alarmIsEnable", "<div class='form-check form-switch'><input class='form-check-input' name='is_enable_label' type='checkbox' val=" + id + "></div>");
             }
             obj.put("created", clustersInfo.getCreated());
             obj.put("modify", clustersInfo.getModify());
-            obj.put("operate",
-                    "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='alarm_cluster_modify' href='#"
-                            + id + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + id
-                            + "' name='alarm_cluster_remove'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Delete</a></div>");
+            obj.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                    "<a href='#" + id + "' name='alarm_cluster_modify'  class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Edit'><i class='bi bi-pencil-fill'></i></a>" +
+                    "<a href='#" + id + "' name='alarm_cluster_remove' class='text-danger' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Delete'><i class='bi bi-trash-fill'></i></a>" +
+                    "</div>");
+
             aaDatas.add(obj);
         }
 
