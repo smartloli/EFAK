@@ -12,15 +12,12 @@
     <properties>
         <package.name>ke</package.name>
         <junit.version>4.11</junit.version>
-        <jdk.version>1.8</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>5.3.1</spring.version>
         <mybatis.version>3.5.6</mybatis.version>
         <mybatis.spring.version>2.0.6</mybatis.spring.version>
         <shiro.version>1.8.0</shiro.version>
         <jackson.version>2.10.0</jackson.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <repositories>
         <repository>
