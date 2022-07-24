@@ -101,7 +101,7 @@ public class ZKFactoryUtils {
         List<BrokersInfo> brokersInfos = BrokerCache.META_CACHE.get(clusterAlias);
         IntStream.range(0, brokersInfos.size()).filter(i ->
                 brokersInfos.get(i).getIds().equals(ids)).
-                boxed().findFirst().map(i -> brokersInfos.remove((int) i));
+            boxed().findFirst().map(i -> brokersInfos.remove((int) i));
     }
 
     private static void refreshKafkaMetaData(List<BrokersInfo> targets, Stat stat, String clusterAlias, String data, String ids) {
@@ -111,6 +111,7 @@ public class ZKFactoryUtils {
         if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
             String endpoints = JSON.parseObject(data).getString("endpoints");
             List<String> endpointsList = JSON.parseArray(endpoints, String.class);
+            String protocalMap = JSON.parseObject(data).getString("listener_security_protocol_map");
             String host = "";
             int port = 0;
             if (endpointsList.size() > 1) {
@@ -122,7 +123,12 @@ public class ZKFactoryUtils {
                     protocol = KConstants.Kafka.SSL;
                 }
                 for (String endpointsStr : endpointsList) {
-                    if (endpointsStr.contains(protocol)) {
+                    String endpointName = endpointsStr.split("://")[0];
+                    String realProtocol = "";
+                    if (!protocalMap.isEmpty()) {
+                        realProtocol = JSON.parseObject(protocalMap).getString(endpointName);
+                    }
+                    if (endpointName.equals(protocol) || realProtocol.equals(protocol)) {
                         String tmp = endpointsStr.split("//")[1];
                         host = tmp.split(":")[0];
                         port = Integer.parseInt(tmp.split(":")[1]);
