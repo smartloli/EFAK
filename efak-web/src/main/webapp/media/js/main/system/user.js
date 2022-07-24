@@ -44,12 +44,11 @@ $(document).ready(function () {
             url: '/system/user/signin/rtxno/ajax/',
             success: function (datas) {
                 $("#ke_rtxno_name").val(datas.rtxno);
-                // $("#ke_rtxno_name").attr("readonly", "readonly");
             }
         });
     });
 
-    $(document).on('click', 'a[name=operater_modify_modal]', function () {
+    $(document).on('click', 'a[name=ke_user_edit]', function () {
         $('#ke_user_modify_dialog').modal('show');
         var href = $(this).attr("href");
         var id = href.split("#")[1];
@@ -59,7 +58,6 @@ $(document).ready(function () {
             url: '/system/user/signin/' + id + '/ajax',
             success: function (datas) {
                 $("#ke_rtxno_name_modify").val(datas.rtxno);
-                $("#ke_rtxno_name_modify").attr("readonly", "readonly");
                 $("#ke_real_name_modify").val(datas.realname);
                 $("#ke_user_name_modify").val(datas.username);
                 $("#ke_user_email_modify").val(datas.email);
@@ -69,7 +67,7 @@ $(document).ready(function () {
 
     });
 
-    $(document).on('click', 'a[name=operater_reset_modal]', function () {
+    $(document).on('click', 'a[name=ke_user_reset]', function () {
         $('#ke_user_reset_dialog').modal('show');
         var href = $(this).attr("href");
         var id = href.split("#")[1];
@@ -84,10 +82,10 @@ $(document).ready(function () {
     });
 
     var id = "";
-    $(document).on('click', 'a[name=operater_modal]', function () {
+    $(document).on('click', 'a[name=ke_user_assign]', function () {
         var href = $(this).attr("href");
         id = href.split("#")[1];
-        $('#ke_setting_dialog').modal('show');
+        $('#ke_user_assign_dialog').modal('show');
         $.ajax({
             type: 'get',
             dataType: 'json',
@@ -131,16 +129,16 @@ $(document).ready(function () {
             url: url,
             success: function (datas) {
                 if (datas != null) {
-                    $("#alert_mssage_info").html("");
-                    $("#alert_mssage_info").append("<label>" + datas.info + "</label>")
-                    $("#alert_mssage_info").show();
+                    $("#ke_user_assign_result").html("");
+                    $("#ke_user_assign_result").append("<label>" + datas.info + "</label>")
+                    $("#ke_user_assign_result").show();
                     if (datas.code > 0) {
-                        $("#alert_mssage_info").addClass("alert alert-success");
+                        $("#ke_user_assign_result").addClass("alert alert-success");
                     } else {
-                        $("#alert_mssage_info").addClass("alert alert-danger");
+                        $("#ke_user_assign_result").addClass("alert alert-danger");
                     }
                     setTimeout(function () {
-                        $("#alert_mssage_info").hide()
+                        $("#ke_user_assign_result").hide()
                     }, 3000);
                 }
             }

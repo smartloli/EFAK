@@ -61,7 +61,6 @@
         </div>
         <!--end row-->
         <!-- content body -->
-        <!-- kafka table list -->
         <h6 class="mb-0 text-uppercase">System User Manager
             <div style="float: right!important;margin-top: -9px;">
                 <button id="ke-add-user-btn" type="button"
@@ -89,7 +88,7 @@
             </div>
         </div>
 
-        <!-- add connectors plugins modal -->
+        <!-- add user modal -->
         <div class="modal fade" id="ke_user_add_dialog" tabindex="-1" aria-labelledby="keModalLabel"
              aria-hidden="true">
             <div class="modal-dialog">
@@ -132,43 +131,42 @@
             </div>
         </div>
 
-        <!-- delete connector -->
-        <div class="modal fade" id="ke_connect_config_delete" tabindex="-1" aria-labelledby="keModalLabel"
+        <!-- edit user profile -->
+        <div class="modal fade" id="ke_user_modify_dialog" tabindex="-1" aria-labelledby="keModalLabel"
              aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="keModalLabel">Delete Connector</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div id="ke_connect_config_remove_content" class="modal-body"></div>
-                    <div id="ke_connect_config_footer" class="modal-footer">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- edit connector -->
-        <div class="modal fade" id="ke_connect_uri_modify_dialog" tabindex="-1" aria-labelledby="keModalLabel"
-             aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="keModalLabel">Edit Connector URI</h5>
+                        <h5 class="modal-title" id="keModalLabel">Edit User Profile</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form role="form" action="/connect/uri/modify/" method="post"
+                        <form role="form" action="/system/user/modify/" method="post"
                               onsubmit="return contextModifyFormValid();return false;">
-                            <div class="input-group mb-3"><span class="input-group-text">URI</span>
-                                <input id="ke_connect_uri_name_modify" name="ke_connect_uri_name_modify" type="text"
-                                       class="form-control" placeholder="http://127.0.0.1:8083/" aria-label=""
+                            <div class="input-group mb-3"><span class="input-group-text">ID</span>
+                                <input id="ke_rtxno_name_modify" name="ke_rtxno_name_modify" type="text"
+                                       class="form-control" readonly aria-label=""
                                        aria-describedby="">
-                                <input id="ke_connect_uri_id_modify" name="ke_connect_uri_id_modify"
+                                <input id="ke_user_id_modify" name="ke_user_id_modify"
                                        type="hidden">
                             </div>
+                            <div class="input-group mb-3"><span class="input-group-text">RealName</span>
+                                <input id="ke_real_name_modify" name="ke_real_name_modify" type="text"
+                                       class="form-control" aria-label=""
+                                       aria-describedby="">
+                            </div>
+                            <div class="input-group mb-3"><span class="input-group-text">UserName</span>
+                                <input id="ke_user_name_modify" name="ke_user_name_modify" type="text"
+                                       class="form-control" aria-label=""
+                                       aria-describedby="">
+                            </div>
+                            <div class="input-group mb-3"><span class="input-group-text">Email</span>
+                                <input id="ke_user_email_modify" name="ke_user_email_modify" type="text"
+                                       class="form-control" aria-label=""
+                                       aria-describedby="">
+                            </div>
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary" id="create-add">Submit
+                                <button type="submit" class="btn btn-primary">Submit
                                 </button>
                             </div>
                         </form>
@@ -177,19 +175,56 @@
             </div>
         </div>
 
-        <!-- connector detail -->
-        <div class="modal fade" id="ke_connectors_detail" tabindex="-1" aria-labelledby="keModalLabel"
+        <!-- reset password -->
+        <div class="modal fade" id="ke_user_reset_dialog" tabindex="-1" aria-labelledby="keModalLabel"
              aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="keModalLabel">Detail Connector</h5>
+                        <h5 class="modal-title" id="keModalLabel">Reset User Password</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div id="ke_connectors_detail_children" class="modal-body"></div>
+                    <div class="modal-body">
+                        <form role="form" action="/system/user/reset/" method="post"
+                              onsubmit="return contextResetFormValid();return false;">
+                            <div class="input-group mb-3"><span class="input-group-text"><i
+                                    class="bx bx-lock"></i></span>
+                                <input id="ke_user_new_pwd_reset" name="ke_user_new_pwd_reset" type="text"
+                                       class="form-control" placeholder="Enter Your New Password" aria-label=""
+                                       aria-describedby="">
+                                <input id="ke_user_rtxno_reset" name="ke_user_rtxno_reset" type="hidden"
+                                       class="form-control">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Submit
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- assign user role -->
+        <div class="modal fade" id="ke_user_assign_dialog" tabindex="-1" aria-labelledby="keModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">Assign User Role</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="ke_role_list"></div>
+                        <div id="ke_user_assign_result"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
     <!--end page main-->
 
@@ -244,20 +279,12 @@
         var ke_user_email_modify = $("#ke_user_email_modify").val();
 
         if (ke_real_name_modify == "Administrator" || ke_user_name_modify == "admin") {
-            $("#alert_mssage_modify").show();
-            $("#alert_mssage_modify_label").text("Oops! Administrator or admin is not available.");
-            setTimeout(function () {
-                $("#alert_mssage_modify").hide()
-            }, 3000);
+            errorNoti("Oops! Administrator or admin is not available.");
             return false;
         }
 
         if (ke_rtxno_name_modify.length == 0 || ke_real_name_modify.length == 0 || ke_user_name_modify.length == 0 || ke_user_email_modify.length == 0) {
-            $("#alert_mssage_modify").show();
-            $("#alert_mssage_modify_label").text("Oops! Please enter the complete information.");
-            setTimeout(function () {
-                $("#alert_mssage_modify").hide()
-            }, 3000);
+            errorNoti("Edit user information cannot be empty.");
             return false;
         }
 
@@ -268,11 +295,7 @@
         var ke_user_new_pwd_reset = $("#ke_user_new_pwd_reset").val();
         var userResetRegular = /[\u4E00-\u9FA5]/;
         if (ke_user_new_pwd_reset.length == 0 || userResetRegular.test(ke_user_new_pwd_reset)) {
-            $("#alert_mssage_reset").show();
-            $("#alert_mssage_reset_label").text("Passwords can only be number and letters or special symbols .");
-            setTimeout(function () {
-                $("#alert_mssage_reset").hide()
-            }, 3000);
+            errorNoti("Password can only be number and letters or special symbols.");
             return false;
         }
 
