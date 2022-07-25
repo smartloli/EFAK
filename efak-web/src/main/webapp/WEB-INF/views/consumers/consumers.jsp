@@ -140,7 +140,7 @@
 </div>
 </body>
 <jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="plugins/echart/echarts.min.js" name="loader"/>
+    <jsp:param value="plugins/echart/echarts.min_bak.js" name="loader"/>
     <jsp:param value="main/consumer/consumers.js?v=1.4.5" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/plus/tscript.jsp"></jsp:include>

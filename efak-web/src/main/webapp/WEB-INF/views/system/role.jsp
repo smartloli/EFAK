@@ -11,7 +11,6 @@
 
     <!-- Required common css -->
     <jsp:include page="../public/pro/css.jsp">
-        <jsp:param value="plugins/notifications/lobibox.min.css" name="css"/>
         <jsp:param value="plugins/treeview/ke-btreeview.min.css" name="css"/>
         <jsp:param value="plugins/treeview/bootstrap-treeview.min.css" name="css"/>
     </jsp:include>
@@ -118,71 +117,9 @@
 
 <!-- import js -->
 <jsp:include page="../public/pro/script.jsp">
-    <jsp:param value="plugins/notifications/lobibox.min.js" name="loader"/>
-    <jsp:param value="plugins/notifications/notifications.min.js" name="loader"/>
     <jsp:param value="plugins/treeview/bootstrap-treeview.min.js" name="loader"/>
     <jsp:param value="main/system/role.js?v=3.0.0" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/pro/tscript.jsp"></jsp:include>
-<script type="text/javascript">
-
-    function errorNoti(errorMsg) {
-        console.log(errorMsg)
-        Lobibox.notify('error', {
-            pauseDelayOnHover: true,
-            continueDelayOnInactiveTab: false,
-            position: 'top right',
-            icon: 'bx bx-x-circle',
-            msg: errorMsg
-        });
-    }
-
-    function contextFormValid() {
-        var ke_rtxno_name = $("#ke_rtxno_name").val();
-        var ke_real_name = $("#ke_real_name").val();
-        var ke_user_name = $("#ke_user_name").val();
-        var ke_user_email = $("#ke_user_email").val();
-        if (ke_real_name == "Administrator" || ke_user_name == "admin") {
-            errorNoti("Oops! Administrator or admin is not available.");
-            return false;
-        }
-        if (ke_rtxno_name.length == 0 || ke_real_name.length == 0 || ke_user_name.length == 0 || ke_user_email.length == 0) {
-            errorNoti("Add user information cannot be empty.");
-            return false;
-        }
-
-        return true;
-    }
-
-    function contextModifyFormValid() {
-        var ke_rtxno_name_modify = $("#ke_rtxno_name_modify").val();
-        var ke_real_name_modify = $("#ke_real_name_modify").val();
-        var ke_user_name_modify = $("#ke_user_name_modify").val();
-        var ke_user_email_modify = $("#ke_user_email_modify").val();
-
-        if (ke_real_name_modify == "Administrator" || ke_user_name_modify == "admin") {
-            errorNoti("Oops! Administrator or admin is not available.");
-            return false;
-        }
-
-        if (ke_rtxno_name_modify.length == 0 || ke_real_name_modify.length == 0 || ke_user_name_modify.length == 0 || ke_user_email_modify.length == 0) {
-            errorNoti("Edit user information cannot be empty.");
-            return false;
-        }
-
-        return true;
-    }
-
-    function contextResetFormValid() {
-        var ke_user_new_pwd_reset = $("#ke_user_new_pwd_reset").val();
-        var userResetRegular = /[\u4E00-\u9FA5]/;
-        if (ke_user_new_pwd_reset.length == 0 || userResetRegular.test(ke_user_new_pwd_reset)) {
-            errorNoti("Password can only be number and letters or special symbols.");
-            return false;
-        }
-
-        return true;
-    }
-</script>
 </body>
 </html>
