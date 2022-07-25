@@ -215,7 +215,7 @@
 <jsp:include page="../public/pro/script.jsp">
     <jsp:param value="plugins/notifications/lobibox.min.js" name="loader"/>
     <jsp:param value="plugins/notifications/notifications.min.js" name="loader"/>
-    <jsp:param value="plugins/echart/echarts.min.js" name="loader"/>
+    <jsp:param value="plugins/echart/echarts.min.js?v=3.0.0" name="loader"/>
     <jsp:param value="main/system/resource.js?v=3.0.0" name="loader"/>
 </jsp:include>
 <jsp:include page="../public/pro/tscript.jsp"></jsp:include>
