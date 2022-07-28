@@ -280,7 +280,7 @@
     </delete>
 
     <delete id="cleanBScreenConsumerTopic" parameterType="int">
-        delete from ke_consumer_bscreen where tm&lt;=#{tm}
+        delete from ke_consumer_bscreen_press where tm&lt;=#{tm}
     </delete>
 
     <select id="getBScreenTotalRecords" parameterType="map" resultType="long">
@@ -299,7 +299,7 @@
     <!-- BScreen Topic -->
     <insert id="writeBSreenConsumerTopic" parameterType="java.util.List">
         insert into
-        ke_consumer_bscreen(`cluster`,`group`,`topic`,`logsize`,`difflogsize`,`offsets`,`diffoffsets`,`lag`,`timespan`,`tm`)
+        ke_consumer_bscreen_press(`cluster`,`group`,`topic`,`logsize`,`difflogsize`,`offsets`,`diffoffsets`,`lag`,`timespan`,`tm`)
         values
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.cluster},#{item.group},#{item.topic},#{item.logsize},#{item.difflogsize},#{item.offsets},#{item.diffoffsets},#{item.lag},#{item.timespan},#{item.tm})
@@ -307,7 +307,8 @@
     </insert>
 
     <select id="readBScreenLastTopic" parameterType="map" resultMap="bsconsumer">
-        select `cluster`,`group`,`topic`,`logsize`,`difflogsize`,`offsets`,`diffoffsets`,`lag` from ke_consumer_bscreen
+        select `cluster`,`group`,`topic`,`logsize`,`difflogsize`,`offsets`,`diffoffsets`,`lag` from
+        ke_consumer_bscreen_press
         where `cluster` =#{cluster} and
         `group`=#{group} and
         `topic`=#{topic}
@@ -315,18 +316,19 @@
     </select>
 
     <select id="queryConsumerHistoryBar" parameterType="map" resultMap="bsbar">
-        select tm,sum(diffoffsets) as total from ke_consumer_bscreen where cluster=#{cluster} and tm between #{stime}
+        select tm,sum(diffoffsets) as total from ke_consumer_bscreen_press where cluster=#{cluster} and tm between
+        #{stime}
         and #{etime} group by tm
     </select>
 
     <select id="queryTodayBScreenConsumer" parameterType="map" resultMap="bsconsumer">
-        select `difflogsize`,`diffoffsets`,`lag`,`timespan` from ke_consumer_bscreen
+        select `difflogsize`,`diffoffsets`,`lag`,`timespan` from ke_consumer_bscreen_press
         where `cluster`=#{cluster} and tm=#{tday}
     </select>
 
     <select id="queryLastestLag" parameterType="map" resultType="long">
         select ifnull((
-        select ifnull(`lag`,0) from ke_consumer_bscreen
+        select ifnull(`lag`,0) from ke_consumer_bscreen_press
         where `cluster`=#{cluster} and tm=#{tday}
         and `group`=#{group} and `topic`=#{topic}
         order by `timespan` desc

@@ -17,10 +17,15 @@
  */
 package org.smartloli.kafka.eagle.core.task.shard;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.constant.ThreadConstants;
 import org.smartloli.kafka.eagle.common.util.NetUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.common.util.WorkUtils;
+import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.task.strategy.WorkNodeStrategy;
 
 import java.util.ArrayList;
@@ -33,9 +38,86 @@ import java.util.Map;
  *
  * @author smartloli.
  * <p>
- * Created by Dec 11, 2021
+ * Created by Jul 28, 2022
  */
 public class ScheduleShardStrategy {
+
+    private final static KafkaService kafkaService = new KafkaFactory().create();
+
+    public static JSONArray getScheduleShardSuperTask() {
+        List<String> hosts = WorkUtils.getWorkNodes();
+        int port = SystemConfigUtils.getIntProperty("efak.worknode.port");
+        List<WorkNodeStrategy> nodes = new ArrayList<>();
+        for (String host : hosts) {
+            if (NetUtils.telnet(host, port)) {
+                WorkNodeStrategy wns = new WorkNodeStrategy();
+                wns.setPort(port);
+                wns.setHost(host);
+                String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+                if (!masterHost.equals(host)) {
+                    nodes.add(wns);
+                }
+            }
+        }
+
+        Map<String, JSONArray> taskShardMaps = new HashMap<>();
+        String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
+        for (String clusterAlias : clusterAliass) {
+            JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+            taskShardMaps.put(clusterAlias, consumerGroups);
+        }
+
+        JSONArray vipTasks = new JSONArray();
+        // split vip
+        for (Map.Entry<String, Integer> entry : ThreadConstants.SUB_TASK_MAP.entrySet()) {
+            // vip3
+            if (entry.getValue() == ThreadConstants.WEIGHT_VIP3) {
+                JSONObject vipTask = new JSONObject();
+                vipTask.put("thread", entry.getKey());
+                vipTask.put("vip", ThreadConstants.WEIGHT_VIP3);
+                Map<String, Map<String, JSONArray>> subShardClusters = new HashMap<>();
+                for (Map.Entry<String, JSONArray> entryShard : taskShardMaps.entrySet()) {
+                    Map<String, JSONArray> subShardMaps = new HashMap<>();
+                    String cluster = entryShard.getKey();
+                    JSONArray consumerGroupShard = entryShard.getValue();
+                    if (nodes.size() > 0 && consumerGroupShard != null) {
+                        int balanceNum = (consumerGroupShard.size() / nodes.size()) + 1;
+                        JSONArray tmpConsumerGroup = new JSONArray();
+                        int consumerGroupIndex = 0;
+                        int nodeIndex = 0;
+                        for (Object consumerGroup : consumerGroupShard) {
+                            consumerGroupIndex++;
+                            JSONObject object = (JSONObject) consumerGroup;
+                            if (tmpConsumerGroup.size() <= balanceNum) {
+                                tmpConsumerGroup.add(object);
+                                // final result dataset
+                                if (consumerGroupIndex == consumerGroupShard.size()) {
+                                    JSONArray result = tmpConsumerGroup;
+                                    subShardMaps.put(nodes.get(nodeIndex).getHost(), result);
+                                    nodeIndex = 0;
+                                    tmpConsumerGroup.clear();
+                                }
+                            } else {
+                                JSONArray result = tmpConsumerGroup;
+                                subShardMaps.put(nodes.get(nodeIndex).getHost(), result);
+                                nodeIndex++;
+                                tmpConsumerGroup.clear();
+                            }
+                        }
+                    }
+
+                    // return result target
+                    if (subShardMaps.size() > 0) {
+                        subShardClusters.put(cluster, subShardMaps);
+                        vipTask.put("task", subShardClusters);
+                    }
+                }
+                vipTasks.add(vipTask);
+            }
+        }
+
+        return vipTasks;
+    }
 
     public static Map<String, List<String>> getScheduleShardTask() {
         List<String> hosts = WorkUtils.getWorkNodes();
@@ -53,16 +135,17 @@ public class ScheduleShardStrategy {
             }
         }
 
-        int threadTaskSize = ThreadConstants.SUB_TASK_MAP.size();
         Map<String, List<String>> strategyMaps = new HashMap<>();
         List<String> vip1Task = new ArrayList<>();
         List<String> vip2Task = new ArrayList<>();
 
         // split vip
         for (Map.Entry<String, Integer> entry : ThreadConstants.SUB_TASK_MAP.entrySet()) {
-            if (entry.getValue() == ThreadConstants.WEIGHT_VIP1) { // vip1
+            if (entry.getValue() == ThreadConstants.WEIGHT_VIP1) {
+                // vip1
                 vip1Task.add(entry.getKey());
-            } else { // vip2
+            } else if (entry.getValue() == ThreadConstants.WEIGHT_VIP2) {
+                // vip2
                 vip2Task.add(entry.getKey());
             }
         }
@@ -97,9 +180,7 @@ public class ScheduleShardStrategy {
                     }
                 }
             }
-
         }
-
         return strategyMaps;
     }
 }

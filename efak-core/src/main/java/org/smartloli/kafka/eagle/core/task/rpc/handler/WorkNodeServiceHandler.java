@@ -135,7 +135,7 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
             Map<String, List<String>> shardTasks = ScheduleShardStrategy.getScheduleShardTask();
             LoggerUtils.print(this.getClass()).info("All shard task strategy, result: " + JSON.toJSONString(shardTasks));
             if (shardTasks.containsKey(this.key)) {
-                result = JSON.toJSONString(ScheduleShardStrategy.getScheduleShardTask().get(this.key));
+                result = JSON.toJSONString(shardTasks.get(this.key));
             }
             LoggerUtils.print(this.getClass()).info("Spent time [" + (System.currentTimeMillis() - stime) + "]ms, worknode[" + this.key + "] get task: " + result);
         }

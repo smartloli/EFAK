@@ -120,7 +120,7 @@ public class KConstants {
         public static final String MODE_MASTER = "master";
         public static final String MODE_SLAVE = "slave";
         public static final String MODE_STANDALONE = "standalone";
-        public static final int THREAD_SLEEP_TIME_SEED = 1000;
+        public static final int THREAD_SLEEP_TIME_SEED = 3000;
     }
 
     /**

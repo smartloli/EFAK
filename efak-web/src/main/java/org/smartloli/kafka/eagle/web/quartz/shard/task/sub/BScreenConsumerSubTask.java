@@ -45,12 +45,10 @@ import java.util.Map.Entry;
  *
  * @author smartloli.
  * <p>
- * Created by Jan 15, 2019
+ * Created by Jul 26, 2022
  * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
-public class MetricsConsumerSubTask extends Thread {
+public class BScreenConsumerSubTask extends Thread {
 
     /**
      * Kafka service interface.
@@ -98,25 +96,7 @@ public class MetricsConsumerSubTask extends Thread {
         List<ConsumerGroupsInfo> consumerGroupTopics = new ArrayList<>();
         String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
         for (String clusterAlias : clusterAliass) {
-
-            // get all consumer summary from database
-            Map<String, Object> paramsSummary = new HashMap<>();
-            paramsSummary.put("cluster", clusterAlias);
-            List<ConsumerSummaryInfo> allConsumerSummary = metricsServiceImpl.getAllConsumerSummary(paramsSummary);
-
-            // get all consumer group from database
-            Map<String, Object> paramsGroup = new HashMap<>();
-            paramsGroup.put("cluster", clusterAlias);
-            List<ConsumerGroupsInfo> allConsumerGroups = metricsServiceImpl.getAllConsumerGroups(paramsGroup);
-
             JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
-
-            // clean offline consumer summary
-            cleanUnExistKafkaConsumerSummary(clusterAlias, allConsumerSummary, consumerGroups, metricsServiceImpl);
-
-            // clean offline consumer group
-            cleanUnExistKafkaConsumerGroup(clusterAlias, allConsumerGroups, consumerGroups, metricsServiceImpl);
-
             for (Object object : consumerGroups) {
                 JSONObject consumerGroup = (JSONObject) object;
                 String group = consumerGroup.getString("group");

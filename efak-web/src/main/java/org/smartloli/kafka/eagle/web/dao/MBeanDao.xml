@@ -106,14 +106,14 @@
     </select>
 
     <select id="getConsumerRateTopic" parameterType="map" resultMap="topicOffsets">
-        select logsize,offsets,timespan from ke_consumer_bscreen
+        select logsize,offsets,timespan from ke_consumer_bscreen_press
         where `cluster`=#{cluster} and `group`=#{group}
         and `topic`=#{topic} order by `timespan` desc limit 2
     </select>
 
     <select id="getConsumerOffsetsTopic" parameterType="map" resultMap="topicConsumerOffsets">
         select `difflogsize`,`diffoffsets`,`lag`,`timespan`
-        from ke_consumer_bscreen
+        from ke_consumer_bscreen_press
         where `cluster`=#{cluster} and `group`=#{group} and `topic`=#{topic}
         and tm between #{stime} and #{etime}
     </select>
