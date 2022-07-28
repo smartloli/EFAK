@@ -44,7 +44,8 @@ public class ScheduleShardStrategy {
 
     private final static KafkaService kafkaService = new KafkaFactory().create();
 
-    public static JSONArray getScheduleShardSuperTask() {
+    public static Map<String, String> getScheduleShardSuperTask(String cluster) {
+        Map<String, String> subShardMaps = new HashMap<>();
         List<String> hosts = WorkUtils.getWorkNodes();
         int port = SystemConfigUtils.getIntProperty("efak.worknode.port");
         List<WorkNodeStrategy> nodes = new ArrayList<>();
@@ -60,63 +61,37 @@ public class ScheduleShardStrategy {
             }
         }
 
-        Map<String, JSONArray> taskShardMaps = new HashMap<>();
-        String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
-        for (String clusterAlias : clusterAliass) {
-            JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
-            taskShardMaps.put(clusterAlias, consumerGroups);
-        }
+        JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(cluster));
 
-        JSONArray vipTasks = new JSONArray();
-        // split vip
-        for (Map.Entry<String, Integer> entry : ThreadConstants.SUB_TASK_MAP.entrySet()) {
-            // vip3
-            if (entry.getValue() == ThreadConstants.WEIGHT_VIP3) {
-                JSONObject vipTask = new JSONObject();
-                vipTask.put("thread", entry.getKey());
-                vipTask.put("vip", ThreadConstants.WEIGHT_VIP3);
-                Map<String, Map<String, JSONArray>> subShardClusters = new HashMap<>();
-                for (Map.Entry<String, JSONArray> entryShard : taskShardMaps.entrySet()) {
-                    Map<String, JSONArray> subShardMaps = new HashMap<>();
-                    String cluster = entryShard.getKey();
-                    JSONArray consumerGroupShard = entryShard.getValue();
-                    if (nodes.size() > 0 && consumerGroupShard != null) {
-                        int balanceNum = (consumerGroupShard.size() / nodes.size()) + 1;
-                        JSONArray tmpConsumerGroup = new JSONArray();
-                        int consumerGroupIndex = 0;
-                        int nodeIndex = 0;
-                        for (Object consumerGroup : consumerGroupShard) {
-                            consumerGroupIndex++;
-                            JSONObject object = (JSONObject) consumerGroup;
-                            if (tmpConsumerGroup.size() <= balanceNum) {
-                                tmpConsumerGroup.add(object);
-                                // final result dataset
-                                if (consumerGroupIndex == consumerGroupShard.size()) {
-                                    JSONArray result = tmpConsumerGroup;
-                                    subShardMaps.put(nodes.get(nodeIndex).getHost(), result);
-                                    nodeIndex = 0;
-                                    tmpConsumerGroup.clear();
-                                }
-                            } else {
-                                JSONArray result = tmpConsumerGroup;
-                                subShardMaps.put(nodes.get(nodeIndex).getHost(), result);
-                                nodeIndex++;
-                                tmpConsumerGroup.clear();
-                            }
-                        }
+        JSONArray consumerGroupShard = consumerGroups;
+        if (nodes.size() > 0 && consumerGroupShard != null) {
+            int balanceNum = (consumerGroupShard.size() / nodes.size()) + 1;
+            JSONArray tmpConsumerGroup = new JSONArray();
+            int consumerGroupIndex = 0;
+            int nodeIndex = 0;
+            for (Object consumerGroup : consumerGroupShard) {
+                consumerGroupIndex++;
+                JSONObject object = (JSONObject) consumerGroup;
+                if (tmpConsumerGroup.size() <= balanceNum) {
+                    tmpConsumerGroup.add(object);
+                    if (tmpConsumerGroup.size() == balanceNum) {
+                        subShardMaps.put(nodes.get(nodeIndex).getHost(), tmpConsumerGroup.toString());
+                        nodeIndex++;
+                        tmpConsumerGroup.clear();
                     }
 
-                    // return result target
-                    if (subShardMaps.size() > 0) {
-                        subShardClusters.put(cluster, subShardMaps);
-                        vipTask.put("task", subShardClusters);
+                    // final result dataset
+                    if (consumerGroupIndex == consumerGroupShard.size()) {
+                        subShardMaps.put(nodes.get(nodeIndex).getHost(), tmpConsumerGroup.toString());
+                        nodeIndex = 0;
+                        tmpConsumerGroup.clear();
                     }
                 }
-                vipTasks.add(vipTask);
             }
+
         }
 
-        return vipTasks;
+        return subShardMaps;
     }
 
     public static Map<String, List<String>> getScheduleShardTask() {

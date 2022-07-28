@@ -17,10 +17,9 @@
  */
 package org.smartloli.kafka.eagle.ipc;
 
-import org.smartloli.kafka.eagle.core.task.metrics.WorkNodeMetrics;
+import com.alibaba.fastjson.JSONArray;
+import org.smartloli.kafka.eagle.common.util.KafkaCacheUtils;
 import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
-
-import java.util.List;
 
 /**
  * Test JobClient
@@ -31,7 +30,11 @@ import java.util.List;
  */
 public class TestJobClient {
     public static void main(String[] args) {
-        List<WorkNodeMetrics> wns = JobClient.getWorkNodeMetrics("cluster1");
-        System.out.println(wns.toString());
+        // List<WorkNodeMetrics> wns = JobClient.getWorkNodeMetrics("cluster1");
+        // System.out.println(wns.toString());
+        KafkaCacheUtils.initKafkaMetaData();
+        JSONArray array = JobClient.getWorkNodeShardSuperTask("cluster1");
+        System.out.println(array);
+//        System.out.println("Result: " + ScheduleShardStrategy.getScheduleShardSuperTask("cluster1"));
     }
 }

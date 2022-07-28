@@ -53,4 +53,6 @@ public class ThreadConstants {
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.ZookeeperClusterSubTask", WEIGHT_VIP2);
         }
     };
+
+    public static String SUPER_VIP_SUB_TASK = "org.smartloli.kafka.eagle.web.quartz.shard.task.sub.BScreenConsumerSubTask";
 }

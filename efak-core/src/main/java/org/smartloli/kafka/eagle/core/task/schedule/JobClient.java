@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.google.gson.Gson;
+import org.smartloli.kafka.eagle.common.constant.ThreadConstants;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
@@ -105,6 +106,27 @@ public class JobClient {
 
     private static boolean validForTopic(String clusterAlias, String topic) {
         return brokerService.findKafkaTopic(clusterAlias, topic);
+    }
+
+    public static JSONArray getWorkNodeShardSuperTask(String cluster) {
+        String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+        int port = SystemConfigUtils.getIntProperty("efak.worknode.port");
+        JSONObject object = new JSONObject();
+        object.put(KConstants.Protocol.KEY, KConstants.Protocol.SHARD_TASK);
+        object.put(KConstants.Protocol.KEY_BY_IP, NetUtils.ip());
+        object.put(KConstants.Protocol.KEY_BY_IP_VIP, ThreadConstants.WEIGHT_VIP3);
+        object.put(KConstants.Protocol.KEY_BY_IP_VIP_CLUSTER, cluster);
+        List<JSONArray> results = new ArrayList<>();
+        try {
+            String resultStr = MasterNodeClient.getResult(masterHost, port, object);
+            if (StrUtils.isNull(resultStr)) {
+                return null;
+            }
+            return JSON.parseArray(resultStr);
+        } catch (Exception e) {
+            LoggerUtils.print(JobClient.class).error("Get worknode shard task has error, msg is ", e);
+        }
+        return null;
     }
 
     public static List<String> getWorkNodeShardTask() {

@@ -33,6 +33,7 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
+import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.ConsumerServiceImpl;
 import org.smartloli.kafka.eagle.web.service.impl.MetricsServiceImpl;
@@ -96,7 +97,13 @@ public class BScreenConsumerSubTask extends Thread {
         List<ConsumerGroupsInfo> consumerGroupTopics = new ArrayList<>();
         String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
         for (String clusterAlias : clusterAliass) {
-            JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+            // JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+            JSONArray consumerGroups = new JSONArray();
+            if (SystemConfigUtils.getBooleanProperty("efak.distributed.enable")) {
+                consumerGroups = JobClient.getWorkNodeShardSuperTask(clusterAlias);
+            } else {
+                consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
+            }
             for (Object object : consumerGroups) {
                 JSONObject consumerGroup = (JSONObject) object;
                 String group = consumerGroup.getString("group");

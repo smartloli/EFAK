@@ -405,6 +405,8 @@ public class KConstants {
         public static final String VALUE = "VALUE";
         public static final String JOB_ID = "JOB_ID";
         public static final String KEY_BY_IP = "KEY_BY_IP";
+        public static final String KEY_BY_IP_VIP = "KEY_BY_IP_VIP";
+        public static final String KEY_BY_IP_VIP_CLUSTER = "KEY_BY_IP_VIP_CLUSTER";
         public static final String HEART_BEAT = "HEART_BEAT";
         public static final String CLUSTER_NAME = "CLUSTER_NAME";
         public static final String SHARD_TASK = "SHARD_TASK";

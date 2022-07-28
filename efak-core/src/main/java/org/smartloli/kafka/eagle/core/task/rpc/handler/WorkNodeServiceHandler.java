@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.thrift.TException;
+import org.smartloli.kafka.eagle.common.constant.ThreadConstants;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.core.task.cache.LogCacheFactory;
 import org.smartloli.kafka.eagle.core.task.rpc.WorkNodeService;
@@ -45,6 +46,7 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
     private String type;
     private String jobId;
     private String key; // used by quartz ip key
+    private int vip = -1; // used by quartz shard task vip
     private String cluster;
 
     @Override
@@ -63,6 +65,10 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
             } else if (object.getString(KConstants.Protocol.KEY).equals(KConstants.Protocol.SHARD_TASK)) {
                 this.type = KConstants.Protocol.SHARD_TASK;
                 this.key = object.getString(KConstants.Protocol.KEY_BY_IP);
+                if (object.containsKey(KConstants.Protocol.KEY_BY_IP_VIP)) {
+                    this.vip = object.getInteger(KConstants.Protocol.KEY_BY_IP_VIP);
+                    this.cluster = object.getString(KConstants.Protocol.KEY_BY_IP_VIP_CLUSTER);
+                }
             }
             return handler();
         }
@@ -132,11 +138,19 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
             }
         } else if (KConstants.Protocol.SHARD_TASK.equals(this.type)) {
             long stime = System.currentTimeMillis();
-            Map<String, List<String>> shardTasks = ScheduleShardStrategy.getScheduleShardTask();
-            LoggerUtils.print(this.getClass()).info("All shard task strategy, result: " + JSON.toJSONString(shardTasks));
-            if (shardTasks.containsKey(this.key)) {
-                result = JSON.toJSONString(shardTasks.get(this.key));
+            if (ThreadConstants.WEIGHT_VIP3 == this.vip) {
+                Map<String, String> vipShardTasks = ScheduleShardStrategy.getScheduleShardSuperTask(this.cluster);
+                if (vipShardTasks != null) {
+                    result = vipShardTasks.get(this.key);
+                }
+            } else {
+                Map<String, List<String>> shardTasks = ScheduleShardStrategy.getScheduleShardTask();
+                LoggerUtils.print(this.getClass()).info("All shard task strategy, result: " + JSON.toJSONString(shardTasks));
+                if (shardTasks.containsKey(this.key)) {
+                    result = JSON.toJSONString(shardTasks.get(this.key));
+                }
             }
+
             LoggerUtils.print(this.getClass()).info("Spent time [" + (System.currentTimeMillis() - stime) + "]ms, worknode[" + this.key + "] get task: " + result);
         }
         return result;
