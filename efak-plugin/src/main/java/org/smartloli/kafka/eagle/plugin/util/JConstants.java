@@ -123,7 +123,7 @@ public interface JConstants {
 
     static String CREATE_TABLE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic` varchar(128) NOT NULL,`status` int(11) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`,`topic`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-    static String CREATE_TABLE_KE_CONSUMER_GROUP_SUMMARY = "CREATE TABLE IF NOT EXISTS `ke_consumer_group_summary` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic_number` varchar(128) NOT NULL,`coordinator`varchar(128) DEFAULT NULL,`active_topic` int(11) DEFAULT NULL,`active_thread_total` int(11) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+    static String CREATE_TABLE_KE_CONSUMER_GROUP_SUMMARY = "CREATE TABLE IF NOT EXISTS `ke_consumer_group_summary` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topics` varchar(256) NOT NULL,`coordinator`varchar(128) DEFAULT NULL,`active_topic` int(11) DEFAULT NULL,`active_thread_total` int(11) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
     static String CREATE_TABLE_KE_TOPIC_CONSUMER_GROUP_SUMMARY_VIEW = "CREATE OR REPLACE VIEW ke_topic_consumer_group_summary_view as select `cluster`, `topic`, count(distinct `group`) group_number , count(distinct `group`) active_group from `ke_consumer_group` where `status` = 0 group by `cluster`, `topic`";
 
     static String CREATE_TABLE_KE_USER_ROLE = "CREATE TABLE IF NOT EXISTS `ke_user_role` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`user_id` int(11) NOT NULL,`role_id` tinyint(4) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4";

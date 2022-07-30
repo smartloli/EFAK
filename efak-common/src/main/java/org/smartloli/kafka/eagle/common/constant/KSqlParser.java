@@ -18,11 +18,15 @@
 package org.smartloli.kafka.eagle.common.constant;
 
 import org.apache.calcite.config.Lex;
+import org.apache.calcite.rel.core.Collect;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.parser.SqlParser;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicPartitionSchema;
 import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * The client requests the t operation to parse the SQL and obtain the fields
@@ -54,7 +58,7 @@ public class KSqlParser {
     }
 
     private static void parseNode(SqlNode sqlNode, TopicPartitionSchema tps) {
-        SqlKind sqlKind = sqlNode.getKind();
+            SqlKind sqlKind = sqlNode.getKind();
         switch (sqlKind) {
             case SELECT:
                 String topic = "";
@@ -72,6 +76,14 @@ public class KSqlParser {
                     SqlBasicCall sqlBasicCall = (SqlBasicCall) sqlWhere;
                     if (sqlBasicCall.operandCount() > 1) {
                         String[] partitions = sqlBasicCall.operand(1).toString().split(",");
+                        tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
+                        tps.setTopic(topic);
+                        tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
+                    }
+                } else if (sqlWhere.getKind() == SqlKind.EQUALS) {
+                    SqlBasicCall sqlBasicCall = (SqlBasicCall) sqlWhere;
+                    if (sqlBasicCall.operands.length == 2) {
+                        String[] partitions = Collections.singletonList(sqlBasicCall.operands[1].toString()).toArray(new String[0]);
                         tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
                         tps.setTopic(topic);
                         tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));

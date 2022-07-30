@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.web.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import joptsimple.internal.Strings;
 import org.smartloli.kafka.eagle.common.protocol.ConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.DisplayInfo;
 import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
@@ -279,7 +280,7 @@ public class ConsumerServiceImpl implements ConsumerService {
             consumer.setId(++id);
             consumer.setNode(consumerGroup.getString("node"));
             OwnerInfo ownerInfo = kafkaService.getKafkaActiverNotOwners(clusterAlias, group);
-            consumer.setTopics(ownerInfo.getTopicSets().size());
+            consumer.setTopics(Strings.join(ownerInfo.getTopicSets(), ","));
             consumer.setActiveTopics(getKafkaActiveTopicNumbers(clusterAlias, group));
             consumer.setActiveThreads(ownerInfo.getActiveSize());
             kafkaConsumerPages.add(consumer);
