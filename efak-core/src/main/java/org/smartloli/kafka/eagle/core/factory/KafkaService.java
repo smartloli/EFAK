@@ -113,6 +113,11 @@ public interface KafkaService {
     public String getKafkaConsumer(String clusterAlias);
 
     /**
+     * Get consumer group info by distribute mode.
+     */
+    public String getDistributeKafkaConsumer(String clusterAlias);
+
+    /**
      * Get kafka 0.10.x consumer group & topic information used for page.
      */
     public String getKafkaConsumer(String clusterAlias, DisplayInfo page);

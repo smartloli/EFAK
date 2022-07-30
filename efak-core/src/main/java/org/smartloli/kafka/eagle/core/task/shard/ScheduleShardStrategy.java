@@ -44,6 +44,7 @@ public class ScheduleShardStrategy {
 
     private final static KafkaService kafkaService = new KafkaFactory().create();
 
+    @Deprecated
     public static Map<String, String> getScheduleShardSuperTask(String cluster) {
         Map<String, String> subShardMaps = new HashMap<>();
         List<String> hosts = WorkUtils.getWorkNodes();

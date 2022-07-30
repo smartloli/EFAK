@@ -25,15 +25,12 @@ import org.smartloli.kafka.eagle.common.protocol.OwnerInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
-import org.smartloli.kafka.eagle.common.util.CalendarUtils;
+import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
-import org.smartloli.kafka.eagle.common.util.LoggerUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
 import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
-import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
 import org.smartloli.kafka.eagle.web.controller.StartupListener;
 import org.smartloli.kafka.eagle.web.service.impl.ConsumerServiceImpl;
 import org.smartloli.kafka.eagle.web.service.impl.MetricsServiceImpl;
@@ -97,16 +94,23 @@ public class BScreenConsumerSubTask extends Thread {
         List<ConsumerGroupsInfo> consumerGroupTopics = new ArrayList<>();
         String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
         for (String clusterAlias : clusterAliass) {
-            // JSONArray consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
             JSONArray consumerGroups = new JSONArray();
             if (SystemConfigUtils.getBooleanProperty("efak.distributed.enable")) {
-                consumerGroups = JobClient.getWorkNodeShardSuperTask(clusterAlias);
+                consumerGroups = JSON.parseArray(kafkaService.getDistributeKafkaConsumer(clusterAlias));
             } else {
                 consumerGroups = JSON.parseArray(kafkaService.getKafkaConsumer(clusterAlias));
             }
             for (Object object : consumerGroups) {
                 JSONObject consumerGroup = (JSONObject) object;
                 String group = consumerGroup.getString("group");
+
+                String ip = NetUtils.ip();
+                if (!StrUtils.isNull(ip)) {
+                    String host = consumerGroup.getString("host");
+                    if (!ip.equals(host)) {
+                        break;
+                    }
+                }
 
                 // storage offline consumer summary
                 OwnerInfo ownerInfo = kafkaService.getKafkaActiverNotOwners(clusterAlias, group);

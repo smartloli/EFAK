@@ -17,9 +17,9 @@
  */
 package org.smartloli.kafka.eagle.ipc;
 
-import com.alibaba.fastjson.JSONArray;
 import org.smartloli.kafka.eagle.common.util.KafkaCacheUtils;
-import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
+import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
+import org.smartloli.kafka.eagle.core.factory.KafkaService;
 
 /**
  * Test JobClient
@@ -29,12 +29,15 @@ import org.smartloli.kafka.eagle.core.task.schedule.JobClient;
  * Created by Sep 20, 2020
  */
 public class TestJobClient {
+
+    private static KafkaService kafkaService = new KafkaFactory().create();
+
     public static void main(String[] args) {
         // List<WorkNodeMetrics> wns = JobClient.getWorkNodeMetrics("cluster1");
         // System.out.println(wns.toString());
         KafkaCacheUtils.initKafkaMetaData();
-        JSONArray array = JobClient.getWorkNodeShardSuperTask("cluster1");
-        System.out.println(array);
+        // JSONArray array = JobClient.getWorkNodeShardSuperTask("cluster1");
+        System.out.println(kafkaService.getKafkaConsumer("cluster1"));
 //        System.out.println("Result: " + ScheduleShardStrategy.getScheduleShardSuperTask("cluster1"));
     }
 }

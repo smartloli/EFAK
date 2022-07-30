@@ -49,6 +49,7 @@ import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaConsumerAdapter;
+import org.smartloli.kafka.eagle.core.task.strategy.WorkNodeStrategy;
 import scala.Option;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
@@ -656,6 +657,96 @@ public class KafkaServiceImpl implements KafkaService {
                         consumerGroup.put("node", node.host() + ":" + node.port());
                     } catch (Exception e) {
                         LOG.error("Get coordinator node has error, msg is " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId, clusterAlias));
+                    consumerGroups.add(consumerGroup);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("Get kafka consumer has error,msg is " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            adminClient.close();
+        }
+        return consumerGroups.toString();
+    }
+
+    /**
+     * Get kafka 0.10.x, 1.x, 2.x consumer metadata by distribute mode.
+     */
+    @Override
+    public String getDistributeKafkaConsumer(String clusterAlias) {
+        Properties prop = new Properties();
+        JSONArray consumerGroups = new JSONArray();
+        prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable")) {
+            sasl(prop, clusterAlias);
+        }
+        if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
+            ssl(prop, clusterAlias);
+        }
+
+        List<String> hosts = WorkUtils.getWorkNodes();
+        int port = SystemConfigUtils.getIntProperty("efak.worknode.port");
+        List<WorkNodeStrategy> nodes = new ArrayList<>();
+        for (String host : hosts) {
+            if (NetUtils.telnet(host, port)) {
+                WorkNodeStrategy wns = new WorkNodeStrategy();
+                wns.setPort(port);
+                wns.setHost(host);
+                String masterHost = SystemConfigUtils.getProperty("efak.worknode.master.host");
+                if (!masterHost.equals(host)) {
+                    nodes.add(wns);
+                }
+            }
+        }
+
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(prop);
+            ListConsumerGroupsResult cgrs = adminClient.listConsumerGroups();
+            java.util.Iterator<ConsumerGroupListing> itor = cgrs.all().get().iterator();
+            int nodeIndex = 0;
+            String[] cgroups = SystemConfigUtils.getPropertyArray("efak.worknode.disable.cgroup", ",");
+            while (itor.hasNext()) {
+                ConsumerGroupListing gs = itor.next();
+                JSONObject consumerGroup = new JSONObject();
+                String groupId = gs.groupId();
+                DescribeConsumerGroupsResult descConsumerGroup = adminClient.describeConsumerGroups(Arrays.asList(groupId));
+                boolean status = true;
+                if (cgroups != null) {
+                    for (String cgroup : cgroups) {
+                        if (groupId != null) {
+                            if (groupId.equals(cgroup)) {
+                                status = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!groupId.contains("efak") && status) {
+                    consumerGroup.put("group", groupId);
+                    try {
+                        Node node = descConsumerGroup.all().get().get(groupId).coordinator();
+                        consumerGroup.put("node", node.host() + ":" + node.port());
+                    } catch (Exception e) {
+                        LOG.error("Get coordinator node has error, msg is " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (nodes.size() > 0) {
+                            consumerGroup.put("host", nodes.get(nodeIndex).getHost());
+                            nodeIndex++;
+                            if (nodeIndex == nodes.size() - 1) {
+                                // reset index
+                                nodeIndex = 0;
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        LOG.error("Get shard node host has error, msg is ", e);
                         e.printStackTrace();
                     }
                     consumerGroup.put("meta", getKafkaMetadata(parseBrokerServer(clusterAlias), groupId, clusterAlias));
