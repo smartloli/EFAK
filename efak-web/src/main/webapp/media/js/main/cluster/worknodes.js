@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#cluster_tab").dataTable({
+    $("#efak_cluster_efakserver_tab").dataTable({
         // "searching" : false,
         "bSort": false,
         "bLengthChange": false,

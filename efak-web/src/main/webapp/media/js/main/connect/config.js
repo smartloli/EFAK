@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#result").dataTable({
+    $("#efak_connect_config_tab").dataTable({
         "bSort": false,
         "bLengthChange": false,
         "bProcessing": true,
@@ -37,7 +37,7 @@ $(document).ready(function () {
     }
 
     $("#ke-add-connect-uri-btn").click(function () {
-        $('#ke_connect_uri_add_dialog').modal('show');
+        $('#ke_connectors_modal').modal('show');
     });
 
     $(document).on('click', 'a[name=ke_connect_uri_modify]', function () {
@@ -79,7 +79,7 @@ $(document).ready(function () {
         var uri = $(this).attr("uri");
         $('#ke_connectors_detail').modal('show');
 
-        $("#ke_connectors_detail_children").append("<div class='table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-condensed' width='100%'><thead><tr><th>ID</th><th>Connectors</th></tr></thead></table></div>");
+        $("#ke_connectors_detail_children").append("<div class='table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-striped table-bordered' width='100%'><thead><tr><th>#ID</th><th>Connectors</th></tr></thead></table></div>");
         if (offset > 0) {
             $("#div_children" + (offset - 1)).remove();
         }

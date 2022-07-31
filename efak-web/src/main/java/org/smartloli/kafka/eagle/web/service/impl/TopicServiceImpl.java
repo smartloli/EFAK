@@ -66,12 +66,7 @@ import java.util.Map.Entry;
  *
  * @author smartloli.
  * <p>
- * Created by Aug 14, 2016.
- * <p>
- * Update by hexiang 20170216
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 11, 2022.
  */
 @Service
 public class TopicServiceImpl implements TopicService {
@@ -166,7 +161,7 @@ public class TopicServiceImpl implements TopicService {
 
             offset++;
         }
-        return topics.toJSONString();
+        return topics.toString();
     }
 
     /**
@@ -198,7 +193,7 @@ public class TopicServiceImpl implements TopicService {
             }
             offset++;
         }
-        return topics.toJSONString();
+        return topics.toString();
     }
 
     /**
@@ -331,7 +326,7 @@ public class TopicServiceImpl implements TopicService {
         object.put("logsize", logSize);
         object.put("topicsize", topicSize.getString("size"));
         object.put("sizetype", topicSize.getString("type"));
-        return object.toJSONString();
+        return object.toString();
     }
 
     /**
@@ -346,7 +341,7 @@ public class TopicServiceImpl implements TopicService {
             object.put("y", topicLogSize.getDiffval());
             arrays.add(object);
         }
-        return arrays.toJSONString();
+        return arrays.toString();
     }
 
     @Override
@@ -379,12 +374,13 @@ public class TopicServiceImpl implements TopicService {
                 array.add(object);
             } else {
                 JSONObject object = new JSONObject();
-                object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+//                object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+                object.put("x", CalendarUtils.getCustomLastDay("yyyy-MM-dd", i));
                 object.put("y", 0);
                 array.add(object);
             }
         }
-        return array.toJSONString();
+        return array.toString();
     }
 
     @Override
@@ -442,7 +438,7 @@ public class TopicServiceImpl implements TopicService {
         JSONObject capacity = StrUtils.stringifyByObject(topicDao.getTopicCapacity(capacityParams));
         object.put("topicCapacity", capacity.getString("size"));
         object.put("capacityType", capacity.getString("type"));
-        return object.toJSONString();
+        return object.toString();
     }
 
     @Override
@@ -464,7 +460,7 @@ public class TopicServiceImpl implements TopicService {
             }
         }
         object.put("topics", array);
-        return kafkaHubService.generate(clusterAlias, object.toJSONString(), brokerService.getBrokerIdList(clusterAlias));
+        return kafkaHubService.generate(clusterAlias, object.toString(), brokerService.getBrokerIdList(clusterAlias));
     }
 
     @Override
@@ -475,6 +471,11 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public String setResetExecute(String clusterAlias, String json) {
         return kafkaHubService.reset(clusterAlias, json);
+    }
+
+    @Override
+    public long getActiveTopicNumbers(Map<String, Object> params) {
+        return topicDao.getActiveTopicNumbers(params);
     }
 
     @Override
@@ -513,6 +514,6 @@ public class TopicServiceImpl implements TopicService {
             typeList.add(object);
             offset++;
         }
-        return typeList.toJSONString();
+        return typeList.toString();
     }
 }

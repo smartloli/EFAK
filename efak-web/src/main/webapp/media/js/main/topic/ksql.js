@@ -1,20 +1,60 @@
 $(document).ready(function () {
-    var mime = 'text/x-mariadb';
+    var mime = 'text/x-sql';
     // get mime type
     if (window.location.href.indexOf('mime=') > -1) {
         mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
     }
-    var sqlEditor = CodeMirror.fromTextArea(document.getElementById('code'), {
+    var sqlEditor = CodeMirror.fromTextArea(document.getElementById('efak_ksql_code'), {
         mode: mime,
         indentWithTabs: true,
         smartIndent: true,
         lineNumbers: true,
         matchBrackets: true,
         autofocus: true,
+        theme: "blackboard",
         extraKeys: {
+            "'a'": completeAfter,
+            "'b'": completeAfter,
+            "'c'": completeAfter,
+            "'d'": completeAfter,
+            "'e'": completeAfter,
+            "'f'": completeAfter,
+            "'g'": completeAfter,
+            "'h'": completeAfter,
+            "'i'": completeAfter,
+            "'j'": completeAfter,
+            "'k'": completeAfter,
+            "'l'": completeAfter,
+            "'m'": completeAfter,
+            "'n'": completeAfter,
+            "'o'": completeAfter,
+            "'p'": completeAfter,
+            "'q'": completeAfter,
+            "'r'": completeAfter,
+            "'s'": completeAfter,
+            "'t'": completeAfter,
+            "'u'": completeAfter,
+            "'v'": completeAfter,
+            "'w'": completeAfter,
+            "'x'": completeAfter,
+            "'y'": completeAfter,
+            "'z'": completeAfter,
             "Alt-/": "autocomplete"
         }
     });
+
+    function completeAfter(cm, pred) {
+        if (!pred || pred()) {
+            setTimeout(function () {
+                if (!cm.state.completionActive) {
+                    cm.showHint({
+                        completeSingle: false
+                    })
+                }
+            }, 100)
+        }
+        return CodeMirror.Pass
+    }
 
     var logEditor = CodeMirror.fromTextArea(document.getElementById('job_info'), {
         mode: mime,
@@ -23,6 +63,7 @@ $(document).ready(function () {
         lineNumbers: true,
         matchBrackets: true,
         autofocus: true,
+        theme: "blackboard",
         readOnly: true
     });
 
@@ -32,7 +73,7 @@ $(document).ready(function () {
 
     function viewerTopics(sql, dataSets, jobId) {
         var ret = JSON.parse(dataSets);
-        var tabHeader = "<div class='panel-body table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-bordered table-hover' width='100%'><thead><tr>"
+        var tabHeader = "<div class='panel-body table-responsive' id='div_children" + offset + "'><table id='result_children" + offset + "' class='table table-striped table-bordered' width='100%'><thead><tr>"
         var mData = [];
         var i = 0;
         for (var key in ret[0]) {
@@ -44,13 +85,15 @@ $(document).ready(function () {
         }
 
         tabHeader += "</tr></thead></table></div>";
-        $("#result_textarea").append(tabHeader);
+        $("#efak_ksql_result_tab").append(tabHeader);
         if (offset > 0) {
             $("#div_children" + (offset - 1)).remove();
         }
 
-        $("#result_children" + offset).dataTable({
+        var result_table_id = "#result_children" + offset;
+        var result_table = $(result_table_id).DataTable({
             "searching": false,
+            "buttons": ['copy', 'excel', 'pdf', 'print'],
             "bSort": false,
             "retrieve": true,
             "bLengthChange": false,
@@ -60,6 +103,10 @@ $(document).ready(function () {
             "sAjaxSource": '/topic/physics/commit/?sql=' + sql + '&jobId=' + jobId,
             "aoColumns": mData
         });
+
+        // todo export data
+        // console.log(result_table);
+        // result_table.buttons().container().appendTo(result_table_id + '_wrapper .col-md-6:eq(0)');
 
         function retrieveData(sSource, aoData, fnCallback) {
             $.ajax({

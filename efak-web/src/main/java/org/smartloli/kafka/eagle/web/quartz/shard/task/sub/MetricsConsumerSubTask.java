@@ -270,15 +270,6 @@ public class MetricsConsumerSubTask extends Thread {
 
     }
 
-    private int getConsumerTopicStatus(String clusterAlias, String group, String topic) {
-        Map<String, List<String>> actvTopics = kafkaService.getActiveTopic(clusterAlias);
-        if (actvTopics.containsKey(group + "_" + topic)) {
-            return Topic.RUNNING;
-        } else {
-            return Topic.SHUTDOWN;
-        }
-    }
-
     private int getKafkaActiveTopicNumbers(String clusterAlias, String group, ConsumerServiceImpl consumerServiceImpl) {
         Set<String> consumerTopics = kafkaService.getKafkaConsumerTopic(clusterAlias, group);
         Set<String> activerTopics = kafkaService.getKafkaActiverTopics(clusterAlias, group);
@@ -380,78 +371,6 @@ public class MetricsConsumerSubTask extends Thread {
                 }
             } catch (Exception e) {
                 LoggerUtils.print(this.getClass()).error("Clean kafka consumer summary final has error, msg is ", e);
-            }
-        }
-    }
-
-    private void cleanUnExistConsumerGroup(String cluster, List<ConsumerGroupsInfo> allConsumerGroups, Map<String, List<String>> consumerGroups, MetricsServiceImpl metricsServiceImpl) {
-        if (allConsumerGroups != null && consumerGroups != null) {
-            Map<String, Set<String>> allConsumerGroupMap = new HashMap<>();
-            for (ConsumerGroupsInfo allConsumerGroup : allConsumerGroups) {
-                if (allConsumerGroupMap.containsKey(allConsumerGroup.getGroup())) {
-                    allConsumerGroupMap.get(allConsumerGroup.getGroup()).add(allConsumerGroup.getTopic());
-                } else {
-                    Set<String> topics = new HashSet<>();
-                    topics.add(allConsumerGroup.getTopic());
-                    allConsumerGroupMap.put(allConsumerGroup.getGroup(), topics);
-                }
-            }
-            try {
-                List<String> realGroups = new ArrayList<>();
-                for (Entry<String, List<String>> entry : consumerGroups.entrySet()) {
-                    realGroups.add(entry.getKey());
-                }
-                for (Entry<String, Set<String>> group : allConsumerGroupMap.entrySet()) {
-                    if (realGroups.contains(group.getKey())) {
-                        for (String topic : allConsumerGroupMap.get(group.getKey())) {
-                            if (!kafkaService.getActiveTopic(cluster, group.getKey()).contains(topic)) {
-                                Map<String, Object> cleanParams = new HashMap<>();
-                                cleanParams.put("cluster", cluster);
-                                cleanParams.put("group", group.getKey());
-                                cleanParams.put("topic", topic);
-                                try {
-                                    metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
-                                } catch (Exception e) {
-                                    LoggerUtils.print(this.getClass()).error("Clean consumer cluster[" + cluster + "] group[" + group.getKey() + "] has error, msg is ", e);
-                                }
-                            }
-                        }
-                    } else {
-                        Map<String, Object> cleanParams = new HashMap<>();
-                        cleanParams.put("cluster", cluster);
-                        cleanParams.put("group", group.getKey());
-                        try {
-                            metricsServiceImpl.cleanConsumerGroupTopic(cleanParams);
-                        } catch (Exception e) {
-                            LoggerUtils.print(this.getClass()).error("Clean consumer cluster[" + cluster + "] group[" + group + "] has error, msg is ", e);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                LoggerUtils.print(this.getClass()).error("Clean kafka consumer group final has error, msg is ", e);
-            }
-        }
-    }
-
-    private void cleanUnExistConsumerSummary(String cluster, List<ConsumerSummaryInfo> allConsumerGroups, Map<String, List<String>> consumerGroups, MetricsServiceImpl metricsServiceImpl) {
-        if (allConsumerGroups != null && consumerGroups != null) {
-
-            try {
-                List<String> realGroups = new ArrayList<>();
-                for (Entry<String, List<String>> entry : consumerGroups.entrySet()) {
-                    realGroups.add(entry.getKey());
-                }
-
-                for (ConsumerSummaryInfo cgi : allConsumerGroups) {
-                    if (!realGroups.contains(cgi.getGroup())) {
-                        Map<String, Object> cleanParams = new HashMap<>();
-                        cleanParams.put("cluster", cluster);
-                        cleanParams.put("group", cgi.getGroup());
-                        metricsServiceImpl.cleanConsumerSummaryTopic(cleanParams);
-                    }
-                }
-            } catch (Exception e) {
-                LoggerUtils.print(this.getClass()).error("Cleam kafka consumer summary final has error, msg is ", e);
             }
         }
     }

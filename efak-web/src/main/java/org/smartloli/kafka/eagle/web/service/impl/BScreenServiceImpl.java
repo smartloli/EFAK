@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,11 +17,8 @@
  */
 package org.smartloli.kafka.eagle.web.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
@@ -38,12 +35,14 @@ import org.smartloli.kafka.eagle.web.service.BScreenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Big screen get data.
- * 
+ *
  * @author smartloli.
  *
  *         Created by Aug 29, 2019
@@ -51,169 +50,169 @@ import com.alibaba.fastjson.JSONObject;
 @Service
 public class BScreenServiceImpl implements BScreenService {
 
-	@Autowired
-	private TopicDao topicDao;
+    @Autowired
+    private TopicDao topicDao;
 
-	@Autowired
-	private MBeanDao mbeanDao;
+    @Autowired
+    private MBeanDao mbeanDao;
 
-	/** Broker service interface. */
-	private static BrokerService brokerService = new BrokerFactory().create();
+    /** Broker service interface. */
+    private static BrokerService brokerService = new BrokerFactory().create();
 
-	/** Get producer and consumer real rate data . */
-	public String getProducerAndConsumerRate(String clusterAlias) {
-		KpiInfo byteIn = getBrokersKpi(clusterAlias, MBean.BYTEIN);
-		KpiInfo byteOut = getBrokersKpi(clusterAlias, MBean.BYTEOUT);
+    /** Get producer and consumer real rate data . */
+    public String getProducerAndConsumerRate(String clusterAlias) {
+        KpiInfo byteIn = getBrokersKpi(clusterAlias, MBean.BYTEIN);
+        KpiInfo byteOut = getBrokersKpi(clusterAlias, MBean.BYTEOUT);
 
-		JSONObject object = new JSONObject();
-		object.put("ins", byteIn.getValue());
-		object.put("outs", byteOut.getValue());
-		return object.toJSONString();
-	}
+        JSONObject object = new JSONObject();
+        object.put("ins", byteIn.getValue());
+        object.put("outs", byteOut.getValue());
+        return object.toString();
+    }
 
-	private KpiInfo getBrokersKpi(String clusterAlias, String key) {
-		Map<String, Object> param = new HashMap<>();
-		param.put("cluster", clusterAlias);
-		param.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
-		param.put("type", CollectorType.KAFKA);
-		param.put("key", key);
-		return mbeanDao.getBrokersKpi(param);
-	}
+    private KpiInfo getBrokersKpi(String clusterAlias, String key) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("cluster", clusterAlias);
+        param.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
+        param.put("type", CollectorType.KAFKA);
+        param.put("key", key);
+        return mbeanDao.getBrokersKpi(param);
+    }
 
-	/** Get topic total logsize data . */
-	public String getTopicTotalLogSize(String clusterAlias) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("cluster", clusterAlias);
-		params.put("topics", brokerService.topicList(clusterAlias));
-		params.put("size", brokerService.topicList(clusterAlias).size());
-		params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
-		long totalRecords = topicDao.getBScreenTotalRecords(params);
-		JSONObject object = new JSONObject();
-		object.put("total", totalRecords);
-		return object.toJSONString();
-	}
+    /** Get topic total logsize data . */
+    public String getTopicTotalLogSize(String clusterAlias) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("cluster", clusterAlias);
+        params.put("topics", brokerService.topicList(clusterAlias));
+        params.put("size", brokerService.topicList(clusterAlias).size());
+        params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
+        long totalRecords = topicDao.getBScreenTotalRecords(params);
+        JSONObject object = new JSONObject();
+        object.put("total", totalRecords);
+        return object.toString();
+    }
 
-	/** Get producer and consumer history data. */
-	public String getProducerOrConsumerHistory(String clusterAlias, String type) {
-		JSONArray array = new JSONArray();
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("cluster", clusterAlias);
-		params.put("stime", CalendarUtils.getCustomLastDay(7));
-		params.put("etime", CalendarUtils.getCustomDate("yyyyMMdd"));
-		if ("producer".equals(type)) {
-			List<BScreenBarInfo> bsProducers = topicDao.queryProducerHistoryBar(params);
-			Map<String, Object> bsMaps = new HashMap<>();
-			for (BScreenBarInfo bsProducer : bsProducers) {
-				if (bsProducer != null) {
-					bsMaps.put(bsProducer.getTm(), bsProducer.getValue());
-				}
-			}
-			for (int i = 6; i >= 0; i--) {
-				String tm = CalendarUtils.getCustomLastDay(i);
-				if (bsMaps.containsKey(tm)) {
-					JSONObject object = new JSONObject();
-					object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
-					object.put("y", bsMaps.get(tm).toString());
-					array.add(object);
-				} else {
-					JSONObject object = new JSONObject();
-					object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
-					object.put("y", 0);
-					array.add(object);
-				}
-			}
-		} else {
-			List<BScreenBarInfo> bsConsumers = topicDao.queryConsumerHistoryBar(params);
-			Map<String, Object> bsMaps = new HashMap<>();
-			for (BScreenBarInfo bsConsumer : bsConsumers) {
-				if (bsConsumer != null) {
-					bsMaps.put(bsConsumer.getTm(), bsConsumer.getValue());
-				}
-			}
-			for (int i = 6; i >= 0; i--) {
-				String tm = CalendarUtils.getCustomLastDay(i);
-				if (bsMaps.containsKey(tm)) {
-					JSONObject object = new JSONObject();
-					object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
-					object.put("y", bsMaps.get(tm).toString());
-					array.add(object);
-				} else {
-					JSONObject object = new JSONObject();
-					object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
-					object.put("y", 0);
-					array.add(object);
-				}
-			}
-		}
+    /** Get producer and consumer history data. */
+    public String getProducerOrConsumerHistory(String clusterAlias, String type) {
+        JSONArray array = new JSONArray();
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("cluster", clusterAlias);
+        params.put("stime", CalendarUtils.getCustomLastDay(7));
+        params.put("etime", CalendarUtils.getCustomDate("yyyyMMdd"));
+        if ("producer".equals(type)) {
+            List<BScreenBarInfo> bsProducers = topicDao.queryProducerHistoryBar(params);
+            Map<String, Object> bsMaps = new HashMap<>();
+            for (BScreenBarInfo bsProducer : bsProducers) {
+                if (bsProducer != null) {
+                    bsMaps.put(bsProducer.getTm(), bsProducer.getValue());
+                }
+            }
+            for (int i = 6; i >= 0; i--) {
+                String tm = CalendarUtils.getCustomLastDay(i);
+                if (bsMaps.containsKey(tm)) {
+                    JSONObject object = new JSONObject();
+                    object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+                    object.put("y", bsMaps.get(tm).toString());
+                    array.add(object);
+                } else {
+                    JSONObject object = new JSONObject();
+                    object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+                    object.put("y", 0);
+                    array.add(object);
+                }
+            }
+        } else {
+            List<BScreenBarInfo> bsConsumers = topicDao.queryConsumerHistoryBar(params);
+            Map<String, Object> bsMaps = new HashMap<>();
+            for (BScreenBarInfo bsConsumer : bsConsumers) {
+                if (bsConsumer != null) {
+                    bsMaps.put(bsConsumer.getTm(), bsConsumer.getValue());
+                }
+            }
+            for (int i = 6; i >= 0; i--) {
+                String tm = CalendarUtils.getCustomLastDay(i);
+                if (bsMaps.containsKey(tm)) {
+                    JSONObject object = new JSONObject();
+                    object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+                    object.put("y", bsMaps.get(tm).toString());
+                    array.add(object);
+                } else {
+                    JSONObject object = new JSONObject();
+                    object.put("x", CalendarUtils.getCustomLastDay("MM-dd", i));
+                    object.put("y", 0);
+                    array.add(object);
+                }
+            }
+        }
 
-		return array.toJSONString();
-	}
+        return array.toString();
+    }
 
-	@Override
-	public String getTodayOrHistoryConsumerProducer(String clusterAlias, String type) {
-		JSONArray targets = new JSONArray();
-		Map<String, Object> params = new HashMap<>();
-		params.put("cluster", clusterAlias);
-		params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
-		List<BScreenConsumerInfo> bscreenConsumers = topicDao.queryTodayBScreenConsumer(params);
-		Map<Integer, Long> map = new HashMap<>();
-		if (bscreenConsumers != null) {
-			if (Topic.PRODUCERS.equals(type)) {
-				for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
-					int hour = 0;
-					try {
-						hour = Integer.parseInt(CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH"));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					if (map.containsKey(hour)) {
-						map.put(hour, map.get(hour) + bscreenConsumer.getDifflogsize());
-					} else {
-						map.put(hour, bscreenConsumer.getDifflogsize());
-					}
-				}
-			} else if (Topic.CONSUMERS.equals(type)) {
-				for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
-					int hour = 0;
-					try {
-						hour = Integer.parseInt(CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH"));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					if (map.containsKey(hour)) {
-						map.put(hour, map.get(hour) + bscreenConsumer.getDiffoffsets());
-					} else {
-						map.put(hour, bscreenConsumer.getDiffoffsets());
-					}
-				}
-			} else if (Topic.LAG.equals(type)) {
-				for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
-					int hour = 0;
-					try {
-						hour = Integer.parseInt(CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH"));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					if (map.containsKey(hour)) {
-						map.put(hour, map.get(hour) + Math.abs(bscreenConsumer.getLogsize() - bscreenConsumer.getDiffoffsets()));
-					} else {
-						map.put(hour, Math.abs(bscreenConsumer.getLogsize() - bscreenConsumer.getDiffoffsets()));
-					}
-				}
-			}
-		}
-		for (Entry<Integer, Long> entry : map.entrySet()) {
-			JSONObject object = new JSONObject();
-			object.put("x", entry.getKey());
-			object.put("y", entry.getValue());
-			targets.add(object);
-		}
-		return targets.toJSONString();
-	}
+    @Override
+    public String getTodayOrHistoryConsumerProducer(String clusterAlias, String type) {
+        JSONArray targets = new JSONArray();
+        Map<String, Object> params = new HashMap<>();
+        params.put("cluster", clusterAlias);
+        params.put("tday", CalendarUtils.getCustomDate("yyyyMMdd"));
+        List<BScreenConsumerInfo> bscreenConsumers = topicDao.queryTodayBScreenConsumer(params);
+        Map<Integer, Long> map = new HashMap<>();
+        if (bscreenConsumers != null) {
+            if (Topic.PRODUCERS.equals(type)) {
+                for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
+                    int hour = 0;
+                    try {
+                        hour = Integer.parseInt(CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (map.containsKey(hour)) {
+                        map.put(hour, map.get(hour) + bscreenConsumer.getDifflogsize());
+                    } else {
+                        map.put(hour, bscreenConsumer.getDifflogsize());
+                    }
+                }
+            } else if (Topic.CONSUMERS.equals(type)) {
+                for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
+                    int hour = 0;
+                    try {
+                        hour = Integer.parseInt(CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (map.containsKey(hour)) {
+                        map.put(hour, map.get(hour) + bscreenConsumer.getDiffoffsets());
+                    } else {
+                        map.put(hour, bscreenConsumer.getDiffoffsets());
+                    }
+                }
+            } else if (Topic.LAG.equals(type)) {
+                for (BScreenConsumerInfo bscreenConsumer : bscreenConsumers) {
+                    int hour = 0;
+                    try {
+                        hour = Integer.parseInt(CalendarUtils.convertUnixTime(bscreenConsumer.getTimespan(), "HH"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (map.containsKey(hour)) {
+                        map.put(hour, map.get(hour) + Math.abs(bscreenConsumer.getLogsize() - bscreenConsumer.getDiffoffsets()));
+                    } else {
+                        map.put(hour, Math.abs(bscreenConsumer.getLogsize() - bscreenConsumer.getDiffoffsets()));
+                    }
+                }
+            }
+        }
+        for (Entry<Integer, Long> entry : map.entrySet()) {
+            JSONObject object = new JSONObject();
+            object.put("x", entry.getKey());
+            object.put("y", entry.getValue());
+            targets.add(object);
+        }
+        return targets.toString();
+    }
 
-	@Override
-	public String getTopicCapacity(Map<String, Object> params) {
-		return StrUtils.stringifyByObject(topicDao.getTopicCapacity(params)).toJSONString();
-	}
+    @Override
+    public String getTopicCapacity(Map<String, Object> params) {
+        return StrUtils.stringifyByObject(topicDao.getTopicCapacity(params)).toString();
+    }
 
 }

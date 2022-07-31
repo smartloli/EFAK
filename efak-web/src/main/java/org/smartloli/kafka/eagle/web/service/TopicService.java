@@ -219,4 +219,9 @@ public interface TopicService {
      * Execute reset offsets.
      */
     public String setResetExecute(String clusterAlias, String json);
+
+    /**
+     * Get active topic numbers.
+     */
+    public long getActiveTopicNumbers(Map<String, Object> params);
 }

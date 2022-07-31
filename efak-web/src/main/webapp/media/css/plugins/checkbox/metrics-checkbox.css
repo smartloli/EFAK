@@ -1,0 +1,12 @@
+.efak-metrics-chart-div {
+    width: 100%;
+    height: 300px;
+}
+
+.efak-metrics-checkbox {
+    float: left;
+}
+
+.efak-metrics-checkbox-alert {
+    height: 110px;
+}

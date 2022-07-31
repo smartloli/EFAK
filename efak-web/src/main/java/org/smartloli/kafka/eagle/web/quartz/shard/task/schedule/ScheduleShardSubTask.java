@@ -85,6 +85,14 @@ public class ScheduleShardSubTask {
                     }
                 }
             }
+
+            try {
+                Class subThreadClass = Class.forName(ThreadConstants.SUPER_VIP_SUB_TASK);
+                Thread thread = (Thread) subThreadClass.newInstance();
+                thread.start();
+            } catch (Exception e) {
+                LoggerUtils.print(this.getClass()).info("Distributed node start super vip thread sub task has error, msg is ", e);
+            }
         }
 
     }

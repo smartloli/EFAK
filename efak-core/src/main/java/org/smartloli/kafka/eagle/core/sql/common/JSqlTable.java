@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +16,6 @@
  * limitations under the License.
  */
 package org.smartloli.kafka.eagle.core.sql.common;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.calcite.DataContext;
 import org.apache.calcite.linq4j.AbstractEnumerable;
@@ -30,54 +27,60 @@ import org.apache.calcite.schema.ScannableTable;
 import org.apache.calcite.schema.impl.AbstractTable;
 import org.apache.calcite.sql.type.SqlTypeUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Define memory table.
- * 
+ *
  * @author smartloli.
- * 
- *         Created by Mar 25, 2016
+ * <p>
+ * Created by Jul 17, 2022
  */
 public class JSqlTable extends AbstractTable implements ScannableTable {
-	private JSqlMapData.Table sourceTable;
-	private RelDataType dataType;
+    private JSqlMapData.Table sourceTable;
+    private RelDataType dataType;
 
-	public JSqlTable(JSqlMapData.Table table) {
-		this.sourceTable = table;
-		dataType = null;
-	}
+    public JSqlTable(JSqlMapData.Table table) {
+        this.sourceTable = table;
+    }
 
-	private static int[] identityList(int n) {
-		int[] integers = new int[n];
-		for (int i = 0; i < n; i++) {
-			integers[i] = i;
-		}
-		return integers;
-	}
+    private static int[] identityList(int n) {
+        int[] integers = new int[n];
+        for (int i = 0; i < n; i++) {
+            integers[i] = i;
+        }
+        return integers;
+    }
 
-	public RelDataType getRowType(RelDataTypeFactory typeFactory) {
-		if (dataType == null) {
-			RelDataTypeFactory.FieldInfoBuilder fieldInfo = typeFactory.builder();
-			for (JSqlMapData.Column column : this.sourceTable.columns) {
-				RelDataType sqlType = typeFactory.createJavaType(JSqlMapData.JAVATYPE_MAPPING.get(column.type));
-				sqlType = SqlTypeUtil.addCharsetAndCollation(sqlType, typeFactory);
-				fieldInfo.add(column.name, sqlType);
-			}
-			this.dataType = typeFactory.createStructType(fieldInfo);
-		}
-		return this.dataType;
-	}
+    @Override
+    public RelDataType getRowType(RelDataTypeFactory typeFactory) {
+        if (this.dataType == null) {
+            RelDataTypeFactory.Builder fieldInfo = typeFactory.builder();
+            for (JSqlMapData.Column column : this.sourceTable.columns) {
+                RelDataType sqlType = typeFactory.createJavaType(JSqlMapData.JAVATYPE_MAPPING.get(column.type));
+                sqlType = SqlTypeUtil.addCharsetAndCollation(sqlType, typeFactory);
+                fieldInfo.add(column.name, sqlType);
+            }
+            this.dataType = typeFactory.createStructType(fieldInfo.build().getFieldList());
+        }
+        return this.dataType;
+    }
 
-	public Enumerable<Object[]> scan(DataContext root) {
-		final List<String> types = new ArrayList<String>(sourceTable.columns.size());
-		for (JSqlMapData.Column column : sourceTable.columns) {
-			types.add(column.type);
-		}
-		final int[] fields = identityList(this.dataType.getFieldCount());
-		return new AbstractEnumerable<Object[]>() {
-			public Enumerator<Object[]> enumerator() {
-				return new JSqlEnumerator<Object[]>(fields, types, sourceTable.data);
-			}
-		};
-	}
+    @Override
+    public Enumerable<Object[]> scan(DataContext dataContext) {
+        final List<String> types = new ArrayList<String>(sourceTable.columns.size());
+        for (JSqlMapData.Column column : sourceTable.columns) {
+            types.add(column.type);
+        }
+
+        final int[] fields = identityList(types.size());
+        return new AbstractEnumerable<Object[]>() {
+            @Override
+            public Enumerator<Object[]> enumerator() {
+                return new JSqlEnumerator<Object[]>(fields, types, sourceTable.data);
+            }
+        };
+    }
 
 }

@@ -58,12 +58,7 @@ import java.util.*;
  *
  * @author smartloli.
  * <p>
- * Created by Sep 6, 2016.
- * <p>
- * Update by hexiang 20170216
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 12, 2022.
  */
 @Controller
 public class TopicController {
@@ -99,7 +94,7 @@ public class TopicController {
      * Topic message viewer.
      */
     @RequiresPermissions("/topic/message")
-    @RequestMapping(value = "/topic/message", method = RequestMethod.GET)
+    @RequestMapping(value = "/topic/ksql", method = RequestMethod.GET)
     public ModelAndView topicMessageView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/topic/ksql");
@@ -110,10 +105,10 @@ public class TopicController {
      * Topic message manager.
      */
     @RequiresPermissions("/topic/manager")
-    @RequestMapping(value = "/topic/manager", method = RequestMethod.GET)
+    @RequestMapping(value = "/topic/metadata", method = RequestMethod.GET)
     public ModelAndView topicManagerView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/topic/manager");
+        mav.setViewName("/topic/metadata");
         return mav;
     }
 
@@ -132,10 +127,10 @@ public class TopicController {
      * Topic mock viewer.
      */
     @RequiresPermissions("/topic/hub")
-    @RequestMapping(value = "/topic/hub", method = RequestMethod.GET)
+    @RequestMapping(value = "/topic/balance", method = RequestMethod.GET)
     public ModelAndView topicHubView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/topic/hub");
+        mav.setViewName("/topic/balance");
         return mav;
     }
 
@@ -223,16 +218,18 @@ public class TopicController {
             object.put("replicas", metadata.getReplicas());
             object.put("isr", metadata.getIsr());
             if (metadata.isPreferredLeader()) {
-                object.put("preferred_leader", "<span class='badge badge-success'>true</span>");
+                object.put("preferred_leader", "<span class='badge bg-light-success text-success'>true</span>");
             } else {
-                object.put("preferred_leader", "<span class='badge badge-danger btn-xs'>false</span>");
+                object.put("preferred_leader", "<span class='badge bg-light-danger text-danger'>false</span>");
             }
             if (metadata.isUnderReplicated()) {
-                object.put("under_replicated", "<span class='badge badge-danger btn-xs'>true</span>");
+                object.put("under_replicated", "<span class='badge bg-light-danger text-danger'>true</span>");
             } else {
-                object.put("under_replicated", "<span class='badge badge-success btn-xs'>false</span>");
+                object.put("under_replicated", "<span class='badge bg-light-success text-success'>false</span>");
             }
-            object.put("preview", "<a name='preview' topic='" + tname + "' partition='" + metadata.getPartitionId() + "' href='#' class='badge badge-primary'>Preview</a>");
+            object.put("preview", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                    "<a href='#' name='efak_topic_preview' topic='" + tname + "' partition='" + metadata.getPartitionId() + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Preview'><i class='bi bi-eye-fill'></i></a>" +
+                    "</div>");
             aaDatas.add(object);
         }
 
@@ -310,18 +307,23 @@ public class TopicController {
             object.put("lag", lag);
 
             if (Topic.RUNNING == status) {
-                object.put("status", "<span class='badge badge-success'>Running</span>");
+                object.put("status", "<span class='badge bg-light-success text-success'>Running</span>");
             } else if (Topic.SHUTDOWN == status) {
-                object.put("status", "<span class='badge badge-danger'>Shutdown</span>");
+                object.put("status", "<span class='badge bg-light-danger text-danger'>Shutdown</span>");
             } else if (Topic.PENDING == status) {
-                object.put("status", "<span class='badge badge-warning'>Pending</span>");
+                object.put("status", "<span class='badge bg-light-warning text-warning'>Pending</span>");
             }
 
-            if (Topic.RUNNING == status) {
-                object.put("operate", "<a value='disable' name='topic_reset_offsets' group='" + group + "' topic='" + topic + "' href='#' class='badge badge-secondary'>Reset</a>");
-            } else {
-                object.put("operate", "<a value='enable' name='topic_reset_offsets' group='" + group + "' topic='" + topic + "' href='#' class='badge badge-primary'>Reset</a>");
-            }
+            // deprecate
+//            if (Topic.RUNNING == status) {
+//                object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+//                        "<a href='#' value='disable' name='topic_reset_offsets' topic='" + topic + "' group='" + group + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Reset'><i class='bx bx-reset'></i></a>" +
+//                        "</div>");
+//            } else {
+//                object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+//                        "<a href='#' value='enable' name='topic_reset_offsets' topic='" + topic + "' group='" + group + "' class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Reset'><i class='bx bx-reset'></i></a>" +
+//                        "</div>");
+//            }
             aaDatas.add(object);
         }
 
@@ -632,35 +634,35 @@ public class TopicController {
             try {
                 long brokerSpread = partition.getBrokersSpread();
                 if (brokerSpread < Topic.TOPIC_BROKER_SPREAD_ERROR) {
-                    object.put("brokerSpread", "<span class='badge badge-danger'>" + brokerSpread + "%</span>");
+                    object.put("brokerSpread", "<span class='badge bg-light-danger text-danger'>" + brokerSpread + "%</span>");
                 } else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_ERROR && brokerSpread < Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-                    object.put("brokerSpread", "<span class='badge badge-warning'>" + brokerSpread + "%</span>");
+                    object.put("brokerSpread", "<span class='badge bg-light-warning text-warning'>" + brokerSpread + "%</span>");
                 } else if (brokerSpread >= Topic.TOPIC_BROKER_SPREAD_NORMAL) {
-                    object.put("brokerSpread", "<span class='badge badge-success'>" + brokerSpread + "%</span>");
+                    object.put("brokerSpread", "<span class='badge bg-light-success text-success'>" + brokerSpread + "%</span>");
                 } else {
-                    object.put("brokerSpread", "<span class='badge badge-primary'>" + brokerSpread + "%</span>");
+                    object.put("brokerSpread", "<span class='badge bg-light-primary text-primary'>" + brokerSpread + "%</span>");
                 }
 
                 long brokerSkewed = partition.getBrokersSkewed();
                 if (brokerSkewed >= Topic.TOPIC_BROKER_SKEW_ERROR) {
-                    object.put("brokerSkewed", "<span class='badge badge-danger'>" + brokerSkewed + "%</span>");
+                    object.put("brokerSkewed", "<span class='badge bg-light-danger text-danger'>" + brokerSkewed + "%</span>");
                 } else if (brokerSkewed > Topic.TOPIC_BROKER_SKEW_NORMAL && brokerSkewed < Topic.TOPIC_BROKER_SKEW_ERROR) {
-                    object.put("brokerSkewed", "<span class='badge badge-warning'>" + brokerSkewed + "%</span>");
+                    object.put("brokerSkewed", "<span class='badge bg-light-warning text-warning'>" + brokerSkewed + "%</span>");
                 } else if (brokerSkewed <= Topic.TOPIC_BROKER_SKEW_NORMAL) {
-                    object.put("brokerSkewed", "<span class='badge badge-success'>" + brokerSkewed + "%</span>");
+                    object.put("brokerSkewed", "<span class='badge bg-light-success text-success'>" + brokerSkewed + "%</span>");
                 } else {
-                    object.put("brokerSkewed", "<span class='badge badge-primary'>" + brokerSkewed + "%</span>");
+                    object.put("brokerSkewed", "<span class='badge bg-light-primary text-primary'>" + brokerSkewed + "%</span>");
                 }
 
                 long brokerLeaderSkewed = partition.getBrokersLeaderSkewed();
                 if (brokerLeaderSkewed >= Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
-                    object.put("brokerLeaderSkewed", "<span class='badge badge-danger'>" + brokerLeaderSkewed + "%</span>");
+                    object.put("brokerLeaderSkewed", "<span class='badge bg-light-danger text-danger'>" + brokerLeaderSkewed + "%</span>");
                 } else if (brokerLeaderSkewed > Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL && brokerLeaderSkewed < Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
-                    object.put("brokerLeaderSkewed", "<span class='badge badge-warning'>" + brokerLeaderSkewed + "%</span>");
+                    object.put("brokerLeaderSkewed", "<span class='badge bg-light-warning text-warning'>" + brokerLeaderSkewed + "%</span>");
                 } else if (brokerLeaderSkewed <= Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL) {
-                    object.put("brokerLeaderSkewed", "<span class='badge badge-success'>" + brokerLeaderSkewed + "%</span>");
+                    object.put("brokerLeaderSkewed", "<span class='badge bg-light-success text-success'>" + brokerLeaderSkewed + "%</span>");
                 } else {
-                    object.put("brokerLeaderSkewed", "<span class='badge badge-primary'>" + brokerLeaderSkewed + "%</span>");
+                    object.put("brokerLeaderSkewed", "<span class='badge bg-light-primary text-primary'>" + brokerLeaderSkewed + "%</span>");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -675,29 +677,32 @@ public class TopicController {
             if (topicStates != null && topicStates.size() > 0) {
                 if (topicStates.get(0).getTvalue() == 0) {
                     if (Role.ADMIN.equals(signiner.getUsername())) {
-                        object.put("operate",
-                                "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
-                                        + partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
-                                        + "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
+                        object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_modify'  class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Edit'><i class='bi bi-pencil-fill'></i></a>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_clean' class='text-warning' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Truncate'><i class='bx bx-brush-alt'></i></a>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_remove' class='text-danger' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Delete'><i class='bi bi-trash-fill'></i></a>" +
+                                "</div>");
                     } else {
                         object.put("operate", "");
                     }
                 } else {
                     if (Role.ADMIN.equals(signiner.getUsername())) {
-                        object.put("operate",
-                                "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
-                                        + partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
-                                        + "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
+                        object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_modify'  class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Edit'><i class='bi bi-pencil-fill'></i></a>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_clean' class='text-warning' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Truncate'><i class='bx bx-brush-alt'></i></a>" +
+                                "<a href='#" + partition.getTopic() + "' name='efak_topic_remove' class='text-danger' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Delete'><i class='bi bi-trash-fill'></i></a>" +
+                                "</div>");
                     } else {
                         object.put("operate", "");
                     }
                 }
             } else {
                 if (Role.ADMIN.equals(signiner.getUsername())) {
-                    object.put("operate",
-                            "<div class='btn-group btn-group-sm' role='group'><button id='ke_btn_action' class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action <span class='caret'></span></button><div aria-labelledby='ke_btn_action' class='dropdown-menu dropdown-menu-right'><a class='dropdown-item' name='topic_modify' href='#"
-                                    + partition.getTopic() + "'><i class='fas fa-edit fa-sm fa-fw mr-1'></i>Alter</a><a class='dropdown-item' href='#" + partition.getTopic() + "' name='topic_remove'><i class='fas fa-minus-circle fa-sm fa-fw mr-1'></i>Drop</a><a class='dropdown-item' href='#" + partition.getTopic()
-                                    + "' name='topic_clean'><i class='fas fa-trash-alt fa-sm fa-fw mr-1'></i>Truncating</a></div>");
+                    object.put("operate", "<div class='table-actions d-flex align-items-center gap-3 fs-6'>" +
+                            "<a href='#" + partition.getTopic() + "' name='efak_topic_modify'  class='text-primary' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Edit'><i class='bi bi-pencil-fill'></i></a>" +
+                            "<a href='#" + partition.getTopic() + "' name='efak_topic_clean' class='text-warning' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Truncate'><i class='bx bx-brush-alt'></i></a>" +
+                            "<a href='#" + partition.getTopic() + "' name='efak_topic_remove' class='text-danger' data-bs-toggle='tooltip' data-bs-placement='bottom' title='Delete'><i class='bi bi-trash-fill'></i></a>" +
+                            "</div>");
                 } else {
                     object.put("operate", "");
                 }
@@ -1031,9 +1036,9 @@ public class TopicController {
                 obj.put("host", "<a href='#" + id + "/host' name='ke_sql_query_detail'>" + (host.length() > 20 ? host.substring(0, 20) + "..." : host) + "</a>");
                 obj.put("ksql", "<a href='#" + id + "/ksql' name='ke_sql_query_detail'>" + (ksql.length() > 60 ? ksql.substring(0, 60) + "..." : ksql) + "</a>");
                 if (topicSql.getStatus().equals("SUCCESSED")) {
-                    obj.put("status", "<span class='badge badge-success'>" + topicSql.getStatus() + "</span>");
+                    obj.put("status", "<span class='badge bg-light-success text-success'>" + topicSql.getStatus() + "</span>");
                 } else {
-                    obj.put("status", "<span class='badge badge-danger'>" + topicSql.getStatus() + "</span>");
+                    obj.put("status", "<span class='badge bg-light-danger text-danger'>" + topicSql.getStatus() + "</span>");
                 }
                 obj.put("spendTime", topicSql.getSpendTime() / 1000.0 + "s");
                 obj.put("created", topicSql.getCreated());

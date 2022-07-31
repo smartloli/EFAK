@@ -1,5 +1,24 @@
 $(document).ready(function () {
-    $("#result").dataTable({
+
+    // part1: produce and capacity
+    try {
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/topic/list/total/jmx/ajax',
+            success: function (datas) {
+                if (datas != null) {
+                    $("#efak_topic_producer_number").text(datas.producerSize + " (APP)");
+                    $("#efak_topic_producer_total_capacity").text(datas.topicCapacity + " (" + datas.capacityType + ")");
+                }
+            }
+        });
+    } catch (e) {
+        console.log(e.message);
+    }
+
+    // part2: topic table list
+    $("#efak_topic_table_result").dataTable({
         // "searching" : false,
         "bSort": false,
         "bLengthChange": false,
@@ -43,13 +62,15 @@ $(document).ready(function () {
         });
     }
 
+    // part3: topic admin operate
     var topic = "";
-    $(document).on('click', 'a[name=topic_remove]', function () {
+    // delete topic
+    $(document).on('click', 'a[name=efak_topic_remove]', function () {
         var href = $(this).attr("href");
         topic = href.split("#")[1];
         var token = $("#ke_admin_token").val();
         $("#remove_div").html("");
-        $("#remove_div").append("<a id='ke_del_topic' href='#' class='btn btn-danger'>Remove</a>");
+        $("#remove_div").append("<a id='ke_del_topic' href='#' class='btn btn-danger'>Delete</a>");
         $('#ke_topic_delete').modal({
             backdrop: 'static',
             keyboard: false
@@ -67,18 +88,8 @@ $(document).ready(function () {
         }
     });
 
-    $("#ke_admin_token").on('input', function (e) {
-        var token = $("#ke_admin_token").val();
-        if (token.length == 0) {
-            $("#ke_del_topic").attr("disabled", true);
-            $("#ke_del_topic").attr("href", "#");
-        } else {
-            $("#ke_del_topic").attr("disabled", false);
-            $("#ke_del_topic").attr("href", "/topic/" + topic + "/" + token + "/delete");
-        }
-    });
-
-    $(document).on('click', 'a[name=topic_modify]', function () {
+    // add partition
+    $(document).on('click', 'a[name=efak_topic_modify]', function () {
         var href = $(this).attr("href");
         topic = href.split("#")[1];
         var partitions = $("#ke_modify_topic_partition").val();
@@ -101,14 +112,14 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', 'a[name=topic_clean]', function () {
+    // truncate topic
+    $(document).on('click', 'a[name=efak_topic_clean]', function () {
         var href = $(this).attr("href");
         var topic = href.split("#")[1];
-        console.log(topic);
         $("#ke_topic_clean_content").html("");
-        $("#ke_topic_clean_content").append("<p class='alert alert-danger alert-dismissable'>Are you sure to truncate the data of topic [ <strong>" + topic + "</strong> ] ?</p>");
+        $("#ke_topic_clean_content").append("<div class='alert border-0 bg-light-warning alert-dismissable'><div class='text-warning'>Are you sure to truncate the data of topic [ <strong>" + topic + "</strong> ] ?</div></div>");
         $("#ke_topic_clean_data_div").html("");
-        $("#ke_topic_clean_data_div").append("<a id='ke_del_topic' href='/topic/clean/data/" + topic + "/' class='btn btn-danger'>Submit</a>");
+        $("#ke_topic_clean_data_div").append("<a id='ke_del_topic' href='/topic/clean/data/" + topic + "/' class='btn btn-warning'>Submit</a>");
         $('#ke_topic_clean').modal({
             backdrop: 'static',
             keyboard: false
@@ -120,6 +131,18 @@ $(document).ready(function () {
             transform: 'translateX(-50%) translateY(-50%)'
         });
     });
+
+    $("#ke_admin_token").on('input', function (e) {
+        var token = $("#ke_admin_token").val();
+        if (token.length == 0) {
+            $("#ke_del_topic").attr("disabled", true);
+            $("#ke_del_topic").attr("href", "#");
+        } else {
+            $("#ke_del_topic").attr("disabled", false);
+            $("#ke_del_topic").attr("href", "/topic/" + topic + "/" + token + "/delete");
+        }
+    });
+
 
     $("#ke_modify_topic_partition").on('input', function (e) {
         var partitions = $("#ke_modify_topic_partition").val();
@@ -135,6 +158,9 @@ $(document).ready(function () {
 
     $("#select2val").select2({
         placeholder: "Topic",
+        theme: 'bootstrap4',
+        width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+        allowClear: true,
         ajax: {
             url: "/topic/mock/list/ajax",
             dataType: 'json',
@@ -173,8 +199,7 @@ $(document).ready(function () {
             escapeMarkup: function (markup) {
                 return markup;
             },
-            minimumInputLength: 0,
-            allowClear: true
+            minimumInputLength: 0
         }
     });
 
@@ -189,50 +214,7 @@ $(document).ready(function () {
         $("#ke_topic_aggrate").val(arrs);
     });
 
-    // Init chart common
-    try {
-        chartCommonOption = {
-            backgroundColor: "#fff",
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    label: {
-                        backgroundColor: '#6a7985'
-                    }
-                }
-            },
-            legend: {
-                data: []
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: true,
-                data: []
-            },
-            grid: {
-                bottom: "70px",
-                left: "90px",
-                right: "90px"
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: {
-                type: 'bar',
-                symbol: "none",
-                smooth: true,
-                areaStyle: {
-                    opacity: 0.1
-                },
-                data: []
-            }
-        };
-    } catch (e) {
-        console.log(e.message);
-    }
-
-    // Add data control
+    // Add daterangepicker
     try {
 
         var start = moment().subtract(6, 'days');
@@ -268,24 +250,98 @@ $(document).ready(function () {
         console.log(e.message);
     }
 
-    try {
-        function morrisBarInit(elment) {
-            lagChart = echarts.init(document.getElementById(elment), 'macarons');
-            lagChart.setOption(chartCommonOption);
-            return lagChart;
+    // topic produce logsize common options
+    var efakTopicLogSizeOptions = {
+        series: [{
+            name: "",
+            data: []
+        }],
+        chart: {
+            foreColor: '#9a9797',
+            type: "bar",
+            //width: 130,
+            stacked: true,
+            height: 280,
+            toolbar: {
+                show: !1
+            },
+            zoom: {
+                enabled: !1
+            },
+            dropShadow: {
+                enabled: 0,
+                top: 3,
+                left: 15,
+                blur: 4,
+                opacity: .12,
+                color: "#3461ff"
+            },
+            sparkline: {
+                enabled: !1
+            }
+        },
+        markers: {
+            size: 0,
+            colors: ["#3461ff"],
+            strokeColors: "#fff",
+            strokeWidth: 2,
+            hover: {
+                size: 7
+            }
+        },
+        plotOptions: {
+            bar: {
+                // horizontal: !1,
+                columnWidth: "35%",
+                //endingShape: "rounded"
+            }
+        },
+        dataLabels: {
+            enabled: !1
+        },
+        legend: {
+            show: false,
+        },
+        stroke: {
+            show: !0,
+            width: 0,
+            curve: "smooth"
+        },
+        colors: ["#3461ff"],
+        xaxis: {
+            // type: 'datetime',
+            labels: {
+                datetimeUTC: false,
+                format: "yyyy-MM-dd"
+            },
+            categories: []
+        },
+        yaxis: [{
+            labels: {
+                // fixed number less than 10
+                formatter: function (val) {
+                    if (window.isNaN(val) || Math.floor(val) != val) {
+                        return val;
+                    }
+                    try {
+                        return val.toFixed(0);
+                    } catch (e) {
+                        return val;
+                    }
+                }
+            }
+        }],
+        tooltip: {
+            theme: "dark",
+            x: {
+                format: "yyyy-MM-dd"
+            }
         }
-    } catch (e) {
-        console.log(e.message);
-    }
+    };
 
-    var topic_producer_agg = morrisBarInit('topic_producer_agg');
-
-    $("#topic_producer_agg").resize(function () {
-        var opt_topic_producer_agg = topic_producer_agg.getOption();
-        topic_producer_agg.clear();
-        topic_producer_agg.resize({width: $("#topic_producer_agg").css('width')});
-        topic_producer_agg.setOption(opt_topic_producer_agg);
-    });
+    // topic produce logsize
+    var efak_topic_producer_logsize_chart = new ApexCharts(document.querySelector("#efak_topic_producer_logsize_chart"), efakTopicLogSizeOptions);
+    efak_topic_producer_logsize_chart.render();
 
     function producerMsg(stime, etime) {
         $.ajax({
@@ -298,7 +354,7 @@ $(document).ready(function () {
             },
             success: function (datas) {
                 if (datas != null) {
-                    setProducerBarData(topic_producer_agg, datas);
+                    setProducerBarData(efak_topic_producer_logsize_chart, datas);
                     datas = null;
                 }
             }
@@ -307,9 +363,10 @@ $(document).ready(function () {
 
     // set trend data
     function setProducerBarData(mbean, data) {
-        chartCommonOption.xAxis.data = filter(data).x;
-        chartCommonOption.series.data = filter(data).y;
-        mbean.setOption(chartCommonOption);
+        efakTopicLogSizeOptions.xaxis.categories = filter(data).x;
+        efakTopicLogSizeOptions.series[0].data = filter(data).y;
+        efakTopicLogSizeOptions.series[0].name = filter(data).name;
+        mbean.updateOptions(efakTopicLogSizeOptions);
     }
 
     // filter data
@@ -348,27 +405,11 @@ $(document).ready(function () {
             url: '/topic/list/filter/select/ajax?stime=' + stime + '&etime=' + etime + '&topics=' + topics,
             success: function (datas) {
                 if (datas != null) {
-                    setProducerBarData(topic_producer_agg, datas);
+                    setProducerBarData(efak_topic_producer_logsize_chart, datas);
                     datas = null;
                 }
             }
         });
-    }
-
-    try {
-        $.ajax({
-            type: 'get',
-            dataType: 'json',
-            url: '/topic/list/total/jmx/ajax',
-            success: function (datas) {
-                if (datas != null) {
-                    $("#producer_number").text(datas.producerSize + " (APP)");
-                    $("#producer_total_capacity").text(datas.topicCapacity + " (" + datas.capacityType + ")");
-                }
-            }
-        });
-    } catch (e) {
-        console.log(e.message);
     }
 
 });

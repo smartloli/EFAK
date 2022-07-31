@@ -44,14 +44,15 @@ import java.util.regex.Pattern;
  * Alarm implements service to get configure info.
  *
  * @Author smartloli.
- *
- *         Created by Oct 27, 2018.
- *
+ * <p>
+ * Created by Oct 27, 2018.
  */
 @Service
 public class AlertServiceImpl implements AlertService {
 
-    /** Kafka service interface. */
+    /**
+     * Kafka service interface.
+     */
     private KafkaService kafkaService = new KafkaFactory().create();
 
     @Autowired
@@ -69,7 +70,9 @@ public class AlertServiceImpl implements AlertService {
         return alertDao.insertAlarmCrontab(alarmCrontab);
     }
 
-    /** Get consumer group to alert. */
+    /**
+     * Get consumer group to alert.
+     */
     public String getAlarmConsumerGroup(String clusterAlias, String formatter, String search) {
         if ("kafka".equals(formatter)) {
             return getAlarmConsumerGroupKafka(clusterAlias, search);
@@ -78,7 +81,9 @@ public class AlertServiceImpl implements AlertService {
         }
     }
 
-    /** Get consumer topic to alert. */
+    /**
+     * Get consumer topic to alert.
+     */
     public String getAlarmConsumerTopic(String clusterAlias, String formatter, String group, String search) {
         if ("kafka".equals(formatter)) {
             return getAlarmConsumerTopicKafka(clusterAlias, group, search);
@@ -110,7 +115,7 @@ public class AlertServiceImpl implements AlertService {
                 offset++;
             }
         }
-        return groups.toJSONString();
+        return groups.toString();
     }
 
     private String getAlarmConsumerGroupKafka(String clusterAlias, String search) {
@@ -138,7 +143,7 @@ public class AlertServiceImpl implements AlertService {
                 offset++;
             }
         }
-        return groups.toJSONString();
+        return groups.toString();
     }
 
     private String getAlarmConsumerTopic(String clusterAlias, String group, String search) {
@@ -164,7 +169,7 @@ public class AlertServiceImpl implements AlertService {
                 offset++;
             }
         }
-        return topics.toJSONString();
+        return topics.toString();
     }
 
     private String getAlarmConsumerTopicKafka(String clusterAlias, String group, String search) {
@@ -190,7 +195,7 @@ public class AlertServiceImpl implements AlertService {
                 offset++;
             }
         }
-        return topics.toJSONString();
+        return topics.toString();
     }
 
     @Override
@@ -248,7 +253,9 @@ public class AlertServiceImpl implements AlertService {
         return alertDao.getAllAlarmClusterTasks();
     }
 
-    /** Get alert type list. */
+    /**
+     * Get alert type list.
+     */
     public String getAlertTypeList() {
         int offset = 0;
         JSONArray typeList = new JSONArray();
@@ -259,7 +266,7 @@ public class AlertServiceImpl implements AlertService {
             typeList.add(object);
             offset++;
         }
-        return typeList.toJSONString();
+        return typeList.toString();
     }
 
     @Override
@@ -370,7 +377,7 @@ public class AlertServiceImpl implements AlertService {
             }
         }
 
-        return typeList.toJSONString();
+        return typeList.toString();
     }
 
     @Override

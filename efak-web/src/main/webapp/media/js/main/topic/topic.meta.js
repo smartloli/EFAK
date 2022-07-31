@@ -2,29 +2,8 @@ $(document).ready(function () {
     var url = window.location.href;
     var topicName = url.split("meta/")[1].split("/")[0];
 
-    // add preview
-    var previewMsg;
-    try {
-        var mime = 'text/x-mariadb';
-        // get mime type
-        if (window.location.href.indexOf('mime=') > -1) {
-            mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
-        }
-        previewMsg = CodeMirror.fromTextArea(document.getElementById('ke_tp_preview_message'), {
-            mode: mime,
-            indentWithTabs: true,
-            smartIndent: true,
-            lineNumbers: false,
-            matchBrackets: true,
-            autofocus: true,
-            readOnly: true
-        });
-    } catch (e) {
-        console.info(e.message);
-    }
-
     // topic meta
-    $("#result").dataTable({
+    $("#efak_topic_meta_table_result").dataTable({
         "searching": false,
         "bSort": false,
         "bLengthChange": false,
@@ -54,7 +33,7 @@ $(document).ready(function () {
     });
 
     // topic consumer group
-    $("#topic_consumer_tab_result").dataTable({
+    $("#efak_topic_consumer_tab_result").dataTable({
         // "searching": false,
         "bSort": false,
         "bLengthChange": false,
@@ -70,8 +49,6 @@ $(document).ready(function () {
             "mData": 'lag'
         }, {
             "mData": 'status'
-        }, {
-            "mData": 'operate'
         }]
     });
 
@@ -124,9 +101,9 @@ $(document).ready(function () {
         }
 
         if (field.toUpperCase().indexOf("BYTE") > -1) {
-            tr += "<tr><td>" + field + "</td><td><span class='badge badge-secondary'>" + data.meanRate + "</span></td><td><span class='badge badge-secondary'>" + data.oneMinute + "</span></td><td><span class='badge badge-secondary'>" + data.fiveMinute + "</span></td><td><span class='badge badge-secondary'>" + data.fifteenMinute + "</span></td></tr>";
+            tr += "<tr><td>" + field + "</td><td><span class='badge bg-secondary'>" + data.meanRate + "</span></td><td><span class='badge bg-secondary'>" + data.oneMinute + "</span></td><td><span class='badge bg-secondary'>" + data.fiveMinute + "</span></td><td><span class='badge bg-secondary'>" + data.fifteenMinute + "</span></td></tr>";
         } else {
-            tr += "<tr><td>" + field + "</td><td><span class='badge badge-secondary'>" + data.meanRate.split("B")[0] + "</span></td><td><span class='badge badge-secondary'>" + data.oneMinute.split("B")[0] + "</span></td><td><span class='badge badge-secondary'>" + data.fiveMinute.split("B")[0] + "</span></td><td><span class='badge badge-secondary'>" + data.fifteenMinute.split("B")[0] + "</span></td></tr>";
+            tr += "<tr><td>" + field + "</td><td><span class='badge bg-secondary'>" + data.meanRate.split("B")[0] + "</span></td><td><span class='badge bg-secondary'>" + data.oneMinute.split("B")[0] + "</span></td><td><span class='badge bg-secondary'>" + data.fiveMinute.split("B")[0] + "</span></td><td><span class='badge bg-secondary'>" + data.fifteenMinute.split("B")[0] + "</span></td></tr>";
         }
 
         return tr;
@@ -138,61 +115,13 @@ $(document).ready(function () {
         url: '/topic/meta/jmx/' + topicName + '/ajax',
         success: function (datas) {
             if (datas != null) {
-                $("#producer_logsize").text(datas.logsize);
-                $("#producer_topicsize").text(datas.topicsize + " (" + datas.sizetype + ")");
+                $("#efak_topic_producer_logsize").text(datas.logsize);
+                $("#efak_topic_producer_capacity").text(datas.topicsize + " (" + datas.sizetype + ")");
             }
         }
     });
 
-    // Init chart common
-    try {
-        chartCommonOption = {
-            backgroundColor: "#fff",
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    label: {
-                        backgroundColor: '#6a7985'
-                    }
-                }
-            },
-            legend: {
-                data: []
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: []
-            },
-            dataZoom: {
-                show: true,
-                start: 30
-            },
-            grid: {
-                bottom: "70px",
-                left: "90px",
-                right: "90px"
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: {
-                type: 'line',
-                symbol: "none",
-                // name : "",
-                smooth: true,
-                areaStyle: {
-                    opacity: 0.1
-                },
-                data: []
-            }
-        };
-    } catch (e) {
-        console.log(e.message);
-    }
-
-    // Add data control
+    // add daterangepicker
     try {
 
         var start = moment();
@@ -231,24 +160,122 @@ $(document).ready(function () {
         console.log(e.message);
     }
 
-    try {
-        function morrisLineInit(elment) {
-            lagChart = echarts.init(document.getElementById(elment), 'macarons');
-            lagChart.setOption(chartCommonOption);
-            return lagChart;
+    // topic msg chart
+    var chartCommonOption = {
+        series: [{
+            name: '',
+            data: []
+        }],
+        chart: {
+            type: "area",
+            // width: 130,
+            stacked: true,
+            height: 280,
+            toolbar: {
+                show: true,
+                tools: {
+                    download: false,
+                    selection: true,
+                    zoom: true,
+                    zoomin: true,
+                    zoomout: true,
+                    pan: true,
+                    reset: true
+                }
+            },
+            zoom: {
+                enabled: true
+            },
+            dropShadow: {
+                enabled: 0,
+                top: 3,
+                left: 14,
+                blur: 4,
+                opacity: .12,
+                color: "#3461ff"
+            },
+            sparkline: {
+                enabled: !1
+            }
+        },
+        markers: {
+            size: 0,
+            colors: ["#3461ff"],
+            strokeColors: "#fff",
+            strokeWidth: 2,
+            hover: {
+                size: 7
+            }
+        },
+        grid: {
+            row: {
+                colors: ["transparent", "transparent"],
+                opacity: .2
+            },
+            borderColor: "#f1f1f1"
+        },
+        plotOptions: {
+            bar: {
+                horizontal: !1,
+                columnWidth: "25%",
+                //endingShape: "rounded"
+            }
+        },
+        dataLabels: {
+            enabled: !1
+        },
+        stroke: {
+            show: !0,
+            width: [2.5],
+            //colors: ["#3461ff"],
+            curve: "smooth"
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shade: 'light',
+                type: 'vertical',
+                shadeIntensity: 0.5,
+                gradientToColors: ['#3461ff'],
+                inverseColors: false,
+                opacityFrom: 0.5,
+                opacityTo: 0.1,
+                // stops: [0, 100]
+            }
+        },
+        colors: ["#3461ff"],
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                datetimeUTC: false,
+            },
+            categories: []
+        },
+        responsive: [
+            {
+                breakpoint: 1000,
+                options: {
+                    chart: {
+                        type: "area",
+                        // width: 130,
+                        stacked: true,
+                    }
+                }
+            }
+        ],
+        legend: {
+            show: false
+        },
+        tooltip: {
+            theme: "dark",
+            x: {
+                format: 'yyyy-MM-dd HH:mm'
+            }
         }
-    } catch (e) {
-        console.log(e.message);
-    }
+    };
 
-    var topic_producer_msg = morrisLineInit('topic_producer_msg');
-
-    $("#topic_producer_msg").resize(function () {
-        var opt_topic_producer_msg = topic_producer_msg.getOption();
-        topic_producer_msg.clear();
-        topic_producer_msg.resize({width: $("#topic_producer_msg").css('width')});
-        topic_producer_msg.setOption(opt_topic_producer_msg);
-    });
+    var efak_topic_producer_msg = new ApexCharts(document.querySelector("#efak_topic_producer_msg"), chartCommonOption);
+    efak_topic_producer_msg.render();
 
     function producerMsg(stime, etime) {
         $.ajax({
@@ -261,7 +288,7 @@ $(document).ready(function () {
             },
             success: function (datas) {
                 if (datas != null) {
-                    setProducerChartData(topic_producer_msg, datas);
+                    setProducerChartData(efak_topic_producer_msg, datas);
                     datas = null;
                 }
             }
@@ -270,9 +297,10 @@ $(document).ready(function () {
 
     // set trend data
     function setProducerChartData(mbean, data) {
-        chartCommonOption.xAxis.data = filter(data).x;
-        chartCommonOption.series.data = filter(data).y;
-        mbean.setOption(chartCommonOption);
+        chartCommonOption.xaxis.categories = filter(data).x;
+        chartCommonOption.series[0].data = filter(data).y;
+        chartCommonOption.series[0].name = filter(data).name;
+        mbean.updateOptions(chartCommonOption);
     }
 
     // filter data
@@ -289,7 +317,7 @@ $(document).ready(function () {
         return data;
     }
 
-    $(document).on('click', 'a[name=preview]', function () {
+    $(document).on('click', 'a[name=efak_topic_preview]', function () {
         var topic = $(this).attr("topic");
         var partition = $(this).attr("partition");
         $('#ke_topic_preview').modal({
@@ -310,24 +338,13 @@ $(document).ready(function () {
                 url: '/topic/meta/preview/msg/ajax?topic=' + topic + '&partition=' + partition,
                 success: function (datas) {
                     if (datas != null) {
-                        previewMsg.setValue(JSON.stringify(datas, null, 2));
+                        $("#ke_tp_preview_message").text(JSON.stringify(datas, null, 2));
                     }
                 }
             });
         } catch (e) {
             console.log(e.message)
         }
-    });
-
-    // reset offset result
-    var topicResetOffsets = CodeMirror.fromTextArea(document.getElementById('ke_reset_offset_result'), {
-        mode: mime,
-        indentWithTabs: true,
-        smartIndent: true,
-        lineNumbers: false,
-        matchBrackets: true,
-        autofocus: true,
-        readOnly: true
     });
 
     // reset offsets
@@ -338,6 +355,9 @@ $(document).ready(function () {
         var topic = $(this).attr("topic");
         $("#select2val").select2({
             placeholder: "Reset Type",
+            theme: 'bootstrap4',
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            allowClear: true,
             ajax: {
                 url: "/topic/reset/offset/type/list/ajax",
                 dataType: 'json',
@@ -404,7 +424,6 @@ $(document).ready(function () {
     });
 
     function execute(json) {
-        console.log(json)
         $.ajax({
             type: 'post',
             dataType: 'json',
@@ -415,12 +434,11 @@ $(document).ready(function () {
             url: '/topic/reset/offsets/execute/result/ajax',
             success: function (datas) {
                 if (datas != null) {
-                    console.log(datas)
                     if (datas.hasOwnProperty("success") && datas.success) {
-                        topicResetOffsets.setValue(datas.result);
+                        $("#topicResetOffsets").text(datas.result);
                     }
                     if (datas.hasOwnProperty("error")) {
-                        topicResetOffsets.setValue(datas.error);
+                        $("#topicResetOffsets").text(datas.error);
                     }
                 }
             }

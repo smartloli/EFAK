@@ -22,9 +22,11 @@ import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.DashboardInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
+import org.smartloli.kafka.eagle.common.protocol.TopicCapacityInfo;
 import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
+import org.smartloli.kafka.eagle.common.util.CalendarUtils;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
@@ -39,20 +41,16 @@ import org.smartloli.kafka.eagle.web.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Kafka Eagle dashboard data generator.
+ * Monitoring panel realizes data interface calling logic.
  *
  * @author smartloli.
  * <p>
- * Created by Aug 12, 2016.
- * <p>
- * Update by hexiang 20170216
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 02, 2022.
  */
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -76,11 +74,35 @@ public class DashboardServiceImpl implements DashboardService {
     /**
      * Get kafka & dashboard dataset.
      */
-    public String getDashboard(String clusterAlias) {
+    @Override
+    public String getDashboardPanel(String clusterAlias) {
         JSONObject target = new JSONObject();
-        target.put("kafka", kafkaBrokersGraph(clusterAlias));
+        // target.put("kafka", kafkaBrokersGraph(clusterAlias));
         target.put("dashboard", panel(clusterAlias));
         return target.toJSONString();
+    }
+
+    private String chart(String clusterAlias, String flag) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("cluster", clusterAlias);
+        params.put("type", KConstants.CollectorType.KAFKA);
+        params.put("key", KConstants.MBean.MESSAGEIN);
+        params.put("tm", CalendarUtils.getCustomLastDay(0));
+
+        if ("broker_chart".equals(flag)) {
+            params.put("size", 6);// display broker lastest 6 minutes
+            List<KpiInfo> kpis = mbeanDao.getDashboradPanelBrokerChart(params);
+            for (KpiInfo kpi : kpis) {
+
+            }
+        } else if ("broker_chart_rate".equals(flag)) {
+            params.put("size", 12);// cacl broker rate
+        } else if ("broker_chart_msg".equals(flag)) {
+            params.put("size", 10); // Broker MessageIn
+
+        }
+
+        return "";
     }
 
     /**
@@ -125,6 +147,7 @@ public class DashboardServiceImpl implements DashboardService {
     /**
      * Get topic rank data,such as logsize and topic capacity.
      */
+    @Override
     public JSONArray getTopicRank(Map<String, Object> params) {
         List<TopicRank> topicRank = topicDao.readTopicRank(params);
         JSONArray array = new JSONArray();
@@ -220,9 +243,9 @@ public class DashboardServiceImpl implements DashboardService {
             long valueFirst = Long.parseLong(kpis.get(0).getValue());
             long valueSecond = Long.parseLong(kpis.get(1).getValue());
             if (valueFirst >= valueSecond) {
-                object.put("mem", 100 * StrUtils.numberic(((valueFirst - valueSecond) * 1.0 / valueFirst) + "", "###.###"));
+                object.put("mem", StrUtils.numberic(((valueFirst - valueSecond) * 100.0 / valueFirst) + ""));
             } else {
-                object.put("mem", 100 * StrUtils.numberic(((valueSecond - valueFirst) * 1.0 / valueSecond) + "", "###.###"));
+                object.put("mem", StrUtils.numberic(((valueSecond - valueFirst) * 100.0 / valueSecond) + ""));
             }
         } else {
             object.put("mem", "0.0");
@@ -240,6 +263,26 @@ public class DashboardServiceImpl implements DashboardService {
             object.put("cpu", StrUtils.numberic(kpis.get(0).getValue()) / brokerService.brokerNumbers(params.get("cluster").toString()));
         } else {
             object.put("cpu", "0.0");
+        }
+        return object.toJSONString();
+    }
+
+    @Override
+    public String getActiveTopicNumbers(String clusterAlias, Map<String, Object> params) {
+        long activeNums = topicDao.getActiveTopicNumbers(params);
+        TopicCapacityInfo topicCapacityInfo = topicDao.getTopicCapacityScatter(params);
+        JSONObject object = new JSONObject();
+        object.put("active", activeNums);
+        object.put("standby", brokerService.topicList(clusterAlias).size() - activeNums);
+        object.put("total", brokerService.topicList(clusterAlias).size());
+        if (topicCapacityInfo != null) {
+            object.put("mb", topicCapacityInfo.getMb());
+            object.put("gb", topicCapacityInfo.getGb());
+            object.put("tb", topicCapacityInfo.getTb());
+        } else {
+            object.put("mb", 0);
+            object.put("gb", 0);
+            object.put("tb", 0);
         }
         return object.toJSONString();
     }

@@ -3,123 +3,155 @@
 
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <jsp:include page="../public/plus/title.jsp">
+    <!-- Required meta tags -->
+    <jsp:include page="../public/pro/title.jsp">
         <jsp:param value="KSQL" name="loader"/>
     </jsp:include>
-    <jsp:include page="../public/plus/css.jsp">
+
+    <!-- Required common css -->
+    <jsp:include page="../public/pro/css.jsp">
         <jsp:param value="plugins/codemirror/codemirror.css" name="css"/>
         <jsp:param value="plugins/codemirror/show-hint.css" name="css"/>
+        <jsp:param value="plugins/codemirror/code-dark.css" name="css"/>
     </jsp:include>
-    <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
+
+    <!-- Required table css -->
+    <jsp:include page="../public/pro/tcss.jsp"></jsp:include>
 </head>
-<style>
-    .CodeMirror {
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-        border-right: 1px solid #ddd;
-        border-left: 1px solid #ddd;
-    }
-</style>
+
 <body>
-<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
-<div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <jsp:include page="../public/plus/navbar.jsp"></jsp:include>
-    </div>
-    <div id="layoutSidenav_content">
-        <main>
-            <div class="container-fluid">
-                <h1 class="mt-4">Topic</h1>
-                <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item"><a href="#">Topic</a></li>
-                    <li class="breadcrumb-item active">KSQL</li>
-                </ol>
-                <div class="alert alert-info alert-dismissable">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <i class="fas fa-info-circle"></i> Sample <a
+
+
+<!--start wrapper-->
+<div class="wrapper">
+
+    <!--start top header-->
+    <jsp:include page="../public/pro/navtop.jsp"></jsp:include>
+    <!--end top header-->
+
+    <!--start sidebar -->
+    <jsp:include page="../public/pro/navbar.jsp"></jsp:include>
+    <!--end sidebar -->
+
+    <!--start content-->
+    <main class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">Topics</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="/"><i class="bx bx-home-alt"></i></a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">KSQL</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <!--end breadcrumb-->
+
+        <hr/>
+        <div class="row">
+            <div class="container">
+                <div class="alert border-0 bg-light-info alert-dismissible fade show py-2 text-info">
+                    <i class="bx bx-info-circle"></i>&nbsp;Sample <a
                         href="http://www.kafka-eagle.org/articles/docs/quickstart/ksql.html" target="_blank">KSQL</a>
-                    query: <strong>select * from ke_topic where `partition` in (0,1,2) limit 10</strong><br/> <i
-                        class="fas fa-info-circle"></i> AutoComplete: Press <strong>Alt and /</strong>.
+                    query: <strong>select * from efak_topic where `partition` in (0,1,2) limit 10</strong>
+                    <br/><i class="bx bx-info-circle"></i>&nbsp;AutoComplete: Press <strong>Alt and /</strong>.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <!-- content body -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <i class="far fa-file-code"></i> Kafka Query SQL
-                            </div>
-                            <div class="card-body">
-                                <div>
-                                    <form>
-                                        <textarea id="code" name="code"></textarea>
-                                    </form>
-                                </div>
-                                <br/>
-                                <button id="ke_ksql_query" class="btn btn-success">Query</button>
-                            </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-12 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="border p-3 rounded">
+                            <h6 class="mb-0 text-uppercase">Kafka Query SQL</h6>
+                            <hr/>
+                            <textarea id="efak_ksql_code" name="efak_ksql_code"></textarea>
+                            <br/>
+                            <button id="ke_ksql_query" class="btn btn-primary">Query</button>
                         </div>
                     </div>
                 </div>
-                <!-- result -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <i class="far fa-comments"></i> Tasks Job Info
-                            </div>
-                            <div class="card-body">
-                                <nav>
-                                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                        <a class="nav-item nav-link active" id="ke_log_textarea" data-toggle="tab"
-                                           href="#log_textarea" role="tab" aria-controls="log_textarea"
-                                           aria-selected="true">Logs</a> <a class="nav-item nav-link"
-                                                                            id="ke_result_textarea" data-toggle="tab"
-                                                                            href="#result_textarea" role="tab"
-                                                                            aria-controls="result_textarea"
-                                                                            aria-selected="false">Result</a> <a
-                                            class="nav-item nav-link" id="ke_ksql_history_textarea" data-toggle="tab"
-                                            href="#ksql_history_textarea" role="tab"
-                                            aria-controls="ksql_history_textarea"
-                                            aria-selected="false">History</a>
-                                    </div>
-                                </nav>
-                                <div class="tab-content" id="nav-tabContent">
-                                    <div class="tab-pane fade show active" id="log_textarea" role="tabpanel"
-                                         aria-labelledby="ke_log_textarea">
-                                        <form>
-                                            <textarea id="job_info" name="job_info"></textarea>
-                                        </form>
-                                    </div>
-                                    <div class="tab-pane fade" id="result_textarea" role="tabpanel"
-                                         aria-labelledby="ke_result_textarea"></div>
-                                    <div class="tab-pane fade" id="ksql_history_textarea" role="tabpanel"
-                                         aria-labelledby="ke_ksql_history_textarea">
-                                        <div id="ksql_history_result_div">
-                                            <div id="ksql_history_result0">
-                                                <div class="table-responsive">
-                                                    <table id="ksql_history_result"
-                                                           class="table table-bordered table-condensed" width="100%">
-                                                        <thead>
-                                                        <tr>
-                                                            <th>ID</th>
-                                                            <th>User</th>
-                                                            <th>Host</th>
-                                                            <th>KSQL</th>
-                                                            <th>Status</th>
-                                                            <th>Spent</th>
-                                                            <th>Created</th>
-                                                        </tr>
-                                                        </thead>
-                                                    </table>
+            </div>
+        </div>
+        <!--end row-->
+
+        <div class="row">
+            <div class="col-xl-12 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="border p-3 rounded">
+                            <h6 class="mb-0 text-uppercase">Tasks Job Info</h6>
+                            <hr/>
+                            <div class="card">
+                                <div class="card-body">
+                                    <ul class="nav nav-tabs nav-primary" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link active" data-bs-toggle="tab" href="#efak_ksql_logs_tab"
+                                               role="tab" aria-selected="true">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="tab-icon"><i class='bx bx-file font-18 me-1'></i>
+                                                    </div>
+                                                    <div class="tab-title">Logs</div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#efak_ksql_result_tab"
+                                               role="tab"
+                                               aria-selected="false">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="tab-icon"><i class='bx bx-table font-18 me-1'></i>
+                                                    </div>
+                                                    <div class="tab-title">Result</div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#efak_ksql_history_tab"
+                                               role="tab"
+                                               aria-selected="false">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="tab-icon"><i class='bx bx-history font-18 me-1'></i>
+                                                    </div>
+                                                    <div class="tab-title">History</div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content py-3">
+                                        <div class="tab-pane fade show active" id="efak_ksql_logs_tab" role="tabpanel">
+                                            <form>
+                                                <textarea id="job_info" name="job_info"></textarea>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="efak_ksql_result_tab" role="tabpanel">
+                                        </div>
+                                        <div class="tab-pane fade" id="efak_ksql_history_tab" role="tabpanel">
+                                            <div id="ksql_history_result_div">
+                                                <div id="ksql_history_result0">
+                                                    <div class="table-responsive">
+                                                        <table id="ksql_history_result"
+                                                               class="table table-striped table-bordered"
+                                                               width="100%">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>#ID</th>
+                                                                <th>User</th>
+                                                                <th>Host</th>
+                                                                <th>KSQL</th>
+                                                                <th>Status</th>
+                                                                <th>Spent</th>
+                                                                <th>Created</th>
+                                                            </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -129,45 +161,51 @@
                         </div>
                     </div>
                 </div>
-                <!-- More then detail -->
-                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_sql_query_detail"
-                     tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="keModalLabel">KSQL</h4>
-                                <button class="close" type="button" data-dismiss="modal">x</button>
-                            </div>
-                            <!-- /.row -->
-                            <div class="modal-body">
-                                <fieldset class="form-horizontal">
-                                    <div class="form-group">
-                                        <textarea id="ke_sql_query_content" name="ke_sql_query_content"
-                                                  class="form-control" readonly="readonly" rows="3"></textarea>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
-                            </div>
-                        </div>
+            </div>
+        </div>
+
+        <!-- ksql detail -->
+        <div class="modal fade" id="ke_sql_query_detail" tabindex="-1" aria-labelledby="keModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">KSQL Detail</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea id="ke_sql_query_content" name="ke_sql_query_content" class="form-control" rows="3"
+                                  cols="10" placeholder="" readonly style="height: 420px;"></textarea>
+                    </div>
+                    <div id="remove_div" class="modal-footer">
                     </div>
                 </div>
             </div>
-        </main>
-        <jsp:include page="../public/plus/footer.jsp"></jsp:include>
-    </div>
+        </div>
+    </main>
+    <!--end page main-->
+
+
+    <!--start overlay-->
+    <div class="overlay nav-toggle-icon"></div>
+    <!--end overlay-->
+
+    <!--Start Back To Top Button-->
+    <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+    <!--End Back To Top Button-->
+
 </div>
-</body>
-<jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="plugins/magicsuggest/magicsuggest.js" name="loader"/>
-    <jsp:param value="plugins/tokenfield/bootstrap-tokenfield.js" name="loader"/>
+<!--end wrapper-->
+
+<!-- import js and plugins -->
+<jsp:include page="../public/pro/script.jsp">
+    <jsp:param value="main/topic/ksql.js?v=3.0.0" name="loader"/>
+    <jsp:param value="main/topic/ksql.history.js?v=3.0.0" name="loader"/>
     <jsp:param value="plugins/codemirror/codemirror.js" name="loader"/>
     <jsp:param value="plugins/codemirror/sql.js" name="loader"/>
     <jsp:param value="plugins/codemirror/show-hint.js" name="loader"/>
     <jsp:param value="plugins/codemirror/sql-hint.js" name="loader"/>
-    <jsp:param value="main/topic/ksql.js" name="loader"/>
-    <jsp:param value="main/topic/ksql.history.js" name="loader"/>
 </jsp:include>
-<jsp:include page="../public/plus/tscript.jsp"></jsp:include>
+<jsp:include page="../public/pro/tscript.jsp"></jsp:include>
+</body>
 </html>

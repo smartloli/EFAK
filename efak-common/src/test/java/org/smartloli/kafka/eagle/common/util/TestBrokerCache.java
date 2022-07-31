@@ -28,7 +28,7 @@ import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
  */
 public class TestBrokerCache {
     public static void main(String[] args) {
-        ZKFactoryUtils.initKafkaMetaData();
+        KafkaCacheUtils.initKafkaMetaData();
         System.out.println(BrokerCache.META_CACHE.toString());
     }
 }

@@ -17,8 +17,10 @@
  */
 package org.smartloli.kafka.eagle.web.dao;
 
+import org.smartloli.kafka.eagle.common.protocol.TopicCapacityInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenBarInfo;
 import org.smartloli.kafka.eagle.common.protocol.bscreen.BScreenConsumerInfo;
+import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsCntInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerGroupsInfo;
 import org.smartloli.kafka.eagle.common.protocol.consumer.ConsumerSummaryInfo;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicLogSize;
@@ -257,5 +259,20 @@ public interface TopicDao {
      * Get  topic consumer group pages.
      */
     public List<ConsumerGroupsInfo> getTopicConsumerPages(Map<String, Object> params);
+
+    /**
+     * Get active topic numbers.
+     */
+    public long getActiveTopicNumbers(Map<String, Object> params);
+
+    /**
+     * Get topic capacity scatter.
+     */
+    public TopicCapacityInfo getTopicCapacityScatter(Map<String, Object> params);
+
+    /**
+     * Get consumer group active and standby count.
+     */
+    public ConsumerGroupsCntInfo getConsumerGroupsCnt(Map<String, Object> params);
 
 }

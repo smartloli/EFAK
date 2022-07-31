@@ -75,7 +75,7 @@ public interface JConstants {
     /**
      * Automatically create databases and tables.
      */
-    public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen", "ke_alarm_config", "ke_consumer_group", "ke_consumer_group_summary", "ke_topic_consumer_group_summary_view", "ke_connect_config", "ke_alarm_crontab");
+    public static final List<String> TBLS = Arrays.asList("ke_p_role", "ke_resources", "ke_role_resource", "ke_metrics", "ke_metrics_offline", "ke_alarm_consumer", "ke_alarm_clusters", "ke_user_role", "ke_users", "ke_topic_rank", "ke_sql_history", "ke_logsize", "ke_consumer_bscreen_press", "ke_alarm_config", "ke_consumer_group", "ke_consumer_group_summary", "ke_topic_consumer_group_summary_view", "ke_connect_config", "ke_alarm_crontab");
 
     static String CREATE_TABLE_KE_P_ROLE = "CREATE TABLE IF NOT EXISTS `ke_p_role` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`name` varchar(64) CHARACTER SET utf8 NOT NULL COMMENT 'role name',`seq` tinyint(4) NOT NULL COMMENT 'rank',`description` varchar(128) CHARACTER SET utf8 NOT NULL COMMENT 'role describe',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4";
     static String CREATE_TABLE_KE_P_ROLE_INSERT = "INSERT INTO `ke_p_role` VALUES ('1', 'Administrator', '1', 'Have all permissions'), ('2', 'Devs', '2', 'Own add or delete'), ('3', 'Tourist', '3', 'Only viewer')";
@@ -87,6 +87,9 @@ public interface JConstants {
     static String CREATE_TABLE_KE_ROLE_RESOURCE_INSERT = "INSERT INTO `ke_role_resource` VALUES ('1', '1', '1'), ('2', '1', '2'), ('3', '1', '3'), ('4', '1', '4'), ('5', '1', '5'), ('6', '1', '7'), ('7', '1', '8'), ('8', '1', '10'), ('9', '1', '11'), ('10', '1', '13'), ('11', '2', '7'), ('12', '2', '8'), ('13', '2', '13'), ('14', '2', '10'), ('15', '2', '11'), ('16', '1', '14'), ('17', '1', '15'), ('18', '1', '16'), ('19', '1', '18'), ('20', '1', '19'), ('21', '1', '20'), ('22', '1', '21'), ('23', '1', '22'), ('24', '1', '23'), ('25', '1', '24')";
 
     static String CREATE_TABLE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64) DEFAULT NULL,`broker` text DEFAULT NULL,`type` varchar(32) DEFAULT NULL,`key` varchar(64) DEFAULT NULL,`value` varchar(128) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+    static String CREATE_TABLE_KE_METRICS_INDEX_TM_CLUSTER = "ALTER TABLE `ke_metrics` ADD INDEX `idx_tm_cluster_key` (`cluster`, `type`, `key`,`tm`);";
+    static String CREATE_TABLE_KE_METRICS_INDEX = "ALTER TABLE `ke_metrics` ADD INDEX `idx_tm_cluster_all` (`cluster`, `type`, `key`,`timespan` , `tm`);";
 
     static String CREATE_TABLE_KE_METRICS_OFFLINE = "CREATE TABLE IF NOT EXISTS `ke_metrics_offline` (`cluster` varchar(64) NOT NULL,`key` varchar(128) NOT NULL,`one` varchar(128) DEFAULT NULL,`mean` varchar(128) DEFAULT NULL,`five` varchar(128) DEFAULT NULL,`fifteen` varchar(128) DEFAULT NULL, PRIMARY KEY (`cluster`,`key`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -112,11 +115,11 @@ public interface JConstants {
 
     static String CREATE_TABLE_KE_LOGSIZE_INDEX_TM_CLUSTER = "ALTER TABLE `ke_logsize` ADD INDEX `idx_tm_cluster_diffval` (`tm`, `cluster`, `diffval`);";
 
-    static String CREATE_TABLE_KE_CONSUMER_BSCREEN = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen` (`cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(64) DEFAULT NULL,`logsize` bigint(20) DEFAULT NULL,`difflogsize` bigint(20) DEFAULT NULL,`offsets` bigint(20) DEFAULT NULL,`diffoffsets` bigint(20) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+    static String CREATE_TABLE_KE_CONSUMER_BSCREEN_PRESS = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen_press` (`id` bigint(20) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT, `cluster` varchar(64) DEFAULT NULL,`group` varchar(128) DEFAULT NULL,`topic` varchar(64) DEFAULT NULL,`logsize` bigint(20) DEFAULT NULL,`difflogsize` bigint(20) DEFAULT NULL,`offsets` bigint(20) DEFAULT NULL,`diffoffsets` bigint(20) DEFAULT NULL,`lag` bigint(20) DEFAULT NULL,`timespan` bigint(20) DEFAULT NULL,`tm` varchar(16) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-    static String CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX = "ALTER TABLE `ke_consumer_bscreen` ADD INDEX `idx_timespan` (`timespan`);";
+    static String CREATE_TABLE_KE_CONSUMER_BSCREEN_PRESS_INDEX = "ALTER TABLE `ke_consumer_bscreen_press` ADD INDEX `idx_timespan` (`timespan`);";
 
-    static String CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX_TM = "ALTER TABLE `ke_consumer_bscreen` ADD INDEX `idx_tm_cluster_diffoffsets` (`tm`, `cluster`, `diffoffsets`);";
+    static String CREATE_TABLE_KE_CONSUMER_BSCREEN_PRESS_INDEX_TM = "ALTER TABLE `ke_consumer_bscreen_press` ADD INDEX `idx_tm_cluster_diffoffsets` (`tm`, `cluster`, `diffoffsets`);";
 
     static String CREATE_TABLE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) NOT NULL,`group` varchar(128) NOT NULL,`topic` varchar(128) NOT NULL,`status` int(11) DEFAULT NULL, PRIMARY KEY (`cluster`,`group`,`topic`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
@@ -143,6 +146,9 @@ public interface JConstants {
 
     static String CREATE_TABLE_SQLITE_KE_METRICS = "CREATE TABLE IF NOT EXISTS `ke_metrics` (`cluster` varchar(64),`broker` text,`type` varchar(32),`key` varchar(64),`value` varchar(128),`timespan` bigint(20),`tm` varchar(16))";
 
+    static String CREATE_TABLE_SQLITE_KE_METRICS_INDEX_TM_CLUSTER = "CREATE INDEX idx_tm_cluster_key on `ke_metrics` (`cluster`, `type`, `key`,`tm`);";
+    static String CREATE_TABLE_SQLITE_KE_METRICS_INDEX = "CREATE INDEX idx_tm_cluster_all on `ke_metrics` (`cluster`, `type`, `key`,`timespan` , `tm`);";
+
     static String CREATE_TABLE_SQLITE_KE_METRICS_OFFLINE = "CREATE TABLE IF NOT EXISTS `ke_metrics_offline` (`cluster` varchar(64) ,`key` varchar(128) ,`one` varchar(128) ,`mean` varchar(128) ,`five` varchar(128) ,`fifteen` varchar(128) , PRIMARY KEY (`cluster`,`key`))";
 
     static String CREATE_TABLE_SQLITE_KE_CONNECT_CONFIG = "CREATE TABLE IF NOT EXISTS `ke_connect_config` (`id` integer primary key autoincrement,`cluster` varchar(64),`connect_uri` varchar(128), `version` varchar(32), `alive` varchar(16),`created` varchar(32) ,`modify` varchar(32))";
@@ -167,11 +173,11 @@ public interface JConstants {
 
     static String CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM_CLUSTER = "CREATE INDEX idx_tm_cluster_diffval ON `ke_logsize` (`tm`, `cluster`, `diffval`);";
 
-    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(64) ,`logsize` bigint(20) ,`difflogsize` bigint(20) ,`offsets` bigint(20) ,`diffoffsets` bigint(20) ,`lag` bigint(20) ,`timespan` bigint(20) ,`tm` varchar(16))";
+    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_PRESS = "CREATE TABLE IF NOT EXISTS `ke_consumer_bscreen_press` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(64) ,`logsize` bigint(20) ,`difflogsize` bigint(20) ,`offsets` bigint(20) ,`diffoffsets` bigint(20) ,`lag` bigint(20) ,`timespan` bigint(20) ,`tm` varchar(16))";
 
-    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX = "CREATE INDEX idx_timespan_bscreen ON `ke_consumer_bscreen` (`timespan`);";
+    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_PRESS_INDEX = "CREATE INDEX idx_timespan_bscreen ON `ke_consumer_bscreen_press` (`timespan`);";
 
-    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX_TM = "CREATE INDEX idx_tm_cluster_diffoffsets ON `ke_consumer_bscreen` (`tm`, `cluster`, `diffoffsets`);";
+    static String CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_PRESS_INDEX_TM = "CREATE INDEX idx_tm_cluster_diffoffsets ON `ke_consumer_bscreen_press` (`tm`, `cluster`, `diffoffsets`);";
 
     static String CREATE_TABLE_SQLITE_KE_CONSUMER_GROUP = "CREATE TABLE IF NOT EXISTS `ke_consumer_group` (`cluster` varchar(64) ,`group` varchar(128) ,`topic` varchar(128) ,`status` int(11), primary key (`cluster`,`group`,`topic`))";
 
@@ -200,6 +206,8 @@ public interface JConstants {
             put("CREATE_TABLE_KE_ROLE_RESOURCE", CREATE_TABLE_KE_ROLE_RESOURCE);
             put("CREATE_TABLE_KE_ROLE_RESOURCE_INSERT", CREATE_TABLE_KE_ROLE_RESOURCE_INSERT);
             put("CREATE_TABLE_KE_METRICS", CREATE_TABLE_KE_METRICS);
+            put("CREATE_TABLE_KE_METRICS_INDEX", CREATE_TABLE_KE_METRICS_INDEX);
+            put("CREATE_TABLE_KE_METRICS_INDEX_TM_CLUSTER", CREATE_TABLE_KE_METRICS_INDEX_TM_CLUSTER);
             put("CREATE_TABLE_KE_METRICS_OFFLINE", CREATE_TABLE_KE_METRICS_OFFLINE);
             put("CREATE_TABLE_KE_CONNECT_CONFIG", CREATE_TABLE_KE_CONNECT_CONFIG);
             put("CREATE_TABLE_KE_ALARM_CONSUMER", CREATE_TABLE_KE_ALARM_CONSUMER);
@@ -215,9 +223,9 @@ public interface JConstants {
             put("CREATE_TABLE_KE_LOGSIZE_INDEX", CREATE_TABLE_KE_LOGSIZE_INDEX);
             put("CREATE_TABLE_KE_LOGSIZE_INDEX_TM", CREATE_TABLE_KE_LOGSIZE_INDEX_TM);
             put("CREATE_TABLE_KE_LOGSIZE_INDEX_TM_CLUSTER", CREATE_TABLE_KE_LOGSIZE_INDEX_TM_CLUSTER);
-            put("CREATE_TABLE_KE_CONSUMER_BSCREEN", CREATE_TABLE_KE_CONSUMER_BSCREEN);
-            put("CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX", CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX);
-            put("CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX_TM", CREATE_TABLE_KE_CONSUMER_BSCREEN_INDEX_TM);
+            put("CREATE_TABLE_KE_CONSUMER_BSCREEN_PRESS", CREATE_TABLE_KE_CONSUMER_BSCREEN_PRESS);
+            put("CREATE_TABLE_KE_CONSUMER_BSCREEN_PRESS_INDEX", CREATE_TABLE_KE_CONSUMER_BSCREEN_PRESS_INDEX);
+            put("CREATE_TABLE_KE_CONSUMER_BSCREEN_PRESS_INDEX_TM", CREATE_TABLE_KE_CONSUMER_BSCREEN_PRESS_INDEX_TM);
             put("CREATE_TABLE_KE_USER_ROLE", CREATE_TABLE_KE_USER_ROLE);
             put("CREATE_TABLE_KE_USER_ROLE_INSERT", CREATE_TABLE_KE_USER_ROLE_INSERT);
             put("CREATE_TABLE_KE_USERS", CREATE_TABLE_KE_USERS);
@@ -230,6 +238,8 @@ public interface JConstants {
             put("CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE", CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE);
             put("CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT", CREATE_TABLE_SQLITE_KE_ROLE_RESOURCE_INSERT);
             put("CREATE_TABLE_SQLITE_KE_METRICS", CREATE_TABLE_SQLITE_KE_METRICS);
+            put("CREATE_TABLE_SQLITE_KE_METRICS_INDEX", CREATE_TABLE_SQLITE_KE_METRICS_INDEX);
+            put("CREATE_TABLE_SQLITE_KE_METRICS_INDEX_TM_CLUSTER", CREATE_TABLE_SQLITE_KE_METRICS_INDEX_TM_CLUSTER);
             put("CREATE_TABLE_SQLITE_KE_METRICS_OFFLINE", CREATE_TABLE_SQLITE_KE_METRICS_OFFLINE);
             put("CREATE_TABLE_SQLITE_KE_CONNECT_CONFIG", CREATE_TABLE_SQLITE_KE_CONNECT_CONFIG);
             put("CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER", CREATE_TABLE_SQLITE_KE_ALARM_CONSUMER);
@@ -245,9 +255,9 @@ public interface JConstants {
             put("CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX", CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX);
             put("CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM", CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM);
             put("CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM_CLUSTER", CREATE_TABLE_SQLITE_KE_LOGSIZE_INDEX_TM_CLUSTER);
-            put("CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN", CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN);
-            put("CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX", CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX);
-            put("CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX_TM", CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_INDEX_TM);
+            put("CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_PRESS", CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_PRESS);
+            put("CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_PRESS_INDEX", CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_PRESS_INDEX);
+            put("CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_PRESS_INDEX_TM", CREATE_TABLE_SQLITE_KE_CONSUMER_BSCREEN_PRESS_INDEX_TM);
             put("CREATE_TABLE_SQLITE_KE_USER_ROLE", CREATE_TABLE_SQLITE_KE_USER_ROLE);
             put("CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT", CREATE_TABLE_SQLITE_KE_USER_ROLE_INSERT);
             put("CREATE_TABLE_SQLITE_KE_USERS", CREATE_TABLE_SQLITE_KE_USERS);

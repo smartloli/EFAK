@@ -17,8 +17,8 @@
  */
 package org.smartloli.kafka.eagle.web.controller;
 
+import org.smartloli.kafka.eagle.common.util.KafkaCacheUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
-import org.smartloli.kafka.eagle.common.util.ZKFactoryUtils;
 import org.smartloli.kafka.eagle.plugin.mysql.MySqlRecordSchema;
 import org.smartloli.kafka.eagle.plugin.sqlite.SqliteRecordSchema;
 import org.smartloli.kafka.eagle.plugin.util.JConstants;
@@ -33,10 +33,7 @@ import org.springframework.web.context.ContextLoader;
  *
  * @author smartloli.
  * <p>
- * Created by May 22, 2017
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 1, 2022.
  */
 @Component
 public class StartupListener implements ApplicationContextAware {
@@ -74,7 +71,7 @@ public class StartupListener implements ApplicationContextAware {
         }
 
         private void initKafkaMetaData() {
-            ZKFactoryUtils.initKafkaMetaData();
+            KafkaCacheUtils.initKafkaMetaData();
         }
     }
 

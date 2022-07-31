@@ -50,7 +50,7 @@ public class JSONFunction {
             value.put(key, result.getString(key));
             target.add(value);
         }
-        return target.toJSONString();
+        return target.toString();
     }
 
 }

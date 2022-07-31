@@ -99,22 +99,43 @@ public class AccountController {
      */
     private void setKafkaAlias(Subject subject) {
         // Set EFAK Version
-        subject.getSession().setAttribute(KConstants.Common.EFAK_VERSION_DOC, "V" + KConstants.Common.EFAK_VERSION);
+        subject.getSession().setAttribute(KConstants.Common.EFAK_VERSION_DOC, KConstants.Common.EFAK_VERSION);
         Object object = subject.getSession().getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS);
         if (object == null) {
             String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
             String defaultClusterAlias = clusterAliass[0];
             subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS, defaultClusterAlias);
-            String dropList = "<div class='dropdown-menu dropdown-menu-right' aria-labelledby='clusterDropdown'>";
+            String clusterDropList = "";
             int i = 0;
-            for (String clusterAlias : clusterAliass) {
-                if (!clusterAlias.equals(defaultClusterAlias) && i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT) {
-                    dropList += "<a class='dropdown-item' href='/cluster/info/" + clusterAlias + "/change'><i class='fas fa-feather-alt fa-sm fa-fw mr-1'></i>" + clusterAlias + "</a>";
+            for (String clusterAliasStr : clusterAliass) {
+                if (i < KConstants.SessionAlias.CLUSTER_ALIAS_LIST_LIMIT) {
+                    if (clusterAliasStr.equals(defaultClusterAlias)) {
+                        clusterDropList += "<a class='dropdown-item' href='/cluster/info/" + clusterAliasStr + "/change'>" +
+                                "                                <div class='d-flex align-items-center'>" +
+                                "                                    <div class='notification-box bg-light-success text-success'><i" +
+                                "                                            class='bx bx-video'></i></div>" +
+                                "                                    <div class='ms-3 flex-grow-1'>" +
+                                "                                        <h6 class='mb-0 dropdown-msg-user'>" + clusterAliasStr + "</h6>" +
+                                "                                        <small class='mb-0 dropdown-msg-text text-secondary d-flex align-items-center'>Active</small>" +
+                                "                                    </div>" +
+                                "                                </div>" +
+                                "                            </a>";
+                    } else {
+                        clusterDropList += "<a class='dropdown-item' href='/cluster/info/" + clusterAliasStr + "/change'>" +
+                                "                                <div class='d-flex align-items-center'>" +
+                                "                                    <div class='notification-box bg-light-danger text-danger'><i" +
+                                "                                            class='bx bx-video-off'></i></div>" +
+                                "                                    <div class='ms-3 flex-grow-1'>" +
+                                "                                        <h6 class='mb-0 dropdown-msg-user'>" + clusterAliasStr + "</h6>" +
+                                "                                        <small class='mb-0 dropdown-msg-text text-secondary d-flex align-items-center'>Standby</small>" +
+                                "                                    </div>" +
+                                "                                </div>" +
+                                "                            </a>";
+                    }
                     i++;
                 }
             }
-            dropList += "<a class='dropdown-item' href='/cluster/multi'><i class='fas fa-server fa-sm fa-fw mr-1'></i>More...</a></div>";
-            subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST, dropList);
+            subject.getSession().setAttribute(KConstants.SessionAlias.CLUSTER_ALIAS_LIST, clusterDropList);
         }
     }
 

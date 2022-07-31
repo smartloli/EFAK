@@ -94,7 +94,7 @@ public class KConstants {
         private Common() {
         }
 
-        public static final String EFAK_VERSION = "2.2.0";
+        public static final String EFAK_VERSION = "v3.0.0";
         public static final String EFAK_VERSION_DOC = "efakVersion";
     }
 
@@ -120,7 +120,7 @@ public class KConstants {
         public static final String MODE_MASTER = "master";
         public static final String MODE_SLAVE = "slave";
         public static final String MODE_STANDALONE = "standalone";
-        public static final int THREAD_SLEEP_TIME_SEED = 1000;
+        public static final int THREAD_SLEEP_TIME_SEED = 3000;
     }
 
     /**
@@ -405,6 +405,8 @@ public class KConstants {
         public static final String VALUE = "VALUE";
         public static final String JOB_ID = "JOB_ID";
         public static final String KEY_BY_IP = "KEY_BY_IP";
+        public static final String KEY_BY_IP_VIP = "KEY_BY_IP_VIP";
+        public static final String KEY_BY_IP_VIP_CLUSTER = "KEY_BY_IP_VIP_CLUSTER";
         public static final String HEART_BEAT = "HEART_BEAT";
         public static final String CLUSTER_NAME = "CLUSTER_NAME";
         public static final String SHARD_TASK = "SHARD_TASK";

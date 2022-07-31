@@ -48,12 +48,7 @@ import java.util.Map;
  *
  * @author smartloli.
  * <p>
- * Created by Sep 6, 2016.
- * <p>
- * Update by hexiang 20170216
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Jun 25, 2022.
  */
 @Controller
 public class ConsumersController {
@@ -64,13 +59,10 @@ public class ConsumersController {
     @Autowired
     private ConsumerService consumerService;
 
-    /**
-     * Consumer viewer.
-     */
-    @RequestMapping(value = "/consumers", method = RequestMethod.GET)
-    public ModelAndView consumersView(HttpSession session) {
+    @RequestMapping(value = "/consumers/groups", method = RequestMethod.GET)
+    public ModelAndView consumersGroupsView(HttpSession session) {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/consumers/consumers");
+        mav.setViewName("/consumers/groups");
         return mav;
     }
 
@@ -88,6 +80,25 @@ public class ConsumersController {
             if (StrUtils.isListNull(JSON.parseObject(result).getJSONObject("active").getString("children"))) {
                 result = consumerService.getActiveTopic(clusterAlias, formatter);// online
             }
+            byte[] output = result.getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Get consumer group status data by ajax.
+     */
+    @RequestMapping(value = "/consumers/group/status/info/ajax", method = RequestMethod.GET)
+    public void consumersGroupStatusAjax(HttpServletResponse response, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("cluster", clusterAlias);
+            String result = consumerService.getConsumerGroupsCnt(params);
             byte[] output = result.getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
@@ -297,11 +308,11 @@ public class ConsumersController {
                     }
 
                     if (consumerDetail.getInteger("isConsumering") == Topic.RUNNING) {
-                        obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-success'>Running</a>");
+                        obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge bg-light-success text-success'>Running</a>");
                     } else if (consumerDetail.getInteger("isConsumering") == Topic.SHUTDOWN) {
-                        obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-danger'>Shutdown</a>");
+                        obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge bg-light-danger text-danger'>Shutdown</a>");
                     } else {
-                        obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-warning'>Pending</a>");
+                        obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge bg-light-warning text-warning'>Pending</a>");
                     }
                     aaDatas.add(obj);
                 }
@@ -323,11 +334,11 @@ public class ConsumersController {
                 }
                 int isConsumering = consumerGroup.getStatus();
                 if (isConsumering == Topic.RUNNING) {
-                    obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-success'>Running</a>");
+                    obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge bg-light-success text-success'>Running</a>");
                 } else if (isConsumering == Topic.SHUTDOWN) {
-                    obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-danger'>Shutdown</a>");
+                    obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge bg-light-danger text-danger'>Shutdown</a>");
                 } else {
-                    obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge badge-warning'>Pending</a>");
+                    obj.put("isConsumering", "<a href='/consumers/offset/?group=" + group + "&topic=" + topic + "' target='_blank' class='badge bg-light-warning text-warning'>Pending</a>");
                 }
                 aaDatas.add(obj);
                 id++;

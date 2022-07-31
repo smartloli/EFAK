@@ -78,6 +78,7 @@ public class BrokerServiceImpl implements BrokerService {
     /**
      * Statistics topic total used as page.
      */
+    @Override
     public long topicNumbers(String clusterAlias) {
         return topicList(clusterAlias).size();
     }
@@ -102,6 +103,7 @@ public class BrokerServiceImpl implements BrokerService {
     /**
      * Get search topic list numbers.
      */
+    @Override
     public long topicNumbers(String clusterAlias, String topic) {
         long count = 0L;
         List<String> topics = topicList(clusterAlias);
@@ -342,6 +344,7 @@ public class BrokerServiceImpl implements BrokerService {
     /**
      * Get kafka broker numbers from zookeeper.
      */
+    @Override
     public long brokerNumbers(String clusterAlias) {
         List<BrokersInfo> brokersInfos = BrokerCache.META_CACHE.get(clusterAlias);
         long count = 0;
@@ -354,6 +357,7 @@ public class BrokerServiceImpl implements BrokerService {
     /**
      * Get topic list include cgroups from zookeeper.
      */
+    @Override
     public List<String> topicList(String clusterAlias) {
         List<String> topics = new ArrayList<>();
         if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.cgroup.enable")) {
@@ -406,7 +410,7 @@ public class BrokerServiceImpl implements BrokerService {
             LOG.error("Get topic list has error, msg is " + e.getCause().getMessage());
             e.printStackTrace();
         }
-        return targets.toJSONString();
+        return targets.toString();
     }
 
     /**

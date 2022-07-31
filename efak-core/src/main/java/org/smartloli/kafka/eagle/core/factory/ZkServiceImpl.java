@@ -269,7 +269,7 @@ public class ZkServiceImpl implements ZkService {
             object.put("version", version(zk.split(":")[0], zk.split(":")[1]));
             targets.add(object);
         }
-        return targets.toJSONString();
+        return targets.toString();
     }
 
     /**

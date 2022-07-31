@@ -73,16 +73,16 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
         String result = "";
         if (KConstants.Protocol.HEART_BEAT.equals(this.type)) {//
             JSONObject object = new JSONObject();
-            String memory = "<span class='badge badge-danger'>NULL</span>";
+            String memory = "<span class='badge bg-light-danger text-danger'>NULL</span>";
             long used = AppUtils.getInstance().getProcessMemUsed();
             long max = AppUtils.getInstance().getProcessMemMax();
             String percent = StrUtils.stringify(used) + " (" + StrUtils.numberic((used * 100.0 / max) + "") + "%)";
             if ((used * 100.0) / max < KConstants.BrokerSever.MEM_NORMAL) {
-                memory = "<span class='badge badge-success'>" + percent + "</span>";
+                memory = "<span class='badge bg-light-success text-success'>" + percent + "</span>";
             } else if ((used * 100.0) / max >= KConstants.BrokerSever.MEM_NORMAL && (used * 100.0) / max < KConstants.BrokerSever.MEM_DANGER) {
-                memory = "<span class='badge badge-warning'>" + percent + "</span>";
+                memory = "<span class='badge bg-light-warning text-warning'>" + percent + "</span>";
             } else if ((used * 100.0) / max >= KConstants.BrokerSever.MEM_DANGER) {
-                memory = "<span class='badge badge-danger'>" + percent + "</span>";
+                memory = "<span class='badge bg-light-danger text-danger'>" + percent + "</span>";
             }
             object.put("memory", memory);
 
@@ -93,20 +93,20 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
             String zkCliSize = "";
             String zkCliStr = zkLimitSize + " | " + zkCliPoolSize;
             if (zkCliIdle < 0) {
-                zkCliSize = "<span class='badge badge-danger'>" + zkCliStr + "</span>";
+                zkCliSize = "<span class='badge bg-light-danger text-danger'>" + zkCliStr + "</span>";
             } else {
                 if ((zkCliIdle * 100.0) / zkLimitSize < KConstants.BrokerSever.MEM_NORMAL) {
-                    zkCliSize = "<span class='badge badge-success'>" + zkCliStr + "</span>";
+                    zkCliSize = "<span class='badge bg-light-success text-success'>" + zkCliStr + "</span>";
                 } else if ((zkCliIdle * 100.0) / zkLimitSize >= KConstants.BrokerSever.MEM_NORMAL && (zkCliIdle * 100.0) / zkLimitSize < KConstants.BrokerSever.MEM_DANGER) {
-                    zkCliSize = "<span class='badge badge-warning'>" + zkCliStr + "</span>";
+                    zkCliSize = "<span class='badge bg-light-warning text-warning'>" + zkCliStr + "</span>";
                 } else if ((zkCliIdle * 100.0) / zkLimitSize >= KConstants.BrokerSever.MEM_DANGER) {
-                    zkCliSize = "<span class='badge badge-danger'>" + zkCliStr + "</span>";
+                    zkCliSize = "<span class='badge bg-light-danger text-danger'>" + zkCliStr + "</span>";
                 }
             }
 
             object.put("zkcli", zkCliSize);
 
-            object.put("cpu", "<span class='badge badge-secondary'>" + AppUtils.getInstance().getProcessCpu() + "%</span>");
+            object.put("cpu", "<span class='badge bg-secondary'>" + AppUtils.getInstance().getProcessCpu() + "%</span>");
             object.put("created", AppUtils.getInstance().getStartTime());
             JSONArray array = new JSONArray();
             array.add(object);
@@ -135,7 +135,7 @@ public class WorkNodeServiceHandler implements WorkNodeService.Iface {
             Map<String, List<String>> shardTasks = ScheduleShardStrategy.getScheduleShardTask();
             LoggerUtils.print(this.getClass()).info("All shard task strategy, result: " + JSON.toJSONString(shardTasks));
             if (shardTasks.containsKey(this.key)) {
-                result = JSON.toJSONString(ScheduleShardStrategy.getScheduleShardTask().get(this.key));
+                result = JSON.toJSONString(shardTasks.get(this.key));
             }
             LoggerUtils.print(this.getClass()).info("Spent time [" + (System.currentTimeMillis() - stime) + "]ms, worknode[" + this.key + "] get task: " + result);
         }

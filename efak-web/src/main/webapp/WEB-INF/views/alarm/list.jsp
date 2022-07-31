@@ -1,192 +1,200 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <jsp:include page="../public/plus/title.jsp">
+    <!-- Required meta tags -->
+    <jsp:include page="../public/pro/title.jsp">
         <jsp:param value="Alarm" name="loader"/>
     </jsp:include>
-    <jsp:include page="../public/plus/css.jsp"></jsp:include>
-    <jsp:include page="../public/plus/tcss.jsp"></jsp:include>
+
+    <!-- Required common css -->
+    <jsp:include page="../public/pro/css.jsp">
+        <jsp:param value="plugins/notifications/lobibox.min.css" name="css"/>
+    </jsp:include>
+
+    <!-- Required table css -->
+    <jsp:include page="../public/pro/tcss.jsp"></jsp:include>
 </head>
 
 <body>
-<jsp:include page="../public/plus/navtop.jsp"></jsp:include>
-<div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <jsp:include page="../public/plus/navbar.jsp"></jsp:include>
-    </div>
-    <div id="layoutSidenav_content">
-        <main>
-            <div class="container-fluid">
-                <h1 class="mt-4">AlarmConsumer</h1>
-                <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item"><a href="#">AlarmConsumer</a></li>
-                    <li class="breadcrumb-item active">List</li>
-                </ol>
-                <div class="alert alert-info alert-dismissable">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <i class="fas fa-info-circle"></i> <strong>Manage the alarm policy of the consumer group.</strong>
-                </div>
-                <!-- content body -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <i class="fas fa-server"></i> Channel List
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="result" class="table table-bordered table-condensed"
-                                           width="100%">
-                                        <thead>
-                                        <tr>
-                                            <th>Cluster</th>
-                                            <th>Alarm Group</th>
-                                            <th>Alarm Type</th>
-                                            <th>Alarm URL</th>
-                                            <th>Http Method</th>
-                                            <th>Address</th>
-                                            <th>Created</th>
-                                            <th>Modify</th>
-                                            <th>Operate</th>
-                                        </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- delete -->
-                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_alarm_config_delete"
-                     tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="keModalLabel">Notify</h4>
-                                <button class="close" type="button" data-dismiss="modal">x</button>
-                            </div>
-                            <!-- /.row -->
-                            <div id="ke_alarm_consumer_remove_content" class="modal-body"></div>
-                            <div id="remove_div" class="modal-footer">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- modify -->
-                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_alarm_config_modify"
-                     tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="keModalLabel">Modify</h4>
-                                <button class="close" type="button" data-dismiss="modal">x</button>
-                            </div>
-                            <!-- /.row -->
-                            <div class="modal-body">
-                                <form role="form" action="/alarm/config/modify/form/"
-                                      method="post"
-                                      onsubmit="return contextModifyConfigFormValid();return false;">
-                                    <fieldset class="form-horizontal">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="basic-addon3">Server</span>
-                                            </div>
-                                            <input id="ke_alarm_group_m_name" name="ke_alarm_group_m_name"
-                                                   type="hidden" class="form-control" placeholder="">
-                                            <input id="ke_alarm_config_m_url" name="ke_alarm_config_m_url"
-                                                   type="text"
-                                                   class="form-control" placeholder=""
-                                                   aria-describedby="basic-addon3">
-                                        </div>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">Address</span>
-                                            </div>
-                                            <textarea id="ke_alarm_config_m_address" name="ke_alarm_config_m_address"
-                                                      rows="3" class="form-control"
-                                                      aria-label="With textarea"></textarea>
-                                        </div>
-                                        <div id="alert_config_message_modify" style="display: none"
-                                             class="alert alert-danger">
-                                            <label> Oops! Please make some changes .</label>
-                                        </div>
-                                    </fieldset>
 
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                                data-dismiss="modal">Cancle
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="create-modify">Submit
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+
+<!--start wrapper-->
+<div class="wrapper">
+
+    <!--start top header-->
+    <jsp:include page="../public/pro/navtop.jsp"></jsp:include>
+    <!--end top header-->
+
+    <!--start sidebar -->
+    <jsp:include page="../public/pro/navbar.jsp"></jsp:include>
+    <!--end sidebar -->
+
+    <!--start content-->
+    <main class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">Channel</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="/"><i class="bx bx-home-alt"></i></a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">List</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <!--end breadcrumb-->
+        <hr/>
+        <div class="row">
+            <div class="container">
+                <div class="alert border-0 bg-light-info alert-dismissible fade show py-2 text-info">
+                    <i class="bx bx-info-circle"></i> <strong>Manage different alarm channels.</strong><br/>
+                    <i class="bx bx-info-circle"></i> <strong>Currently, it supports the alarms of dingding, wechat,
+                    email and some webhook interfaces.</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <!-- More detail info -->
-                <div class="modal fade" aria-labelledby="keModalLabel" aria-hidden="true" id="ke_alarm_config_detail"
-                     tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="keModalLabel">Detail</h4>
-                                <button class="close" type="button" data-dismiss="modal">x</button>
-                            </div>
-                            <!-- /.row -->
-                            <div class="modal-body">
-                                <fieldset class="form-horizontal">
-                                    <div class="form-group">
-                                        <div class="col-sm-12">
-									        <textarea id="ke_alarm_config_property"
-                                                      name="ke_alarm_config_property" class="form-control"
-                                                      readonly="readonly" rows="3"></textarea>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary"
-                                        data-dismiss="modal">Cancle
-                                </button>
-                            </div>
-                        </div>
+            </div>
+        </div>
+        <!--end row-->
+        <!-- content body -->
+        <!-- kafka table list -->
+        <h6 class="mb-0 text-uppercase">Channel List</h6>
+        <hr/>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="efak_alarm_channel_tab" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th>#Cluster</th>
+                            <th>Alarm Group</th>
+                            <th>Alarm Type</th>
+                            <th>Alarm URL</th>
+                            <th>Http Method</th>
+                            <th>Address</th>
+                            <th>Created</th>
+                            <th>Modify</th>
+                            <th>Operate</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- delete connector -->
+        <div class="modal fade" id="ke_alarm_config_delete" tabindex="-1" aria-labelledby="keModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">Delete Config</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div id="ke_alarm_config_remove_content" class="modal-body"></div>
+                    <div id="ke_alarm_config_remove_footer" class="modal-footer">
                     </div>
                 </div>
             </div>
-        </main>
-        <jsp:include page="../public/plus/footer.jsp"></jsp:include>
-    </div>
+        </div>
+
+        <!-- edit connector -->
+        <div class="modal fade" id="ke_alarm_config_modify" tabindex="-1" aria-labelledby="keModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">Edit Config URI</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form" action="/alarm/config/modify/form/" method="post"
+                              onsubmit="return contextModifyConfigFormValid();return false;">
+                            <div class="input-group mb-3"><span class="input-group-text">URI</span>
+                                <input id="ke_alarm_config_m_url" name="ke_alarm_config_m_url" type="text"
+                                       class="form-control" aria-label=""
+                                       aria-describedby="">
+                                <input id="ke_alarm_group_m_name" name="ke_alarm_group_m_name"
+                                       type="hidden">
+                            </div>
+                            <div id="efak_alert_config_address" style="display: none" class="input-group mb-3"><span
+                                    class="input-group-text">Address</span>
+                                <input id="ke_alarm_config_m_address" name="ke_alarm_config_m_address" type="text"
+                                       class="form-control" aria-label=""
+                                       aria-describedby="">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" id="create-add">Submit
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- detail -->
+        <div class="modal fade" id="ke_alarm_config_detail" tabindex="-1" aria-labelledby="keModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keModalLabel">Detail Config</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea id="ke_alarm_config_property"
+                                  name="ke_alarm_config_property" class="form-control"
+                                  readonly="readonly" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!--end page main-->
+
+    <!--Start Back To Top Button-->
+    <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+    <!--End Back To Top Button-->
+
 </div>
-</body>
-<jsp:include page="../public/plus/script.jsp">
-    <jsp:param value="main/alarm/list.js" name="loader"/>
+<!--end wrapper-->
+
+<!-- import js -->
+<jsp:include page="../public/pro/script.jsp">
+    <jsp:param value="plugins/notifications/lobibox.min.js" name="loader"/>
+    <jsp:param value="plugins/notifications/notifications.min.js" name="loader"/>
+    <jsp:param value="main/alarm/list.js?v=3.0.0" name="loader"/>
 </jsp:include>
-<jsp:include page="../public/plus/tscript.jsp"></jsp:include>
+<jsp:include page="../public/pro/tscript.jsp"></jsp:include>
 <script type="text/javascript">
+
+    function errorNoti(errorMsg) {
+        console.log(errorMsg)
+        Lobibox.notify('error', {
+            pauseDelayOnHover: true,
+            continueDelayOnInactiveTab: false,
+            position: 'top right',
+            icon: 'bx bx-x-circle',
+            msg: errorMsg
+        });
+    }
+
     function contextModifyConfigFormValid() {
         var ke_alarm_config_m_url = $("#ke_alarm_config_m_url").val();
 
         if (ke_alarm_config_m_url.length == 0) {
-            $("#alert_config_message_modify").show();
-            setTimeout(function () {
-                $("#alert_config_message_modify").hide()
-            }, 3000);
+            errorNoti("Edit alarm url cannot be empty.");
             return false;
         }
 
         return true;
     }
+
 </script>
+</body>
 </html>

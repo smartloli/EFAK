@@ -25,12 +25,13 @@ import java.util.Map;
  *
  * @author smartloli.
  * <p>
- * Created by Dec 10, 2021
+ * Created by Jul 26, 2022
  */
 public class ThreadConstants {
 
     public static final int WEIGHT_VIP1 = 1;
     public static final int WEIGHT_VIP2 = 2;
+    public static final int WEIGHT_VIP3 = 3;
 
     public static final Map<String, Integer> SUB_TASK_MAP = new HashMap<String, Integer>() {
         {
@@ -38,11 +39,13 @@ public class ThreadConstants {
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.AlertClusterSubTask", WEIGHT_VIP1);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.AlertConsumerSubTask", WEIGHT_VIP1);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CapacityStatsSubTask", WEIGHT_VIP2);
-            // put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanTopicSubTask", WEIGHT_VIP1);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanTopicSubTask", WEIGHT_VIP1);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.DetectConnectUriSubTask", WEIGHT_VIP1);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.KafkaClusterSubTask", WEIGHT_VIP2);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.LogsizeStatsSubTask", WEIGHT_VIP2);
-            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.MetricsConsumerSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.BScreenConsumerSubTask", WEIGHT_VIP3);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanConsumerGroupSubTask", WEIGHT_VIP2);
+            put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.CleanConsumerSummarySubTask", WEIGHT_VIP2);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.PerformanceByTopicStatsSubTask", WEIGHT_VIP2);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.ProducerLogSizeStatsSubTask", WEIGHT_VIP2);
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.TopicThroughputByteInTask", WEIGHT_VIP2);
@@ -50,4 +53,6 @@ public class ThreadConstants {
             put("org.smartloli.kafka.eagle.web.quartz.shard.task.sub.ZookeeperClusterSubTask", WEIGHT_VIP2);
         }
     };
+
+    public static String SUPER_VIP_SUB_TASK = "org.smartloli.kafka.eagle.web.quartz.shard.task.sub.BScreenConsumerSubTask";
 }
