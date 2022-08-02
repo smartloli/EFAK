@@ -108,7 +108,7 @@ public class BScreenConsumerSubTask extends Thread {
                 if (!StrUtils.isNull(ip)) {
                     String host = consumerGroup.getString("host");
                     if (!ip.equals(host)) {
-                        break;
+                        continue;
                     }
                 }
 
