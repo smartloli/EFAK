@@ -31,10 +31,7 @@ import org.smartloli.kafka.eagle.common.util.KafkaCacheUtils;
 import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Get the Kafka topic metadata information through the broker address.
@@ -81,7 +78,7 @@ public class KafkaSchemaFactory {
         }
     }
 
-    public List<String> getTopicPartitions(String clusterAlias, String topic) {
+    public List<String> getTopicPartitionsOfString(String clusterAlias, String topic) {
         List<String> partitions = new ArrayList<>();
         AdminClient adminClient = null;
         try {
@@ -89,6 +86,23 @@ public class KafkaSchemaFactory {
             DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(topic));
             for (TopicPartitionInfo tp : describeTopicsResult.all().get().get(topic).partitions()) {
                 partitions.add(String.valueOf(tp.partition()));
+            }
+        } catch (Exception e) {
+            LoggerUtils.print(this.getClass()).error("Failure while loading topic '{}' meta for kafka '{}': {}", topic, clusterAlias, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+        return partitions;
+    }
+
+    public Set<Integer> getTopicPartitionsOfInt(String clusterAlias, String topic) {
+        Set<Integer> partitions = new HashSet<>();
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(clusterAlias));
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(topic));
+            for (TopicPartitionInfo tp : describeTopicsResult.all().get().get(topic).partitions()) {
+                partitions.add(tp.partition());
             }
         } catch (Exception e) {
             LoggerUtils.print(this.getClass()).error("Failure while loading topic '{}' meta for kafka '{}': {}", topic, clusterAlias, e);

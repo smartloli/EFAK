@@ -581,30 +581,34 @@ public class BrokerServiceImpl implements BrokerService {
         if (Kafka.CONSUMER_OFFSET_TOPIC.equals(topic)) {
             return logSize;
         }
-        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+        // KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
         try {
-            if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
-                Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
-                String tupleString = new String(tuple._1.get());
-                JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
-                Set<Integer> partitions = new HashSet<>();
-                for (String partition : partitionObject.keySet()) {
-                    try {
-                        partitions.add(Integer.valueOf(partition));
-                    } catch (Exception e) {
-                        LOG.error("Convert partition string to integer has error, msg is ", e);
-                    }
-                }
-                logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partitions);
-            }
+//            if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
+//                Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+//                String tupleString = new String(tuple._1.get());
+//                JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+//                Set<Integer> partitions = new HashSet<>();
+//                for (String partition : partitionObject.keySet()) {
+//                    try {
+//                        partitions.add(Integer.valueOf(partition));
+//                    } catch (Exception e) {
+//                        LOG.error("Convert partition string to integer has error, msg is ", e);
+//                    }
+//                }
+//                logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partitions);
+//            }
+            KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+            Set<Integer> partitions = ksf.getTopicPartitionsOfInt(clusterAlias, topic);
+            logSize = kafkaService.getKafkaRealLogSize(clusterAlias, topic, partitions);
         } catch (Exception e) {
             LoggerUtils.print(this.getClass()).error("Get topic real logsize has error, msg is ", e);
-        } finally {
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
-            }
         }
+//        finally {
+//            if (zkc != null) {
+//                kafkaZKPool.release(clusterAlias, zkc);
+//                zkc = null;
+//            }
+//        }
         return logSize;
     }
 

@@ -145,7 +145,7 @@ public class KafkaServiceImpl implements KafkaService {
 //        return topicAndPartitions;
 
         KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
-        return ksf.getTopicPartitions(clusterAlias, topic);
+        return ksf.getTopicPartitionsOfString(clusterAlias, topic);
     }
 
     /**
