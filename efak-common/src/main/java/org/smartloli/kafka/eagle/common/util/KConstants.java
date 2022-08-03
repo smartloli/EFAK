@@ -121,6 +121,8 @@ public class KConstants {
         public static final String MODE_SLAVE = "slave";
         public static final String MODE_STANDALONE = "standalone";
         public static final int THREAD_SLEEP_TIME_SEED = 3000;
+        public static final String RUNTIME_ENV_DEV = "dev";
+        public static final String RUNTIME_ENV_PRD = "prd";
     }
 
     /**

@@ -20,11 +20,18 @@ package org.smartloli.kafka.eagle.common.util.kraft;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.DescribeTopicsResult;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartitionInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
+import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
+import org.smartloli.kafka.eagle.common.util.KConstants;
+import org.smartloli.kafka.eagle.common.util.KafkaCacheUtils;
 import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -74,11 +81,66 @@ public class KafkaSchemaFactory {
         }
     }
 
-    public static void main(String[] args) {
-        String[] kafkaClusters = SystemConfigUtils.getPropertyArray("efak.kafka.cluster.alias", ",");
-        for (String kafkaCluster : kafkaClusters) {
-            KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
-            ksf.getTopicMetaData(kafkaCluster, Arrays.asList("test16", "lb_te"));
+    public List<String> getTopicPartitions(String clusterAlias, String topic) {
+        List<String> partitions = new ArrayList<>();
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(clusterAlias));
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(topic));
+            for (TopicPartitionInfo tp : describeTopicsResult.all().get().get(topic).partitions()) {
+                partitions.add(String.valueOf(tp.partition()));
+            }
+        } catch (Exception e) {
+            LoggerUtils.print(this.getClass()).error("Failure while loading topic '{}' meta for kafka '{}': {}", topic, clusterAlias, e);
+        } finally {
+            plugin.registerToClose(adminClient);
         }
+        return partitions;
+    }
+
+    public List<MetadataInfo> getTopicPartitionsLeader(String clusterAlias, String topic) {
+        List<MetadataInfo> partitions = new ArrayList<>();
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(clusterAlias));
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(topic));
+            for (TopicPartitionInfo tp : describeTopicsResult.all().get().get(topic).partitions()) {
+                MetadataInfo metadata = new MetadataInfo();
+                metadata.setPartitionId(tp.partition());
+                metadata.setLeader(tp.leader().id());
+                partitions.add(metadata);
+            }
+        } catch (Exception e) {
+            LoggerUtils.print(this.getClass()).error("Failure while loading topic '{}' meta for kafka '{}': {}", topic, clusterAlias, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+        return partitions;
+    }
+
+    public String getBrokerJMXFromIds(String clusterAlias, int ids) {
+        String jni = "";
+        try {
+            String env = SystemConfigUtils.getProperty("efak.runtime.env", KConstants.EFAK.RUNTIME_ENV_PRD);
+            if (env.equals(KConstants.EFAK.RUNTIME_ENV_DEV)) {
+                KafkaCacheUtils.initKafkaMetaData();
+            }
+
+            for (BrokersInfo brokersInfo : BrokerCache.META_CACHE.get(clusterAlias)) {
+                if (String.valueOf(ids).equals(brokersInfo.getIds())) {
+                    jni = brokersInfo.getHost() + ":" + brokersInfo.getJmxPort();
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            LoggerUtils.print(this.getClass()).error("Failure while loading meta for kafka '{}': {}", clusterAlias, e);
+        }
+        return jni;
+    }
+
+    public static void main(String[] args) {
+        KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+        String jni = ksf.getBrokerJMXFromIds("cluster1", 0);
+        System.out.println(jni);
     }
 }

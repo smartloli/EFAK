@@ -29,7 +29,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KafkaZKPoolUtils;
 import org.smartloli.kafka.eagle.common.util.KafkaZKSingletonUtils;
-import org.smartloli.kafka.eagle.common.util.SystemConfigUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.ZkFactory;
@@ -59,7 +58,8 @@ public class TestKafkaServiceImpl {
     public static void main(String[] args) {
         // System.out.println(kafkaService.getAllBrokersInfo("cluster1"));
         String clusterAlias = "cluster1";
-        System.out.println(SystemConfigUtils.getProperty(clusterAlias + ".efak.ssl.endpoint.identification.algorithm"));
+        // System.out.println(SystemConfigUtils.getProperty(clusterAlias + ".efak.ssl.endpoint.identification.algorithm"));
+        System.out.println(kafkaService.findKafkaLeader("cluster1", "test16"));
     }
 
     public Map<TopicPartition, Long> getKafkaLogSize(String topic, Set<Integer> partitionids) {

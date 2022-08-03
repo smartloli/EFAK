@@ -48,6 +48,8 @@ import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.BrokerSever;
 import org.smartloli.kafka.eagle.common.util.KConstants.CollectorType;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
+import org.smartloli.kafka.eagle.common.util.kraft.KafkaSchemaFactory;
+import org.smartloli.kafka.eagle.common.util.kraft.KafkaStoragePlugin;
 import org.smartloli.kafka.eagle.core.sql.execute.KafkaConsumerAdapter;
 import org.smartloli.kafka.eagle.core.task.strategy.WorkNodeStrategy;
 import scala.Option;
@@ -71,13 +73,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author smartloli.
  * <p>
- * Created by Jan 18, 2017.
- * <p>
- * Update by hexiang 20170216
- * @see org.smartloli.kafka.eagle.core.factory.KafkaService
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Aug 3, 2022.
  */
 public class KafkaServiceImpl implements KafkaService {
 
@@ -129,23 +125,27 @@ public class KafkaServiceImpl implements KafkaService {
      * @param topic Selected condition.
      * @return List.
      */
+    @Override
     public List<String> findTopicPartition(String clusterAlias, String topic) {
-        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        List<String> topicAndPartitions = null;
-        Seq<String> brokerTopicsPaths = null;
-        try {
-            brokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
-            topicAndPartitions = JavaConversions.seqAsJavaList(brokerTopicsPaths);
-        } catch (Exception e) {
-            LoggerUtils.print(this.getClass()).error("Find topic partition has error, msg is ", e);
-        } finally {
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
-                brokerTopicsPaths = null;
-            }
-        }
-        return topicAndPartitions;
+//        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+//        List<String> topicAndPartitions = null;
+//        Seq<String> brokerTopicsPaths = null;
+//        try {
+//            brokerTopicsPaths = zkc.getChildren(BROKER_TOPICS_PATH + "/" + topic + "/partitions");
+//            topicAndPartitions = JavaConversions.seqAsJavaList(brokerTopicsPaths);
+//        } catch (Exception e) {
+//            LoggerUtils.print(this.getClass()).error("Find topic partition has error, msg is ", e);
+//        } finally {
+//            if (zkc != null) {
+//                kafkaZKPool.release(clusterAlias, zkc);
+//                zkc = null;
+//                brokerTopicsPaths = null;
+//            }
+//        }
+//        return topicAndPartitions;
+
+        KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+        return ksf.getTopicPartitions(clusterAlias, topic);
     }
 
     /**
@@ -1353,41 +1353,43 @@ public class KafkaServiceImpl implements KafkaService {
     }
 
     /**
-     * Get kafka 0.10.x sasl topic metadata.
+     * Get kafka 0.10.x sasl topic metadata from kafka.
      */
+    @Override
     public List<MetadataInfo> findKafkaLeader(String clusterAlias, String topic) {
-        List<MetadataInfo> targets = new ArrayList<>();
-        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        try {
-            if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
-                Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
-                String tupleString = new String(tuple._1.get());
-                JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
-                for (String partition : partitionObject.keySet()) {
-                    String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
-                    Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
-                    String tupleString2 = new String(tuple2._1.get());
-                    JSONObject topicMetadata = JSON.parseObject(tupleString2);
-                    MetadataInfo metadate = new MetadataInfo();
-                    try {
-                        metadate.setLeader(topicMetadata.getInteger("leader"));
-                    } catch (Exception e) {
-                        LOG.error("Parse string brokerid to int has error, brokerid[" + topicMetadata.getString("leader") + "]");
-                        e.printStackTrace();
-                    }
-                    metadate.setPartitionId(Integer.valueOf(partition));
-                    targets.add(metadate);
-                }
-            }
-        } catch (Exception e) {
-            LoggerUtils.print(this.getClass()).error("Find kafka partition leader has error, msg is ", e);
-        } finally {
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
-            }
-        }
-        return targets;
+//        List<MetadataInfo> targets = new ArrayList<>();
+//        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+//        try {
+//            if (zkc.pathExists(BROKER_TOPICS_PATH + "/" + topic)) {
+//                Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_TOPICS_PATH + "/" + topic);
+//                String tupleString = new String(tuple._1.get());
+//                JSONObject partitionObject = JSON.parseObject(tupleString).getJSONObject("partitions");
+//                for (String partition : partitionObject.keySet()) {
+//                    String path = String.format(TOPIC_ISR, topic, Integer.valueOf(partition));
+//                    Tuple2<Option<byte[]>, Stat> tuple2 = zkc.getDataAndStat(path);
+//                    String tupleString2 = new String(tuple2._1.get());
+//                    JSONObject topicMetadata = JSON.parseObject(tupleString2);
+//                    MetadataInfo metadate = new MetadataInfo();
+//                    try {
+//                        metadate.setLeader(topicMetadata.getInteger("leader"));
+//                    } catch (Exception e) {
+//                        LOG.error("Parse string brokerid to int has error, brokerid[" + topicMetadata.getString("leader") + "]");
+//                        e.printStackTrace();
+//                    }
+//                    metadate.setPartitionId(Integer.valueOf(partition));
+//                    targets.add(metadate);
+//                }
+//            }
+//        } catch (Exception e) {
+//            LoggerUtils.print(this.getClass()).error("Find kafka partition leader has error, msg is ", e);
+//        } finally {
+//            if (zkc != null) {
+//                kafkaZKPool.release(clusterAlias, zkc);
+//                zkc = null;
+//            }
+//        }
+        KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+        return ksf.getTopicPartitionsLeader(clusterAlias, topic);
     }
 
     /**
@@ -1417,37 +1419,38 @@ public class KafkaServiceImpl implements KafkaService {
      * Get broker host and jmx_port info from ids.
      */
     public String getBrokerJMXFromIds(String clusterAlias, int ids) {
-        String jni = "";
-        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
-        try {
-            if (zkc.pathExists(BROKER_IDS_PATH)) {
-                try {
-                    Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
-                    String tupleString = new String(tuple._1.get());
-                    String host = "";
-                    if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
-                        String endpoints = JSON.parseObject(tupleString).getString("endpoints");
-                        String tmp = endpoints.split("//")[1];
-                        host = tmp.substring(0, tmp.length() - 2).split(":")[0];
-                    } else {
-                        host = JSON.parseObject(tupleString).getString("host");
-                    }
-                    int jmxPort = JSON.parseObject(tupleString).getInteger("jmx_port");
-                    jni = host + ":" + jmxPort;
-                } catch (Exception ex) {
-                    LOG.error("Get broker from ids has error, msg is " + ex.getCause().getMessage());
-                    ex.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            LoggerUtils.print(this.getClass()).error("Get broker jmx info from ids has error,msg is ", e);
-        } finally {
-            if (zkc != null) {
-                kafkaZKPool.release(clusterAlias, zkc);
-                zkc = null;
-            }
-        }
-        return jni;
+//        String jni = "";
+//        KafkaZkClient zkc = kafkaZKPool.getZkClient(clusterAlias);
+//        try {
+//            if (zkc.pathExists(BROKER_IDS_PATH)) {
+//                try {
+//                    Tuple2<Option<byte[]>, Stat> tuple = zkc.getDataAndStat(BROKER_IDS_PATH + "/" + ids);
+//                    String tupleString = new String(tuple._1.get());
+//                    String host = "";
+//                    if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable") || SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.ssl.enable")) {
+//                        String endpoints = JSON.parseObject(tupleString).getString("endpoints");
+//                        String tmp = endpoints.split("//")[1];
+//                        host = tmp.substring(0, tmp.length() - 2).split(":")[0];
+//                    } else {
+//                        host = JSON.parseObject(tupleString).getString("host");
+//                    }
+//                    int jmxPort = JSON.parseObject(tupleString).getInteger("jmx_port");
+//                    jni = host + ":" + jmxPort;
+//                } catch (Exception ex) {
+//                    LOG.error("Get broker from ids has error, msg is " + ex.getCause().getMessage());
+//                    ex.printStackTrace();
+//                }
+//            }
+//        } catch (Exception e) {
+//            LoggerUtils.print(this.getClass()).error("Get broker jmx info from ids has error,msg is ", e);
+//        } finally {
+//            if (zkc != null) {
+//                kafkaZKPool.release(clusterAlias, zkc);
+//                zkc = null;
+//            }
+//        }
+        KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+        return ksf.getBrokerJMXFromIds(clusterAlias, ids);
     }
 
     /**

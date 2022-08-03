@@ -68,8 +68,12 @@ public class KafkaStoragePlugin {
     }
 
     public Properties getKafkaAdminClientProps(String clusterAlias) {
-        // props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
-        props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+        String env = SystemConfigUtils.getProperty("efak.runtime.env", KConstants.EFAK.RUNTIME_ENV_PRD);
+        if (env.equals(KConstants.EFAK.RUNTIME_ENV_DEV)) {
+            props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+        } else if (env.equals(KConstants.EFAK.RUNTIME_ENV_PRD)) {
+            props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, parseBrokerServer(clusterAlias));
+        }
 
         if (SystemConfigUtils.getBooleanProperty(clusterAlias + ".efak.sasl.enable")) {
             sasl(props, clusterAlias);
