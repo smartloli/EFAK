@@ -18,6 +18,7 @@
 package org.smartloli.kafka.eagle.web.quartz.shard.task.sub;
 
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicRank;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
@@ -83,7 +84,8 @@ public class TopicThroughputByteOutTask extends Thread {
         String[] clusterAliass = SystemConfigUtils.getPropertyArray("efak.zk.cluster.alias", ",");
         for (String clusterAlias : clusterAliass) {
             List<String> topics = brokerService.topicList(clusterAlias);
-            List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+            // List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+            List<BrokersInfo> brokers = BrokerCache.META_CACHE.get(clusterAlias);
 
             // clean up nonexistent topic
             Map<String, Object> params = new HashMap<>();

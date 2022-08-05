@@ -21,6 +21,7 @@ import org.smartloli.kafka.eagle.common.constant.JmxConstants;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.KpiInfo;
 import org.smartloli.kafka.eagle.common.protocol.MBeanInfo;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.MBean;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
@@ -72,7 +73,8 @@ public class KafkaClusterSubTask extends Thread {
     }
 
     private void kafkaCluster(String clusterAlias) {
-        List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+        // List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+        List<BrokersInfo> brokers = BrokerCache.META_CACHE.get(clusterAlias);
         List<KpiInfo> list = new ArrayList<>();
 
         for (String kpi : BROKER_KPIS) {

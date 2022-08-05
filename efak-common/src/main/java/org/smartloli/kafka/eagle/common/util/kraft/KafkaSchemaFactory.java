@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.common.util.kraft;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.DescribeTopicsResult;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartitionInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,10 @@ public class KafkaSchemaFactory {
     private Set<String> tableNames;
 
     public KafkaSchemaFactory(final KafkaStoragePlugin plugin) {
+        String env = SystemConfigUtils.getProperty("efak.runtime.env", KConstants.EFAK.RUNTIME_ENV_PRD);
+        if (env.equals(KConstants.EFAK.RUNTIME_ENV_DEV)) {
+            KafkaCacheUtils.initKafkaMetaData();
+        }
         this.plugin = plugin;
     }
 
@@ -63,19 +68,6 @@ public class KafkaSchemaFactory {
             }
         }
         return tableNames;
-    }
-
-    public void getTopicMetaData(String clusterAlias, List<String> topics) {
-        AdminClient adminClient = null;
-        try {
-            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(clusterAlias));
-            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(topics);
-            System.out.println(describeTopicsResult.all().get());
-        } catch (Exception e) {
-            LoggerUtils.print(this.getClass()).error("Failure while loading topic meta for kafka '{}': {}", clusterAlias, e);
-        } finally {
-            plugin.registerToClose(adminClient);
-        }
     }
 
     public List<String> getTopicPartitionsOfString(String clusterAlias, String topic) {
@@ -132,14 +124,40 @@ public class KafkaSchemaFactory {
         return partitions;
     }
 
+    public List<MetadataInfo> getTopicMetaData(String clusterAlias, String topic) {
+        List<MetadataInfo> partitions = new ArrayList<>();
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(clusterAlias));
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(topic));
+            for (TopicPartitionInfo tp : describeTopicsResult.all().get().get(topic).partitions()) {
+                MetadataInfo metadata = new MetadataInfo();
+                metadata.setPartitionId(tp.partition());
+                metadata.setLeader(tp.leader().id());
+                List<Integer> isr = new ArrayList<>();
+                for (Node node : tp.isr()) {
+                    isr.add(node.id());
+                }
+                metadata.setIsr(isr.toString());
+
+                List<Integer> replicas = new ArrayList<>();
+                for (Node node : tp.replicas()) {
+                    replicas.add(node.id());
+                }
+                metadata.setReplicas(replicas.toString());
+                partitions.add(metadata);
+            }
+        } catch (Exception e) {
+            LoggerUtils.print(this.getClass()).error("Failure while loading topic '{}' meta for kafka '{}': {}", topic, clusterAlias, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+        return partitions;
+    }
+
     public String getBrokerJMXFromIds(String clusterAlias, int ids) {
         String jni = "";
         try {
-            String env = SystemConfigUtils.getProperty("efak.runtime.env", KConstants.EFAK.RUNTIME_ENV_PRD);
-            if (env.equals(KConstants.EFAK.RUNTIME_ENV_DEV)) {
-                KafkaCacheUtils.initKafkaMetaData();
-            }
-
             for (BrokersInfo brokersInfo : BrokerCache.META_CACHE.get(clusterAlias)) {
                 if (String.valueOf(ids).equals(brokersInfo.getIds())) {
                     jni = brokersInfo.getHost() + ":" + brokersInfo.getJmxPort();
@@ -154,7 +172,7 @@ public class KafkaSchemaFactory {
 
     public static void main(String[] args) {
         KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
-        String jni = ksf.getBrokerJMXFromIds("cluster1", 0);
-        System.out.println(jni);
+        List<MetadataInfo> metadataInfos = ksf.getTopicMetaData("cluster1", "test16");
+        System.out.println(metadataInfos.toString());
     }
 }

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.smartloli.kafka.eagle.common.constant.JmxConstants.KafkaLog;
 import org.smartloli.kafka.eagle.common.protocol.BrokersInfo;
 import org.smartloli.kafka.eagle.common.protocol.MetadataInfo;
+import org.smartloli.kafka.eagle.common.protocol.cache.BrokerCache;
 import org.smartloli.kafka.eagle.common.util.*;
 import org.smartloli.kafka.eagle.common.util.KConstants.Kafka;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
@@ -54,15 +55,12 @@ import java.util.concurrent.TimeUnit;
  *
  * @author smartloli.
  * <p>
- * Created by Oct 26, 2018
+ * Created by Aug 6, 2022
  * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
  */
 public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
     private Logger LOG = LoggerFactory.getLogger(Mx4jServiceImpl.class);
-    // private String JMX = "service:jmx:rmi:///jndi/rmi://%s/jmxrmi";
 
     /**
      * Kafka service interface.
@@ -72,7 +70,6 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
     /**
      * Instance Kafka Zookeeper client pool.
      */
-    // private KafkaZKPoolUtils kafkaZKPool = KafkaZKPoolUtils.getInstance();
     private KafkaZKPoolUtils kafkaZKPool = KafkaZKSingletonUtils.create();
 
     /**
@@ -280,7 +277,8 @@ public class KafkaMetricsServiceImpl implements KafkaMetricsService {
 
     private String parseBrokerServer(String clusterAlias) {
         String brokerServer = "";
-        List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+        // List<BrokersInfo> brokers = kafkaService.getAllBrokersInfo(clusterAlias);
+        List<BrokersInfo> brokers = BrokerCache.META_CACHE.get(clusterAlias);
         for (BrokersInfo broker : brokers) {
             brokerServer += broker.getHost() + ":" + broker.getPort() + ",";
         }
