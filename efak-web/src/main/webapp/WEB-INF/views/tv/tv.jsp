@@ -965,6 +965,14 @@
     <link href="/media/css/tv/css/tv-common.css" rel="stylesheet">
     <link href="/media/css/tv/css/tv-playground.css" rel="stylesheet">
     <link href="/media/css/tv/css/tv-vendors.css" rel="stylesheet">
+    <jsp:include page="../public/pro/script.jsp">
+        <jsp:param value="plugins/chartjs/Chart.min.js" name="loader"/>
+        <jsp:param value="plugins/chartjs/Chart.extension.js" name="loader"/>
+        <jsp:param value="plugins/apexcharts-bundle/apexcharts.min.js" name="loader"/>
+        <jsp:param value="main/tv/tv.js?v=3.0.0" name="loader"/>
+    </jsp:include>
+
+
     <style type="text/css">
         #dv-full-screen-container {
             position: fixed;
@@ -3169,10 +3177,11 @@
                                                                                           stop-color="#00BAFF"></stop>
                                                                                 </lineargradient>
                                                                             </defs>
-                                                                            <text stroke="url(#water-level-pond-a1abf9595caf400191a13d533fbb932d)"
+                                                                            <text id="efak_tv_monitor_cpu_usage"
+                                                                                  stroke="url(#water-level-pond-a1abf9595caf400191a13d533fbb932d)"
                                                                                   fill="url(#water-level-pond-a1abf9595caf400191a13d533fbb932d)"
                                                                                   x="40"
-                                                                                  y="37.5">0.79%
+                                                                                  y="37.5">0.0%
                                                                             </text>
                                                                             <rect x="2" y="2" rx="10" ry="10" width="76"
                                                                                   height="71"
@@ -3197,10 +3206,11 @@
                                                                                           stop-color="#00BAFF"></stop>
                                                                                 </lineargradient>
                                                                             </defs>
-                                                                            <text stroke="url(#water-level-pond-b9a9b284da694a00a3118e2919f50f4c)"
+                                                                            <text id="efak_tv_monitor_mem_usage"
+                                                                                  stroke="url(#water-level-pond-b9a9b284da694a00a3118e2919f50f4c)"
                                                                                   fill="url(#water-level-pond-b9a9b284da694a00a3118e2919f50f4c)"
                                                                                   x="40"
-                                                                                  y="37.5">30%
+                                                                                  y="37.5">0.0%
                                                                             </text>
                                                                             <rect x="2" y="2" rx="10" ry="10" width="76"
                                                                                   height="71"
