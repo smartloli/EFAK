@@ -17,13 +17,14 @@
  */
 package org.smartloli.kafka.eagle.api.im;
 
-import java.util.Date;
-
 import org.smartloli.kafka.eagle.api.im.queue.DingDingJob;
+import org.smartloli.kafka.eagle.api.im.queue.LarkJob;
 import org.smartloli.kafka.eagle.api.im.queue.MailJob;
 import org.smartloli.kafka.eagle.api.im.queue.WeChatJob;
 import org.smartloli.kafka.eagle.common.protocol.alarm.queue.BaseJobContext;
 import org.smartloli.kafka.eagle.common.util.QuartzManagerUtils;
+
+import java.util.Date;
 
 /**
  * Implements IMService all method.
@@ -35,6 +36,15 @@ import org.smartloli.kafka.eagle.common.util.QuartzManagerUtils;
 public class IMServiceImpl implements IMService {
 
 	private static final String KE_JOB_ID = "ke_job_id_";
+
+	/** Send Json msg by Lark. */
+	@Override
+	public void sendPostMsgByLark(String data, String url) {
+		BaseJobContext jobContext = new BaseJobContext();
+		jobContext.setData(data);
+		jobContext.setUrl(url);
+		QuartzManagerUtils.addJob(jobContext, KE_JOB_ID + new Date().getTime(), LarkJob.class, QuartzManagerUtils.getCron(new Date(), 5));
+	}
 
 	/** Send Json msg by dingding. */
 	@Override

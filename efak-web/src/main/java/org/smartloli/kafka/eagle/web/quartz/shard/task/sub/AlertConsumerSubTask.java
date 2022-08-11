@@ -146,6 +146,12 @@ public class AlertConsumerSubTask extends Thread {
                 alarmMsg.setAlarmStatus("<font color=\"warning\">PROBLEM</font>");
                 IMServiceImpl im = new IMServiceImpl();
                 im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+            } else if (alarmConfing.getAlarmType().equals(KConstants.AlarmType.LARK)) {
+                alarmMsg.setTitle("`EFAK - Alert Consumer Notice`\n");
+                alarmMsg.setAlarmContent("lag.overflow [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+                alarmMsg.setAlarmStatus("PROBLEM");
+                IMServiceImpl im = new IMServiceImpl();
+                im.sendPostMsgByLark(alarmMsg.toMail(), alarmConfing.getAlarmUrl());
             }
         }
 
@@ -176,6 +182,12 @@ public class AlertConsumerSubTask extends Thread {
                 alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
                 IMServiceImpl im = new IMServiceImpl();
                 im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+            } else if (alarmConfing.getAlarmType().equals(KConstants.AlarmType.LARK)) {
+                alarmMsg.setTitle("`EFAK - Alert Consumer Notice`\n");
+                alarmMsg.setAlarmContent("lag.normal [ cluster(" + alarmConsumer.getCluster() + "), group(" + alarmConsumer.getGroup() + "), topic(" + alarmConsumer.getTopic() + "), current(" + lag + "), max(" + alarmConsumer.getLag() + ") ]");
+                alarmMsg.setAlarmStatus("NORMAL");
+                IMServiceImpl im = new IMServiceImpl();
+                im.sendPostMsgByLark(alarmMsg.toMail(), alarmConfing.getAlarmUrl());
             }
         }
     }

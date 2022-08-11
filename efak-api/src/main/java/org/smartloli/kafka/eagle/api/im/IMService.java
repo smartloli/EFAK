@@ -26,7 +26,9 @@ package org.smartloli.kafka.eagle.api.im;
  */
 public interface IMService {
 
-	/** Send post request alert message by dingding. */
+    void sendPostMsgByLark(String data, String url);
+
+    /** Send post request alert message by dingding. */
 	public void sendPostMsgByDingDing(String data, String url);
 
 	/** Send alert message by wechat. */

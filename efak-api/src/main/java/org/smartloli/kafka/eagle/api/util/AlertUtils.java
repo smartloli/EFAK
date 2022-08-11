@@ -43,12 +43,29 @@ public class AlertUtils {
 
     }
 
+    public static String sendTestMsgByLark(String url, String data) {
+        Map<String, Object> larkMessage = getLarkMessage(data);
+        return HttpClientUtils.doPostJson(url, JSONObject.toJSONString(larkMessage));
+    }
+
     /**
      * Send Json msg by wechat.
      */
     public static String sendTestMsgByWeChat(String url, String data) {
         Map<String, Object> wechatMarkdownMessage = getWeChatMarkdownMessage(data);
         return HttpClientUtils.doPostJson(url, JSONObject.toJSONString(wechatMarkdownMessage));
+    }
+
+    private static Map<String, Object> getLarkMessage(String text) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("msg_type", "text");
+
+        Map<String, Object> textContainer = new HashMap<>();
+        textContainer.put("text", text);
+        map.put("content", textContainer);
+
+
+        return map;
     }
 
     private static Map<String, Object> getWeChatMarkdownMessage(String text) {
