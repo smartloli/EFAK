@@ -965,13 +965,6 @@
     <link href="/media/css/tv/css/tv-common.css" rel="stylesheet">
     <link href="/media/css/tv/css/tv-playground.css" rel="stylesheet">
     <link href="/media/css/tv/css/tv-vendors.css" rel="stylesheet">
-    <jsp:include page="../public/pro/script.jsp">
-        <jsp:param value="plugins/chartjs/Chart.min.js" name="loader"/>
-        <jsp:param value="plugins/chartjs/Chart.extension.js" name="loader"/>
-        <jsp:param value="plugins/apexcharts-bundle/apexcharts.min.js" name="loader"/>
-        <jsp:param value="main/tv/tv.js?v=3.0.0" name="loader"/>
-    </jsp:include>
-
 
     <style type="text/css">
         #dv-full-screen-container {
@@ -3457,38 +3450,9 @@
         "></polygon>
                                                         </svg>
                                                         <div class="border-box-content">
-                                                            <div class="graph-block__kg5tT">
-                                                                <div class="graph-half-block__E5FOv">
-                                                                    <div class="graph-chart-block__y7GL3">
-                                                                        <div class="graph-chart-title__zmeBL">active
-                                                                            session nums
-                                                                        </div>
-                                                                        <div class="screen-chart__nZcqk"></div>
-                                                                    </div>
-                                                                    <div class="graph-chart-block__y7GL3"
-                                                                         style="padding-top: 0px;">
-                                                                        <div class="graph-chart-title__zmeBL"
-                                                                             style="margin-top: 10px;">active query nums
-                                                                        </div>
-                                                                        <div class="screen-chart__nZcqk"></div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="graph-half-block__E5FOv">
-                                                                    <div class="graph-chart-block__y7GL3">
-                                                                        <div class="graph-chart-title__zmeBL">slow query
-                                                                            percentage
-                                                                        </div>
-                                                                        <div class="screen-chart__nZcqk"></div>
-                                                                    </div>
-                                                                    <div class="graph-chart-block__y7GL3"
-                                                                         style="padding-top: 0px;">
-                                                                        <div class="graph-chart-title__zmeBL"
-                                                                             style="margin-top: 10px;">error query
-                                                                            percentage
-                                                                        </div>
-                                                                        <div class="screen-chart__nZcqk"></div>
-                                                                    </div>
-                                                                </div>
+                                                            <div class="row" style="margin-top: 5%">
+                                                                <div id="efak_dashboard_logsize_chart"
+                                                                     class=""></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -3665,7 +3629,8 @@
                                                     </svg>
                                                     <div class="border-box-content">
                                                         <div class="chart-title__nQpiI">message in</div>
-                                                        <div class="screen-chart__nZcqk"></div>
+                                                        <div id="efak_dashboard_msg_in_chart"
+                                                             class="screen-chart__nZcqk"></div>
                                                     </div>
                                                 </div>
                                                 <div class="dv-border-box-8 node-metrics-bottom__f2yJf"
@@ -3680,11 +3645,13 @@
                                                         <div class="disk-block__l_9zd">
                                                             <div class="disk-chart-block__d1cO_">
                                                                 <div class="disk-chart-title__YGis2">byte in rate</div>
-                                                                <div class="screen-chart__nZcqk"></div>
+                                                                <div id="efak_dashboard_byte_in_chart"
+                                                                     class="screen-chart__nZcqk"></div>
                                                             </div>
                                                             <div class="disk-chart-block__d1cO_">
                                                                 <div class="disk-chart-title__YGis2">byte out rate</div>
-                                                                <div class="screen-chart__nZcqk"></div>
+                                                                <div id="efak_dashboard_byte_out_chart"
+                                                                     class="screen-chart__nZcqk"></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -3702,5 +3669,10 @@
     </section>
 </div>
 </body>
-
+<jsp:include page="../public/pro/script.jsp">
+    <jsp:param value="plugins/chartjs/Chart.min.js" name="loader"/>
+    <jsp:param value="plugins/chartjs/Chart.extension.js" name="loader"/>
+    <jsp:param value="plugins/apexcharts-bundle/apexcharts.min.js" name="loader"/>
+    <jsp:param value="main/tv/tv.js?v=3.0.0" name="loader"/>
+</jsp:include>
 </html>

@@ -238,8 +238,8 @@ $(function () {
     var efak_dashboard_byte_out_chart = new ApexCharts(document.querySelector("#efak_dashboard_byte_out_chart"), chartPanelCommonOption);
     efak_dashboard_byte_out_chart.render();
 
-    var efak_dashboard_osfree_memory_chart = new ApexCharts(document.querySelector("#efak_dashboard_osfree_memory_chart"), chartPanelCommonOption);
-    efak_dashboard_osfree_memory_chart.render();
+    // var efak_dashboard_osfree_memory_chart = new ApexCharts(document.querySelector("#efak_dashboard_osfree_memory_chart"), chartPanelCommonOption);
+    // efak_dashboard_osfree_memory_chart.render();
 
     getDashboardAreaChart();
 
@@ -254,7 +254,7 @@ $(function () {
                         setTrendData(efak_dashboard_msg_in_chart, 'message_in', datas);
                         setTrendData(efak_dashboard_byte_in_chart, 'byte_in', datas);
                         setTrendData(efak_dashboard_byte_out_chart, 'byte_out', datas);
-                        setTrendData(efak_dashboard_osfree_memory_chart, 'os_free_memory', datas);
+                        // setTrendData(efak_dashboard_osfree_memory_chart, 'os_free_memory', datas);
                         datas = null;
                     }
                 }
@@ -590,12 +590,12 @@ $(function () {
 
     }
 
-    var efak_dashboard_active_topic_chart = new ApexCharts(
-        document.querySelector("#efak_dashboard_active_topic_chart"),
-        activeTopicOptions
-    );
-
-    efak_dashboard_active_topic_chart.render();
+    // var efak_dashboard_active_topic_chart = new ApexCharts(
+    //     document.querySelector("#efak_dashboard_active_topic_chart"),
+    //     activeTopicOptions
+    // );
+    //
+    // efak_dashboard_active_topic_chart.render();
 
 
     function getDashboardTopicActive() {
@@ -634,7 +634,7 @@ $(function () {
         }
     }
 
-    getDashboardTopicActive();
+    // getDashboardTopicActive();
 
 
     // Topic logsize
@@ -699,6 +699,7 @@ $(function () {
             // type: 'datetime',
             labels: {
                 datetimeUTC: false,
+                format: "yyyy-MM-dd"
             },
             categories: []
         },
@@ -718,7 +719,10 @@ $(function () {
             }
         }],
         tooltip: {
-            theme: "dark"
+            theme: "dark",
+            x: {
+                format: "yyyy-MM-dd"
+            }
         }
     };
 
@@ -748,96 +752,96 @@ $(function () {
     getDashboardTopicLogSize();
 
     // table topic by byte in , byte out , logsize and capacity
-    $.ajax({
-        type: 'get',
-        dataType: 'json',
-        url: '/get/dashboard/rank/logsize/table/ajax',
-        success: function (datas) {
-            if (datas != null) {
-                $("#efak_dashboard_logsize_table").html("")
-                var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>LogSize</th></tr></thead>";
-                $("#efak_dashboard_logsize_table").append(thead);
-                var tbody = "<tbody>";
-                var tr = '';
-                for (var i = 0; i < datas.length; i++) {
-                    var id = datas[i].id;
-                    var topic = datas[i].topic;
-                    var logsize = datas[i].logsize;
-                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + logsize + "</td></tr>"
-                }
-                tbody += tr + "</tbody>"
-                $("#efak_dashboard_logsize_table").append(tbody);
-            }
-        }
-    });
-
-    $.ajax({
-        type: 'get',
-        dataType: 'json',
-        url: '/get/dashboard/rank/capacity/table/ajax',
-        success: function (datas) {
-            if (datas != null) {
-                $("#efak_dashboard_capacity_table").html("")
-                var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Capacity</th></tr></thead>";
-                $("#efak_dashboard_capacity_table").append(thead);
-                var tbody = "<tbody>";
-                var tr = '';
-                for (var i = 0; i < datas.length; i++) {
-                    var id = datas[i].id;
-                    var topic = datas[i].topic;
-                    var capacity = datas[i].capacity;
-                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + capacity + "</td></tr>"
-                }
-                tbody += tr + "</tbody>"
-                $("#efak_dashboard_capacity_table").append(tbody);
-            }
-        }
-    });
-
-    $.ajax({
-        type: 'get',
-        dataType: 'json',
-        url: '/get/dashboard/rank/byte_in/table/ajax',
-        success: function (datas) {
-            if (datas != null) {
-                $("#efak_dashboard_bytein_table").html("")
-                var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
-                $("#efak_dashboard_bytein_table").append(thead);
-                var tbody = "<tbody>";
-                var tr = '';
-                for (var i = 0; i < datas.length; i++) {
-                    var id = datas[i].id;
-                    var topic = datas[i].topic;
-                    var byte_in = datas[i].byte_in;
-                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_in + "</td></tr>"
-                }
-                tbody += tr + "</tbody>"
-                $("#efak_dashboard_bytein_table").append(tbody);
-            }
-        }
-    });
-
-    $.ajax({
-        type: 'get',
-        dataType: 'json',
-        url: '/get/dashboard/rank/byte_out/table/ajax',
-        success: function (datas) {
-            if (datas != null) {
-                $("#efak_dashboard_byteout_table").html("")
-                var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
-                $("#efak_dashboard_byteout_table").append(thead);
-                var tbody = "<tbody>";
-                var tr = '';
-                for (var i = 0; i < datas.length; i++) {
-                    var id = datas[i].id;
-                    var topic = datas[i].topic;
-                    var byte_out = datas[i].byte_out;
-                    tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_out + "</td></tr>"
-                }
-                tbody += tr + "</tbody>"
-                $("#efak_dashboard_byteout_table").append(tbody);
-            }
-        }
-    });
+    // $.ajax({
+    //     type: 'get',
+    //     dataType: 'json',
+    //     url: '/get/dashboard/rank/logsize/table/ajax',
+    //     success: function (datas) {
+    //         if (datas != null) {
+    //             $("#efak_dashboard_logsize_table").html("")
+    //             var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>LogSize</th></tr></thead>";
+    //             $("#efak_dashboard_logsize_table").append(thead);
+    //             var tbody = "<tbody>";
+    //             var tr = '';
+    //             for (var i = 0; i < datas.length; i++) {
+    //                 var id = datas[i].id;
+    //                 var topic = datas[i].topic;
+    //                 var logsize = datas[i].logsize;
+    //                 tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + logsize + "</td></tr>"
+    //             }
+    //             tbody += tr + "</tbody>"
+    //             $("#efak_dashboard_logsize_table").append(tbody);
+    //         }
+    //     }
+    // });
+    //
+    // $.ajax({
+    //     type: 'get',
+    //     dataType: 'json',
+    //     url: '/get/dashboard/rank/capacity/table/ajax',
+    //     success: function (datas) {
+    //         if (datas != null) {
+    //             $("#efak_dashboard_capacity_table").html("")
+    //             var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Capacity</th></tr></thead>";
+    //             $("#efak_dashboard_capacity_table").append(thead);
+    //             var tbody = "<tbody>";
+    //             var tr = '';
+    //             for (var i = 0; i < datas.length; i++) {
+    //                 var id = datas[i].id;
+    //                 var topic = datas[i].topic;
+    //                 var capacity = datas[i].capacity;
+    //                 tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + capacity + "</td></tr>"
+    //             }
+    //             tbody += tr + "</tbody>"
+    //             $("#efak_dashboard_capacity_table").append(tbody);
+    //         }
+    //     }
+    // });
+    //
+    // $.ajax({
+    //     type: 'get',
+    //     dataType: 'json',
+    //     url: '/get/dashboard/rank/byte_in/table/ajax',
+    //     success: function (datas) {
+    //         if (datas != null) {
+    //             $("#efak_dashboard_bytein_table").html("")
+    //             var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
+    //             $("#efak_dashboard_bytein_table").append(thead);
+    //             var tbody = "<tbody>";
+    //             var tr = '';
+    //             for (var i = 0; i < datas.length; i++) {
+    //                 var id = datas[i].id;
+    //                 var topic = datas[i].topic;
+    //                 var byte_in = datas[i].byte_in;
+    //                 tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_in + "</td></tr>"
+    //             }
+    //             tbody += tr + "</tbody>"
+    //             $("#efak_dashboard_bytein_table").append(tbody);
+    //         }
+    //     }
+    // });
+    //
+    // $.ajax({
+    //     type: 'get',
+    //     dataType: 'json',
+    //     url: '/get/dashboard/rank/byte_out/table/ajax',
+    //     success: function (datas) {
+    //         if (datas != null) {
+    //             $("#efak_dashboard_byteout_table").html("")
+    //             var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
+    //             $("#efak_dashboard_byteout_table").append(thead);
+    //             var tbody = "<tbody>";
+    //             var tr = '';
+    //             for (var i = 0; i < datas.length; i++) {
+    //                 var id = datas[i].id;
+    //                 var topic = datas[i].topic;
+    //                 var byte_out = datas[i].byte_out;
+    //                 tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_out + "</td></tr>"
+    //             }
+    //             tbody += tr + "</tbody>"
+    //             $("#efak_dashboard_byteout_table").append(tbody);
+    //         }
+    //     }
+    // });
 
 });
