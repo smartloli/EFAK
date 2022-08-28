@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.web.controller;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.KConstants.Topic;
 import org.smartloli.kafka.eagle.web.service.BScreenService;
+import org.smartloli.kafka.eagle.web.service.TVBScreenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,6 +46,9 @@ public class BScreenController {
 
     @Autowired
     private BScreenService bscreen;
+
+    @Autowired
+    private TVBScreenService tvbScreenService;
 
     /**
      * Big screen viewer.
@@ -85,6 +89,7 @@ public class BScreenController {
             ex.printStackTrace();
         }
     }
+
 
     /**
      * Get producer history bar data by ajax.
@@ -128,6 +133,36 @@ public class BScreenController {
             params.put("cluster", clusterAlias);
             params.put("tkey", Topic.CAPACITY);
             byte[] output = bscreen.getTopicCapacity(params).getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Get producer and consumer real rate data by ajax.
+     */
+    @RequestMapping(value = "/get/tv/dashboard/mid/result/ajax", method = RequestMethod.GET)
+    public void getTVDashboardMidResultAjax(HttpServletResponse response, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+        try {
+            byte[] output = tvbScreenService.getClusterInfo(clusterAlias).getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Get producer and consumer real rate data by ajax.
+     */
+    @RequestMapping(value = "/get/tv/dashboard/mid/result/worknode/ajax", method = RequestMethod.GET)
+    public void getTVDashboardMidResultOfWorkNodeAjax(HttpServletResponse response, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String clusterAlias = session.getAttribute(KConstants.SessionAlias.CLUSTER_ALIAS).toString();
+        try {
+            byte[] output = tvbScreenService.getClusterOfWorkNodeInfo(clusterAlias).getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
             ex.printStackTrace();

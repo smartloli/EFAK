@@ -24,8 +24,8 @@
             <ul>
                 <li><a href="/"><i class="bx bx-laptop"></i>Overview</a>
                 </li>
-                <%--                <li><a href="/tv"><i class="bx bx-desktop"></i>TV Dashboard</a>--%>
-                <%--                </li>--%>
+                <li><a href="/tv"><i class="bx bx-desktop"></i>TV Dashboard</a>
+                </li>
             </ul>
         </li>
         <li class="menu-label">Message</li>

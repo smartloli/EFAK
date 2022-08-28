@@ -29,8 +29,8 @@ public interface TVBScreenService {
     /**
      * Include cluster name, mem, capacity, logsize, groups .
      */
-    public String getTVMidOfKafka(String clusterAlias);
+    public String getClusterInfo(String clusterAlias);
 
-    public String getCpuAndMem(String clusterAlias);
+    public String getClusterOfWorkNodeInfo(String clusterAlias);
 
 }

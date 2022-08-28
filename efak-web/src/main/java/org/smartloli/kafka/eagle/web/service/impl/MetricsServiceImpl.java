@@ -258,6 +258,7 @@ public class MetricsServiceImpl implements MetricsService {
         JSONArray replicationBytesIns = new JSONArray();
 
         JSONArray osFreeMems = new JSONArray();
+        JSONArray cpuUsed = new JSONArray();
 
         JSONArray zkSendPackets = new JSONArray();
         JSONArray zkReceivedPackets = new JSONArray();
@@ -313,6 +314,9 @@ public class MetricsServiceImpl implements MetricsService {
                 case MBean.OSFREEMEMORY:
                     assembly(osFreeMems, kpi);
                     break;
+                case MBean.CPUUSED:
+                    assembly(cpuUsed, kpi);
+                    break;
                 default:
                     break;
             }
@@ -334,6 +338,7 @@ public class MetricsServiceImpl implements MetricsService {
         target.put("replicationBytesIns", replicationBytesIns);
         target.put("replicationBytesOuts", replicationBytesOuts);
         target.put("osFreeMems", osFreeMems);
+        target.put("cpuUsed", cpuUsed);
 
         return target.toJSONString();
     }

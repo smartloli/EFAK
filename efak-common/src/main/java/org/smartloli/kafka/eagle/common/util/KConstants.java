@@ -94,7 +94,7 @@ public class KConstants {
         private Common() {
         }
 
-        public static final String EFAK_VERSION = "v3.0.0";
+        public static final String EFAK_VERSION = "v3.0.1";
         public static final String EFAK_VERSION_DOC = "efakVersion";
     }
 

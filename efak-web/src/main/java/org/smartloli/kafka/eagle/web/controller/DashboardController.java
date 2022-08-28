@@ -95,7 +95,7 @@ public class DashboardController {
             param.put("stime", CalendarUtils.getCustomLastDay(0));
             param.put("etime", CalendarUtils.getCustomLastDay(0));
             param.put("type", KConstants.CollectorType.KAFKA);
-            param.put("modules", Arrays.asList(KConstants.MBean.MESSAGEIN, KConstants.MBean.BYTEIN, KConstants.MBean.BYTEOUT, KConstants.MBean.OSFREEMEMORY));
+            param.put("modules", Arrays.asList(KConstants.MBean.MESSAGEIN, KConstants.MBean.BYTEIN, KConstants.MBean.BYTEOUT, KConstants.MBean.OSFREEMEMORY, KConstants.MBean.CPUUSED, KConstants.MBean.FAILEDFETCHREQUEST, KConstants.MBean.TOTALFETCHREQUESTSPERSEC, KConstants.MBean.TOTALPRODUCEREQUESTSPERSEC));
             String target = metricsService.query(param);
             if (StringUtils.isEmpty(target)) {
                 target = "";

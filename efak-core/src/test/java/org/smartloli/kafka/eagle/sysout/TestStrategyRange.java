@@ -17,6 +17,11 @@
  */
 package org.smartloli.kafka.eagle.sysout;
 
+import org.smartloli.kafka.eagle.core.task.shard.ScheduleShardStrategy;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * // NOTE
  *
@@ -27,13 +32,10 @@ package org.smartloli.kafka.eagle.sysout;
 public class TestStrategyRange {
 
     public static void main(String[] args) {
-//        if ((end - start) <= 20) {
-//            submit();
-//        } else {
-//            long middle = (start + end) / 2;
-//        }
-        System.out.println((0 + 30) / 2);
-
+        Map<String, List<String>> shardTasks = ScheduleShardStrategy.getScheduleShardTask();
+        for (Map.Entry<String, List<String>> entry : shardTasks.entrySet()) {
+            System.out.println(entry.getKey() + ":" + entry.getValue());
+        }
     }
 
 }

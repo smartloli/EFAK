@@ -174,10 +174,12 @@ public class DashboardServiceImpl implements DashboardService {
                 if (i < topicRank.size()) {
                     object.put("id", index);
                     object.put("topic", "<a href='/topic/meta/" + topicRank.get(i).getTopic() + "/'>" + topicRank.get(i).getTopic() + "</a>");
+                    object.put("topic_text", topicRank.get(i).getTopic());
                     object.put("capacity", StrUtils.stringify(topicRank.get(i).getTvalue()));
                 } else {
                     object.put("id", index);
                     object.put("topic", "");
+                    object.put("topic_text", "");
                     object.put("capacity", "");
                 }
                 index++;

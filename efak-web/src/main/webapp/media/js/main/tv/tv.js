@@ -30,115 +30,6 @@ $(function () {
         }
     }
 
-
-    var chartCommonOption = {
-        series: [{
-            name: '',
-            data: []
-        }],
-        chart: {
-            type: "area",
-            // width: 130,
-            stacked: true,
-            height: 280,
-            toolbar: {
-                show: !1
-            },
-            zoom: {
-                enabled: !1
-            },
-            dropShadow: {
-                enabled: 0,
-                top: 3,
-                left: 14,
-                blur: 4,
-                opacity: .12,
-                color: "#3461ff"
-            },
-            sparkline: {
-                enabled: !1
-            }
-        },
-        markers: {
-            size: 0,
-            colors: ["#3461ff"],
-            strokeColors: "#fff",
-            strokeWidth: 2,
-            hover: {
-                size: 7
-            }
-        },
-        grid: {
-            row: {
-                colors: ["transparent", "transparent"],
-                opacity: .2
-            },
-            borderColor: "#f1f1f1"
-        },
-        plotOptions: {
-            bar: {
-                horizontal: !1,
-                columnWidth: "25%",
-                //endingShape: "rounded"
-            }
-        },
-        dataLabels: {
-            enabled: !1
-        },
-        stroke: {
-            show: !0,
-            width: [2.5],
-            //colors: ["#3461ff"],
-            curve: "smooth"
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shade: 'light',
-                type: 'vertical',
-                shadeIntensity: 0.5,
-                gradientToColors: ['#3461ff'],
-                inverseColors: false,
-                opacityFrom: 0.5,
-                opacityTo: 0.1,
-                // stops: [0, 100]
-            }
-        },
-        colors: ["#3461ff"],
-        xaxis: {
-            type: 'datetime',
-            labels: {
-                datetimeUTC: false,
-            },
-            categories: []
-        },
-        responsive: [
-            {
-                breakpoint: 1000,
-                options: {
-                    chart: {
-                        type: "area",
-                        // width: 130,
-                        stacked: true,
-                    }
-                }
-            }
-        ],
-        legend: {
-            show: false
-        },
-        tooltip: {
-            theme: "dark",
-            x: {
-                format: 'yyyy-MM-dd HH:mm'
-            }
-        }
-    };
-
-    var efak_dashboard_msg_in_chart = new ApexCharts(document.querySelector("#efak_dashboard_msg_in_chart"), chartCommonOption);
-    efak_dashboard_msg_in_chart.render();
-
-
     var chartPanelCommonOption = {
         series: [{
             name: "",
@@ -232,14 +123,29 @@ $(function () {
         }
     };
 
+    var efak_dashboard_msg_in_chart = new ApexCharts(document.querySelector("#efak_dashboard_msg_in_chart"), chartPanelCommonOption);
+    efak_dashboard_msg_in_chart.render();
+
     var efak_dashboard_byte_in_chart = new ApexCharts(document.querySelector("#efak_dashboard_byte_in_chart"), chartPanelCommonOption);
     efak_dashboard_byte_in_chart.render();
 
     var efak_dashboard_byte_out_chart = new ApexCharts(document.querySelector("#efak_dashboard_byte_out_chart"), chartPanelCommonOption);
     efak_dashboard_byte_out_chart.render();
 
-    // var efak_dashboard_osfree_memory_chart = new ApexCharts(document.querySelector("#efak_dashboard_osfree_memory_chart"), chartPanelCommonOption);
-    // efak_dashboard_osfree_memory_chart.render();
+    var efak_dashboard_osfree_memory_chart = new ApexCharts(document.querySelector("#efak_dashboard_osfree_memory_chart"), chartPanelCommonOption);
+    efak_dashboard_osfree_memory_chart.render();
+
+    var efak_dashboard_cpu_used_chart = new ApexCharts(document.querySelector("#efak_dashboard_cpu_used_chart"), chartPanelCommonOption);
+    efak_dashboard_cpu_used_chart.render();
+
+    var efak_dashboard_failed_fetch_request_chart = new ApexCharts(document.querySelector("#efak_dashboard_failed_fetch_request_chart"), chartPanelCommonOption);
+    efak_dashboard_failed_fetch_request_chart.render();
+
+    var efak_dashboard_total_fetch_request_chart = new ApexCharts(document.querySelector("#efak_dashboard_total_fetch_request_chart"), chartPanelCommonOption);
+    efak_dashboard_total_fetch_request_chart.render();
+
+    var efak_dashboard_total_produce_request_chart = new ApexCharts(document.querySelector("#efak_dashboard_total_produce_request_chart"), chartPanelCommonOption);
+    efak_dashboard_total_produce_request_chart.render();
 
     getDashboardAreaChart();
 
@@ -254,7 +160,11 @@ $(function () {
                         setTrendData(efak_dashboard_msg_in_chart, 'message_in', datas);
                         setTrendData(efak_dashboard_byte_in_chart, 'byte_in', datas);
                         setTrendData(efak_dashboard_byte_out_chart, 'byte_out', datas);
-                        // setTrendData(efak_dashboard_osfree_memory_chart, 'os_free_memory', datas);
+                        setTrendData(efak_dashboard_osfree_memory_chart, 'os_free_memory', datas);
+                        setTrendData(efak_dashboard_cpu_used_chart, 'cpu_used', datas);
+                        setTrendData(efak_dashboard_failed_fetch_request_chart, 'failed_fetch_request', datas);
+                        setTrendData(efak_dashboard_total_fetch_request_chart, 'total_fetch_requests', datas);
+                        setTrendData(efak_dashboard_total_produce_request_chart, 'total_produce_requests', datas);
                         datas = null;
                     }
                 }
@@ -268,10 +178,40 @@ $(function () {
     function setTrendData(mbean, filed, data) {
         switch (filed) {
             case "message_in":
-                chartCommonOption.xaxis.categories = filter(data, filed).x;
-                chartCommonOption.series[0].data = filter(data, filed).y;
-                chartCommonOption.series[0].name = filter(data, filed).name;
-                mbean.updateOptions(chartCommonOption);
+                chartPanelCommonOption.xaxis.categories = filter(data, filed).x;
+                chartPanelCommonOption.series[0].data = filter(data, filed).y;
+                chartPanelCommonOption.series[0].name = filter(data, filed).name;
+                mbean.updateOptions(chartPanelCommonOption);
+                var value = (data.messageIns[data.messageIns.length - 1].y * 60).toFixed(1);
+                cunit = " (MSG/min)";
+                $("#efak_dashboard_message_in_lastest").text("[ " + value + cunit + " ]");
+                break;
+            case "failed_fetch_request":
+                chartPanelCommonOption.xaxis.categories = filter(data, filed).x;
+                chartPanelCommonOption.series[0].data = filter(data, filed).y;
+                chartPanelCommonOption.series[0].name = filter(data, filed).name;
+                mbean.updateOptions(chartPanelCommonOption);
+                var value = (data.failedFetchRequest[data.failedFetchRequest.length - 1].y * 60).toFixed(1);
+                cunit = " (MSG/min)";
+                $("#efak_dashboard_faild_fetch_request_lastest").text("[" + value + cunit + "]");
+                break;
+            case "total_fetch_requests":
+                chartPanelCommonOption.xaxis.categories = filter(data, filed).x;
+                chartPanelCommonOption.series[0].data = filter(data, filed).y;
+                chartPanelCommonOption.series[0].name = filter(data, filed).name;
+                mbean.updateOptions(chartPanelCommonOption);
+                var value = (data.totalFetchRequests[data.totalFetchRequests.length - 1].y * 60).toFixed(1);
+                cunit = " (MSG/min)";
+                $("#efak_dashboard_total_fetch_request_lastest").text("[" + value + cunit + "]");
+                break;
+            case "total_produce_requests":
+                chartPanelCommonOption.xaxis.categories = filter(data, filed).x;
+                chartPanelCommonOption.series[0].data = filter(data, filed).y;
+                chartPanelCommonOption.series[0].name = filter(data, filed).name;
+                mbean.updateOptions(chartPanelCommonOption);
+                var value = (data.totalProduceRequests[data.totalProduceRequests.length - 1].y * 60).toFixed(1);
+                cunit = " (MSG/min)";
+                $("#efak_dashboard_total_produce_request_lastest").text("[" + value + cunit + "]");
                 break;
             case "byte_in":
                 chartPanelCommonOption.xaxis.categories = filter(data, filed).x;
@@ -280,7 +220,7 @@ $(function () {
                 mbean.updateOptions(chartPanelCommonOption);
                 var value = stringify(data.byteIns[data.byteIns.length - 1].y).value;
                 cunit = stringify(data.byteIns[data.byteIns.length - 1].y).type;
-                $("#efak_dashboard_byte_in_lastest").text(value + cunit);
+                $("#efak_dashboard_byte_in_lastest").text("[" + value + cunit + "]");
                 break;
             case "byte_out":
                 chartPanelCommonOption.xaxis.categories = filter(data, filed).x;
@@ -289,7 +229,7 @@ $(function () {
                 mbean.updateOptions(chartPanelCommonOption);
                 var value = stringify(data.byteOuts[data.byteOuts.length - 1].y).value;
                 cunit = stringify(data.byteOuts[data.byteOuts.length - 1].y).type;
-                $("#efak_dashboard_byte_out_lastest").text(value + cunit);
+                $("#efak_dashboard_byte_out_lastest").text("[ " + value + cunit + " ]");
                 break;
             case "os_free_memory":
                 chartPanelCommonOption.xaxis.categories = filter(data, filed).x;
@@ -298,7 +238,15 @@ $(function () {
                 mbean.updateOptions(chartPanelCommonOption);
                 var value = (data.osFreeMems[data.osFreeMems.length - 1].y * 1.0 / GB_IN_BYTES).toFixed(2);
                 cunit = " (GB/min)";
-                $("#efak_dashboard_osfreememory_lastest").text(value + cunit);
+                $("#efak_dashboard_osfreememory_lastest").text("[ " + value + cunit + " ]");
+                break;
+            case "cpu_used":
+                chartPanelCommonOption.xaxis.categories = filter(data, filed).x;
+                chartPanelCommonOption.series[0].data = filter(data, filed).y;
+                chartPanelCommonOption.series[0].name = filter(data, filed).name;
+                mbean.updateOptions(chartPanelCommonOption);
+                var value = data.cpuUsed[data.cpuUsed.length - 1].y;
+                $("#efak_dashboard_cpu_used_lastest").text("[ " + value + "% ]");
                 break;
             default:
                 break;
@@ -312,12 +260,18 @@ $(function () {
         var datay = new Array();
         switch (type) {
             case "message_in":
-                // var init = (datas.messageIns.length - 10) > 0 ? (datas.messageIns.length - 10) : 0;
                 for (var i = 0; i < datas.messageIns.length; i++) {
                     datax.push(datas.messageIns[i].x);
                     datay.push((datas.messageIns[i].y * 60).toFixed(2));
                 }
                 data.name = "MessagesInPerSec (msg/min)";
+                break;
+            case "cpu_used":
+                for (var i = 0; i < datas.cpuUsed.length; i++) {
+                    datax.push(datas.cpuUsed[i].x);
+                    datay.push(datas.cpuUsed[i].y);
+                }
+                data.name = "CpuUsed (%)";
                 break;
             case "byte_in":
                 var cunit = "";
@@ -494,149 +448,6 @@ $(function () {
     getDashboardMem();
     getDashboardCpu();
 
-    // get active topic scatter
-    var activeTopicOptions = {
-        chart: {
-            height: 300,
-            type: 'radialBar',
-            toolbar: {
-                show: false
-            }
-        },
-        plotOptions: {
-            radialBar: {
-                //startAngle: -135,
-                //endAngle: 225,
-                hollow: {
-                    margin: 0,
-                    size: '80%',
-                    background: 'transparent',
-                    image: undefined,
-                    imageOffsetX: 0,
-                    imageOffsetY: 0,
-                    position: 'front',
-                    dropShadow: {
-                        enabled: true,
-                        top: 3,
-                        left: 0,
-                        blur: 4,
-                        color: 'rgba(0, 169, 255, 0.85)',
-                        opacity: 0.65
-                    }
-                },
-                track: {
-                    background: '#e8edff',
-                    strokeWidth: '67%',
-                    margin: 0, // margin is in pixels
-                    dropShadow: {
-                        enabled: 0,
-                        top: -3,
-                        left: 0,
-                        blur: 4,
-                        color: 'rgba(0, 169, 255, 0.85)',
-                        opacity: 0.65
-                    }
-                },
-                dataLabels: {
-                    showOn: 'always',
-                    name: {
-                        offsetY: -20,
-                        show: true,
-                        color: '#212529',
-                        fontSize: '16px'
-                    },
-                    value: {
-                        formatter: function (val) {
-                            return val + "%";
-                        },
-                        color: '#212529',
-                        fontSize: '35px',
-                        show: true,
-                        offsetY: 10,
-                    }
-                }
-            }
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shade: 'light',
-                type: 'horizontal',
-                shadeIntensity: 0.5,
-                gradientToColors: ['#3461ff'],
-                inverseColors: false,
-                opacityFrom: 1,
-                opacityTo: 1,
-                stops: [0, 100]
-            }
-        },
-        colors: ["#3461ff"],
-        series: [],
-        stroke: {
-            lineCap: 'round',
-            //dashArray: 4
-        },
-        labels: ['Active'],
-        responsive: [
-            {
-                breakpoint: 1281,
-                options: {
-                    chart: {
-                        height: 280,
-                    }
-                }
-            }
-        ],
-
-    }
-
-    // var efak_dashboard_active_topic_chart = new ApexCharts(
-    //     document.querySelector("#efak_dashboard_active_topic_chart"),
-    //     activeTopicOptions
-    // );
-    //
-    // efak_dashboard_active_topic_chart.render();
-
-
-    function getDashboardTopicActive() {
-        try {
-            $.ajax({
-                type: 'get',
-                dataType: 'json',
-                url: '/get/dashboard/active/topic/ajax',
-                success: function (datas) {
-                    if (datas != null) {
-                        $("#efak_dashboard_active_topic_nums").text(datas.active);
-                        $("#efak_dashboard_standby_topic_nums").text(datas.standby);
-                        $("#efak_dashboard_active_topic_mb").text(datas.mb);
-                        $("#efak_dashboard_active_topic_gb").text(datas.gb);
-                        $("#efak_dashboard_active_topic_tb").text(datas.tb);
-                        activeTopicOptions.series = [(datas.active * 100.0 / datas.total).toFixed(2)];
-                        var mb = (datas.mb * 100.0 / datas.active).toFixed(0) + "%";
-                        var gb = (datas.gb * 100.0 / datas.active).toFixed(0) + "%";
-                        var tb = (datas.tb * 100.0 / datas.active).toFixed(0) + "%";
-
-                        $("#efak_dashboard_active_topic_mb_div").css({
-                            width: mb
-                        });
-                        $("#efak_dashboard_active_topic_gb_div").css({
-                            width: gb
-                        });
-                        $("#efak_dashboard_active_topic_tb_div").css({
-                            width: tb
-                        });
-                        efak_dashboard_active_topic_chart.updateOptions(activeTopicOptions);
-                    }
-                }
-            });
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    // getDashboardTopicActive();
-
-
     // Topic logsize
     var efakTopicLogSizeOptions = {
         series: [{
@@ -751,97 +562,52 @@ $(function () {
 
     getDashboardTopicLogSize();
 
-    // table topic by byte in , byte out , logsize and capacity
-    // $.ajax({
-    //     type: 'get',
-    //     dataType: 'json',
-    //     url: '/get/dashboard/rank/logsize/table/ajax',
-    //     success: function (datas) {
-    //         if (datas != null) {
-    //             $("#efak_dashboard_logsize_table").html("")
-    //             var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>LogSize</th></tr></thead>";
-    //             $("#efak_dashboard_logsize_table").append(thead);
-    //             var tbody = "<tbody>";
-    //             var tr = '';
-    //             for (var i = 0; i < datas.length; i++) {
-    //                 var id = datas[i].id;
-    //                 var topic = datas[i].topic;
-    //                 var logsize = datas[i].logsize;
-    //                 tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + logsize + "</td></tr>"
-    //             }
-    //             tbody += tr + "</tbody>"
-    //             $("#efak_dashboard_logsize_table").append(tbody);
-    //         }
-    //     }
-    // });
-    //
-    // $.ajax({
-    //     type: 'get',
-    //     dataType: 'json',
-    //     url: '/get/dashboard/rank/capacity/table/ajax',
-    //     success: function (datas) {
-    //         if (datas != null) {
-    //             $("#efak_dashboard_capacity_table").html("")
-    //             var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Capacity</th></tr></thead>";
-    //             $("#efak_dashboard_capacity_table").append(thead);
-    //             var tbody = "<tbody>";
-    //             var tr = '';
-    //             for (var i = 0; i < datas.length; i++) {
-    //                 var id = datas[i].id;
-    //                 var topic = datas[i].topic;
-    //                 var capacity = datas[i].capacity;
-    //                 tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + capacity + "</td></tr>"
-    //             }
-    //             tbody += tr + "</tbody>"
-    //             $("#efak_dashboard_capacity_table").append(tbody);
-    //         }
-    //     }
-    // });
-    //
-    // $.ajax({
-    //     type: 'get',
-    //     dataType: 'json',
-    //     url: '/get/dashboard/rank/byte_in/table/ajax',
-    //     success: function (datas) {
-    //         if (datas != null) {
-    //             $("#efak_dashboard_bytein_table").html("")
-    //             var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
-    //             $("#efak_dashboard_bytein_table").append(thead);
-    //             var tbody = "<tbody>";
-    //             var tr = '';
-    //             for (var i = 0; i < datas.length; i++) {
-    //                 var id = datas[i].id;
-    //                 var topic = datas[i].topic;
-    //                 var byte_in = datas[i].byte_in;
-    //                 tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_in + "</td></tr>"
-    //             }
-    //             tbody += tr + "</tbody>"
-    //             $("#efak_dashboard_bytein_table").append(tbody);
-    //         }
-    //     }
-    // });
-    //
-    // $.ajax({
-    //     type: 'get',
-    //     dataType: 'json',
-    //     url: '/get/dashboard/rank/byte_out/table/ajax',
-    //     success: function (datas) {
-    //         if (datas != null) {
-    //             $("#efak_dashboard_byteout_table").html("")
-    //             var thead = "<thead><tr><th>#RankID</th><th>Topic Name</th><th>Throughput</th></tr></thead>";
-    //             $("#efak_dashboard_byteout_table").append(thead);
-    //             var tbody = "<tbody>";
-    //             var tr = '';
-    //             for (var i = 0; i < datas.length; i++) {
-    //                 var id = datas[i].id;
-    //                 var topic = datas[i].topic;
-    //                 var byte_out = datas[i].byte_out;
-    //                 tr += "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + byte_out + "</td></tr>"
-    //             }
-    //             tbody += tr + "</tbody>"
-    //             $("#efak_dashboard_byteout_table").append(tbody);
-    //         }
-    //     }
-    // });
+    // table topic by capacity and cluster info
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/get/dashboard/rank/capacity/table/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#efak_dashboard_capacity_table").html("")
+                var count = 0;
+                for (var i = 0; i < datas.length; i++) {
+                    if (count > 2) {
+                        break;
+                    }
+                    var topic = datas[i].topic_text;
+                    var capacity = datas[i].capacity;
+                    $("#efak_dashboard_capacity_table").append("<div class='service-item__RCcpv'><span>" + topic + " (" + capacity + ")" + "</span></div>");
+                    count++;
+                }
+            }
+        }
+    });
+
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/get/tv/dashboard/mid/result/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#efak_tv_cluster").text(datas.cluster);
+                $("#efak_tv_version").text(datas.version);
+                $("#efak_tv_capacity").text(datas.capacity + " (" + datas.capacityType + ")");
+                $("#efak_tv_mode").text(datas.mode);
+                $("#efak_tv_app").text(datas.app);
+            }
+        }
+    });
+
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/get/tv/dashboard/mid/result/worknode/ajax',
+        success: function (datas) {
+            if (datas != null) {
+                $("#efak_tv_worknode").text(datas.worknode);
+            }
+        }
+    });
 
 });

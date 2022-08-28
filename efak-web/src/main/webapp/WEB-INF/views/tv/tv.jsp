@@ -1944,7 +1944,7 @@
     </style>
 </head>
 
-<body class="nebula-dashboard" style="background: rgb(240, 242, 245); cursor: default;">
+<body class="efak-dashboard" style="background: rgb(240, 242, 245); cursor: default;">
 <svg aria-hidden="true"
      style="position: absolute; width: 0px; height: 0px; overflow: hidden;">
     <symbol id="iconnav-tvMode" viewBox="0 0 1024 1024">
@@ -2638,7 +2638,7 @@
             <section class="ant-layout page-content" id="page-content">
                 <section class="ant-layout efak-stat">
                     <section class="ant-layout ant-layout-has-sider">
-                        <aside class="ant-layout-sider ant-layout-sider-dark nebula-sider"
+                        <aside class="ant-layout-sider ant-layout-sider-dark efak-sider"
                                style="flex: 0 0 200px; max-width: 200px; min-width: 200px; width: 200px;">
 
                         </aside>
@@ -2758,7 +2758,8 @@
         "></polygon>
                                                     <text class="dv-border-box-11-title" x="187.5" y="32" fill="#fff"
                                                           font-size="18"
-                                                          text-anchor="middle" dominant-baseline="middle">NETWORK IDEL
+                                                          text-anchor="middle" dominant-baseline="middle">Failed Fetch
+                                                        Requests
                                                     </text>
                                                     <polygon fill="#4fd2dd"
                                                              filter="url(#border-box-11-filterId-5fdd71a5f6d04bdb999b4db97e1b3a86)"
@@ -2774,7 +2775,14 @@
         "></polygon>
                                                 </svg>
                                                 <div class="border-box-content">
-                                                    <div class="screen-chart__nZcqk"></div>
+                                                    <div id="efak_dashboard_faild_fetch_request_lastest"
+                                                         class="chart-title__nQpiI" style="margin-top: 20%">[ 0
+                                                        (MSG/min)]
+                                                    </div>
+                                                    <div class="screen-chart__nZcqk"
+                                                         id="efak_dashboard_failed_fetch_request_chart"
+                                                         style="position:relative;width: 80%;margin-left:10%;margin-top: 20%">
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="dv-border-box-11 storage-metrics__gilPc" style="height: 527px;">
@@ -2873,7 +2881,8 @@
         "></polygon>
                                                     <text class="dv-border-box-11-title" x="187.5" y="32" fill="#fff"
                                                           font-size="18"
-                                                          text-anchor="middle" dominant-baseline="middle">QUEUE METRICS
+                                                          text-anchor="middle" dominant-baseline="middle">Fetch &
+                                                        Produce
                                                     </text>
                                                     <polygon fill="#4fd2dd"
                                                              filter="url(#border-box-11-filterId-7915575ec2774cd2a0032a601368cde1)"
@@ -2890,12 +2899,28 @@
                                                 </svg>
                                                 <div class="border-box-content">
                                                     <div class="storage-chart-block__JPdjC">
-                                                        <div class="chart-title__nQpiI">request queue length</div>
-                                                        <div class="screen-chart__nZcqk"></div>
+                                                        <div class="chart-title__nQpiI">total fetch requests</div>
+                                                        <div id="efak_dashboard_total_fetch_request_lastest"
+                                                             class="chart-title__nQpiI" style="margin-top: 7%">
+                                                            [
+                                                            0
+                                                            (MSG/min) ]
+                                                        </div>
+                                                        <div id="efak_dashboard_total_fetch_request_chart"
+                                                             class="screen-chart__nZcqk"
+                                                             style="width: 80%;margin-left: 10%"></div>
                                                     </div>
                                                     <div class="storage-chart-block__JPdjC">
-                                                        <div class="chart-title__nQpiI">respone queue length</div>
-                                                        <div class="screen-chart__nZcqk"></div>
+                                                        <div class="chart-title__nQpiI">total produce requests</div>
+                                                        <div id="efak_dashboard_total_produce_request_lastest"
+                                                             class="chart-title__nQpiI" style="margin-top: 7%">
+                                                            [
+                                                            0
+                                                            (MSG/min) ]
+                                                        </div>
+                                                        <div id="efak_dashboard_total_produce_request_chart"
+                                                             class="screen-chart__nZcqk"
+                                                             style="width: 80%;margin-left: 10%"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -3004,13 +3029,14 @@
                                                                     </svg>
                                                                     <div class="decoration-content__H9c6U">
                                                                         <div class="node-health-block__y9j82">
-                                                                            <div class="node-health__KOzGT">DEAD LOCK
+                                                                            <div class="node-health__KOzGT">CONSUMERS
                                                                             </div>
                                                                             <div class="health-num__VIsIc">
-                                                                                <!-- <div class="node-title__YHkc6" style="color: rgb(255, 70, 70);">XXX</div> -->
                                                                                 <div class="dv-water-pond-level"
                                                                                      style="color: #08ffff">
-                                                                                    <text>OK</text>
+                                                                                    <text id="efak_dashboard_panel_consumers">
+                                                                                        0
+                                                                                    </text>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -3055,7 +3081,9 @@
                                                                             <div>
                                                                                 <div class="dv-water-pond-level"
                                                                                      style="color: #08ffff">
-                                                                                    <text>12</text>
+                                                                                    <text id="efak_dashboard_panel_brokers">
+                                                                                        0
+                                                                                    </text>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -3096,12 +3124,14 @@
                                                                     </svg>
                                                                     <div class="decoration-content__H9c6U">
                                                                         <div class="node-info-block__DQGxr">
-                                                                            <div class="node-title__YHkc6">CONTROLLER
+                                                                            <div class="node-title__YHkc6">ZOOKEEPERS
                                                                             </div>
                                                                             <div>
                                                                                 <div class="dv-water-pond-level"
                                                                                      style="color: #08ffff">
-                                                                                    <text>1</text>
+                                                                                    <text id="efak_dashboard_panel_zookeepers">
+                                                                                        0
+                                                                                    </text>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -3143,12 +3173,14 @@
                                                                     <div class="decoration-content__H9c6U">
                                                                         <div class="node-info-block__DQGxr">
                                                                             <!-- <div class="node-title__YHkc6" style="color: rgb(255, 70, 70);">XXX</div> -->
-                                                                            <div class="node-title__YHkc6">SERVICES
+                                                                            <div class="node-title__YHkc6">TOPICS
                                                                             </div>
                                                                             <div>
                                                                                 <div class="dv-water-pond-level"
                                                                                      style="color: #08ffff">
-                                                                                    <text>17</text>
+                                                                                    <text id="efak_dashboard_panel_topics">
+                                                                                        0
+                                                                                    </text>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -3261,16 +3293,11 @@
                                                                                              stroke-width="3"></polygon>
                                                                                 </svg>
                                                                                 <div class="decoration-content__H9c6U"><span
-                                                                                        style="font-size: 16px;">TOPIC TRAFFIC RANK</span>
+                                                                                        style="font-size: 16px;">TOPIC CAPACITY RANK</span>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="service-info__OzcCc">
-                                                                                <div class="service-item__RCcpv"><span>topic001</span>
-                                                                                </div>
-                                                                                <div class="service-item__RCcpv"><span>topic002</span>
-                                                                                </div>
-                                                                                <div class="service-item__RCcpv"><span>topic003</span>
-                                                                                </div>
+                                                                            <div id="efak_dashboard_capacity_table"
+                                                                                 class="service-info__OzcCc">
                                                                             </div>
                                                                         </div>
                                                                         <div class="right-panel-item__TEENy">
@@ -3278,41 +3305,47 @@
                                                                                 <div class="info-title__CXw5K"
                                                                                      style="font-size: 18px;">CLUSTER
                                                                                 </div>
-                                                                                <div class="info-value__yPbV5"
+                                                                                <div id="efak_tv_cluster"
+                                                                                     class="info-value__yPbV5"
                                                                                      style="font-size: 18px;">
-                                                                                    TEST-KAFKA-001
+                                                                                    -
                                                                                 </div>
                                                                             </div>
                                                                             <div class="machine-info-item__pMWYQ">
                                                                                 <div class="info-title__CXw5K"
-                                                                                     style="font-size: 18px;">MEMORY
+                                                                                     style="font-size: 18px;">EFAK
+                                                                                    VERSION
                                                                                 </div>
-                                                                                <div class="info-value__yPbV5"
-                                                                                     style="font-size: 18px;">16.12 GB
+                                                                                <div id="efak_tv_version"
+                                                                                     class="info-value__yPbV5"
+                                                                                     style="font-size: 18px;">-
                                                                                 </div>
                                                                             </div>
                                                                             <div class="machine-info-item__pMWYQ">
                                                                                 <div class="info-title__CXw5K"
                                                                                      style="font-size: 18px;">CAPACITY
                                                                                 </div>
-                                                                                <div class="info-value__yPbV5"
-                                                                                     style="font-size: 18px;">41.94 GB
+                                                                                <div id="efak_tv_capacity"
+                                                                                     class="info-value__yPbV5"
+                                                                                     style="font-size: 18px;">-
                                                                                 </div>
                                                                             </div>
                                                                             <div class="machine-info-item__pMWYQ">
                                                                                 <div class="info-title__CXw5K"
-                                                                                     style="font-size: 18px;">LOGSIZE
+                                                                                     style="font-size: 18px;">MODE
                                                                                 </div>
-                                                                                <div class="info-value__yPbV5"
-                                                                                     style="font-size: 18px;">102400
+                                                                                <div id="efak_tv_mode"
+                                                                                     class="info-value__yPbV5"
+                                                                                     style="font-size: 18px;">-
                                                                                 </div>
                                                                             </div>
                                                                             <div class="machine-info-item__pMWYQ">
                                                                                 <div class="info-title__CXw5K"
-                                                                                     style="font-size: 18px;">GROUPS
+                                                                                     style="font-size: 18px;">WORKNODE
                                                                                 </div>
-                                                                                <div class="info-value__yPbV5"
-                                                                                     style="font-size: 18px;">201
+                                                                                <div id="efak_tv_worknode"
+                                                                                     class="info-value__yPbV5"
+                                                                                     style="font-size: 18px;">-
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -3321,10 +3354,11 @@
                                                             </div>
                                                             <div class="dv-scroll-ranking-board__wHQDU">
                                                                 <div class="alert-panel__taEuU">
-                                                                    <div class="title__hGFf9">ISR EXPIRATION</div>
+                                                                    <div class="title__hGFf9">KAFAK PRODUCER SERVICES
+                                                                    </div>
                                                                     <div class="empty-content__aqiEm"><img
                                                                             src="/media/css/tv/images/efak03.png">
-                                                                        <div class="no-data__XgHjd"
+                                                                        <div id="efak_tv_app" class="no-data__XgHjd"
                                                                              style="font-size: 25px; font-weight: bold;">
                                                                             0
                                                                         </div>
@@ -3515,7 +3549,13 @@
                                                     </svg>
                                                     <div class="border-box-content">
                                                         <div class="chart-title__nQpiI">cpu used</div>
-                                                        <div class="screen-chart__nZcqk"></div>
+                                                        <div id="efak_dashboard_cpu_used_lastest"
+                                                             class="chart-title__nQpiI" style="margin-top: 5%">[ 0% ]
+                                                        </div>
+                                                        <div class="screen-chart__nZcqk"
+                                                             id="efak_dashboard_cpu_used_chart"
+                                                             style="position:relative;width: 80%;margin-left:10%">
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="dv-border-box-1 node-metrics-top__LjyLl">
@@ -3572,7 +3612,14 @@
                                                     </svg>
                                                     <div class="border-box-content">
                                                         <div class="chart-title__nQpiI">memory used</div>
-                                                        <div class="screen-chart__nZcqk"></div>
+                                                        <div id="efak_dashboard_osfreememory_lastest"
+                                                             class="chart-title__nQpiI" style="margin-top: 5%">[ 0
+                                                            (GB/min)]
+                                                        </div>
+                                                        <div class="screen-chart__nZcqk"
+                                                             id="efak_dashboard_osfree_memory_chart"
+                                                             style="position:relative;width: 80%;margin-left:10%">
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="dv-border-box-1 node-metrics-top__LjyLl">
@@ -3629,14 +3676,21 @@
                                                     </svg>
                                                     <div class="border-box-content">
                                                         <div class="chart-title__nQpiI">message in</div>
-                                                        <div id="efak_dashboard_msg_in_chart"
-                                                             class="screen-chart__nZcqk"></div>
+                                                        <div id="efak_dashboard_message_in_lastest"
+                                                             class="chart-title__nQpiI" style="margin-top: 5%">[ 0
+                                                            (MSG/min) ]
+                                                        </div>
+                                                        <div class="screen-chart__nZcqk"
+                                                             id="efak_dashboard_msg_in_chart"
+                                                             style="position:relative;width: 80%;margin-left:10%">
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="dv-border-box-8 node-metrics-bottom__f2yJf"
                                                      style="height: 314.8px;">
                                                     <svg
-                                                            class="dv-border-svg-container" width="375" height="315">
+                                                            class="dv-border-svg-container" width="375"
+                                                            height="315">
                                                         <path stroke="#4fd2dd"
                                                               d="M2.5, 2.5 L372.5, 2.5 L372.5, 312.5 L2.5, 312.5 L2.5, 2.5"
                                                               stroke-width="3" fill="transparent"></path>
@@ -3644,14 +3698,30 @@
                                                     <div class="border-box-content">
                                                         <div class="disk-block__l_9zd">
                                                             <div class="disk-chart-block__d1cO_">
-                                                                <div class="disk-chart-title__YGis2">byte in rate</div>
+                                                                <div class="disk-chart-title__YGis2">byte in rate
+                                                                </div>
+                                                                <div id="efak_dashboard_byte_in_lastest"
+                                                                     class="chart-title__nQpiI" style="margin-top: 7%">
+                                                                    [
+                                                                    0
+                                                                    (B/sec) ]
+                                                                </div>
                                                                 <div id="efak_dashboard_byte_in_chart"
-                                                                     class="screen-chart__nZcqk"></div>
+                                                                     class="screen-chart__nZcqk"
+                                                                     style="width: 80%"></div>
                                                             </div>
                                                             <div class="disk-chart-block__d1cO_">
-                                                                <div class="disk-chart-title__YGis2">byte out rate</div>
+                                                                <div class="disk-chart-title__YGis2">byte out rate
+                                                                </div>
+                                                                <div id="efak_dashboard_byte_out_lastest"
+                                                                     class="chart-title__nQpiI" style="margin-top: 7%">
+                                                                    [
+                                                                    0
+                                                                    (B/sec) ]
+                                                                </div>
                                                                 <div id="efak_dashboard_byte_out_chart"
-                                                                     class="screen-chart__nZcqk"></div>
+                                                                     class="screen-chart__nZcqk"
+                                                                     style="width: 80%"></div>
                                                             </div>
                                                         </div>
                                                     </div>
