@@ -20,11 +20,13 @@ Supported platform: ```Mac OS X```,```Linux```,```Windows```.
 Supported JDK: ```JDK8+```
 
 Here are a few `EFAK` system screenshots:
+![efak_tv](https://www.kafka-eagle.org/images/docs/bscreen@2x.png)
 
-<video width="830" height="521" controls autoplay>
-    <source src="https://www.kafka-eagle.org/video/efak_v3_0_1.mp4" type="video/mp4">
-</video>
+# Get started
+* [Get EFAK](http://download.kafka-eagle.org/)
+* [Installation guides](https://www.kafka-eagle.org/articles/docs/documentation.html)
 
+Unsure if EFAK is for you? Watch EFAK video in action on [www.kafka-eagle.org](https://www.kafka-eagle.org)!
 
 # Alert Support
 `EFAK` supports currently popular IM alarm systems, such as:
