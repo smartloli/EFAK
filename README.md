@@ -21,7 +21,9 @@ Supported JDK: ```JDK8+```
 
 Here are a few `EFAK` system screenshots:
 
-![efak_video](https://www.kafka-eagle.org/video/efak_v3_0_1.mp4)
+<video width="830" height="521" controls autoplay>
+    <source src="https://www.kafka-eagle.org/video/efak_v3_0_1.mp4" type="video/mp4">
+</video>
 
 
 # Alert Support
