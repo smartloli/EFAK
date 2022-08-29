@@ -21,6 +21,8 @@ Supported JDK: ```JDK8+```
 
 Here are a few `EFAK` system screenshots:
 
+<iframe height=830 width=520 src="https://www.kafka-eagle.org/video/efak_v3_0_1.mp4" />
+
 # Alert Support
 `EFAK` supports currently popular IM alarm systems, such as:
 * DingDing
