@@ -296,7 +296,7 @@ public class KConstants {
         public static final String RETENTION_MS_KEY = "retention.ms";
         public static final String RETENTION_MS_VALUE = "1000";
 
-        public static final int BATCH_SIZE = 500;
+        public static final int BATCH_SIZE = 50;
 
         public static final long TOPIC_BROKER_SPREAD_ERROR = 60;
         public static final long TOPIC_BROKER_SPREAD_NORMAL = 80;
