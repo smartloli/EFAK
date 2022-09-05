@@ -207,7 +207,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <a class="dropdown-item" href="http://www.kafka-eagle.org/articles/docs/documentation.html"
+                            <a class="dropdown-item" href="http://www.kafka-eagle.org/"
                                target="_blank">
                                 <div class="d-flex align-items-center">
                                     <div class="notification-box bg-light-info text-info"><i
@@ -219,7 +219,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <a class="dropdown-item" href="http://download.kafka-eagle.org/" target="_blank">
+                            <a class="dropdown-item" href="http://www.kafka-eagle.org/" target="_blank">
                                 <div class="d-flex align-items-center">
                                     <div class="notification-box bg-light-success text-success"><i
                                             class="bx bx-download"></i></div>
