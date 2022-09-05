@@ -190,10 +190,10 @@
     </select>
 
     <select id="queryTopicProducerByAlarm" parameterType="map" resultMap="tlogsize">
-        select `cluster`,`topic`,`logsize`,`diffval`,`timespan` from ke_logsize
-        where `cluster`=#{cluster} and `topic`=#{topic}
-        and tm=#{stime} order by `timespan` desc
-        limit 1
+        select sum(`diffval`) as `diffval`,`cluster`,`topic` from
+        (select `cluster`,`topic`,`diffval` from ke_logsize where `cluster`=#{cluster}
+            and `topic`=#{topic} and tm=#{stime} ORDER BY `timespan` desc limit #{duration})
+        as a group by `cluster`,`topic`;
     </select>
 
     <select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
