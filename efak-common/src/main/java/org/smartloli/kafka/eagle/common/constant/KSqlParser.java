@@ -21,6 +21,7 @@ import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.parser.SqlParser;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicPartitionSchema;
+import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.LoggerUtils;
 import org.smartloli.kafka.eagle.common.util.StrUtils;
 
@@ -67,6 +68,13 @@ public class KSqlParser {
                     if (sqlBasicCall.getKind() == SqlKind.AS && sqlBasicCall.operandCount() > 0) {
                         topic = sqlBasicCall.operand(0).toString();
                     }
+                }
+                if(sqlWhere==null){
+                    String[] partitions ={KConstants.Kafka.ALL_PARTITION+""};
+                    tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
+                    tps.setTopic(topic);
+                    tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
+                    return;
                 }
                 if (sqlWhere.getKind() == SqlKind.IN) {// one and
                     SqlBasicCall sqlBasicCall = (SqlBasicCall) sqlWhere;
