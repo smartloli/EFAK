@@ -246,7 +246,7 @@ $(function () {
                 chartPanelCommonOption.series[0].name = filter(data, filed).name;
                 mbean.updateOptions(chartPanelCommonOption);
                 var value = data.cpuUsed[data.cpuUsed.length - 1].y;
-                $("#efak_dashboard_cpu_used_lastest").text("[ " + value + "% ]");
+                $("#efak_dashboard_cpu_used_lastest").text("[ " + value.toFixed(1) + "% ]");
                 break;
             default:
                 break;

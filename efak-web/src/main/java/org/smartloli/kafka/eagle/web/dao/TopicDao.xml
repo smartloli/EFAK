@@ -206,6 +206,7 @@
             </foreach>
             )
         </if>
+        and diffval > 0
         and tm between #{stime} and #{etime} group by from_unixtime(timespan/1000,'%Y-%m-%d %H:%i:%s'),tm
         )a group by tm
     </select>

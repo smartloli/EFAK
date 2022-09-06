@@ -37,6 +37,8 @@ import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
 import org.smartloli.kafka.eagle.core.factory.Mx4jFactory;
 import org.smartloli.kafka.eagle.core.factory.Mx4jService;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerFactory;
+import org.smartloli.kafka.eagle.core.factory.v2.BrokerService;
 import org.smartloli.kafka.eagle.web.dao.BrokerDao;
 import org.smartloli.kafka.eagle.web.dao.MBeanDao;
 import org.smartloli.kafka.eagle.web.dao.TopicDao;
@@ -55,10 +57,7 @@ import java.util.Map.Entry;
  *
  * @author smartloli.
  * <p>
- * Created by Jul 17, 2017 Update by No 3, 2018 by cocodroid
- * <p>
- * Update by smartloli Sep 12, 2021
- * Settings prefixed with 'kafka.eagle.' will be deprecated, use 'efak.' instead.
+ * Created by Aug 30, 2022
  */
 @Service
 public class MetricsServiceImpl implements MetricsService {
@@ -76,6 +75,11 @@ public class MetricsServiceImpl implements MetricsService {
      * Kafka service interface.
      */
     private KafkaService kafkaService = new KafkaFactory().create();
+
+    /**
+     * Broker service interface.
+     */
+    private static BrokerService brokerService = new BrokerFactory().create();
 
     /**
      * Mx4j service interface.
@@ -244,6 +248,7 @@ public class MetricsServiceImpl implements MetricsService {
     public String query(Map<String, Object> params) throws ParseException {
 
         List<KpiInfo> kpis = mbeanDao.query(params);
+        long brokerSize = brokerService.brokerNumbers(params.get("cluster").toString());
 
         JSONArray messageIns = new JSONArray();
         JSONArray byteIns = new JSONArray();
@@ -312,10 +317,16 @@ public class MetricsServiceImpl implements MetricsService {
                     assembly(replicationBytesIns, kpi);
                     break;
                 case MBean.OSFREEMEMORY:
-                    assembly(osFreeMems, kpi);
+                    JSONObject memObject = new JSONObject();
+                    memObject.put("key", MBean.OSFREEMEMORY);
+                    memObject.put("size", brokerSize);
+                    assembly(osFreeMems, kpi, memObject);
                     break;
                 case MBean.CPUUSED:
-                    assembly(cpuUsed, kpi);
+                    JSONObject cpuObject = new JSONObject();
+                    cpuObject.put("key", MBean.CPUUSED);
+                    cpuObject.put("size", brokerSize);
+                    assembly(cpuUsed, kpi, cpuObject);
                     break;
                 default:
                     break;
@@ -348,6 +359,15 @@ public class MetricsServiceImpl implements MetricsService {
         object.put("x", CalendarUtils.convertUnixTime(kpi.getTimespan(), "yyyy-MM-dd HH:mm"));
         object.put("y", kpi.getValue());
         assemblys.add(object);
+    }
+
+    private void assembly(JSONArray assemblys, KpiInfo kpi, JSONObject type) throws ParseException {
+        if (MBean.CPUUSED.equals(type.getString("key")) || MBean.OSFREEMEMORY.equals(type.getString("key"))) {
+            JSONObject object = new JSONObject();
+            object.put("x", CalendarUtils.convertUnixTime(kpi.getTimespan(), "yyyy-MM-dd HH:mm"));
+            object.put("y", Double.parseDouble(kpi.getValue()) / type.getLong("size"));
+            assemblys.add(object);
+        }
     }
 
     /**

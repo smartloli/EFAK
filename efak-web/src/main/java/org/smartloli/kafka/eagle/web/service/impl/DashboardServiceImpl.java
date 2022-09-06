@@ -245,9 +245,9 @@ public class DashboardServiceImpl implements DashboardService {
             long valueFirst = Long.parseLong(kpis.get(0).getValue());
             long valueSecond = Long.parseLong(kpis.get(1).getValue());
             if (valueFirst >= valueSecond) {
-                object.put("mem", StrUtils.numberic(((valueFirst - valueSecond) * 100.0 / valueFirst) + ""));
+                object.put("mem", StrUtils.numberic(((valueFirst - valueSecond) * 100.0 / valueFirst) + "") / brokerService.brokerNumbers(params.get("cluster").toString()));
             } else {
-                object.put("mem", StrUtils.numberic(((valueSecond - valueFirst) * 100.0 / valueSecond) + ""));
+                object.put("mem", StrUtils.numberic(((valueSecond - valueFirst) * 100.0 / valueSecond) + "") / brokerService.brokerNumbers(params.get("cluster").toString()));
             }
         } else {
             object.put("mem", "0.0");

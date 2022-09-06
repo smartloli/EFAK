@@ -17,9 +17,12 @@
  */
 package org.smartloli.kafka.eagle.ipc;
 
-import org.smartloli.kafka.eagle.common.util.KafkaCacheUtils;
 import org.smartloli.kafka.eagle.core.factory.KafkaFactory;
 import org.smartloli.kafka.eagle.core.factory.KafkaService;
+import org.smartloli.kafka.eagle.core.task.shard.ScheduleShardStrategy;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Test JobClient
@@ -35,9 +38,11 @@ public class TestJobClient {
     public static void main(String[] args) {
         // List<WorkNodeMetrics> wns = JobClient.getWorkNodeMetrics("cluster1");
         // System.out.println(wns.toString());
-        KafkaCacheUtils.initKafkaMetaData();
+        // KafkaCacheUtils.initKafkaMetaData();
         // JSONArray array = JobClient.getWorkNodeShardSuperTask("cluster1");
-        System.out.println(kafkaService.getKafkaConsumer("cluster1"));
+        for (Map.Entry<String, List<String>> entry : ScheduleShardStrategy.getScheduleShardTask().entrySet()) {
+            System.out.println(entry.getKey() + ":" + entry.getValue());
+        }
 //        System.out.println("Result: " + ScheduleShardStrategy.getScheduleShardSuperTask("cluster1"));
     }
 }
