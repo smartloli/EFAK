@@ -197,8 +197,24 @@
     </select>
 
     <select id="queryProducerHistoryBar" parameterType="map" resultMap="bsbar">
+        <!--        select tm,sum(new_diffval) as total from (-->
+        <!--        select tm,max(diffval) as new_diffval from ke_logsize where cluster=#{cluster}-->
+        <!--        <if test="topics != null and topics.size > 0">-->
+        <!--            and `topic` in (-->
+        <!--            <foreach collection="topics" item="item" index="index" separator=",">-->
+        <!--                #{item}-->
+        <!--            </foreach>-->
+        <!--            )-->
+        <!--        </if>-->
+        <!--        and diffval > 0-->
+        <!--        and tm between #{stime} and #{etime} group by from_unixtime(timespan/1000,'%Y-%m-%d %H:%i:%s'),tm-->
+        <!--        )a group by tm-->
+
         select tm,sum(new_diffval) as total from (
-        select tm,max(diffval) as new_diffval from ke_logsize where cluster=#{cluster}
+        select tm,new_timespan,sum(diffval) new_diffval
+        from (
+        select tm,from_unixtime( timespan / 1000, '%Y-%m-%d %H:%i:%s' ) new_timespan,diffval from ke_logsize where
+        cluster=#{cluster}
         <if test="topics != null and topics.size > 0">
             and `topic` in (
             <foreach collection="topics" item="item" index="index" separator=",">
@@ -207,7 +223,8 @@
             )
         </if>
         and diffval > 0
-        and tm between #{stime} and #{etime} group by from_unixtime(timespan/1000,'%Y-%m-%d %H:%i:%s'),tm
+        and tm between #{stime} and #{etime} order by diffval desc
+        )b group by new_timespan,tm
         )a group by tm
     </select>
 
