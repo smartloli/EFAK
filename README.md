@@ -23,8 +23,8 @@ Here are a few `EFAK` system screenshots:
 ![efak_tv](https://www.kafka-eagle.org/images/docs/bscreen@2x.png)
 
 # Get started
-* [Get EFAK](http://download.kafka-eagle.org/)
-* [Installation guides](https://www.kafka-eagle.org/articles/docs/documentation.html)
+* [Get EFAK](https://www.kafka-eagle.org/)
+* [Installation guides](https://www.kafka-eagle.org/)
 
 Unsure if EFAK is for you? Watch EFAK video in action on [www.kafka-eagle.org](https://www.kafka-eagle.org)!
 
