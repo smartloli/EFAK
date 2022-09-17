@@ -9,7 +9,7 @@
     <artifactId>efak-common</artifactId>
 
     <properties>
-        <calcite.version>1.30.0</calcite.version>
+        <calcite.version>1.32.0</calcite.version>
     </properties>
 
     <repositories>
