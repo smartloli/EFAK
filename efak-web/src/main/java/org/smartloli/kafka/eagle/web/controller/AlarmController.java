@@ -985,6 +985,12 @@ public class AlarmController {
                 result = AlertUtils.sendTestMsgByDingDing(url, msg);
             } else if (AlarmType.WeChat.equals(type)) {
                 result = AlertUtils.sendTestMsgByWeChat(url, msg);
+            } else if (AlarmType.Kafka.equals(type)) {
+                JSONObject data = new JSONObject();
+                data.put("msg", msg);
+                data.put("title", AlarmType.EMAIL_TEST_TITLE);
+
+                result = AlertUtils.sendTestMsgByKafka(url, data);
             }
             byte[] output = result.getBytes();
             BaseController.response(output, response);

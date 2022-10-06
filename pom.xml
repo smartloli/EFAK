@@ -10,6 +10,9 @@
     <url>https://repo1.maven.org/maven2/</url>
 
     <properties>
+        <jdk.version>1.8</jdk.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.version>3.0.1</project.version>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

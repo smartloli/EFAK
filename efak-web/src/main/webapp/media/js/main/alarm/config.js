@@ -51,19 +51,33 @@ $(document).ready(function () {
         if (text.indexOf("Email") > -1) {
             $("#div_alarm_http").hide();
             $("#div_alarm_address").show();
+            $("#label_alarm_url").show();
+            $("#label_alarm_topic").hide();
             $("#ke_alarm_url").attr('placeholder', "http://127.0.0.1:10086/email");
         } else if (text.indexOf("WebHook") > -1) {
             $("#div_alarm_http").hide();
             $("#div_alarm_address").show();
+            $("#label_alarm_url").show();
+            $("#label_alarm_topic").hide();
             $("#ke_alarm_url").attr('placeholder', "http://127.0.0.1:10086/webhook");
         } else if (text.indexOf("DingDing") > -1) {
             $("#div_alarm_http").hide();
             $("#div_alarm_address").hide();
+            $("#label_alarm_url").show();
+            $("#label_alarm_topic").hide();
             $("#ke_alarm_url").attr('placeholder', "https://oapi.dingtalk.com/robot/send?access_token=");
         } else if (text.indexOf("WeChat") > -1) {
             $("#div_alarm_http").hide();
             $("#div_alarm_address").hide();
+            $("#label_alarm_url").show();
+            $("#label_alarm_topic").hide();
             $("#ke_alarm_url").attr('placeholder', "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=");
+        } else if (text.indexOf("Kafka") > -1) {
+            $("#div_alarm_http").hide();
+            $("#div_alarm_address").hide();
+            $("#label_alarm_url").hide();
+            $("#label_alarm_topic").show();
+            $("#ke_alarm_url").attr('placeholder', "kafka topic");
         }
     });
 
@@ -113,7 +127,7 @@ $(document).ready(function () {
                 url: '/alarm/config/test/send/ajax',
                 success: function (datas) {
                     console.log(datas)
-                    if (type.indexOf("DingDing") > -1 || type.indexOf("WeChat") > -1 || type.indexOf("Email") > -1) {
+                    if (type.indexOf("DingDing") > -1 || type.indexOf("WeChat") > -1 || type.indexOf("Email") > -1|| type.indexOf("Kafka") > -1) {
                         if (datas.errcode == 0) {
                             successNoti("Send test msg has successed.");
                         } else {

@@ -17,6 +17,7 @@
  */
 package org.smartloli.kafka.eagle.common.protocol.alarm;
 
+import com.alibaba.fastjson.JSONObject;
 import org.smartloli.kafka.eagle.common.protocol.BaseProtocol;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 
@@ -96,6 +97,23 @@ public class AlarmMessageInfo extends BaseProtocol {
     public String toMailJSON() {
         return title + " <br/> AlarmID : [ " + alarmId + " ]<br/> AlarmCluster : [ " + alarmCluster + " ]<br/> AlarmStatus : [ " + alarmStatus + " ]<br/>" + " AlarmLevel : [ " + alarmLevel + " ]<br/>" + " AlarmProject : [ " + alarmProject + " ]<br/>" + " AlarmTimes : [ " + alarmTimes
                 + " ]<br/> AlarmDate : [ " + alarmDate + " ]<br/>" + " AlarmContent : [ " + alarmContent + " ]";
+    }
+
+    public String toJSON() {
+        JSONObject json=new JSONObject();
+        json.put("title",title);
+        json.put("type","kafka");
+        json.put("alarmId",alarmId);
+        json.put("alarmCluster",alarmCluster);
+        json.put("alarmStatus",alarmStatus);
+        json.put("alarmLevel",alarmLevel);
+        json.put("alarmProject",alarmProject);
+        json.put("alarmTimes",alarmTimes);
+        json.put("alarmTimes",alarmTimes);
+        json.put("alarmTimes",alarmTimes);
+        json.put("alarmDate",alarmDate);
+        json.put("alarmContent",alarmContent);
+        return json.toJSONString();
     }
 
     public String getAlarmCluster() {

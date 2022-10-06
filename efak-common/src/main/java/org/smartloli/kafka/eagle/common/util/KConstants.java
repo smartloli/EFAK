@@ -347,7 +347,7 @@ public class KConstants {
     }
 
     public interface AlarmType {
-        public static String[] TYPE = new String[]{"DingDing", "WeChat", "Email"};
+        public static String[] TYPE = new String[]{"DingDing", "WeChat", "Email","Kafka"};
         public static String[] CLUSTER = new String[]{"Kafka", "Zookeeper", "Topic", "Producer"};
         public static String[] LEVEL = new String[]{"P0", "P1", "P2", "P3"};
         public static int[] MAXTIMES = new int[]{-1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -355,6 +355,7 @@ public class KConstants {
         public static String EMAIL_TEST_TITLE = "Kafka Eagle Send Test MSG";
         public static String DingDing = "DingDing";
         public static String WeChat = "WeChat";
+        public static String Kafka = "Kafka";
         public static String HTTP_GET = "get";
         public static String HTTP_POST = "post";
         public static String DISABLE = "N";

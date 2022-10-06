@@ -122,7 +122,15 @@ public class KafkaCacheUtils {
                     protocol = KConstants.Kafka.SSL;
                 }
                 for (String endpointsStr : endpointsList) {
-                    if (endpointsStr.contains(protocol)) {
+                    /**
+                     * add support format demo：
+                     * listener.security.protocol.map=CLIENT:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
+                     * advertised.listeners=CLIENT://192.168.56.11:9092,EXTERNAL://192.168.55.11:9093
+                     * sasl.mechanism.inter.broker.protocol=plain
+                     * sasl_mechanism_inter_broker_protocol=plain
+                     * inter.broker.listener.name=CLIENT
+                     */
+                    if (endpointsStr.contains(protocol) || endpointsStr.contains("INTERNAL") || endpointsStr.contains("CLIENT")) {
                         String tmp = endpointsStr.split("//")[1];
                         host = tmp.split(":")[0];
                         port = Integer.parseInt(tmp.split(":")[1]);

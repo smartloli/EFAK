@@ -120,4 +120,17 @@ public class AlertUtils {
         return object.toJSONString();
     }
 
+    public static String sendTestMsgByKafka(String url, JSONObject data) {
+        data.put("type","kafka");
+        JSONObject object = new JSONObject();
+        IMService im = new IMFactory().create();
+        try {
+            im.sendPostMsgByKafka(data.toJSONString(), url);
+            object.put("errcode", 0);
+        } catch (Exception e) {
+            LoggerUtils.print(AlertUtils.class).error("Send test message by post kafka has error, msg is ", e);
+            object.put("errcode", 1);
+        }
+        return object.toJSONString();
+    }
 }

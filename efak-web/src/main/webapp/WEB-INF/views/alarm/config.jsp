@@ -77,12 +77,9 @@
                                     </label>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">Alarm URL (*)</label>
-                                    <input id="ke_alarm_url" name="ke_alarm_url" class="form-control"
-                                           placeholder="Enter Alarm URL">
-                                    <label for="inputError" class="control-label text-danger">
-                                        <i class="bx bx-info-circle"></i> Input the alarm url.
-                                    </label>
+                                    <label id="label_alarm_url" class="form-label">Alarm URL (*)</label>
+                                    <label id="label_alarm_topic"  class="form-label">Topic (*)</label>
+                                    <input id="ke_alarm_url" name="ke_alarm_url" class="form-control" placeholder="Enter Alarm URL">
                                 </div>
                                 <div id="div_alarm_http" style="display: none" class="col-12">
                                     <label class="form-label">Http Method</label>
@@ -109,6 +106,7 @@
                                         im addresses using a ";" separator.
                                     </label>
                                 </div>
+
                                 <div class="col-12">
                                     <label class="form-label">Test Message</label>
                                     <textarea id="ke_test_msg" name="ke_test_msg" class="form-control"

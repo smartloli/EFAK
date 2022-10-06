@@ -92,6 +92,10 @@ public class JMXFactoryUtils {
         Object result = null;
         try {
             result = blockQueue.poll(timeout, unit);
+            if(result instanceof Exception){
+                LoggerUtils.print(JMXFactoryUtils.class).error("query jmx error: ", (Exception)result);
+                throw (Exception)result;
+            }
             if (result == null && !blockQueue.offer("")) {
                 result = blockQueue.take();
             }

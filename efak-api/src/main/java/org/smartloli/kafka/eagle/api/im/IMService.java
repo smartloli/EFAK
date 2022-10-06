@@ -35,4 +35,5 @@ public interface IMService {
 	/** Send alert message by mail. */
 	public void sendPostMsgByMail(String data, String url);
 
+	public void sendPostMsgByKafka(String data, String topic);
 }
