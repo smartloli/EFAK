@@ -20,6 +20,7 @@ package org.smartloli.kafka.eagle.common.constant;
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.parser.SqlParser;
+import org.apache.calcite.sql.util.SqlBasicVisitor;
 import org.smartloli.kafka.eagle.common.protocol.topic.TopicPartitionSchema;
 import org.smartloli.kafka.eagle.common.util.KConstants;
 import org.smartloli.kafka.eagle.common.util.LoggerUtils;
@@ -69,47 +70,32 @@ public class KSqlParser {
                         topic = sqlBasicCall.operand(0).toString();
                     }
                 }
-                if(sqlWhere==null){
-                    String[] partitions ={KConstants.Kafka.ALL_PARTITION+""};
+                // no where
+                if (sqlWhere == null) {
+                    String[] partitions = {KConstants.Kafka.ALL_PARTITION + ""};
                     tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
                     tps.setTopic(topic);
                     tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
                     return;
                 }
-                if (sqlWhere.getKind() == SqlKind.IN) {// one and
-                    SqlBasicCall sqlBasicCall = (SqlBasicCall) sqlWhere;
-                    if (sqlBasicCall.operandCount() > 1) {
-                        String[] partitions = sqlBasicCall.operand(1).toString().split(",");
-                        tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
-                        tps.setTopic(topic);
-                        tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
-                    }
-                } else if (sqlWhere.getKind() == SqlKind.AND) {// two and
-                    SqlBasicCall sqlBasicCall = (SqlBasicCall) sqlWhere;
-                    if (sqlBasicCall.operandCount() > 0) {
-                        SqlNode sqlNodeChild = sqlBasicCall.operand(0);
-                        if (sqlNodeChild.getKind() == SqlKind.IN) {
-                            SqlBasicCall sqlBasicCallChild = (SqlBasicCall) sqlNodeChild;
-                            if (sqlBasicCallChild.operandCount() > 1) {
-                                String[] partitions = sqlBasicCallChild.operand(1).toString().split(",");
-                                tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
-                                tps.setTopic(topic);
+                // where info
+                String finalTopic = topic;
+                sqlWhere.accept(new SqlBasicVisitor<String>() {
+                    @Override
+                    public String visit(SqlCall call) {
+                        if (call.getKind().equals(SqlKind.AND) || call.getKind().equals(SqlKind.OR)) {
+                            SqlBasicCall sql = (SqlBasicCall) call;
+                            SqlBasicCall left = (SqlBasicCall) sql.getOperandList().get(0);
+                            if (!left.getKind().equals(SqlKind.AND) && !left.getKind().equals(SqlKind.OR)) {
+                                String[] partitions = left.operand(1).toString().split(",");
+                                tps.getTopicSchema().put(finalTopic, StrUtils.stringsConvertIntegers(partitions));
+                                tps.setTopic(finalTopic);
                                 tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
                             }
-                        } else if (sqlNodeChild.getKind() == SqlKind.AND) {
-                            SqlNode sqlBasicCallChild = ((SqlBasicCall) sqlNodeChild).operand(0);
-                            if (sqlBasicCallChild.getKind() == SqlKind.IN) {
-                                SqlBasicCall sqlBasicCallGrandson = (SqlBasicCall) sqlBasicCallChild;
-                                if (sqlBasicCallGrandson.operandCount() > 1) {
-                                    String[] partitions = sqlBasicCallGrandson.operand(1).toString().split(",");
-                                    tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
-                                    tps.setTopic(topic);
-                                    tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
-                                }
-                            }
                         }
+                        return call.getOperator().acceptCall(this, call);
                     }
-                }
+                });
                 break;
             case JOIN:
                 SqlNode leftNode = ((SqlJoin) sqlNode).getLeft();
