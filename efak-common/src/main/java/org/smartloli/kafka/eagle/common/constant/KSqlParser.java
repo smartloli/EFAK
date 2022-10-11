@@ -79,23 +79,33 @@ public class KSqlParser {
                     return;
                 }
                 // where info
-                String finalTopic = topic;
-                sqlWhere.accept(new SqlBasicVisitor<String>() {
-                    @Override
-                    public String visit(SqlCall call) {
-                        if (call.getKind().equals(SqlKind.AND) || call.getKind().equals(SqlKind.OR)) {
-                            SqlBasicCall sql = (SqlBasicCall) call;
-                            SqlBasicCall left = (SqlBasicCall) sql.getOperandList().get(0);
-                            if (!left.getKind().equals(SqlKind.AND) && !left.getKind().equals(SqlKind.OR)) {
-                                String[] partitions = left.operand(1).toString().split(",");
-                                tps.getTopicSchema().put(finalTopic, StrUtils.stringsConvertIntegers(partitions));
-                                tps.setTopic(finalTopic);
-                                tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
-                            }
-                        }
-                        return call.getOperator().acceptCall(this, call);
+                if (sqlWhere.getKind() == SqlKind.IN) {
+                    SqlBasicCall sqlBasicCall = (SqlBasicCall) sqlWhere;
+                    if (sqlBasicCall.operandCount() > 1) {
+                        String[] partitions = sqlBasicCall.operand(1).toString().split(",");
+                        tps.getTopicSchema().put(topic, StrUtils.stringsConvertIntegers(partitions));
+                        tps.setTopic(topic);
+                        tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
                     }
-                });
+                } else {
+                    String finalTopic = topic;
+                    sqlWhere.accept(new SqlBasicVisitor<String>() {
+                        @Override
+                        public String visit(SqlCall call) {
+                            if (call.getKind().equals(SqlKind.AND) || call.getKind().equals(SqlKind.OR)) {
+                                SqlBasicCall sql = (SqlBasicCall) call;
+                                SqlBasicCall left = (SqlBasicCall) sql.getOperandList().get(0);
+                                if (!left.getKind().equals(SqlKind.AND) && !left.getKind().equals(SqlKind.OR)) {
+                                    String[] partitions = left.operand(1).toString().split(",");
+                                    tps.getTopicSchema().put(finalTopic, StrUtils.stringsConvertIntegers(partitions));
+                                    tps.setTopic(finalTopic);
+                                    tps.setPartitions(StrUtils.stringsConvertIntegers(partitions));
+                                }
+                            }
+                            return call.getOperator().acceptCall(this, call);
+                        }
+                    });
+                }
                 break;
             case JOIN:
                 SqlNode leftNode = ((SqlJoin) sqlNode).getLeft();

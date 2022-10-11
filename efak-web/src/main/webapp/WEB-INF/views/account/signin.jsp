@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <jsp:include page="../public/plus/title.jsp">
+    <jsp:include page="../public/pro/title.jsp">
         <jsp:param value="Login" name="loader"/>
     </jsp:include>
     <meta name="description" content="">
@@ -70,7 +70,7 @@
     </div>
 </div>
 </body>
-<jsp:include page="../public/plus/script.jsp">
+<jsp:include page="../public/pro/script.jsp">
     <jsp:param value="main/account/signin.js" name="loader"/>
 </jsp:include>
 <script type="text/javascript">

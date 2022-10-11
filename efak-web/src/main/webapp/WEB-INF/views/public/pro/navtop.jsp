@@ -230,7 +230,8 @@
                                     </div>
                                 </div>
                             </a>
-                            <a class="dropdown-item" href="https://github.com/smartloli/EFAK/issues" target="_blank">
+                            <a class="dropdown-item" href="https://github.com/smartloli/EFAK/discussions"
+                               target="_blank">
                                 <div class="d-flex align-items-center">
                                     <div class="notification-box bg-light-bronze text-bronze"><i
                                             class="bi bi-people-fill"></i></div>

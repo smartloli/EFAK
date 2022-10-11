@@ -29,7 +29,8 @@ import org.smartloli.kafka.eagle.common.constant.KSqlParser;
 public class TestKSQLParser {
 
     public static void main(String[] args) {
-        String sql = "select msg from kk a where `partition` in (0,1,2) and `offset`=10 and msg like 'BB%' and msg like '%aaabbb%' order by timespan desc limit 240";
+        String sql = "select msg from kk a where `partition` in (0,1,2) and `offset`=10 or `offset`>100 and msg like 'BB%' and msg like '%aaabbb%' order by timespan desc limit 240";
+//        String sql = "select msg from kk a where `partition` in (0,1,2) and `offset`=10 limit 240";
         System.out.println(KSqlParser.parserTopic(sql));
     }
 
