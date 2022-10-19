@@ -31,12 +31,29 @@ import org.smartloli.kafka.eagle.common.protocol.alarm.AlarmMessageInfo;
  */
 public class TestIM {
     public static void main(String[] args) {
-        testAlarmClusterByDingDingMarkDownNewStyle();
+      //  testAlarmClusterByDingDingMarkDownNewStyle();
 //        testAlarmClusterByDingDingMarkDown();
-//		testAlarmClusterByWeChatMarkDown();
+        testAlarmClusterByLark();
 
     }
 
+    private static void testAlarmClusterByLark() {
+        AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+        // FF0000 (red), 008000(green), FFA500(yellow)
+        alarmMsg.setTitle("`Kafka Eagle Alarm Notice`\n");
+        alarmMsg.setAlarmContent("<font color=\"warning\">node.shutdown [ localhost:9092 ]</font>");
+        // alarmMsg.setAlarmContent("<font color=\"#008000\">node.alive [
+        // localhost:9092 ]</font>");
+        alarmMsg.setAlarmDate("2019-10-07 21:43:22");
+        alarmMsg.setAlarmLevel("P0");
+        alarmMsg.setAlarmProject("Kafka");
+        alarmMsg.setAlarmStatus("<font color=\"warning\">PROBLEM</font>");
+        // alarmMsg.setAlarmStatus("<font color=\"#008000\">NORMAL</font>");
+        alarmMsg.setAlarmTimes("current(1), max(7)");
+
+        IMServiceImpl im = new IMServiceImpl();
+        im.sendPostMsgByLark(alarmMsg.toMail(), "xxx");
+    }
     /**
      * New alarm im api.
      */

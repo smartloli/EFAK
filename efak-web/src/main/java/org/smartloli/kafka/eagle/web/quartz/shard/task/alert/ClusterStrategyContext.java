@@ -178,6 +178,33 @@ public class ClusterStrategyContext {
             alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
             IMServiceImpl im = new IMServiceImpl();
             im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+        } else if (alarmConfing.getAlarmType().equals(KConstants.AlarmType.LARK)) {
+            AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+            alarmMsg.setAlarmId(cluster.getId());
+            alarmMsg.setAlarmCluster(alarmConfing.getCluster());
+            alarmMsg.setTitle("`EFAK - Alert Cluster Error`\n");
+            if (KConstants.AlarmType.TOPIC.equals(cluster.getType())) {
+                JSONObject alarmTopicMsg = JSON.parseObject(server);
+                String topic = alarmTopicMsg.getString("topic");
+                long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
+                long realCapacity = alarmTopicMsg.getLong("realCapacity");
+                alarmMsg.setAlarmContent("topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]");
+            } else if (KConstants.AlarmType.PRODUCER.equals(cluster.getType())) {
+                JSONObject alarmTopicMsg = JSON.parseObject(server);
+                String topic = alarmTopicMsg.getString("topic");
+                String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
+                long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
+                alarmMsg.setAlarmContent("producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]");
+            } else {
+                alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
+            }
+            alarmMsg.setAlarmDate(CalendarUtils.getDate());
+            alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+            alarmMsg.setAlarmProject(cluster.getType());
+            alarmMsg.setAlarmStatus("PROBLEM");
+            alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + 1 + "), max(" + cluster.getAlarmMaxTimes() + ")");
+            IMServiceImpl im = new IMServiceImpl();
+            im.sendPostMsgByLark(alarmMsg.toMail(), alarmConfing.getAlarmUrl());
         }
     }
 
@@ -271,6 +298,33 @@ public class ClusterStrategyContext {
             alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + "), max(" + cluster.getAlarmMaxTimes() + ")");
             IMServiceImpl im = new IMServiceImpl();
             im.sendPostMsgByWeChat(alarmMsg.toWeChatMarkDown(), alarmConfing.getAlarmUrl());
+        } else if (alarmConfing.getAlarmType().equals(KConstants.AlarmType.LARK)) {
+            AlarmMessageInfo alarmMsg = new AlarmMessageInfo();
+            alarmMsg.setAlarmId(cluster.getId());
+            alarmMsg.setAlarmCluster(alarmConfing.getCluster());
+            alarmMsg.setTitle("`EFAK - Alert Cluster Error`\n");
+            if (KConstants.AlarmType.TOPIC.equals(cluster.getType())) {
+                JSONObject alarmTopicMsg = JSON.parseObject(server);
+                String topic = alarmTopicMsg.getString("topic");
+                long alarmCapacity = alarmTopicMsg.getLong("alarmCapacity");
+                long realCapacity = alarmTopicMsg.getLong("realCapacity");
+                alarmMsg.setAlarmContent("topic.capacity.overflow [topic(" + topic + "), real.capacity(" + StrUtils.stringify(realCapacity) + "), alarm.capacity(" + StrUtils.stringify(alarmCapacity) + ")]");
+            } else if (KConstants.AlarmType.PRODUCER.equals(cluster.getType())) {
+                JSONObject alarmTopicMsg = JSON.parseObject(server);
+                String topic = alarmTopicMsg.getString("topic");
+                String alarmSpeeds = alarmTopicMsg.getString("alarmSpeeds");
+                long realSpeeds = alarmTopicMsg.getLong("realSpeeds");
+                alarmMsg.setAlarmContent("producer.speed.overflow [topic(" + topic + "), real.speeds(" + realSpeeds + "), alarm.speeds.range(" + alarmSpeeds + ")]");
+            } else {
+                alarmMsg.setAlarmContent("node.shutdown [ " + server + " ]");
+            }
+            alarmMsg.setAlarmDate(CalendarUtils.getDate());
+            alarmMsg.setAlarmLevel(cluster.getAlarmLevel());
+            alarmMsg.setAlarmProject(cluster.getType());
+            alarmMsg.setAlarmStatus("PROBLEM");
+            alarmMsg.setAlarmTimes("current(" + cluster.getAlarmTimes() + 1 + "), max(" + cluster.getAlarmMaxTimes() + ")");
+            IMServiceImpl im = new IMServiceImpl();
+            im.sendPostMsgByLark(alarmMsg.toMail(), alarmConfing.getAlarmUrl());
         }
     }
 }
