@@ -18,7 +18,7 @@
         <mybatis.version>3.5.10</mybatis.version>
         <mybatis.spring.version>2.0.7</mybatis.spring.version>
         <shiro.version>1.9.1</shiro.version>
-        <jackson.version>2.13.3</jackson.version>
+        <jackson.version>2.14.0-rc1</jackson.version>
         <aspectjrt.version>1.9.9.1</aspectjrt.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
