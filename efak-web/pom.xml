@@ -12,7 +12,6 @@
     <properties>
         <package.name>ke</package.name>
         <junit.version>4.11</junit.version>
-        <jdk.version>1.8</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>5.3.22</spring.version>
         <mybatis.version>3.5.10</mybatis.version>
@@ -20,8 +19,6 @@
         <shiro.version>1.9.1</shiro.version>
         <jackson.version>2.13.3</jackson.version>
         <aspectjrt.version>1.9.9.1</aspectjrt.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <repositories>
         <repository>
