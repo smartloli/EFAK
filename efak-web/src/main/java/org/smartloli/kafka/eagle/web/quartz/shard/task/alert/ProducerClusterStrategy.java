@@ -45,6 +45,17 @@ public class ProducerClusterStrategy implements ClusterStrategy {
         JSONObject producerAlarmJson = JSON.parseObject(cluster.getServer());
         String topic = producerAlarmJson.getString("topic");
         String[] speeds = producerAlarmJson.getString("speed").split(",");
+        String duration_tmp = producerAlarmJson.getString("duration"); // unit is minute
+        int duration = 1;
+        if(duration_tmp == null){
+            duration = 1;
+        }
+        try{
+            duration = Integer.valueOf(duration_tmp).intValue();
+        }catch (NumberFormatException e){
+            throw new RuntimeException(e);
+        }
+
         long startSpeed = 0L;
         long endSpeed = 0L;
         if (speeds.length == 2) {
@@ -55,6 +66,7 @@ public class ProducerClusterStrategy implements ClusterStrategy {
         producerSpeedParams.put("cluster", cluster.getCluster());
         producerSpeedParams.put("topic", topic);
         producerSpeedParams.put("stime", CalendarUtils.getCustomDate("yyyyMMdd"));
+        producerSpeedParams.put("duration", duration);
         List<TopicLogSize> topicLogSizes = alertService.queryTopicProducerByAlarm(producerSpeedParams);
         long realSpeed = 0;
         if (topicLogSizes != null && topicLogSizes.size() > 0) {
