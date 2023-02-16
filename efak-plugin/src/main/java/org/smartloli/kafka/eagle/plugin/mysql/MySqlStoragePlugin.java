@@ -55,7 +55,7 @@ public class MySqlStoragePlugin {
     public static Connection getInstance(String address, String username, String password) {
         Connection connection = null;
         try {
-            connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + address, username, password);
+            connection = (Connection) DriverManager.getConnection(address, username, password);
         } catch (Exception e) {
             LOG.error("Create mysql connection has error address[" + address + "],username[" + username + "],password[" + password + "],msg is " + e.getMessage());
         }
