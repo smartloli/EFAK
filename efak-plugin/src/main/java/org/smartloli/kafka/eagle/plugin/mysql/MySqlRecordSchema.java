@@ -47,17 +47,21 @@ public class MySqlRecordSchema {
         String url = SystemConfigUtils.getProperty("efak.url");
         String username = SystemConfigUtils.getProperty("efak.username");
         String password = SystemConfigUtils.getProperty("efak.password");
-        String host = url.split("//")[1].split("/")[0].split(":")[0];
-        String port = url.split("//")[1].split("/")[0].split(":")[1];
         String db = url.split("//")[1].split("/")[1].split("\\?")[0];
+        int prefixLength = url.split("//")[0].length()
+                + url.split("//")[1].split("/")[0].length() + "?".length()
+                + 3;
+        int dbNameLength = db.length();
+        // exclude db: "jdbc:mysql://127.0.0.1:3306" + "?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull"
+        String databaseUrl = url.substring(0, prefixLength - 2) + url.substring(prefixLength + dbNameLength - 1);
 
-        if (database(username, password, host, port, db)) {
-            tables(username, password, host, port, db);
+        if (database(username, password, databaseUrl, db)) {
+            tables(username, password, url);
         }
     }
 
-    private static void tables(String username, String password, String host, String port, String db) {
-        Connection connection = MySqlStoragePlugin.getInstance(host + ":" + port + "/" + db, username, password);
+    private static void tables(String username, String password, String url) {
+        Connection connection = MySqlStoragePlugin.getInstance(url, username, password);
         ResultSet rs = null;
         Statement stmt = null;
         List<String> tbls = new ArrayList<>();
@@ -125,8 +129,8 @@ public class MySqlRecordSchema {
         MySqlStoragePlugin.close(connection);
     }
 
-    private static boolean database(String username, String password, String host, String port, String db) {
-        Connection connection = MySqlStoragePlugin.getInstance(host + ":" + port, username, password);
+    private static boolean database(String username, String password, String databaseUrl, String db) {
+        Connection connection = MySqlStoragePlugin.getInstance(databaseUrl, username, password);
         ResultSet rs = null;
         List<String> dbs = new ArrayList<>();
         try {
