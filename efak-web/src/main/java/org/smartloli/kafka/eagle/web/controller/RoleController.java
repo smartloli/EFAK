@@ -231,7 +231,6 @@ public class RoleController {
             obj.put("username", role.getString("username"));
             obj.put("realname", role.getString("realname"));
             obj.put("email", role.getString("email"));
-            obj.put("password", role.getString("password"));
 
             if (KConstants.Role.ADMIN.equals(role.getString("username"))) {
                 obj.put("operate", "");

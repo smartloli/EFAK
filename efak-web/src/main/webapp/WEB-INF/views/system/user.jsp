@@ -79,7 +79,6 @@
                             <th>UserName</th>
                             <th>RealName</th>
                             <th>Email</th>
-                            <th>Password</th>
                             <th>Operate</th>
                         </tr>
                         </thead>
