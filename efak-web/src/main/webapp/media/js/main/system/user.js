@@ -14,9 +14,7 @@ $(document).ready(function () {
             "mData": 'realname'
         }, {
             "mData": 'email'
-        }, {
-            "mData": 'password'
-        }, {
+        },{
             "mData": 'operate'
         }]
     });
