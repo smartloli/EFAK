@@ -1,0 +1,31 @@
+// Bootstrap Alert
+
+@each $state, $value in $theme-colors {
+  // Basic alerts
+  .alert-#{$state} {
+    background-color: rgba($value, .1);
+    color: darken($value, 5%);
+    border-color: rgba($value, .2);
+    .alert-link {
+      color: darken($value, 5%);
+    }
+    svg {
+      width: 19px;
+      height: 19px;
+      margin-right: .5rem;
+    }
+    i {
+      font-size: 19px;
+      margin-right: .5rem;
+    }
+  }
+
+  // Fill alerts
+  .alert-fill-#{$state} {
+    @include alert-variant($value, $value, $white);
+    &.alert-fill-light {
+      color: $text-muted;
+    }
+  }
+}
+

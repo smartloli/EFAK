@@ -1,0 +1,178 @@
+.navbar {
+  width: calc(100% - #{$sidebar-width-lg});
+  height: $navbar-height;
+  background: $card-bg;
+  border-bottom: 1px solid $border-color;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  position: fixed;
+  right: 0;
+  left: $sidebar-width-lg;
+  z-index: 978;
+  -webkit-box-shadow: 3px 0 10px 0 #03060b;
+          box-shadow: 3px 0 10px 0 #03060b;
+  -webkit-transition: width .1s ease, left .1s ease;
+  transition: width .1s ease, left .1s ease;
+
+  @media(max-width: 991px) {
+    width: 100%;
+    left: 0;
+    .navbar-content {
+      width: calc(100% - #{$sidebar-folded-width} - 1px);
+    }
+  }
+
+  .sidebar-toggler {
+    height: 100%;
+    border-right: 1px solid $border-color;
+    display: flex;
+    align-items: center;
+    padding: 0 25px;
+    display: none;
+    svg {
+      width: 20px;
+      height: 20px;
+      color: $text-muted;
+    }
+    @media(max-width: 991px) {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;    
+    }
+  }
+
+  .search-form {
+    @extend .d-none;
+    @extend .d-md-flex;
+    @extend .align-items-center;
+    width: 100%;
+    margin-right: 60px;
+    .input-group {
+      .input-group-text {
+        padding: 0;
+        border: 0;
+        color: $text-muted;
+        background: $input-bg;
+        svg {
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+        }
+      }
+      .form-control {
+        border: 0;
+        background: transparent;
+        padding: 0 .8rem;
+        margin-top: 3px;
+        color: $text-muted;
+        &::-webkit-input-placeholder {
+          color: $text-muted;
+        }
+        &:-ms-input-placeholder {
+          color: $text-muted;
+        }
+        &::-ms-input-placeholder {
+          color: $text-muted;
+        }
+        &::placeholder {
+          color: $text-muted;
+        }
+      }
+    }
+  }
+
+  .navbar-content {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding-left: 25px;
+    padding-right: 25px;
+    @media(max-width: 991px) {
+      width: calc(100% - #{$sidebar-folded-width} - 1px);
+    }
+    .navbar-nav {
+      display: flex;
+      flex-direction: row;
+      margin-left: auto;
+      .nav-item {
+        position: relative;
+        margin-left: 5px;
+        margin-right: 5px;
+        min-width: 30px;
+        display: flex;
+        align-items: center;
+        .nav-link {
+          color: $text-muted;
+          padding: 0;
+          position: relative;
+          margin-left: auto;
+          margin-right: auto;
+          &:hover,
+          &[aria-expanded="true"] {
+            color: $primary;
+          }
+          &::after {
+            display: none;
+          }
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+          .indicator {
+            position: absolute;
+            top: 0px;
+            right: 2px;
+            .circle {
+                background: $primary;
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                &::before {
+                    background-color: $primary;
+                    content: "";
+                    display: table;
+                    border-radius: 50%;
+                    position: absolute;
+                    @extend .pulse;
+                }
+            }
+          }
+        }
+        &.dropdown {
+          @media(max-width: 767px) {
+            position: static;
+          }
+          .dropdown-menu {
+            width: max-content;
+            position: absolute;
+            right: -20px;
+            left: auto;
+            @extend .dropdownAnimation;
+            font-size: .875rem;
+            &::before {
+              content: '';
+              width: 13px;
+              height: 13px;
+              background: $dropdown-bg;
+              position: absolute;
+              top: -7px;
+              right: 28px;
+              -webkit-transform: rotate(45deg);
+                      transform: rotate(45deg);
+              border-top: 1px solid $border-color;
+              border-left: 1px solid $border-color;
+            }
+            @media(max-width: 767px) {
+              right: 20px;
+              width: calc(100% - 40px);
+              &::before{
+                display: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+.CodeMirror {
+  background: $input-bg;
+  border: 1px solid $input-border-color;
+  color: $body-color;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.editor-toolbar {
+  border: 1px solid $input-border-color;
+  border-bottom: 0;
+  border-radius: $input-border-radius $input-border-radius 0 0;
+  &, &:hover {
+    opacity: 1;
+  }
+  a {
+    color: rgba($body-color, .7) !important;
+    &:hover {
+      background: $gray-200;
+      border: none;
+    }
+  }
+  i.separator {
+    border-left: 1px solid $input-border-color;
+    border-right: 1px solid $input-border-color;
+  }
+}
+
+.CodeMirror-fullscreen,
+.editor-toolbar.fullscreen,
+.editor-preview-side {
+  z-index: 999;
+}
+
+.editor-preview-side {
+  border-color: $input-border-color;
+}
+
+.editor-toolbar a.active,.editor-toolbar a:hover {
+  background: $gray-200;
+  border-color: transparent;
+}
+
+.editor-statusbar {
+  padding: 0 10px;
+  border: 1px solid $input-border-color;
+  border-top-color: transparent;
+  border-bottom-left-radius: $input-border-radius;
+  border-bottom-right-radius: $input-border-radius;
+}

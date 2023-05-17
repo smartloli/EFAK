@@ -1,0 +1,163 @@
+.chat-wrapper {
+  height: calc(100vh - #{$navbar-height} - 102px);
+  @media(max-width: 991px) {
+    min-height: 100%;
+  }
+  @media(max-width: 991px) {
+    height: 100%;
+  }
+  .chat-aside {
+    @media(min-width: 992px) {
+      padding-right: 23px;
+    }
+    .aside-body {
+      .tab-content {
+        .tab-pane {
+          position: relative;
+          max-height: calc(100vh - 385px);
+          .chat-list {
+            .chat-item {
+              a {
+                > div {
+                  padding-top: 11px;
+                  padding-bottom: 11px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .chat-content {
+    @media(max-width: 991px) {
+      position: absolute;
+      background: $card-bg;
+      left: 0;
+      bottom: -1px;
+      top: 0;
+      right: 0;
+      display: none;
+      &.show {
+        display: block;
+      }
+    }
+    .chat-header {
+      padding: 0 10px;
+    }
+    .chat-body {
+      position: relative;
+      max-height: calc(100vh - 340px);
+      @media(max-width: 767px) {
+        max-height: calc(100vh - 315px);        
+      }
+      @media(max-width: 991px) {
+        max-height: calc(100vh - 342px);        
+      }
+      margin-top: 20px;
+      margin-bottom: 20px;
+      .messages {
+        padding: 0 10px;
+        list-style-type: none;
+        .message-item {
+          display: flex;
+          max-width: 80%;
+          margin-bottom: 20px;
+          @media(max-width: 767px) {
+            max-width: 95%;
+          }
+          .content {
+            .bubble {
+              position: relative;
+              padding: 7px 15px;
+              margin-bottom: 4px;
+              width: -webkit-fit-content;
+              width: -moz-fit-content;
+              width: fit-content;
+            }
+            span {
+              font-size: 12px;
+              color: $text-muted;
+            }
+          }
+          &.friend {
+            img {
+              order: 1;
+              margin-right: 15px;
+            }
+            .content {
+              order: 2;
+              .bubble {
+                background: rgba($primary, .1);
+                border-radius: 0 5px 5px;
+                &::before {
+                  content: '';
+                  width: 0;
+                  height: 0;
+                  position: absolute;
+                  left: -10px;
+                  top: 0;
+                  border-top: 5px solid rgba($primary, .1);
+                  border-bottom: 5px solid transparent; 
+                  border-left: 5px solid transparent; 
+                  border-right:5px solid rgba($primary, .1); 
+                }
+              }
+            }
+          }
+          &.me {
+            margin-left: auto;
+            img {
+              order: 2;
+              margin-left: 15px;
+            }
+            .content {
+              order: 1;
+              margin-left: auto;
+              .bubble {
+                background: rgba($info, .1);
+                border-radius: 5px 0 5px 5px;
+                margin-left: auto;
+                &::before {
+                  content: '';
+                  width: 0;
+                  height: 0;
+                  position: absolute;
+                  right: -10px;
+                  top: 0;
+                  border-top: 5px solid rgba($info, .1);
+                  border-bottom: 5px solid transparent; 
+                  border-left: 5px solid rgba($info, .1); 
+                  border-right:5px solid transparent; 
+                }
+              }
+              span {
+                text-align: right;
+                display: block;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  figure {
+    position: relative;
+    .status {
+      width: 11px;
+      height: 11px;
+      background: $secondary;
+      position: absolute;
+      bottom: 0px;
+      right: -2px;
+      border-radius: 50%;
+      border: 2px solid $card-bg;
+      &.online {
+        background: $success;
+      }
+      &.offline {
+        background: $secondary;
+      }
+    }
+  }
+}

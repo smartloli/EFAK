@@ -1,0 +1,58 @@
+.nav {
+  &.nav-tabs {
+    .nav-item {
+      .nav-link {
+        border-color: $nav-tabs-link-border-color;
+        color: $body-color;
+        background-color: $nav-tabs-link-bg;
+        cursor: pointer;
+        &.active {
+          border-color: $nav-tabs-link-active-border-color;
+          color: $primary;
+          background: $nav-tabs-link-active-bg;
+        }
+        &.disabled {
+          background-color: transparent;
+          color: $text-muted;
+          border-color: rgba($border-color, .7) rgba($border-color, .7) transparent;
+        }
+      }
+    }
+    &.nav-tabs-vertical {
+      border-bottom: 0;
+      .nav-link {
+        width: 100%;
+        border: 1px solid transparent;
+        border-radius: 0;
+        border-color: $nav-tabs-link-border-color;
+        color: $body-color;
+        background-color: $nav-tabs-link-bg;
+        &:first-child {
+          border-radius: $border-radius 0 0 0;
+        }
+        &:last-child {
+          border-radius: 0 0 0 $border-radius;
+        }
+        &.active {
+          background-color: $nav-tabs-link-active-bg;
+          color: $primary;
+          border-right-color: transparent;
+        }
+      }
+    }
+    &.nav-tabs-line {
+      .nav-link {
+        border: 0;
+        background-color: transparent;
+        &.active {
+          border-bottom: 2px solid $primary;
+        }
+      }
+    }
+  }
+}
+.tab-content {
+  &.tab-content-vertical {
+    height: 100%;
+  }
+}

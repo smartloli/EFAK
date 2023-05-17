@@ -1,0 +1,75 @@
+// Dropdowns 
+
+.dropdown,
+.btn-group {
+  .dropdown-toggle {
+    &:after {
+      border-top: 0;
+      border-right: 0;
+      border-left: 0;
+      border-bottom: 0;
+      font: normal normal normal 24px/1 "feather";
+      content: "\e842";  
+      width: auto;
+      height: auto;
+      vertical-align: middle;
+      line-height: .625rem;
+      font-size: .875rem;
+    }
+  }
+  &.dropup {
+    .dropdown-toggle {
+      &::after {
+        content: "\e845";
+      }
+    }
+  }
+  &.dropstart {
+    .dropdown-toggle {
+      &::before {
+        border: 0;
+        font: normal normal normal 24px/1 "feather";
+        content: "\e843";
+        width: auto;
+        height: auto;
+        vertical-align: middle;
+        line-height: .625rem;
+        font-size: .875rem;
+      }
+    }
+  }
+  &.dropend {
+    .dropdown-toggle {
+      &::after {
+        content: "\e844";
+      }
+    }
+  }
+}
+
+.dropdown-menu {
+  padding: .35rem;
+  margin-top: 0;
+  box-shadow: $dropdown-box-shadow; 
+}
+
+.dropdown-item {
+  font-size: .812rem;
+  padding: .25rem .875rem;
+  border-radius: 2px;
+  i, svg {
+    color: $text-muted;
+  }
+  &:not(&:active, &.active):hover {
+    background-color: rgba($primary, .1);
+    &, i, svg {
+      color: $primary;
+    }        
+  }
+  &:active,
+  &.active {
+    i, svg {
+      color: $white;
+    }
+  }
+}

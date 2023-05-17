@@ -1,0 +1,13 @@
+// Typography
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Social colors
+@each $color, $value in $social-colors {
+  .text-#{$color} {
+    color: $value;
+  }
+}

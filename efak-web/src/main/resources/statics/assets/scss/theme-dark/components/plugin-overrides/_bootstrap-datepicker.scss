@@ -1,0 +1,166 @@
+// Bootstrap datepicker
+
+.datepicker.datepicker-dropdown {
+	@extend .dropdown-menu;
+	&::before {
+		border-bottom-color: $dropdown-border-color;
+	}
+	&:after {
+		border-bottom-color: $dropdown-bg;
+	}
+	&.datepicker-orient-top {
+		&::before {
+			border-top-color: $dropdown-border-color;
+		}
+		&:after {
+			border-top-color: $dropdown-bg;
+		}
+	}
+}
+
+.datepicker {
+	table {
+		@extend .table;
+		tr {
+			// days
+			td.day.focused, 
+			td.day:hover {
+				background: lighten($input-bg, 10%);
+			}
+
+			td.new,
+			td.old {
+				color: rgba($body-color, .5);
+			}
+
+			td.active.active, 
+			td.active.disabled, 
+			td.active.disabled.active, 
+			td.active.disabled.disabled, 
+			td.active.disabled:active, 
+			td.active.disabled:hover, 
+			td.active.disabled:hover.active, 
+			td.active.disabled:hover.disabled, 
+			td.active.disabled:hover:active, 
+			td.active.disabled:hover:hover, 
+			td.active.disabled:hover[disabled], 
+			td.active.disabled[disabled], 
+			td.active:active, 
+			td.active:hover, 
+			td.active:hover.active, 
+			td.active:hover.disabled, 
+			td.active:hover:active, 
+			td.active:hover:hover, 
+			td.active:hover[disabled], 
+			td.active[disabled] {
+				background-color: $primary;
+			}
+
+			td.active, 
+			td.active.disabled, 
+			td.active.disabled:hover, 
+			td.active:hover {
+				background-color: $primary;
+				background-image: none;
+				border-color: $primary;
+				text-shadow: none;
+			}
+
+			td.today,
+			td.today.disabled,
+			td.today.disabled:hover,
+			td.today:hover {
+				background-color: rgba($primary, .2);
+				background-image: none;
+				border-color: $primary;
+				color: $primary;
+			}
+
+			td.today.active, 
+			td.today.disabled, 
+			td.today.disabled.active, 
+			td.today.disabled.disabled, 
+			td.today.disabled:active, 
+			td.today.disabled:hover, 
+			td.today.disabled:hover.active, 
+			td.today.disabled:hover.disabled, 
+			td.today.disabled:hover:active, 
+			td.today.disabled:hover:hover, 
+			td.today.disabled:hover[disabled], 
+			td.today.disabled[disabled], 
+			td.today:active, 
+			td.today:hover, 
+			td.today:hover.active, 
+			td.today:hover.disabled, 
+			td.today:hover:active, 
+			td.today:hover:hover, 
+			td.today:hover[disabled], 
+			td.today[disabled] {
+				background-color: rgba($primary, .3);
+			}
+
+			td.today:hover:hover {
+				color: $primary;
+			}
+
+			// months,years
+			td span {
+				height: 40px;
+				line-height: 40px;
+			}
+
+			td span.focused, 
+			td span:hover {
+				background-color: lighten($input-bg, 10%);
+			}
+
+			td span.active.active, 
+			td span.active.disabled, 
+			td span.active.disabled.active, 
+			td span.active.disabled.disabled, 
+			td span.active.disabled:active, 
+			td span.active.disabled:hover, 
+			td span.active.disabled:hover.active, 
+			td span.active.disabled:hover.disabled, 
+			td span.active.disabled:hover:active, 
+			td span.active.disabled:hover:hover, 
+			td span.active.disabled:hover[disabled], 
+			td span.active.disabled[disabled], 
+			td span.active:active, 
+			td span.active:hover, 
+			td span.active:hover.active, 
+			td span.active:hover.disabled, 
+			td span.active:hover:active, 
+			td span.active:hover:hover, 
+			td span.active:hover[disabled], 
+			td span.active[disabled] {
+				background-color: $primary;
+			}
+
+			td span.active, 
+			td span.active.disabled, 
+			td span.active.disabled:hover, 
+			td span.active:hover {
+				background-color: rgba($primary, .2);
+				background-image: none;
+				border-color: $primary;
+				color: $body-color;
+				text-shadow: none;
+			}
+		}
+	}
+}
+
+.datepicker-switch:hover, 
+.datepicker .next:hover, 
+.datepicker .prev:hover, 
+.datepicker tfoot tr th:hover {
+	background: lighten($input-bg, 10%);
+}
+
+.datepicker .datepicker-switch:hover,
+.datepicker .next:hover,
+.datepicker .prev:hover,
+.datepicker tfoot tr th:hover {
+	background: lighten($input-bg, 10%);
+}

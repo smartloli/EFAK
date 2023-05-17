@@ -1,0 +1,56 @@
+// Reste styles
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.btn,
+.btn-group.open .dropdown-toggle,
+.btn:active,
+.btn:focus,
+.btn:hover,
+.btn:visited,
+a,
+a:active,
+a:checked,
+a:focus,
+a:hover,
+a:visited,
+body,
+button,
+button:active,
+button:hover,
+button:visited,
+div,
+input,
+input:active,
+input:hover,
+input:focus,
+input:visited,
+select,
+select:active,
+select:focus,
+select:visited,
+textarea,
+textarea:active,
+textarea:focus,
+textarea:visited {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+select, 
+.form-check-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+  -webkit-box-shadow: 0 0 0 30px $input-bg inset;
+  -webkit-text-fill-color: $body-color;
+}

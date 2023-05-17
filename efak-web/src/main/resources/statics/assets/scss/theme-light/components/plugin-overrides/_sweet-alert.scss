@@ -1,0 +1,50 @@
+// Sweet Alert 
+
+.swal2-popup {
+  font-size: $font-size-base;
+
+  .swal2-title {
+    font-size: 25px;
+    line-height: 1;
+    font-weight: 500;
+    color: $body-color;
+    margin-bottom: 0;
+  }
+
+  .swal2-html-container {
+    font-size: $font-size-base;
+    color: $text-muted;
+    font-weight: initial;
+    margin-top: 11px;
+    text-decoration: none;
+  }
+
+  .swal2-actions {
+    button {
+      @extend .btn;
+      &.swal2-confirm {
+        @extend .btn-primary;
+      }
+      &.swal2-cancel {
+        @extend .btn-danger;
+        @extend .border-danger;
+      }
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .swal2-close {
+    font-size: 22px;
+    &:focus {
+      box-shadow: none;
+    }
+  }
+
+  .swal2-timer-progress-bar {
+    background: $secondary;
+  }
+
+}

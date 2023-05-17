@@ -1,0 +1,29 @@
+.breadcrumb {
+  &.breadcrumb-line {
+    .breadcrumb-item {
+      + .breadcrumb-item {
+        &::before {
+          content: "-" !important;
+        }
+      }
+    }
+  }
+  &.breadcrumb-dot {
+    .breadcrumb-item {
+      + .breadcrumb-item {
+        &::before {
+          content: "•" !important;
+        }
+      }
+    }
+  }
+  &.breadcrumb-arrow {
+    .breadcrumb-item {
+      + .breadcrumb-item {
+        &::before {
+          content: ">" !important;
+        }
+      }
+    }
+  }
+}

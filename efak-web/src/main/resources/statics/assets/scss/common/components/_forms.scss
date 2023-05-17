@@ -1,0 +1,40 @@
+// Forms 
+
+.form-control-xs,
+.form-select-xs {
+  padding: $input-padding-y-xs $input-padding-x-xs;
+  font-size: $input-font-size-xs;
+}
+
+.form-control-xs {
+  + .input-group-text {
+    padding-top: $input-padding-y-xs;
+    padding-bottom: $input-padding-y-xs;
+  }
+}
+
+.form-check-input {
+  margin-top: .13em; // height adjustment
+}
+
+.input-group-text {
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.input-group {
+  // To fix Bootstrap-datepicker in RTL
+  /*rtl:raw:
+  direction: rtl;
+  */
+}
+
+// For RTL
+[type="tel"], 
+[type="url"], 
+[type="email"], 
+[type="number"] {
+  direction: ltr;
+}

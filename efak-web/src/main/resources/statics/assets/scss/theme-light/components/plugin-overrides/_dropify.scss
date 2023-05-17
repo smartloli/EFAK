@@ -1,0 +1,17 @@
+.dropify-wrapper {
+  border: 1px solid $input-border-color;
+  border-radius: $input-border-radius;
+  .dropify-message {
+    span {
+      &.file-icon {
+        font-size: .875rem;
+        color: $text-muted;
+        &::before {
+          font-family: feather;
+          content: '\e8e3';
+          font-size: 24px;
+        }
+      }
+    }
+  }
+}

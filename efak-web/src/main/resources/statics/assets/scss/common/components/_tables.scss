@@ -1,0 +1,35 @@
+// Tables 
+
+.table {
+  margin-bottom: 0;
+
+  >:not(:last-child)>:last-child>* {
+		border-bottom-color: inherit;
+	}
+
+  thead {
+    th {
+      border-top: 0;
+      font-weight: 500;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: $text-muted;
+      i {
+        margin-left: 0.325rem;
+      }
+    }
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+  }
+  
+  td {
+    img {
+      width: 36px;
+      height: 36px;
+      border-radius: 100%;
+    }
+  }
+}

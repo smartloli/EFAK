@@ -1,0 +1,12 @@
+// Ace Editor 
+
+.ace_editor {
+  border-radius: $input-border-radius;
+  margin: auto;
+  height: 300px;
+  width: 100%;
+  font: 14px/normal SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  .ace_content{
+    font-size: $font-size-base;
+  }
+}

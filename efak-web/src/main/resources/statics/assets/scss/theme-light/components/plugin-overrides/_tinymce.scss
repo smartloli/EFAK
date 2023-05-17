@@ -1,0 +1,165 @@
+.tox.tox-tinymce {
+  border: 1px solid $input-border-color;
+  border-radius: $input-border-radius;
+  .tox-menubar,
+  .tox-toolbar-overlord,
+  .tox-toolbar,
+  .tox-toolbar__overflow,
+  .tox-toolbar__primary {
+    background-color: $input-bg;
+    background-image: none;
+    border-bottom: 1px solid $input-border-color;
+  }
+  .tox-toolbar-overlord {
+    border-bottom: none;
+  }
+  &:not(.tox-tinymce-inline) .tox-editor-header {
+    padding: 0;
+    box-shadow: none;
+  }
+  .tox-edit-area__iframe {
+    background-color: $input-bg;
+  }
+  &.tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type) {
+    border-right-color: $input-border-color;
+    border-left-color: $input-border-color; // RTL
+  }
+  .tox-statusbar {
+    background-color: $input-bg;
+    border-color: $input-border-color;
+    color: $text-muted;
+  }
+  .tox-statusbar a,
+  .tox-statusbar__path-item,
+  .tox-statusbar__wordcount {
+    color: $text-muted;
+  }
+  .tox-mbtn {
+    color: $body-color;
+  }
+  .tox-tbtn {
+    color: rgba($body-color, .7);
+  }
+  .tox-tbtn:hover {
+    background: $gray-200;
+    color: $body-color;
+    svg {
+      fill: $body-color;
+    }
+  }
+  .tox-tbtn:focus:not(.tox-tbtn--disabled) {
+    color: $body-color;
+  }
+  .tox-mbtn:hover:not(:disabled):not(.tox-mbtn--active) {
+    background: $gray-200;
+    color: $body-color;
+  }
+  .tox-mbtn:focus:not(:disabled),
+  .tox-mbtn--active {
+    background: $gray-200;
+    color: $body-color;
+  }
+  .tox-tbtn svg {
+    fill: rgba($body-color, .7);
+  }
+  .tox-tbtn--disabled svg,
+  .tox-tbtn--disabled:hover svg,
+  .tox-tbtn:disabled svg,
+  .tox-tbtn:disabled:hover svg {
+    fill: $input-disabled-bg;
+  }
+  .tox-split-button:hover {
+    box-shadow: 0 0 0 1px $input-border-color inset;
+  }
+  .tox-split-button:focus {
+    background: $gray-200;
+  }
+  .tox-tbtn--enabled,
+  .tox-tbtn--enabled:hover,
+  .tox-tbtn:focus {
+    background: $gray-200;
+  }
+}
+
+
+div.tox {
+  .tox-menu {
+    background-color: $dropdown-bg;
+    border-color: $dropdown-border-color;
+  }
+  .tox-collection__item {
+    color: $dropdown-color;
+  }
+  .tox-collection--list .tox-collection__item--enabled {
+    background-color: $primary;
+    color: $white;
+  }
+  .tox-collection--list .tox-collection__group {
+    border-color: $border-color;
+  }
+  .tox-collection--toolbar .tox-collection__item--active {
+    background-color: $gray-200;
+  }
+  .tox-collection--list .tox-collection__item--active {
+    background-color: $gray-200;
+  }
+  .tox-collection--toolbar .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+    color: $body-color;
+  }
+  .tox-collection--list .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+    color: $body-color;
+  }
+
+
+  .tox-dialog-wrap__backdrop {
+    background-color: rgba(0,0,0,.75);
+  }
+  .tox-dialog,
+  .tox-dialog__header,
+  .tox-dialog__footer {
+    background-color: $input-bg;
+    border-color: $border-color;
+    color: $body-color;
+  }
+  .tox-button--secondary {
+    @extend .btn-secondary;
+  }
+  .tox-button {
+    @extend .btn;
+    &:not(.tox-button--naked):not(.tox-button--secondary) {
+      @extend .btn-primary;
+    }
+  }
+  .tox-button--secondary:hover:not(:disabled) {
+    background-color: $secondary;
+    border-color: $secondary;
+    color: $white;
+  }
+  .tox-button--naked:hover:not(:disabled) {
+    background-color: transparent;
+    border-color: transparent;
+  }
+  .tox-button--naked.tox-button--icon:hover:not(:disabled) {
+    color: lighten($body-color, 20%);
+  }
+  .tox-listboxfield .tox-listbox--select, 
+  .tox-textarea, 
+  .tox-textfield, 
+  .tox-toolbar-textfield {
+    background-color: $input-bg;
+    border-color: $input-border-color;
+    color: $body-color;
+  }
+  .tox-listboxfield .tox-listbox--select:focus, 
+  .tox-textarea:focus, 
+  .tox-textfield:focus {
+    background-color: $input-bg;
+    border-color: $input-focus-border-color;
+  }
+  .tox-dialog__table tbody tr {
+    border-color: $border-color;
+  }
+  .tox-dialog__body {
+    color: $body-color;
+  }
+}

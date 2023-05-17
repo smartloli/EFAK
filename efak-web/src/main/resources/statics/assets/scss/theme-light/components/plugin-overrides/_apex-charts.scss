@@ -1,0 +1,89 @@
+// Apex charts
+
+div.apexcharts-canvas {
+  .apexcharts-menu {
+    background: $dropdown-bg !important;
+    color: $body-color;
+    border-color: $border-color;
+  }
+
+  .apexcharts-zoom-icon svg, 
+  .apexcharts-zoomin-icon svg, 
+  .apexcharts-zoomout-icon svg, 
+  .apexcharts-reset-icon svg, 
+  .apexcharts-pan-icon svg, 
+  .apexcharts-selection-icon svg, 
+  .apexcharts-menu-icon svg, 
+  .apexcharts-toolbar-custom-icon svg {
+    fill: $secondary;
+  }
+
+  .apexcharts-legend.apexcharts-align-right .apexcharts-legend-series, 
+  .apexcharts-legend.apexcharts-align-left .apexcharts-legend-series {
+    display: flex;
+    align-items: center;
+  }
+
+  .apexcharts-legend-marker {
+    margin-right: 3px;
+  }
+
+  .apexcharts-tooltip {
+    background: rgba($dropdown-bg, .8);
+    color: $body-color;
+    box-shadow: $dropdown-box-shadow;
+    border-radius: $border-radius;
+    border: 1px solid $dropdown-border-color;
+    .apexcharts-tooltip-title {
+      border-color: $border-color;
+      background-color: $dropdown-bg;
+    }
+    * {
+      font-family: $font-family-sans-serif !important;
+    }
+  }
+  .apexcharts-tooltip-series-group.apexcharts-active, 
+  .apexcharts-tooltip-series-group:last-child {
+    padding: 0 10px;
+  }
+  .apexcharts-tooltip-text-y-value, 
+  .apexcharts-tooltip-text-goals-value, 
+  .apexcharts-tooltip-text-z-value {
+    margin-left: 0;
+  }
+
+  .apexcharts-tooltip-title {
+    margin-bottom: 0;
+  }
+
+  .apexcharts-xaxistooltip,
+  .apexcharts-yaxistooltip {
+    background: $dropdown-bg;
+    color: $body-color;
+    border-color: $dropdown-border-color;
+  }
+
+  .apexcharts-xaxistooltip-bottom::before {
+    border-bottom-color: $dropdown-border-color;
+  }
+  .apexcharts-xaxistooltip-bottom::after {
+    border-bottom-color: rgba($dropdown-bg, .8);
+  }
+
+  .apexcharts-yaxistooltip-left:before,
+    .apexcharts-yaxistooltip-right:before {
+    border-left-color: $dropdown-border-color;
+  }
+  .apexcharts-yaxistooltip-left:after,
+    .apexcharts-yaxistooltip-right:after {
+    border-left-color: rgba($dropdown-bg, .8);
+  }
+
+  .apexcharts-tooltip-marker {
+    /*rtl:raw:
+    margin-right: 0; 
+    margin-left: 10px; 
+    */
+  }
+
+}

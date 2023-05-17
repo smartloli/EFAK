@@ -1,0 +1,179 @@
+// Demo Styles 
+
+.main-content {
+  color: $body-color;
+  font-size: 16px;
+  > .page-title {
+    margin-bottom: 1rem;
+    font-weight: 400;
+  }
+  > h4 {
+    margin-top: 1.5rem;
+    margin-bottom: .875rem;
+    &::before {
+      display: block;
+      height: 5.4rem;
+      margin-top: -6rem;
+      content: "";
+    }
+  }
+  > hr {
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+  .example {
+    font-size: 0.875rem;
+    letter-spacing: normal;
+    padding: 10px;
+    background-color: $card-bg;
+    border: 4px solid $border-color;
+    position: relative;
+    @media(min-width: 576px) {
+      padding: 25px;
+    }
+  }
+  .highlight {
+    position: relative;
+    background-color: $card-bg;
+    padding: 15px;
+    pre {
+      padding: 15px;
+      font-size: .875rem;
+      font-family: $font-family-sans-serif;
+      background: transparent;
+      line-height: 1.4;
+      margin: 0;
+      code {
+        font-family: $font-family-sans-serif;
+        padding: 0;
+        tab-size: 8;
+        color: $body-color;
+        text-shadow: none;
+        .token {
+          &.url,
+          &.string,
+          &.entity,
+          &.operator {
+            background: none;
+          }
+        }
+      }
+    }
+    .btn-clipboard {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 12px;
+      padding: 1px 6px;
+      background: rgba($primary, .2);
+      &:hover {
+        background: rgba($primary, .3);
+        transition: background .3s ease-in-out;
+      }
+    }
+  }
+}
+
+.example {
+  .btn-toolbar {
+    + .btn-toolbar {
+      margin-top: .5rem;
+    }
+  }
+  .btn-group {
+    @extend .mb-1;
+    @extend .mb-md-0;
+  }
+  .modal {
+    &.static {
+      position: static;
+      display: block;
+    }
+  }
+  .navbar {
+    position: relative;
+    padding: .5rem 1rem;
+    left: auto;
+    width: 100%;
+    height: auto;
+    z-index: 9;
+    border-bottom: 0;
+    box-shadow: none;
+    .navbar-brand {
+      font-size: 1.25rem;
+    }
+  }
+  .progress {
+    + .progress {
+      margin-top: 10px;
+    }
+  }
+  .perfect-scrollbar-example {
+    position: relative;
+    max-height: 250px;
+    background: $card-bg;
+  }
+  .scrollspy-example {
+    position: relative;
+    height: 200px;
+    margin-top: .5rem;
+    overflow: auto;
+  }
+  .scrollspy-example-2 {
+    position: relative;
+    height: 350px;
+    overflow: auto;
+  }
+  nav {
+    .breadcrumb {
+      margin-bottom: .75rem;
+    }
+
+    &:last-child {
+      .breadcrumb {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.page-breadcrumb {
+  margin-bottom: 15px;
+  .breadcrumb {
+    padding: 0;
+    background: $body-bg;
+  }
+}
+
+.noble-ui-logo {
+  font-weight: 700;
+  font-size: 25px;
+  color: darken($primary, 50%);
+  span {
+    color: $primary;
+    font-weight: 300;
+  }
+  &:hover {
+    color: darken($primary, 50%);
+  }
+  &.logo-light {
+    color: $body-color;
+  }
+}
+
+.buy-now-wrapper {
+  position: fixed;
+  bottom: 30px;
+  right: 35px;
+  z-index: 99999;
+  .rtl & {
+    right: auto;
+    left: 35px;
+  }
+  .btn {
+    svg {
+      width: 19px !important;
+      height: 19px !important;
+    }
+  }
+}

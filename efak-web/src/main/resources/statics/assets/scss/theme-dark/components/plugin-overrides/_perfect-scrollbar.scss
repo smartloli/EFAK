@@ -1,0 +1,48 @@
+.ps__thumb-x {
+	background-color: lighten($card-bg, 10%);
+	height: 4px;
+}
+
+.ps__rail-x.ps--clicking .ps__thumb-x, 
+.ps__rail-x:focus>.ps__thumb-x, 
+.ps__rail-x:hover>.ps__thumb-x {
+	background-color: lighten($card-bg, 8%);
+	height: 6px;
+}
+
+.ps__rail-x {
+	height: 10px;
+}
+
+.ps__thumb-y {
+	background-color: lighten($card-bg, 10%);
+	width: 4px;
+	/*rtl:raw:
+  left: 2px !important;
+	right: auto !important;
+  */
+}
+
+.ps__rail-y.ps--clicking .ps__thumb-y, 
+.ps__rail-y:focus>.ps__thumb-y, 
+.ps__rail-y:hover>.ps__thumb-y {
+	background-color: lighten($card-bg, 8%);
+	width: 6px;
+}
+
+.ps__rail-y {
+	width: 10px;
+	/*rtl:raw:
+  left: 0 !important;
+	right: auto !important;
+  */
+}
+
+.ps .ps__rail-x.ps--clicking, 
+.ps .ps__rail-x:focus, 
+.ps .ps__rail-x:hover, 
+.ps .ps__rail-y.ps--clicking, 
+.ps .ps__rail-y:focus, 
+.ps .ps__rail-y:hover {
+	background-color: $dark;
+}

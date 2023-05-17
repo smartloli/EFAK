@@ -1,0 +1,38 @@
+// Tags 
+
+div.tagsinput {
+  padding: 6px 6px 1px;
+  border-color: $input-border-color;
+  border-radius: $input-border-radius;
+  span.tag {
+    background: $primary;
+    color: $white;
+    border: 0;
+    padding: 3px 7px;
+    font-family: inherit;
+    border-radius: .15rem;
+    margin-bottom: 4px;
+    float: left;
+     /*rtl:raw:
+    margin-left: 0;
+    margin-right: 5px;
+    */
+    a {
+      font-size: 13px;
+      font-weight: 500;
+      color: $white;
+      opacity: .5;
+    }
+  }
+  #tags_addTag {
+    float: left;
+    /*rtl:raw:
+    margin-right: 5px;
+    */
+  }
+  input {
+    margin: 0;
+    padding: 1px;
+    border-radius: $border-radius;
+  }
+}

@@ -1,0 +1,107 @@
+// Animation mixins 
+
+@keyframes dropdownAnimation {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    transform: translate3d(0, 0px , 0);
+  }
+}
+
+.dropdownAnimation {
+  -webkit-animation-name: dropdownAnimation;
+          animation-name: dropdownAnimation;
+  -webkit-animation-duration: $action-transition-duration;
+  animation-duration: $action-transition-duration;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fadeOut {
+  animation-name: fadeOUt;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fadeInUp {
+  animation-name: fadeInUp;
+}
+
+.infinite-spin {
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  animation-name: spin;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@mixin transition($settings) {
+  -webkit-transition: $settings;
+  -moz-transition: $settings;
+  -ms-transition: $settings;
+  -o-transition: $settings;
+  transition: $settings;
+}
+
+.pulse {
+  $dim : 7px;
+  $mult : 4;
+  @keyframes pulse{
+    0% {
+      opacity: 1;
+      width: $dim;
+      height: $dim;
+      left: 0;
+      top: 0;
+    }
+    
+    95% {
+      opacity: 0.1;
+      left: -(($dim * $mult) - $dim) * .5;
+      top: -(($dim * $mult) - $dim) * .5;
+      width: $dim * $mult;
+      height: $dim * $mult;
+    }
+    
+    100% {
+      opacity: 0;
+      width: $dim;
+      height: $dim;
+      left: 0;
+      top: 0;
+    }
+  }
+  animation-name: pulse;
+  animation-duration: .9s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-out;
+}

@@ -1,0 +1,169 @@
+// Utilities 
+
+.grid-margin {
+  margin-bottom: 1.5rem;
+}
+.grid-margin-sm-0 {
+  @media (min-width: 576px) {
+    margin-bottom: 0;
+  }
+}
+.grid-margin-md-0 {
+  @media (min-width: 768px) {
+    margin-bottom: 0;
+  }
+}
+.grid-margin-lg-0 {
+  @media (min-width: 992px) {
+    margin-bottom: 0;
+  }
+}
+.grid-margin-xl-0 {
+  @media (min-width: 1200px) {
+    margin-bottom: 0;
+  }
+}
+
+
+
+.stretch-card {
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  >.card{
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+
+
+.img-lg {
+  width: 92px;
+  height: 92px;
+}
+.img-md {
+  width: 75px;
+  height: 92px;
+}
+.img-sm {
+  width: 43px;
+  height: 43px;
+}
+.img-xs {
+  width: 36px;
+  height: 36px;
+}
+.img-ss {
+  width: 26px;
+  height: 26px;
+}
+
+
+
+
+.fw-boldest {
+  font-weight: 900;
+}
+
+
+
+.tx-10 { font-size: 10px; }
+.tx-11 { font-size: 11px; }
+.tx-12 { font-size: 12px; }
+.tx-13 { font-size: 13px; }
+.tx-14 { font-size: 14px; }
+.tx-16 { font-size: 16px; }
+.tx-80 { font-size: 80px; }
+
+
+
+svg.icon-xs {
+  width: 12px;
+  height: 12px;
+}
+svg.icon-sm {
+  width: 14px;
+  height: 14px;
+}
+svg.icon-md {
+  width: 16px;
+  height: 16px;
+}
+svg.icon-lg {
+  width: 20px;
+  height: 20px;
+}
+svg.icon-xl {
+  width: 26px;
+  height: 26px;
+}
+svg.icon-xxl {
+  width: 40px;
+  height: 40px;
+}
+
+
+
+.icon-xs {
+  font-size: 14px;
+}
+.icon-sm {
+  font-size: 16px;
+}
+.icon-md {
+  font-size: 18px;
+}
+.icon-lg {
+  font-size: 20px;
+}
+.icon-xl {
+  font-size: 24px;
+}
+.icon-xxl {
+  font-size: 30px;
+}
+
+
+
+.cursor-pointer {
+  cursor: pointer;
+}
+.cursor-default {
+  cursor: default;
+}
+
+
+
+// Small paddings and margins
+.pt-1px { padding-top: 1px }
+.pt-2px { padding-top: 2px }
+.pt-3px { padding-top: 3px }
+
+.pb-1px { padding-bottom: 1px }
+.pb-2px { padding-bottom: 2px }
+.pb-3px { padding-bottom: 3px }
+
+.mt-1px { margin-top: 1px }
+.mt-2px { margin-top: 2px }
+.mt-3px { margin-top: 3px }
+
+.mb-1px { margin-bottom: 1px }
+.mb-2px { margin-bottom: 2px }
+.mb-3px { margin-bottom: 3px }
+
+
+
+// Height
+.ht-5 { height: 5px; }
+.ht-10 { height: 10px; }
+.ht-15 { height: 15px; }
+.ht-20 { height: 20px; }
+.ht-30 { height: 30px; }
+.ht-40 { height: 40px; }
+.ht-50 { height: 50px; }
+.ht-60 { height: 60px; }
+.ht-70 { height: 70px; }
+.ht-80 { height: 80px; }
+.ht-90 { height: 90px; }
+.ht-100 { height: 100px; }

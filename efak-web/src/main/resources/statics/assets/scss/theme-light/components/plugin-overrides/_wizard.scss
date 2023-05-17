@@ -1,0 +1,157 @@
+// jQuery Steps
+
+.tabcontrol ul, .wizard ul {
+  display: flex;
+  @media(max-width: 676px) {
+    flex-wrap: wrap;
+  }
+}
+
+.wizard>.steps>ul>li {
+  width: auto;
+  display: flex;
+  flex-grow: 1;
+}
+
+.wizard>.steps .disabled a, 
+.wizard>.steps .disabled a:active, 
+.wizard>.steps .disabled a:hover {
+  background-color: $gray-200;
+  color: $body-color;
+  border: 1px solid transparent;
+}
+
+.wizard>.steps .current a, 
+.wizard>.steps .current a:active, 
+.wizard>.steps .current a:hover {
+  background-color: $primary;
+  border: 1px solid transparent;
+}
+
+.wizard>.steps a, 
+.wizard>.steps a:active, 
+.wizard>.steps a:hover {
+  padding: $btn-padding-y $btn-padding-x;
+  border-radius: $input-border-radius;
+  width: 100%;
+}
+
+.wizard>.steps .done a, 
+.wizard>.steps .done a:active, 
+.wizard>.steps .done a:hover {
+  background-color: rgba($primary, .2);
+  color: $primary;
+  border: 1px solid $primary;
+}
+
+.wizard>.steps ul li {
+  a {
+    &, &:active, &:hover {
+      margin: 0 .5em .5em 0;
+    }
+  }
+  &:last-child {
+    a {
+      &, &:active, &:hover {
+        margin: 0 0 .5em 0;
+      }
+    }
+  }
+}
+
+.wizard>.steps .number {
+  font-size: inherit;
+}
+
+.wizard>.content {
+  background: $input-bg;
+  border: 1px solid $input-border-color;
+  min-height: 23em;
+  overflow: auto;
+  margin: .5em 0;
+}
+
+.wizard>.content>.body {
+  @media(max-width: 767px) {
+    width: 90%;
+    height: 90%;
+    padding: 5%;
+  }
+}
+
+.wizard>.actions {
+  /*rtl:raw:
+    text-align: left; 
+  */
+}
+
+.wizard>.actions>ul>li, 
+.wizard>.steps>ul>li {
+  /*rtl:raw:
+    float: right;
+  */
+}
+
+.wizard.vertical>.steps {
+  /*rtl:raw:
+    float: right;
+  */
+}
+
+.wizard>.actions a, 
+.wizard>.actions a:active, 
+.wizard>.actions a:hover {
+  @extend .btn;
+  @extend .btn-primary;
+}
+
+.wizard>.actions .disabled a, 
+.wizard>.actions .disabled a:active, 
+.wizard>.actions .disabled a:hover {
+  background: $gray-200;
+  border-color: $gray-200;
+  cursor: not-allowed;
+  color: $gray-500;
+}
+
+.wizard>.actions .disabled a:focus {
+  box-shadow: none;
+  color: $gray-500;
+}
+
+.wizard>.actions>ul {
+  li {
+    margin-right: 0;
+    margin-left: .7em;
+  }
+}
+
+
+
+// vertical
+
+.wizard.vertical {
+  >.steps ul {
+    flex-direction: column;
+  }
+}
+
+.wizard.vertical>.content {
+  margin: 0 0 .5em 2%;
+  width: 68%;
+}
+
+.wizard.vertical>.steps a, 
+.wizard.vertical>.steps a:active, 
+.wizard.vertical>.steps a:hover {
+  margin: 0 0 .5em 0;
+}
+
+.wizard.vertical>.actions {
+  margin: 0;
+  width: 100%;
+}
+
+.wizard.vertical>.actions>ul>li {
+  margin: 0 0 0 .7em;
+}

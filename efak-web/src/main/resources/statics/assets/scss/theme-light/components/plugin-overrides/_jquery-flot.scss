@@ -1,0 +1,25 @@
+.flot-chart-wrapper {
+  .flot-chart {
+    width: 100%;
+    position: relative;
+    max-width: none;
+    height: 400px;
+  }
+  @media(max-width: 767px) {
+    height: 200px;
+    min-height: 200px;
+    .flot-chart {
+      height: 100%;
+    }
+  }
+}
+
+.flot-text {
+  .flot-x-axis,
+  .flot-y-axis {
+    > div,
+    .flot-tick-label {
+      color: $body-color;
+    }
+  }
+}

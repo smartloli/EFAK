@@ -1,0 +1,125 @@
+/*
+* NobleUI - HTML Bootstrap 5 Admin Dashboard Template v2.0.1 (http://www.bootstrapmb.com)
+* Copyright © 2022 NobleUI
+* Licensed under ThemeForest License
+*/
+
+// Theme style for demo2 (Vertical Layout - Dark, Dark-RTL)
+
+
+
+
+// Custom variables
+@import '../theme-dark/variables';
+@import './variables';
+
+
+// Bootstrap stylesheets
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// Bootstrap layout & components
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/dropdown";
+@import "bootstrap/scss/button-group";
+@import "bootstrap/scss/nav";
+@import "bootstrap/scss/navbar";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/accordion";
+@import "bootstrap/scss/breadcrumb";
+@import "bootstrap/scss/pagination";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/progress";
+@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/toasts";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/tooltip";
+@import "bootstrap/scss/popover";
+@import "bootstrap/scss/carousel";
+@import "bootstrap/scss/spinners";
+
+// Bootstrap helpers
+@import "bootstrap/scss/helpers";
+
+// Bootstrap utilities
+@import '../common/utilities';
+@import "bootstrap/scss/utilities/api";
+
+
+// Custom mixins
+@import '../common/mixins/animation';
+@import '../common/mixins/buttons';
+@import '../common/mixins/misc';
+@import '../common/mixins/width';
+
+// Core styles
+@import '../common/background';
+@import '../common/reset';
+@import '../common/functions';
+@import '../common/misc';
+@import '../common/helpers';
+@import '../common/typography';
+@import '../common/demo';
+
+// Layout
+@import './vertical-wrapper';
+@import './navbar';
+@import './sidebar';
+@import './layouts';
+
+// Custom components
+@import "../common/components/badges";
+@import "../common/components/bootstrap-alert";
+@import "../common/components/breadcrumbs";
+@import "../common/components/buttons";
+@import "../common/components/cards";
+// @import "../common/components/checkbox-radio";
+@import "../common/components/dashboard";
+@import "../common/components/dropdown";
+@import "../common/components/forms";
+@import "../common/components/icons";
+@import "../common/components/nav";
+@import "../common/components/pagination";
+@import "../common/components/tables";
+@import "../common/components/timeline";
+@import "../common/components/chat";
+@import "../common/components/auth";
+
+// Email app
+@import '../common/components/email/inbox';
+
+// 3rd-Party plugin overrides
+@import "../theme-dark/components/plugin-overrides/ace";
+@import "../theme-dark/components/plugin-overrides/apex-charts";
+@import "../theme-dark/components/plugin-overrides/bootstrap-datepicker";
+@import "../theme-dark/components/plugin-overrides/data-tables";
+@import "../theme-dark/components/plugin-overrides/dropify";
+@import "../theme-dark/components/plugin-overrides/dropzone";
+@import "../theme-dark/components/plugin-overrides/full-calendar";
+@import "../theme-dark/components/plugin-overrides/jquery-flot";
+@import "../theme-dark/components/plugin-overrides/morrisjs";
+@import "../theme-dark/components/plugin-overrides/peity";
+@import "../theme-dark/components/plugin-overrides/perfect-scrollbar";
+@import "../theme-dark/components/plugin-overrides/sweet-alert";
+@import "../theme-dark/components/plugin-overrides/select2";
+@import "../theme-dark/components/plugin-overrides/simplemde";
+@import "../theme-dark/components/plugin-overrides/tags-input";
+@import "../theme-dark/components/plugin-overrides/tempusdominus-bootstrap-4";
+@import "../theme-dark/components/plugin-overrides/tinymce";
+@import "../theme-dark/components/plugin-overrides/typeahead";
+@import "../theme-dark/components/plugin-overrides/wizard";
+
+

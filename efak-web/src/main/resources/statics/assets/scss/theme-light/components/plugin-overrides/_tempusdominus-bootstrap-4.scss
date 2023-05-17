@@ -1,0 +1,51 @@
+// tempusdominus-bootstrap-4
+
+.bootstrap-datetimepicker-widget table td {
+  &, span {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+  }
+
+  &.seperator {
+    width: 1000px !important;
+  }
+
+  span:hover {
+    background-color: rgba($primary, .2);
+  }
+  
+  .timepicker .timepicker-picker a.btn {
+    color: $primary !important;
+  }
+
+  .timepicker-hour, 
+  .timepicker-minute, 
+  .timepicker-second {
+    width: 40px;
+    font-size: 1rem;
+  }
+
+  &.day:hover, 
+  &.hour:hover, 
+  &.minute:hover, 
+  &.second:hover {
+    background-color: rgba($primary, .2);
+    color: $primary;
+  }
+  
+}
+
+.bootstrap-datetimepicker-widget .timepicker .timepicker-picker a.btn {
+  color: $primary;
+  &:hover {
+    color: $primary;
+  }
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu {
+  &:before,
+  &:after {
+    border-bottom-color: $input-border-color !important;
+  }
+}

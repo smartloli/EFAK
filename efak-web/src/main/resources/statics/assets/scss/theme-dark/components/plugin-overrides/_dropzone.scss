@@ -1,0 +1,30 @@
+.dropzone {
+  background: $input-bg;
+  overflow: auto;
+  border: 1px solid $input-border-color;
+  border-radius: $input-border-radius;
+  @media (min-width: 1400px) {
+    min-height: 200px;
+  }
+  max-height: 200px;
+  padding: 0;
+  &.dz-clickable {
+    .dz-message {
+      margin-top: 65px;
+      * {
+        @extend .text-muted;
+      }
+    }
+  }
+  .dz-preview {
+    &.dz-image-preview {
+      background: $input-bg;
+    }
+    &.dz-file-preview,
+    &.dz-image-preview {
+     .dz-image {
+        border-radius: $input-border-radius;
+     }
+    }
+  }
+}

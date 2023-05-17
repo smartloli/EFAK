@@ -1,0 +1,72 @@
+.timeline {
+  border-left: 3px solid $primary;
+  border-bottom-right-radius: $border-radius;
+  border-top-right-radius: $border-radius;    
+  background: rgba($primary, .2);
+  margin: 0 auto;  
+  position: relative;
+  padding: 50px;
+  list-style: none;
+  max-width: 40%; 
+  @media(max-width: 767px) {
+    max-width: 98%;
+    padding: 25px;
+  }
+  
+  .event {
+    border-bottom: 1px dashed $border-color;
+    padding-bottom: (50px * 0.5);
+    margin-bottom: 25px;  
+    position: relative;
+    
+    @media(max-width: 767px) {
+      padding-top: 30px;
+    }
+
+    .title {
+      font-weight: 500;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    &:last-of-type { 
+      padding-bottom: 0;
+      margin-bottom: 0; 
+      border: none;      
+    }
+
+    &:before, &:after {
+      position: absolute;
+      display: block;
+      top: 0;
+    }
+
+    &:before {
+      left: (((120px * 0.6) + 50px + 4px + 4px + (4px * 2)) * 1.5) * -1;    
+      content: attr(data-date);
+      text-align: right;
+      font-weight: 500;    
+      font-size: 0.9em;
+      min-width: 120px;
+      @media(max-width: 767px) {
+        left: 0px;
+        text-align: left;
+      }
+    }
+
+    &:after {
+      -webkit-box-shadow: 0 0 0 3px $primary;
+              box-shadow: 0 0 0 3px $primary;    
+      left: (50px + 3px + (8px * 0.35)) * -1;        
+      background: $card-bg;    
+      border-radius: 50%;  
+      height: 9px;
+      width: 9px;
+      content: "";
+      top: 5px;
+      @media(max-width: 767px) {
+        left: (25px + 4px + (8px * 0.35)) * -1;        
+      }
+    }
+  }
+}

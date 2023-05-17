@@ -1,0 +1,91 @@
+//width mixin
+@mixin make-width($num, $viewport: "") {
+  $p: $num + "%";
+
+  @if $viewport == "" {
+    $viewport: "-";
+  } @else {
+    $viewport: "-" + $viewport + "-";
+  }
+
+  .wd#{$viewport}#{$num} { width: #{$num}px; }
+  .wd#{$viewport}#{$num}p { width: #{$p}; }
+  .mx-wd#{$viewport}#{$num}p { max-width: #{$p}; }
+  .mn-wd#{$viewport}#{$num}p { min-width: #{$p}; }
+
+  .wd#{$viewport}#{$num}-f { width: #{$num}px !important; }
+  .wd#{$viewport}#{$num}p-f { width: #{$p} !important; }
+  .mx-wd#{$viewport}#{$num}p-f { max-width: #{$p} !important; }
+  .mn-wd#{$viewport}#{$num}p-f { min-width: #{$p} !important; }
+}
+
+$num: 5;
+@while $num <= 100 {
+  @include make-width($num);
+  $num: $num + 5;
+}
+
+$num: 150;
+@while $num <= 1000 {
+  .wd-#{$num} { width: #{$num}px; }
+  .wd-#{$num}-f { width: #{$num}px !important; }
+  $num: $num + 50;
+}
+
+@mixin do-make-width($viewport, $num, $max, $plus) {
+  @while $num <= $max {
+    @include make-width($num,$viewport);
+    $num: $num + $plus;
+  }
+}
+
+@media (min-width: 480px) {
+  @include do-make-width("xs",5,100,5);
+  @include do-make-width("xs",150,1000,50);
+
+  .wd-xs-auto { width: auto; }
+  .wd-xs-auto-f { width: auto !important; }
+}
+
+@include media-breakpoint-up(sm) {
+  @include do-make-width("sm",5,100,5);
+  @include do-make-width("sm",150,1000,50);
+
+  .wd-sm-auto { width: auto; }
+  .wd-sm-auto-f { width: auto !important; }
+}
+
+@include media-breakpoint-up(md) {
+  @include do-make-width("md",5,100,5);
+  @include do-make-width("md",150,1000,50);
+
+  .wd-md-auto { width: auto; }
+  .wd-md-auto-f { width: auto !important; }
+
+  //Custom
+  .wd-md-120 { width: 120px; }
+}
+
+@include media-breakpoint-up(lg) {
+  @include do-make-width("lg",5,100,5);
+  @include do-make-width("lg",150,1000,50);
+
+  .wd-lg-auto { width: auto; }
+  .wd-lg-auto-f { width: auto !important; }
+}
+
+@include media-breakpoint-up(xl) {
+  @include do-make-width("xl",5,100,5);
+  @include do-make-width("xl",150,1000,50);
+
+  .wd-xl-auto { width: auto; }
+  .wd-xl-auto { width: auto !important; }
+}
+
+@include media-breakpoint-up(xxl) {
+  @include do-make-width("xxl",5,100,5);
+  @include do-make-width("xxl",150,1000,50);
+
+  .wd-xxl-auto { width: auto; }
+  .wd-xxl-auto { width: auto !important; }
+}

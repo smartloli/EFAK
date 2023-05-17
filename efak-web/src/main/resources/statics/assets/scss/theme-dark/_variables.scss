@@ -1,0 +1,390 @@
+// Dark theme variables
+
+
+
+// Bootstrap base colors
+$white:        #fff !default;
+$gray-100:     #f8f9fa !default;
+$gray-200:     #e9ecef !default;
+$gray-300:     #dee2e6 !default;
+$gray-400:     #cbd1db !default;
+$gray-500:     #aeb7c5 !default;
+$gray-600:     #7987a1 !default;
+$gray-700:     #41516c !default;
+$gray-800:     #212a3a !default;
+$gray-900:     #060c17 !default;
+$black:        #000 !default;
+$text-muted:   $gray-600 !default;
+
+
+// Bootstrap custom colors
+$blue:    #0d6efd !default;
+$indigo:  #6610f2 !default;
+$purple:  #6f42c1 !default;
+$pink:    #d63384 !default;
+$red:     #dc3545 !default;
+$orange:  #fd7e14 !default;
+$yellow:  #ffc107 !default;
+$green:   #198754 !default;
+$teal:    #20c997 !default;
+$cyan:    #0dcaf0 !default;
+
+
+
+// --- Bootstrap Theme Colors --- //
+//
+$primary:         #6571ff !default;
+$secondary:       $gray-600 !default;
+$success:         #05a34a !default;
+$info:            #66d1d1 !default;
+$warning:         #fbbc06 !default;
+$danger:          #ff3366 !default;
+$light:           $gray-200 !default;
+$dark:            $gray-900 !default;
+//
+// --- Bootstrap Theme Colors --- //
+
+
+
+// Social colors
+$social-colors: (
+  "facebook":        #3b5998,
+  "twitter":         #1da1f2,
+  "google":          #dc4e41,
+  "youtube":         #f00,
+  "vimeo":           #1ab7ea,
+  "dribbble":        #ea4c89,
+  "github":          #181717,
+  "instagram":       #e4405f,
+  "pinterest":       #bd081c,
+  "flickr":          #0063dc,
+  "bitbucket":       #0052cc,
+  "linkedin":        #0077b5
+) !default;
+
+
+// The contrast ratio to reach against white, to determine if color changes from "light" to "dark". Acceptable values for WCAG 2.0 are 3, 4.5 and 7.
+// See https://www.w3.org/TR/WCAG20/#visual-audio-contrast-contrast
+$min-contrast-ratio:   3 !default;
+
+
+// Options
+//
+// Quickly modify global styling by enabling or disabling optional features.
+$enable-gradients:            false !default;
+$enable-negative-margins:     true !default;
+
+
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+// You can add more entries to the $spacers map, should you need more variation.
+$spacer: 1rem !default;
+$spacers: (
+  0: 0,
+  1: $spacer * .25,
+  2: $spacer * .5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3,
+  6: ($spacer * 4.5),
+  7: ($spacer * 6)
+);
+
+
+// Position
+//
+// Define the edge positioning anchors of the position utilities.
+$position-values: (
+  0: 0,
+  10: 10%,
+  20: 20%,
+  25: 25%,
+  30: 30%,
+  40: 40%,
+  50: 50%,
+  60: 60%,
+  70: 70%,
+  75: 75%,
+  80: 80%,
+  90: 90%,
+  100: 100%
+) !default;
+
+
+// Body
+//
+// Settings for the `<body>` element.
+$body-bg:                      #070d19 !default;
+$body-color:                   #d0d6e1 !default;
+
+
+// Links
+//
+// Style anchor elements.
+$link-decoration:              none !default;
+// $link-hover-decoration:        underline !default;
+
+
+// Paragraphs
+//
+// Style p element.
+$paragraph-margin-bottom:      0 !default;
+
+
+// Grid columns
+$grid-gutter-width:           1.5rem !default;
+
+
+// Components
+//
+// Define common padding and border radius sizes and more.
+
+// Border
+$border-color:                #172340 !default;
+
+// Border Radiues
+$border-radius:					.25rem !default;
+
+
+$action-transition-duration: 0.2s;
+$action-transition-timing-function: ease;
+
+
+// Typography
+//
+// Font, line-height, and color for body text, headings, and more.
+
+// Font family
+$font-family-sans-serif:           "Roboto", Helvetica, sans-serif !default;
+
+$font-size-base:              		 0.875rem !default;   // 14px
+$font-size-lg:               	 		 1rem !default;       // 16px
+$font-size-sm:                		 0.812rem !default;   // 13px
+
+$font-weight-lighter:              lighter !default;
+$font-weight-light:                300 !default;
+$font-weight-normal:               400 !default;
+$font-weight-bold:                 500 !default;
+$font-weight-bolder:               700 !default;
+$font-weight-boldest:              900 !default;
+
+$font-weight-base:                 $font-weight-normal !default;
+
+
+// Heading sizes
+$h1-font-size:                     2.5rem !default;  
+$h2-font-size:                     2rem !default;   
+$h3-font-size:                     1.5rem !default;  
+$h4-font-size:                     1.25rem !default;  
+$h5-font-size:                     1rem !default;  
+$h6-font-size:                     $font-size-base !default; 
+
+$headings-margin-bottom:      0 !default;
+$headings-font-weight:        500 !default;
+
+
+$hr-opacity:                  .1 !default;
+
+
+// Tables
+//
+// Customizes the `.table` component with basic values, each used across all table variations.
+
+$table-cell-padding-y:                 .85rem !default;
+$table-cell-padding-x:                 .85rem !default;
+$table-cell-padding-y-sm:              .55rem !default;
+$table-cell-padding-x-sm:              .55rem !default;
+
+$table-striped-bg:                     #080e1b !default;
+$table-active-bg:                      #050913 !default;
+$table-hover-bg:                       #080e1b !default;
+
+$table-group-separator-color:          $border-color;
+
+
+// Buttons + Forms
+//
+// Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
+
+$input-btn-padding-y:                   .469rem !default;
+$input-btn-padding-x:                   .8rem !default;
+
+$input-btn-focus-box-shadow:            none !default;
+$input-btn-focus-width:                 0 !default;
+
+$input-placeholder-color:               $gray-500 !default;
+
+$input-btn-padding-y-xs:                .313rem !default;
+$input-btn-padding-x-xs:                .8rem !default;
+$input-btn-font-size-xs:                .75rem !default;
+
+$input-btn-padding-y-sm:                .391rem !default;
+$input-btn-padding-x-sm:                .8rem !default;
+$input-btn-font-size-sm:                $font-size-sm !default;
+
+$input-btn-padding-y-lg:                .5rem !default;
+$input-btn-padding-x-lg:                .8rem !default;
+$input-btn-font-size-lg:                $font-size-lg !default;
+
+
+// Buttons
+//
+// For each of Bootstrap's buttons, define text, background, and border color.
+
+$btn-font-weight:           $font-weight-normal !default;
+
+$btn-padding-y-xs:          $input-btn-padding-y-xs !default;
+$btn-padding-x-xs:          $input-btn-padding-x-xs !default;
+$btn-font-size-xs:          $input-btn-font-size-xs !default;
+
+// Allows for customizing button radius independently from global border radius
+$btn-border-radius:                     $border-radius !default;
+$btn-border-radius-sm:                  $border-radius !default;
+$btn-border-radius-lg:                  $border-radius !default;
+
+
+// Forms
+
+$input-padding-y-xs:                    $input-btn-padding-y-xs !default;
+$input-padding-x-xs:                    $input-btn-padding-x-xs !default;
+$input-font-size-xs:                    $input-btn-font-size-xs !default;
+
+$input-bg:                              #0c1427 !default;
+$input-disabled-bg:                     lighten($input-bg, 5%) !default; // dark
+$input-border-color:                    $border-color !default;
+$input-focus-border-color:              lighten($border-color, 10%) !default;
+
+$input-border-radius:                   $btn-border-radius !default;
+$input-border-radius-sm:                $btn-border-radius-sm !default;
+$input-border-radius-lg:                $btn-border-radius-lg !default;
+
+// form-check
+$form-check-input-width:                1.3em !default;
+$form-check-input-border:               1px solid lighten($input-border-color, 20%) !default; // dark
+$form-check-input-focus-border:         lighten($input-border-color, 25%) !default; // dark
+$form-check-input-border-radius:        .15em !default;
+
+// Form switch
+$form-switch-color:                     lighten($input-bg, 60%) !default; // dark
+$form-switch-focus-color:               lighten($input-bg, 65%) !default; // dark
+
+// Input-group
+$input-group-addon-padding-x:           .563rem !default;
+$input-group-addon-bg:                  lighten($input-bg, 5%) !default;
+
+// Range
+$form-range-track-bg:                   lighten($input-bg, 5%) !default; // dark
+
+
+
+// Navs
+$nav-tabs-border-color:               $border-color !default; // dark
+$nav-tabs-link-bg:                    transparent; // custom variable
+$nav-tabs-link-border-color:          $border-color $border-color $nav-tabs-border-color; // custom variable
+$nav-tabs-link-active-bg:             $input-bg !default;
+$nav-tabs-link-active-border-color:   $border-color $border-color $nav-tabs-link-active-bg !default; //dark
+
+
+
+// Dropdowns
+$dropdown-font-size:               13px !default; // dark
+$dropdown-color:                   $text-muted !default; // dark
+$dropdown-bg:                      $gray-900 !default; // dark
+$dropdown-border-color:            $border-color;
+$dropdown-box-shadow:              0 0 10px 0 #060b15;
+$dropdown-link-color:              $body-color !default; // dark
+
+
+
+// Pagination
+$pagination-padding-y:              .469rem !default;
+$pagination-padding-x:              1rem !default;
+$pagination-padding-y-sm:           .391rem !default;
+$pagination-padding-x-sm:           .75rem !default;
+$pagination-padding-y-lg:           .5rem !default;
+$pagination-padding-x-lg:           1.1rem !default;
+
+$pagination-color:                  $primary !default;
+$pagination-bg:                     $input-bg !default; // dark
+$pagination-border-color:           $border-color !default; // dark
+
+$pagination-focus-bg:               lighten($input-bg, 10%) !default; // dark
+
+$pagination-hover-bg:               lighten($input-bg, 10%); // dark
+$pagination-hover-border-color:     lighten($input-bg, 10%); // dark
+
+$pagination-active-bg:              $primary !default;
+$pagination-active-border-color:    $primary !default;
+
+$pagination-disabled-color:         $gray-700 !default; // dark
+$pagination-disabled-bg:            $input-bg !default; // dark
+$pagination-disabled-border-color:  $border-color !default; // dark
+
+
+
+// Cards
+$card-box-shadow:                   3px 0 10px 0 #060b15; // custom variable
+$card-spacer-y:                     1.5rem !default;
+$card-spacer-x:                     1.5rem !default;
+$card-title-spacer-y:               .875rem !default;
+$card-border-color:                 #172340 !default;
+$card-cap-padding-y:                .875rem !default;
+$card-cap-padding-x:                $card-spacer-x !default;
+$card-cap-bg:                       #0a1122 !default;
+$card-bg:                           #0c1427 !default; // dark
+
+
+
+// Accordion
+$accordion-bg:                            $input-bg !default;
+$accordion-border-color:                  $border-color !default;
+$accordion-icon-width:                    .875rem !default;
+$accordion-button-active-bg:              lighten($input-bg, 5%) !default; // dark
+
+
+
+// Popovers
+$popover-bg:                        $input-bg !default; // dark
+$popover-border-color:              $border-color !default;
+$popover-header-bg:                 lighten($input-bg, 5%) !default;
+
+
+
+// Badges
+$badge-font-size:           .8em !default;
+$badge-font-weight:         $font-weight-bold !default;
+
+
+
+// Modals
+$modal-content-bg:              $input-bg !default; //dark
+$modal-content-border-color:    $border-color !default;
+$modal-fade-transform:          scale(.8) !default;
+$modal-transition:              transform .4s ease !default;
+// Modals
+
+
+
+// Progress bars
+$progress-bg:                       lighten($input-bg, 5%) !default; // dark
+
+
+
+// List group
+$list-group-color:                  $body-color!default; // dark
+$list-group-bg:                     $input-bg !default; // dark
+$list-group-border-color:           $border-color !default; // dark
+
+$list-group-item-padding-y:         .75rem !default;
+$list-group-item-padding-x:         1.25rem !default;
+
+$list-group-hover-bg:               lighten($input-bg, 5%); // dark
+$list-group-action-color:           $gray-400 !default; // dark
+
+
+
+// Close
+$btn-close-width:            .8em !default;
+$btn-close-color:            $text-muted !default;

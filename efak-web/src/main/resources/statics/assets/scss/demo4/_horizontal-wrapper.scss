@@ -1,0 +1,45 @@
+.page-wrapper {
+  &.full-page {
+    .page-content {
+      min-height: 100vh;
+      max-width: 100%;
+    }
+  }
+  @media (max-width: 991px) {
+    margin-top: $navbar-height;
+  }
+ .page-content {
+    padding: 2rem 0;
+    @include make-container();
+    @extend .container;
+    min-height: calc(100vh - #{$navbar-height} - 50px);
+    flex-grow: 1;
+
+    .content-nav-wrapper {
+      padding: 0;
+      position: sticky;
+      top: 80px;
+      height: calc(100vh - 6rem);
+      overflow-y: auto;
+      border-left: 1px solid $border-color;
+      display: none;
+      @media(min-width: 1200px) {
+        display: block;
+      }
+      .content-nav {
+        padding: 0px 25px;
+        .nav-item {
+          .nav-link {
+            padding: 0;
+            height: 30px;
+            white-space: nowrap;
+            color: $text-muted;
+            font-size: $font-size-base;
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+    }
+  }
+}
