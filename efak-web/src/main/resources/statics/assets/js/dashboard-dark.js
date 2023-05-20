@@ -746,5 +746,56 @@ $(function() {
   }
   // Cloud Storage Chart - END
 
+  // Active Topics
+  if ($('#storageChart2').length) {
+    var options = {
+      chart: {
+        height: 260,
+        type: "radialBar"
+      },
+      series: [67],
+      colors: [colors.primary],
+      plotOptions: {
+        radialBar: {
+          hollow: {
+            margin: 15,
+            size: "70%"
+          },
+          track: {
+            show: true,
+            background: colors.dark,
+            strokeWidth: '100%',
+            opacity: 1,
+            margin: 5,
+          },
+          dataLabels: {
+            showOn: "always",
+            name: {
+              offsetY: -11,
+              show: true,
+              color: colors.muted,
+              fontSize: "13px"
+            },
+            value: {
+              color: colors.bodyColor,
+              fontSize: "30px",
+              show: true
+            }
+          }
+        }
+      },
+      fill: {
+        opacity: 1
+      },
+      stroke: {
+        lineCap: "round",
+      },
+      labels: ["Storage Used"]
+    };
+
+    var chart = new ApexCharts(document.querySelector("#storageChart2"), options);
+    chart.render();
+  }
+
 
 });
