@@ -17,8 +17,13 @@
  */
 package org.kafka.eagle.web;
 
+import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.plugins.mysql.MySqlRecordSchema;
+import org.kafka.eagle.pojo.mysql.MySQLDataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 /**
  *  KafkaEagle is a web-based monitoring and management platform for Apache Kafka clusters.
@@ -30,8 +35,32 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @Version: 3.4.0
  */
 @SpringBootApplication
+@Slf4j
 public class KafkaEagle {
+
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+    @Value("${spring.datasource.username}")
+    private String dbUserName;
+
+    @Value("${spring.datasource.password}")
+    private String dbPassword;
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String dbDriverName;
+
     public static void main(String[] args) {
         SpringApplication.run(KafkaEagle.class, args);
+    }
+
+    @Bean
+    public void initKafkaEagleDatabase() {
+        MySQLDataSource mySQLDataSource = new MySQLDataSource();
+        mySQLDataSource.setDbUrl(this.dbUrl);
+        mySQLDataSource.setDbUserName(this.dbUserName);
+        mySQLDataSource.setDbPassword(this.dbPassword);
+        mySQLDataSource.setDbDriverName(this.dbDriverName);
+        MySqlRecordSchema.schema(mySQLDataSource);
+        log.info("MySQLDataSource initialization: {}",mySQLDataSource);
     }
 }

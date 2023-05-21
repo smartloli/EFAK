@@ -43,6 +43,5 @@
     <module>efak-plugins</module>
     <module>efak-ai</module>
     <module>efak-web</module>
-    <module>efak-utils</module>
   </modules>
 </project>

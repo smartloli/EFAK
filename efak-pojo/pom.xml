@@ -15,10 +15,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
+            <groupId>org.kafka.eagle</groupId>
+            <artifactId>efak-common</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
