@@ -1,5 +1,5 @@
 /**
- * DashboardController.java
+ * WelcomeController.java
  * <p>
  * Copyright 2023 smartloli
  * <p>
@@ -21,26 +21,25 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- *  The DashboardController handles requests for dashboard pages. This controller handles the following requests:
- *  - /dashboard: returns the main dashboard page.
- *  - /dashboard/{id}: returns a specific dashboard page with the given ID.
- *  - /dashboard/create: returns a page for creating a new dashboard.
- *  - /dashboard/save: handles POST requests to save a dashboard.
- *
- *  This controller uses the DashboardService to manage the creation, editing, and saving of dashboards. When
- *  handling requests, this controller also uses the Thymeleaf template engine to render pages and pass necessary data
- *  to the pages.
+ * In the provided example, the WelcomeController handles the root URL request ("/") and is
+ * responsible for displaying the cluster management interface. The welcome() method is
+ * annotated with @GetMapping("/") to map the root URL request to this method.
+ * It returns the name of the cluster management view template, which will be resolved by
+ * the configured view resolver.
  *
  * @Author: smartloli
- * @Date: 2023/5/13 23:38
+ * @Date: 2023/5/26 22:41
  * @Version: 3.4.0
  */
 @Controller
-public class HomeController {
-
-    @GetMapping("")
-    public String index() {
-        return "dashboard.html";
+public class WelcomeController {
+    /**
+     * Handles the root URL request and displays the cluster management interface.
+     *
+     * @return The name of the cluster management view template.
+     */
+    @GetMapping("/")
+    public String welcomeView() {
+        return "welcome.html";
     }
-
 }
