@@ -86,7 +86,7 @@ gsap.to("#glassShine", {
     delay: 2
 });
 
-// go home
-$("#efak_error_btn_404").click(function () {
-    window.location.href = '/';
+// go clusters
+$("#efak_welcome_btn").click(function () {
+    window.location.href = '/clusters/manage';
 });
