@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>Manage - KafkaEagle</title>
+    <title th:text="#{kafka.eagle.manage.title.desc}">Manage - KafkaEagle</title>
 
     <th:block th:replace="public/common :: css"></th:block>
 
@@ -37,7 +37,7 @@
                             <h6 class="card-title" th:text="#{kafka.eagle.clusters.manage.home.sub}"></h6>
                             <p class="text-muted mb-3" th:utext="#{kafka.eagle.clusters.manage.home.sub.desc}"></p>
                             <div style="float: right!important;margin-top: -88px;">
-                                <button type="button" class="btn btn-primary btn-sm"
+                                <button id="efak_manage_btn" type="button" class="btn btn-primary btn-sm"
                                         th:text="#{kafka.eagle.clusters.manage.create}"></button>
                             </div>
                             <div class="table-responsive">

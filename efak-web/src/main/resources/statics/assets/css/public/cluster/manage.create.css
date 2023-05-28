@@ -1,0 +1,131 @@
+.efka_kraft_version_card {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    align-items: center;
+    border-radius: 6px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    height: 66px;
+    height: 100px;
+    justify-content: space-between;
+    padding: 13px 17px;
+    position: relative;
+    width: 240px;
+
+    background-color: #0c1427;
+    background-clip: border-box;
+    border: 1px solid #172340;
+}
+
+.efka_kraft_version_card:hover {
+    border: 1px solid #4372ff;
+    cursor: pointer
+}
+
+.efka_kraft_detail_info {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column
+}
+
+.efka_kraft_title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 25px
+}
+
+.efka_kraft_version_type_enable {
+    color: #6571ff;
+    font-size: 12px;
+    font-style: normal;
+    line-height: 14px;
+    margin: 10px 0
+}
+
+.efka_kraft_version_type_disable {
+    color: #d63384;
+    font-size: 12px;
+    font-style: normal;
+    line-height: 14px;
+    margin: 10px 0
+}
+
+.efka_kraft_version_info {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    font-size: 12px;
+    font-style: normal;
+}
+
+.efak_kraft_card_checked {
+    border: 2px solid #6571ff
+}
+
+.efak_kraft_version_checked {
+    position: absolute;
+    right: 0;
+    top: 0
+}
+
+
+.efak_kraft_badges {
+    border-left: 35px solid transparent;
+    border-top: 35px solid #4372ff;
+    border-top-right-radius: 4px;
+    height: 0;
+    width: 0;
+}
+
+.efak_kraft_badges:after {
+    border-bottom: 35px solid #0c1427;
+    border-right: 35px solid transparent;
+    bottom: 0;
+    content: "";
+    display: block;
+    height: 0;
+    left: 0;
+    position: absolute;
+    width: 0
+}
+
+.efka_kraft_logo {
+    width: 64px;
+    z-index: 1
+}
+
+.efka_kraft_check {
+    border-bottom: 2px solid #fff;
+    border-right: 2px solid #fff;
+    height: 12px;
+    position: absolute;
+    right: 7px;
+    top: 3px;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    width: 6px
+}
+
+.efka_kraft_card-list {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-top: 8px
+}
+
+.efka_kraft_card-list>div {
+    margin-bottom: 8px
+}

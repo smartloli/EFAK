@@ -42,7 +42,7 @@ public class DataSpaceController {
 
     @GetMapping("/dashboard")
     public String dashboardView() {
-        return "dataspace/welcome.html";
+        return "dataspace/dashboard.html";
     }
 
 }

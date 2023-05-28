@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan("")
+@MapperScan("org.kafka.eagle.web.dao.mapper")
 public class MapperScanConfig {
 
     @Bean

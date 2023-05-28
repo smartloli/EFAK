@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title th:text="#{kafka.eagle.manage.create.title.desc}"></title>
+
+    <th:block th:replace="public/common :: css"></th:block>
+    <link rel="stylesheet" th:href="@{../../assets/css/public/cluster/manage.create.css}">
+
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:menu -->
+    <div th:replace="public/header :: menu"></div>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+
+        <div class="page-content">
+            <nav class="page-breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/clusters/manage"
+                                                   th:text="#{kafka.eagle.clusters.manage.home.sub}"></a></li>
+                    <li class="breadcrumb-item active" aria-current="page"
+                        th:text="#{kafka.eagle.clusters.manage.create}"></li>
+                </ol>
+            </nav>
+            <div class="row">
+                <div class="col-xl-10 main-content ps-xl-4 pe-xl-5">
+                    <h1 class="page-title" th:text="#{kafka.eagle.clusters.manage.create}"></h1>
+                    <p class="lead" th:utext="#{kafka.eagle.clusters.manage.create.desc}"></p>
+
+                    <hr>
+
+                    <h4 id="efka_cluster_name" th:text="#{kafka.eagle.clusters.manage.create.name}"></h4>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="exampleInputText1" maxlength="128" value=""
+                               placeholder="Enter Name" th:value="#{kafka.eagle.clusters.manage.create.name.test}"
+                               th:placeholder="#{kafka.eagle.clusters.manage.create.name.placeholder}">
+                    </div>
+                    <hr>
+
+                    <h4 id="efka_kafka_kraft" th:text="#{kafka.eagle.clusters.manage.create.kraft}"></h4>
+                    <div class="efka_kraft_card-list">
+                        <div style="margin-right: 22px;">
+                            <div id="efka_kafka_kraft_enable" class="efka_kraft_version_card ">
+                                <div class="efka_kraft_detail_info">
+                                    <div class="efka_kraft_title">Kafka KRaft</div>
+                                    <div class="efka_kraft_version_type_enable">开启</div>
+                                    <div class="efka_kraft_version_info">高于 v2.8.0</div>
+                                </div>
+                                <img src="../../assets/images/profile.png"
+                                     class="efka_kraft_logo">
+                                <div id="efak_kraft_enable_checked" style="display: none" class="efak_kraft_version_checked">
+                                    <div class="efak_kraft_badges"></div>
+                                    <div class="efka_kraft_check"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-right: 22px;">
+                            <div id="efka_kafka_kraft_disable" class="efka_kraft_version_card ">
+                                <div class="efka_kraft_detail_info">
+                                    <div class="efka_kraft_title">Kafka KRaft</div>
+                                    <div class="efka_kraft_version_type_disable">禁止</div>
+                                    <div class="efka_kraft_version_info">低于 v2.8.0</div>
+                                </div>
+                                <img src="../../assets/images/profile.png"
+                                     class="efka_kraft_logo">
+                                <div id="efak_kraft_disable_checked" style="display: none" class="efak_kraft_version_checked">
+                                    <div class="efak_kraft_badges"></div>
+                                    <div class="efka_kraft_check"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <h4 id="efka_kafka_brokers" th:text="#{kafka.eagle.clusters.manage.create.node}"></h4>
+                    <p class="mb-3" th:utext="#{kafka.eagle.clusters.manage.create.node.exist}"></p>
+                    <button id="efak_cluset_add_btn" type="button" class="btn btn-primary btn-sm"
+                            th:text="#{kafka.eagle.clusters.manage.create.node.btn}"></button>&nbsp;&nbsp;<button
+                        id="efak_cluset_add_batch_btn" type="button" class="btn btn-outline-primary btn-sm"
+                        th:text="#{kafka.eagle.clusters.manage.create.node.batch.btn}"></button>
+                    <div class="table-responsive">
+                        <table id="efak_cluster_manage_tbl" class="table table-striped " style="width:100%">
+                            <thead>
+                            <tr th:utext="#{kafka.eagle.clusters.manage.create.tr}">
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><a href="#">预发集群</a></td>
+                                <td><span class="badge bg-danger">异常</span></td>
+                                <td>10</td>
+                                <td>2023-05-27 18:30:30</td>
+                                <td><span class="badge bg-secondary">否</span></td>
+                                <td><a href="#" class="badge border border-primary text-primary">编辑</a> <a href="#"
+                                                                                                             class="badge border border-danger text-danger">删除</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><a href="#">生产集群</a></td>
+                                <td><span class="badge bg-success">健康</span></td>
+                                <td>10</td>
+                                <td>2023-05-27 18:30:30</td>
+                                <td><span class="badge bg-primary">是</span></td>
+                                <td><a href="#" class="badge border border-primary text-primary">编辑</a> <a href="#"
+                                                                                                             class="badge border border-danger text-danger">删除</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <div class="example">
+                        <div style="text-align: center;">
+                            <button id="efak_cluster_create_cancle" type="button" class="btn btn-primary btn-lg"
+                                    th:text="#{kafka.eagle.clusters.manage.create.cancle}"></button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" class="btn btn-secondary btn-lg"
+                                    th:text="#{kafka.eagle.clusters.manage.create}"></button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-xl-2 content-nav-wrapper">
+                    <ul class="nav content-nav d-flex flex-column">
+                        <li class="nav-item">
+                            <a href="#efka_cluster_name" class="nav-link"
+                               th:text="#{kafka.eagle.clusters.manage.create.name}"></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#efka_kafka_kraft" class="nav-link"
+                               th:text="#{kafka.eagle.clusters.manage.create.kraft}"></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#efka_kafka_brokers" class="nav-link"
+                               th:text="#{kafka.eagle.clusters.manage.create.node}"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- partial:footer -->
+        <footer th:replace="public/common :: footer"></footer>
+        <!-- partial -->
+
+    </div>
+</div>
+
+<!-- core:js -->
+<th:block th:replace="public/common :: js"></th:block>
+
+<!-- plugins:js -->
+<script th:src="@{../../assets/js/cluster/manage.create.js}"></script>
+
+</body>
+</html>    

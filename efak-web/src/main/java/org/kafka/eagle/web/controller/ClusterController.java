@@ -39,4 +39,9 @@ public class ClusterController {
         return "cluster/manage.html";
     }
 
+    @GetMapping("/manage/create")
+    public String createClusterView(){
+        return "cluster/manage-create.html";
+    }
+
 }
