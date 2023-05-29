@@ -22,6 +22,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import org.springframework.context.annotation.Description;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -44,6 +46,8 @@ public class ClusterInfo implements Serializable {
     /**
      * Cluster Name
      */
+    @NotNull
+    @Size(min=1, max=128)
     private String name;
 
     /**
