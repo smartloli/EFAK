@@ -89,32 +89,33 @@
                     <button id="efak_cluset_add_btn" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#efak_kafka_broker_add_modal" data-bs-whatever=""
                             th:text="#{kafka.eagle.clusters.manage.create.node.btn}"></button>&nbsp;&nbsp;<button
-                        id="efak_cluset_add_batch_btn" type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                        id="efak_cluset_add_batch_btn" type="button" class="btn btn-outline-primary btn-sm"
+                        data-bs-toggle="modal"
                         data-bs-target="#efak_kafka_broker_batch_modal" data-bs-whatever=""
                         th:text="#{kafka.eagle.clusters.manage.create.node.batch.btn}"></button>
                     <div class="table-responsive">
                         <table id="efak_cluster_manage_tbl" class="table table-striped " style="width:100%">
                             <thead>
-                            <tr th:utext="#{kafka.eagle.clusters.manage.create.tr}">
+                            <tr th:utext="#{kafka.eagle.clusters.manage.add.node.tr}">
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
-                                <td><a href="#">预发集群</a></td>
-                                <td><span class="badge bg-danger">异常</span></td>
-                                <td>10</td>
+                                <td>1000</td>
+                                <td>127.0.0.1</td>
+                                <td>9092</td>
+                                <td>9999</td>
                                 <td>2023-05-27 18:30:30</td>
-                                <td><span class="badge bg-secondary">否</span></td>
                                 <td><a href="#" class="badge border border-primary text-primary">编辑</a> <a href="#"
                                                                                                              class="badge border border-danger text-danger">删除</a>
                                 </td>
                             </tr>
                             <tr>
-                                <td><a href="#">生产集群</a></td>
-                                <td><span class="badge bg-success">健康</span></td>
-                                <td>10</td>
-                                <td>2023-05-27 18:30:30</td>
-                                <td><span class="badge bg-primary">是</span></td>
+                                <td>1001</td>
+                                <td>127.0.0.1</td>
+                                <td>9093</td>
+                                <td>9998</td>
+                                <td>2023-05-28 18:30:30</td>
                                 <td><a href="#" class="badge border border-primary text-primary">编辑</a> <a href="#"
                                                                                                              class="badge border border-danger text-danger">删除</a>
                                 </td>
@@ -243,14 +244,17 @@
                         <div class="mb-3">
                             <label for="efak_batch_module" class="form-label"
                                    th:text="#{kafka.eagle.clusters.manage.add.batch.module}">Module:</label><br/>
-                            <button id="efak_batch_module" type="button" class="btn btn-outline-primary btn-sm" th:utext="#{kafka.eagle.clusters.manage.add.batch.module.download}"></button>
+                            <button id="efak_batch_module" type="button" class="btn btn-outline-primary btn-sm"
+                                    th:utext="#{kafka.eagle.clusters.manage.add.batch.module.download}"></button>
                         </div>
                         <div class="mb-3">
                             <label for="efak_batch_module" class="form-label"
                                    th:text="#{kafka.eagle.clusters.manage.add.batch.node.import}">Module:</label><br/>
                             <div>
-                                <input type="file" id="efak_kafka_broker_batch_import" data-allowed-file-extensions="xlsx xls" data-max-file-size="100M" />
-                                <input id="efak_kafka_broker_batch_import_hidden" name="efak_kafka_broker_batch_import_hidden" type="hidden" class="form-control"/>
+                                <input type="file" id="efak_kafka_broker_batch_import"
+                                       data-allowed-file-extensions="xlsx xls" data-max-file-size="100M"/>
+                                <input id="efak_kafka_broker_batch_import_hidden"
+                                       name="efak_kafka_broker_batch_import_hidden" type="hidden" class="form-control"/>
                             </div>
                         </div>
 
