@@ -47,14 +47,14 @@
                     </div>
                     <hr>
 
-                    <h4 id="efka_kafka_kraft" th:text="#{kafka.eagle.clusters.manage.create.kraft}"></h4>
+                    <h4 id="efka_kafka_kraft" th:text="#{kafka.eagle.clusters.manage.add.node.auth.check}"></h4>
                     <div class="efka_kraft_card-list">
                         <div style="margin-right: 22px;">
                             <div id="efka_kafka_kraft_enable" class="efka_kraft_version_card ">
                                 <div class="efka_kraft_detail_info">
-                                    <div class="efka_kraft_title">Kafka KRaft</div>
+                                    <div class="efka_kraft_title">Authentication</div>
                                     <div class="efka_kraft_version_type_enable">开启</div>
-                                    <div class="efka_kraft_version_info">高于 v2.8.0</div>
+                                    <div class="efka_kraft_version_info">Kafka集群加密访问</div>
                                 </div>
                                 <img src="../../assets/images/profile.png"
                                      class="efka_kraft_logo">
@@ -68,9 +68,9 @@
                         <div style="margin-right: 22px;">
                             <div id="efka_kafka_kraft_disable" class="efka_kraft_version_card ">
                                 <div class="efka_kraft_detail_info">
-                                    <div class="efka_kraft_title">Kafka KRaft</div>
+                                    <div class="efka_kraft_title">None</div>
                                     <div class="efka_kraft_version_type_disable">禁止</div>
-                                    <div class="efka_kraft_version_info">低于 v2.8.0</div>
+                                    <div class="efka_kraft_version_info">Kafka集群明文访问</div>
                                 </div>
                                 <img src="../../assets/images/profile.png"
                                      class="efka_kraft_logo">
@@ -82,6 +82,11 @@
                             </div>
                         </div>
                     </div>
+                    <hr>
+                    <h4 id="efka_kafka_auth_desc" th:text="#{kafka.eagle.clusters.manage.add.node.auth.config}"></h4>
+                    <textarea class="form-control" id="efak_kafka_auth_config"
+                              th:placeholder="#{kafka.eagle.clusters.manage.add.node.auth.config.placeholder}"
+                              rows="10"></textarea>
                     <hr>
 
                     <h4 id="efka_kafka_brokers" th:text="#{kafka.eagle.clusters.manage.create.node}"></h4>
@@ -144,7 +149,11 @@
                         </li>
                         <li class="nav-item">
                             <a href="#efka_kafka_kraft" class="nav-link"
-                               th:text="#{kafka.eagle.clusters.manage.create.kraft}"></a>
+                               th:text="#{kafka.eagle.clusters.manage.add.node.auth.check}"></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#efka_kafka_auth_desc" class="nav-link"
+                               th:text="#{kafka.eagle.clusters.manage.add.node.auth.config}"></a>
                         </li>
                         <li class="nav-item">
                             <a href="#efka_kafka_brokers" class="nav-link"
@@ -193,32 +202,6 @@
                                    th:text="#{kafka.eagle.clusters.manage.add.node.jmxport}">BrokerJmxPort:</label>
                             <input type="text" class="form-control" id="efak_brokerjmxport_label">
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label"
-                                   th:text="#{kafka.eagle.clusters.manage.add.node.auth.check}">Auth:</label><br/>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" class="form-check-input" name="radioInline"
-                                       id="efak_kafka_auth_disable" checked>
-                                <label class="form-check-label" for="efak_kafka_auth_disable">
-                                    None
-                                </label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" class="form-check-input" name="radioInline"
-                                       id="efak_kafka_auth_enable">
-                                <label class="form-check-label" for="efak_kafka_auth_enable">
-                                    Authentication
-                                </label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="efak_kafka_auth_config" class="form-label"
-                                   th:text="#{kafka.eagle.clusters.manage.add.node.auth.config}">Message:</label>
-                            <textarea class="form-control" id="efak_kafka_auth_config"
-                                      th:placeholder="#{kafka.eagle.clusters.manage.add.node.auth.config.placeholder}"
-                                      rows="10"></textarea>
-                        </div>
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

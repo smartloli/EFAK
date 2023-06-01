@@ -18,9 +18,17 @@
 package org.kafka.eagle.web.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
+import org.kafka.eagle.web.service.IClusterCreateDaoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The ClusterController is responsible for handling requests related to viewing and
@@ -34,6 +42,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 public class ClusterController {
 
+    @Autowired
+    private IClusterCreateDaoService clusterCreateDaoService;
+
     @GetMapping("/manage")
     public String clusterView(){
         return "cluster/manage.html";
@@ -42,6 +53,20 @@ public class ClusterController {
     @GetMapping("/manage/create")
     public String createClusterView(){
         return "cluster/manage-create.html";
+    }
+
+    @ResponseBody
+    @PostMapping("/manage/add/batch")
+    public boolean addClusterCreateInfo(){
+        List<ClusterCreateInfo> list = new ArrayList<>();
+        ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
+        clusterCreateInfo.setClusterId("asdfqwer");
+        clusterCreateInfo.setBrokerId("1000");
+        clusterCreateInfo.setBrokerHost("127.0.0.1");
+        clusterCreateInfo.setBrokerPort(9092);
+        clusterCreateInfo.setBrokerJmxPort(9999);
+        list.add(clusterCreateInfo);
+        return this.clusterCreateDaoService.batch(list);
     }
 
 }

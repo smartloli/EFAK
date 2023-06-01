@@ -20,9 +20,11 @@ package org.kafka.eagle.web.dao.config;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.kafka.eagle.web.dao.injector.MySqlInjector;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -51,6 +53,12 @@ public class MapperScanConfig {
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
         mybatisPlusInterceptor.addInnerInterceptor(paginationInnerInterceptor());
         return mybatisPlusInterceptor;
+    }
+
+    @Bean
+    @Primary // batch insert confg
+    public MySqlInjector mySqlInjector() {
+        return new MySqlInjector();
     }
 
 }

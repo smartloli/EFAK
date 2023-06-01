@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.web.config;
 
+import org.kafka.eagle.web.dao.injector.MySqlInjector;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,4 +56,10 @@ public class CustomizeDataSourceInitializer {
         resourceDatabasePopulator.setSeparator(";");
         return resourceDatabasePopulator;
     }
+
+    @Bean
+    public MySqlInjector sqlInjector() {
+        return new MySqlInjector();
+    }
+
 }
