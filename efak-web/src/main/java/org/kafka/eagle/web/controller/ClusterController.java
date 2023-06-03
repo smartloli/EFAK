@@ -22,14 +22,17 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.plugins.excel.ExcelUtil;
 import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
 import org.kafka.eagle.web.service.IClusterCreateDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,18 +64,22 @@ public class ClusterController {
         return "cluster/manage-create.html";
     }
 
-    @ResponseBody
     @PostMapping("/manage/add/batch")
-    public boolean addClusterCreateBatch() {
+    public String addClusterCreateBatch(@RequestParam("file") MultipartFile file,@RequestParam("cid") String cid) {
+        InputStream inputStream;
         List<ClusterCreateInfo> list = new ArrayList<>();
-        ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
-        clusterCreateInfo.setClusterId("asdfqwer");
-        clusterCreateInfo.setBrokerId("1000");
-        clusterCreateInfo.setBrokerHost("127.0.0.2");
-        clusterCreateInfo.setBrokerPort(9092);
-        clusterCreateInfo.setBrokerJmxPort(9999);
-        list.add(clusterCreateInfo);
-        return this.clusterCreateDaoService.batch(list);
+        try {
+            inputStream = file.getInputStream();
+            ExcelUtil.readBrokerInfo(inputStream);
+        } catch (Exception e) {
+            log.error("Batch add broker has error, msg is {}", e);
+        }
+        boolean status = this.clusterCreateDaoService.batch(list);
+        if (status) {
+            return "redirect:/clusters/manage/create?cid=" + cid;
+        } else {
+            return "redirect:/error/500";
+        }
     }
 
     // @ResponseBody
