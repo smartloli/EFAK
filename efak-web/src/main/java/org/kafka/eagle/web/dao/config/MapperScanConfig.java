@@ -49,6 +49,7 @@ public class MapperScanConfig {
         return paginationInnerInterceptor;
     }
 
+    @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(){
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
         mybatisPlusInterceptor.addInnerInterceptor(paginationInnerInterceptor());

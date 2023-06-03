@@ -104,28 +104,6 @@
                             <tr th:utext="#{kafka.eagle.clusters.manage.add.node.tr}">
                             </tr>
                             </thead>
-                            <tbody>
-                            <tr>
-                                <td>1000</td>
-                                <td>127.0.0.1</td>
-                                <td>9092</td>
-                                <td>9999</td>
-                                <td>2023-05-27 18:30:30</td>
-                                <td><a href="#" class="badge border border-primary text-primary">编辑</a> <a href="#"
-                                                                                                             class="badge border border-danger text-danger">删除</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1001</td>
-                                <td>127.0.0.1</td>
-                                <td>9093</td>
-                                <td>9998</td>
-                                <td>2023-05-28 18:30:30</td>
-                                <td><a href="#" class="badge border border-primary text-primary">编辑</a> <a href="#"
-                                                                                                             class="badge border border-danger text-danger">删除</a>
-                                </td>
-                            </tr>
-                            </tbody>
                         </table>
                     </div>
 
@@ -177,35 +155,37 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="varyingModalLabel"
-                        th:text="#{kafka.eagle.clusters.manage.add.node}"></h5>
+                        th:utext="#{kafka.eagle.clusters.manage.add.node}"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
                 </div>
-                <form>
+                <form role="form" action="/clusters/manage/add/single" method="post"
+                      onsubmit="return contextFormValid();return false;">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="efak_brokerid_label" class="form-label"
-                                   th:text="#{kafka.eagle.clusters.manage.add.node.id}">BrokerId:</label>
-                            <input type="text" class="form-control" id="efak_brokerid_label">
+                                   th:utext="#{kafka.eagle.clusters.manage.add.node.id}">BrokerId:</label>
+                            <input type="text" class="form-control" id="efak_brokerid_label" name="efak_brokerid_name">
+                            <input type="hidden" class="form-control" id="efak_clusterid" name="efak_clusterid_name">
                         </div>
                         <div class="mb-3">
                             <label for="efak_brokerhost_label" class="form-label"
-                                   th:text="#{kafka.eagle.clusters.manage.add.node.host}">BrokerHost:</label>
-                            <input type="text" class="form-control" id="efak_brokerhost_label">
+                                   th:utext="#{kafka.eagle.clusters.manage.add.node.host}">BrokerHost:</label>
+                            <input type="text" class="form-control" id="efak_brokerhost_label" name="efak_brokerhost_name">
                         </div>
                         <div class="mb-3">
                             <label for="efak_brokerport_label" class="form-label"
-                                   th:text="#{kafka.eagle.clusters.manage.add.node.port}">BrokerPort:</label>
-                            <input type="text" class="form-control" id="efak_brokerport_label">
+                                   th:utext="#{kafka.eagle.clusters.manage.add.node.port}">BrokerPort:</label>
+                            <input type="text" class="form-control" id="efak_brokerport_label" name="efak_brokerport_name">
                         </div>
                         <div class="mb-3">
                             <label for="efak_brokerjmxport_label" class="form-label"
-                                   th:text="#{kafka.eagle.clusters.manage.add.node.jmxport}">BrokerJmxPort:</label>
-                            <input type="text" class="form-control" id="efak_brokerjmxport_label">
+                                   th:utext="#{kafka.eagle.clusters.manage.add.node.jmxport}">BrokerJmxPort:</label>
+                            <input type="text" class="form-control" id="efak_brokerjmxport_label" name="efak_brokerjmxport_name">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>
             </div>
@@ -262,4 +242,47 @@
 <script th:src="@{../../assets/js/cluster/manage.create.js}"></script>
 
 </body>
+<script type="text/javascript">
+
+    function errorNoti(msg, icon) {
+        console.log(msg)
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
+        // error or success
+        Toast.fire({
+            icon: icon,
+            title: msg
+        })
+    }
+
+    function contextFormValid() {
+        var efak_brokerid_label = $("#efak_brokerid_label").val();
+        var efak_brokerhost_label = $("#efak_brokerhost_label").val();
+        var efak_brokerport_label = $("#efak_brokerport_label").val();
+        var efak_brokerjmxport_label = $("#efak_brokerjmxport_label").val();
+        if (efak_brokerid_label.length == 0||efak_brokerhost_label.length == 0||efak_brokerport_label.length == 0||efak_brokerjmxport_label.length == 0) {
+            errorNoti("必填项不能为空","error");
+            return false;
+        }
+
+        console.log(efak_brokerport_label+","+efak_brokerjmxport_label)
+        if(!$.isNumeric(efak_brokerport_label)||!$.isNumeric(efak_brokerjmxport_label)){
+            errorNoti("端口号必须为数字","error");
+            return false;
+        }
+
+        return true;
+    }
+
+</script>
 </html>    
