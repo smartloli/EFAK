@@ -2,20 +2,21 @@
 
 -- Cluster: 1683968819703@@
 CREATE TABLE IF NOT EXISTS ke_clusters(
-    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key ClusterId',
+    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key',
+    cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
     name VARCHAR(128) NOT NULL COMMENT 'Cluster Name',
-    status SMALLINT NOT NULL COMMENT '2:unknown,1:Normal,0:Error',
+    status INT NOT NULL COMMENT '2:unknown,1:Normal,0:Error',
     nodes INT NOT NULL COMMENT 'Cluster Nodes',
     modify_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
     auth CHAR(1) NOT NULL COMMENT 'Y,N',
-    auth_info TEXT NOT NULL COMMENT 'Auth Information',
+    auth_config TEXT NOT NULL COMMENT 'Auth Information',
     INDEX idx_name (name)
 ) COMMENT 'Cluster Manage' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Broker: 1683968819703@@
 CREATE TABLE IF NOT EXISTS ke_brokers(
     id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key',
-    cluster_id BIGINT NOT NULL COMMENT 'Cluster ID',
+    cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
     broker_id VARCHAR(128) NOT NULL COMMENT 'Broker ID',
     broker_host VARCHAR(128) NOT NULL COMMENT 'Broker Host',
     broker_port INT NOT NULL COMMENT 'Broker Port',
@@ -41,6 +42,6 @@ CREATE TABLE IF NOT EXISTS ke_clusters_create(
     broker_host VARCHAR(128) NOT NULL COMMENT 'Broker Host',
     broker_port INT NOT NULL COMMENT 'Broker Port',
     broker_jmx_port INT NOT NULL COMMENT 'Broker JMX Port',
-    modify_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
+    modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
     INDEX idx_cluster_id (cluster_id)
 ) COMMENT 'Cluster Create Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

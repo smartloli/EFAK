@@ -116,6 +116,7 @@ $("#efak_kafka_kraft_enable").click(function () {
     $("#efak_kraft_disable_checked").hide();
     $("#efak_kafka_kraft_enable").css({border: "1px solid #4372ff"});
     $("#efak_kafka_kraft_disable").css({border: ""});
+    $("#efak_cluster_auth_isopen").val("Y");
 });
 
 $("#efak_kafka_kraft_disable").click(function () {
@@ -123,6 +124,7 @@ $("#efak_kafka_kraft_disable").click(function () {
     $("#efak_kraft_disable_checked").show();
     $("#efak_kafka_kraft_enable").css({border: ""});
     $("#efak_kafka_kraft_disable").css({border: "1px solid #4372ff"});
+    $("#efak_cluster_auth_isopen").val("N");
 });
 
 $("#efak_cluster_create_cancle").click(function () {
@@ -198,6 +200,27 @@ function delNoti(dataid, brokerId, brokerHost) {
     })
 }
 
+// alert noti
+function alertNoti(msg, icon) {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    })
+
+    // error or success
+    Toast.fire({
+        icon: icon,
+        title: msg
+    })
+}
+
 // delete node
 $(document).on('click', 'a[name=efak_cluster_node_manage_del]', function (event) {
     event.preventDefault();
@@ -224,4 +247,51 @@ $(document).on('click', 'a[name=efak_cluster_node_manage_edit]', function (event
     $("#efak_brokerport_label").val(brokerPort);
     $("#efak_brokerjmxport_label").val(brokerJmxPort);
     $("#efak_dataid").val(dataid);
+});
+
+// create cluster
+$("#efak_cluster_create_submit").click(function () {
+    var clusterName = $("#efak_cluster_name_create").val();
+    var auth = $("#efak_cluster_auth_isopen").val();
+    var authConfig = $("#efak_kafka_auth_config").val();
+    if (clusterName.length == 0) {
+        alertNoti("集群名称不能为空", "error");
+        return;
+    }
+    if (auth.length == 0) {
+        alertNoti("请选择是否开启认证", "error");
+        return;
+    }
+    if (auth.length > 0 && auth.indexOf("Y") > -1) {
+        if (authConfig.length == 0) {
+            alertNoti("请输入认证配置", "error");
+            return;
+        }
+    }
+
+    $.ajax({
+        url: '/clusters/manage/cluster/create',
+        method: 'POST',
+        data: {
+            cid: cid,
+            clusterName: clusterName,
+            auth: auth,
+            authConfig: authConfig
+        },
+        success: function (response) {
+            Swal.fire({
+                title: '成功',
+                icon: 'success',
+                html: '集群名称[<code>' + clusterName + '</code>]创建完成',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/clusters/manage';
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            Swal.fire('失败', '创建集群发生异常', 'error');
+        }
+    });
 });

@@ -39,7 +39,7 @@ public class ClusterCreateInfo {
     private Long id;
 
     /**
-     * Create ClusterI id.
+     * Create Cluster id.
      */
     private String clusterId;
 

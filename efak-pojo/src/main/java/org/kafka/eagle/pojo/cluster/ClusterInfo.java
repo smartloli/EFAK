@@ -19,8 +19,8 @@ package org.kafka.eagle.pojo.cluster;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import org.springframework.context.annotation.Description;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -34,7 +34,7 @@ import java.time.LocalDateTime;
  * @Version: 3.4.0
  */
 @Data
-@Description("Database: ke.ke_clusters")
+@TableName("ke_clusters")
 public class ClusterInfo implements Serializable {
 
     /**
@@ -42,6 +42,11 @@ public class ClusterInfo implements Serializable {
      */
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;
+
+    /**
+     * Create Cluster id.
+     */
+    private String clusterId;
 
     /**
      * Cluster Name
@@ -53,7 +58,7 @@ public class ClusterInfo implements Serializable {
     /**
      * Cluster Status,1:Normal, 0:Error
      */
-    private short status;
+    private int status;
 
     /**
      * Kafka Brokers Number
@@ -63,7 +68,9 @@ public class ClusterInfo implements Serializable {
     /**
      * Whether enable kraft, Y or N
      */
-    private String kraft;
+    private String auth;
+
+    private String authConfig;
 
     /**
      * Cluster modify time.

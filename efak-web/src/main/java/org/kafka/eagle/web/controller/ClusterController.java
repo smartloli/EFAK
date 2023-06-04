@@ -23,9 +23,12 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.common.utils.HtmlAttributeUtil;
 import org.kafka.eagle.plugins.excel.ExcelUtil;
 import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
+import org.kafka.eagle.pojo.cluster.ClusterInfo;
 import org.kafka.eagle.web.service.IClusterCreateDaoService;
+import org.kafka.eagle.web.service.IClusterDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +57,9 @@ public class ClusterController {
 
     @Autowired
     private IClusterCreateDaoService clusterCreateDaoService;
+
+    @Autowired
+    private IClusterDaoService clusterDaoService;
 
     @GetMapping("/manage")
     public String clusterView() {
@@ -198,11 +204,83 @@ public class ClusterController {
 
     @ResponseBody
     @RequestMapping(value = "/manage/cluster/del", method = RequestMethod.POST)
-    public boolean delClusterByIdAjax(HttpServletResponse response, @RequestParam("dataid") Long dataid) {
+    public boolean delClusterById(HttpServletResponse response, @RequestParam("dataid") Long dataid) {
         ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
         clusterCreateInfo.setId(dataid);
         boolean status = this.clusterCreateDaoService.delete(clusterCreateInfo);
         return status;
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/manage/cluster/create", method = RequestMethod.POST)
+    public boolean createClusterById(HttpServletResponse response, @RequestParam("cid") String cid, @RequestParam("clusterName") String clusterName, @RequestParam("auth") String auth, @RequestParam("authConfig") String authConfig) {
+        ClusterInfo clusterInfo = new ClusterInfo();
+        clusterInfo.setClusterId(cid);
+        clusterInfo.setStatus(2);
+        clusterInfo.setName(clusterName);
+        clusterInfo.setAuth(auth);
+        clusterInfo.setAuthConfig(authConfig);
+        int size = this.clusterCreateDaoService.clusters(cid).size();
+        clusterInfo.setNodes(size);
+
+        boolean status = this.clusterDaoService.insert(clusterInfo);
+        return status;
+    }
+
+    /**
+     * cluster list
+     *
+     * @param response
+     * @param request
+     */
+    @RequestMapping(value = "/manage/table/ajax", method = RequestMethod.GET)
+    public void pageClustersAjax(HttpServletResponse response, HttpServletRequest request) {
+        String aoData = request.getParameter("aoData");
+        JSONArray params = JSON.parseArray(aoData);
+        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+        String search = "";
+        for (Object object : params) {
+            JSONObject param = (JSONObject) object;
+            if ("sEcho".equals(param.getString("name"))) {
+                sEcho = param.getIntValue("value");
+            } else if ("iDisplayStart".equals(param.getString("name"))) {
+                iDisplayStart = param.getIntValue("value");
+            } else if ("iDisplayLength".equals(param.getString("name"))) {
+                iDisplayLength = param.getIntValue("value");
+            } else if ("sSearch".equals(param.getString("name"))) {
+                search = param.getString("value");
+            }
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("start", iDisplayStart / iDisplayLength + 1);
+        map.put("size", iDisplayLength);
+        map.put("search", search);
+
+
+        Page<ClusterInfo> pages = this.clusterDaoService.pages(map);
+        JSONArray aaDatas = new JSONArray();
+
+        for (ClusterInfo clusterInfo : pages.getRecords()) {
+            JSONObject target = new JSONObject();
+            target.put("clusterName", "<a href='#'>" + clusterInfo.getName() + "</a>");
+            target.put("status", HtmlAttributeUtil.getClusterStatusHtml(clusterInfo.getStatus()));
+            target.put("node", clusterInfo.getNodes());
+            target.put("modify", clusterInfo.getModifyTime());
+            target.put("auth", HtmlAttributeUtil.getAuthHtml(clusterInfo.getAuth()));
+            target.put("operate", "<a href='' name='efak_cluster_node_manage_edit' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' class='badge border border-primary text-primary'>编辑</a> <a href='' name='efak_cluster_node_manage_del' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' class='badge border border-danger text-danger'>删除</a>");
+            aaDatas.add(target);
+        }
+
+        JSONObject target = new JSONObject();
+        target.put("sEcho", sEcho);
+        target.put("iTotalRecords", pages.getTotal());
+        target.put("iTotalDisplayRecords", pages.getTotal());
+        target.put("aaData", aaDatas);
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }

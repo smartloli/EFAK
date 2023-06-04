@@ -8,6 +8,8 @@
 
     <title th:text="#{kafka.eagle.manage.title.desc}">Manage - KafkaEagle</title>
 
+    <link rel="stylesheet" th:href="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css}">
+
     <th:block th:replace="public/common :: css"></th:block>
 
 </head>
@@ -41,29 +43,11 @@
                                         th:text="#{kafka.eagle.clusters.manage.create}"></button>
                             </div>
                             <div class="table-responsive">
-                                <table id="efak_cluster_manage_tbl" class="table table-striped " style="width:100%">
+                                <table id="efak_cluster_manage_tbl" class="table table-striped" style="width:100%">
                                     <thead>
                                     <tr th:utext="#{kafka.eagle.clusters.manage.create.tr}">
                                     </tr>
                                     </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td><a href="#">预发集群</a></td>
-                                        <td><span class="badge bg-danger">异常</span></td>
-                                        <td>10</td>
-                                        <td>2023-05-27 18:30:30</td>
-                                        <td><span class="badge bg-secondary">否</span></td>
-                                        <td><a href="#" class="badge border border-primary text-primary">编辑</a> <a href="#" class="badge border border-danger text-danger">删除</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">生产集群</a></td>
-                                        <td><span class="badge bg-success">健康</span></td>
-                                        <td>10</td>
-                                        <td>2023-05-27 18:30:30</td>
-                                        <td><span class="badge bg-primary">是</span></td>
-                                        <td><a href="#" class="badge border border-primary text-primary">编辑</a> <a href="#" class="badge border border-danger text-danger">删除</a></td>
-                                    </tr>
-                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -84,6 +68,8 @@
 <th:block th:replace="public/common :: js"></th:block>
 
 <!-- plugins:js -->
+<script th:src="@{../../assets/vendors/datatables.net/jquery.dataTables.js}"></script>
+<script th:src="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js}"></script>
 <script th:src="@{../assets/js/cluster/manage.js}"></script>
 
 </body>
