@@ -20,7 +20,7 @@ public interface IClusterDaoService extends IService<ClusterInfo> {
      * Get all cluster info.
      * @return
      */
-    List<ClusterInfo> clusters();
+    List<ClusterInfo> clusters(String clusterId);
 
     /**
      * Get cluster info by cluster name.
@@ -42,5 +42,7 @@ public interface IClusterDaoService extends IService<ClusterInfo> {
      * @return
      */
     boolean update(ClusterInfo clusterInfo);
+
+    boolean delete(ClusterInfo clusterInfo);
 
 }

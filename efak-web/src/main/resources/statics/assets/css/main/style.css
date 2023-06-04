@@ -25476,3 +25476,9 @@ div.tox .tox-dialog__body {
   margin: 0;
   width: 100%;
 }
+
+.efak-noti-custom-common-btn-submit {
+  background-color: #ff3366 !important;
+  color: #fff !important;
+  border-color: #ff3366 !important;
+}

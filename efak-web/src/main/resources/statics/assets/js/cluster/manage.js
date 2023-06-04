@@ -100,3 +100,56 @@ function retrieveData(sSource, aoData, fnCallback) {
         }
     });
 }
+
+function delNoti(dataid, clusterName) {
+    Swal.fire({
+        customClass: {
+            confirmButton: 'efak-noti-custom-common-btn-submit'
+        },
+        buttonsStyling: false,
+        title: '确定执行删除操作吗?',
+        html: "集群名称 [<code>" + clusterName + "</code>] 删除后不能被恢复!",
+        icon: 'warning',
+        showCloseButton: true,
+        showCancelButton: false,
+        focusConfirm: false,
+        cancelButtonClass: 'me-2',
+        confirmButtonText: '删除',
+        reverseButtons: true,
+        scrollbarPadding: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // send ajax request
+            $.ajax({
+                url: '/clusters/manage/cluster/del',
+                method: 'POST',
+                data: {
+                    dataid: dataid
+                },
+                success: function (response) {
+                    Swal.fire({
+                        title: '成功',
+                        icon: 'success',
+                        html: '集群名称 [<code>' + clusterName + '</code>] 已被删除',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire('失败', '数据删除发生异常', 'error');
+                }
+            });
+        }
+    })
+}
+
+// delete cluster
+$(document).on('click', 'a[name=efak_cluster_node_manage_del]', function (event) {
+    event.preventDefault();
+    var dataid = $(this).attr("dataid");
+    var clusterName = $(this).attr("clusterName");
+    delNoti(dataid, clusterName);
+});

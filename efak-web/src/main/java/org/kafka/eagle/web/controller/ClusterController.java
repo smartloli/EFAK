@@ -23,6 +23,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.common.constants.EfakClusterType;
 import org.kafka.eagle.common.utils.HtmlAttributeUtil;
 import org.kafka.eagle.plugins.excel.ExcelUtil;
 import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
@@ -190,7 +191,7 @@ public class ClusterController {
     }
 
     @RequestMapping(value = "/manage/cluster/size/ajax", method = RequestMethod.GET)
-    public void getClusterByIdAjax(HttpServletResponse response, @RequestParam("cid") String cid) {
+    public void getClusterSizeByIdAjax(HttpServletResponse response, @RequestParam("cid") String cid) {
         int size = this.clusterCreateDaoService.clusters(cid).size();
         JSONObject target = new JSONObject();
         target.put("nodes", "已添加 <code>" + size + "</code> 个节点");
@@ -202,18 +203,44 @@ public class ClusterController {
         }
     }
 
+    @RequestMapping(value = "/manage/cluster/info/ajax", method = RequestMethod.GET)
+    public void getClusterInfoByIdAjax(HttpServletResponse response, @RequestParam("cid") String cid) {
+        List<ClusterInfo> clusterInfos = this.clusterDaoService.clusters(cid);
+        JSONObject target = new JSONObject();
+        if (clusterInfos != null && clusterInfos.size() > 0) {
+            target.put("clusterName", clusterInfos.get(0).getName());
+            target.put("auth", clusterInfos.get(0).getAuth());
+            target.put("authConfig", clusterInfos.get(0).getAuthConfig());
+        }
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     @ResponseBody
-    @RequestMapping(value = "/manage/cluster/del", method = RequestMethod.POST)
-    public boolean delClusterById(HttpServletResponse response, @RequestParam("dataid") Long dataid) {
-        ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
-        clusterCreateInfo.setId(dataid);
-        boolean status = this.clusterCreateDaoService.delete(clusterCreateInfo);
+    @RequestMapping(value = "/manage/{type}/del", method = RequestMethod.POST)
+    public boolean delClusterById(@PathVariable("type") String type, HttpServletResponse response, @RequestParam("dataid") Long dataid) {
+        boolean status = false;
+        if (EfakClusterType.BROKER.getName().equals(type)) {
+            ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
+            clusterCreateInfo.setId(dataid);
+            status = this.clusterCreateDaoService.delete(clusterCreateInfo);
+        } else if (EfakClusterType.CLUSTER.getName().equals(type)) {
+            ClusterInfo clusterInfo = new ClusterInfo();
+            clusterInfo.setId(dataid);
+            status = this.clusterDaoService.delete(clusterInfo);
+        }
+
         return status;
     }
 
     @ResponseBody
     @RequestMapping(value = "/manage/cluster/create", method = RequestMethod.POST)
-    public boolean createClusterById(HttpServletResponse response, @RequestParam("cid") String cid, @RequestParam("clusterName") String clusterName, @RequestParam("auth") String auth, @RequestParam("authConfig") String authConfig) {
+    public boolean createClusterById(HttpServletResponse response, @RequestParam("cid") String cid, @RequestParam("clusterName") String clusterName, @RequestParam("auth") String auth, @RequestParam("authConfig") String authConfig, @RequestParam("newCreate") String newCreate) {
+        boolean status = false;
         ClusterInfo clusterInfo = new ClusterInfo();
         clusterInfo.setClusterId(cid);
         clusterInfo.setStatus(2);
@@ -222,8 +249,11 @@ public class ClusterController {
         clusterInfo.setAuthConfig(authConfig);
         int size = this.clusterCreateDaoService.clusters(cid).size();
         clusterInfo.setNodes(size);
-
-        boolean status = this.clusterDaoService.insert(clusterInfo);
+        if (EfakClusterType.NEW_CREATE.getName().equals(newCreate)) { // new create
+            status = this.clusterDaoService.insert(clusterInfo);
+        } else if (EfakClusterType.OLD_CREATE.getName().equals(newCreate)) {
+            status = this.clusterDaoService.update(clusterInfo);
+        }
         return status;
     }
 
@@ -267,7 +297,7 @@ public class ClusterController {
             target.put("node", clusterInfo.getNodes());
             target.put("modify", clusterInfo.getModifyTime());
             target.put("auth", HtmlAttributeUtil.getAuthHtml(clusterInfo.getAuth()));
-            target.put("operate", "<a href='' name='efak_cluster_node_manage_edit' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' class='badge border border-primary text-primary'>编辑</a> <a href='' name='efak_cluster_node_manage_del' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' class='badge border border-danger text-danger'>删除</a>");
+            target.put("operate", "<a href='/clusters/manage/create?cid=" + clusterInfo.getClusterId() + "' name='efak_cluster_node_manage_edit' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' class='badge border border-primary text-primary'>编辑</a> <a href='' name='efak_cluster_node_manage_del' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' clusterName='" + clusterInfo.getName() + "' class='badge border border-danger text-danger'>删除</a>");
             aaDatas.add(target);
         }
 

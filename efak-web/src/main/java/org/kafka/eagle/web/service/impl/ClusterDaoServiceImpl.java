@@ -43,8 +43,8 @@ public class ClusterDaoServiceImpl extends ServiceImpl<ClusterDaoMapper, Cluster
     ClusterDaoMapper clusterDaoMapper;
 
     @Override
-    public List<ClusterInfo> clusters() {
-        return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).list();
+    public List<ClusterInfo> clusters(String clusterId) {
+        return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).eq(ClusterInfo::getClusterId,clusterId).list();
     }
 
     @Override
@@ -72,7 +72,14 @@ public class ClusterDaoServiceImpl extends ServiceImpl<ClusterDaoMapper, Cluster
     @Override
     public boolean update(ClusterInfo clusterInfo) {
         LambdaUpdateChainWrapper<ClusterInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<ClusterInfo>(this.clusterDaoMapper);
-        lambdaUpdateChainWrapper.eq(ClusterInfo::getId,clusterInfo.getId());
+        lambdaUpdateChainWrapper.eq(ClusterInfo::getClusterId,clusterInfo.getClusterId());
         return lambdaUpdateChainWrapper.update(clusterInfo);
+    }
+
+    @Override
+    public boolean delete(ClusterInfo clusterInfo) {
+        LambdaUpdateChainWrapper<ClusterInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<ClusterInfo>(this.clusterDaoMapper);
+        lambdaUpdateChainWrapper.eq(ClusterInfo::getId, clusterInfo.getId());
+        return lambdaUpdateChainWrapper.remove();
     }
 }

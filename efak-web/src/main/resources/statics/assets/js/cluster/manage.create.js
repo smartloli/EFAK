@@ -97,6 +97,51 @@ function retrieveData(sSource, aoData, fnCallback) {
     });
 }
 
+function enableAuth() {
+    $("#efak_kraft_enable_checked").show();
+    $("#efak_kraft_disable_checked").hide();
+    $("#efak_kafka_kraft_enable").css({border: "1px solid #4372ff"});
+    $("#efak_kafka_kraft_disable").css({border: ""});
+    $("#efak_cluster_auth_isopen").val("Y");
+}
+
+function disableAuth() {
+    $("#efak_kraft_enable_checked").hide();
+    $("#efak_kraft_disable_checked").show();
+    $("#efak_kafka_kraft_enable").css({border: ""});
+    $("#efak_kafka_kraft_disable").css({border: "1px solid #4372ff"});
+    $("#efak_cluster_auth_isopen").val("N");
+}
+
+// load cluster info
+try {
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/clusters/manage/cluster/info/ajax?cid=' + cid,
+        success: function (datas) {
+            console.log()
+            if (JSON.stringify(datas) === '{}') {
+                $("#efak_cluster_edit").val("newCreate");
+            } else {
+                $("#efak_cluster_name_create").val(datas.clusterName);
+                $("#efak_cluster_auth_isopen").val(datas.auth);
+                $("#efak_kafka_auth_config").val(datas.authConfig);
+                $("#efak_cluster_edit").val("oldCreate");
+                if (datas.auth.indexOf("Y") > -1) {
+                    enableAuth();
+                } else if (datas.auth.indexOf("N") > -1) {
+                    disableAuth()
+                }
+            }
+
+        }
+    });
+} catch (e) {
+    console.log(e);
+}
+
+
 // load already nodes
 try {
     $.ajax({
@@ -112,19 +157,11 @@ try {
 }
 
 $("#efak_kafka_kraft_enable").click(function () {
-    $("#efak_kraft_enable_checked").show();
-    $("#efak_kraft_disable_checked").hide();
-    $("#efak_kafka_kraft_enable").css({border: "1px solid #4372ff"});
-    $("#efak_kafka_kraft_disable").css({border: ""});
-    $("#efak_cluster_auth_isopen").val("Y");
+    enableAuth();
 });
 
 $("#efak_kafka_kraft_disable").click(function () {
-    $("#efak_kraft_enable_checked").hide();
-    $("#efak_kraft_disable_checked").show();
-    $("#efak_kafka_kraft_enable").css({border: ""});
-    $("#efak_kafka_kraft_disable").css({border: "1px solid #4372ff"});
-    $("#efak_cluster_auth_isopen").val("N");
+    disableAuth();
 });
 
 $("#efak_cluster_create_cancle").click(function () {
@@ -175,7 +212,7 @@ function delNoti(dataid, brokerId, brokerHost) {
         if (result.isConfirmed) {
             // send ajax request
             $.ajax({
-                url: '/clusters/manage/cluster/del',
+                url: '/clusters/manage/broker/del',
                 method: 'POST',
                 data: {
                     dataid: dataid
@@ -221,7 +258,7 @@ function alertNoti(msg, icon) {
     })
 }
 
-// delete node
+// delete broker
 $(document).on('click', 'a[name=efak_cluster_node_manage_del]', function (event) {
     event.preventDefault();
     var dataid = $(this).attr("dataid");
@@ -254,6 +291,7 @@ $("#efak_cluster_create_submit").click(function () {
     var clusterName = $("#efak_cluster_name_create").val();
     var auth = $("#efak_cluster_auth_isopen").val();
     var authConfig = $("#efak_kafka_auth_config").val();
+    var newCreate = $("#efak_cluster_edit").val(); // newCreate
     if (clusterName.length == 0) {
         alertNoti("集群名称不能为空", "error");
         return;
@@ -276,7 +314,8 @@ $("#efak_cluster_create_submit").click(function () {
             cid: cid,
             clusterName: clusterName,
             auth: auth,
-            authConfig: authConfig
+            authConfig: authConfig,
+            newCreate: newCreate
         },
         success: function (response) {
             Swal.fire({
