@@ -1,4 +1,4 @@
-.efka_kraft_version_card {
+.efak_kraft_version_card {
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
     -webkit-box-align: center;
@@ -24,12 +24,12 @@
     border: 1px solid #172340;
 }
 
-.efka_kraft_version_card:hover {
+.efak_kraft_version_card:hover {
     border: 1px solid #4372ff;
     cursor: pointer
 }
 
-.efka_kraft_detail_info {
+.efak_kraft_detail_info {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     display: -webkit-box;
@@ -39,13 +39,13 @@
     flex-direction: column
 }
 
-.efka_kraft_title {
+.efak_kraft_title {
     font-size: 18px;
     font-weight: 700;
     line-height: 25px
 }
 
-.efka_kraft_version_type_enable {
+.efak_kraft_version_type_enable {
     color: #6571ff;
     font-size: 12px;
     font-style: normal;
@@ -53,7 +53,7 @@
     margin: 10px 0
 }
 
-.efka_kraft_version_type_disable {
+.efak_kraft_version_type_disable {
     color: #d63384;
     font-size: 12px;
     font-style: normal;
@@ -61,7 +61,7 @@
     margin: 10px 0
 }
 
-.efka_kraft_version_info {
+.efak_kraft_version_info {
     -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
@@ -100,12 +100,12 @@
     width: 0
 }
 
-.efka_kraft_logo {
+.efak_kraft_logo {
     width: 64px;
     z-index: 1
 }
 
-.efka_kraft_check {
+.efak_kraft_check {
     border-bottom: 2px solid #fff;
     border-right: 2px solid #fff;
     height: 12px;
@@ -117,7 +117,7 @@
     width: 6px
 }
 
-.efka_kraft_card-list {
+.efak_kraft_card-list {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -126,6 +126,12 @@
     margin-top: 8px
 }
 
-.efka_kraft_card-list>div {
+.efak_kraft_card-list>div {
     margin-bottom: 8px
+}
+
+.efak-noti-custom-btn-submit {
+    background-color: #ff3366 !important;
+    color: #fff !important;
+    border-color: #ff3366 !important;
 }

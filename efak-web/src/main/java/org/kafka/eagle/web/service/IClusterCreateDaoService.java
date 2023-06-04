@@ -18,12 +18,14 @@ public interface IClusterCreateDaoService extends IService<ClusterCreateInfo> {
 
     /**
      * Get all cluster info.
+     *
      * @return
      */
-    List<ClusterCreateInfo> clusters();
+    List<ClusterCreateInfo> clusters(String clusterId);
 
     /**
      * Get cluster info by cluster name.
+     *
      * @param clusterInfo
      * @return
      */
@@ -31,19 +33,23 @@ public interface IClusterCreateDaoService extends IService<ClusterCreateInfo> {
 
     /**
      * Page limit.
+     *
      * @param params
      * @return
      */
-    Page<ClusterCreateInfo> pages(Map<String,Object> params);
+    Page<ClusterCreateInfo> pages(Map<String, Object> params);
 
     /**
      * Update cluster info by clusterId.
+     *
      * @param clusterInfo
      * @return
      */
     boolean update(ClusterCreateInfo clusterInfo);
 
-    boolean delete(String clusterId);
+    boolean delete(ClusterCreateInfo clusterCreateInfo);
+
+    boolean deleteBatch(List<ClusterCreateInfo> clusterCreateInfo);
 
     boolean batch(List<ClusterCreateInfo> createInfos);
 

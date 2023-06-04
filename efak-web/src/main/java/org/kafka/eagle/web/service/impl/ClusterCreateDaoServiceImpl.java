@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @Author: smartloli
  * @Date: 2023/5/28 00:44
  * @Version: 3.4.0
@@ -44,15 +43,15 @@ public class ClusterCreateDaoServiceImpl extends ServiceImpl<ClusterCreateDaoMap
     ClusterCreateDaoMapper clusterDaoMapper;
 
     @Override
-    public List<ClusterCreateInfo> clusters() {
-        return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).list();
+    public List<ClusterCreateInfo> clusters(String clusterId) {
+        return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).eq(ClusterCreateInfo::getClusterId, clusterId).list();
     }
 
     @Override
     public boolean insert(ClusterCreateInfo clusterInfo) {
-        boolean status =false;
+        boolean status = false;
         int code = this.clusterDaoMapper.insert(clusterInfo);
-        if(code>0){
+        if (code > 0) {
             status = true;
         }
         return status;
@@ -62,36 +61,44 @@ public class ClusterCreateDaoServiceImpl extends ServiceImpl<ClusterCreateDaoMap
     public Page<ClusterCreateInfo> pages(Map<String, Object> params) {
         int start = Integer.parseInt(params.get("start").toString());
         int size = Integer.parseInt(params.get("size").toString());
+        String search = params.get("search").toString();
+        String cid = params.get("cid").toString();
 
-        Page<ClusterCreateInfo> pages = new Page<>(start,size);
+        Page<ClusterCreateInfo> pages = new Page<>(start, size);
 
         LambdaQueryChainWrapper<ClusterCreateInfo> queryChainWrapper = new LambdaQueryChainWrapper<ClusterCreateInfo>(this.clusterDaoMapper);
-        queryChainWrapper.like(ClusterCreateInfo::getBrokerHost,params.get("search").toString());
+        queryChainWrapper.like(ClusterCreateInfo::getBrokerHost, search).eq(ClusterCreateInfo::getClusterId, cid);
         return queryChainWrapper.orderByDesc(ClusterCreateInfo::getModifyTime).page(pages);
     }
 
     @Override
     public boolean update(ClusterCreateInfo clusterInfo) {
         LambdaUpdateChainWrapper<ClusterCreateInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<ClusterCreateInfo>(this.clusterDaoMapper);
-        lambdaUpdateChainWrapper.eq(ClusterCreateInfo::getClusterId,clusterInfo.getClusterId());
+        lambdaUpdateChainWrapper.eq(ClusterCreateInfo::getId, clusterInfo.getId());
         return lambdaUpdateChainWrapper.update(clusterInfo);
     }
 
     @Override
-    public boolean delete(String clusterId) {
+    public boolean delete(ClusterCreateInfo clusterCreateInfo) {
         LambdaUpdateChainWrapper<ClusterCreateInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<ClusterCreateInfo>(this.clusterDaoMapper);
-        lambdaUpdateChainWrapper.eq(ClusterCreateInfo::getClusterId,clusterId);
+        lambdaUpdateChainWrapper.eq(ClusterCreateInfo::getId, clusterCreateInfo.getId());
         return lambdaUpdateChainWrapper.remove();
+    }
+
+    @Override
+    public boolean deleteBatch(List<ClusterCreateInfo> clusterCreateInfo) {
+        return false;
     }
 
     @Transactional
     @Override
     public boolean batch(List<ClusterCreateInfo> createInfos) {
-        boolean status =false;
+        boolean status = false;
         int code = this.clusterDaoMapper.insertBatchSomeColumn(createInfos);
-        if(code>0){
+        if (code > 0) {
             status = true;
         }
         return status;
     }
+
 }

@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.web.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -65,12 +66,12 @@ public class ClusterController {
     }
 
     @PostMapping("/manage/add/batch")
-    public String addClusterCreateBatch(@RequestParam("file") MultipartFile file,@RequestParam("cid") String cid) {
+    public String addClusterCreateBatch(@RequestParam("file") MultipartFile file, @RequestParam("cid") String cid) {
         InputStream inputStream;
         List<ClusterCreateInfo> list = new ArrayList<>();
         try {
             inputStream = file.getInputStream();
-            ExcelUtil.readBrokerInfo(inputStream);
+            list = ExcelUtil.readBrokerInfo(inputStream, cid);
         } catch (Exception e) {
             log.error("Batch add broker has error, msg is {}", e);
         }
@@ -90,17 +91,33 @@ public class ClusterController {
         String brokerHost = request.getParameter("efak_brokerhost_name");
         String brokerPort = request.getParameter("efak_brokerport_name");
         String brokerJmxPort = request.getParameter("efak_brokerjmxport_name");
-        List<ClusterCreateInfo> list = new ArrayList<>();
-        ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
-        clusterCreateInfo.setClusterId(clusterId);
-        clusterCreateInfo.setBrokerId(brokerId);
-        clusterCreateInfo.setBrokerHost(brokerHost);
-        int brokerPortInt = Integer.parseInt(brokerPort);
-        clusterCreateInfo.setBrokerPort(brokerPortInt);
-        int brokerJmxPortInt = Integer.parseInt(brokerJmxPort);
-        clusterCreateInfo.setBrokerJmxPort(brokerJmxPortInt);
-        list.add(clusterCreateInfo);
-        boolean status = this.clusterCreateDaoService.batch(list);
+        String dataId = request.getParameter("efak_dataid");
+        boolean status = false;
+        if (StrUtil.isBlank(dataId)) {
+            List<ClusterCreateInfo> list = new ArrayList<>();
+            ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
+            clusterCreateInfo.setClusterId(clusterId);
+            clusterCreateInfo.setBrokerId(brokerId);
+            clusterCreateInfo.setBrokerHost(brokerHost);
+            int brokerPortInt = Integer.parseInt(brokerPort);
+            clusterCreateInfo.setBrokerPort(brokerPortInt);
+            int brokerJmxPortInt = Integer.parseInt(brokerJmxPort);
+            clusterCreateInfo.setBrokerJmxPort(brokerJmxPortInt);
+            list.add(clusterCreateInfo);
+            status = this.clusterCreateDaoService.batch(list);
+        } else {
+            ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
+            clusterCreateInfo.setId(Long.parseLong(dataId));
+            clusterCreateInfo.setClusterId(clusterId);
+            clusterCreateInfo.setBrokerId(brokerId);
+            clusterCreateInfo.setBrokerHost(brokerHost);
+            int brokerPortInt = Integer.parseInt(brokerPort);
+            clusterCreateInfo.setBrokerPort(brokerPortInt);
+            int brokerJmxPortInt = Integer.parseInt(brokerJmxPort);
+            clusterCreateInfo.setBrokerJmxPort(brokerJmxPortInt);
+            status = this.clusterCreateDaoService.update(clusterCreateInfo);
+        }
+
         if (status) {
             return "redirect:/clusters/manage/create?cid=" + clusterId;
         } else {
@@ -115,7 +132,7 @@ public class ClusterController {
      * @param request
      */
     @RequestMapping(value = "/manage/brokers/table/ajax", method = RequestMethod.GET)
-    public void pageBrokersAjax(HttpServletResponse response, HttpServletRequest request) {
+    public void pageBrokersAjax(HttpServletResponse response, HttpServletRequest request, @RequestParam("cid") String cid) {
         String aoData = request.getParameter("aoData");
         JSONArray params = JSON.parseArray(aoData);
         int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -136,6 +153,7 @@ public class ClusterController {
         map.put("start", iDisplayStart / iDisplayLength + 1);
         map.put("size", iDisplayLength);
         map.put("search", search);
+        map.put("cid", cid);
 
 
         Page<ClusterCreateInfo> pages = this.clusterCreateDaoService.pages(map);
@@ -148,7 +166,7 @@ public class ClusterController {
             target.put("brokerPort", clusterCreateInfo.getBrokerPort());
             target.put("brokerJmxPort", clusterCreateInfo.getBrokerJmxPort());
             target.put("modify", clusterCreateInfo.getBrokerJmxPort());
-            target.put("operate", "<a href=\"#\" class=\"badge border border-primary text-primary\">编辑</a> <a href=\"#\" class=\"badge border border-danger text-danger\">删除</a>");
+            target.put("operate", "<a href='' name='efak_cluster_node_manage_edit' dataid='" + clusterCreateInfo.getId() + "' cid='" + clusterCreateInfo.getClusterId() + "' brokerId='" + clusterCreateInfo.getBrokerId() + "' brokerHost='" + clusterCreateInfo.getBrokerHost() + "' brokerPort='" + clusterCreateInfo.getBrokerPort() + "' brokerJmxPort='" + clusterCreateInfo.getBrokerJmxPort() + "' class='badge border border-primary text-primary'>编辑</a> <a href='' name='efak_cluster_node_manage_del' dataid='" + clusterCreateInfo.getId() + "' cid='" + clusterCreateInfo.getClusterId() + "' brokerId='" + clusterCreateInfo.getBrokerId() + "' brokerHost='" + clusterCreateInfo.getBrokerHost() + "' class='badge border border-danger text-danger'>删除</a>");
             aaDatas.add(target);
         }
 
@@ -163,6 +181,28 @@ public class ClusterController {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    @RequestMapping(value = "/manage/cluster/size/ajax", method = RequestMethod.GET)
+    public void getClusterByIdAjax(HttpServletResponse response, @RequestParam("cid") String cid) {
+        int size = this.clusterCreateDaoService.clusters(cid).size();
+        JSONObject target = new JSONObject();
+        target.put("nodes", "已添加 <code>" + size + "</code> 个节点");
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/manage/cluster/del", method = RequestMethod.POST)
+    public boolean delClusterByIdAjax(HttpServletResponse response, @RequestParam("dataid") Long dataid) {
+        ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
+        clusterCreateInfo.setId(dataid);
+        boolean status = this.clusterCreateDaoService.delete(clusterCreateInfo);
+        return status;
     }
 
 }

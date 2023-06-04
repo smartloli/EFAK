@@ -20,8 +20,6 @@ package org.kafka.eagle.plugins.excel;
 import org.apache.poi.ss.usermodel.*;
 import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -40,7 +38,7 @@ public class ExcelUtil {
 
     }
 
-    public static List<ClusterCreateInfo> readBrokerInfo(InputStream inputStream) throws IOException {
+    public static List<ClusterCreateInfo> readBrokerInfo(InputStream inputStream,String cid) throws IOException {
         // Create a workbook object from the uploaded excel file
         Workbook workbook = WorkbookFactory.create(inputStream);
 
@@ -54,6 +52,7 @@ public class ExcelUtil {
             Row row = sheet.getRow(i);
             DataFormatter formatter = new DataFormatter();
             ClusterCreateInfo clusterCreateInfo = new ClusterCreateInfo();
+            clusterCreateInfo.setClusterId(cid);
             clusterCreateInfo.setBrokerId(formatter.formatCellValue(row.getCell(0)));
             clusterCreateInfo.setBrokerHost(formatter.formatCellValue(row.getCell(1)));
             clusterCreateInfo.setBrokerPort(Integer.parseInt(formatter.formatCellValue(row.getCell(2))));
@@ -65,17 +64,6 @@ public class ExcelUtil {
         workbook.close();
 
         return data;
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        FileInputStream file = new FileInputStream("/Users/smartloli/Desktop/kafka_broker_example.xlsx");
-        try {
-            List<ClusterCreateInfo> data = readBrokerInfo(file);
-            System.out.println(data);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
 }
