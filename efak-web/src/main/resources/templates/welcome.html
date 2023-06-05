@@ -16,7 +16,7 @@
 <div class="main-wrapper">
 
     <!-- partial:menu -->
-    <div th:replace="public/header :: menu"></div>
+    <div th:replace="public/header :: menu_header"></div>
     <!-- partial -->
 
     <div class="page-wrapper">
@@ -322,7 +322,7 @@
                             </svg>
                         </div>
                         <div class="col-md-6 align-self-center">
-                            <h1 class="efak_welcome_title_h1" th:text="#{kafka.eagle.welcome.title}"></h1>
+                            <h1 class="efak_welcome_title_h1" th:utext="#{kafka.eagle.welcome.title}"></h1>
                             <button id="efak_welcome_btn" class="btn btn-primary btn-icon-text btn-lg" th:utext="#{kafka.eagle.welcome.title.button}"></button>
                         </div>
                     </div>

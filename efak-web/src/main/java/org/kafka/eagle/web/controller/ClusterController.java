@@ -292,7 +292,7 @@ public class ClusterController {
 
         for (ClusterInfo clusterInfo : pages.getRecords()) {
             JSONObject target = new JSONObject();
-            target.put("clusterName", "<a href='#'>" + clusterInfo.getName() + "</a>");
+            target.put("clusterName", "<a href='/dataspace/dashboard/" + clusterInfo.getId() + "'>" + clusterInfo.getName() + "</a>");
             target.put("status", HtmlAttributeUtil.getClusterStatusHtml(clusterInfo.getStatus()));
             target.put("node", clusterInfo.getNodes());
             target.put("modify", clusterInfo.getModifyTime());

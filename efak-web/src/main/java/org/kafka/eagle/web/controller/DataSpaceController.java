@@ -19,6 +19,7 @@ package org.kafka.eagle.web.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -40,9 +41,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/dataspace")
 public class DataSpaceController {
 
-    @GetMapping("/dashboard")
-    public String dashboardView() {
+//    @GetMapping("/dashboard")
+//    public String dashboardView() {
+//        return "dataspace/dashboard.html";
+//    }
+
+    @GetMapping("/dashboard/{cid}")
+    public String dashboardView(@PathVariable("cid") Long cid) {
         return "dataspace/dashboard.html";
     }
+
+
 
 }

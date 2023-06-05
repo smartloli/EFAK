@@ -14,7 +14,8 @@
 <div class="main-wrapper">
 
     <!-- partial:menu -->
-    <div th:replace="public/header :: menu"></div>
+    <div th:replace="public/header :: menu_header"></div>
+    <div th:replace="public/navbar :: menu_navbar"></div>
     <!-- partial -->
 
     <div class="page-wrapper">
@@ -441,7 +442,7 @@
 <!-- core:js -->
 <th:block th:replace="public/common :: js"></th:block>
 <!-- Custom js for this page -->
-<script src="../assets/js/dashboard-dark.js"></script>
-<script src="../assets/js/datepicker.js"></script>
+<script src="../../assets/js/dashboard-dark.js"></script>
+<script src="../../assets/js/datepicker.js"></script>
 </body>
 </html>    

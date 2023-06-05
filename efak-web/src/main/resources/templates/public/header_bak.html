@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <!-- header menu -->
-<div class="horizontal-menu" th:fragment="menu_header">
+<div class="horizontal-menu" th:fragment="menu">
     <nav class="navbar top-navbar">
         <div class="container">
             <div class="navbar-content">
@@ -229,6 +229,134 @@
                     <i data-feather="menu"></i>
                 </button>
             </div>
+        </div>
+    </nav>
+    <nav class="bottom-navbar">
+        <div class="container">
+            <ul class="nav page-navigation">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="link-icon" data-feather="box"></i>
+                        <span class="menu-title" th:text="#{kafka.eagle.dataspace}">DataSpace</span>
+                        <i class="link-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <ul class="submenu-item">
+                            <li class="nav-item"><a class="nav-link" href="/dataspace/dashboard?cid=" th:text="#{kafka.eagle.dataspace.dashboard}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/dataspace/tv?cid" th:text="#{kafka.eagle.dataspace.tv}">TV</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="link-icon" data-feather="database"></i>
+                        <span class="menu-title" th:text="#{kafka.eagle.topics}">Topics</span>
+                        <i class="link-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <ul class="submenu-item">
+                            <li class="category-heading" th:text="#{kafka.eagle.topics.list}">Manager</li>
+                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.create}">Create</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.ksql}">KSQL</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.manager}">Manager</a>
+                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.mock}">Mock</a>
+                            </li>
+                            <li class="category-heading" th:text="#{kafka.eagle.topics.metadata}">Metadata
+                            <li>
+                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.metadata.op}">MetadataOp</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.balance}">Balance</a>
+                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.balance.job}">Job</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="link-icon" data-feather="layers"></i>
+                        <span class="menu-title" th:text="#{kafka.eagle.consumers.group}">Consumers</span>
+                        <i class="link-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <ul class="submenu-item">
+                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.consumers.group.overview}">Overview</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.consumers.group.detail}">Detail</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="link-icon" data-feather="inbox"></i>
+                        <span class="menu-title" th:text="#{kafka.eagle.clusters}">Clusters</span>
+                        <i class="link-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <ul class="submenu-item">
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.clusters.kafka}">Kafka</a></li>
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.clusters.zookeeper}">Zookeeper</a></li>
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.clusters.server}">Server</a></li>
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.clusters.manager}">Manager</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="link-icon" data-feather="pie-chart"></i>
+                        <span class="menu-title" th:text="#{kafka.eagle.monitor}">Monitor</span>
+                        <i class="link-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="submenu-item pe-md-0">
+                                    <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.monitor.mbean}">MBean</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.monitor.kafka}">Kafka</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.monitor.zookeeper}">Zookeeper</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="link-icon" data-feather="cpu"></i>
+                        <span class="menu-title" th:text="#{kafka.eagle.plugins}">Connectors</span>
+                        <i class="link-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <ul class="submenu-item">
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.plugins.connector}">Connectors</a></li>
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.plugins.worker}">Workers</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="link-icon" data-feather="bell"></i>
+                        <span class="menu-title" th:text="#{kafka.eagle.alert}">Alert</span>
+                        <i class="link-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <ul class="submenu-item">
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.alert.config}">Config</a></li>
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.alert.info}">Info</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" target="_blank"
+                       class="nav-link">
+                        <i class="link-icon" data-feather="users"></i>
+                        <span class="menu-title" th:text="#{kafka.eagle.system}">System</span>
+                    </a>
+                    <div class="submenu">
+                        <ul class="submenu-item">
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.system.user}">Users</a></li>
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.system.role}">Role</a></li>
+                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.system.audit}">Audit</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
         </div>
     </nav>
 </div>
