@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS ke_brokers(
     broker_id VARCHAR(128) NOT NULL COMMENT 'Broker ID',
     broker_host VARCHAR(128) NOT NULL COMMENT 'Broker Host',
     broker_port INT NOT NULL COMMENT 'Broker Port',
+    broker_port_status SMALLINT NOT NULL COMMENT 'Broker JMX Port Status: 0-Not Available, 1-Available',
     broker_jmx_port INT NOT NULL COMMENT 'Broker JMX Port',
     broker_jmx_port_status SMALLINT NOT NULL COMMENT 'Broker JMX Port Status: 0-Not Available, 1-Available',
     broker_memory_used_rate DOUBLE NOT NULL COMMENT 'Broker Memory Used Rate',

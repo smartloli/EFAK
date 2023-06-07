@@ -34,12 +34,12 @@ import org.kafka.eagle.pojo.kafka.JMXInitializeInfo;
 public class TestKafkaClusterFetcher {
 
     @Test
-    public void version() {
+    public void testKafkaJmxInfo() {
         JMXInitializeInfo initializeInfo = new JMXInitializeInfo();
         initializeInfo.setBrokerId("1");
         initializeInfo.setHost("127.0.0.1");
         initializeInfo.setPort(9999);
-        BrokerInfo brokerInfo = KafkaClusterFetcher.getKafkaVersion(initializeInfo);
+        BrokerInfo brokerInfo = KafkaClusterFetcher.getKafkaJmxInfo(initializeInfo);
         log.info("brokerInfo:{}", brokerInfo);
     }
 

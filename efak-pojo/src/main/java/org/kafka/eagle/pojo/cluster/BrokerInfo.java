@@ -45,7 +45,7 @@ public class BrokerInfo {
     /**
      * ClusterId.
      */
-    private Long clusterId;
+    private String clusterId;
 
     /**
      * Kafka broker id.
@@ -61,6 +61,8 @@ public class BrokerInfo {
      * Kafka broker port.
      */
     private int brokerPort;
+
+    private short brokerPortStatus;
 
     /**
      * Kafka broker jmx port.
@@ -80,7 +82,7 @@ public class BrokerInfo {
     /**
      * Kafka broker cpu used rate.
      */
-    private double broerCpuUsedRate;
+    private double brokerCpuUsedRate;
 
     private LocalDateTime brokerStartupTime;
 

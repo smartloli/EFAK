@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public interface IClusterCreateDaoService extends IService<ClusterCreateInfo> {
 
+    List<ClusterCreateInfo> list();
+
     /**
      * Get all cluster info.
      *

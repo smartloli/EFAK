@@ -205,12 +205,12 @@ public class ClusterController {
 
     @RequestMapping(value = "/manage/cluster/info/ajax", method = RequestMethod.GET)
     public void getClusterInfoByIdAjax(HttpServletResponse response, @RequestParam("cid") String cid) {
-        List<ClusterInfo> clusterInfos = this.clusterDaoService.clusters(cid);
+        ClusterInfo clusterInfo = this.clusterDaoService.clusters(cid);
         JSONObject target = new JSONObject();
-        if (clusterInfos != null && clusterInfos.size() > 0) {
-            target.put("clusterName", clusterInfos.get(0).getName());
-            target.put("auth", clusterInfos.get(0).getAuth());
-            target.put("authConfig", clusterInfos.get(0).getAuthConfig());
+        if (clusterInfo != null) {
+            target.put("clusterName", clusterInfo.getName());
+            target.put("auth", clusterInfo.getAuth());
+            target.put("authConfig", clusterInfo.getAuthConfig());
         }
         try {
             byte[] output = target.toJSONString().getBytes();

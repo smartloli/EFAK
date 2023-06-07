@@ -17,10 +17,17 @@
  */
 package org.kafka.eagle.web.controller;
 
+import com.alibaba.fastjson2.JSONObject;
+import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
+import org.kafka.eagle.pojo.cluster.ClusterInfo;
+import org.kafka.eagle.web.service.IClusterCreateDaoService;
+import org.kafka.eagle.web.service.IClusterDaoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  *  The DashboardController handles requests for dashboard pages. This controller handles the following requests:
@@ -41,14 +48,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/dataspace")
 public class DataSpaceController {
 
-//    @GetMapping("/dashboard")
-//    public String dashboardView() {
-//        return "dataspace/dashboard.html";
-//    }
+    @Autowired
+    private IClusterCreateDaoService clusterCreateDaoService;
+
+    @Autowired
+    private IClusterDaoService clusterDaoService;
+
 
     @GetMapping("/dashboard/{cid}")
     public String dashboardView(@PathVariable("cid") Long cid) {
         return "dataspace/dashboard.html";
+    }
+
+    @RequestMapping(value = "/dashboard/{cid}/panel/ajax", method = RequestMethod.GET)
+    public void getDashboardPanelAjax(HttpServletResponse response, @PathVariable("cid") Long cid) {
+        ClusterInfo clusterInfo= this.clusterDaoService.clusters(cid);
+        List<ClusterCreateInfo> clusterCreateInfos=  this.clusterCreateDaoService.clusters(clusterInfo.getClusterId());
+
+        JSONObject target = new JSONObject();
+        target.put("brokers", clusterCreateInfos.size());
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 

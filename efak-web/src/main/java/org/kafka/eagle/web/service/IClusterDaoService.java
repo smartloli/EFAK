@@ -16,11 +16,14 @@ import java.util.Map;
  */
 public interface IClusterDaoService extends IService<ClusterInfo> {
 
+    List<ClusterInfo> list();
+
     /**
      * Get all cluster info.
      * @return
      */
-    List<ClusterInfo> clusters(String clusterId);
+    ClusterInfo clusters(String clusterId);
+    ClusterInfo clusters(Long id);
 
     /**
      * Get cluster info by cluster name.

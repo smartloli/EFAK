@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @Author: smartloli
  * @Date: 2023/5/28 00:44
  * @Version: 3.4.0
@@ -43,15 +42,25 @@ public class ClusterDaoServiceImpl extends ServiceImpl<ClusterDaoMapper, Cluster
     ClusterDaoMapper clusterDaoMapper;
 
     @Override
-    public List<ClusterInfo> clusters(String clusterId) {
-        return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).eq(ClusterInfo::getClusterId,clusterId).list();
+    public List<ClusterInfo> list() {
+        return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).list();
+    }
+
+    @Override
+    public ClusterInfo clusters(String clusterId) {
+        return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).eq(ClusterInfo::getClusterId, clusterId).one();
+    }
+
+    @Override
+    public ClusterInfo clusters(Long id) {
+        return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).eq(ClusterInfo::getId, id).one();
     }
 
     @Override
     public boolean insert(ClusterInfo clusterInfo) {
-        boolean status =false;
+        boolean status = false;
         int code = this.clusterDaoMapper.insert(clusterInfo);
-        if(code>0){
+        if (code > 0) {
             status = true;
         }
         return status;
@@ -62,17 +71,17 @@ public class ClusterDaoServiceImpl extends ServiceImpl<ClusterDaoMapper, Cluster
         int start = Integer.parseInt(params.get("start").toString());
         int size = Integer.parseInt(params.get("size").toString());
 
-        Page<ClusterInfo> pages = new Page<>(start,size);
+        Page<ClusterInfo> pages = new Page<>(start, size);
 
         LambdaQueryChainWrapper<ClusterInfo> queryChainWrapper = new LambdaQueryChainWrapper<ClusterInfo>(this.clusterDaoMapper);
-        queryChainWrapper.like(ClusterInfo::getName,params.get("search").toString());
+        queryChainWrapper.like(ClusterInfo::getName, params.get("search").toString());
         return queryChainWrapper.orderByDesc(ClusterInfo::getModifyTime).page(pages);
     }
 
     @Override
     public boolean update(ClusterInfo clusterInfo) {
         LambdaUpdateChainWrapper<ClusterInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<ClusterInfo>(this.clusterDaoMapper);
-        lambdaUpdateChainWrapper.eq(ClusterInfo::getClusterId,clusterInfo.getClusterId());
+        lambdaUpdateChainWrapper.eq(ClusterInfo::getClusterId, clusterInfo.getClusterId());
         return lambdaUpdateChainWrapper.update(clusterInfo);
     }
 

@@ -18,11 +18,19 @@
 package org.kafka.eagle.web.task;
 
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.core.kafka.KafkaClusterFetcher;
+import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
+import org.kafka.eagle.pojo.cluster.ClusterInfo;
+import org.kafka.eagle.web.service.IClusterCreateDaoService;
+import org.kafka.eagle.web.service.IClusterDaoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Description: TODO
@@ -37,18 +45,40 @@ import org.springframework.stereotype.Component;
 @EnableAsync
 public class ClusterManageTask {
 
+
+    @Autowired
+    private IClusterCreateDaoService clusterCreateDaoService;
+
+    @Autowired
+    private IClusterDaoService clusterDaoService;
+
     @Async
-    // @Scheduled(cron = "0/2 * * * * ? ")
-    @Scheduled(fixedRate = 10000)
-    public void test2() {
-        log.info("test2, {}", Thread.currentThread().getName());
+    @Scheduled(fixedRate = 60000)
+    public void clusterHealthyTask() {
+        List<ClusterInfo> clusterInfos = this.clusterDaoService.list();
+        for (ClusterInfo clusterInfo : clusterInfos) {
+            List<ClusterCreateInfo> clusterCreateInfos = this.clusterCreateDaoService.clusters(clusterInfo.getClusterId());
+            int size = 0;
+            for (ClusterCreateInfo clusterCreateInfo : clusterCreateInfos) {
+                boolean status = KafkaClusterFetcher.getKafkaAliveStatus(clusterCreateInfo.getBrokerHost(), clusterCreateInfo.getBrokerPort());
+                if (status) {
+                    size++;
+                }
+            }
+            if (clusterCreateInfos != null && clusterCreateInfos.size() == size) {
+                clusterInfo.setStatus(1);
+            } else {
+                clusterInfo.setStatus(0);
+            }
+            this.clusterDaoService.update(clusterInfo);
+        }
+
     }
 
     @Async
-    // @Scheduled(cron = "0/10 * * * * ? ")
-    @Scheduled(fixedRate = 5000)
+    // @Scheduled(fixedRate = 5000)
     public void test1() {
-        log.info("test1, {}", Thread.currentThread().getName());
+        // log.info("test1, {}", Thread.currentThread().getName());
     }
 
 }

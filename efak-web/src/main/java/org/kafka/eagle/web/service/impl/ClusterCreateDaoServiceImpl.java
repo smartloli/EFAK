@@ -43,6 +43,11 @@ public class ClusterCreateDaoServiceImpl extends ServiceImpl<ClusterCreateDaoMap
     ClusterCreateDaoMapper clusterDaoMapper;
 
     @Override
+    public List<ClusterCreateInfo> list() {
+        return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).list();
+    }
+
+    @Override
     public List<ClusterCreateInfo> clusters(String clusterId) {
         return new LambdaQueryChainWrapper<>(this.clusterDaoMapper).eq(ClusterCreateInfo::getClusterId, clusterId).list();
     }
