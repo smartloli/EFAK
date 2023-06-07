@@ -25,8 +25,12 @@ var cid = "";
 
 try {
     url = window.location.href;
-    if (url.indexOf("?")) {
-        cid = url.split("?")[1].split("=")[1]
+    url_cid = url;
+    if (url.indexOf("#") > -1) {
+        url_cid = url.split("#")[1];
+    }
+    if (url_cid.indexOf("?") > -1) {
+        cid = url_cid.split("=")[1]
     }
     $("#efak_clusterid").val(cid);
     $("#cid").val(cid);

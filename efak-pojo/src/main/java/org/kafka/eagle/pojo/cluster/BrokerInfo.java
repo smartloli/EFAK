@@ -19,6 +19,7 @@ package org.kafka.eagle.pojo.cluster;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.springframework.context.annotation.Description;
 
@@ -32,6 +33,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Description("Database: ke.ke_brokers")
+@TableName("ke_brokers")
 public class BrokerInfo {
 
     /**
@@ -79,6 +81,8 @@ public class BrokerInfo {
      * Kafka broker cpu used rate.
      */
     private double broerCpuUsedRate;
+
+    private LocalDateTime brokerStartupTime;
 
     /**
      * Modify time.

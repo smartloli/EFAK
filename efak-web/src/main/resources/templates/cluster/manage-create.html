@@ -38,6 +38,25 @@
                     <p class="lead" th:utext="#{kafka.eagle.clusters.manage.create.desc}"></p>
 
                     <hr>
+                    <h4 id="efak_kafka_brokers" th:text="#{kafka.eagle.clusters.manage.create.node}"></h4>
+                    <p id="efak_cluster_create_exist_nodes" class="mb-3"
+                       th:utext="#{kafka.eagle.clusters.manage.create.node.exist}"></p>
+                    <button id="efak_cluset_add_btn" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#efak_kafka_broker_add_modal" data-bs-whatever=""
+                            th:text="#{kafka.eagle.clusters.manage.create.node.btn}"></button>&nbsp;&nbsp;<button
+                        id="efak_cluset_add_batch_btn" type="button" class="btn btn-outline-primary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#efak_kafka_broker_batch_modal" data-bs-whatever=""
+                        th:text="#{kafka.eagle.clusters.manage.create.node.batch.btn}"></button>
+                    <div class="table-responsive">
+                        <table id="efak_cluster_manage_tbl" class="table table-striped " style="width:100%">
+                            <thead>
+                            <tr th:utext="#{kafka.eagle.clusters.manage.add.node.tr}">
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <hr>
 
                     <h4 id="efak_cluster_name" th:text="#{kafka.eagle.clusters.manage.create.name}"></h4>
                     <div class="mb-3">
@@ -91,27 +110,6 @@
                               rows="10"></textarea>
                     <hr>
 
-                    <h4 id="efak_kafka_brokers" th:text="#{kafka.eagle.clusters.manage.create.node}"></h4>
-                    <p id="efak_cluster_create_exist_nodes" class="mb-3"
-                       th:utext="#{kafka.eagle.clusters.manage.create.node.exist}"></p>
-                    <button id="efak_cluset_add_btn" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#efak_kafka_broker_add_modal" data-bs-whatever=""
-                            th:text="#{kafka.eagle.clusters.manage.create.node.btn}"></button>&nbsp;&nbsp;<button
-                        id="efak_cluset_add_batch_btn" type="button" class="btn btn-outline-primary btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#efak_kafka_broker_batch_modal" data-bs-whatever=""
-                        th:text="#{kafka.eagle.clusters.manage.create.node.batch.btn}"></button>
-                    <div class="table-responsive">
-                        <table id="efak_cluster_manage_tbl" class="table table-striped " style="width:100%">
-                            <thead>
-                            <tr th:utext="#{kafka.eagle.clusters.manage.add.node.tr}">
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
-
-                    <hr>
-
                     <div class="example">
                         <div style="text-align: center;">
                             <button id="efak_cluster_create_cancle" type="button" class="btn btn-secondary btn-lg"
@@ -125,6 +123,10 @@
                 <div class="col-xl-2 content-nav-wrapper">
                     <ul class="nav content-nav d-flex flex-column">
                         <li class="nav-item">
+                            <a href="#efak_kafka_brokers" class="nav-link"
+                               th:text="#{kafka.eagle.clusters.manage.create.node}"></a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#efak_cluster_name" class="nav-link"
                                th:text="#{kafka.eagle.clusters.manage.create.name}"></a>
                         </li>
@@ -135,10 +137,6 @@
                         <li class="nav-item">
                             <a href="#efak_kafka_auth_desc" class="nav-link"
                                th:text="#{kafka.eagle.clusters.manage.add.node.auth.config}"></a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#efak_kafka_brokers" class="nav-link"
-                               th:text="#{kafka.eagle.clusters.manage.create.node}"></a>
                         </li>
                     </ul>
                 </div>
