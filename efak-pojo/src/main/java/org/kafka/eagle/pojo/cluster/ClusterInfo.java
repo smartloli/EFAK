@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 
 /**
  * Manage kafka cluster info.
+ *
  * @Author: smartloli
  * @Date: 2023/5/27 20:21
  * @Version: 3.4.0
@@ -40,7 +41,7 @@ public class ClusterInfo implements Serializable {
     /**
      * ClusterId AUTO_INCREMENT
      */
-    @TableId(value = "id",type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -52,7 +53,7 @@ public class ClusterInfo implements Serializable {
      * Cluster Name
      */
     @NotNull
-    @Size(min=1, max=128)
+    @Size(min = 1, max = 128)
     private String name;
 
     /**
@@ -75,7 +76,6 @@ public class ClusterInfo implements Serializable {
     /**
      * Cluster modify time.
      */
-    private LocalDateTime modifyTime;
-
+    private LocalDateTime modifyTime = LocalDateTime.now();
 
 }

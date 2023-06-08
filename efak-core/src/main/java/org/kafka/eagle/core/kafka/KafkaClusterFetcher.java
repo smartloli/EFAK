@@ -71,6 +71,9 @@ public class KafkaClusterFetcher {
             brokerInfo.setBrokerStartupTime(dateConvert(Long.parseLong(startTimemsStr)));
             brokerInfo.setBrokerCpuUsedRate(cpu);
             brokerInfo.setBrokerMemoryUsedRate(mem);
+            brokerInfo.setBrokerHost(initializeInfo.getHost());
+            brokerInfo.setBrokerJmxPort(initializeInfo.getPort());
+            brokerInfo.setBrokerJmxPortStatus(getBrokerStatus(initializeInfo.getHost(), initializeInfo.getPort()));
         } catch (Exception e) {
             log.error("Get kafka version from jmx has error, JMXInitializeInfo[{}], error msg is {}", initializeInfo, e);
         } finally {

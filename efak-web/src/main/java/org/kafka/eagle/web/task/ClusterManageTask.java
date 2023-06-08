@@ -19,8 +19,11 @@ package org.kafka.eagle.web.task;
 
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.core.kafka.KafkaClusterFetcher;
+import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
+import org.kafka.eagle.pojo.kafka.JMXInitializeInfo;
+import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterCreateDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +54,15 @@ public class ClusterManageTask {
 
     @Autowired
     private IClusterDaoService clusterDaoService;
+    @Autowired
+    private IBrokerDaoService brokerDaoService;
 
     @Async
     @Scheduled(fixedRate = 60000)
     public void clusterHealthyTask() {
         List<ClusterInfo> clusterInfos = this.clusterDaoService.list();
         for (ClusterInfo clusterInfo : clusterInfos) {
+            // 1.submit cluster healthy status to mysql
             List<ClusterCreateInfo> clusterCreateInfos = this.clusterCreateDaoService.clusters(clusterInfo.getClusterId());
             int size = 0;
             for (ClusterCreateInfo clusterCreateInfo : clusterCreateInfos) {
@@ -64,14 +70,31 @@ public class ClusterManageTask {
                 if (status) {
                     size++;
                 }
+                JMXInitializeInfo initializeInfo = new JMXInitializeInfo();
+                initializeInfo.setBrokerId(clusterCreateInfo.getBrokerId());
+                initializeInfo.setHost(clusterCreateInfo.getBrokerHost());
+                initializeInfo.setPort(clusterCreateInfo.getBrokerJmxPort());
+                BrokerInfo brokerInfo = KafkaClusterFetcher.getKafkaJmxInfo(initializeInfo);
+                brokerInfo.setBrokerId(clusterCreateInfo.getBrokerId());
+                brokerInfo.setBrokerPort(clusterCreateInfo.getBrokerPort());
+                brokerInfo.setBrokerPortStatus(KafkaClusterFetcher.getBrokerStatus(clusterCreateInfo.getBrokerHost(), clusterCreateInfo.getBrokerPort()));
+                brokerInfo.setClusterId(clusterInfo.getClusterId());
+                this.brokerDaoService.update(brokerInfo);
             }
+
             if (clusterCreateInfos != null && clusterCreateInfos.size() == size) {
                 clusterInfo.setStatus(1);
             } else {
                 clusterInfo.setStatus(0);
             }
+
             this.clusterDaoService.update(clusterInfo);
+
+
         }
+
+        // 2.submit broker healthy status to mysql
+
 
     }
 

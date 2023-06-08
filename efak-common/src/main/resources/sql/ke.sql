@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS ke_clusters(
     name VARCHAR(128) NOT NULL COMMENT 'Cluster Name',
     status INT NOT NULL COMMENT '2:unknown,1:Normal,0:Error',
     nodes INT NOT NULL COMMENT 'Cluster Nodes',
-    modify_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
+    modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
     auth CHAR(1) NOT NULL COMMENT 'Y,N',
     auth_config TEXT NOT NULL COMMENT 'Auth Information',
     INDEX idx_name (name)
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS ke_brokers(
     broker_memory_used_rate DOUBLE NOT NULL COMMENT 'Broker Memory Used Rate',
     broker_cpu_used_rate DOUBLE NOT NULL COMMENT 'Broker CPU Used Rate',
     broker_startup_time DATETIME NOT NULL COMMENT 'Broker Startup Time',
-    modify_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
+    modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
     broker_version VARCHAR(128) NOT NULL COMMENT 'Broker Version',
     INDEX idx_cluster_id (cluster_id),
     INDEX idx_broker_id (broker_id),

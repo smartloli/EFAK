@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 
 /**
  * Kafka broker info.
+ *
  * @Author: smartloli
  * @Date: 2023/5/27 20:59
  * @Version: 3.4.0
@@ -39,7 +40,7 @@ public class BrokerInfo {
     /**
      * BrokerId AUTO_INCREMENT
      */
-    @TableId(value = "id",type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -89,7 +90,7 @@ public class BrokerInfo {
     /**
      * Modify time.
      */
-    private LocalDateTime modifyTime;
+    private LocalDateTime modifyTime = LocalDateTime.now();
 
     /**
      * Kafka broker version.

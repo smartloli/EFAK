@@ -33,4 +33,9 @@ public class KConstants {
         public static final int BUFFER_SIZE = 8049;
     }
 
+    /**
+     * Schudle job submit to mysql default size.
+     */
+    public static final int MYSQL_BATCH_SIZE = 500;
+
 }
