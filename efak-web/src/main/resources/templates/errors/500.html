@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>500 - KafkaEagle</title>
+
+    <th:block th:replace="public/common :: css"></th:block>
+</head>
+<body>
+<div class="main-wrapper">
+    <!-- partial:menu -->
+    <div th:replace="public/header :: menu_header"></div>
+    <!-- partial -->
+    <div class="page-wrapper">
+        <div class="page-content d-flex align-items-center justify-content-center">
+
+            <div class="row w-100 mx-0 auth-page">
+                <div class="col-md-8 col-xl-6 mx-auto d-flex flex-column align-items-center">
+                    <h1 class="fw-bolder mb-22 mt-2 tx-120 text-muted">500</h1>
+                    <h3 class="mb-2">内部服务器错误</h3>
+                    <h5 class="text-muted mb-3 text-center">哎呀！！ 您访问的服务发生异常，请稍后再试。</h5>
+                    <a href="/">返回首页</a>
+                </div>
+            </div>
+
+        </div>
+        <!-- partial:footer -->
+        <footer th:replace="public/common :: footer"></footer>
+        <!-- partial -->
+    </div>
+</div>
+<th:block th:replace="public/common :: js"></th:block>
+</body>
+</html>

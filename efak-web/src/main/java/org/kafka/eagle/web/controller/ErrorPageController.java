@@ -29,33 +29,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @Version: 3.4.0
  */
 @Controller
-@RequestMapping("/error")
+@RequestMapping("/errors")
 @Slf4j
 public class ErrorPageController {
 
-    @GetMapping("/403")
-    public String e403() {
-        return "error/403.html";
-    }
-
     @GetMapping("/404")
     public String e404() {
-        return "error/404.html";
-    }
-
-    @GetMapping("/405")
-    public String e405() {
-        return "error/405.html";
+        return "errors/404.html";
     }
 
     @GetMapping("/500")
     public String e500() {
-        return "error/500.html";
-    }
-
-    @GetMapping("/503")
-    public String e503() {
-        return "error/503.html";
+        return "errors/500.html";
     }
 
 }

@@ -21,12 +21,14 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.web.dao.mapper.BrokerDaoMapper;
 import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import java.util.Map;
  * @Date: 2023/5/28 00:44
  * @Version: 3.4.0
  */
+@Slf4j
 @Service
 public class BrokerDaoServiceImpl extends ServiceImpl<BrokerDaoMapper, BrokerInfo> implements IBrokerDaoService {
 
@@ -79,8 +82,26 @@ public class BrokerDaoServiceImpl extends ServiceImpl<BrokerDaoMapper, BrokerInf
     @Override
     public boolean update(BrokerInfo brokerInfo) {
         LambdaUpdateChainWrapper<BrokerInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<BrokerInfo>(this.brokerDaoMapper);
-        lambdaUpdateChainWrapper.eq(BrokerInfo::getClusterId,brokerInfo.getClusterId()).eq(BrokerInfo::getId, brokerInfo.getId());
+        lambdaUpdateChainWrapper.eq(BrokerInfo::getClusterId,brokerInfo.getClusterId()).eq(BrokerInfo::getClusterId,brokerInfo.getClusterId());
         return lambdaUpdateChainWrapper.update(brokerInfo);
+    }
+
+    @Override
+    public boolean update(List<BrokerInfo> brokerInfos) {
+        log.info("Broker batch update.");
+        if(brokerInfos==null|| CollectionUtils.isEmpty(brokerInfos)||brokerInfos.size()==0){
+            return false;
+        }
+
+        BrokerInfo brokerInfo = brokerInfos.get(0);
+        List<BrokerInfo> brokerInfosInDb = this.clusters(brokerInfo.getClusterId());
+        if(CollectionUtils.isEmpty(brokerInfosInDb)){
+            return this.batch(brokerInfos);
+        }else {
+            // return this.updateBatchById(brokerInfos);
+            return false;
+        }
+
     }
 
     @Override
@@ -94,6 +115,7 @@ public class BrokerDaoServiceImpl extends ServiceImpl<BrokerDaoMapper, BrokerInf
     @Override
     public boolean batch(List<BrokerInfo> brokerInfos) {
         boolean status = false;
+
         int code = this.brokerDaoMapper.insertBatchSomeColumn(brokerInfos);
         if (code > 0) {
             status = true;

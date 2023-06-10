@@ -18,6 +18,7 @@
 package org.kafka.eagle.web.task;
 
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.core.kafka.KafkaClusterFetcher;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
@@ -33,6 +34,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,6 +67,7 @@ public class ClusterManageTask {
             // 1.submit cluster healthy status to mysql
             List<ClusterCreateInfo> clusterCreateInfos = this.clusterCreateDaoService.clusters(clusterInfo.getClusterId());
             int size = 0;
+            List<BrokerInfo> brokerInfos = new ArrayList<>();
             for (ClusterCreateInfo clusterCreateInfo : clusterCreateInfos) {
                 boolean status = KafkaClusterFetcher.getKafkaAliveStatus(clusterCreateInfo.getBrokerHost(), clusterCreateInfo.getBrokerPort());
                 if (status) {
@@ -80,6 +83,17 @@ public class ClusterManageTask {
                 brokerInfo.setBrokerPortStatus(KafkaClusterFetcher.getBrokerStatus(clusterCreateInfo.getBrokerHost(), clusterCreateInfo.getBrokerPort()));
                 brokerInfo.setClusterId(clusterInfo.getClusterId());
                 this.brokerDaoService.update(brokerInfo);
+
+                brokerInfos.add(brokerInfo);
+                if (brokerInfos != null && brokerInfos.size() > KConstants.MYSQL_BATCH_SIZE) {
+                    this.brokerDaoService.update(brokerInfos);
+                    brokerInfos.clear();
+                }
+            }
+
+            if (brokerInfos.size() > 0) {
+                this.brokerDaoService.update(brokerInfos);
+                brokerInfos.clear();
             }
 
             if (clusterCreateInfos != null && clusterCreateInfos.size() == size) {
@@ -93,7 +107,8 @@ public class ClusterManageTask {
 
         }
 
-        // 2.submit broker healthy status to mysql
+        // 2.submi
+        // t broker healthy status to mysql
 
 
     }

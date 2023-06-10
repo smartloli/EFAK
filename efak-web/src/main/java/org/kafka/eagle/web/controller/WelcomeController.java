@@ -40,6 +40,6 @@ public class WelcomeController {
      */
     @GetMapping("/")
     public String welcomeView() {
-        return "index.html";
+        return "welcome.html";
     }
 }

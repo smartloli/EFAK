@@ -18,6 +18,11 @@
 package org.kafka.eagle.plugins.test;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
+import org.kafka.eagle.pojo.cluster.BrokerInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Description: TODO
@@ -30,5 +35,11 @@ public class StrTest {
         String dataid="11";
         boolean status = StrUtil.isBlank(dataid);
         System.out.println(status);
+
+        List<BrokerInfo> brokerInfos = new ArrayList<>();
+        BrokerInfo brokerInfo = new BrokerInfo();
+        brokerInfo.setId(1L);
+        brokerInfos.add(brokerInfo);
+        System.out.println(JSON.toJSONString(brokerInfos.stream().map(BrokerInfo::getId).toArray()));
     }
 }

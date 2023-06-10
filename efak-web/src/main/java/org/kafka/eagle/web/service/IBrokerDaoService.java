@@ -45,6 +45,8 @@ public interface IBrokerDaoService extends IService<BrokerInfo> {
      */
     boolean update(BrokerInfo clusterInfo);
 
+    boolean update(List<BrokerInfo> brokerInfos);
+
     boolean delete(BrokerInfo clusterInfo);
 
     boolean batch(List<BrokerInfo> clusterInfos);
