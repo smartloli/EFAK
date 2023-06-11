@@ -234,8 +234,6 @@ $(function() {
   // New Customers Chart - END
 
 
-
-
   // Orders Chart
   if($('#ordersChart').length) {
     var options2 = {

@@ -8,10 +8,11 @@ try {
         dataType: 'json',
         url: pathname + '/panel/ajax',
         success: function (datas) {
-            console.log(datas)
             if (JSON.stringify(datas) === '{}') {
             } else {
-
+                console.log(datas.brokers)
+                $("#efak_dashboard_brokers_panel").text(datas.brokers);
+                $("#efak_dashboard_brokers_onlines_panel").text(datas.onlines);
             }
 
         }
