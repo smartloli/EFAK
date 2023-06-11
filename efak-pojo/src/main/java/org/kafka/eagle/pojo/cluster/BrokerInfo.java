@@ -98,7 +98,7 @@ public class BrokerInfo {
     /**
      * Kafka broker version.
      */
-    private String brokerVersion;
+    private String brokerVersion = "-";
 
 
 }

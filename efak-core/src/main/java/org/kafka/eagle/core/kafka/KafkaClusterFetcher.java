@@ -53,27 +53,31 @@ public class KafkaClusterFetcher {
         JMXConnector connector = null;
         String JMX = initializeInfo.getUri();
         try {
-            JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, initializeInfo.getHost() + ":" + initializeInfo.getPort()));
-            initializeInfo.setUrl(jmxSeriverUrl);
-            connector = JMXFactoryUtil.connectWithTimeout(initializeInfo);
-            MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
-            String version = mbeanConnection.getAttribute(new ObjectName(String.format(JmxConstants.BrokerServer.BROKER_APP_INFO.getValue(), initializeInfo.getBrokerId())), JmxConstants.BrokerServer.BROKER_VERSION_VALUE.getValue()).toString();
-            String startTimemsStr = mbeanConnection.getAttribute(new ObjectName(String.format(JmxConstants.BrokerServer.BROKER_APP_INFO.getValue(), initializeInfo.getBrokerId())), JmxConstants.BrokerServer.BROKER_STARTTIME_VALUE.getValue()).toString();
-            String cpuStr = mbeanConnection.getAttribute(new ObjectName(String.format(JmxConstants.BrokerServer.JMX_PERFORMANCE_TYPE.getValue(), initializeInfo.getBrokerId())), JmxConstants.BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
-            MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
-            long memUsed = memBean.getHeapMemoryUsage().getUsed();
-            long memMax = memBean.getHeapMemoryUsage().getMax();
-            double mem = StrUtils.numberic(String.valueOf(memUsed * 100.0/memMax));
 
-            double cpuValue = Double.parseDouble(cpuStr);
-            double cpu = StrUtils.numberic(String.valueOf(cpuValue * 100.0));
-            brokerInfo.setBrokerVersion(version);
-            brokerInfo.setBrokerStartupTime(dateConvert(Long.parseLong(startTimemsStr)));
-            brokerInfo.setBrokerCpuUsedRate(cpu);
-            brokerInfo.setBrokerMemoryUsedRate(mem);
             brokerInfo.setBrokerHost(initializeInfo.getHost());
             brokerInfo.setBrokerJmxPort(initializeInfo.getPort());
             brokerInfo.setBrokerJmxPortStatus(getBrokerStatus(initializeInfo.getHost(), initializeInfo.getPort()));
+            if (brokerInfo.getBrokerJmxPortStatus() == 1) {
+                JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, initializeInfo.getHost() + ":" + initializeInfo.getPort()));
+                initializeInfo.setUrl(jmxSeriverUrl);
+                connector = JMXFactoryUtil.connectWithTimeout(initializeInfo);
+                MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+                String version = mbeanConnection.getAttribute(new ObjectName(String.format(JmxConstants.BrokerServer.BROKER_APP_INFO.getValue(), initializeInfo.getBrokerId())), JmxConstants.BrokerServer.BROKER_VERSION_VALUE.getValue()).toString();
+                String startTimemsStr = mbeanConnection.getAttribute(new ObjectName(String.format(JmxConstants.BrokerServer.BROKER_APP_INFO.getValue(), initializeInfo.getBrokerId())), JmxConstants.BrokerServer.BROKER_STARTTIME_VALUE.getValue()).toString();
+                String cpuStr = mbeanConnection.getAttribute(new ObjectName(String.format(JmxConstants.BrokerServer.JMX_PERFORMANCE_TYPE.getValue(), initializeInfo.getBrokerId())), JmxConstants.BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
+                MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
+                long memUsed = memBean.getHeapMemoryUsage().getUsed();
+                long memMax = memBean.getHeapMemoryUsage().getMax();
+                double mem = StrUtils.numberic(String.valueOf(memUsed * 100.0 / memMax));
+
+                double cpuValue = Double.parseDouble(cpuStr);
+                double cpu = StrUtils.numberic(String.valueOf(cpuValue * 100.0));
+                brokerInfo.setBrokerVersion(version);
+                brokerInfo.setBrokerStartupTime(dateConvert(Long.parseLong(startTimemsStr)));
+                brokerInfo.setBrokerCpuUsedRate(cpu);
+                brokerInfo.setBrokerMemoryUsedRate(mem);
+            }
+
         } catch (Exception e) {
             log.error("Get kafka version from jmx has error, JMXInitializeInfo[{}], error msg is {}", initializeInfo, e);
         } finally {
@@ -88,7 +92,7 @@ public class KafkaClusterFetcher {
         return brokerInfo;
     }
 
-    private static LocalDateTime dateConvert(long timestamp){
+    private static LocalDateTime dateConvert(long timestamp) {
         LocalDateTime dateTime = Instant.ofEpochMilli(timestamp)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
