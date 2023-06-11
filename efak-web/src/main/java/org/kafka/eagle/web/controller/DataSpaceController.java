@@ -18,13 +18,17 @@
 package org.kafka.eagle.web.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
+import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
+import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterCreateDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -54,6 +58,9 @@ public class DataSpaceController {
     @Autowired
     private IClusterDaoService clusterDaoService;
 
+    @Autowired
+    private IBrokerDaoService brokerDaoService;
+
 
     @GetMapping("/dashboard/{cid}")
     public String dashboardView(@PathVariable("cid") Long cid) {
@@ -63,10 +70,12 @@ public class DataSpaceController {
     @RequestMapping(value = "/dashboard/{cid}/panel/ajax", method = RequestMethod.GET)
     public void getDashboardPanelAjax(HttpServletResponse response, @PathVariable("cid") Long cid) {
         ClusterInfo clusterInfo= this.clusterDaoService.clusters(cid);
-        List<ClusterCreateInfo> clusterCreateInfos=  this.clusterCreateDaoService.clusters(clusterInfo.getClusterId());
+        List<BrokerInfo> brokerInfos  = this.brokerDaoService.clusters(clusterInfo.getClusterId());
+        List<BrokerInfo> onlineBrokerInfos  = this.brokerDaoService.brokerStatus(clusterInfo.getClusterId(),Short.valueOf("1"));
 
         JSONObject target = new JSONObject();
-        target.put("brokers", clusterCreateInfos.size());
+        target.put("brokers", brokerInfos.size());
+        target.put("onlines", onlineBrokerInfos.size());
         try {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);

@@ -82,22 +82,22 @@ public class BrokerDaoServiceImpl extends ServiceImpl<BrokerDaoMapper, BrokerInf
     @Override
     public boolean update(BrokerInfo brokerInfo) {
         LambdaUpdateChainWrapper<BrokerInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<BrokerInfo>(this.brokerDaoMapper);
-        lambdaUpdateChainWrapper.eq(BrokerInfo::getClusterId,brokerInfo.getClusterId()).eq(BrokerInfo::getClusterId,brokerInfo.getClusterId());
+        lambdaUpdateChainWrapper.eq(BrokerInfo::getClusterId, brokerInfo.getClusterId()).eq(BrokerInfo::getClusterId, brokerInfo.getClusterId());
         return lambdaUpdateChainWrapper.update(brokerInfo);
     }
 
     @Override
     public boolean update(List<BrokerInfo> brokerInfos) {
         log.info("Broker batch update.");
-        if(brokerInfos==null|| CollectionUtils.isEmpty(brokerInfos)||brokerInfos.size()==0){
+        if (brokerInfos == null || CollectionUtils.isEmpty(brokerInfos) || brokerInfos.size() == 0) {
             return false;
         }
 
         BrokerInfo brokerInfo = brokerInfos.get(0);
         List<BrokerInfo> brokerInfosInDb = this.clusters(brokerInfo.getClusterId());
-        if(CollectionUtils.isEmpty(brokerInfosInDb)){
+        if (CollectionUtils.isEmpty(brokerInfosInDb)) {
             return this.batch(brokerInfos);
-        }else {
+        } else {
             // return this.updateBatchById(brokerInfos);
             return false;
         }
@@ -123,4 +123,8 @@ public class BrokerDaoServiceImpl extends ServiceImpl<BrokerDaoMapper, BrokerInf
         return status;
     }
 
+    @Override
+    public List<BrokerInfo> brokerStatus(String clusterId, short status) {
+        return new LambdaQueryChainWrapper<>(this.brokerDaoMapper).eq(BrokerInfo::getClusterId, clusterId).eq(BrokerInfo::getBrokerPortStatus, status).list();
+    }
 }

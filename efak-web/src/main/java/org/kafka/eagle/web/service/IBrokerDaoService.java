@@ -24,6 +24,8 @@ public interface IBrokerDaoService extends IService<BrokerInfo> {
      */
     List<BrokerInfo> clusters(String clusterId);
 
+    List<BrokerInfo> brokerStatus(String clusterId,short status);
+
     /**
      * Get cluster info by cluster name.
      * @param clusterInfo

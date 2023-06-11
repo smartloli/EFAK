@@ -63,6 +63,9 @@ public class BrokerInfo {
      */
     private int brokerPort;
 
+    /**
+     * Kafka broker port status,1:Online, 0:Offline
+     */
     private short brokerPortStatus;
 
     /**
