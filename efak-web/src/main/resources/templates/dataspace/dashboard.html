@@ -55,26 +55,26 @@
                                         <div class="col-6 col-md-12 col-xl-5">
                                             <h3 id="efak_dashboard_brokers_panel" class="mb-2">0</h3>
                                             <div class="d-flex align-items-baseline">
-                                                <p class="text-success">
-                                                    在线: <span id="efak_dashboard_brokers_onlines_panel">0</span>
-<!--                                                    <i data-feather="airplay" class="icon-sm mb-1"></i>-->
+                                                <p class="text-primary">
+                                                    <span>总数</span>
+                                                    <i data-feather="airplay" class="icon-sm mb-1"></i>
                                                 </p>
                                             </div>
                                         </div>
                                         <div class="col-6 col-md-12 col-xl-5">
-                                            <h3 class="mb-2">Controller</h3>
+                                            <h3 class="mb-2" id="efak_dashboard_brokers_onlines_panel">0</h3>
                                             <div class="d-flex align-items-baseline">
                                                 <p class="text-success">
-                                                    <span>健康</span>
+                                                    <span>在线</span>
                                                     <i data-feather="check-circle" class="icon-sm mb-1"></i>
                                                 </p>
                                             </div>
                                         </div>
-<!--                                        <div class="col-6 col-md-12 col-xl-7">-->
-                                            <div id="customersChart" style="display: none" class="mt-md-3 mt-xl-0"></div>
-<!--                                            <div id="efak_dashboard1" class="">Controller</div>-->
-<!--                                            <div id="efak_dashboard2" class="">健康度</div>-->
-<!--                                        </div>-->
+                                        <!--                                        <div class="col-6 col-md-12 col-xl-7">-->
+                                        <div id="customersChart" style="display: none" class="mt-md-3 mt-xl-0"></div>
+                                        <!--                                            <div id="efak_dashboard1" class="">Controller</div>-->
+                                        <!--                                            <div id="efak_dashboard2" class="">健康度</div>-->
+                                        <!--                                        </div>-->
                                     </div>
                                 </div>
                             </div>
@@ -184,10 +184,15 @@
                                 </div>
                                 <div class="col-md-5 d-flex justify-content-md-end">
                                     <div class="btn-group mb-3 mb-md-0" role="group" aria-label="Basic example">
-                                        <button type="button" class="btn btn-primary" th:text="#{kafka.eagle.dataspace.dashboard.messagein.day}">天</button>
-                                        <button type="button" class="btn btn-outline-primary d-none d-md-block" th:text="#{kafka.eagle.dataspace.dashboard.messagein.weekly}">周
+                                        <button type="button" class="btn btn-primary"
+                                                th:text="#{kafka.eagle.dataspace.dashboard.messagein.day}">天
                                         </button>
-                                        <button type="button" class="btn btn-outline-primary" th:text="#{kafka.eagle.dataspace.dashboard.messagein.month}">月</button>
+                                        <button type="button" class="btn btn-outline-primary d-none d-md-block"
+                                                th:text="#{kafka.eagle.dataspace.dashboard.messagein.weekly}">周
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary"
+                                                th:text="#{kafka.eagle.dataspace.dashboard.messagein.month}">月
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -266,11 +271,12 @@
             </div> <!-- row -->
 
             <div class="row">
-                    <div class="col-lg-5 col-xl-4 grid-margin grid-margin-xl-0 stretch-card">
+                <div class="col-lg-5 col-xl-4 grid-margin grid-margin-xl-0 stretch-card">
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-baseline">
-                                <h6 class="card-title mb-0" th:text="#{kafka.eagle.dataspace.dashboard.topic.title}">Cloud
+                                <h6 class="card-title mb-0" th:text="#{kafka.eagle.dataspace.dashboard.topic.title}">
+                                    Cloud
                                     storage</h6>
                                 <div class="dropdown mb-2">
                                     <button class="btn p-0" type="button" id="dropdownMenuButton6"
@@ -308,17 +314,26 @@
                                 <br/>
                                 <p>0B-100MB</p>
                                 <div class="progress">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 70%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">70%</div>
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                         role="progressbar" style="width: 70%" aria-valuenow="10" aria-valuemin="0"
+                                         aria-valuemax="100">70%
+                                    </div>
                                 </div>
                                 <br/>
                                 <p>100MB-10GB</p>
                                 <div class="progress">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 40%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">40%</div>
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                         role="progressbar" style="width: 40%" aria-valuenow="10" aria-valuemin="0"
+                                         aria-valuemax="100">40%
+                                    </div>
                                 </div>
                                 <br/>
                                 <p>10GB+</p>
                                 <div class="progress">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">10%</div>
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                         role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0"
+                                         aria-valuemax="100">10%
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -328,16 +343,26 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-baseline mb-2">
-                                <h6 class="card-title mb-0" th:text="#{kafka.eagle.dataspace.dashboard.topic.table}">Projects</h6>
+                                <h6 class="card-title mb-0" th:text="#{kafka.eagle.dataspace.dashboard.topic.table}">
+                                    Projects</h6>
                                 <div class="dropdown mb-2">
-                                    <button class="btn p-0" type="button" id="dropdownMenuButton7" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <button class="btn p-0" type="button" id="dropdownMenuButton7"
+                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton7">
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="chevrons-down" class="icon-sm me-2"></i> <span class="" th:text="#{kafka.eagle.dataspace.dashboard.topic.table.logsize.doc}"></span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="chevrons-down" class="icon-sm me-2"></i> <span class="" th:text="#{kafka.eagle.dataspace.dashboard.topic.table.capacity.doc}"></span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="chevrons-down" class="icon-sm me-2"></i> <span class="" th:text="#{kafka.eagle.dataspace.dashboard.topic.table.bytein.doc}"></span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="chevrons-down" class="icon-sm me-2"></i> <span class="" th:text="#{kafka.eagle.dataspace.dashboard.topic.table.byteout.doc}"></span></a>
+                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
+                                                data-feather="chevrons-down" class="icon-sm me-2"></i> <span class=""
+                                                                                                             th:text="#{kafka.eagle.dataspace.dashboard.topic.table.logsize.doc}"></span></a>
+                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
+                                                data-feather="chevrons-down" class="icon-sm me-2"></i> <span class=""
+                                                                                                             th:text="#{kafka.eagle.dataspace.dashboard.topic.table.capacity.doc}"></span></a>
+                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
+                                                data-feather="chevrons-down" class="icon-sm me-2"></i> <span class=""
+                                                                                                             th:text="#{kafka.eagle.dataspace.dashboard.topic.table.bytein.doc}"></span></a>
+                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
+                                                data-feather="chevrons-down" class="icon-sm me-2"></i> <span class=""
+                                                                                                             th:text="#{kafka.eagle.dataspace.dashboard.topic.table.byteout.doc}"></span></a>
                                     </div>
                                 </div>
                             </div>
@@ -346,11 +371,16 @@
                                     <thead>
                                     <tr>
                                         <th class="pt-0">#</th>
-                                        <th class="pt-0" th:text="#{kafka.eagle.dataspace.dashboard.topic.table.name}"></th>
-                                        <th class="pt-0" th:text="#{kafka.eagle.dataspace.dashboard.topic.table.logsize}"></th>
-                                        <th class="pt-0" th:text="#{kafka.eagle.dataspace.dashboard.topic.table.capacity}"></th>
-                                        <th class="pt-0" th:text="#{kafka.eagle.dataspace.dashboard.topic.table.bytein}"></th>
-                                        <th class="pt-0" th:text="#{kafka.eagle.dataspace.dashboard.topic.table.byteout}"></th>
+                                        <th class="pt-0"
+                                            th:text="#{kafka.eagle.dataspace.dashboard.topic.table.name}"></th>
+                                        <th class="pt-0"
+                                            th:text="#{kafka.eagle.dataspace.dashboard.topic.table.logsize}"></th>
+                                        <th class="pt-0"
+                                            th:text="#{kafka.eagle.dataspace.dashboard.topic.table.capacity}"></th>
+                                        <th class="pt-0"
+                                            th:text="#{kafka.eagle.dataspace.dashboard.topic.table.bytein}"></th>
+                                        <th class="pt-0"
+                                            th:text="#{kafka.eagle.dataspace.dashboard.topic.table.byteout}"></th>
                                     </tr>
                                     </thead>
                                     <tbody>
