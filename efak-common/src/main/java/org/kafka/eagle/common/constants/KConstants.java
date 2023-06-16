@@ -38,4 +38,13 @@ public class KConstants {
      */
     public static final int MYSQL_BATCH_SIZE = 500;
 
+    public final class SessionClusterId {
+        private SessionClusterId() {
+        }
+
+        public static final String CLUSTER_ID = "clusterId";
+        public static final String CLUSTER_ID_LIST = "clusterIdList";
+        public static final int CLUSTER_ID_LIST_LIMIT = 5;
+    }
+
 }

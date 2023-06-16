@@ -18,6 +18,7 @@
 package org.kafka.eagle.web.controller;
 
 import com.alibaba.fastjson2.JSONObject;
+import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
 import org.kafka.eagle.web.service.IBrokerDaoService;
@@ -31,18 +32,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
- *  The DashboardController handles requests for dashboard pages. This controller handles the following requests:
- *  - /dashboard: returns the main dashboard page.
- *  - /dashboard/{id}: returns a specific dashboard page with the given ID.
- *  - /dashboard/create: returns a page for creating a new dashboard.
- *  - /dashboard/save: handles POST requests to save a dashboard.
- *
- *  This controller uses the DashboardService to manage the creation, editing, and saving of dashboards. When
- *  handling requests, this controller also uses the Thymeleaf template engine to render pages and pass necessary data
- *  to the pages.
+ * The DashboardController handles requests for dashboard pages. This controller handles the following requests:
+ * - /dashboard: returns the main dashboard page.
+ * - /dashboard/{id}: returns a specific dashboard page with the given ID.
+ * - /dashboard/create: returns a page for creating a new dashboard.
+ * - /dashboard/save: handles POST requests to save a dashboard.
+ * <p>
+ * This controller uses the DashboardService to manage the creation, editing, and saving of dashboards. When
+ * handling requests, this controller also uses the Thymeleaf template engine to render pages and pass necessary data
+ * to the pages.
  *
  * @Author: smartloli
  * @Date: 2023/5/13 23:38
@@ -63,15 +65,17 @@ public class DataSpaceController {
 
 
     @GetMapping("/dashboard/{cid}")
-    public String dashboardView(@PathVariable("cid") Long cid) {
+    public String dashboardView(@PathVariable("cid") Long cid, HttpSession session) {
+        session.removeAttribute(KConstants.SessionClusterId.CLUSTER_ID);
+        session.setAttribute(KConstants.SessionClusterId.CLUSTER_ID, cid);
         return "dataspace/dashboard.html";
     }
 
     @RequestMapping(value = "/dashboard/{cid}/panel/ajax", method = RequestMethod.GET)
     public void getDashboardPanelAjax(HttpServletResponse response, @PathVariable("cid") Long cid) {
-        ClusterInfo clusterInfo= this.clusterDaoService.clusters(cid);
-        List<BrokerInfo> brokerInfos  = this.brokerDaoService.clusters(clusterInfo.getClusterId());
-        List<BrokerInfo> onlineBrokerInfos  = this.brokerDaoService.brokerStatus(clusterInfo.getClusterId(),Short.valueOf("1"));
+        ClusterInfo clusterInfo = this.clusterDaoService.clusters(cid);
+        List<BrokerInfo> brokerInfos = this.brokerDaoService.clusters(clusterInfo.getClusterId());
+        List<BrokerInfo> onlineBrokerInfos = this.brokerDaoService.brokerStatus(clusterInfo.getClusterId(), Short.valueOf("1"));
 
         JSONObject target = new JSONObject();
         target.put("brokers", brokerInfos.size());
@@ -83,7 +87,6 @@ public class DataSpaceController {
             ex.printStackTrace();
         }
     }
-
 
 
 }

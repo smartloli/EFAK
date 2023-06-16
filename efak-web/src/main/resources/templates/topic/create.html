@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title th:text="#{kafka.eagle.manage.create.title.desc}"></title>
+
+    <link rel="stylesheet" th:href="@{../../assets/vendors/dropify/dist/dropify.min.css}">
+    <link rel="stylesheet" th:href="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css}">
+    <link rel="stylesheet" th:href="@{../../assets/css/public/cluster/manage.create.css}">
+    <th:block th:replace="public/common :: css"></th:block>
+
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:menu -->
+    <div th:replace="public/header :: menu_header"></div>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+
+        <div class="page-content">
+            <nav class="page-breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/topic/manage"
+                                                   th:text="#{kafka.eagle.topics.manager}"></a></li>
+                    <li class="breadcrumb-item active" aria-current="page"
+                        th:text="#{kafka.eagle.topics.create}"></li>
+                </ol>
+            </nav>
+            <div class="row">
+                <div class="col-xl-10 main-content ps-xl-4 pe-xl-5">
+                    <h1 class="page-title" th:text="#{kafka.eagle.topics.create}"></h1>
+                    <p class="lead" th:utext="#{kafka.eagle.topics.create.desc}"></p>
+
+                    <hr>
+                    <h4 id="efak_kafka_brokers" th:text="#{kafka.eagle.clusters.manage.create.node}"></h4>
+                    <p id="efak_cluster_create_exist_nodes" class="mb-3"
+                       th:utext="#{kafka.eagle.clusters.manage.create.node.exist}"></p>
+                    <button id="efak_cluset_add_btn" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#efak_kafka_broker_add_modal" data-bs-whatever=""
+                            th:text="#{kafka.eagle.clusters.manage.create.node.btn}"></button>&nbsp;&nbsp;<button
+                        id="efak_cluset_add_batch_btn" type="button" class="btn btn-outline-primary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#efak_kafka_broker_batch_modal" data-bs-whatever=""
+                        th:text="#{kafka.eagle.clusters.manage.create.node.batch.btn}"></button>
+                    <div class="table-responsive">
+                        <table id="efak_cluster_manage_tbl" class="table table-striped " style="width:100%">
+                            <thead>
+                            <tr th:utext="#{kafka.eagle.clusters.manage.add.node.tr}">
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <hr>
+
+                    <h4 id="efak_cluster_name" th:text="#{kafka.eagle.clusters.manage.create.name}"></h4>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="efak_cluster_name_create" maxlength="128" value=""
+                               placeholder="Enter Name" th:value="#{kafka.eagle.clusters.manage.create.name.test}"
+                               th:placeholder="#{kafka.eagle.clusters.manage.create.name.placeholder}">
+                        <input type="hidden" id="efak_cluster_auth_isopen" name="efak_cluster_auth_isopen"/>
+                        <input type="hidden" id="efak_cluster_edit" name="efak_cluster_edit"/>
+                    </div>
+                    <hr>
+
+                    <h4 id="efak_kafka_kraft" th:text="#{kafka.eagle.clusters.manage.add.node.auth.check}"></h4>
+                    <div class="efak_kraft_card-list">
+                        <div style="margin-right: 22px;">
+                            <div id="efak_kafka_kraft_enable" class="efak_kraft_version_card ">
+                                <div class="efak_kraft_detail_info">
+                                    <div class="efak_kraft_title">Authentication</div>
+                                    <div class="efak_kraft_version_type_enable">开启</div>
+                                    <div class="efak_kraft_version_info">Kafka集群加密访问</div>
+                                </div>
+                                <img src="../../assets/images/profile.png"
+                                     class="efak_kraft_logo">
+                                <div id="efak_kraft_enable_checked" style="display: none"
+                                     class="efak_kraft_version_checked">
+                                    <div class="efak_kraft_badges"></div>
+                                    <div class="efak_kraft_check"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-right: 22px;">
+                            <div id="efak_kafka_kraft_disable" class="efak_kraft_version_card ">
+                                <div class="efak_kraft_detail_info">
+                                    <div class="efak_kraft_title">None</div>
+                                    <div class="efak_kraft_version_type_disable">禁止</div>
+                                    <div class="efak_kraft_version_info">Kafka集群明文访问</div>
+                                </div>
+                                <img src="../../assets/images/profile.png"
+                                     class="efak_kraft_logo">
+                                <div id="efak_kraft_disable_checked" style="display: none"
+                                     class="efak_kraft_version_checked">
+                                    <div class="efak_kraft_badges"></div>
+                                    <div class="efak_kraft_check"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h4 id="efak_kafka_auth_desc" th:text="#{kafka.eagle.clusters.manage.add.node.auth.config}"></h4>
+                    <textarea class="form-control" id="efak_kafka_auth_config"
+                              th:placeholder="#{kafka.eagle.clusters.manage.add.node.auth.config.placeholder}"
+                              rows="10"></textarea>
+                    <hr>
+
+                    <div class="example">
+                        <div style="text-align: center;">
+                            <button id="efak_cluster_create_cancle" type="button" class="btn btn-secondary btn-lg"
+                                    th:text="#{kafka.eagle.clusters.manage.create.cancle}"></button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" id="efak_cluster_create_submit" class="btn btn-primary btn-lg"
+                                    th:text="#{kafka.eagle.clusters.manage.create}"></button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-xl-2 content-nav-wrapper">
+                    <ul class="nav content-nav d-flex flex-column">
+                        <li class="nav-item">
+                            <a href="#efak_kafka_brokers" class="nav-link"
+                               th:text="#{kafka.eagle.clusters.manage.create.node}"></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#efak_cluster_name" class="nav-link"
+                               th:text="#{kafka.eagle.clusters.manage.create.name}"></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#efak_kafka_kraft" class="nav-link"
+                               th:text="#{kafka.eagle.clusters.manage.add.node.auth.check}"></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#efak_kafka_auth_desc" class="nav-link"
+                               th:text="#{kafka.eagle.clusters.manage.add.node.auth.config}"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- partial:footer -->
+        <footer th:replace="public/common :: footer"></footer>
+        <!-- partial -->
+
+    </div>
+
+    <!-- single add node -->
+    <div class="modal fade" id="efak_kafka_broker_add_modal" tabindex="-1" aria-labelledby="varyingModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="varyingModalLabel"
+                        th:utext="#{kafka.eagle.clusters.manage.add.node}"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+                </div>
+                <form role="form" action="/clusters/manage/add/single" method="post"
+                      onsubmit="return contextFormValid();return false;">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="efak_brokerid_label" class="form-label"
+                                   th:utext="#{kafka.eagle.clusters.manage.add.node.id}">BrokerId:</label>
+                            <input type="text" class="form-control" id="efak_brokerid_label" name="efak_brokerid_name">
+                            <input type="hidden" class="form-control" id="efak_clusterid" name="efak_clusterid_name">
+                            <input type="hidden" class="form-control" id="efak_dataid" name="efak_dataid">
+                        </div>
+                        <div class="mb-3">
+                            <label for="efak_brokerhost_label" class="form-label"
+                                   th:utext="#{kafka.eagle.clusters.manage.add.node.host}">BrokerHost:</label>
+                            <input type="text" class="form-control" id="efak_brokerhost_label"
+                                   name="efak_brokerhost_name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="efak_brokerport_label" class="form-label"
+                                   th:utext="#{kafka.eagle.clusters.manage.add.node.port}">BrokerPort:</label>
+                            <input type="text" class="form-control" id="efak_brokerport_label"
+                                   name="efak_brokerport_name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="efak_brokerjmxport_label" class="form-label"
+                                   th:utext="#{kafka.eagle.clusters.manage.add.node.jmxport}">BrokerJmxPort:</label>
+                            <input type="text" class="form-control" id="efak_brokerjmxport_label"
+                                   name="efak_brokerjmxport_name">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                th:text="#{kafka.eagle.clusters.manage.button.close}">Close
+                        </button>
+                        <button type="submit" class="btn btn-primary"
+                                th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- batch add nodes -->
+    <div class="modal fade" id="efak_kafka_broker_batch_modal" tabindex="-1" aria-labelledby="varyingModalLabelBatch"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="varyingModalLabelBatch"
+                        th:text="#{kafka.eagle.clusters.manage.add.batch.node}"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+                </div>
+                <form role="form" action="/clusters/manage/add/batch" enctype="multipart/form-data" method="post"
+                      onsubmit="return contextFormValidBatch();return false;">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="efak_batch_module_download" class="form-label"
+                                   th:text="#{kafka.eagle.clusters.manage.add.batch.module}">Module:</label><br/>
+                            <button id="efak_batch_module_download" type="button" class="btn btn-outline-primary btn-sm"
+                                    th:utext="#{kafka.eagle.clusters.manage.add.batch.module.download}"></button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="efak_batch_module_download" class="form-label"
+                                   th:text="#{kafka.eagle.clusters.manage.add.batch.node.import}">Module:</label><br/>
+                            <div>
+                                <input type="file" id="efak_kafka_broker_batch_import" name="file"
+                                       data-allowed-file-extensions="xlsx xls" data-max-file-size="100M"/>
+                                <input id="cid"
+                                       name="cid" type="hidden" class="form-control"/>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                th:text="#{kafka.eagle.clusters.manage.button.close}">Close
+                        </button>
+                        <button type="submit" class="btn btn-primary"
+                                th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- core:js -->
+<th:block th:replace="public/common :: js"></th:block>
+
+<!-- plugins:js -->
+<script th:src="@{../../assets/vendors/datatables.net/jquery.dataTables.js}"></script>
+<script th:src="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js}"></script>
+<script th:src="@{../../assets/vendors/dropify/dist/dropify.min.js}"></script>
+<script th:src="@{../../assets/js/cluster/manage.create.js}"></script>
+
+</body>
+<script type="text/javascript">
+
+    function errorNoti(msg, icon) {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
+        // error or success
+        Toast.fire({
+            icon: icon,
+            title: msg
+        })
+    }
+
+    function contextFormValid() {
+        var efak_brokerid_label = $("#efak_brokerid_label").val();
+        var efak_brokerhost_label = $("#efak_brokerhost_label").val();
+        var efak_brokerport_label = $("#efak_brokerport_label").val();
+        var efak_brokerjmxport_label = $("#efak_brokerjmxport_label").val();
+        if (efak_brokerid_label.length == 0 || efak_brokerhost_label.length == 0 || efak_brokerport_label.length == 0 || efak_brokerjmxport_label.length == 0) {
+            errorNoti("必填项不能为空", "error");
+            return false;
+        }
+
+        console.log(efak_brokerport_label + "," + efak_brokerjmxport_label)
+        if (!$.isNumeric(efak_brokerport_label) || !$.isNumeric(efak_brokerjmxport_label)) {
+            errorNoti("端口号必须为数字", "error");
+            return false;
+        }
+
+        return true;
+    }
+
+    function contextFormValidBatch() {
+        var file = $("#efak_kafka_broker_batch_import")[0];
+        if (file.value == "") {
+            errorNoti("请选择文件", "error");
+            return false;
+        }
+        return true;
+    }
+</script>
+</html>    
