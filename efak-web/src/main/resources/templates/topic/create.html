@@ -9,6 +9,7 @@
     <title th:text="#{kafka.eagle.topics.create}"></title>
 
     <link rel="stylesheet" th:href="@{../../assets/vendors/dropify/dist/dropify.min.css}">
+    <link rel="stylesheet" th:href="@{../../assets/vendors/select2/select2.min.css}">
     <link rel="stylesheet" th:href="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css}">
     <link rel="stylesheet" th:href="@{../../assets/css/public/cluster/manage.create.css}">
     <th:block th:replace="public/common :: css"></th:block>
@@ -79,10 +80,12 @@
                         <div class="col-md-6">
                             <h4 id="efak_topic_name_retain_unit" th:utext="#{kafka.eagle.topics.retain.unit.name}"></h4>
                             <div class="mb-3">
-                                <input type="text" class="form-control" id="efak_topic_name_retain_unit_create"
-                                       value=""
-                                       placeholder="Enter Name"
-                                       th:placeholder="#{kafka.eagle.topics.replicate.name.placeholder}">
+                                <select id="efak_topic_name_retain_unit_create" class="form-select" data-width="100%">
+                                    <option value="ms" th:text="#{kafka.eagle.topics.retain.unit.ms}">ms</option>
+                                    <option value="min" th:text="#{kafka.eagle.topics.retain.unit.min}">min</option>
+                                    <option value="hour" th:text="#{kafka.eagle.topics.retain.unit.hour}">hour</option>
+                                    <option value="day" th:text="#{kafka.eagle.topics.retain.unit.day}">day</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -232,6 +235,7 @@
 <script th:src="@{../../assets/vendors/datatables.net/jquery.dataTables.js}"></script>
 <script th:src="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js}"></script>
 <script th:src="@{../../assets/vendors/dropify/dist/dropify.min.js}"></script>
+<script th:src="@{../../assets/vendors/select2/select2.min.js}"></script>
 <script th:src="@{../../assets/js/topic/topic.create.js}"></script>
 
 </body>
