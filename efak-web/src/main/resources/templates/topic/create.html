@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title th:text="#{kafka.eagle.manage.create.title.desc}"></title>
+    <title th:text="#{kafka.eagle.topics.create}"></title>
 
     <link rel="stylesheet" th:href="@{../../assets/vendors/dropify/dist/dropify.min.css}">
     <link rel="stylesheet" th:href="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css}">
@@ -38,76 +38,55 @@
                     <p class="lead" th:utext="#{kafka.eagle.topics.create.desc}"></p>
 
                     <hr>
-                    <h4 id="efak_kafka_brokers" th:text="#{kafka.eagle.clusters.manage.create.node}"></h4>
-                    <p id="efak_cluster_create_exist_nodes" class="mb-3"
-                       th:utext="#{kafka.eagle.clusters.manage.create.node.exist}"></p>
-                    <button id="efak_cluset_add_btn" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#efak_kafka_broker_add_modal" data-bs-whatever=""
-                            th:text="#{kafka.eagle.clusters.manage.create.node.btn}"></button>&nbsp;&nbsp;<button
-                        id="efak_cluset_add_batch_btn" type="button" class="btn btn-outline-primary btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#efak_kafka_broker_batch_modal" data-bs-whatever=""
-                        th:text="#{kafka.eagle.clusters.manage.create.node.batch.btn}"></button>
-                    <div class="table-responsive">
-                        <table id="efak_cluster_manage_tbl" class="table table-striped " style="width:100%">
-                            <thead>
-                            <tr th:utext="#{kafka.eagle.clusters.manage.add.node.tr}">
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
-                    <hr>
-
-                    <h4 id="efak_cluster_name" th:text="#{kafka.eagle.clusters.manage.create.name}"></h4>
+                    <h4 id="efak_topic_name" th:utext="#{kafka.eagle.topics.create.name}"></h4>
                     <div class="mb-3">
-                        <input type="text" class="form-control" id="efak_cluster_name_create" maxlength="128" value=""
-                               placeholder="Enter Name" th:value="#{kafka.eagle.clusters.manage.create.name.test}"
-                               th:placeholder="#{kafka.eagle.clusters.manage.create.name.placeholder}">
-                        <input type="hidden" id="efak_cluster_auth_isopen" name="efak_cluster_auth_isopen"/>
-                        <input type="hidden" id="efak_cluster_edit" name="efak_cluster_edit"/>
+                        <input type="text" class="form-control" id="efak_topic_name_create" maxlength="128" value=""
+                               placeholder="Enter Name"
+                               th:placeholder="#{kafka.eagle.topics.create.name.placeholder}">
                     </div>
                     <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 id="efak_topic_name_partition" th:utext="#{kafka.eagle.topics.partition.name}"></h4>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="efak_topic_name_partition_create"
+                                       value=""
+                                       placeholder="Enter Name"
+                                       th:placeholder="#{kafka.eagle.topics.partition.name.placeholder}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 id="efak_topic_name_replicate" th:utext="#{kafka.eagle.topics.replicate.name}"></h4>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="efak_topic_name_replicate_create"
+                                       value=""
+                                       placeholder="Enter Name"
+                                       th:placeholder="#{kafka.eagle.topics.replicate.name.placeholder}">
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 id="efak_topic_name_retain" th:utext="#{kafka.eagle.topics.retain.name}"></h4>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="efak_topic_name_retain_create"
+                                       value=""
+                                       placeholder="Enter Name"
+                                       th:placeholder="#{kafka.eagle.topics.retain.name.placeholder}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 id="efak_topic_name_retain_unit" th:utext="#{kafka.eagle.topics.retain.unit.name}"></h4>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="efak_topic_name_retain_unit_create"
+                                       value=""
+                                       placeholder="Enter Name"
+                                       th:placeholder="#{kafka.eagle.topics.replicate.name.placeholder}">
+                            </div>
+                        </div>
+                    </div>
 
-                    <h4 id="efak_kafka_kraft" th:text="#{kafka.eagle.clusters.manage.add.node.auth.check}"></h4>
-                    <div class="efak_kraft_card-list">
-                        <div style="margin-right: 22px;">
-                            <div id="efak_kafka_kraft_enable" class="efak_kraft_version_card ">
-                                <div class="efak_kraft_detail_info">
-                                    <div class="efak_kraft_title">Authentication</div>
-                                    <div class="efak_kraft_version_type_enable">开启</div>
-                                    <div class="efak_kraft_version_info">Kafka集群加密访问</div>
-                                </div>
-                                <img src="../../assets/images/profile.png"
-                                     class="efak_kraft_logo">
-                                <div id="efak_kraft_enable_checked" style="display: none"
-                                     class="efak_kraft_version_checked">
-                                    <div class="efak_kraft_badges"></div>
-                                    <div class="efak_kraft_check"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="margin-right: 22px;">
-                            <div id="efak_kafka_kraft_disable" class="efak_kraft_version_card ">
-                                <div class="efak_kraft_detail_info">
-                                    <div class="efak_kraft_title">None</div>
-                                    <div class="efak_kraft_version_type_disable">禁止</div>
-                                    <div class="efak_kraft_version_info">Kafka集群明文访问</div>
-                                </div>
-                                <img src="../../assets/images/profile.png"
-                                     class="efak_kraft_logo">
-                                <div id="efak_kraft_disable_checked" style="display: none"
-                                     class="efak_kraft_version_checked">
-                                    <div class="efak_kraft_badges"></div>
-                                    <div class="efak_kraft_check"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <h4 id="efak_kafka_auth_desc" th:text="#{kafka.eagle.clusters.manage.add.node.auth.config}"></h4>
-                    <textarea class="form-control" id="efak_kafka_auth_config"
-                              th:placeholder="#{kafka.eagle.clusters.manage.add.node.auth.config.placeholder}"
-                              rows="10"></textarea>
                     <hr>
 
                     <div class="example">
@@ -253,7 +232,7 @@
 <script th:src="@{../../assets/vendors/datatables.net/jquery.dataTables.js}"></script>
 <script th:src="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js}"></script>
 <script th:src="@{../../assets/vendors/dropify/dist/dropify.min.js}"></script>
-<script th:src="@{../../assets/js/cluster/manage.create.js}"></script>
+<script th:src="@{../../assets/js/topic/topic.create.js}"></script>
 
 </body>
 <script type="text/javascript">

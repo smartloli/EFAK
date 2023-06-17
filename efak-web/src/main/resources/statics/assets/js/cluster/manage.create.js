@@ -40,6 +40,11 @@ try {
     console.log(e);
 }
 
+$("#efak_cluster_name_create").maxlength({
+    warningClass: "badge mt-1 bg-success",
+    limitReachedClass: "badge mt-1 bg-danger"
+});
+
 $("#efak_cluster_manage_tbl").DataTable({
     "bSort": false,
     "bLengthChange": false,
