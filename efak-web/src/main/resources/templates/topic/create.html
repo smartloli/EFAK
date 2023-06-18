@@ -81,10 +81,10 @@
                             <h4 id="efak_topic_name_retain_unit" th:utext="#{kafka.eagle.topics.retain.unit.name}"></h4>
                             <div class="mb-3">
                                 <select id="efak_topic_name_retain_unit_create" class="form-select" data-width="100%">
+                                    <option value="day" th:text="#{kafka.eagle.topics.retain.unit.day}">day</option>
                                     <option value="ms" th:text="#{kafka.eagle.topics.retain.unit.ms}">ms</option>
                                     <option value="min" th:text="#{kafka.eagle.topics.retain.unit.min}">min</option>
                                     <option value="hour" th:text="#{kafka.eagle.topics.retain.unit.hour}">hour</option>
-                                    <option value="day" th:text="#{kafka.eagle.topics.retain.unit.day}">day</option>
                                 </select>
                             </div>
                         </div>
@@ -94,10 +94,10 @@
 
                     <div class="example">
                         <div style="text-align: center;">
-                            <button id="efak_cluster_create_cancle" type="button" class="btn btn-secondary btn-lg"
-                                    th:text="#{kafka.eagle.clusters.manage.create.cancle}"></button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button id="efak_topic_create_cancle" type="button" class="btn btn-secondary btn-lg"
+                                    th:text="#{kafka.eagle.topic.manage.create.cancle}"></button>&nbsp;&nbsp;&nbsp;&nbsp;
                             <button type="button" id="efak_cluster_create_submit" class="btn btn-primary btn-lg"
-                                    th:text="#{kafka.eagle.clusters.manage.create}"></button>
+                                    th:text="#{kafka.eagle.topics.create}"></button>
                         </div>
                     </div>
 
@@ -105,20 +105,16 @@
                 <div class="col-xl-2 content-nav-wrapper">
                     <ul class="nav content-nav d-flex flex-column">
                         <li class="nav-item">
-                            <a href="#efak_kafka_brokers" class="nav-link"
-                               th:text="#{kafka.eagle.clusters.manage.create.node}"></a>
+                            <a href="#efak_topic_name" class="nav-link"
+                               th:text="#{kafka.eagle.topic.create.name.link}"></a>
                         </li>
                         <li class="nav-item">
-                            <a href="#efak_cluster_name" class="nav-link"
-                               th:text="#{kafka.eagle.clusters.manage.create.name}"></a>
+                            <a href="#efak_topic_name_partition" class="nav-link"
+                               th:text="#{kafka.eagle.topic.partition.name.link}"></a>
                         </li>
                         <li class="nav-item">
-                            <a href="#efak_kafka_kraft" class="nav-link"
-                               th:text="#{kafka.eagle.clusters.manage.add.node.auth.check}"></a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#efak_kafka_auth_desc" class="nav-link"
-                               th:text="#{kafka.eagle.clusters.manage.add.node.auth.config}"></a>
+                            <a href="#efak_topic_name_retain" class="nav-link"
+                               th:text="#{kafka.eagle.topic.retain.name.link}"></a>
                         </li>
                     </ul>
                 </div>

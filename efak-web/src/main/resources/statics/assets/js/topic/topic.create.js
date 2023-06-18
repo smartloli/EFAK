@@ -9,6 +9,9 @@ $("#efak_topic_name_create").maxlength({
 });
 
 if ($("#efak_topic_name_retain_unit_create").length) {
-    console.log("select2");
     $("#efak_topic_name_retain_unit_create").select2();
 }
+
+$("#efak_topic_create_cancle").click(function () {
+    window.location.href = '/topic/list';
+});

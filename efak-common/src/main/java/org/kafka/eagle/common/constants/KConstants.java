@@ -47,4 +47,14 @@ public class KConstants {
         public static final int CLUSTER_ID_LIST_LIMIT = 5;
     }
 
+    /**
+     * Kafka parameter setting.
+     */
+    public static final class Kafka {
+        private Kafka() {
+        }
+
+        public static final String EFAK_SYSTEM_GROUP = "efak.system.group";
+    }
+
 }

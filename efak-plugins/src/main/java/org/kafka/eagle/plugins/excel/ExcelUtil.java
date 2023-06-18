@@ -45,7 +45,7 @@ public class ExcelUtil {
         // Read the first sheet from the workbook
         Sheet sheet = workbook.getSheetAt(0);
 
-        List<ClusterCreateInfo> data = new ArrayList<>();
+        List<ClusterCreateInfo> data = new ArrayList<ClusterCreateInfo>();
         // Read the second row, which is the first row of data.
         int startRow = 1;
         for (int i = startRow; i <= sheet.getLastRowNum(); i++) {
