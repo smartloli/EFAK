@@ -20,14 +20,14 @@ CREATE TABLE IF NOT EXISTS ke_brokers(
     broker_id VARCHAR(128) NOT NULL COMMENT 'Broker ID',
     broker_host VARCHAR(128) NOT NULL COMMENT 'Broker Host',
     broker_port INT NOT NULL COMMENT 'Broker Port',
-    broker_port_status SMALLINT COMMENT 'Broker JMX Port Status: 0-Not Available, 1-Available',
-    broker_jmx_port INT COMMENT 'Broker JMX Port',
-    broker_jmx_port_status SMALLINT COMMENT 'Broker JMX Port Status: 0-Not Available, 1-Available',
-    broker_memory_used_rate DOUBLE COMMENT 'Broker Memory Used Rate',
-    broker_cpu_used_rate DOUBLE COMMENT 'Broker CPU Used Rate',
-    broker_startup_time DATETIME COMMENT 'Broker Startup Time',
+    broker_port_status SMALLINT NOT NULL COMMENT 'Broker JMX Port Status: 0-Not Available, 1-Available',
+    broker_jmx_port INT NOT NULL COMMENT 'Broker JMX Port',
+    broker_jmx_port_status SMALLINT NOT NULL COMMENT 'Broker JMX Port Status: 0-Not Available, 1-Available',
+    broker_memory_used_rate DOUBLE NOT NULL COMMENT 'Broker Memory Used Rate',
+    broker_cpu_used_rate DOUBLE NOT NULL COMMENT 'Broker CPU Used Rate',
+    broker_startup_time DATETIME NOT NULL COMMENT 'Broker Startup Time',
     modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
-    broker_version VARCHAR(128) COMMENT 'Broker Version',
+    broker_version VARCHAR(128) NOT NULL COMMENT 'Broker Version',
     INDEX idx_cluster_id (cluster_id),
     INDEX idx_broker_id (broker_id),
     INDEX idx_broker_host (broker_host),
@@ -46,3 +46,18 @@ CREATE TABLE IF NOT EXISTS ke_clusters_create(
     modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
     INDEX idx_cluster_id (cluster_id)
 ) COMMENT 'Cluster Create Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS ke_topics(
+    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key ClusterId',
+    cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
+    topic_name VARCHAR(128) NOT NULL COMMENT 'Topic Name',
+    partitions INT COMMENT 'Partitions',
+    replications INT COMMENT 'Replications',
+    broker_spread INT COMMENT 'Broker Spread',
+    broker_skewed INT COMMENT 'Broker Skewed',
+    broker_leader_skewed INT COMMENT 'Broker Spread',
+    retain_ms BIGINT COMMENT 'Retain Ms',
+    modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
+    INDEX idx_cluster_id (cluster_id),
+    INDEX idx_cluster_topic_id (cluster_id,topic_name)
+) COMMENT 'Topic Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
