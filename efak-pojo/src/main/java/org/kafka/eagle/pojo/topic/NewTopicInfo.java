@@ -32,7 +32,7 @@ public class NewTopicInfo {
     /**
      * Topic name.
      */
-    private String tableName;
+    private String topicName;
 
     /**
      * Topic partitions.

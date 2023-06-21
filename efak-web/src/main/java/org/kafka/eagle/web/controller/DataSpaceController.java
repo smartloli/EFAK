@@ -19,6 +19,7 @@ package org.kafka.eagle.web.controller;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.kafka.eagle.common.constants.KConstants;
+import org.kafka.eagle.common.utils.Md5Util;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
 import org.kafka.eagle.web.service.IBrokerDaoService;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -65,9 +67,10 @@ public class DataSpaceController {
 
 
     @GetMapping("/dashboard/{cid}")
-    public String dashboardView(@PathVariable("cid") Long cid, HttpSession session) {
-        session.removeAttribute(KConstants.SessionClusterId.CLUSTER_ID);
-        session.setAttribute(KConstants.SessionClusterId.CLUSTER_ID, cid);
+    public String dashboardView(@PathVariable("cid") Long cid, HttpSession session, HttpServletRequest request) {
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + request.getRemoteAddr());
+        session.removeAttribute(clusterAlias);
+        session.setAttribute(clusterAlias, cid);
         return "dataspace/dashboard.html";
     }
 

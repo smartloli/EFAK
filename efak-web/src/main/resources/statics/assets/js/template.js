@@ -44,8 +44,7 @@
       return new bootstrap.Popover(popoverTriggerEl)
     })
 
-
-    // Applying perfect-scrollbar 
+    // Applying perfect-scrollbar
     if ($('.sidebar .sidebar-body').length) {
       const sidebarBodyScroll = new PerfectScrollbar('.sidebar-body');
     }

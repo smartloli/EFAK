@@ -51,6 +51,19 @@ public class KConstants {
     }
 
     /**
+     * Login session.
+     */
+    public final class Login {
+        private Login() {
+        }
+
+        public static final String SESSION_USER = "LOGIN_USER_SESSION";
+        public static final String SESSION_USER_TIME = "LOGIN_USER_SESSION_TIME";
+        public static final String UNKNOW_USER = "__unknow__";
+        public static final String ERROR_LOGIN = "error_msg";
+    }
+
+    /**
      * Kafka parameter setting.
      */
     public static final class Kafka {

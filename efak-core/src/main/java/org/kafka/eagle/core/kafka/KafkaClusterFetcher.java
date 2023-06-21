@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.core.kafka;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.JmxConstants;
 import org.kafka.eagle.common.utils.NetUtil;
@@ -35,6 +36,7 @@ import java.lang.management.MemoryMXBean;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 /**
  * Description: TODO
@@ -46,6 +48,17 @@ import java.time.ZoneId;
 @Slf4j
 public class KafkaClusterFetcher {
     private KafkaClusterFetcher() {
+    }
+
+    public static String parseBrokerServer(List<BrokerInfo> brokerInfos) {
+        String brokerServer = "";
+        for (BrokerInfo brokerInfo : brokerInfos) {
+            brokerServer += brokerInfo.getBrokerHost() + ":" + brokerInfo.getBrokerPort() + ",";
+        }
+        if (StrUtil.isBlank(brokerServer)) {
+            return "";
+        }
+        return brokerServer.substring(0, brokerServer.length() - 1);
     }
 
     public static BrokerInfo getKafkaJmxInfo(JMXInitializeInfo initializeInfo) {

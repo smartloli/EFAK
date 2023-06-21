@@ -24,6 +24,7 @@ import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartitionInfo;
+import org.apache.kafka.common.config.TopicConfig;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.topic.MetadataInfo;
 import org.kafka.eagle.pojo.topic.NewTopicInfo;
@@ -46,13 +47,13 @@ public class KafkaSchemaFactory {
         this.plugin = plugin;
     }
 
-    public Map<String, Object> createTableName(KafkaClientInfo kafkaClientInfo, NewTopicInfo newTopicInfo) {
-        Map<String, Object> targets = new HashMap<String, Object>();
+    public boolean createTableName(KafkaClientInfo kafkaClientInfo, NewTopicInfo newTopicInfo) {
         boolean status = false;
         AdminClient adminClient = null;
         try {
             adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
-            NewTopic newTopic = new NewTopic(newTopicInfo.getTableName(), newTopicInfo.getPartitions(), newTopicInfo.getReplication());
+            NewTopic newTopic = new NewTopic(newTopicInfo.getTopicName(), newTopicInfo.getPartitions(), newTopicInfo.getReplication());
+            newTopic.configs(Collections.singletonMap(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(newTopicInfo.getRetainMs())));
             adminClient.createTopics(Collections.singleton(newTopic)).all().get();
             status = true;
         } catch (Exception e) {
@@ -62,12 +63,10 @@ public class KafkaSchemaFactory {
             adminClient.close();
         }
 
-        targets.put("status", status);
-        targets.put("info", newTopicInfo.toString());
-        return targets;
+        return status;
     }
 
-    public Set<String> getTableNames(KafkaClientInfo kafkaClientInfo) {
+    public Set<String> getTopicNames(KafkaClientInfo kafkaClientInfo) {
         if (tableNames == null) {
             KafkaConsumer<?, ?> kafkaConsumer = null;
             try {
@@ -172,7 +171,7 @@ public class KafkaSchemaFactory {
 
         KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
         kafkaClientInfo.setBrokerServer("127.0.0.1:9092");
-        log.info("topic name is : {}", ksf.getTableNames(kafkaClientInfo).toString());
+        log.info("topic name is : {}", ksf.getTopicNames(kafkaClientInfo).toString());
 
         List<MetadataInfo> metadataInfos = ksf.getTopicMetaData(kafkaClientInfo, "ke28");
         log.info("metadataInfos: {}", metadataInfos.toString());

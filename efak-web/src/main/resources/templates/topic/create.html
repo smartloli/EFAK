@@ -96,7 +96,7 @@
                         <div style="text-align: center;">
                             <button id="efak_topic_create_cancle" type="button" class="btn btn-secondary btn-lg"
                                     th:text="#{kafka.eagle.topic.manage.create.cancle}"></button>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <button type="button" id="efak_cluster_create_submit" class="btn btn-primary btn-lg"
+                            <button type="button" id="efak_topic_create_submit" class="btn btn-primary btn-lg"
                                     th:text="#{kafka.eagle.topics.create}"></button>
                         </div>
                     </div>
@@ -127,101 +127,6 @@
 
     </div>
 
-    <!-- single add node -->
-    <div class="modal fade" id="efak_kafka_broker_add_modal" tabindex="-1" aria-labelledby="varyingModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="varyingModalLabel"
-                        th:utext="#{kafka.eagle.clusters.manage.add.node}"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
-                </div>
-                <form role="form" action="/clusters/manage/add/single" method="post"
-                      onsubmit="return contextFormValid();return false;">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="efak_brokerid_label" class="form-label"
-                                   th:utext="#{kafka.eagle.clusters.manage.add.node.id}">BrokerId:</label>
-                            <input type="text" class="form-control" id="efak_brokerid_label" name="efak_brokerid_name">
-                            <input type="hidden" class="form-control" id="efak_clusterid" name="efak_clusterid_name">
-                            <input type="hidden" class="form-control" id="efak_dataid" name="efak_dataid">
-                        </div>
-                        <div class="mb-3">
-                            <label for="efak_brokerhost_label" class="form-label"
-                                   th:utext="#{kafka.eagle.clusters.manage.add.node.host}">BrokerHost:</label>
-                            <input type="text" class="form-control" id="efak_brokerhost_label"
-                                   name="efak_brokerhost_name">
-                        </div>
-                        <div class="mb-3">
-                            <label for="efak_brokerport_label" class="form-label"
-                                   th:utext="#{kafka.eagle.clusters.manage.add.node.port}">BrokerPort:</label>
-                            <input type="text" class="form-control" id="efak_brokerport_label"
-                                   name="efak_brokerport_name">
-                        </div>
-                        <div class="mb-3">
-                            <label for="efak_brokerjmxport_label" class="form-label"
-                                   th:utext="#{kafka.eagle.clusters.manage.add.node.jmxport}">BrokerJmxPort:</label>
-                            <input type="text" class="form-control" id="efak_brokerjmxport_label"
-                                   name="efak_brokerjmxport_name">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                th:text="#{kafka.eagle.clusters.manage.button.close}">Close
-                        </button>
-                        <button type="submit" class="btn btn-primary"
-                                th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- batch add nodes -->
-    <div class="modal fade" id="efak_kafka_broker_batch_modal" tabindex="-1" aria-labelledby="varyingModalLabelBatch"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="varyingModalLabelBatch"
-                        th:text="#{kafka.eagle.clusters.manage.add.batch.node}"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
-                </div>
-                <form role="form" action="/clusters/manage/add/batch" enctype="multipart/form-data" method="post"
-                      onsubmit="return contextFormValidBatch();return false;">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="efak_batch_module_download" class="form-label"
-                                   th:text="#{kafka.eagle.clusters.manage.add.batch.module}">Module:</label><br/>
-                            <button id="efak_batch_module_download" type="button" class="btn btn-outline-primary btn-sm"
-                                    th:utext="#{kafka.eagle.clusters.manage.add.batch.module.download}"></button>
-                        </div>
-                        <div class="mb-3">
-                            <label for="efak_batch_module_download" class="form-label"
-                                   th:text="#{kafka.eagle.clusters.manage.add.batch.node.import}">Module:</label><br/>
-                            <div>
-                                <input type="file" id="efak_kafka_broker_batch_import" name="file"
-                                       data-allowed-file-extensions="xlsx xls" data-max-file-size="100M"/>
-                                <input id="cid"
-                                       name="cid" type="hidden" class="form-control"/>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                th:text="#{kafka.eagle.clusters.manage.button.close}">Close
-                        </button>
-                        <button type="submit" class="btn btn-primary"
-                                th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- core:js -->
