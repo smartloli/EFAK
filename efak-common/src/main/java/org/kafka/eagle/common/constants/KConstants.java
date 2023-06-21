@@ -114,6 +114,11 @@ public class KConstants {
 
         public static final int BATCH_SIZE = 50;
 
+        /**
+         * used by batch quartz task.
+         */
+        public static final int TOPIC_QUARTZ_BATCH_SIZE=100;
+
         public static final long TOPIC_BROKER_SPREAD_ERROR = 60;
         public static final long TOPIC_BROKER_SPREAD_NORMAL = 80;
         public static final long TOPIC_BROKER_SKEW_ERROR = 80;
