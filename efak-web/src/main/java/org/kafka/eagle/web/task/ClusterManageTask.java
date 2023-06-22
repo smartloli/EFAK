@@ -59,6 +59,9 @@ public class ClusterManageTask {
     @Autowired
     private IBrokerDaoService brokerDaoService;
 
+    /**
+     * check cluster and broker healthy status task.
+     */
     @Async
     @Scheduled(fixedRate = 60000)
     public void clusterHealthyTask() {
