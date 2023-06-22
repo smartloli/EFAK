@@ -17,6 +17,8 @@
  */
 package org.kafka.eagle.common.utils;
 
+import org.kafka.eagle.common.constants.KConstants;
+
 /**
  * Description: TODO
  *
@@ -39,6 +41,50 @@ public class HtmlAttributeUtil {
         } else if (status == 2) {
             result = "<span class='badge bg-secondary'>初始化</span>";
         }
+        return result;
+    }
+
+    public static String getTopicSpreadHtml(int brokerSpread) {
+        String result = "";
+        if (brokerSpread < KConstants.Topic.TOPIC_BROKER_SPREAD_ERROR) {
+            result = "<span class='badge bg-danger'>异常</span>";
+        } else if (brokerSpread >= KConstants.Topic.TOPIC_BROKER_SPREAD_ERROR && brokerSpread < KConstants.Topic.TOPIC_BROKER_SPREAD_NORMAL) {
+            result = "<span class='badge bg-warning'>警告</span>";
+        } else if (brokerSpread >= KConstants.Topic.TOPIC_BROKER_SPREAD_NORMAL) {
+            result = "<span class='badge bg-success'>健康</span>";
+        } else {
+            result = "<span class='badge bg-secondary'>未知</span>";
+        }
+        return result;
+    }
+
+    public static String getTopicSkewedHtml(int brokerSkewed) {
+        String result = "";
+        if (brokerSkewed >= KConstants.Topic.TOPIC_BROKER_SKEW_ERROR) {
+            result = "<span class='badge bg-danger'>异常</span>";
+        } else if (brokerSkewed > KConstants.Topic.TOPIC_BROKER_SKEW_NORMAL && brokerSkewed < KConstants.Topic.TOPIC_BROKER_SKEW_ERROR) {
+            result = "<span class='badge bg-warning'>警告</span>";
+        } else if (brokerSkewed <= KConstants.Topic.TOPIC_BROKER_SKEW_NORMAL) {
+            result = "<span class='badge bg-success'>健康</span>";
+        } else {
+            result = "<span class='badge bg-secondary'>未知</span>";
+        }
+
+        return result;
+    }
+
+    public static String getTopicLeaderSkewedHtml(int brokerLeaderSkewed) {
+        String result = "";
+        if (brokerLeaderSkewed >= KConstants.Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
+            result = "<span class='badge bg-danger'>异常</span>";
+        } else if (brokerLeaderSkewed > KConstants.Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL && brokerLeaderSkewed < KConstants.Topic.TOPIC_BROKER_LEADER_SKEW_ERROR) {
+            result = "<span class='badge bg-warning'>警告</span>";
+        } else if (brokerLeaderSkewed <= KConstants.Topic.TOPIC_BROKER_LEADER_SKEW_NORMAL) {
+            result = "<span class='badge bg-success'>健康</span>";
+        } else {
+            result = "<span class='badge bg-secondary'>未知</span>";
+        }
+
         return result;
     }
 

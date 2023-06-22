@@ -80,7 +80,14 @@ public class TopicDaoServiceImpl extends ServiceImpl<TopicDaoMapper, TopicInfo> 
 
     @Override
     public Page<TopicInfo> pages(Map<String, Object> params) {
-        return null;
+        int start = Integer.parseInt(params.get("start").toString());
+        int size = Integer.parseInt(params.get("size").toString());
+
+        Page<TopicInfo> pages = new Page<>(start, size);
+
+        LambdaQueryChainWrapper<TopicInfo> queryChainWrapper = new LambdaQueryChainWrapper<TopicInfo>(this.topicDaoMapper);
+        queryChainWrapper.like(TopicInfo::getTopicName, params.get("search").toString());
+        return queryChainWrapper.orderByDesc(TopicInfo::getRetainMs).page(pages);
     }
 
     @Override

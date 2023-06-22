@@ -41,4 +41,11 @@ public class MathUtil {
         }
         return percent;
     }
+
+    public static double millis2Hours(long millis) {
+        double percent = 0.00;
+        double calc = millis / 1000.0 / 60.0 / 60.0;
+        percent = StrUtils.numberic(calc);
+        return percent;
+    }
 }
