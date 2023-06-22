@@ -17,7 +17,10 @@
  */
 package org.kafka.eagle.web.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -52,17 +55,27 @@ public class TopicDaoServiceImpl extends ServiceImpl<TopicDaoMapper, TopicInfo> 
 
     @Override
     public List<TopicInfo> topics(String clusterId) {
-        return null;
+        return new LambdaQueryChainWrapper<>(this.topicDaoMapper).eq(TopicInfo::getClusterId, clusterId).list();
+    }
+
+    @Override
+    public TopicInfo topics(String clusterId, String topicName) {
+        return new LambdaQueryChainWrapper<>(this.topicDaoMapper).eq(TopicInfo::getClusterId, clusterId).eq(TopicInfo::getTopicName, topicName).one();
     }
 
     @Override
     public TopicInfo topic(Long id) {
-        return null;
+        return new LambdaQueryChainWrapper<>(this.topicDaoMapper).eq(TopicInfo::getId, id).one();
     }
 
     @Override
     public boolean insert(TopicInfo topicInfo) {
-        return false;
+        boolean status = false;
+        int code = this.topicDaoMapper.insert(topicInfo);
+        if (code > 0) {
+            status = true;
+        }
+        return status;
     }
 
     @Override
@@ -72,7 +85,14 @@ public class TopicDaoServiceImpl extends ServiceImpl<TopicDaoMapper, TopicInfo> 
 
     @Override
     public boolean update(TopicInfo topicInfo) {
-        return false;
+        TopicInfo checkTopicInfo = this.topics(topicInfo.getClusterId(), topicInfo.getTopicName());
+        if (checkTopicInfo == null || StrUtil.isBlank(checkTopicInfo.getTopicName())) {
+            return this.insert(topicInfo);
+        } else {
+            LambdaUpdateChainWrapper<TopicInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<TopicInfo>(this.topicDaoMapper);
+            lambdaUpdateChainWrapper.eq(TopicInfo::getClusterId, topicInfo.getClusterId()).eq(TopicInfo::getTopicName, topicInfo.getTopicName());
+            return lambdaUpdateChainWrapper.update(topicInfo);
+        }
     }
 
     @Override
@@ -82,11 +102,30 @@ public class TopicDaoServiceImpl extends ServiceImpl<TopicDaoMapper, TopicInfo> 
 
     @Override
     public boolean update(List<TopicInfo> topicInfos) {
-        return false;
+        log.info("Topic batch update.");
+        if (topicInfos == null || CollectionUtils.isEmpty(topicInfos) || topicInfos.size() == 0) {
+            return false;
+        }
+
+        TopicInfo topicInfo = topicInfos.get(0);
+        List<TopicInfo> brokerInfosInDb = this.topics(topicInfo.getClusterId());
+        if (CollectionUtils.isEmpty(brokerInfosInDb)) {
+            return this.batch(topicInfos);
+        } else {
+            return this.updateBatchById(topicInfos);
+        }
+
     }
 
     @Override
     public boolean batch(List<TopicInfo> topicInfos) {
-        return false;
+
+        boolean status = false;
+
+        int code = this.topicDaoMapper.insertBatchSomeColumn(topicInfos);
+        if (code > 0) {
+            status = true;
+        }
+        return status;
     }
 }

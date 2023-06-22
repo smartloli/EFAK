@@ -26,6 +26,14 @@ public interface ITopicDaoService extends IService<TopicInfo> {
     List<TopicInfo> topics(String clusterId);
 
     /**
+     * Get topic info by clusterId and topic name.
+     * @param clusterId
+     * @param topicName
+     * @return
+     */
+    TopicInfo topics(String clusterId,String topicName);
+
+    /**
      * Get topic info by id(topic id).
      * @param id
      * @return

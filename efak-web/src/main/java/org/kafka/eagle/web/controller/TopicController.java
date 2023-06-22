@@ -87,7 +87,9 @@ public class TopicController {
     @ResponseBody
     @RequestMapping(value = "/name/create", method = RequestMethod.POST)
     public String createClusterById(NewTopicInfo newTopicInfo, HttpServletResponse response, HttpSession session, HttpServletRequest request) {
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + request.getRemoteAddr());
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic create:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
         Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
         ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
         List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());

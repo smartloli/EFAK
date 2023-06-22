@@ -64,17 +64,23 @@ public class KafkaClientInfo {
     private String sslAlgorithm;
 
     /**
-     * key.deserializer
+     * key.deserializer by consumer
      */
     private String keyDeserializer;
 
     /**
-     * value.deserializer
+     * value.deserializer by consumer
      */
     private String valueDeserializer;
 
+    /**
+     * key.serializer by producer
+     */
     private  String keySerializer;
 
+    /**
+     * value.serializer by producer
+     */
     private String valueSerializer;
 
 

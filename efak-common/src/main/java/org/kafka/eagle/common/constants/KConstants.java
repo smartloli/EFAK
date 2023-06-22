@@ -22,6 +22,7 @@ import java.util.List;
 
 /**
  * Description: TODO
+ *
  * @Author: smartloli
  * @Date: 2023/6/7 15:22
  * @Version: 3.4.0
@@ -34,6 +35,19 @@ public class KConstants {
 
         public static final int TIME_OUT = 3000;
         public static final int BUFFER_SIZE = 8049;
+    }
+
+    public static final class Cluster {
+        private Cluster() {
+        }
+
+        public static final String ENABLE_AUTH = "Y";
+        // public static final String DISABLE_AUTH = "N";
+
+        public static final String AUTH_TYPE_SASL = "SASL";
+
+        public static final String AUTH_TYPE_SSL = "SSL";
+
     }
 
     /**
@@ -80,6 +94,8 @@ public class KConstants {
         private Topic() {
         }
 
+        public static final String CONSUMER_OFFSET_TOPIC = "__consumer_offsets";
+
         public static final int PARTITION_LENGTH = 10;
 
         public static List<String> getTopicConfigKeys() {
@@ -110,14 +126,14 @@ public class KConstants {
         public static final String RETENTION_MS_KEY = "retention.ms";
         public static final String RETENTION_MS_VALUE = "1000";
 
-        public static final String RETENTION_MS_DEFAULT_VALUE="86400000"; // default 24 hour
+        public static final String RETENTION_MS_DEFAULT_VALUE = "86400000"; // default 24 hour
 
         public static final int BATCH_SIZE = 50;
 
         /**
          * used by batch quartz task.
          */
-        public static final int TOPIC_QUARTZ_BATCH_SIZE=100;
+        public static final int TOPIC_QUARTZ_BATCH_SIZE = 100;
 
         public static final long TOPIC_BROKER_SPREAD_ERROR = 60;
         public static final long TOPIC_BROKER_SPREAD_NORMAL = 80;

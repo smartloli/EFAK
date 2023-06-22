@@ -18,17 +18,17 @@
 package org.kafka.eagle.core.kafka;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.DescribeTopicsResult;
-import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartitionInfo;
+import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.TopicConfig;
+import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.topic.MetadataInfo;
 import org.kafka.eagle.pojo.topic.NewTopicInfo;
+import org.kafka.eagle.pojo.topic.TopicMetadataInfo;
 
 import java.util.*;
 
@@ -42,7 +42,7 @@ import java.util.*;
 @Slf4j
 public class KafkaSchemaFactory {
     private final KafkaStoragePlugin plugin;
-    private Set<String> tableNames;
+    // private Set<String> tableNames;
 
     public KafkaSchemaFactory(final KafkaStoragePlugin plugin) {
         this.plugin = plugin;
@@ -68,18 +68,22 @@ public class KafkaSchemaFactory {
     }
 
     public Set<String> getTopicNames(KafkaClientInfo kafkaClientInfo) {
-        if (tableNames == null) {
-            KafkaConsumer<?, ?> kafkaConsumer = null;
-            try {
-                kafkaConsumer = new KafkaConsumer<>(plugin.getKafkaConsumerProps(kafkaClientInfo));
-                tableNames = kafkaConsumer.listTopics().keySet();
-            } catch (Exception e) {
-                log.error("Failure while loading table names for database '{}': {}", kafkaClientInfo, e);
-            } finally {
-                plugin.registerToClose(kafkaConsumer);
-            }
+        Set<String> topicNames = new HashSet<>();
+
+        KafkaConsumer<?, ?> kafkaConsumer = null;
+        try {
+            kafkaConsumer = new KafkaConsumer<>(plugin.getKafkaConsumerProps(kafkaClientInfo));
+            topicNames = kafkaConsumer.listTopics().keySet();
+        } catch (Exception e) {
+            log.error("Failure while loading table names for database '{}': {}", kafkaClientInfo, e);
+        } finally {
+            plugin.registerToClose(kafkaConsumer);
         }
-        return tableNames;
+
+        if (topicNames != null && topicNames.contains(KConstants.Topic.CONSUMER_OFFSET_TOPIC)) {
+            topicNames.remove(KConstants.Topic.CONSUMER_OFFSET_TOPIC);
+        }
+        return topicNames;
     }
 
     public List<String> getTopicPartitionsOfString(KafkaClientInfo kafkaClientInfo, String topic) {
@@ -167,14 +171,24 @@ public class KafkaSchemaFactory {
         return partitions;
     }
 
-    public Map<String,List<MetadataInfo>> getTopicMetaData(KafkaClientInfo kafkaClientInfo, List<String> topics) {
-        Map<String,List<MetadataInfo>> topicMetas = new HashMap<>();
+    public Map<String, TopicMetadataInfo> getTopicMetaData(KafkaClientInfo kafkaClientInfo, Set<String> topics) {
+        Map<String, TopicMetadataInfo> topicMetas = new HashMap<>();
 
         AdminClient adminClient = null;
         try {
             adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
             DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(topics);
+
+            List<ConfigResource> configResources = new ArrayList<>();
+            for (String topic : topics) {
+                ConfigResource resource = new ConfigResource(ConfigResource.Type.TOPIC, topic);
+                configResources.add(resource);
+            }
+            DescribeConfigsResult describeConfigsResult = adminClient.describeConfigs(configResources);
+            Map<ConfigResource, Config> topicConfigDescMap = describeConfigsResult.all().get();
+
             for (Map.Entry<String, TopicDescription> entry : describeTopicsResult.allTopicNames().get().entrySet()) {
+                TopicMetadataInfo topicMetadataInfo = new TopicMetadataInfo();
                 List<MetadataInfo> partitions = new ArrayList<>();
                 for (TopicPartitionInfo tp : entry.getValue().partitions()) {
                     MetadataInfo metadata = new MetadataInfo();
@@ -193,7 +207,15 @@ public class KafkaSchemaFactory {
                     metadata.setReplicas(replicas.toString());
                     partitions.add(metadata);
                 }
-                topicMetas.put(entry.getKey(),partitions);
+
+                ConfigResource resource = new ConfigResource(ConfigResource.Type.TOPIC, entry.getKey());
+                Config topicConfig = topicConfigDescMap.get(resource);
+                String retentionMs = topicConfig.get(TopicConfig.RETENTION_MS_CONFIG).value();
+
+                topicMetadataInfo.setMetadataInfos(partitions);
+                topicMetadataInfo.setRetainMs(retentionMs);
+
+                topicMetas.put(entry.getKey(), topicMetadataInfo);
             }
         } catch (Exception e) {
             log.error("Failure while loading topics meta for kafka '{}': {}", kafkaClientInfo, e);
@@ -208,9 +230,13 @@ public class KafkaSchemaFactory {
 
         KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
         kafkaClientInfo.setBrokerServer("127.0.0.1:9092");
-        log.info("topic name is : {}", ksf.getTopicNames(kafkaClientInfo).toString());
-
-        Map<String,List<MetadataInfo>> metadataInfos = ksf.getTopicMetaData(kafkaClientInfo, Arrays.asList("ke28","k30","ke_test30"));
+        // log.info("topic name is : {}", ksf.getTopicNames(kafkaClientInfo).toString());
+        Set<String> topicNames = new HashSet<>();
+        topicNames.add("ke28");
+        topicNames.add("k30");
+        topicNames.add("ke_test30");
+        log.info(topicNames.iterator().next());
+        Map<String, TopicMetadataInfo> metadataInfos = ksf.getTopicMetaData(kafkaClientInfo, topicNames);
         log.info("metadataInfos: {}", metadataInfos.toString());
     }
 }

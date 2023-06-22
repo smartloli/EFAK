@@ -18,6 +18,7 @@
 package org.kafka.eagle.web.controller;
 
 import com.alibaba.fastjson2.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.common.utils.Md5Util;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
@@ -52,6 +53,7 @@ import java.util.List;
  * @Date: 2023/5/13 23:38
  * @Version: 3.4.0
  */
+@Slf4j
 @Controller
 @RequestMapping("/dataspace")
 public class DataSpaceController {
@@ -68,7 +70,9 @@ public class DataSpaceController {
 
     @GetMapping("/dashboard/{cid}")
     public String dashboardView(@PathVariable("cid") Long cid, HttpSession session, HttpServletRequest request) {
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + request.getRemoteAddr());
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
         session.removeAttribute(clusterAlias);
         session.setAttribute(clusterAlias, cid);
         return "dataspace/dashboard.html";

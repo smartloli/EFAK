@@ -129,7 +129,7 @@ try {
         dataType: 'json',
         url: '/clusters/manage/cluster/info/ajax?cid=' + cid,
         success: function (datas) {
-            console.log()
+            console.log(datas);
             if (JSON.stringify(datas) === '{}') {
                 $("#efak_cluster_edit").val("newCreate");
             } else {

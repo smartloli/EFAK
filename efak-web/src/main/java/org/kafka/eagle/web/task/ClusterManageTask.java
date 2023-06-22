@@ -17,16 +17,31 @@
  */
 package org.kafka.eagle.web.task;
 
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.TypeReference;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.common.config.SslConfigs;
 import org.kafka.eagle.common.constants.KConstants;
+import org.kafka.eagle.common.utils.MathUtil;
 import org.kafka.eagle.core.kafka.KafkaClusterFetcher;
+import org.kafka.eagle.core.kafka.KafkaSchemaFactory;
+import org.kafka.eagle.core.kafka.KafkaStoragePlugin;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
+import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.kafka.JMXInitializeInfo;
+import org.kafka.eagle.pojo.topic.MetadataInfo;
+import org.kafka.eagle.pojo.topic.TopicInfo;
+import org.kafka.eagle.pojo.topic.TopicMetadataInfo;
 import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterCreateDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
+import org.kafka.eagle.web.service.ITopicDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -34,8 +49,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Description: TODO
@@ -56,8 +70,12 @@ public class ClusterManageTask {
 
     @Autowired
     private IClusterDaoService clusterDaoService;
+
     @Autowired
     private IBrokerDaoService brokerDaoService;
+
+    @Autowired
+    private ITopicDaoService topicDaoService;
 
     /**
      * check cluster and broker healthy status task.
@@ -110,16 +128,136 @@ public class ClusterManageTask {
 
         }
 
-        // 2.submi
-        // t broker healthy status to mysql
-
-
     }
 
+    /**
+     * update topic info task.
+     */
     @Async
-    // @Scheduled(fixedRate = 5000)
-    public void test1() {
-        // log.info("test1, {}", Thread.currentThread().getName());
+    @Scheduled(fixedRate = 60000)
+    public void topicMetadataTask() {
+        List<TopicInfo> topicInfos = new ArrayList<>();
+
+        List<ClusterInfo> clusterInfos = this.clusterDaoService.list();
+        for (ClusterInfo clusterInfo : clusterInfos) {
+            // get online brokers
+            List<BrokerInfo> brokerInfos = this.brokerDaoService.brokerStatus(clusterInfo.getClusterId(), Short.valueOf("1"));
+            KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
+            kafkaClientInfo.setBrokerServer(KafkaClusterFetcher.parseBrokerServer(brokerInfos));
+            kafkaClientInfo.setClusterId(clusterInfo.getClusterId());
+            if (KConstants.Cluster.ENABLE_AUTH.equals(clusterInfo.getAuth())) {
+                try {
+                    String authConfig = clusterInfo.getAuthConfig();
+                    if (!StrUtil.isBlank(authConfig)) {
+                        JSONObject authConfigJson = JSON.parseObject(authConfig);
+                        if (KConstants.Cluster.AUTH_TYPE_SASL.equals(authConfigJson.getString(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG))) {
+                            kafkaClientInfo.setSasl(true);
+                            kafkaClientInfo.setSaslClientId(CommonClientConfigs.CLIENT_ID_CONFIG);
+                            kafkaClientInfo.setSaslProtocol(authConfigJson.getString(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
+                            kafkaClientInfo.setSaslMechanism(authConfigJson.getString(SaslConfigs.SASL_MECHANISM));
+                            kafkaClientInfo.setSaslJaasConfig(authConfigJson.getString(SaslConfigs.SASL_JAAS_CONFIG));
+                        } else if (KConstants.Cluster.AUTH_TYPE_SSL.equals(authConfigJson.getString(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG))) {
+                            kafkaClientInfo.setSsl(true);
+                            kafkaClientInfo.setSslProtocol(authConfigJson.getString(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
+                            kafkaClientInfo.setSslTruststoreLocation(authConfigJson.getString(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG));
+                            kafkaClientInfo.setSslTruststorePassword(authConfigJson.getString(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
+                            kafkaClientInfo.setSslKeystoreLocation(authConfigJson.getString(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG));
+                            kafkaClientInfo.setSslKeystorePassword(authConfigJson.getString(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG));
+                            kafkaClientInfo.setSslKeyPassword(authConfigJson.getString(SslConfigs.SSL_KEY_PASSWORD_CONFIG));
+                            kafkaClientInfo.setSslAlgorithm(authConfigJson.getString(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG));
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Parse auth config to json has error,msg is {}", e);
+                }
+            }
+
+            Set<String> topicNames = ksf.getTopicNames(kafkaClientInfo);
+            Map<String, TopicMetadataInfo> topicMetaMaps = ksf.getTopicMetaData(kafkaClientInfo, topicNames);
+
+            for (String topicName : topicNames) {
+                TopicInfo topicInfo = new TopicInfo();
+                topicInfo.setClusterId(clusterInfo.getClusterId());
+                topicInfo.setTopicName(topicName);
+                TopicMetadataInfo metadataInfos = topicMetaMaps.get(topicName);
+                topicInfo.setPartitions(metadataInfos == null ? 0 : metadataInfos.getMetadataInfos().size());
+
+                int partitionAndReplicaTopics = 0;
+                Map<Integer, Integer> brokers = new HashMap<>();
+                Set<Integer> brokerSizes = new HashSet<>();
+                Map<Integer, Integer> brokerLeaders = new HashMap<>();
+                for (MetadataInfo meta : metadataInfos.getMetadataInfos()) {
+                    List<Integer> replicasIntegers = new ArrayList<>();
+                    try {
+                        replicasIntegers = JSON.parseObject(meta.getReplicas(), new TypeReference<ArrayList<Integer>>() {
+                        });
+                    } catch (Exception e) {
+                        log.error("Parse string to int list has error, msg is {}", e);
+                    }
+                    brokerSizes.addAll(replicasIntegers);
+                    partitionAndReplicaTopics += replicasIntegers.size();
+                    for (Integer brokerId : replicasIntegers) {
+                        if (brokers.containsKey(brokerId)) {
+                            int value = brokers.get(brokerId);
+                            brokers.put(brokerId, value + 1);
+                        } else {
+                            brokers.put(brokerId, 1);
+                        }
+                    }
+                    if (brokerLeaders.containsKey(meta.getLeader())) {
+                        int value = brokerLeaders.get(meta.getLeader());
+                        brokerLeaders.put(meta.getLeader(), value + 1);
+                    } else {
+                        brokerLeaders.put(meta.getLeader(), 1);
+                    }
+                }
+                topicInfo.setReplications(brokerSizes.size());
+
+                int brokerSize = brokerInfos.size();
+                int normalSkewedValue = MathUtil.ceil(brokerSize, partitionAndReplicaTopics);
+                int brokerSkewSize = 0;
+                for (Map.Entry<Integer, Integer> entry : brokers.entrySet()) {
+                    if (entry.getValue() > normalSkewedValue) {
+                        brokerSkewSize++;
+                    }
+                }
+
+                int brokerSkewLeaderNormal = MathUtil.ceil(brokerSize, metadataInfos.getMetadataInfos().size());
+                int brokerSkewLeaderSize = 0;
+                for (Map.Entry<Integer, Integer> entry : brokerLeaders.entrySet()) {
+                    if (entry.getValue() > brokerSkewLeaderNormal) {
+                        brokerSkewLeaderSize++;
+                    }
+                }
+
+                int spread = 0;
+                int skewed = 0;
+                int leaderSkewed = 0;
+                if(brokerSize>0){
+                    spread = brokerSizes.size() * 100 / brokerSize;
+                    skewed = brokerSkewSize * 100 / brokerSize;
+                    leaderSkewed = brokerSkewLeaderSize * 100 / brokerSize;
+                }
+
+                topicInfo.setBrokerSpread(spread);
+                topicInfo.setBrokerSkewed(skewed);
+                topicInfo.setBrokerLeaderSkewed(leaderSkewed);
+
+                topicInfo.setRetainMs(metadataInfos == null ? 0 : Long.parseLong(metadataInfos.getRetainMs()));
+                this.topicDaoService.update(topicInfo);
+
+                topicInfos.add(topicInfo);
+                if (topicInfos != null && topicInfos.size() > KConstants.MYSQL_BATCH_SIZE) {
+                    this.topicDaoService.update(topicInfos);
+                    topicInfos.clear();
+                }
+            }
+            if(topicInfos.size() > 0){
+                this.topicDaoService.update(topicInfos);
+                topicInfos.clear();
+            }
+        }
     }
 
 }

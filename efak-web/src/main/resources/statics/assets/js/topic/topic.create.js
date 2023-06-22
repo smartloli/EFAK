@@ -88,7 +88,7 @@ $("#efak_topic_create_submit").click(function () {
             topicName: topicName,
             partitions: partitions,
             replication: replication,
-            retainMs: retainMs
+            retainMs: convertMs(retainMs,retainMsUnit)
         },
         success: function (response) {
             result = JSON.parse(response);

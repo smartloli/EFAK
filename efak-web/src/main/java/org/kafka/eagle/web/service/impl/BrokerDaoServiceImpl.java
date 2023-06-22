@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.web.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -56,6 +57,11 @@ public class BrokerDaoServiceImpl extends ServiceImpl<BrokerDaoMapper, BrokerInf
     }
 
     @Override
+    public BrokerInfo clusters(String clusterId, String brokerId) {
+        return new LambdaQueryChainWrapper<>(this.brokerDaoMapper).eq(BrokerInfo::getClusterId, clusterId).eq(BrokerInfo::getBrokerId, brokerId).one();
+    }
+
+    @Override
     public boolean insert(BrokerInfo brokerInfo) {
         boolean status = false;
         int code = this.brokerDaoMapper.insert(brokerInfo);
@@ -81,9 +87,14 @@ public class BrokerDaoServiceImpl extends ServiceImpl<BrokerDaoMapper, BrokerInf
 
     @Override
     public boolean update(BrokerInfo brokerInfo) {
-        LambdaUpdateChainWrapper<BrokerInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<BrokerInfo>(this.brokerDaoMapper);
-        lambdaUpdateChainWrapper.eq(BrokerInfo::getClusterId, brokerInfo.getClusterId()).eq(BrokerInfo::getClusterId, brokerInfo.getClusterId());
-        return lambdaUpdateChainWrapper.update(brokerInfo);
+        BrokerInfo checkBrokerInfo = this.clusters(brokerInfo.getClusterId(), brokerInfo.getBrokerId());
+        if (checkBrokerInfo == null || StrUtil.isBlank(checkBrokerInfo.getBrokerId())) {
+            return this.insert(brokerInfo);
+        } else {
+            LambdaUpdateChainWrapper<BrokerInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<BrokerInfo>(this.brokerDaoMapper);
+            lambdaUpdateChainWrapper.eq(BrokerInfo::getClusterId, brokerInfo.getClusterId()).eq(BrokerInfo::getBrokerId, brokerInfo.getBrokerId());
+            return lambdaUpdateChainWrapper.update(brokerInfo);
+        }
     }
 
     @Override
@@ -98,6 +109,7 @@ public class BrokerDaoServiceImpl extends ServiceImpl<BrokerDaoMapper, BrokerInf
         if (CollectionUtils.isEmpty(brokerInfosInDb)) {
             return this.batch(brokerInfos);
         } else {
+            // updateBatchById function no update ,todo
             // return this.updateBatchById(brokerInfos);
             return false;
         }
