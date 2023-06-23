@@ -89,6 +89,7 @@ public class TopicController {
 
     /**
      * Topic manage view.
+     *
      * @return
      */
     @GetMapping("/manage")
@@ -127,9 +128,9 @@ public class TopicController {
                 KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
                 kafkaClientInfo.setBrokerServer(KafkaClusterFetcher.parseBrokerServer(brokerInfos));
                 boolean status = ksf.createTableName(kafkaClientInfo, newTopicInfo);
-                if(status){
+                if (status) {
                     target.put("status", status);
-                }else{
+                } else {
                     target.put("status", status);
                     target.put("msg", ResponseModuleType.CREATE_TOPIC_SERVICE_ERROR.getName());
                 }
@@ -141,6 +142,7 @@ public class TopicController {
 
     /**
      * topic manage table data.
+     *
      * @param response
      * @param request
      */
@@ -180,7 +182,7 @@ public class TopicController {
             target.put("brokerSkewed", HtmlAttributeUtil.getTopicSkewedHtml(topicInfo.getBrokerSkewed()));
             target.put("brokerLeaderSkewed", HtmlAttributeUtil.getTopicLeaderSkewedHtml(topicInfo.getBrokerLeaderSkewed()));
             target.put("retainMs", MathUtil.millis2Hours(topicInfo.getRetainMs()));
-            target.put("operate", "<a href='/clusters/manage/create?cid=" + topicInfo.getId() + "' name='efak_topic_manage_edit' class='badge border border-primary text-primary'>扩分区</a> <a href='' name='efak_topic_manage_del' class='badge border border-danger text-danger'>删除</a>");
+            target.put("operate", "<a href='' cid='" + topicInfo.getClusterId() + "' topic='" + topicInfo.getTopicName() + "' partitions='"+topicInfo.getPartitions()+"' name='efak_topic_manage_add_partition' class='badge border border-primary text-primary'>扩分区</a> <a href='' name='efak_topic_manage_del' class='badge border border-danger text-danger'>删除</a>");
             aaDatas.add(target);
         }
 

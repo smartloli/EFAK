@@ -120,3 +120,18 @@ $(document).on('click', 'a[name=efak_cluster_node_manage_del]', function (event)
     var clusterName = $(this).attr("clusterName");
     delNoti(dataid, clusterName);
 });
+
+
+// edit topic
+$(document).on('click', 'a[name=efak_topic_manage_add_partition]', function (event) {
+    event.preventDefault();
+    var clusterId = $(this).attr("cid");
+    var topic = $(this).attr("topic");
+    var partitions = $(this).attr("partitions");
+
+    $('#efak_topic_partition_add_modal').modal('show');
+    $("#efak_clusterid").val(clusterId);
+    $("#efak_topic_name_manage").val(topic);
+    $("#efak_topic_name_manage_partition_current").val(partitions);
+    $("#efak_topic_name_manage_partition_new").val(partitions);
+});
