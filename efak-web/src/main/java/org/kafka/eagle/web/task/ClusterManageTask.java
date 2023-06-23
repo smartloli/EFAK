@@ -17,18 +17,14 @@
  */
 package org.kafka.eagle.web.task;
 
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.common.config.SaslConfigs;
-import org.apache.kafka.common.config.SslConfigs;
 import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.common.utils.MathUtil;
 import org.kafka.eagle.core.kafka.KafkaClusterFetcher;
 import org.kafka.eagle.core.kafka.KafkaSchemaFactory;
+import org.kafka.eagle.core.kafka.KafkaSchemaInitialize;
 import org.kafka.eagle.core.kafka.KafkaStoragePlugin;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
@@ -140,40 +136,27 @@ public class ClusterManageTask {
 
         List<ClusterInfo> clusterInfos = this.clusterDaoService.list();
         for (ClusterInfo clusterInfo : clusterInfos) {
-            // get online brokers
+            // 1. get online brokers
             List<BrokerInfo> brokerInfos = this.brokerDaoService.brokerStatus(clusterInfo.getClusterId(), Short.valueOf("1"));
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
-            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
-            kafkaClientInfo.setBrokerServer(KafkaClusterFetcher.parseBrokerServer(brokerInfos));
-            kafkaClientInfo.setClusterId(clusterInfo.getClusterId());
-            if (KConstants.Cluster.ENABLE_AUTH.equals(clusterInfo.getAuth())) {
-                try {
-                    String authConfig = clusterInfo.getAuthConfig();
-                    if (!StrUtil.isBlank(authConfig)) {
-                        JSONObject authConfigJson = JSON.parseObject(authConfig);
-                        if (KConstants.Cluster.AUTH_TYPE_SASL.equals(authConfigJson.getString(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG))) {
-                            kafkaClientInfo.setSasl(true);
-                            kafkaClientInfo.setSaslClientId(CommonClientConfigs.CLIENT_ID_CONFIG);
-                            kafkaClientInfo.setSaslProtocol(authConfigJson.getString(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
-                            kafkaClientInfo.setSaslMechanism(authConfigJson.getString(SaslConfigs.SASL_MECHANISM));
-                            kafkaClientInfo.setSaslJaasConfig(authConfigJson.getString(SaslConfigs.SASL_JAAS_CONFIG));
-                        } else if (KConstants.Cluster.AUTH_TYPE_SSL.equals(authConfigJson.getString(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG))) {
-                            kafkaClientInfo.setSsl(true);
-                            kafkaClientInfo.setSslProtocol(authConfigJson.getString(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
-                            kafkaClientInfo.setSslTruststoreLocation(authConfigJson.getString(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG));
-                            kafkaClientInfo.setSslTruststorePassword(authConfigJson.getString(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
-                            kafkaClientInfo.setSslKeystoreLocation(authConfigJson.getString(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG));
-                            kafkaClientInfo.setSslKeystorePassword(authConfigJson.getString(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG));
-                            kafkaClientInfo.setSslKeyPassword(authConfigJson.getString(SslConfigs.SSL_KEY_PASSWORD_CONFIG));
-                            kafkaClientInfo.setSslAlgorithm(authConfigJson.getString(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG));
-                        }
-                    }
-                } catch (Exception e) {
-                    log.error("Parse auth config to json has error,msg is {}", e);
+
+            // 2. init kafka client
+            KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+
+            // 3. get kafka info by @KafkaSchemaFactory
+            Set<String> topicNames = ksf.getTopicNames(kafkaClientInfo);
+
+            // 4. delete topics that do not exist in kafka
+            List<TopicInfo> topicInfoList = this.topicDaoService.topics(clusterInfo.getClusterId());
+            List<Long> waitDeleteTopicIds = new ArrayList<>();
+            for (TopicInfo topicInfo : topicInfoList) {
+                if (!topicNames.contains(topicInfo.getTopicName())) {
+                    waitDeleteTopicIds.add(topicInfo.getId());
                 }
             }
+            this.topicDaoService.delete(waitDeleteTopicIds);
 
-            Set<String> topicNames = ksf.getTopicNames(kafkaClientInfo);
+            // 5. update topic info
             Map<String, TopicMetadataInfo> topicMetaMaps = ksf.getTopicMetaData(kafkaClientInfo, topicNames);
 
             for (String topicName : topicNames) {
@@ -234,7 +217,7 @@ public class ClusterManageTask {
                 int spread = 0;
                 int skewed = 0;
                 int leaderSkewed = 0;
-                if(brokerSize>0){
+                if (brokerSize > 0) {
                     spread = brokerSizes.size() * 100 / brokerSize;
                     skewed = brokerSkewSize * 100 / brokerSize;
                     leaderSkewed = brokerSkewLeaderSize * 100 / brokerSize;
@@ -253,7 +236,7 @@ public class ClusterManageTask {
                     topicInfos.clear();
                 }
             }
-            if(topicInfos.size() > 0){
+            if (topicInfos.size() > 0) {
                 this.topicDaoService.update(topicInfos);
                 topicInfos.clear();
             }

@@ -27,8 +27,8 @@ import org.kafka.eagle.common.constants.ResponseModuleType;
 import org.kafka.eagle.common.utils.HtmlAttributeUtil;
 import org.kafka.eagle.common.utils.MathUtil;
 import org.kafka.eagle.common.utils.Md5Util;
-import org.kafka.eagle.core.kafka.KafkaClusterFetcher;
 import org.kafka.eagle.core.kafka.KafkaSchemaFactory;
+import org.kafka.eagle.core.kafka.KafkaSchemaInitialize;
 import org.kafka.eagle.core.kafka.KafkaStoragePlugin;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
@@ -108,7 +108,7 @@ public class TopicController {
      */
     @ResponseBody
     @RequestMapping(value = "/name/create", method = RequestMethod.POST)
-    public String createClusterById(NewTopicInfo newTopicInfo, HttpServletResponse response, HttpSession session, HttpServletRequest request) {
+    public String createTopicName(NewTopicInfo newTopicInfo, HttpServletResponse response, HttpSession session, HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();
         String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
         log.info("Topic create:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
@@ -125,9 +125,8 @@ public class TopicController {
                 target.put("msg", ResponseModuleType.CREATE_TOPIC_REPLICAS_ERROR.getName());
             } else {
                 KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
-                KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
-                kafkaClientInfo.setBrokerServer(KafkaClusterFetcher.parseBrokerServer(brokerInfos));
-                boolean status = ksf.createTableName(kafkaClientInfo, newTopicInfo);
+                KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+                boolean status = ksf.createTopicName(kafkaClientInfo, newTopicInfo);
                 if (status) {
                     target.put("status", status);
                 } else {
@@ -182,7 +181,7 @@ public class TopicController {
             target.put("brokerSkewed", HtmlAttributeUtil.getTopicSkewedHtml(topicInfo.getBrokerSkewed()));
             target.put("brokerLeaderSkewed", HtmlAttributeUtil.getTopicLeaderSkewedHtml(topicInfo.getBrokerLeaderSkewed()));
             target.put("retainMs", MathUtil.millis2Hours(topicInfo.getRetainMs()));
-            target.put("operate", "<a href='' cid='" + topicInfo.getClusterId() + "' topic='" + topicInfo.getTopicName() + "' partitions='"+topicInfo.getPartitions()+"' name='efak_topic_manage_add_partition' class='badge border border-primary text-primary'>扩分区</a> <a href='' name='efak_topic_manage_del' class='badge border border-danger text-danger'>删除</a>");
+            target.put("operate", "<a href='' cid='" + topicInfo.getClusterId() + "' topic='" + topicInfo.getTopicName() + "' partitions='" + topicInfo.getPartitions() + "' name='efak_topic_manage_add_partition' class='badge border border-primary text-primary'>扩分区</a> <a href='' cid='" + topicInfo.getClusterId() + "' topic='" + topicInfo.getTopicName() + "' name='efak_topic_manage_del' class='badge border border-danger text-danger'>删除</a>");
             aaDatas.add(target);
         }
 
@@ -198,4 +197,79 @@ public class TopicController {
             ex.printStackTrace();
         }
     }
+
+
+    /**
+     * Add topic partition.
+     *
+     * @param newTopicInfo
+     * @param response
+     * @param session
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/partition/add", method = RequestMethod.POST)
+    public String addTopicPartition(NewTopicInfo newTopicInfo, HttpServletResponse response, HttpSession session, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic partition add:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+        List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
+        JSONObject target = new JSONObject();
+        if (brokerInfos == null || brokerInfos.size() == 0) {
+            target.put("status", false);
+            target.put("msg", ResponseModuleType.CREATE_PARTITION_NOBROKERS_ERROR.getName());
+        } else {
+            KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+            KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+            boolean status = ksf.addTopicPartitions(kafkaClientInfo, newTopicInfo);
+            if (status) {
+                target.put("status", status);
+            } else {
+                target.put("status", status);
+                target.put("msg", ResponseModuleType.CREATE_PARTITION_SERVICE_ERROR.getName());
+            }
+        }
+
+        return target.toString();
+    }
+
+    /**
+     * delete topic.
+     * @param newTopicInfo
+     * @param response
+     * @param session
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/manage/name/del", method = RequestMethod.POST)
+    public String deleteTopic(NewTopicInfo newTopicInfo, HttpServletResponse response, HttpSession session, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic partition add:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+        List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
+        JSONObject target = new JSONObject();
+        if (brokerInfos == null || brokerInfos.size() == 0) {
+            target.put("status", false);
+            target.put("msg", ResponseModuleType.CREATE_TOPIC_DEL_NOBROKERS_ERROR.getName());
+        } else {
+            KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+            KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+            boolean status = ksf.deleteTopic(kafkaClientInfo, newTopicInfo);
+            if (status) {
+                target.put("status", status);
+            } else {
+                target.put("status", status);
+                target.put("msg", ResponseModuleType.CREATE_TOPIC_DEL_SERVICE_ERROR.getName());
+            }
+        }
+
+        return target.toString();
+    }
+
 }

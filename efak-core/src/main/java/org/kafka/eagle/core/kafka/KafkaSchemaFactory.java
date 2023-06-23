@@ -20,6 +20,7 @@ package org.kafka.eagle.core.kafka;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartitionInfo;
 import org.apache.kafka.common.config.ConfigResource;
@@ -48,7 +49,7 @@ public class KafkaSchemaFactory {
         this.plugin = plugin;
     }
 
-    public boolean createTableName(KafkaClientInfo kafkaClientInfo, NewTopicInfo newTopicInfo) {
+    public boolean createTopicName(KafkaClientInfo kafkaClientInfo, NewTopicInfo newTopicInfo) {
         boolean status = false;
         AdminClient adminClient = null;
         try {
@@ -66,6 +67,50 @@ public class KafkaSchemaFactory {
 
         return status;
     }
+
+    public boolean addTopicPartitions(KafkaClientInfo kafkaClientInfo, NewTopicInfo newTopicInfo) {
+        boolean status = false;
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
+            Map<String, NewPartitions> newPartitions = new HashMap<String, NewPartitions>();
+            newPartitions.put(newTopicInfo.getTopicName(), NewPartitions.increaseTo(newTopicInfo.getPartitions()));
+            adminClient.createPartitions(newPartitions);
+            status = true;
+        } catch (Exception e) {
+            status = false;
+            log.error("Add kafka topic partition has error, new topic [{}], msg is {}", newTopicInfo, e);
+        } finally {
+            adminClient.close();
+        }
+
+        return status;
+    }
+
+    public boolean deleteTopic(KafkaClientInfo kafkaClientInfo, NewTopicInfo newTopicInfo) {
+        boolean status = false;
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
+            // create delete object
+            NewTopic topic = new NewTopic(newTopicInfo.getTopicName(), Collections.emptyMap());
+            // delete  topic
+            DeleteTopicsResult deleteResult = adminClient.deleteTopics(Collections.singleton(topic.name()), new DeleteTopicsOptions());
+            KafkaFuture<Void> future = deleteResult.values().get(topic.name());
+            // wait delete finished
+            future.get();
+            status = true;
+        } catch (Exception e) {
+            status = false;
+            log.error("Delete kafka topic has error, new topic [{}], msg is {}", newTopicInfo, e);
+        } finally {
+            adminClient.close();
+        }
+
+        return status;
+    }
+
+
 
     public Set<String> getTopicNames(KafkaClientInfo kafkaClientInfo) {
         Set<String> topicNames = new HashSet<>();

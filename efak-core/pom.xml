@@ -19,16 +19,6 @@
     <dependencies>
         <dependency>
             <groupId>org.kafka.eagle</groupId>
-            <artifactId>efak-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kafka.eagle</groupId>
-            <artifactId>efak-pojo</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-plugins</artifactId>
             <version>${project.version}</version>
         </dependency>

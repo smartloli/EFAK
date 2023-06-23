@@ -103,8 +103,13 @@ public class TopicDaoServiceImpl extends ServiceImpl<TopicDaoMapper, TopicInfo> 
     }
 
     @Override
-    public boolean delete(TopicInfo topicInfo) {
-        return false;
+    public boolean delete(List<Long> topicIds) {
+        boolean status = false;
+        int code = this.topicDaoMapper.deleteBatchIds(topicIds);
+        if (code > 0) {
+            status = true;
+        }
+        return status;
     }
 
     @Override

@@ -66,7 +66,7 @@ public interface ITopicDaoService extends IService<TopicInfo> {
      * @param topicInfo
      * @return
      */
-    boolean delete(TopicInfo topicInfo);
+    boolean delete(List<Long> topicIds);
 
     /**
      * Batch update topic infos.

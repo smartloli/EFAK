@@ -96,11 +96,11 @@ $("#efak_topic_create_submit").click(function () {
                 Swal.fire({
                     title: '成功',
                     icon: 'success',
-                    html: '主题名称[<code>' + topicName + '</code>]创建完成',
+                    html: '主题名称[<code>' + topicName + '</code>]创建完成，<br/>请等待一分钟后刷新主题列表查看！',
                     allowOutsideClick: false
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '/topic/list';
+                        window.location.href = '/topic/manage';
                     }
                 });
             }else{

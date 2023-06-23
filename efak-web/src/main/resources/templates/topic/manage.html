@@ -39,10 +39,10 @@
                         <div class="card-body">
                             <h6 class="card-title" th:text="#{kafka.eagle.topics.manager}"></h6>
                             <p class="text-muted mb-3" th:utext="#{kafka.eagle.topics.manager.home.sub.desc}"></p>
-<!--                            <div style="float: right!important;margin-top: -88px;">-->
-<!--                                <button id="efak_manage_btn" type="button" class="btn btn-primary btn-sm"-->
-<!--                                        th:text="#{kafka.eagle.clusters.manage.create}"></button>-->
-<!--                            </div>-->
+                            <!--                            <div style="float: right!important;margin-top: -88px;">-->
+                            <!--                                <button id="efak_manage_btn" type="button" class="btn btn-primary btn-sm"-->
+                            <!--                                        th:text="#{kafka.eagle.clusters.manage.create}"></button>-->
+                            <!--                            </div>-->
                             <div class="table-responsive">
                                 <table id="efak_topic_manage_tbl" class="table table-striped" style="width:100%">
                                     <thead>
@@ -73,37 +73,35 @@
                         th:utext="#{kafka.eagle.topic.manage.partition.add}"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
                 </div>
-                <form role="form" action="/topic/manage/add/partition" method="post"
-                      onsubmit="return contextFormValid();return false;">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="efak_topic_name_manage" class="form-label"
-                                   th:utext="#{kafka.eagle.topic.manage.name.add}"></label>
-                            <input type="text" class="form-control" id="efak_topic_name_manage" name="efak_topic_name_manage" readonly/>
-                            <input type="hidden" class="form-control" id="efak_clusterid" name="efak_clusterid_name">
-                        </div>
-                        <div class="mb-3">
-                            <label for="efak_topic_name_manage_partition_current" class="form-label"
-                                   th:utext="#{kafka.eagle.topic.manage.partition.add.current}">Partition:</label>
-                            <input type="text" class="form-control" id="efak_topic_name_manage_partition_current"
-                                   name="efak_topic_name_manage_partition_current">
-                        </div>
-                        <div class="mb-3">
-                            <label for="efak_topic_name_manage_partition_new" class="form-label"
-                                   th:utext="#{kafka.eagle.topic.manage.partition.add.new}">NewPartition:</label>
-                            <input type="text" class="form-control" id="efak_topic_name_manage_partition_new"
-                                   name="efak_topic_name_manage_partition_new">
-                        </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="efak_topic_name_manage" class="form-label"
+                               th:utext="#{kafka.eagle.topic.manage.name.add}"></label>
+                        <input type="text" class="form-control" id="efak_topic_name_manage"
+                               name="efak_topic_name_manage" readonly/>
+                        <input type="hidden" class="form-control" id="efak_clusterid" name="efak_clusterid_name">
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                th:text="#{kafka.eagle.clusters.manage.button.close}">Close
-                        </button>
-                        <button type="submit" class="btn btn-primary"
-                                th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
-                        </button>
+                    <div class="mb-3">
+                        <label for="efak_topic_name_manage_partition_current" class="form-label"
+                               th:utext="#{kafka.eagle.topic.manage.partition.add.current}">Partition:</label>
+                        <input type="text" class="form-control" id="efak_topic_name_manage_partition_current"
+                               name="efak_topic_name_manage_partition_current">
                     </div>
-                </form>
+                    <div class="mb-3">
+                        <label for="efak_topic_name_manage_partition_new" class="form-label"
+                               th:utext="#{kafka.eagle.topic.manage.partition.add.new}">NewPartition:</label>
+                        <input type="text" class="form-control" id="efak_topic_name_manage_partition_new"
+                               name="efak_topic_name_manage_partition_new">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            th:text="#{kafka.eagle.clusters.manage.button.close}">Close
+                    </button>
+                    <button type="button" id="efak_topic_add_partition_submit" class="btn btn-primary"
+                            th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -118,4 +116,4 @@
 <script th:src="@{../assets/js/topic/topic.manage.js}"></script>
 
 </body>
-</html>    
+</html>

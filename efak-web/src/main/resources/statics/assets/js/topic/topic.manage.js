@@ -1,4 +1,3 @@
-
 var topicTable = $("#efak_topic_manage_tbl").DataTable({
     "bSort": false,
     "bLengthChange": false,
@@ -68,14 +67,14 @@ setInterval(function () {
     topicTable.ajax.reload();
 }, 60000); // 1 min
 
-function delNoti(dataid, clusterName) {
+function delNoti(topicName) {
     Swal.fire({
         customClass: {
             confirmButton: 'efak-noti-custom-common-btn-submit'
         },
         buttonsStyling: false,
         title: '确定执行删除操作吗?',
-        html: "集群名称 [<code>" + clusterName + "</code>] 删除后不能被恢复!",
+        html: "主题名称 [<code>" + topicName + "</code>] 删除后不能被恢复!",
         icon: 'warning',
         showCloseButton: true,
         showCancelButton: false,
@@ -88,22 +87,27 @@ function delNoti(dataid, clusterName) {
         if (result.isConfirmed) {
             // send ajax request
             $.ajax({
-                url: '/clusters/manage/cluster/del',
+                url: '/topic/manage/name/del',
                 method: 'POST',
                 data: {
-                    dataid: dataid
+                    topicName: topicName
                 },
                 success: function (response) {
-                    Swal.fire({
-                        title: '成功',
-                        icon: 'success',
-                        html: '集群名称 [<code>' + clusterName + '</code>] 已被删除',
-                        allowOutsideClick: false
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.reload();
-                        }
-                    });
+                    result = JSON.parse(response);
+                    if (result.status) {
+                        Swal.fire({
+                            title: '成功',
+                            icon: 'success',
+                            html: '主题名称 [<code>' + topicName + '</code>] 已被删除，<br/>请等待一分钟后刷新页面查看！',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload();
+                            }
+                        });
+                    } else {
+                        Swal.fire('失败', result.msg, 'error');
+                    }
                 },
                 error: function (xhr, status, error) {
                     Swal.fire('失败', '数据删除发生异常', 'error');
@@ -114,11 +118,10 @@ function delNoti(dataid, clusterName) {
 }
 
 // delete cluster
-$(document).on('click', 'a[name=efak_cluster_node_manage_del]', function (event) {
+$(document).on('click', 'a[name=efak_topic_manage_del]', function (event) {
     event.preventDefault();
-    var dataid = $(this).attr("dataid");
-    var clusterName = $(this).attr("clusterName");
-    delNoti(dataid, clusterName);
+    var topic = $(this).attr("topic");
+    delNoti(topic);
 });
 
 
@@ -134,4 +137,80 @@ $(document).on('click', 'a[name=efak_topic_manage_add_partition]', function (eve
     $("#efak_topic_name_manage").val(topic);
     $("#efak_topic_name_manage_partition_current").val(partitions);
     $("#efak_topic_name_manage_partition_new").val(partitions);
+});
+
+function errorNoti(msg, icon) {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    })
+
+    // error or success
+    Toast.fire({
+        icon: icon,
+        title: msg
+    })
+}
+
+function contextFormValid() {
+    var partition = $("#efak_topic_name_manage_partition_current").val();
+    var partitionNew = $("#efak_topic_name_manage_partition_new").val();
+    if (partition.length == 0 || partitionNew.length == 0) {
+        errorNoti("必填项不能为空", "error");
+        return false;
+    }
+
+    if (!$.isNumeric(partition) || !$.isNumeric(partitionNew)) {
+        errorNoti("分区数必须为数字", "error");
+        return false;
+    }
+
+    if (partition > partitionNew) {
+        errorNoti("分区数只能增加不能减少", "error");
+        return false;
+    }
+
+    return true;
+}
+
+$("#efak_topic_add_partition_submit").click(function () {
+    var topicName = $("#efak_topic_name_manage").val();
+    var partitions = $("#efak_topic_name_manage_partition_new").val();
+    if (contextFormValid()) {
+        $.ajax({
+            url: '/topic/partition/add',
+            method: 'POST',
+            data: {
+                topicName: topicName,
+                partitions: partitions
+            },
+            success: function (response) {
+                result = JSON.parse(response);
+                if (result.status) {
+                    Swal.fire({
+                        title: '成功',
+                        icon: 'success',
+                        html: '主题名称[<code>' + topicName + '</code>]分区数已增加为[<code>' + partitions + '</code>]，<br/>请等待一分钟后刷新页面查看！',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/topic/manage';
+                        }
+                    });
+                } else {
+                    Swal.fire('失败', result.msg, 'error');
+                }
+            },
+            error: function (xhr, status, error) {
+                Swal.fire('失败', '增加主题分区数发生异常', 'error');
+            }
+        });
+    }
 });
