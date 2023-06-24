@@ -27,9 +27,7 @@ import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.TopicConfig;
 import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
-import org.kafka.eagle.pojo.topic.MetadataInfo;
-import org.kafka.eagle.pojo.topic.NewTopicInfo;
-import org.kafka.eagle.pojo.topic.TopicMetadataInfo;
+import org.kafka.eagle.pojo.topic.*;
 
 import java.util.*;
 
@@ -111,7 +109,6 @@ public class KafkaSchemaFactory {
     }
 
 
-
     public Set<String> getTopicNames(KafkaClientInfo kafkaClientInfo) {
         Set<String> topicNames = new HashSet<>();
 
@@ -163,6 +160,79 @@ public class KafkaSchemaFactory {
             plugin.registerToClose(adminClient);
         }
         return partitions;
+    }
+
+    /**
+     * Get topic partitions size.
+     *
+     * @param kafkaClientInfo
+     * @param topic
+     * @return
+     */
+    public Integer getTopicPartitionsOfSize(KafkaClientInfo kafkaClientInfo, String topic) {
+        Integer partitions = 0;
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(topic));
+            partitions = describeTopicsResult.all().get().get(topic).partitions().size();
+        } catch (Exception e) {
+            log.error("Failure while loading topic '{}' meta for kafka '{}': {}", kafkaClientInfo, topic, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+        return partitions;
+    }
+
+    public TopicRecordPageInfo getTopicMetaPageOfRecord(KafkaClientInfo kafkaClientInfo, String topic, Map<String, String> params) {
+        TopicRecordPageInfo topicRecordPageInfo = new TopicRecordPageInfo();
+        Integer partitions = 0;
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(topic));
+            List<TopicPartitionInfo> tps = describeTopicsResult.all().get().get(topic).partitions();
+            partitions = tps.size();
+
+            Set<Integer> partitionSet = new TreeSet<>();
+            for (TopicPartitionInfo tp : tps) {
+                partitionSet.add(tp.partition());
+            }
+
+            Set<Integer> partitionSortSet = new TreeSet<>(new Comparator<Integer>() {
+                @Override
+                public int compare(Integer o1, Integer o2) {
+                    int diff = o1 - o2;// asc
+                    if (diff > 0) {
+                        return 1;
+                    } else if (diff < 0) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            });
+            partitionSortSet.addAll(partitionSet);
+
+            // get topic meta page default 10 records
+            int start = Integer.parseInt(params.get("start").toString());
+            int offset = start;
+            int length = Integer.parseInt(params.get("size").toString());
+            List<TopicRecordInfo> topicRecordInfos = new ArrayList<>();
+            for (int partition : partitionSortSet) {
+                if (offset >= start && offset < (start + length)) {
+
+                }
+                offset++;
+            }
+
+
+        } catch (Exception e) {
+            log.error("Failure while loading topic '{}' meta for kafka '{}': {}", kafkaClientInfo, topic, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+        topicRecordPageInfo.setTotal(partitions);
+        return topicRecordPageInfo;
     }
 
     public List<MetadataInfo> getTopicPartitionsLeader(KafkaClientInfo kafkaClientInfo, String topic) {

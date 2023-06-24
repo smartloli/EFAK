@@ -40,10 +40,7 @@ import org.kafka.eagle.web.service.IClusterDaoService;
 import org.kafka.eagle.web.service.ITopicDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -93,8 +90,24 @@ public class TopicController {
      * @return
      */
     @GetMapping("/manage")
-    public String manageView() {
+    public String topicManageView() {
         return "topic/manage.html";
+    }
+
+    @GetMapping("/meta/{topic}")
+    public String topicMetaView(@PathVariable("topic") String topic, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        HttpSession session = request.getSession();
+        log.info("Topic metadata:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+        TopicInfo topicInfo = topicDaoService.topics(clusterInfo.getClusterId(), topic);
+        if (topicInfo == null) {
+            return "redirect:/error/404";
+        }
+
+        return "topic/meta.html";
     }
 
     /**
@@ -146,7 +159,14 @@ public class TopicController {
      * @param request
      */
     @RequestMapping(value = "/manage/table/ajax", method = RequestMethod.GET)
-    public void pageClustersAjax(HttpServletResponse response, HttpServletRequest request) {
+    public void pageTopicNameAjax(HttpServletResponse response, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        HttpSession session = request.getSession();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic name list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+
         String aoData = request.getParameter("aoData");
         JSONArray params = JSON.parseArray(aoData);
         int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -167,6 +187,7 @@ public class TopicController {
         map.put("start", iDisplayStart / iDisplayLength + 1);
         map.put("size", iDisplayLength);
         map.put("search", search);
+        map.put("cid", clusterInfo.getClusterId());
 
 
         Page<TopicInfo> pages = this.topicDaoService.pages(map);
@@ -174,7 +195,7 @@ public class TopicController {
 
         for (TopicInfo topicInfo : pages.getRecords()) {
             JSONObject target = new JSONObject();
-            target.put("topicName", "<a href='#" + topicInfo.getId() + "'>" + topicInfo.getTopicName() + "</a>");
+            target.put("topicName", "<a href='/topic/meta/" + topicInfo.getTopicName() + "'>" + topicInfo.getTopicName() + "</a>");
             target.put("partition", topicInfo.getPartitions());
             target.put("replicas", topicInfo.getReplications());
             target.put("brokerSpread", HtmlAttributeUtil.getTopicSpreadHtml(topicInfo.getBrokerSpread()));
@@ -238,6 +259,7 @@ public class TopicController {
 
     /**
      * delete topic.
+     *
      * @param newTopicInfo
      * @param response
      * @param session
@@ -270,6 +292,75 @@ public class TopicController {
         }
 
         return target.toString();
+    }
+
+    /**
+     * topic metadata table info.
+     *
+     * @param response
+     * @param request
+     */
+    @RequestMapping(value = "/meta/table/ajax", method = RequestMethod.GET)
+    public void pageTopicMetaAjax(@RequestParam("topic") String topic, HttpServletResponse response, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic meta list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        HttpSession session = request.getSession();
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+        List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
+
+        String aoData = request.getParameter("aoData");
+        JSONArray params = JSON.parseArray(aoData);
+        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+        String search = "";
+        for (Object object : params) {
+            JSONObject param = (JSONObject) object;
+            if ("sEcho".equals(param.getString("name"))) {
+                sEcho = param.getIntValue("value");
+            } else if ("iDisplayStart".equals(param.getString("name"))) {
+                iDisplayStart = param.getIntValue("value");
+            } else if ("iDisplayLength".equals(param.getString("name"))) {
+                iDisplayLength = param.getIntValue("value");
+            } else if ("sSearch".equals(param.getString("name"))) {
+                search = param.getString("value");
+            }
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("start", iDisplayStart / iDisplayLength + 1);
+        map.put("size", iDisplayLength);
+
+        KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+        KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+
+
+        Page<TopicInfo> pages = this.topicDaoService.pages(map);
+        JSONArray aaDatas = new JSONArray();
+
+        for (TopicInfo topicInfo : pages.getRecords()) {
+            JSONObject target = new JSONObject();
+            target.put("topicName", "<a href='/topic/meta/" + topicInfo.getTopicName() + "'>" + topicInfo.getTopicName() + "</a>");
+            target.put("partition", topicInfo.getPartitions());
+            target.put("replicas", topicInfo.getReplications());
+            target.put("brokerSpread", HtmlAttributeUtil.getTopicSpreadHtml(topicInfo.getBrokerSpread()));
+            target.put("brokerSkewed", HtmlAttributeUtil.getTopicSkewedHtml(topicInfo.getBrokerSkewed()));
+            target.put("brokerLeaderSkewed", HtmlAttributeUtil.getTopicLeaderSkewedHtml(topicInfo.getBrokerLeaderSkewed()));
+            target.put("retainMs", MathUtil.millis2Hours(topicInfo.getRetainMs()));
+            target.put("operate", "<a href='' cid='" + topicInfo.getClusterId() + "' topic='" + topicInfo.getTopicName() + "' partitions='" + topicInfo.getPartitions() + "' name='efak_topic_manage_add_partition' class='badge border border-primary text-primary'>扩分区</a> <a href='' cid='" + topicInfo.getClusterId() + "' topic='" + topicInfo.getTopicName() + "' name='efak_topic_manage_del' class='badge border border-danger text-danger'>删除</a>");
+            aaDatas.add(target);
+        }
+
+        JSONObject target = new JSONObject();
+        target.put("sEcho", sEcho);
+        target.put("iTotalRecords", pages.getTotal());
+        target.put("iTotalDisplayRecords", pages.getTotal());
+        target.put("aaData", aaDatas);
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 }

@@ -154,7 +154,9 @@ public class ClusterManageTask {
                     waitDeleteTopicIds.add(topicInfo.getId());
                 }
             }
-            this.topicDaoService.delete(waitDeleteTopicIds);
+            if (waitDeleteTopicIds != null && waitDeleteTopicIds.size() > 0) {
+                this.topicDaoService.delete(waitDeleteTopicIds);
+            }
 
             // 5. update topic info
             Map<String, TopicMetadataInfo> topicMetaMaps = ksf.getTopicMetaData(kafkaClientInfo, topicNames);

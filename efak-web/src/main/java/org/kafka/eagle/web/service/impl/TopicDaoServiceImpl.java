@@ -82,11 +82,12 @@ public class TopicDaoServiceImpl extends ServiceImpl<TopicDaoMapper, TopicInfo> 
     public Page<TopicInfo> pages(Map<String, Object> params) {
         int start = Integer.parseInt(params.get("start").toString());
         int size = Integer.parseInt(params.get("size").toString());
+        String cid = params.get("cid").toString();
 
         Page<TopicInfo> pages = new Page<>(start, size);
 
         LambdaQueryChainWrapper<TopicInfo> queryChainWrapper = new LambdaQueryChainWrapper<TopicInfo>(this.topicDaoMapper);
-        queryChainWrapper.like(TopicInfo::getTopicName, params.get("search").toString());
+        queryChainWrapper.eq(TopicInfo::getClusterId, cid).like(TopicInfo::getTopicName, params.get("search").toString());
         return queryChainWrapper.orderByDesc(TopicInfo::getRetainMs).page(pages);
     }
 

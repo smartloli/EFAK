@@ -46,7 +46,7 @@ var topicTable = $("#efak_topic_manage_tbl").DataTable({
             "sSortDescending": ": 以降序排列此列"
         }
     }
-}); // ._fnAjaxUpdate()
+});
 
 function retrieveData(sSource, aoData, fnCallback) {
     $.ajax({
