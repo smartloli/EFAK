@@ -22,6 +22,7 @@ import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.Node;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.TopicPartitionInfo;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.TopicConfig;
@@ -30,6 +31,7 @@ import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.topic.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Get the Kafka topic metadata information through the broker address.
@@ -184,13 +186,36 @@ public class KafkaSchemaFactory {
         return partitions;
     }
 
-    public TopicRecordPageInfo getTopicMetaPageOfRecord(KafkaClientInfo kafkaClientInfo, String topic, Map<String, String> params) {
+    public Long getTopicPartitionOfLogSize(KafkaClientInfo kafkaClientInfo, String topic, Integer partitionId) {
+        Long logSize = 0L;
+
+        // get topic partition logsize
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(plugin.getKafkaConsumerProps(kafkaClientInfo));
+        TopicPartition tp = new TopicPartition(topic, partitionId);
+        consumer.assign(Collections.singleton(tp));
+        java.util.Map<TopicPartition, Long> endLogSize = consumer.endOffsets(Collections.singleton(tp));
+        java.util.Map<TopicPartition, Long> startLogSize = consumer.beginningOffsets(Collections.singleton(tp));
+        try {
+            logSize = endLogSize.get(tp).longValue() - startLogSize.get(tp).longValue();
+        } catch (Exception e) {
+            log.error("Get topic:{}, partition:{}, logsize has error, msg is {}", topic, partitionId, e);
+        } finally {
+            if (consumer != null) {
+                consumer.close();
+            }
+        }
+
+        return logSize;
+
+    }
+
+    public TopicRecordPageInfo getTopicMetaPageOfRecord(KafkaClientInfo kafkaClientInfo, String topic, Map<String, Object> params) {
         TopicRecordPageInfo topicRecordPageInfo = new TopicRecordPageInfo();
         Integer partitions = 0;
         AdminClient adminClient = null;
         try {
             adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
-            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(topic));
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Collections.singleton(topic));
             List<TopicPartitionInfo> tps = describeTopicsResult.all().get().get(topic).partitions();
             partitions = tps.size();
 
@@ -215,12 +240,41 @@ public class KafkaSchemaFactory {
 
             // get topic meta page default 10 records
             int start = Integer.parseInt(params.get("start").toString());
-            int offset = start;
-            int length = Integer.parseInt(params.get("size").toString());
-            List<TopicRecordInfo> topicRecordInfos = new ArrayList<>();
+            int length = Integer.parseInt(params.get("length").toString());
+            int offset = 0;
             for (int partition : partitionSortSet) {
                 if (offset >= start && offset < (start + length)) {
+                    TopicRecordInfo topicRecordInfo = new TopicRecordInfo();
+                    topicRecordInfo.setPartitionId(partition);
+                    for (TopicPartitionInfo tp : tps) {
+                        if (partition == tp.partition()) {
+                            topicRecordInfo.setLeader(tp.leader().idString());
+                            topicRecordInfo.setReplicas(tp.replicas().stream()
+                                    .map(Node::idString)
+                                    .collect(Collectors.toList()).toString());
+                            topicRecordInfo.setIsr(tp.isr().stream()
+                                    .map(Node::idString)
+                                    .collect(Collectors.toList()).toString());
+                            if (tp.isr().size() != tp.replicas().size()) {
+                                // replicas lost
+                                topicRecordInfo.setUnderReplicated(true);
+                            } else {
+                                // replicas normal
+                                topicRecordInfo.setUnderReplicated(false);
+                            }
+                            if (tp.replicas() != null && tp.replicas().size() > 0 && tp.replicas().get(0).idString().equals(tp.leader().idString())) {
+                                // partition preferred leader
+                                topicRecordInfo.setPreferredLeader(true);
+                            } else {
+                                // partition occurs preferred leader exception
+                                topicRecordInfo.setPreferredLeader(false);
+                            }
+                            break;
+                        }
+                    }
 
+                    topicRecordInfo.setLogSize(getTopicPartitionOfLogSize(kafkaClientInfo, topic, partition));
+                    topicRecordPageInfo.getRecords().add(topicRecordInfo);
                 }
                 offset++;
             }

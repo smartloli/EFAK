@@ -35,6 +35,8 @@ import org.kafka.eagle.pojo.cluster.ClusterInfo;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.topic.NewTopicInfo;
 import org.kafka.eagle.pojo.topic.TopicInfo;
+import org.kafka.eagle.pojo.topic.TopicRecordInfo;
+import org.kafka.eagle.pojo.topic.TopicRecordPageInfo;
 import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
 import org.kafka.eagle.web.service.ITopicDaoService;
@@ -327,33 +329,32 @@ public class TopicController {
             }
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("start", iDisplayStart / iDisplayLength + 1);
-        map.put("size", iDisplayLength);
+        map.put("start", iDisplayStart);
+        map.put("length", iDisplayLength);
 
         KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
         KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
 
-
-        Page<TopicInfo> pages = this.topicDaoService.pages(map);
         JSONArray aaDatas = new JSONArray();
+        TopicRecordPageInfo topicRecordPageInfo = ksf.getTopicMetaPageOfRecord(kafkaClientInfo,topic,map);
 
-        for (TopicInfo topicInfo : pages.getRecords()) {
+        for (TopicRecordInfo topicRecordInfo : topicRecordPageInfo.getRecords()) {
             JSONObject target = new JSONObject();
-            target.put("topicName", "<a href='/topic/meta/" + topicInfo.getTopicName() + "'>" + topicInfo.getTopicName() + "</a>");
-            target.put("partition", topicInfo.getPartitions());
-            target.put("replicas", topicInfo.getReplications());
-            target.put("brokerSpread", HtmlAttributeUtil.getTopicSpreadHtml(topicInfo.getBrokerSpread()));
-            target.put("brokerSkewed", HtmlAttributeUtil.getTopicSkewedHtml(topicInfo.getBrokerSkewed()));
-            target.put("brokerLeaderSkewed", HtmlAttributeUtil.getTopicLeaderSkewedHtml(topicInfo.getBrokerLeaderSkewed()));
-            target.put("retainMs", MathUtil.millis2Hours(topicInfo.getRetainMs()));
-            target.put("operate", "<a href='' cid='" + topicInfo.getClusterId() + "' topic='" + topicInfo.getTopicName() + "' partitions='" + topicInfo.getPartitions() + "' name='efak_topic_manage_add_partition' class='badge border border-primary text-primary'>扩分区</a> <a href='' cid='" + topicInfo.getClusterId() + "' topic='" + topicInfo.getTopicName() + "' name='efak_topic_manage_del' class='badge border border-danger text-danger'>删除</a>");
+            target.put("partitionId", topicRecordInfo.getPartitionId());
+            target.put("logsize", topicRecordInfo.getLogSize());
+            target.put("leader", topicRecordInfo.getLeader());
+            target.put("replicas", topicRecordInfo.getReplicas());
+            target.put("isr", topicRecordInfo.getIsr());
+            target.put("preferredLeader", HtmlAttributeUtil.getPreferredLeader(topicRecordInfo.getPreferredLeader()));
+            target.put("underReplicated", HtmlAttributeUtil.getUnderReplicated(topicRecordInfo.getUnderReplicated()));
+            target.put("preview", "<a href='' cid='" + cid + "' topic='" + topic + "' partitions='" + topicRecordInfo.getPartitionId() + "' name='efak_topic_partition_preview' class='badge border border-primary text-primary'>预览</a>");
             aaDatas.add(target);
         }
 
         JSONObject target = new JSONObject();
         target.put("sEcho", sEcho);
-        target.put("iTotalRecords", pages.getTotal());
-        target.put("iTotalDisplayRecords", pages.getTotal());
+        target.put("iTotalRecords", topicRecordPageInfo.getTotal());
+        target.put("iTotalDisplayRecords", topicRecordPageInfo.getTotal());
         target.put("aaData", aaDatas);
         try {
             byte[] output = target.toJSONString().getBytes();

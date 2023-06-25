@@ -58,6 +58,26 @@ public class HtmlAttributeUtil {
         return result;
     }
 
+    public static String getPreferredLeader(boolean preferredLeader) {
+        String result = "";
+        if (preferredLeader) {
+            result = "<span class='badge bg-success'>健康</span>";
+        } else {
+            result = "<span class='badge bg-danger'>异常</span>";
+        }
+        return result;
+    }
+
+    public static String getUnderReplicated(boolean underReplicated) {
+        String result = "";
+        if (!underReplicated) { // false => healthy
+            result = "<span class='badge bg-success'>健康</span>";
+        } else {
+            result = "<span class='badge bg-danger'>异常</span>";
+        }
+        return result;
+    }
+
     public static String getTopicSkewedHtml(int brokerSkewed) {
         String result = "";
         if (brokerSkewed >= KConstants.Topic.TOPIC_BROKER_SKEW_ERROR) {
@@ -90,9 +110,9 @@ public class HtmlAttributeUtil {
 
     public static String getAuthHtml(String auth) {
         String result = "";
-        if("Y".equals(auth)){
+        if ("Y".equals(auth)) {
             result = "<span class='badge bg-primary'>是</span>";
-        }else{
+        } else {
             result = "<span class='badge bg-secondary'>否</span>";
         }
         return result;

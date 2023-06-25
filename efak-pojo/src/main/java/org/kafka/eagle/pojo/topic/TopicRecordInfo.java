@@ -32,12 +32,12 @@ public class TopicRecordInfo {
     /**
      * topic partition id.
      */
-    public String partitionId;
+    public Integer partitionId;
 
     /**
      * topic partition records.
      */
-    private String logSize;
+    private Long logSize;
 
     /**
      * topic partition leader.
@@ -48,9 +48,9 @@ public class TopicRecordInfo {
 
     private String isr;
 
-    private String preferredLeader;
+    private Boolean preferredLeader;
 
-    private String underReplicated;
+    private Boolean underReplicated;
 
 
 

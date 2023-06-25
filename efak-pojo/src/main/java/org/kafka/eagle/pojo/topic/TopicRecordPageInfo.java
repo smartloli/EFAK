@@ -19,6 +19,7 @@ package org.kafka.eagle.pojo.topic;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -42,6 +43,6 @@ public class TopicRecordPageInfo {
      */
     private TreeSet<String> partitionIds;
 
-    private List<TopicRecordInfo> records;
+    private List<TopicRecordInfo> records = new ArrayList<>();
 
 }
