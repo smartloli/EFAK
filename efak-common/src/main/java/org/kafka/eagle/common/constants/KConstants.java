@@ -85,6 +85,7 @@ public class KConstants {
         }
 
         public static final String EFAK_SYSTEM_GROUP = "efak.system.group";
+
     }
 
     /**

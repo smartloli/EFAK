@@ -74,6 +74,11 @@ public class JMXInitializeInfo {
 
     private String keyStorePassword;
 
+    /**
+     * Get value from jmx result
+     */
+    private String objectName;
+
 
 
 }

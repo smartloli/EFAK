@@ -105,6 +105,34 @@ public class KafkaClusterFetcher {
         return brokerInfo;
     }
 
+    public static Long getTopicRecordJmxInfo(JMXInitializeInfo initializeInfo) {
+        Long capacity = 0L;
+        JMXConnector connector = null;
+        String JMX = initializeInfo.getUri();
+        try {
+            if (getBrokerStatus(initializeInfo.getHost(), initializeInfo.getPort()) == 1) {
+                JMXServiceURL jmxSeriverUrl = new JMXServiceURL(String.format(JMX, initializeInfo.getHost() + ":" + initializeInfo.getPort()));
+                initializeInfo.setUrl(jmxSeriverUrl);
+                connector = JMXFactoryUtil.connectWithTimeout(initializeInfo);
+                MBeanServerConnection mbeanConnection = connector.getMBeanServerConnection();
+                Object size = mbeanConnection.getAttribute(new ObjectName(initializeInfo.getObjectName()), JmxConstants.KafkaLog.VALUE.getValue());
+                capacity = Long.parseLong(size.toString());
+            }
+
+        } catch (Exception e) {
+            log.error("Get kafka version from jmx has error, JMXInitializeInfo[{}], error msg is {}", initializeInfo, e);
+        } finally {
+            if (connector != null) {
+                try {
+                    connector.close();
+                } catch (IOException e) {
+                    log.error("Close jmx connector has error, msg is {}", e);
+                }
+            }
+        }
+        return capacity;
+    }
+
     private static LocalDateTime dateConvert(long timestamp) {
         LocalDateTime dateTime = Instant.ofEpochMilli(timestamp)
                 .atZone(ZoneId.systemDefault())

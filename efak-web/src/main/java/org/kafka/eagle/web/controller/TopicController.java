@@ -33,10 +33,7 @@ import org.kafka.eagle.core.kafka.KafkaStoragePlugin;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
-import org.kafka.eagle.pojo.topic.NewTopicInfo;
-import org.kafka.eagle.pojo.topic.TopicInfo;
-import org.kafka.eagle.pojo.topic.TopicRecordInfo;
-import org.kafka.eagle.pojo.topic.TopicRecordPageInfo;
+import org.kafka.eagle.pojo.topic.*;
 import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
 import org.kafka.eagle.web.service.ITopicDaoService;
@@ -362,6 +359,32 @@ public class TopicController {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/record/size/ajax", method = RequestMethod.GET)
+    public String getTopicRecordSize(@RequestParam("topic") String topic, HttpServletResponse response, HttpSession session, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic partition add:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+        List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
+        JSONObject target = new JSONObject();
+        if (brokerInfos == null || brokerInfos.size() == 0) {
+            target.put("status", false);
+            target.put("msg", ResponseModuleType.GET_TOPIC_RECORD_NOBROKERS_ERROR.getName());
+        } else {
+            KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+            KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+            TopicJmxInfo topicJmxInfo = ksf.geTopicRecordCapacity(kafkaClientInfo,brokerInfos, topic);
+            Long logsize = ksf.getTopicOfLogSize(kafkaClientInfo,topic);
+            target.put("logsize", logsize);
+            target.put("capacity", topicJmxInfo.getCapacity());
+            target.put("unit", topicJmxInfo.getUnit());
+        }
+        return target.toString();
     }
 
 }

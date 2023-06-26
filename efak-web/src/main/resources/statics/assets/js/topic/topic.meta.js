@@ -76,3 +76,18 @@ function retrieveData(sSource, aoData, fnCallback) {
 setInterval(function () {
     topicTable.ajax.reload();
 }, 60000); // 1 min
+
+try {
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/topic/record/size/ajax?topic=' + topicName,
+        success: function (datas) {
+            $("#efka_topic_meta_logsize").val(datas.logsize);
+            $("#efka_topic_meta_capacity").val(datas.capacity);
+            $("#efka_topic_meta_capacity_unit").val(datas.unit);
+        }
+    });
+} catch (e) {
+    console.log(e);
+}

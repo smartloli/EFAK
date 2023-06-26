@@ -26,8 +26,12 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.TopicPartitionInfo;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.TopicConfig;
+import org.kafka.eagle.common.constants.JmxConstants;
 import org.kafka.eagle.common.constants.KConstants;
+import org.kafka.eagle.common.utils.StrUtils;
+import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
+import org.kafka.eagle.pojo.kafka.JMXInitializeInfo;
 import org.kafka.eagle.pojo.topic.*;
 
 import java.util.*;
@@ -176,7 +180,7 @@ public class KafkaSchemaFactory {
         AdminClient adminClient = null;
         try {
             adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
-            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(topic));
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Collections.singleton(topic));
             partitions = describeTopicsResult.all().get().get(topic).partitions().size();
         } catch (Exception e) {
             log.error("Failure while loading topic '{}' meta for kafka '{}': {}", kafkaClientInfo, topic, e);
@@ -207,6 +211,42 @@ public class KafkaSchemaFactory {
 
         return logSize;
 
+    }
+
+    public Long getTopicOfLogSize(KafkaClientInfo kafkaClientInfo, String topic) {
+        Long logSize = 0L;
+
+        // get topic logsize
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(plugin.getKafkaConsumerProps(kafkaClientInfo));
+
+        Set<Integer> partitionIds = getTopicPartitionsOfInt(kafkaClientInfo, topic);
+        Set<TopicPartition> tps = new HashSet<>();
+        for (int partitionid : partitionIds) {
+            TopicPartition tp = new TopicPartition(topic, partitionid);
+            tps.add(tp);
+        }
+        consumer.assign(tps);
+        java.util.Map<TopicPartition, Long> endLogSize = consumer.endOffsets(tps);
+        java.util.Map<TopicPartition, Long> startLogSize = consumer.beginningOffsets(tps);
+
+        try {
+            long endSumLogSize = 0L;
+            long startSumLogSize = 0L;
+            for (Map.Entry<TopicPartition, Long> entry : endLogSize.entrySet()) {
+                endSumLogSize += entry.getValue();
+            }
+            for (Map.Entry<TopicPartition, Long> entry : startLogSize.entrySet()) {
+                startSumLogSize += entry.getValue();
+            }
+            logSize = endSumLogSize - startSumLogSize;
+        } catch (Exception e) {
+            log.error("Get topic[{}] logsize has error, msg is {}", topic, e);
+        } finally {
+            if (consumer != null) {
+                consumer.close();
+            }
+        }
+        return logSize;
     }
 
     public TopicRecordPageInfo getTopicMetaPageOfRecord(KafkaClientInfo kafkaClientInfo, String topic, Map<String, Object> params) {
@@ -338,6 +378,35 @@ public class KafkaSchemaFactory {
             plugin.registerToClose(adminClient);
         }
         return partitions;
+    }
+
+    public TopicJmxInfo geTopicRecordCapacity(KafkaClientInfo kafkaClientInfo, List<BrokerInfo> brokerInfos, String topic) {
+        TopicJmxInfo topicJmxInfo = new TopicJmxInfo();
+        Long capacity = 0L;
+        List<MetadataInfo> metadataInfos = getTopicMetaData(kafkaClientInfo, topic);
+        for (MetadataInfo metadataInfo : metadataInfos) {
+            JMXInitializeInfo initializeInfo = getBrokerJmxRmiOfLeaderId(brokerInfos, metadataInfo.getLeader());
+            initializeInfo.setObjectName(String.format(JmxConstants.KafkaLog.SIZE.getValue(), topic, metadataInfo.getPartitionId()));
+            capacity += KafkaClusterFetcher.getTopicRecordJmxInfo(initializeInfo);
+        }
+        Long size = StrUtils.stringifyByObject(capacity).getLong("size");
+        String type = StrUtils.stringifyByObject(capacity).getString("type");
+        topicJmxInfo.setCapacity(size);
+        topicJmxInfo.setUnit(type);
+        return topicJmxInfo;
+    }
+
+    private JMXInitializeInfo getBrokerJmxRmiOfLeaderId(List<BrokerInfo> brokerInfos, Integer leadId) {
+        JMXInitializeInfo initializeInfo = new JMXInitializeInfo();
+        for (BrokerInfo brokerInfo : brokerInfos) {
+            if (String.valueOf(leadId).equals(brokerInfo.getBrokerId())) {
+                initializeInfo.setBrokerId(String.valueOf(leadId));
+                initializeInfo.setHost(brokerInfo.getBrokerHost());
+                initializeInfo.setPort(brokerInfo.getBrokerJmxPort());
+                break;
+            }
+        }
+        return initializeInfo;
     }
 
     public Map<String, TopicMetadataInfo> getTopicMetaData(KafkaClientInfo kafkaClientInfo, Set<String> topics) {
