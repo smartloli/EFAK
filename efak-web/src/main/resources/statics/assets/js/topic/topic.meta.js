@@ -83,11 +83,21 @@ try {
         dataType: 'json',
         url: '/topic/record/size/ajax?topic=' + topicName,
         success: function (datas) {
-            $("#efka_topic_meta_logsize").val(datas.logsize);
-            $("#efka_topic_meta_capacity").val(datas.capacity);
-            $("#efka_topic_meta_capacity_unit").val(datas.unit);
+            $("#efka_topic_meta_logsize").text(datas.logsize);
+            $("#efka_topic_meta_capacity").text(datas.capacity);
+            $("#efka_topic_meta_capacity_unit").text(datas.unit);
         }
     });
 } catch (e) {
     console.log(e);
 }
+
+$(document).on('click', 'a[name=efak_topic_partition_preview]', function (event) {
+    event.preventDefault();
+    var clusterId = $(this).attr("cid");
+    var topic = $(this).attr("topic");
+    var partition = $(this).attr("partition");
+
+    $('#efak_topic_partition_msg_preview_modal').modal('show');
+
+});

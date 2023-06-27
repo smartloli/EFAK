@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.web.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -47,6 +48,7 @@ import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * In the provided example, the TopicController handles the root URL request ("/") and is
@@ -107,6 +109,16 @@ public class TopicController {
         }
 
         return "topic/meta.html";
+    }
+
+    /**
+     * test topic view.
+     *
+     * @return
+     */
+    @GetMapping("/mock")
+    public String topicMockView() {
+        return "topic/mock.html";
     }
 
     /**
@@ -333,7 +345,7 @@ public class TopicController {
         KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
 
         JSONArray aaDatas = new JSONArray();
-        TopicRecordPageInfo topicRecordPageInfo = ksf.getTopicMetaPageOfRecord(kafkaClientInfo,topic,map);
+        TopicRecordPageInfo topicRecordPageInfo = ksf.getTopicMetaPageOfRecord(kafkaClientInfo, topic, map);
 
         for (TopicRecordInfo topicRecordInfo : topicRecordPageInfo.getRecords()) {
             JSONObject target = new JSONObject();
@@ -344,7 +356,7 @@ public class TopicController {
             target.put("isr", topicRecordInfo.getIsr());
             target.put("preferredLeader", HtmlAttributeUtil.getPreferredLeader(topicRecordInfo.getPreferredLeader()));
             target.put("underReplicated", HtmlAttributeUtil.getUnderReplicated(topicRecordInfo.getUnderReplicated()));
-            target.put("preview", "<a href='' cid='" + cid + "' topic='" + topic + "' partitions='" + topicRecordInfo.getPartitionId() + "' name='efak_topic_partition_preview' class='badge border border-primary text-primary'>预览</a>");
+            target.put("preview", "<a href='' cid='" + cid + "' topic='" + topic + "' partition='" + topicRecordInfo.getPartitionId() + "' name='efak_topic_partition_preview' class='badge border border-primary text-primary'>预览</a>");
             aaDatas.add(target);
         }
 
@@ -378,11 +390,89 @@ public class TopicController {
         } else {
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
             KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
-            TopicJmxInfo topicJmxInfo = ksf.geTopicRecordCapacity(kafkaClientInfo,brokerInfos, topic);
-            Long logsize = ksf.getTopicOfLogSize(kafkaClientInfo,topic);
+            TopicJmxInfo topicJmxInfo = ksf.geTopicRecordCapacity(kafkaClientInfo, brokerInfos, topic);
+            Long logsize = ksf.getTopicOfLogSize(kafkaClientInfo, topic);
             target.put("logsize", logsize);
             target.put("capacity", topicJmxInfo.getCapacity());
             target.put("unit", topicJmxInfo.getUnit());
+        }
+        return target.toString();
+    }
+
+
+    /**
+     * get topic name mock list.
+     *
+     * @param response
+     * @param request
+     */
+    @RequestMapping(value = "/name/mock/ajax", method = RequestMethod.GET)
+    public void pageTopicNameMockAjax(HttpServletResponse response, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic name mock list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        HttpSession session = request.getSession();
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+        List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
+        String name = request.getParameter("name");
+        JSONObject object = new JSONObject();
+
+        KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+        KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+        Set<String> topicNames = ksf.getTopicNames(kafkaClientInfo);
+        int offset = 0;
+        JSONArray topics = new JSONArray();
+        for (String topicName : topicNames) {
+            if (StrUtil.isNotBlank(name)) {
+                JSONObject topic = new JSONObject();
+                if (topicName.contains(name)) {
+                    topic.put("text", topicName);
+                    topic.put("id", offset);
+                }
+                topics.add(topic);
+            } else {
+                JSONObject topic = new JSONObject();
+                topic.put("text", topicName);
+                topic.put("id", offset);
+                topics.add(topic);
+            }
+
+            offset++;
+        }
+
+        object.put("items", topics);
+        try {
+            byte[] output = object.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/name/mock/send", method = RequestMethod.POST)
+    public String mockTopicRecord(@RequestBody TopicMockInfo topicMockInfo, HttpSession session, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic partition add:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+        List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
+        JSONObject target = new JSONObject();
+        if (brokerInfos == null || brokerInfos.size() == 0) {
+            target.put("status", false);
+            target.put("msg", ResponseModuleType.ADD_TOPIC_NOBROKERS_ERROR.getName());
+        } else {
+            KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+            KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+            boolean result = ksf.sendMsg(kafkaClientInfo,topicMockInfo.getTopicName(),topicMockInfo.getMessage());
+            if(result) {
+                target.put("status", true);
+            }else{
+                target.put("status", false);
+                target.put("msg", ResponseModuleType.ADD_TOPCI_RECORD_SERVICE_ERROR.getName());
+            }
         }
         return target.toString();
     }

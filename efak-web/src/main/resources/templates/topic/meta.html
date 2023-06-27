@@ -139,8 +139,6 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
                 <div class="col-xl-2 content-nav-wrapper">
                     <ul class="nav content-nav d-flex flex-column">
@@ -156,11 +154,32 @@
                 </div>
             </div>
         </div>
-
         <!-- partial:footer -->
         <footer th:replace="public/common :: footer"></footer>
         <!-- partial -->
+    </div>
 
+    <!-- preview -->
+    <div class="modal fade" id="efak_topic_partition_msg_preview_modal" tabindex="-1"
+         aria-labelledby="varyingModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="varyingModalLabel"
+                        th:utext="#{kafka.eagle.topic.meta.preview}"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="efak_topic_name_msg_preview" class="form-label"
+                               th:utext="#{kafka.eagle.topic.meta.preview.ten}"></label>
+                        <textarea class="form-control" id="efak_topic_name_msg_preview"
+                                  name="efak_topic_name_msg_preview" rows="20" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

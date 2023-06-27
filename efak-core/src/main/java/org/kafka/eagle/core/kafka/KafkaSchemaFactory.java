@@ -20,6 +20,9 @@ package org.kafka.eagle.core.kafka;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
@@ -461,6 +464,23 @@ public class KafkaSchemaFactory {
             plugin.registerToClose(adminClient);
         }
         return topicMetas;
+    }
+
+    public boolean sendMsg(KafkaClientInfo kafkaClientInfo, String topic, String msg) {
+        boolean flag = false;
+        Producer<String, String> producer = null;
+        try {
+            producer = new KafkaProducer<>(plugin.getKafkaProducerProps(kafkaClientInfo));
+            producer.send(new ProducerRecord<>(topic, StrUtils.getUUid(), msg));
+            flag = true;
+        } catch (Exception e) {
+            log.error("Failure while sending msg '{}' to topic '{}' for kafka '{}': {}", msg, topic, kafkaClientInfo, e);
+        } finally {
+            if (producer != null) {
+                producer.close();
+            }
+        }
+        return flag;
     }
 
     public static void main(String[] args) {

@@ -192,4 +192,8 @@ public class StrUtils {
     public static List<String> stringListConvertListStrings(String strings) {
         return Arrays.asList(strings.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "").split(","));
     }
+
+    public static String getUUid() {
+        return java.util.UUID.randomUUID().toString().replaceAll("-", "");
+    }
 }

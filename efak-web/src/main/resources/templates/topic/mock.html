@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title th:text="#{kafka.eagle.topics.mock}"></title>
+
+    <link rel="stylesheet" th:href="@{../../assets/vendors/dropify/dist/dropify.min.css}">
+    <link rel="stylesheet" th:href="@{../../assets/vendors/select2/select2.min.css}">
+    <link rel="stylesheet" th:href="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css}">
+    <link rel="stylesheet" th:href="@{../../assets/css/public/cluster/manage.create.css}">
+    <th:block th:replace="public/common :: css"></th:block>
+
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:menu -->
+    <div th:replace="public/header :: menu_header"></div>
+    <div th:replace="public/navbar :: menu_navbar"></div>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+
+        <div class="page-content">
+            <nav class="page-breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/topic/manage"
+                                                   th:text="#{kafka.eagle.topics.manager}"></a></li>
+                    <li class="breadcrumb-item active" aria-current="page"
+                        th:text="#{kafka.eagle.topics.mock}"></li>
+                </ol>
+            </nav>
+            <div class="row">
+                <div class="col-xl-10 main-content ps-xl-4 pe-xl-5">
+                    <h1 class="page-title" th:text="#{kafka.eagle.topics.mock}"></h1>
+                    <p class="lead" th:utext="#{kafka.eagle.topics.mock.desc}"></p>
+
+                    <hr>
+                    <h4 id="efak_topic_name" th:utext="#{kafka.eagle.topics.create.name}"></h4>
+                    <div class="mb-3">
+                        <select id="efak_topic_name_mock_list" class="form-select" data-width="100%">
+                        </select>
+                        <input type="hidden" id="efak_topic_name_mock_hidden" />
+                    </div>
+                    <hr>
+                    <h4 id="efak_topic_name_msg_text" th:utext="#{kafka.eagle.topics.mock.name.text}"></h4>
+                    <div class="mb-3">
+                        <textarea class="form-control" id="efak_topic_name_mock_textarea" maxlength="1024" value="" rows="16"></textarea>
+                    </div>
+                    <hr>
+                    <div class="example">
+                        <div style="text-align: center;">
+                            <button id="efak_topic_create_cancle" type="button" class="btn btn-secondary btn-lg"
+                                    th:text="#{kafka.eagle.topic.manage.create.cancle}"></button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" id="efak_topic_mock_submit" class="btn btn-primary btn-lg"
+                                    th:text="#{kafka.eagle.topics.mock.send}"></button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-xl-2 content-nav-wrapper">
+                    <ul class="nav content-nav d-flex flex-column">
+                        <li class="nav-item">
+                            <a href="#efak_topic_name" class="nav-link"
+                               th:text="#{kafka.eagle.topics.mock.name.select.link}"></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#efak_topic_name_msg_text" class="nav-link"
+                               th:text="#{kafka.eagle.topics.mock.name.textarea.link}"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- partial:footer -->
+        <footer th:replace="public/common :: footer"></footer>
+        <!-- partial -->
+
+    </div>
+
+</div>
+
+<!-- core:js -->
+<th:block th:replace="public/common :: js"></th:block>
+
+<!-- plugins:js -->
+<script th:src="@{../../assets/vendors/datatables.net/jquery.dataTables.js}"></script>
+<script th:src="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js}"></script>
+<script th:src="@{../../assets/vendors/dropify/dist/dropify.min.js}"></script>
+<script th:src="@{../../assets/vendors/select2/select2.min.js}"></script>
+<script th:src="@{../../assets/js/topic/topic.mock.js}"></script>
+
+</body>
+</html>
