@@ -17,8 +17,12 @@
  */
 package org.kafka.eagle.core.kafka;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -31,12 +35,14 @@ import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.TopicConfig;
 import org.kafka.eagle.common.constants.JmxConstants;
 import org.kafka.eagle.common.constants.KConstants;
+import org.kafka.eagle.common.utils.CalendarUtil;
 import org.kafka.eagle.common.utils.StrUtils;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.kafka.JMXInitializeInfo;
 import org.kafka.eagle.pojo.topic.*;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -481,6 +487,48 @@ public class KafkaSchemaFactory {
             }
         }
         return flag;
+    }
+
+    public String getMsg(KafkaClientInfo kafkaClientInfo, String topic, Integer partitionId) {
+        JSONArray dataSets = new JSONArray();
+        KafkaConsumer<String, String> consumer = null;
+        try {
+            consumer = new KafkaConsumer<>(plugin.getKafkaConsumerProps(kafkaClientInfo));
+            TopicPartition topicPartition = new TopicPartition(topic, partitionId);
+            consumer.assign(Collections.singleton(topicPartition));
+            Map<TopicPartition, Long> offsets = consumer.endOffsets(Collections.singleton(topicPartition));
+            long position = KConstants.Topic.PREVIEW_SIZE;
+            if (offsets.get(topicPartition).longValue() > position) {
+                consumer.seek(topicPartition, offsets.get(topicPartition).longValue() - position);
+            } else {
+                consumer.seek(topicPartition, 0);
+            }
+
+            boolean flag = true;
+            while (flag) {
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(KConstants.Kafka.TIME_OUT));
+                for (ConsumerRecord<String, String> record : records) {
+                    JSONObject object = new JSONObject(new LinkedHashMap<>());
+                    object.put(TopicSchema.PARTITION, record.partition());
+                    object.put(TopicSchema.OFFSET, record.offset());
+                    object.put(TopicSchema.MSG, record.value());
+                    object.put(TopicSchema.TIMESPAN, record.timestamp());
+                    object.put(TopicSchema.DATE, CalendarUtil.convertUnixTime(record.timestamp()));
+                    dataSets.add(object);
+                }
+                if (records.isEmpty()) {
+                    flag = false;
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Failure while get msg to topic '{}' for kafka '{}': {}", topic, kafkaClientInfo, e);
+        } finally {
+            if (consumer != null) {
+                consumer.close();
+            }
+        }
+        return dataSets.toJSONString();
     }
 
     public static void main(String[] args) {

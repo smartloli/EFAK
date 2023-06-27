@@ -94,10 +94,28 @@ try {
 
 $(document).on('click', 'a[name=efak_topic_partition_preview]', function (event) {
     event.preventDefault();
-    var clusterId = $(this).attr("cid");
     var topic = $(this).attr("topic");
     var partition = $(this).attr("partition");
 
     $('#efak_topic_partition_msg_preview_modal').modal('show');
+
+    try {
+        $.ajax({
+            url: '/topic/name/msg/preview',
+            method: 'POST',
+            dataType: 'json',
+            contentType: 'application/json;charset=UTF-8',
+            data: JSON.stringify({
+                "topicName": topic,
+                "partitionId": partition
+            }),
+            success: function (response) {
+                console.log(response);
+                $("#efak_topic_name_msg_preview").text(JSON.stringify(response, null, 2));
+            }
+        });
+    } catch (e) {
+        console.log(e);
+    }
 
 });

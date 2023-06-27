@@ -452,7 +452,7 @@ public class TopicController {
 
     @ResponseBody
     @RequestMapping(value = "/name/mock/send", method = RequestMethod.POST)
-    public String mockTopicRecord(@RequestBody TopicMockInfo topicMockInfo, HttpSession session, HttpServletRequest request) {
+    public String sendTopicRecord(@RequestBody TopicMockInfo topicMockInfo, HttpSession session, HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();
         String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
         log.info("Topic partition add:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
@@ -466,15 +466,34 @@ public class TopicController {
         } else {
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
             KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
-            boolean result = ksf.sendMsg(kafkaClientInfo,topicMockInfo.getTopicName(),topicMockInfo.getMessage());
-            if(result) {
+            boolean result = ksf.sendMsg(kafkaClientInfo, topicMockInfo.getTopicName(), topicMockInfo.getMessage());
+            if (result) {
                 target.put("status", true);
-            }else{
+            } else {
                 target.put("status", false);
                 target.put("msg", ResponseModuleType.ADD_TOPCI_RECORD_SERVICE_ERROR.getName());
             }
         }
         return target.toString();
+    }
+
+    @RequestMapping(value = "/name/msg/preview", method = RequestMethod.POST)
+    public void getTopicRecord(@RequestBody TopicPreviewInfo topicPreviewInfo, HttpServletResponse response, HttpSession session, HttpServletRequest request) {
+        try {
+            String remoteAddr = request.getRemoteAddr();
+            String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+            log.info("Topic partition add:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+            Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+            ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+            List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
+            KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+            KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+            String content = ksf.getMsg(kafkaClientInfo, topicPreviewInfo.getTopicName(), topicPreviewInfo.getPartitionId());
+            byte[] output = content.getBytes();
+            BaseController.response(output, response);
+        } catch (Exception e) {
+            log.error("Get topic[{}],partitionId[] msg has error: {}", topicPreviewInfo.getTopicName(), topicPreviewInfo.getPartitionId(), e);
+        }
     }
 
 }

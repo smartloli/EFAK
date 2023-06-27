@@ -86,6 +86,8 @@ public class KConstants {
 
         public static final String EFAK_SYSTEM_GROUP = "efak.system.group";
 
+        public static final int TIME_OUT = 100;
+
     }
 
     /**
@@ -154,6 +156,8 @@ public class KConstants {
         public static final String PRODUCERS = "producers";
         public static final String CONSUMERS = "consumers";
         public static final String LAG = "lag";
+
+        public static final Integer PREVIEW_SIZE = 10;
     }
 
 }
