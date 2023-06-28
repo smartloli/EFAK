@@ -61,3 +61,20 @@ CREATE TABLE IF NOT EXISTS ke_topics(
     INDEX idx_cluster_id (cluster_id),
     INDEX idx_cluster_topic_id (cluster_id,topic_name)
 ) COMMENT 'Topic Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS ke_user_persistent_logins(
+    username varchar(64) NOT NULL COMMENT 'Username',
+    series varchar(64) NOT NULL COMMENT 'Series',
+    token varchar(64) NOT NULL COMMENT  'Token',
+    last_used timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last Used',
+    PRIMARY KEY (`series`)
+) COMMENT 'persistent logins' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS ke_users_info (
+  id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'UserId',
+  username varchar(20) DEFAULT NULL COMMENT 'UserName',
+  passwd varchar(100) DEFAULT NULL COMMENT 'Password',
+  roles varchar(50) DEFAULT NULL COMMENT 'Roles',
+  INDEX idx_username (username),
+  INDEX idx_user_pwd (username,passwd)
+) COMMENT 'User info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

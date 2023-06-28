@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 /**
  *  KafkaEagle is a web-based monitoring and management platform for Apache Kafka clusters.
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.Bean;
  * @Version: 3.4.0
  */
 @SpringBootApplication
+@EnableGlobalMethodSecurity(securedEnabled = true)
 @Slf4j
 public class KafkaEagle {
 

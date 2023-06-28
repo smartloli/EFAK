@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>default</title>
+</head>
+<body>
+
+
+账号:<span sec:authentication="name"></span><br>
+角色:<span sec:authentication="principal.authorities"></span><br>
+用户名:<span sec:authentication="principal.username"></span><br>
+密码:<span sec:authentication="principal.password"></span><br>
+
+
+<span sec:authorize="isAuthenticated()">
+    已登录<br>
+    <span sec:authorize="hasRole('ADMIN')">
+        <a href="#">用户管理</a>
+    </span><br>
+    <span sec:authorize="hasRole('ADMIN')">
+        <a href="#">角色管理</a>
+    </span><br>
+    <span sec:authorize="hasRole('DEV')">
+        <a href="#">商品管理</a>
+    </span><br>
+    <span sec:authorize="hasRole('TEST')">
+        <a href="#">订单管理</a>
+    </span><br>
+</span>
+
+</body>
+</html>

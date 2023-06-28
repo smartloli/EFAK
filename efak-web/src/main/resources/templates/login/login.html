@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<body>
+
+<form th:action="@{/login.do}" method="post">
+    账号:<input type="text" name="username"><br>
+    密码:<input type="password" name="password"><br>
+    <input type="checkbox" id="rememberme" name="remember-me" value="1">记住我<br>
+    <input type="submit" value="登录"><br>
+</form>
+</body>
+</html>
