@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -54,28 +55,20 @@ public class KeWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication()
-//                .withUser("che")
-//                .password("{noop}123456")
-//                .authorities("ADMIN");
-
         auth.userDetailsService(sysUserDaoService).passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //super.configure(http);
         http.authorizeRequests() // Which pages can be accessed directly and which ones require verification?
-                .antMatchers("/login","/error").permitAll() // accessed directly
-                //.antMatchers("/get").hasRole("ROOT")
-                //.antMatchers("/save").hasRole("TEST")
+                .antMatchers("/login","/error/500").permitAll() // accessed directly
                 .anyRequest().authenticated() // All remaining addresses require authentication to access
                 .and()
                 .formLogin()
                 .loginPage("/login") // Specify the desired login page.
                 .loginProcessingUrl("/login.do") // Handle authentication path requests.
-                .defaultSuccessUrl("/deault")
-                .failureForwardUrl("/error")
+                .defaultSuccessUrl("/")
+                .failureForwardUrl("/error/500")
                 .and()
                 .logout()
                 .logoutUrl("/logout")
@@ -101,4 +94,8 @@ public class KeWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/assets/**");
+    }
 }
