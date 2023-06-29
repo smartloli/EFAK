@@ -33,18 +33,4 @@ public class LoginController {
         return "login/login.html";
     }
 
-    @GetMapping("/home")
-    public String home(){
-        return "login/home.html";
-    }
-
-    @GetMapping("/deault")
-    public String deault(){
-        return "login/deault.html";
-    }
-
-    @GetMapping("/error")
-    public String error(){
-        return "login/error.html";
-    }
 }
