@@ -48,7 +48,7 @@ public class UserInfo implements Serializable {
     /**
      * password, lenth default 100
      */
-    private String passwd;
+    private String password;
 
     /**
      * roles, such as ADMIN, DEV, TEST

@@ -28,22 +28,22 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 public class LoginController {
-    @GetMapping("/login.html")
+    @GetMapping("/login")
     public String loginPage(){
         return "login/login.html";
     }
 
-    @GetMapping("/home.html")
+    @GetMapping("/home")
     public String home(){
         return "login/home.html";
     }
 
-    @GetMapping("/deault.html")
+    @GetMapping("/deault")
     public String deault(){
         return "login/deault.html";
     }
 
-    @GetMapping("/error.html")
+    @GetMapping("/error")
     public String error(){
         return "login/error.html";
     }

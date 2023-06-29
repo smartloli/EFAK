@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS ke_topics(
     INDEX idx_cluster_topic_id (cluster_id,topic_name)
 ) COMMENT 'Topic Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS ke_user_persistent_logins(
+CREATE TABLE IF NOT EXISTS persistent_logins(
     username varchar(64) NOT NULL COMMENT 'Username',
     series varchar(64) NOT NULL COMMENT 'Series',
     token varchar(64) NOT NULL COMMENT  'Token',

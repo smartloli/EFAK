@@ -74,7 +74,7 @@ public class SysUserDaoServiceImpl implements ISysUserDaoService {
         //UserDetails user = new User(s,"{noop}aaa",authorities);
         UserDetails user = new User(
                 userInfo.getUsername(),
-                userInfo.getPasswd(),
+                userInfo.getPassword(),
                 true,
                 true,
                 true, // true: credentials not expired

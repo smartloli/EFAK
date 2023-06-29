@@ -66,20 +66,20 @@ public class KeWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         //super.configure(http);
         http.authorizeRequests() // Which pages can be accessed directly and which ones require verification?
-                .antMatchers("/login.html", "/error.html").permitAll() // accessed directly
+                .antMatchers("/login","/error").permitAll() // accessed directly
                 //.antMatchers("/get").hasRole("ROOT")
                 //.antMatchers("/save").hasRole("TEST")
                 .anyRequest().authenticated() // All remaining addresses require authentication to access
                 .and()
                 .formLogin()
-                .loginPage("/login.html") // Specify the desired login page.
+                .loginPage("/login") // Specify the desired login page.
                 .loginProcessingUrl("/login.do") // Handle authentication path requests.
-                .defaultSuccessUrl("/deault.html")
-                .failureForwardUrl("/error.html")
+                .defaultSuccessUrl("/deault")
+                .failureForwardUrl("/error")
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login.html")
+                .logoutSuccessUrl("/login")
                 .and()
                 .rememberMe()
                 .tokenRepository(tokenRepository)
