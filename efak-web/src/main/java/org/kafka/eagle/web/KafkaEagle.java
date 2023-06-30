@@ -18,9 +18,11 @@
 package org.kafka.eagle.web;
 
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.plugins.font.KafkaEagleVersion;
 import org.kafka.eagle.plugins.mysql.MySqlRecordSchema;
 import org.kafka.eagle.pojo.mysql.MySQLDataSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -52,7 +54,11 @@ public class KafkaEagle {
     private String dbDriverName;
 
     public static void main(String[] args) {
-        SpringApplication.run(KafkaEagle.class, args);
+        // SpringApplication.run(KafkaEagle.class, args);
+        SpringApplication application=new SpringApplication(KafkaEagle.class);
+        application.setBannerMode(Banner.Mode.OFF);
+        application.run(args);
+        KafkaEagleVersion.version();
     }
 
     @Bean

@@ -160,4 +160,12 @@ public class KConstants {
         public static final Integer PREVIEW_SIZE = 10;
     }
 
+    public final class Common {
+        private Common() {
+        }
+
+        public static final String EFAK_VERSION = "v3.4.0";
+        public static final String EFAK_VERSION_DOC = "efakVersion";
+    }
+
 }

@@ -33,9 +33,13 @@
                         <input type="hidden" id="ref_url" name="ref_url">
                     </div>
                     <div class="form-group">
-                        <input class="checkbox" type="checkbox" id="rememberme" name="remember-me" th:text="#{kafka.eagle.login.rememberme}" value="1"><br>
+<!--                        <input class="checkbox" type="checkbox" id="rememberme" name="remember-me" value="1">-->
+                        <input type="checkbox" class="form-check-input" id="rememberme" name="remember-me" value="1">
+                        <label class="form-check-label" for="rememberme" th:text="#{kafka.eagle.login.rememberme}"></label>
                     </div>
                     <div class="form-group">
+                        <div class="alert alert-danger" th:if="${param.error}" th:text="#{kafka.eagle.login.error.msg}">
+                        </div>
                         <div id="alert_mssage" style="display: none"
                              class="alert alert-danger"></div>
                     </div>
@@ -67,7 +71,7 @@
         }
         $("#ref_url").val(ref_url);
         if (username.length == 0 || password.length == 0) {
-            $("#alert_mssage").text("Account or password cannot be null.").show();
+            $("#alert_mssage").text("用户名和密码不能为空").show();
             setTimeout(function () {
                 $("#alert_mssage").hide()
             }, 3000);

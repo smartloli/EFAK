@@ -68,7 +68,7 @@ public class KeWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .loginPage("/login") // Specify the desired login page.
                 .loginProcessingUrl("/login.do") // Handle authentication path requests.
                 .defaultSuccessUrl("/")
-                .failureForwardUrl("/error/500")
+                // .failureUrl("/login/failed")
                 .and()
                 .logout()
                 .logoutUrl("/logout")

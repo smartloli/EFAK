@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * Description: TODO
+ *
  * @Author: smartloli
  * @Date: 2023/6/28 23:49
  * @Version: 3.4.0
@@ -29,8 +30,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class LoginController {
     @GetMapping("/login")
-    public String loginPage(){
+    public String loginPage() {
         return "login/login.html";
     }
+
 
 }
