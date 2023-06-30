@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <!-- header menu -->
 <div class="horizontal-menu" th:fragment="menu_header">
@@ -36,33 +37,30 @@
                             </div>
                             <div class="row g-0 p-1">
                                 <div class="col-3 text-center">
-                                    <a href="pages/apps/chat.html"
+                                    <a href="#"
                                        class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70"><i
                                             data-feather="message-square" class="icon-lg mb-1"></i>
                                         <p class="tx-12" th:text="#{kafka.eagle.header.chatgpt}">ChatGPT</p></a>
                                 </div>
                                 <div class="col-3 text-center">
-                                    <a href="pages/apps/calendar.html"
+                                    <a href="#"
                                        class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70"><i
                                             data-feather="calendar" class="icon-lg mb-1"></i>
                                         <p class="tx-12" th:text="#{kafka.eagle.header.calendar}">Calendar</p></a>
                                 </div>
                                 <div class="col-3 text-center">
-                                    <a href="pages/email/inbox.html"
+                                    <a href="/clusters/manage"
                                        class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70"><i
                                             data-feather="inbox" class="icon-lg mb-1"></i>
                                         <p class="tx-12" th:text="#{kafka.eagle.header.manager.change}">Manager</p></a>
                                 </div>
                                 <div class="col-3 text-center">
-                                    <a href="pages/general/profile.html"
+                                    <a href="#"
                                        class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70"><i
                                             data-feather="instagram" class="icon-lg mb-1"></i>
                                         <p class="tx-12" th:text="#{kafka.eagle.header.profile}">Profile</p></a>
                                 </div>
                             </div>
-<!--                            <div class="px-3 py-2 d-flex align-items-center justify-content-center border-top">-->
-<!--                                <a href="javascript:;">View all</a>-->
-<!--                            </div>-->
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -203,8 +201,8 @@
                                          alt="">
                                 </div>
                                 <div class="text-center">
-                                    <p class="tx-16 fw-bolder">Admin</p>
-                                    <p class="tx-12 text-muted">admin@gmail.com</p>
+                                    <p class="tx-16 fw-bolder"><span sec:authentication="principal.username"></span></p>
+                                    <p class="tx-12 text-muted"><span sec:authentication="principal.authorities"></span></p>
                                 </div>
                             </div>
                             <ul class="list-unstyled p-1">

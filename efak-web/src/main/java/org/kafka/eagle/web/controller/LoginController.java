@@ -34,5 +34,10 @@ public class LoginController {
         return "login/login.html";
     }
 
+    @GetMapping("/deault")
+    public String defaultPage() {
+        return "login/deault.html";
+    }
+
 
 }

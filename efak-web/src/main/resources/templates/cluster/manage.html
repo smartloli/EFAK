@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
@@ -38,10 +39,15 @@
                         <div class="card-body">
                             <h6 class="card-title" th:text="#{kafka.eagle.clusters.manage.home.sub}"></h6>
                             <p class="text-muted mb-3" th:utext="#{kafka.eagle.clusters.manage.home.sub.desc}"></p>
-                            <div style="float: right!important;margin-top: -88px;">
-                                <button id="efak_manage_btn" type="button" class="btn btn-primary btn-sm"
-                                        th:text="#{kafka.eagle.clusters.manage.create}"></button>
-                            </div>
+                            <span sec:authorize="isAuthenticated()">
+                                <span sec:authorize="hasRole('ADMIN')">
+                                    <div style="float: right!important;margin-top: -88px;">
+                                        <button id="efak_manage_btn" type="button" class="btn btn-primary btn-sm"
+                                            th:text="#{kafka.eagle.clusters.manage.create}"></button>
+                                    </div>
+                                </span>
+                            </span>
+
                             <div class="table-responsive">
                                 <table id="efak_cluster_manage_tbl" class="table table-striped" style="width:100%">
                                     <thead>
