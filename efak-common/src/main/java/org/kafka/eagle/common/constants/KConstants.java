@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.common.constants;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,6 +29,11 @@ import java.util.List;
  * @Version: 3.4.0
  */
 public class KConstants {
+
+    public static DateTimeFormatter getFormatter(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        return formatter;
+    }
 
     public final class ServerDevice {
         private ServerDevice() {

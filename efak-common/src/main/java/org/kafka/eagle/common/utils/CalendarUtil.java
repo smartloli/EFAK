@@ -155,4 +155,5 @@ public class CalendarUtil {
         SimpleDateFormat df = new SimpleDateFormat(DATA_FORMAT_YEAR);
         return Integer.parseInt((df.parse(afterDate).getTime() - df.parse(beforeDate).getTime()) / (1000 * 3600 * 24) + "");
     }
+
 }

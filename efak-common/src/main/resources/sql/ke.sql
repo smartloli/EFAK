@@ -79,27 +79,19 @@ CREATE TABLE IF NOT EXISTS ke_users_info (
   INDEX idx_user_pwd (username,passwd)
 ) COMMENT 'User info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
 CREATE TABLE IF NOT EXISTS ke_topics_summary(
     id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key ClusterId',
     cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
     topic_name VARCHAR(128) NOT NULL COMMENT 'Topic Name',
-    logsize BIGINT COMMENT 'Topic Logsize',
-    day VARCHAR(8) COMMENT 'Topic Day',
-    modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
-    INDEX idx_cluster_id (cluster_id),
-    INDEX idx_cluster_topic_id (cluster_id,topic_name)
-) COMMENT 'Topic Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE IF NOT EXISTS ke_topics_sequence(
-    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key ClusterId',
-    cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
-    topic_name VARCHAR(128) NOT NULL COMMENT 'Topic Name',
-    logsize BIGINT COMMENT 'Topic Logsize',
-    logsize_diff_val BIGINT COMMENT 'Topic Logsize Diff Value',
+    log_size BIGINT COMMENT 'Topic Logsize',
+    log_size_diff_val BIGINT COMMENT 'Topic Logsize Diff Value',
     timespan BIGINT COMMENT 'Collect Timespan',
     day VARCHAR(8) COMMENT 'Topic Day',
     modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
     INDEX idx_cluster_id (cluster_id),
     INDEX idx_cluster_topic_id (cluster_id,topic_name),
+    INDEX idx_cluster_topic_id_day (cluster_id,topic_name,day),
+    INDEX idx_cluster_topic_id_day_timespan (cluster_id,topic_name,day,timespan),
     INDEX idx_cluster_topic_id_timespan (cluster_id,topic_name,timespan)
-) COMMENT 'Topic Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) COMMENT 'Topic Summary Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

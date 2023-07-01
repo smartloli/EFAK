@@ -20,10 +20,17 @@ public interface ITopicSummaryDaoService extends IService<TopicSummaryInfo> {
     List<TopicSummaryInfo> list();
 
     /**
+     * Get topic info by day.
+     * @param day
+     * @return
+     */
+    List<TopicSummaryInfo> list(String day);
+
+    /**
      * Get topic info by clusterId.
      * @return
      */
-    List<TopicSummaryInfo> topics(String clusterId);
+    List<TopicSummaryInfo> topicsOfDay(String clusterId,String day);
 
     /**
      * Get topic info by clusterId and topic name.
@@ -31,7 +38,7 @@ public interface ITopicSummaryDaoService extends IService<TopicSummaryInfo> {
      * @param topicName
      * @return
      */
-    TopicSummaryInfo topics(String clusterId,String topicName);
+    TopicSummaryInfo topicOfLatest(String clusterId,String topicName,String day);
 
     /**
      * Get topic info by id(topic id).

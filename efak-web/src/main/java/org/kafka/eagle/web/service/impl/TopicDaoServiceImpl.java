@@ -121,8 +121,8 @@ public class TopicDaoServiceImpl extends ServiceImpl<TopicDaoMapper, TopicInfo> 
         }
 
         TopicInfo topicInfo = topicInfos.get(0);
-        List<TopicInfo> brokerInfosInDb = this.topics(topicInfo.getClusterId());
-        if (CollectionUtils.isEmpty(brokerInfosInDb)) {
+        List<TopicInfo> targetTopicInfos = this.topics(topicInfo.getClusterId());
+        if (CollectionUtils.isEmpty(targetTopicInfos)) {
             return this.batch(topicInfos);
         } else {
             return this.updateBatchById(topicInfos);

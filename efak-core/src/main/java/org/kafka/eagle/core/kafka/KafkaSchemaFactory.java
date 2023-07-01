@@ -249,7 +249,38 @@ public class KafkaSchemaFactory {
             }
             logSize = endSumLogSize - startSumLogSize;
         } catch (Exception e) {
-            log.error("Get topic[{}] logsize has error, msg is {}", topic, e);
+            log.error("Get topic[{}] logsize diff val has error, msg is {}", topic, e);
+        } finally {
+            if (consumer != null) {
+                consumer.close();
+            }
+        }
+        return logSize;
+    }
+
+    public Long getTopicOfTotalLogSize(KafkaClientInfo kafkaClientInfo, String topic) {
+        Long logSize = 0L;
+
+        // get topic logsize
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(plugin.getKafkaConsumerProps(kafkaClientInfo));
+
+        Set<Integer> partitionIds = getTopicPartitionsOfInt(kafkaClientInfo, topic);
+        Set<TopicPartition> tps = new HashSet<>();
+        for (int partitionid : partitionIds) {
+            TopicPartition tp = new TopicPartition(topic, partitionid);
+            tps.add(tp);
+        }
+        consumer.assign(tps);
+        java.util.Map<TopicPartition, Long> endLogSize = consumer.endOffsets(tps);
+
+        try {
+            long endSumLogSize = 0L;
+            for (Map.Entry<TopicPartition, Long> entry : endLogSize.entrySet()) {
+                endSumLogSize += entry.getValue();
+            }
+            logSize = endSumLogSize ;
+        } catch (Exception e) {
+            log.error("Get topic[{}] real logsize has error, msg is {}", topic, e);
         } finally {
             if (consumer != null) {
                 consumer.close();

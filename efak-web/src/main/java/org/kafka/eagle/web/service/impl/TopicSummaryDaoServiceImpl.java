@@ -18,6 +18,7 @@
 package org.kafka.eagle.web.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
@@ -54,13 +55,19 @@ public class TopicSummaryDaoServiceImpl extends ServiceImpl<TopicSummaryDaoMappe
     }
 
     @Override
-    public List<TopicSummaryInfo> topics(String clusterId) {
-        return new LambdaQueryChainWrapper<>(this.topicSummaryDaoMapper).eq(TopicSummaryInfo::getClusterId, clusterId).list();
+    public List<TopicSummaryInfo> list(String day) {
+        return new LambdaQueryChainWrapper<>(this.topicSummaryDaoMapper).lt(TopicSummaryInfo::getDay, day).list();
+    }
+
+
+    @Override
+    public List<TopicSummaryInfo> topicsOfDay(String clusterId, String day) {
+        return new LambdaQueryChainWrapper<>(this.topicSummaryDaoMapper).eq(TopicSummaryInfo::getClusterId, clusterId).eq(TopicSummaryInfo::getDay, day).list();
     }
 
     @Override
-    public TopicSummaryInfo topics(String clusterId, String topicName) {
-        return new LambdaQueryChainWrapper<>(this.topicSummaryDaoMapper).eq(TopicSummaryInfo::getClusterId, clusterId).eq(TopicSummaryInfo::getTopicName, topicName).one();
+    public TopicSummaryInfo topicOfLatest(String clusterId, String topicName, String day) {
+        return this.topicSummaryDaoMapper.selectOne(new QueryWrapper<TopicSummaryInfo>().lambda().eq(TopicSummaryInfo::getClusterId, clusterId).eq(TopicSummaryInfo::getTopicName, topicName).eq(TopicSummaryInfo::getDay, day).orderByDesc(TopicSummaryInfo::getTimespan).last("limit 1"));
     }
 
     @Override
@@ -93,12 +100,12 @@ public class TopicSummaryDaoServiceImpl extends ServiceImpl<TopicSummaryDaoMappe
 
     @Override
     public boolean update(TopicSummaryInfo topicInfo) {
-        TopicSummaryInfo checkTopicInfo = this.topics(topicInfo.getClusterId(), topicInfo.getTopicName());
+        TopicSummaryInfo checkTopicInfo = this.topicOfLatest(topicInfo.getClusterId(), topicInfo.getTopicName(), topicInfo.getDay());
         if (checkTopicInfo == null || StrUtil.isBlank(checkTopicInfo.getTopicName())) {
             return this.insert(topicInfo);
         } else {
             LambdaUpdateChainWrapper<TopicSummaryInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<TopicSummaryInfo>(this.topicSummaryDaoMapper);
-            lambdaUpdateChainWrapper.eq(TopicSummaryInfo::getClusterId, topicInfo.getClusterId()).eq(TopicSummaryInfo::getTopicName, topicInfo.getTopicName());
+            lambdaUpdateChainWrapper.eq(TopicSummaryInfo::getClusterId, topicInfo.getClusterId()).eq(TopicSummaryInfo::getTopicName, topicInfo.getTopicName()).eq(TopicSummaryInfo::getDay, topicInfo.getDay());
             return lambdaUpdateChainWrapper.update(topicInfo);
         }
     }
@@ -121,8 +128,8 @@ public class TopicSummaryDaoServiceImpl extends ServiceImpl<TopicSummaryDaoMappe
         }
 
         TopicSummaryInfo topicInfo = topicInfos.get(0);
-        List<TopicSummaryInfo> brokerInfosInDb = this.topics(topicInfo.getClusterId());
-        if (CollectionUtils.isEmpty(brokerInfosInDb)) {
+        List<TopicSummaryInfo> topicSummaryInfos = this.topicsOfDay(topicInfo.getClusterId(), topicInfo.getDay());
+        if (CollectionUtils.isEmpty(topicSummaryInfos)) {
             return this.batch(topicInfos);
         } else {
             return this.updateBatchById(topicInfos);
@@ -132,9 +139,7 @@ public class TopicSummaryDaoServiceImpl extends ServiceImpl<TopicSummaryDaoMappe
 
     @Override
     public boolean batch(List<TopicSummaryInfo> topicInfos) {
-
         boolean status = false;
-
         int code = this.topicSummaryDaoMapper.insertBatchSomeColumn(topicInfos);
         if (code > 0) {
             status = true;

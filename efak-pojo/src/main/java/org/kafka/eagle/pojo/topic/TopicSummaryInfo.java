@@ -21,9 +21,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import org.kafka.eagle.common.constants.KConstants;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * The data level used to collect topics, divided by day.
@@ -58,13 +59,19 @@ public class TopicSummaryInfo {
     private Long logSize = 0L;
 
     /**
-     * Define the time format.
+     * Get topic logsize diff val.
      */
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private Long logSizeDiffVal = 0L;
+
+    /**
+     * Get topic logsize timespan.
+     */
+    private Long timespan = new Date().getTime();
+
     /**
      * Topic day, such as 20230701
      */
-    private String day = LocalDateTime.now().format(formatter);
+    private String day = LocalDateTime.now().format(KConstants.getFormatter());
 
 
     /**
