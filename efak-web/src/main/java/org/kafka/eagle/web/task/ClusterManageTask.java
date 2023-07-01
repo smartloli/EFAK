@@ -121,7 +121,6 @@ public class ClusterManageTask {
 
             this.clusterDaoService.update(clusterInfo);
 
-
         }
 
     }
