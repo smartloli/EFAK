@@ -22,7 +22,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.pojo.topic.TopicSummaryInfo;
@@ -86,16 +85,13 @@ public class TopicSummaryDaoServiceImpl extends ServiceImpl<TopicSummaryDaoMappe
     }
 
     @Override
-    public Page<TopicSummaryInfo> pages(Map<String, Object> params) {
-        int start = Integer.parseInt(params.get("start").toString());
-        int size = Integer.parseInt(params.get("size").toString());
+    public List<TopicSummaryInfo> pages(Map<String, Object> params) {
         String cid = params.get("cid").toString();
+        String topic = params.get("topic").toString();
+        String stime = params.get("stime").toString();
+        String etime = params.get("etime").toString();
 
-        Page<TopicSummaryInfo> pages = new Page<>(start, size);
-
-        LambdaQueryChainWrapper<TopicSummaryInfo> queryChainWrapper = new LambdaQueryChainWrapper<TopicSummaryInfo>(this.topicSummaryDaoMapper);
-        queryChainWrapper.eq(TopicSummaryInfo::getClusterId, cid).like(TopicSummaryInfo::getTopicName, params.get("search").toString());
-        return queryChainWrapper.orderByDesc(TopicSummaryInfo::getModifyTime).page(pages);
+        return new LambdaQueryChainWrapper<>(this.topicSummaryDaoMapper).eq(TopicSummaryInfo::getClusterId, cid).eq(TopicSummaryInfo::getTopicName, topic).between(TopicSummaryInfo::getDay,stime,etime).list();
     }
 
     @Override

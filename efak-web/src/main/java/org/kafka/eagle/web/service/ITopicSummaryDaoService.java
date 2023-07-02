@@ -1,6 +1,5 @@
 package org.kafka.eagle.web.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.kafka.eagle.pojo.topic.TopicSummaryInfo;
 
@@ -59,7 +58,7 @@ public interface ITopicSummaryDaoService extends IService<TopicSummaryInfo> {
      * @param params
      * @return
      */
-    Page<TopicSummaryInfo> pages(Map<String,Object> params);
+    List<TopicSummaryInfo> pages(Map<String,Object> params);
 
     /**
      * Update topic info by topic id.

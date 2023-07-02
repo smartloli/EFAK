@@ -164,18 +164,6 @@ public class ClusterManageTask {
                 this.topicDaoService.delete(waitDeleteTopicIds);
             }
 
-            // 4.2 get topic summary info from mysql
-            List<TopicSummaryInfo> topicSummaryInfoList = this.topicSummaryDaoService.topicsOfDay(clusterInfo.getClusterId(), new TopicSummaryInfo().getDay());
-            List<Long> waitDeleteTopicSummaryIds = new ArrayList<>();
-            for (TopicSummaryInfo topicSummaryInfo : topicSummaryInfoList) {
-                if (!topicNames.contains(topicSummaryInfo.getTopicName())) {
-                    waitDeleteTopicSummaryIds.add(topicSummaryInfo.getId());
-                }
-            }
-            if (waitDeleteTopicSummaryIds != null && waitDeleteTopicSummaryIds.size() > 0) {
-                this.topicSummaryDaoService.delete(waitDeleteTopicSummaryIds);
-            }
-
             // 5. update topic info
             Map<String, TopicMetadataInfo> topicMetaMaps = ksf.getTopicMetaData(kafkaClientInfo, topicNames);
 

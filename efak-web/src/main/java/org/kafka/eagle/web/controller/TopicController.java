@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.common.constants.ResponseModuleType;
+import org.kafka.eagle.common.utils.CalendarUtil;
 import org.kafka.eagle.common.utils.HtmlAttributeUtil;
 import org.kafka.eagle.common.utils.MathUtil;
 import org.kafka.eagle.common.utils.Md5Util;
@@ -38,6 +39,7 @@ import org.kafka.eagle.pojo.topic.*;
 import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
 import org.kafka.eagle.web.service.ITopicDaoService;
+import org.kafka.eagle.web.service.ITopicSummaryDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -74,6 +76,9 @@ public class TopicController {
 
     @Autowired
     private ITopicDaoService topicDaoService;
+
+    @Autowired
+    private ITopicSummaryDaoService topicSummaryDaoService;
 
     /**
      * Handles the root URL request and displays the cluster management interface.
@@ -493,6 +498,47 @@ public class TopicController {
             BaseController.response(output, response);
         } catch (Exception e) {
             log.error("Get topic[{}],partitionId[] msg has error: {}", topicPreviewInfo.getTopicName(), topicPreviewInfo.getPartitionId(), e);
+        }
+    }
+
+
+    /**
+     * Get producer chart data by ajax.
+     */
+    @RequestMapping(value = "/meta/msg/chart/ajax", method = RequestMethod.GET)
+    public void getTopicMetaMsgChartAjax(HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+        try {
+            String remoteAddr = request.getRemoteAddr();
+            String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+            log.info("Topic meta chart :: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+            Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+            ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+
+            Map<String, Object> param = new HashMap<>();
+            param.put("cid", clusterInfo.getClusterId());
+            param.put("topic", request.getParameter("topic"));
+            param.put("stime", request.getParameter("stime"));
+            param.put("etime", request.getParameter("etime"));
+
+            // topic summary
+            List<TopicSummaryInfo> topicSummaryInfos = topicSummaryDaoService.pages(param);
+
+            JSONArray arrays = new JSONArray();
+            for (TopicSummaryInfo topicSummaryInfo : topicSummaryInfos) {
+                JSONObject object = new JSONObject();
+                object.put("x", CalendarUtil.convertUnixTime(topicSummaryInfo.getTimespan(), "yyyy-MM-dd HH:mm"));
+                object.put("y", topicSummaryInfo.getLogSizeDiffVal());
+                arrays.add(object);
+            }
+
+            String target = arrays.toJSONString();
+            if (StrUtil.isBlank(target)) {
+                target = "";
+            }
+            byte[] output = target.getBytes();
+            BaseController.response(output, response);
+        } catch (Exception e) {
+            log.error("Get topic meta msg chart has error, msg is {}", e);
         }
     }
 

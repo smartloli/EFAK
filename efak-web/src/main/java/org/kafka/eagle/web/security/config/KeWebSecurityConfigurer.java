@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kafka.eagle.web.config;
+package org.kafka.eagle.web.security.config;
 
+import org.kafka.eagle.web.security.handle.KeAuthenctiationSuccessHandler;
 import org.kafka.eagle.web.service.ISysUserDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +43,9 @@ import javax.sql.DataSource;
 public class KeWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Autowired
+    private KeAuthenctiationSuccessHandler keAuthenctiationSuccessHandler;
+
+    @Autowired
     private ISysUserDaoService sysUserDaoService;
 
     /**
@@ -61,13 +65,14 @@ public class KeWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests() // Which pages can be accessed directly and which ones require verification?
-                .antMatchers("/login","/error/500").permitAll() // accessed directly
+                .antMatchers("/login", "/error/500").permitAll() // accessed directly
                 .anyRequest().authenticated() // All remaining addresses require authentication to access
                 .and()
                 .formLogin()
                 .loginPage("/login") // Specify the desired login page.
                 .loginProcessingUrl("/login.do") // Handle authentication path requests.
                 .defaultSuccessUrl("/")
+                .successHandler(keAuthenctiationSuccessHandler)
                 // .failureUrl("/login/failed")
                 .and()
                 .logout()
