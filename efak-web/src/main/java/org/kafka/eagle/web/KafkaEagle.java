@@ -54,7 +54,6 @@ public class KafkaEagle {
     private String dbDriverName;
 
     public static void main(String[] args) {
-        // SpringApplication.run(KafkaEagle.class, args);
         SpringApplication application=new SpringApplication(KafkaEagle.class);
         application.setBannerMode(Banner.Mode.OFF);
         application.run(args);

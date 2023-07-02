@@ -78,6 +78,21 @@ public class ClusterManageTask {
     @Autowired
     private ITopicSummaryDaoService topicSummaryDaoService;
 
+//    @Async
+//    @Scheduled(fixedRate = 60000)
+//    public void testMockMsg() {
+//        ClusterInfo clusterInfo = clusterDaoService.clusters(7L);
+//        List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
+//        KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+//        KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+//        Random random = new Random();
+//        int size = random.nextInt(10);
+//        log.info("send mock test data size[{}], kafka[{}] ", size, kafkaClientInfo.toString());
+//        for (int i = 0; i < size; i++) {
+//            ksf.sendMsg(kafkaClientInfo, "ke28", "test_" + i + "_" + new Date().getTime());
+//        }
+//    }
+
     /**
      * check cluster and broker healthy status task.
      */
