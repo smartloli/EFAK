@@ -83,6 +83,19 @@ try {
         dataType: 'json',
         url: '/topic/record/size/ajax?topic=' + topicName,
         success: function (datas) {
+            if (datas.logsize >= 0 && datas.logsize < 10000000) {
+                $("#efka_meta_panel1").addClass("col-md-4 grid-margin stretch-card");
+                $("#efka_meta_panel2").addClass("col-md-4 grid-margin stretch-card");
+                $("#efka_meta_panel3").addClass("col-md-4 grid-margin stretch-card");
+            } else if (datas.logsize >= 10000000 && datas.logsize < 10000000000) {
+                $("#efka_meta_panel1").addClass("col-md-5 grid-margin stretch-card");
+                $("#efka_meta_panel2").addClass("col-md-2 grid-margin stretch-card");
+                $("#efka_meta_panel3").addClass("col-md-5 grid-margin stretch-card");
+            } else if (datas.logsize > 10000000000) {
+                $("#efka_meta_panel1").addClass("col-md-5 grid-margin stretch-card");
+                $("#efka_meta_panel2").remove();
+                $("#efka_meta_panel3").addClass("col-md-5 grid-margin stretch-card");
+            }
             $("#efka_topic_meta_logsize").text(datas.logsize);
             $("#efka_topic_meta_capacity").text(datas.capacity);
             $("#efka_topic_meta_capacity_unit").text(datas.unit);
