@@ -1,9 +1,6 @@
-
 if ($("#efak_topic_name_produce_list").length) {
     $("#efak_topic_name_produce_list").select2({
         placeholder: "请选择主题名称",
-        // theme: 'bootstrap4',
-        // width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
         allowClear: true,
         ajax: {
             url: "/topic/name/mock/ajax",
@@ -48,45 +45,20 @@ if ($("#efak_topic_name_produce_list").length) {
     });
 }
 
-function alertNoti(msg, icon) {
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
+$('#efak_topic_name_produce_list').on('change', function (evt) {
+    var o = document.getElementById('efak_topic_name_produce_list').getElementsByTagName('option');
+    var arrs = [];
+    for (var i = 0; i < o.length; i++) {
+        if (o[i].selected) {
+            arrs.push(o[i].innerText);
         }
-    })
-
-    // error or success
-    Toast.fire({
-        icon: icon,
-        title: msg
-    })
-}
-
-$('#efak_topic_name_produce_list').on('select2:select', function (evt) {
-    var text = evt.params.data.text;
-    //$("#efak_topic_name_produce_list").val(text);
-    //$("#efak_topic_name_mock_hidden").val(text);
+    }
+    $("#efak_topic_name_produce_hidden").val(arrs);
 });
 
 // create topic
 $("#efak_topic_mock_submit").click(function () {
-    var topicName = $("#efak_topic_name_mock_hidden").val();
-    var message = $("#efak_topic_name_mock_textarea").val();
-
-    if (topicName.length == 0) {
-        alertNoti("主题名称不能为空", "error");
-        return;
-    }
-    if (message.length == 0) {
-        alertNoti("发送内容不能为空", "error");
-        return;
-    }
+    var topicName = $("#efak_topic_name_produce_hidden").val();
 
     $.ajax({
         url: '/topic/name/mock/send',
@@ -123,7 +95,7 @@ $("#efak_topic_mock_submit").click(function () {
 // plugins by daterangepicker
 try {
 
-    var start = moment();
+    var start = moment().subtract(6, 'days');
     var end = moment();
 
     function cb(start, end) {
@@ -154,16 +126,189 @@ try {
     var stime = reportrange[0].innerText.replace(/-/g, '').split("至")[0].trim();
     var etime = reportrange[0].innerText.replace(/-/g, '').split("至")[1].trim();
 
-    producerMsg(stime, etime);
+    var topicName = $("#efak_topic_name_produce_hidden").val();
+    producerMsg(stime, etime, topicName);
 
     reportrange.on('apply.daterangepicker', function (ev, picker) {
         stime = reportrange[0].innerText.replace(/-/g, '').split("至")[0].trim();
         etime = reportrange[0].innerText.replace(/-/g, '').split("至")[1].trim();
-        producerMsg(stime, etime);
+        producerMsg(stime, etime, topicName);
     });
     setInterval(function () {
         producerMsg(stime, etime)
     }, 1000 * 60 * 5); // 5min
 } catch (e) {
     console.log(e);
+}
+
+// Color val
+var colors = {
+    primary: "#6571ff",
+    secondary: "#7987a1",
+    success: "#05a34a",
+    info: "#66d1d1",
+    warning: "#fbbc06",
+    danger: "#ff3366",
+    light: "#e9ecef",
+    dark: "#060c17",
+    muted: "#7987a1",
+    gridBorder: "rgba(77, 138, 240, .15)",
+    bodyColor: "#b8c3d9",
+    cardBg: "#0c1427"
+}
+
+// Chart
+if ($('#efak_topic_produce_chart_msg').length) {
+    var lineChartOptions = {
+        chart: {
+            type: "bar",
+            height: '400',
+            parentHeightOffset: 0,
+            foreColor: colors.bodyColor,
+            background: colors.cardBg,
+            toolbar: {
+                show: false
+            },
+        },
+        theme: {
+            mode: 'light'
+        },
+        tooltip: {
+            theme: 'light',
+            x: {
+                format: 'yyyy-MM-dd'
+            }
+        },
+        colors: [colors.primary, colors.danger, colors.warning],
+        grid: {
+            padding: {
+                bottom: -4,
+            },
+            borderColor: colors.gridBorder,
+            xaxis: {
+                lines: {
+                    show: true
+                }
+            }
+        },
+        series: [
+            {
+                name: "",
+                data: []
+            },
+        ],
+        xaxis: {
+            // type: "datetime",
+            labels: {
+                datetimeUTC: false,
+                format: "yyyy-MM-dd"
+            },
+            categories: [],
+            lines: {
+                show: true
+            },
+            axisBorder: {
+                color: colors.gridBorder,
+            },
+            axisTicks: {
+                color: colors.gridBorder,
+            },
+            crosshairs: {
+                stroke: {
+                    color: colors.secondary,
+                },
+            },
+        },
+        yaxis: {
+            title: {
+                text: '消息量级 ( 条 )',
+                style: {
+                    size: 9,
+                    color: colors.muted
+                }
+            },
+            tickAmount: 4,
+            tooltip: {
+                enabled: true
+            },
+            crosshairs: {
+                stroke: {
+                    color: colors.secondary,
+                },
+            },
+            // fixed number less than 10
+            formatter: function (val) {
+                if (window.isNaN(val) || Math.floor(val) != val) {
+                    return val;
+                }
+                try {
+                    return val.toFixed(0);
+                } catch (e) {
+                    return val;
+                }
+            }
+        },
+        markers: {
+            size: 0,
+        },
+        stroke: {
+            width: 2,
+            curve: "straight",
+        },
+        plotOptions: {
+            bar: {
+                columnWidth: "50%",
+                borderRadius: 4,
+
+            }
+        },
+        dataLabels: {
+            enabled: false
+        }
+    };
+    var efak_topic_producer_msg = new ApexCharts(document.querySelector("#efak_topic_produce_chart_msg"), lineChartOptions);
+    efak_topic_producer_msg.render();
+}
+
+// Chart - END
+
+function producerMsg(stime, etime, topicName) {
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/monitor/produce/msg/chart/ajax?stime=' + stime + '&etime=' + etime + '&topic=' + topicName,
+        beforeSend: function (xmlHttp) {
+            xmlHttp.setRequestHeader("If-Modified-Since", "0");
+            xmlHttp.setRequestHeader("Cache-Control", "no-cache");
+        },
+        success: function (datas) {
+            if (datas != null) {
+                console.log(datas);
+                setProducerChartData(efak_topic_producer_msg, datas);
+                datas = null;
+            }
+        }
+    });
+}
+
+// set chart data
+function setProducerChartData(mbean, data) {
+    lineChartOptions.xaxis.categories = filter(data).x;
+    lineChartOptions.series[0].data = filter(data).y;
+    lineChartOptions.series[0].name = filter(data).name;
+    mbean.updateOptions(lineChartOptions);
+}
+
+// filter data
+function filter(datas) {
+    var data = new Object();
+    var datax = new Array();
+    var datay = new Array();
+    for (var i = 0; i < datas.length; i++) {
+        datax.push(datas[i].x);
+        datay.push(datas[i].y);
+    }
+    data.x = datax;
+    data.y = datay;
+    return data;
 }

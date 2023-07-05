@@ -60,6 +60,8 @@ public interface ITopicSummaryDaoService extends IService<TopicSummaryInfo> {
      */
     List<TopicSummaryInfo> pages(Map<String,Object> params);
 
+    List<TopicSummaryInfo> pagesOfDay(Map<String,Object> params);
+
     /**
      * Update topic info by topic id.
      * @param topicInfo

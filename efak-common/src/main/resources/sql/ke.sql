@@ -95,3 +95,15 @@ CREATE TABLE IF NOT EXISTS ke_topics_summary(
     INDEX idx_cluster_topic_id_day_timespan (cluster_id,topic_name,day,timespan),
     INDEX idx_cluster_topic_id_timespan (cluster_id,topic_name,timespan)
 ) COMMENT 'Topic Summary Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS ke_users_audit_log (
+  id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'UserId',
+  username varchar(20) DEFAULT NULL COMMENT 'UserName',
+  host varchar(32) DEFAULT NULL COMMENT 'Remote Host',
+  uri varchar(256) DEFAULT NULL COMMENT 'Request Uri',
+  params varchar(256) DEFAULT NULL COMMENT 'Request Params',
+  method varchar(32) DEFAULT NULL COMMENT 'Request Method',
+  code varchar(32) DEFAULT NULL COMMENT 'Request Code',
+  INDEX idx_username (username),
+  INDEX idx_host (host)
+) COMMENT 'User Audit Log' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

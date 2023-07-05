@@ -30,8 +30,10 @@ import org.kafka.eagle.web.service.ITopicSummaryDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of the Topic Data Access Object (DAO) service interface.
@@ -92,6 +94,27 @@ public class TopicSummaryDaoServiceImpl extends ServiceImpl<TopicSummaryDaoMappe
         String etime = params.get("etime").toString();
 
         return new LambdaQueryChainWrapper<>(this.topicSummaryDaoMapper).eq(TopicSummaryInfo::getClusterId, cid).eq(TopicSummaryInfo::getTopicName, topic).between(TopicSummaryInfo::getDay,stime,etime).list();
+    }
+
+    @Override
+    public List<TopicSummaryInfo> pagesOfDay(Map<String, Object> params) {
+        String cid = params.get("cid").toString();
+        String topic = params.get("topic").toString();
+        String stime = params.get("stime").toString();
+        String etime = params.get("etime").toString();
+        StringBuilder sb = new StringBuilder();
+        Set<String> topics = new HashSet<>();
+        QueryWrapper<TopicSummaryInfo> queryWrapper = new QueryWrapper<>();
+        if(StrUtil.isNotBlank(topic)){
+            for (String subTopic : topic.split(",")) {
+                topics.add(subTopic);
+            }
+            queryWrapper.select("day, IFNULL(sum(log_size_diff_val),0) AS log_size_diff_val").lambda().eq(TopicSummaryInfo::getClusterId, cid).in(TopicSummaryInfo::getTopicName,topics).gt(TopicSummaryInfo::getLogSizeDiffVal,0).between(TopicSummaryInfo::getDay,stime,etime).groupBy(TopicSummaryInfo::getDay);
+        }else{
+            queryWrapper.select("day, IFNULL(sum(log_size_diff_val),0) AS log_size_diff_val").lambda().eq(TopicSummaryInfo::getClusterId, cid).gt(TopicSummaryInfo::getLogSizeDiffVal,0).between(TopicSummaryInfo::getDay,stime,etime).groupBy(TopicSummaryInfo::getDay);
+        }
+
+        return this.topicSummaryDaoMapper.selectList(queryWrapper);
     }
 
     @Override

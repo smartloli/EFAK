@@ -29,14 +29,14 @@
         <div class="page-content">
             <nav class="page-breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/topic/manage"
-                                                   th:text="#{kafka.eagle.monitor}"></a></li>
+                    <li class="breadcrumb-item"><a href="/"
+                                                   th:text="#{kafka.eagle.clusters.manage.home}"></a></li>
                     <li class="breadcrumb-item active" aria-current="page"
                         th:text="#{kafka.eagle.monitor.produce}"></li>
                 </ol>
             </nav>
             <div class="row">
-                <div class="col-xl-10 main-content ps-xl-4 pe-xl-5">
+                <div class="col-xl-12 main-content ps-xl-4 pe-xl-5">
                     <h1 class="page-title" th:text="#{kafka.eagle.monitor.produce}"></h1>
                     <p class="lead" th:utext="#{kafka.eagle.monitor.produce.desc}"></p>
 
@@ -45,7 +45,7 @@
                     <div class="mb-3">
                         <select id="efak_topic_name_produce_list" class="form-select" multiple="multiple" data-width="100%">
                         </select>
-                        <input type="hidden" id="efak_topic_name_mock_hidden" />
+                        <input type="hidden" id="efak_topic_name_produce_hidden" />
                     </div>
                     <hr>
                     <h4 th:utext="#{kafka.eagle.monitor.produce.trend}"></h4>
@@ -67,7 +67,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="efak_topic_meta_chart_msg"></div>
+                                    <div id="efak_topic_produce_chart_msg"></div>
                                 </div>
                             </div>
                         </div>
