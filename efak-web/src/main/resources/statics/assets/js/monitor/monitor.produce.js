@@ -45,58 +45,13 @@ if ($("#efak_topic_name_produce_list").length) {
     });
 }
 
-$('#efak_topic_name_produce_list').on('change', function (evt) {
-    var o = document.getElementById('efak_topic_name_produce_list').getElementsByTagName('option');
-    var arrs = [];
-    for (var i = 0; i < o.length; i++) {
-        if (o[i].selected) {
-            arrs.push(o[i].innerText);
-        }
-    }
-    $("#efak_topic_name_produce_hidden").val(arrs);
-});
-
-// create topic
-$("#efak_topic_mock_submit").click(function () {
-    var topicName = $("#efak_topic_name_produce_hidden").val();
-
-    $.ajax({
-        url: '/topic/name/mock/send',
-        method: 'POST',
-        dataType: 'json',
-        contentType: 'application/json;charset=UTF-8',
-        data: JSON.stringify({
-            "topicName": topicName,
-            "message": message
-        }),
-        success: function (response) {
-            // result = JSON.parse(response);
-            if (response.status) {
-                Swal.fire({
-                    title: '成功',
-                    icon: 'success',
-                    html: '主题名称[<code>' + topicName + '</code>]内容发送完成，<br/>请跳转到主题详情页预览数据！',
-                    allowOutsideClick: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '/topic/meta/' + topicName;
-                    }
-                });
-            } else {
-                Swal.fire('失败', result.msg, 'error');
-            }
-        },
-        error: function (xhr, status, error) {
-            Swal.fire('失败', '测试主题发生异常', 'error');
-        }
-    });
-});
-
 // plugins by daterangepicker
+var start;
+var end;
 try {
 
-    var start = moment().subtract(6, 'days');
-    var end = moment();
+    start = moment().subtract(6, 'days');
+    end = moment();
 
     function cb(start, end) {
         $('#efak_topic_meta_date span').html(start.format('YYYY-MM-DD') + ' 至 ' + end.format('YYYY-MM-DD'));
@@ -135,11 +90,23 @@ try {
         producerMsg(stime, etime, topicName);
     });
     setInterval(function () {
-        producerMsg(stime, etime)
+        producerMsg(stime, etime, topicName)
     }, 1000 * 60 * 5); // 5min
 } catch (e) {
     console.log(e);
 }
+
+$('#efak_topic_name_produce_list').on('change', function (evt) {
+    var o = document.getElementById('efak_topic_name_produce_list').getElementsByTagName('option');
+    var arrs = [];
+    for (var i = 0; i < o.length; i++) {
+        if (o[i].selected) {
+            arrs.push(o[i].innerText);
+        }
+    }
+    $("#efak_topic_name_produce_hidden").val(arrs);
+    producerMsg(stime, etime, arrs);
+});
 
 // Color val
 var colors = {

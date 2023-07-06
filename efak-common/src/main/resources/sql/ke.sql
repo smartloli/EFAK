@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS ke_users_audit_log (
   params varchar(256) DEFAULT NULL COMMENT 'Request Params',
   method varchar(32) DEFAULT NULL COMMENT 'Request Method',
   code varchar(32) DEFAULT NULL COMMENT 'Request Code',
+  modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
   INDEX idx_username (username),
   INDEX idx_host (host)
 ) COMMENT 'User Audit Log' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
