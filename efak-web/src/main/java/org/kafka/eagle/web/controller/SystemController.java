@@ -27,12 +27,11 @@ import org.kafka.eagle.pojo.audit.AuditLogInfo;
 import org.kafka.eagle.web.service.IAuditDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,7 +100,7 @@ public class SystemController {
             target.put("spent", auditLogInfo.getSpentTime());
             target.put("code", auditLogInfo.getCode());
             target.put("modify", auditLogInfo.getModifyTime());
-            target.put("operate", "<a href='' cid='" + auditLogInfo.getId() + "' name='efak_system_audit' class='badge border border-primary text-primary'>查看详情</a>");
+            target.put("operate", "<a href='' id='" + auditLogInfo.getId() + "' name='efak_system_audit' class='badge border border-primary text-primary'>查看详情</a>");
             aaDatas.add(target);
         }
 
@@ -116,6 +115,13 @@ public class SystemController {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/audit/log/detail/ajax", method = RequestMethod.GET)
+    public String getAuditLogDetail(@RequestParam("id") Long id, HttpServletResponse response, HttpSession session, HttpServletRequest request) {
+        AuditLogInfo auditLogInfo = this.auditDaoService.auditById(id);
+        return JSON.toJSONString(auditLogInfo);
     }
 
 }

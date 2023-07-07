@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public interface IAuditDaoService extends IService<AuditLogInfo> {
 
+    AuditLogInfo auditById(Long id);
+
     boolean insert(AuditLogInfo auditLogInfo);
 
     /**

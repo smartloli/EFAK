@@ -40,6 +40,10 @@ public class AuditDaoServiceImpl extends ServiceImpl<AuditDaoMapper, AuditLogInf
     @Resource
     AuditDaoMapper auditDaoMapper;
 
+    @Override
+    public AuditLogInfo auditById(Long id) {
+        return new LambdaQueryChainWrapper<>(this.auditDaoMapper).eq(AuditLogInfo::getId, id).one();
+    }
 
     @Override
     public boolean insert(AuditLogInfo auditLogInfo) {

@@ -59,44 +59,20 @@
         <!-- partial -->
     </div>
 
-    <!-- add partitions -->
-    <div class="modal fade" id="efak_topic_partition_add_modal" tabindex="-1" aria-labelledby="varyingModalLabel"
+    <!-- view detail -->
+    <div class="modal fade" id="efak_system_audit_detail_modal" tabindex="-1" aria-labelledby="varyingModalLabel"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="varyingModalLabel"
-                        th:utext="#{kafka.eagle.topic.manage.partition.add}"></h5>
+                        th:utext="#{kafka.eagle.system.audit.log.detail}"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="efak_topic_name_manage" class="form-label"
-                               th:utext="#{kafka.eagle.topic.manage.name.add}"></label>
-                        <input type="text" class="form-control" id="efak_topic_name_manage"
-                               name="efak_topic_name_manage" readonly/>
-                        <input type="hidden" class="form-control" id="efak_clusterid" name="efak_clusterid_name">
+                        <textarea class="form-control" id="efak_system_audit_detail_textarea" value="" rows="16"></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label for="efak_topic_name_manage_partition_current" class="form-label"
-                               th:utext="#{kafka.eagle.topic.manage.partition.add.current}">Partition:</label>
-                        <input type="text" class="form-control" id="efak_topic_name_manage_partition_current"
-                               name="efak_topic_name_manage_partition_current">
-                    </div>
-                    <div class="mb-3">
-                        <label for="efak_topic_name_manage_partition_new" class="form-label"
-                               th:utext="#{kafka.eagle.topic.manage.partition.add.new}">NewPartition:</label>
-                        <input type="text" class="form-control" id="efak_topic_name_manage_partition_new"
-                               name="efak_topic_name_manage_partition_new">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            th:text="#{kafka.eagle.clusters.manage.button.close}">Close
-                    </button>
-                    <button type="button" id="efak_topic_add_partition_submit" class="btn btn-primary"
-                            th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
-                    </button>
                 </div>
             </div>
         </div>

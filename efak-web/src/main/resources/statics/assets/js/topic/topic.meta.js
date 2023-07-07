@@ -123,7 +123,6 @@ $(document).on('click', 'a[name=efak_topic_partition_preview]', function (event)
                 "partitionId": partition
             }),
             success: function (response) {
-                console.log(response);
                 $("#efak_topic_name_msg_preview").text(JSON.stringify(response, null, 2));
             }
         });

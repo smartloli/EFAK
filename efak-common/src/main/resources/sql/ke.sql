@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS ke_users_audit_log (
   id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'UserId',
   host varchar(128) DEFAULT NULL COMMENT 'Remote Host',
   uri varchar(256) DEFAULT NULL COMMENT 'Request Uri',
-  params varchar(1024) DEFAULT NULL COMMENT 'Request Params',
+  params TEXT DEFAULT NULL COMMENT 'Request Params',
   method varchar(32) DEFAULT NULL COMMENT 'Request Method',
   spent_time BIGINT DEFAULT NULL COMMENT 'Request Spent Time',
   code INT DEFAULT NULL COMMENT 'Request Code',

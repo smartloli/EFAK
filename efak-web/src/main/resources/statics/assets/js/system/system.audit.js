@@ -69,8 +69,21 @@ setInterval(function () {
 
 
 // view topic
-$(document).on('click', 'a[name=efak_topic_manage_add_partition]', function (event) {
+$(document).on('click', 'a[name=efak_system_audit]', function (event) {
     event.preventDefault();
+    var auditId = $(this).attr("id");
+    $('#efak_system_audit_detail_modal').modal('show');
 
-    $('#efak_topic_partition_add_modal').modal('show');
+    try {
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/system/audit/log/detail/ajax?id=' + auditId,
+            success: function (datas) {
+                $("#efak_system_audit_detail_textarea").text(JSON.stringify(datas, null, 2));
+            }
+        });
+    } catch (e) {
+        console.log(e);
+    }
 });
