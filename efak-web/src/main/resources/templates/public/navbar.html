@@ -125,11 +125,11 @@
                         <ul class="submenu-item">
                             <span sec:authorize="isAuthenticated()">
                                 <span sec:authorize="hasRole('ADMIN')">
-                                    <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.system.user}">Users</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.system.role}">Role</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.system.user}"></a></li>
+                                    <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.system.role}"></a></li>
                                 </span>
                             </span>
-                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.system.audit}">Audit</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/system/audit" th:text="#{kafka.eagle.system.audit}"></a></li>
                         </ul>
                     </div>
                 </li>

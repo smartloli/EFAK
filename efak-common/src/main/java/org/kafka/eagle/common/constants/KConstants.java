@@ -35,6 +35,12 @@ public class KConstants {
         return formatter;
     }
 
+    public final class TableCommon{
+        private TableCommon(){}
+
+        public static final int TR_LEN = 20;
+    }
+
     public final class ServerDevice {
         private ServerDevice() {
         }
