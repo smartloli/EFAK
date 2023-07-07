@@ -98,13 +98,12 @@ CREATE TABLE IF NOT EXISTS ke_topics_summary(
 
 CREATE TABLE IF NOT EXISTS ke_users_audit_log (
   id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'UserId',
-  username varchar(20) DEFAULT NULL COMMENT 'UserName',
-  host varchar(32) DEFAULT NULL COMMENT 'Remote Host',
+  host varchar(128) DEFAULT NULL COMMENT 'Remote Host',
   uri varchar(256) DEFAULT NULL COMMENT 'Request Uri',
   params varchar(256) DEFAULT NULL COMMENT 'Request Params',
   method varchar(32) DEFAULT NULL COMMENT 'Request Method',
-  code varchar(32) DEFAULT NULL COMMENT 'Request Code',
+  spent_time BIGINT DEFAULT NULL COMMENT 'Request Spent Time',
+  code INT DEFAULT NULL COMMENT 'Request Code',
   modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
-  INDEX idx_username (username),
   INDEX idx_host (host)
 ) COMMENT 'User Audit Log' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
