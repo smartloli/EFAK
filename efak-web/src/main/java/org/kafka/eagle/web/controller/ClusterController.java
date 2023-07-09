@@ -24,10 +24,14 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.EfakClusterType;
+import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.common.utils.HtmlAttributeUtil;
+import org.kafka.eagle.common.utils.Md5Util;
 import org.kafka.eagle.plugins.excel.ExcelUtil;
+import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterCreateInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
+import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterCreateDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +66,9 @@ public class ClusterController {
     @Autowired
     private IClusterDaoService clusterDaoService;
 
+    @Autowired
+    private IBrokerDaoService brokerDaoService;
+
     @GetMapping("/manage")
     public String clusterView() {
         return "cluster/manage.html";
@@ -70,6 +77,11 @@ public class ClusterController {
     @GetMapping("/manage/create")
     public String createClusterView() {
         return "cluster/manage-create.html";
+    }
+
+    @GetMapping("/kafka")
+    public String kafkaClusterView() {
+        return "cluster/kafka.html";
     }
 
     @PostMapping("/manage/add/batch")
@@ -298,6 +310,76 @@ public class ClusterController {
             target.put("modify", clusterInfo.getModifyTime());
             target.put("auth", HtmlAttributeUtil.getAuthHtml(clusterInfo.getAuth()));
             target.put("operate", "<a href='/clusters/manage/create?cid=" + clusterInfo.getClusterId() + "' name='efak_cluster_node_manage_edit' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' class='badge border border-primary text-primary'>编辑</a> <a href='' name='efak_cluster_node_manage_del' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' clusterName='" + clusterInfo.getName() + "' class='badge border border-danger text-danger'>删除</a>");
+            aaDatas.add(target);
+        }
+
+        JSONObject target = new JSONObject();
+        target.put("sEcho", sEcho);
+        target.put("iTotalRecords", pages.getTotal());
+        target.put("iTotalDisplayRecords", pages.getTotal());
+        target.put("aaData", aaDatas);
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Get kafka cluster list
+     *
+     * @param response
+     * @param request
+     * @param cid
+     */
+    @RequestMapping(value = "/kafka/table/ajax", method = RequestMethod.GET)
+    public void pageKafkaAjax(HttpServletResponse response, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic partition add:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        Long cid = Long.parseLong(request.getSession().getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+
+        String aoData = request.getParameter("aoData");
+        JSONArray params = JSON.parseArray(aoData);
+        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+        String search = "";
+        for (Object object : params) {
+            JSONObject param = (JSONObject) object;
+            if ("sEcho".equals(param.getString("name"))) {
+                sEcho = param.getIntValue("value");
+            } else if ("iDisplayStart".equals(param.getString("name"))) {
+                iDisplayStart = param.getIntValue("value");
+            } else if ("iDisplayLength".equals(param.getString("name"))) {
+                iDisplayLength = param.getIntValue("value");
+            } else if ("sSearch".equals(param.getString("name"))) {
+                search = param.getString("value");
+            }
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("start", iDisplayStart / iDisplayLength + 1);
+        map.put("size", iDisplayLength);
+        map.put("search", search);
+        map.put("cid", clusterInfo.getClusterId());
+
+
+        Page<BrokerInfo> pages = this.brokerDaoService.pages(map);
+        JSONArray aaDatas = new JSONArray();
+
+        for (BrokerInfo brokerInfo : pages.getRecords()) {
+            JSONObject target = new JSONObject();
+            target.put("brokerId", brokerInfo.getBrokerId());
+            target.put("brokerHost", brokerInfo.getBrokerHost());
+            target.put("brokerPort", brokerInfo.getBrokerPort());
+            target.put("brokerPortStatus", HtmlAttributeUtil.getClusterStatusHtml(brokerInfo.getBrokerPortStatus()));
+            target.put("brokerJmxPort", brokerInfo.getBrokerJmxPort());
+            target.put("brokerJmxPortStatus", HtmlAttributeUtil.getClusterStatusHtml(brokerInfo.getBrokerJmxPortStatus()));
+            target.put("mem_used", brokerInfo.getBrokerMemoryUsedRate());
+            target.put("cpu_used", brokerInfo.getBrokerCpuUsedRate());
+            target.put("startup", brokerInfo.getBrokerStartupTime());
+            target.put("version", brokerInfo.getBrokerVersion());
             aaDatas.add(target);
         }
 
