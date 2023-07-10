@@ -68,7 +68,7 @@ public final class KafkaZKPoolUtils {
             KafkaZkClient zkc = null;
             for (int i = 0; i < zkCliPoolSize; i++) {
                 try {
-                    zkc = KafkaZkClient.apply(entry.getValue(), JaasUtils.isZkSecurityEnabled(), ZK_SESSION_TIMEOUT_MS, ZK_CONNECTION_TIMEOUT_MS, Integer.MAX_VALUE, Time.SYSTEM, METRIC_GROUP_NAME, "SessionExpireListener");
+                    zkc = KafkaZkClient.apply(entry.getValue(), JaasUtils.isZkSecurityEnabled(), ZK_SESSION_TIMEOUT_MS, ZK_CONNECTION_TIMEOUT_MS, 5, Time.SYSTEM, METRIC_GROUP_NAME, "SessionExpireListener");
                     if (zkc != null) {
                         if (SystemConfigUtils.getBooleanProperty(entry.getKey() + ".zk.acl.enable")) {
                             String schema = SystemConfigUtils.getProperty(entry.getKey() + ".zk.acl.schema");
@@ -132,7 +132,7 @@ public final class KafkaZKPoolUtils {
             } else {
                 LoggerUtils.print(KafkaZKPoolUtils.class).info("ZkClient is empty.");
                 for (int i = 0; i < zkCliPoolSize; i++) {
-                    zkc = KafkaZkClient.apply(clusterAliass.get(clusterAlias), JaasUtils.isZkSecurityEnabled(), ZK_SESSION_TIMEOUT_MS, ZK_CONNECTION_TIMEOUT_MS, Integer.MAX_VALUE, Time.SYSTEM, METRIC_GROUP_NAME, "SessionExpireListener");
+                    zkc = KafkaZkClient.apply(clusterAliass.get(clusterAlias), JaasUtils.isZkSecurityEnabled(), ZK_SESSION_TIMEOUT_MS, ZK_CONNECTION_TIMEOUT_MS, 5, Time.SYSTEM, METRIC_GROUP_NAME, "SessionExpireListener");
                     if (zkc != null) {
                         zkCliPool.add(zkc);
                     }
