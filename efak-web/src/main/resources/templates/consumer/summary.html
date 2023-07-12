@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title th:text="#{kafka.eagle.consumers.group.title}"></title>
+
+    <link rel="stylesheet" th:href="@{../../assets/vendors/dropify/dist/dropify.min.css}">
+    <link rel="stylesheet" th:href="@{../../assets/vendors/select2/select2.min.css}">
+    <link rel="stylesheet" th:href="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css}">
+    <link rel="stylesheet" th:href="@{../../assets/css/public/cluster/manage.create.css}">
+    <link rel="stylesheet" th:href="@{../../assets/vendors/bootstrap-datepicker/daterangepicker.css}">
+    <th:block th:replace="public/common :: css"></th:block>
+
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:menu -->
+    <div th:replace="public/header :: menu_header"></div>
+    <div th:replace="public/navbar :: menu_navbar"></div>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+
+        <div class="page-content">
+            <nav class="page-breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"
+                                                   th:text="#{kafka.eagle.clusters.manage.home}"></a></li>
+                    <li class="breadcrumb-item active" aria-current="page"
+                        th:text="#{kafka.eagle.consumers.group.summary}"></li>
+                </ol>
+            </nav>
+            <div class="row">
+                <div class="col-xl-12 main-content ps-xl-4 pe-xl-5">
+                    <h1 class="page-title" th:text="#{kafka.eagle.consumers.group.summary}"></h1>
+                    <p class="lead" th:utext="#{kafka.eagle.consumers.group.summary.desc}"></p>
+                    <hr>
+
+                    <div class="row">
+                        <div id="efka_meta_panel1" class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-baseline">
+                                        <h6 class="card-title mb-0" th:text="#{kafka.eagle.consumers.group.total}"></h6>
+                                        <div class="dropdown mb-2">
+                                            <button class="btn p-0" type="button" id="dropdownMenuButtonGroupTotal"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false">
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButtonGroupTotal">
+                                                <a class="dropdown-item d-flex align-items-center"
+                                                   href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i>
+                                                    <span class="" th:text="#{kafka.eagle.dataspace.dashboard.view}">View</span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xxl-8 col-md-12">
+                                            <h1 id="efka_consumer_group_total" class="mb-2">0</h1>
+                                            <div class="d-flex align-items-baseline">
+                                                <p class="text-primary">
+                                                    <span>个</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-4 col-md-12">
+                                            <h3 class="mb-2"></h3>
+                                            <div class="d-flex align-items-baseline">
+                                                <p class="text-primary">
+                                                    <i data-feather="users" class="icon-xxl mb-1"></i>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="efka_meta_panel2" class="col-md-4 grid-margin stretch-card"></div>
+                        <div id="efka_meta_panel3" class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-baseline">
+                                        <h6 class="card-title mb-0" th:text="#{kafka.eagle.consumers.group.active}"></h6>
+                                        <div class="dropdown mb-2">
+                                            <button class="btn p-0" type="button" id="dropdownMenuButtonGroupActive"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false">
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButtonGroupActive">
+                                                <a class="dropdown-item d-flex align-items-center"
+                                                   href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i>
+                                                    <span class="" th:text="#{kafka.eagle.dataspace.dashboard.view}">View</span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xxl-8 col-md-12">
+                                            <h1 id="efka_consumer_group_active" class="mb-2">0</h1>
+                                            <div class="d-flex align-items-baseline">
+                                                <p class="text-success">
+                                                    <span>个</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-4 col-md-12">
+                                            <h3 class="mb-2"></h3>
+                                            <div class="d-flex align-items-baseline">
+                                                <p class="text-success">
+                                                    <i data-feather="user-check" class="icon-xxl mb-1"></i>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h4 th:utext="#{kafka.eagle.consumers.group.name}"></h4>
+                    <div class="mb-3">
+                        <select id="efak_consumer_group_list" class="form-select" data-width="100%">
+                        </select>
+                        <input type="hidden" id="efak_topic_name_produce_hidden" />
+                    </div>
+                    <hr>
+                    <h4 th:utext="#{kafka.eagle.consumers.group.topology}"></h4>
+                    <div class="row">
+                        <div class="col-12 col-xl-12 grid-margin stretch-card">
+                            <div class="card overflow-hidden">
+                                <div class="card-body">
+                                    <div id="efak_cosumer_group_topology_chart" style="height: 1000px"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- partial:footer -->
+        <footer th:replace="public/common :: footer"></footer>
+        <!-- partial -->
+
+    </div>
+
+</div>
+
+<!-- core:js -->
+<th:block th:replace="public/common :: js"></th:block>
+
+<!-- plugins:js -->
+<script th:src="@{../../assets/vendors/datatables.net/jquery.dataTables.js}"></script>
+<script th:src="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js}"></script>
+<script th:src="@{../../assets/vendors/select2/select2.min.js}"></script>
+<script th:src="@{../../assets/vendors/echart/echarts.min.js}"></script>
+<script th:src="@{../../assets/js/consumer/consumer.summary.js}"></script>
+
+</body>
+</html>
