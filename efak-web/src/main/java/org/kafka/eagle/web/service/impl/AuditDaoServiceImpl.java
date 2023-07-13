@@ -18,6 +18,7 @@
 package org.kafka.eagle.web.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.kafka.eagle.pojo.audit.AuditLogInfo;
@@ -26,6 +27,8 @@ import org.kafka.eagle.web.service.IAuditDaoService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -75,5 +78,11 @@ public class AuditDaoServiceImpl extends ServiceImpl<AuditDaoMapper, AuditLogInf
             status = true;
         }
         return status;
+    }
+
+    @Override
+    public boolean delete(String day) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return new LambdaUpdateChainWrapper<>(this.auditDaoMapper).lt(AuditLogInfo::getModifyTime, LocalDateTime.parse(day,df)).remove();
     }
 }

@@ -29,4 +29,6 @@ public interface IAuditDaoService extends IService<AuditLogInfo> {
 
     boolean batch(List<AuditLogInfo> createInfos);
 
+    boolean delete(String day);
+
 }

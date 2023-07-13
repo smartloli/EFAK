@@ -78,6 +78,9 @@ public class ClusterManageTask {
     @Autowired
     private ITopicSummaryDaoService topicSummaryDaoService;
 
+    @Autowired
+    private IAuditDaoService auditDaoService;
+
 //    @Async
 //    @Scheduled(fixedRate = 60000)
 //    public void testMockMsg() {
@@ -333,8 +336,10 @@ public class ClusterManageTask {
      * Executes at 1 AM every day
      */
     @Async
-    @Scheduled(cron = "0 0 1 * * *")
+    // @Scheduled(cron = "0 0 0/1 * * *")
+    @Scheduled(fixedRate = 60000 * 10)
     public void deleteExpireDataTask() {
+        log.info("EFAK schedule delete expire data task start");
         String day = CalendarUtil.getCustomLastDay(this.retain);
         // 1. delete expire topic summary
         List<TopicSummaryInfo> topicSummaryInfos = this.topicSummaryDaoService.list(day);
@@ -347,6 +352,9 @@ public class ClusterManageTask {
                 this.topicSummaryDaoService.delete(waitDeleteTopicSummaryIds);
             }
         }
+
+        // 2. delete expire audit log
+        this.auditDaoService.delete(day);
     }
 
 }

@@ -48,7 +48,7 @@ public class LoggerAudit {
     @Autowired
     private IAuditDaoService auditDaoService;
 
-    @Pointcut("execution(* org.kafka.eagle.web.controller.*.*(..))")
+    @Pointcut("execution(* org.kafka.eagle.web.*.*(..))")
     public void audit() {
     }
 
