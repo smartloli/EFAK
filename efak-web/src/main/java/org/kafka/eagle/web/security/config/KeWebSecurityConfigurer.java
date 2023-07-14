@@ -65,7 +65,7 @@ public class KeWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests() // Which pages can be accessed directly and which ones require verification?
-                .antMatchers("/login", "/error/500").permitAll() // accessed directly
+                .antMatchers("/login", "/error/500", "/job/*").permitAll() // accessed directly
                 .anyRequest().authenticated() // All remaining addresses require authentication to access
                 .and()
                 .formLogin()
