@@ -47,14 +47,9 @@ public class ClusterJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        // get parameters
-        context.getJobDetail().getJobDataMap().forEach(
-                (k, v) -> log.info("param, key:{}, value:{}", k, v)
-        );
-
+        log.info("Cluster job has started, class = {}", this.getClass().getName());
         // logics
         this.clusterHealthyTask();
-
     }
 
     private void clusterHealthyTask() {

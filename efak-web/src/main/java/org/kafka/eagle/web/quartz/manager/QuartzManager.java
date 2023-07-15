@@ -17,9 +17,11 @@
  */
 package org.kafka.eagle.web.quartz.manager;
 
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.common.constants.JobConstans;
 import org.kafka.eagle.web.quartz.pojo.JobDetails;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -44,14 +46,15 @@ public class QuartzManager {
     private Scheduler sched;
 
     /**
-     * 创建or更新任务，存在则更新不存在创建
+     * Add or update job.
      *
-     * @param jobClass     任务类
-     * @param jobName      任务名称
-     * @param jobGroupName 任务组名称
-     * @param jobCron      cron表达式
+     * @param jobClass
+     * @param jobName
+     * @param jobGroupName
+     * @param jobCron
      */
-    public void addOrUpdateJob(Class<? extends QuartzJobBean> jobClass, String jobName, String jobGroupName, String jobCron) {
+    public Boolean addOrUpdateJob(Class<? extends QuartzJobBean> jobClass, String jobName, String jobGroupName, String jobCron) {
+        Boolean status = false;
         try {
             TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroupName);
             CronTrigger trigger = (CronTrigger) sched.getTrigger(triggerKey);
@@ -59,22 +62,24 @@ public class QuartzManager {
                 addJob(jobClass, jobName, jobGroupName, jobCron);
             } else {
                 if (trigger.getCronExpression().equals(jobCron)) {
-                    return;
+                    return true;
                 }
                 updateJob(jobName, jobGroupName, jobCron);
             }
+            status = true;
         } catch (SchedulerException e) {
             log.error("Add or update job has error, msg is {}", e);
         }
+        return status;
     }
 
     /**
-     * 增加一个job
+     * Add a job
      *
-     * @param jobClass     任务实现类
-     * @param jobName      任务名称
-     * @param jobGroupName 任务组名
-     * @param jobCron      cron表达式(如：0/5 * * * * ? )
+     * @param jobClass
+     * @param jobName
+     * @param jobGroupName
+     * @param jobCron      (0/5 * * * * ?)
      */
     public void addJob(Class<? extends QuartzJobBean> jobClass, String jobName, String jobGroupName, String jobCron) {
         try {
@@ -92,12 +97,6 @@ public class QuartzManager {
         }
     }
 
-    /**
-     * @param jobClass
-     * @param jobName
-     * @param jobGroupName
-     * @param jobTime
-     */
     public void addJob(Class<? extends Job> jobClass, String jobName, String jobGroupName, int jobTime) {
         addJob(jobClass, jobName, jobGroupName, jobTime, -1);
     }
@@ -106,7 +105,6 @@ public class QuartzManager {
         try {
             JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName)// 任务名称和组构成任务key
                     .build();
-            // 使用simpleTrigger规则
             Trigger trigger;
             if (jobTimes < 0) {
                 trigger = TriggerBuilder.newTrigger().withIdentity(jobName, jobGroupName)
@@ -133,67 +131,49 @@ public class QuartzManager {
             CronTrigger trigger = (CronTrigger) sched.getTrigger(triggerKey);
             trigger = trigger.getTriggerBuilder().withIdentity(triggerKey)
                     .withSchedule(CronScheduleBuilder.cronSchedule(jobTime)).build();
-            // 重启触发器
             sched.rescheduleJob(triggerKey, trigger);
         } catch (SchedulerException e) {
             log.error("Update job has error, msg is {}", e);
         }
     }
 
-    /**
-     * 删除任务一个job
-     *
-     * @param jobName      任务名称
-     * @param jobGroupName 任务组名
-     */
-    public void deleteJob(String jobName, String jobGroupName) {
+    public Boolean deleteJob(String jobName, String jobGroupName) {
+        Boolean status = false;
         try {
             sched.pauseTrigger(TriggerKey.triggerKey(jobName, jobGroupName));
             sched.unscheduleJob(TriggerKey.triggerKey(jobName, jobGroupName));
             sched.deleteJob(new JobKey(jobName, jobGroupName));
+            status = true;
         } catch (Exception e) {
             log.error("Delete job has error, msg is {}", e);
         }
+        return status;
     }
 
-    /**
-     * 暂停一个job
-     *
-     * @param jobName
-     * @param jobGroupName
-     */
-    public void pauseJob(String jobName, String jobGroupName) {
+    public Boolean pauseJob(String jobName, String jobGroupName) {
+        Boolean status = false;
         try {
             JobKey jobKey = JobKey.jobKey(jobName, jobGroupName);
             sched.pauseJob(jobKey);
+            status = true;
         } catch (SchedulerException e) {
-            e.printStackTrace();
             log.error("Pause job has error, msg is {}", e);
         }
+        return status;
     }
 
-    /**
-     * 恢复一个job
-     *
-     * @param jobName
-     * @param jobGroupName
-     */
-    public void resumeJob(String jobName, String jobGroupName) {
+    public Boolean resumeJob(String jobName, String jobGroupName) {
+        Boolean status = false;
         try {
             JobKey jobKey = JobKey.jobKey(jobName, jobGroupName);
             sched.resumeJob(jobKey);
+            status = false;
         } catch (SchedulerException e) {
-            e.printStackTrace();
             log.error("Resume job has error, msg is {}", e);
         }
+        return status;
     }
 
-    /**
-     * 立即执行一个job
-     *
-     * @param jobName
-     * @param jobGroupName
-     */
     public void runAJobNow(String jobName, String jobGroupName) {
         try {
             JobKey jobKey = JobKey.jobKey(jobName, jobGroupName);
@@ -204,13 +184,12 @@ public class QuartzManager {
         }
     }
 
-    public PageInfo<JobDetails> queryAllJobBean(int pageNum, int pageSize) {
+    public PageInfo<JobDetails> queryAllJobBean(int pageNum, int pageSize, String search) {
         PageHelper.startPage(pageNum, pageSize);
-        List<JobDetails> jobList = null;
+        List<JobDetails> jobList = new ArrayList<>();
         try {
             GroupMatcher<JobKey> matcher = GroupMatcher.anyJobGroup();
             Set<JobKey> jobKeys = sched.getJobKeys(matcher);
-            jobList = new ArrayList<>();
             for (JobKey jobKey : jobKeys) {
                 List<? extends Trigger> triggers = sched.getTriggersOfJob(jobKey);
                 for (Trigger trigger : triggers) {
@@ -229,7 +208,14 @@ public class QuartzManager {
                     jobDetails.setNextFireTime(trigger.getNextFireTime());
                     jobDetails.setPreviousFireTime(trigger.getPreviousFireTime());
                     jobDetails.setStatus(sched.getTriggerState(trigger.getKey()).name());
-                    jobList.add(jobDetails);
+                    if (StrUtil.isNotBlank(search)) {
+                        if (JobConstans.JOBS.containsKey(jobKey.getName()) && JobConstans.JOBS.get(jobKey.getName()).contains(search)) {
+                            jobList.add(jobDetails);
+                        }
+                    }
+                    if (StrUtil.isBlank(search)) {
+                        jobList.add(jobDetails);
+                    }
                 }
             }
         } catch (SchedulerException e) {
@@ -238,11 +224,21 @@ public class QuartzManager {
         return new PageInfo<>(jobList);
     }
 
-    /**
-     * 获取所有计划中的任务列表
-     *
-     * @return
-     */
+    public List<String> getAllJobNames() {
+        List<String> jobNames = new ArrayList<>();
+        try {
+            GroupMatcher<JobKey> matcher = GroupMatcher.anyJobGroup();
+            Set<JobKey> jobKeys = sched.getJobKeys(matcher);
+            for (JobKey jobKey : jobKeys) {
+                jobNames.add(JobConstans.JOBS.get(jobKey.getName()));
+            }
+        } catch (SchedulerException e) {
+            log.error("Find a job has error, msg is {}", e);
+        }
+        return jobNames;
+
+    }
+
     public List<Map<String, Object>> queryAllJob() {
         List<Map<String, Object>> jobList = null;
         try {
@@ -272,11 +268,6 @@ public class QuartzManager {
         return jobList;
     }
 
-    /**
-     * 获取所有正在运行的job
-     *
-     * @return
-     */
     public List<Map<String, Object>> queryRunJon() {
         List<Map<String, Object>> jobList = null;
         try {

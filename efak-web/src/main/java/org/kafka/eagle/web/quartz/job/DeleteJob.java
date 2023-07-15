@@ -52,17 +52,14 @@ public class DeleteJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        // get parameters
-        context.getJobDetail().getJobDataMap().forEach(
-                (k, v) -> log.info("param, key:{}, value:{}", k, v)
-        );
+        log.info("Delete job has started, class = {}", this.getClass().getName());
         // logics
         this.deleteExpireDataTask();
     }
 
     private void deleteExpireDataTask() {
         log.info("EFAK schedule delete expire data task start");
-        String day = CalendarUtil.getCustomLastDay(this.retain);
+        String day = CalendarUtil.getCustomLastDay("yyyy-MM-dd HH:mm:ss",this.retain);
         // 1. delete expire topic summary
         List<TopicSummaryInfo> topicSummaryInfos = this.topicSummaryDaoService.list(day);
         if (topicSummaryInfos != null && topicSummaryInfos.size() > 0) {

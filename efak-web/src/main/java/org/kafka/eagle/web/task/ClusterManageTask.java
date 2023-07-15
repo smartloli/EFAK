@@ -55,6 +55,7 @@ import java.util.*;
 //@Component
 //@EnableScheduling
 //@EnableAsync
+@Deprecated
 public class ClusterManageTask {
 
     @Value("${efak.collect.retain}")

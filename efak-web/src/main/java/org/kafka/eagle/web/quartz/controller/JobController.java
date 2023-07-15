@@ -29,6 +29,7 @@ import java.util.Map;
 
 /**
  * Description: TODO
+ *
  * @Author: smartloli
  * @Date: 2023/7/14 22:39
  * @Version: 3.4.0
@@ -88,8 +89,8 @@ public class JobController {
      */
     @PostMapping(value = "/update")
     public void updateJob(@RequestParam(value = "jobClassName") String jobClassName,
-                              @RequestParam(value = "jobGroupName") String jobGroupName,
-                              @RequestParam(value = "cronExpression") String cronExpression) throws Exception {
+                          @RequestParam(value = "jobGroupName") String jobGroupName,
+                          @RequestParam(value = "cronExpression") String cronExpression) throws Exception {
         qtzManager.addOrUpdateJob(getClass(jobClassName), jobClassName, jobGroupName, cronExpression);
     }
 
@@ -111,8 +112,10 @@ public class JobController {
      */
     @GetMapping(value = "/query")
     public Map<String, Object> queryJob(@RequestParam(value = "pageNum") Integer pageNum,
-                                        @RequestParam(value = "pageSize") Integer pageSize) {
-        PageInfo<JobDetails> jobAndTrigger = qtzManager.queryAllJobBean(pageNum, pageSize);
+                                        @RequestParam(value = "pageSize") Integer pageSize,
+                                        @RequestParam(value = "search") String search) {
+        System.out.println("search:" + search);
+        PageInfo<JobDetails> jobAndTrigger = qtzManager.queryAllJobBean(pageNum, pageSize, search);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("JobAndTrigger", jobAndTrigger);
         map.put("number", jobAndTrigger.getTotal());

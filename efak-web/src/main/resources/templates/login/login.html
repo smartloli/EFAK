@@ -23,18 +23,24 @@
                 <div class="form-content">
                     <div class="form-group">
                         <input class="form-control input-underline input-lg" id="usr"
-                               ng-model="name" name="username" placeholder="" th:placeholder="#{kafka.eagle.login.username}"
+                               ng-model="name" name="username" placeholder=""
+                               th:placeholder="#{kafka.eagle.login.username}"
                                autocomplete="off" type="text">
                     </div>
                     <div class="form-group">
                         <input class="form-control input-underline input-lg" id="pwd"
-                               name="password" placeholder="" th:placeholder="#{kafka.eagle.login.passowrd}" autocomplete="off"
+                               name="password" placeholder="" th:placeholder="#{kafka.eagle.login.passowrd}"
+                               autocomplete="off"
                                type="password">
                         <input type="hidden" id="ref_url" name="ref_url">
                     </div>
                     <div class="form-group">
-                        <input type="checkbox" class="form-check-input" id="rememberme" name="remember-me" value="1">
-                        <label class="form-check-label" for="rememberme" th:text="#{kafka.eagle.login.rememberme}"></label>
+                        <div class="chech-input-custom">
+                            <input type="checkbox" class="form-check-input" id="rememberme" name="remember-me"
+                                   value="1">
+                            <span class="form-check-input" for="rememberme"
+                                   th:text="#{kafka.eagle.login.rememberme}"></span>
+                        </div>
                     </div>
                     <div class="form-group">
                         <div class="alert alert-danger" th:if="${param.error}" th:text="#{kafka.eagle.login.error.msg}">

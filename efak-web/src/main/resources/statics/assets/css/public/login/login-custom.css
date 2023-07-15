@@ -16,5 +16,10 @@ form-check-input[type=checkbox] {
 
 .form-check-input {
     margin-top: 0.13em;
-    margin-left: -25em;
+    margin-right: 10px;
+}
+
+.chech-input-custom {
+    display: flex;
+    flex-direction: row;
 }

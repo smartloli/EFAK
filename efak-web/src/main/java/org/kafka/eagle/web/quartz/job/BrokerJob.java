@@ -55,10 +55,7 @@ public class BrokerJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        // get parameters
-        context.getJobDetail().getJobDataMap().forEach(
-                (k, v) -> log.info("param, key:{}, value:{}", k, v)
-        );
+        log.info("Broker job has started, class = {}", this.getClass().getName());
         // logics
         this.brokerHealthyTask();
     }

@@ -17,6 +17,11 @@ public class JobConstans {
      */
     public static final String CRON_DEFAULT = "0 0/1 * * * ?";
 
+    public static final String UNKOWN = "未知任务";
+    public static final String DELETE = "delete";
+    public static final String PAUSE = "pause";
+    public static final String RESUME = "resume";
+
 
     public static final Map<String,String> JOBS = new HashMap<String,String>(){{
         put("org.kafka.eagle.web.quartz.job.ClusterJob","多集群定时任务");

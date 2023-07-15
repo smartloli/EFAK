@@ -17,7 +17,9 @@
  */
 package org.kafka.eagle.web.quartz.config;
 
+import org.kafka.eagle.web.quartz.manager.AutowiringBeanJobFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -29,6 +31,7 @@ import java.util.concurrent.Executor;
 
 /**
  * Description: TODO
+ *
  * @Author: smartloli
  * @Date: 2023/7/14 23:11
  * @Version: 3.4.0
@@ -39,8 +42,14 @@ public class SchedulerConfig {
     @Autowired
     private DataSource dataSource;
 
+    @Autowired
+    private AutowiringBeanJobFactory jobFactory;
+
+    @Qualifier("schedulerQuartzFactoryBean")
+    private SchedulerFactoryBean schedulerFactoryBean;
+
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean() throws IOException {
+    public SchedulerFactoryBean schedulerQuartzFactoryBean() throws IOException {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         factory.setSchedulerName("EFAK_SCHEDULER_TASKS");
         factory.setDataSource(dataSource);
@@ -48,7 +57,8 @@ public class SchedulerConfig {
         factory.setApplicationContextSchedulerContextKey("applicationContext");
         factory.setTaskExecutor(schedulerThreadPool());
         factory.setOverwriteExistingJobs(true);
-        factory.setStartupDelay(10);
+        factory.setStartupDelay(10);// unit seconds
+        factory.setJobFactory(jobFactory);
         return factory;
     }
 
@@ -60,4 +70,5 @@ public class SchedulerConfig {
         executor.setQueueCapacity(Runtime.getRuntime().availableProcessors());
         return executor;
     }
+
 }
