@@ -57,6 +57,11 @@ public class SystemController {
         return "system/profile.html";
     }
 
+    @GetMapping("/job")
+    public String jobView() {
+        return "system/job.html";
+    }
+
 
     @GetMapping("/audit")
     public String auditView() {

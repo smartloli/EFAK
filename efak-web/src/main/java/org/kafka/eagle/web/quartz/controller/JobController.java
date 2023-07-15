@@ -40,7 +40,6 @@ public class JobController {
     @Autowired
     private QuartzManager qtzManager;
 
-    @SuppressWarnings("unchecked")
     private static Class<? extends QuartzJobBean> getClass(String classname) throws Exception {
         Class<?> class1 = Class.forName(classname);
         return (Class<? extends QuartzJobBean>) class1;
@@ -53,7 +52,7 @@ public class JobController {
      * @throws Exception
      */
     @PostMapping(value = "/add")
-    public void addjob(@RequestParam(value = "jobClassName") String jobClassName,
+    public void addJob(@RequestParam(value = "jobClassName") String jobClassName,
                        @RequestParam(value = "jobGroupName") String jobGroupName,
                        @RequestParam(value = "cronExpression") String cronExpression) throws Exception {
         qtzManager.addOrUpdateJob(getClass(jobClassName), jobClassName, jobGroupName, cronExpression);
@@ -64,8 +63,8 @@ public class JobController {
      * @param jobGroupName
      * @throws Exception
      */
-    @PostMapping(value = "/pausejob")
-    public void pausejob(@RequestParam(value = "jobClassName") String jobClassName,
+    @PostMapping(value = "/pause")
+    public void pauseJob(@RequestParam(value = "jobClassName") String jobClassName,
                          @RequestParam(value = "jobGroupName") String jobGroupName) throws Exception {
         qtzManager.pauseJob(jobClassName, jobGroupName);
     }
@@ -75,8 +74,8 @@ public class JobController {
      * @param jobGroupName
      * @throws Exception
      */
-    @PostMapping(value = "/resumejob")
-    public void resumejob(@RequestParam(value = "jobClassName") String jobClassName,
+    @PostMapping(value = "/resume")
+    public void resumeJob(@RequestParam(value = "jobClassName") String jobClassName,
                           @RequestParam(value = "jobGroupName") String jobGroupName) throws Exception {
         qtzManager.resumeJob(jobClassName, jobGroupName);
     }
@@ -88,7 +87,7 @@ public class JobController {
      * @throws Exception
      */
     @PostMapping(value = "/update")
-    public void update(@RequestParam(value = "jobClassName") String jobClassName,
+    public void updateJob(@RequestParam(value = "jobClassName") String jobClassName,
                               @RequestParam(value = "jobGroupName") String jobGroupName,
                               @RequestParam(value = "cronExpression") String cronExpression) throws Exception {
         qtzManager.addOrUpdateJob(getClass(jobClassName), jobClassName, jobGroupName, cronExpression);
@@ -99,8 +98,8 @@ public class JobController {
      * @param jobGroupName
      * @throws Exception
      */
-    @PostMapping(value = "/deletejob")
-    public void deletejob(@RequestParam(value = "jobClassName") String jobClassName,
+    @PostMapping(value = "/delete")
+    public void deleteJob(@RequestParam(value = "jobClassName") String jobClassName,
                           @RequestParam(value = "jobGroupName") String jobGroupName) throws Exception {
         qtzManager.deleteJob(jobClassName, jobGroupName);
     }
@@ -110,8 +109,8 @@ public class JobController {
      * @param pageSize
      * @return
      */
-    @GetMapping(value = "/queryjob")
-    public Map<String, Object> queryjob(@RequestParam(value = "pageNum") Integer pageNum,
+    @GetMapping(value = "/query")
+    public Map<String, Object> queryJob(@RequestParam(value = "pageNum") Integer pageNum,
                                         @RequestParam(value = "pageSize") Integer pageSize) {
         PageInfo<JobDetails> jobAndTrigger = qtzManager.queryAllJobBean(pageNum, pageSize);
         Map<String, Object> map = new HashMap<String, Object>();

@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title th:text="#{kafka.eagle.system.job.title}">Job - KafkaEagle</title>
+
+    <link rel="stylesheet" th:href="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css}">
+
+    <th:block th:replace="public/common :: css"></th:block>
+
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:menu -->
+    <div th:replace="public/header :: menu_header"></div>
+    <div th:replace="public/navbar :: menu_navbar"></div>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+
+        <div class="page-content">
+
+            <nav class="page-breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" th:text="#{kafka.eagle.clusters.manage.home}"></a></li>
+                    <li class="breadcrumb-item active" aria-current="page"
+                        th:text="#{kafka.eagle.system.job}"></li>
+                </ol>
+            </nav>
+
+            <div class="row">
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title" th:text="#{kafka.eagle.system.job}"></h6>
+                            <p class="text-muted mb-3" th:utext="#{kafka.eagle.system.job.desc}"></p>
+                                                        <div style="float: right!important;margin-top: -88px;">
+                                                            <button id="efak_system_job_btn" type="button" class="btn btn-primary btn-sm"
+                                                                    th:text="#{kafka.eagle.system.job.btn}"></button>
+                                                        </div>
+                            <div class="table-responsive">
+                                <table id="efak_system_job_tbl" class="table table-striped" style="width:100%">
+                                    <thead>
+                                    <tr th:utext="#{kafka.eagle.system.job.tr}">
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- partial:footer -->
+        <footer th:replace="public/common :: footer"></footer>
+        <!-- partial -->
+    </div>
+
+    <!-- add partitions -->
+    <div class="modal fade" id="efak_topic_partition_add_modal" tabindex="-1" aria-labelledby="varyingModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="varyingModalLabel"
+                        th:utext="#{kafka.eagle.topic.manage.partition.add}"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="efak_topic_name_manage" class="form-label"
+                               th:utext="#{kafka.eagle.topic.manage.name.add}"></label>
+                        <input type="text" class="form-control" id="efak_topic_name_manage"
+                               name="efak_topic_name_manage" readonly/>
+                        <input type="hidden" class="form-control" id="efak_clusterid" name="efak_clusterid_name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="efak_topic_name_manage_partition_current" class="form-label"
+                               th:utext="#{kafka.eagle.topic.manage.partition.add.current}">Partition:</label>
+                        <input type="text" class="form-control" id="efak_topic_name_manage_partition_current"
+                               name="efak_topic_name_manage_partition_current">
+                    </div>
+                    <div class="mb-3">
+                        <label for="efak_topic_name_manage_partition_new" class="form-label"
+                               th:utext="#{kafka.eagle.topic.manage.partition.add.new}">NewPartition:</label>
+                        <input type="text" class="form-control" id="efak_topic_name_manage_partition_new"
+                               name="efak_topic_name_manage_partition_new">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            th:text="#{kafka.eagle.clusters.manage.button.close}">Close
+                    </button>
+                    <button type="button" id="efak_topic_add_partition_submit" class="btn btn-primary"
+                            th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- core:js -->
+<th:block th:replace="public/common :: js"></th:block>
+
+<!-- plugins:js -->
+<script th:src="@{../../assets/vendors/datatables.net/jquery.dataTables.js}"></script>
+<script th:src="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js}"></script>
+<script th:src="@{../assets/js/topic/topic.manage.js}"></script>
+
+</body>
+</html>

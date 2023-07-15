@@ -40,10 +40,7 @@ import org.kafka.eagle.web.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 
@@ -55,9 +52,9 @@ import java.util.*;
  * @Version: 3.4.0
  */
 @Slf4j
-@Component
-@EnableScheduling
-@EnableAsync
+//@Component
+//@EnableScheduling
+//@EnableAsync
 public class ClusterManageTask {
 
     @Value("${efak.collect.retain}")

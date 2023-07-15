@@ -218,7 +218,7 @@ public class QuartzManager {
                     if (trigger instanceof CronTrigger) {
                         CronTrigger cronTrigger = (CronTrigger) trigger;
                         jobDetails.setCronExpression(cronTrigger.getCronExpression());
-                        jobDetails.setTimeZone(cronTrigger.getTimeZone().getDisplayName());
+                        jobDetails.setTimeZone(cronTrigger.getTimeZone().toZoneId().toString());
                     }
                     jobDetails.setTriggerGroupName(trigger.getKey().getName());
                     jobDetails.setTriggerName(trigger.getKey().getGroup());
