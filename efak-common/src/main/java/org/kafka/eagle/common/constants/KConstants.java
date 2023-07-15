@@ -160,6 +160,7 @@ public class KConstants {
         public static final int RUNNING = 0;
         public static final int SHUTDOWN = 1;
         public static final int PENDING = 2;
+        public static final int ALL = -1;
 
         public static final String RUNNING_STRING = "Running";
         public static final String SHUTDOWN_STRING = "Shutdown";

@@ -12,11 +12,6 @@ import java.util.Map;
  */
 public class JobConstans {
 
-    /**
-     * 1 miniute
-     */
-    public static final String CRON_DEFAULT = "0 0/1 * * * ?";
-
     public static final String UNKOWN = "未知任务";
     public static final String DELETE = "delete";
     public static final String PAUSE = "pause";
