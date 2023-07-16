@@ -282,5 +282,18 @@ CREATE TABLE IF NOT EXISTS QRTZ_TASK_HISTORY (
   INDEX IDX_QRTZ_TK_S(SCHED_NAME)
 )ENGINE=InnoDB;
 
+-- quartz end
 
--- end
+CREATE TABLE IF NOT EXISTS ke_consumer_group(
+    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key ClusterId',
+    cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
+    group_id VARCHAR(128) COMMENT 'Group Name',
+    topic_name VARCHAR(128) COMMENT 'Topic Name',
+    coordinator VARCHAR(128) COMMENT 'Coordinator',
+    state VARCHAR(32) COMMENT 'State',
+    status SMALLINT COMMENT 'running(0), shutdown(1), pending(2)',
+    modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
+    INDEX idx_cluster_id (cluster_id),
+    INDEX idx_cluster_group_id (cluster_id,group_id),
+    INDEX idx_cluster_group_topic (cluster_id,group_id,topic_name)
+) COMMENT 'Consumer Group Summary Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

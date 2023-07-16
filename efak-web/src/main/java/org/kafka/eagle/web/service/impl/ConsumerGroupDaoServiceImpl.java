@@ -28,7 +28,6 @@ import org.kafka.eagle.web.service.IConsumerGroupDaoService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -44,12 +43,22 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
     ConsumerGroupDaoMapper consumerGroupDaoMapper;
 
     @Override
-    public ConsumerGroupInfo consumerById(Long id) {
+    public ConsumerGroupInfo consumerGroups(Long id) {
         return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getId, id).one();
     }
 
     @Override
-    public ConsumerGroupInfo consumerByObject(ConsumerGroupInfo consumerGroupInfo) {
+    public List<ConsumerGroupInfo> consumerGroups(String clusterId) {
+        return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).list();
+    }
+
+    @Override
+    public Boolean consumerGroups(String clusterId, String groupId, String topicName) {
+        return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).eq(ConsumerGroupInfo::getTopicName, topicName).exists();
+    }
+
+    @Override
+    public ConsumerGroupInfo consumerGroups(ConsumerGroupInfo consumerGroupInfo) {
         return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, consumerGroupInfo.getClusterId()).eq(ConsumerGroupInfo::getGroupId, consumerGroupInfo.getGroupId()).eq(ConsumerGroupInfo::getTopicName, consumerGroupInfo.getTopicName()).one();
     }
 
@@ -72,6 +81,17 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
             status = true;
         }
         return status;
+    }
+
+    @Override
+    public boolean update(ConsumerGroupInfo consumerGroupInfo) {
+        if (!this.consumerGroups(consumerGroupInfo.getClusterId(), consumerGroupInfo.getGroupId(), consumerGroupInfo.getTopicName())) {
+            return this.insert(consumerGroupInfo);
+        } else {
+            LambdaUpdateChainWrapper<ConsumerGroupInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<ConsumerGroupInfo>(this.consumerGroupDaoMapper);
+            lambdaUpdateChainWrapper.eq(ConsumerGroupInfo::getClusterId, consumerGroupInfo.getClusterId()).eq(ConsumerGroupInfo::getGroupId, consumerGroupInfo.getGroupId()).eq(ConsumerGroupInfo::getTopicName, consumerGroupInfo.getTopicName());
+            return lambdaUpdateChainWrapper.update(consumerGroupInfo);
+        }
     }
 
     @Override
@@ -98,7 +118,16 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
 
     @Override
     public boolean delete(Long id) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return new LambdaUpdateChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getId, id).remove();
+    }
+
+    @Override
+    public boolean delete(List<Long> groupIds) {
+        boolean status = false;
+        int code = this.consumerGroupDaoMapper.deleteBatchIds(groupIds);
+        if (code > 0) {
+            status = true;
+        }
+        return status;
     }
 }

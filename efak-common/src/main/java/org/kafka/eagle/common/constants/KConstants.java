@@ -157,10 +157,10 @@ public class KConstants {
         public static final long TOPIC_BROKER_LEADER_SKEW_ERROR = 80;
         public static final long TOPIC_BROKER_LEADER_SKEW_NORMAL = 30;
 
-        public static final int RUNNING = 0;
-        public static final int SHUTDOWN = 1;
-        public static final int PENDING = 2;
-        public static final int ALL = -1;
+        public static final Short RUNNING = 0;
+        public static final Short SHUTDOWN = 1;
+        public static final Short PENDING = 2;
+        public static final Short ALL = -1;
 
         public static final String RUNNING_STRING = "Running";
         public static final String SHUTDOWN_STRING = "Shutdown";

@@ -17,6 +17,8 @@
  */
 package org.kafka.eagle.core.kafka;
 
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +29,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.KafkaFuture;
-import org.apache.kafka.common.Node;
-import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.TopicPartitionInfo;
+import org.apache.kafka.common.*;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.TopicConfig;
 import org.kafka.eagle.common.constants.JmxConstants;
@@ -39,6 +38,8 @@ import org.kafka.eagle.common.utils.CalendarUtil;
 import org.kafka.eagle.common.utils.StrUtils;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
+import org.kafka.eagle.pojo.consumer.ConsumerGroupDescInfo;
+import org.kafka.eagle.pojo.consumer.ConsumerGroupInfo;
 import org.kafka.eagle.pojo.kafka.JMXInitializeInfo;
 import org.kafka.eagle.pojo.topic.*;
 
@@ -132,7 +133,7 @@ public class KafkaSchemaFactory {
             kafkaConsumer = new KafkaConsumer<>(plugin.getKafkaConsumerProps(kafkaClientInfo));
             topicNames = kafkaConsumer.listTopics().keySet();
         } catch (Exception e) {
-            log.error("Failure while loading table names for database '{}': {}", kafkaClientInfo, e);
+            log.error("Failure while loading kafka client for database '{}': {}", kafkaClientInfo, e);
         } finally {
             plugin.registerToClose(kafkaConsumer);
         }
@@ -278,7 +279,7 @@ public class KafkaSchemaFactory {
             for (Map.Entry<TopicPartition, Long> entry : endLogSize.entrySet()) {
                 endSumLogSize += entry.getValue();
             }
-            logSize = endSumLogSize ;
+            logSize = endSumLogSize;
         } catch (Exception e) {
             log.error("Get topic[{}] real logsize has error, msg is {}", topic, e);
         } finally {
@@ -562,18 +563,101 @@ public class KafkaSchemaFactory {
         return dataSets.toJSONString();
     }
 
+    public List<ConsumerGroupInfo> getConsumerGroups(KafkaClientInfo kafkaClientInfo) {
+        AdminClient adminClient = null;
+        List<ConsumerGroupInfo> consumerGroupInfos = new ArrayList<>();
+
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
+            Iterator<ConsumerGroupListing> itors = adminClient.listConsumerGroups().all().get().iterator();
+            Set<String> groupIdSets = new HashSet<>();
+            while (itors.hasNext()) {
+                String groupId = itors.next().groupId();
+                if (!groupId.equals(KConstants.Kafka.EFAK_SYSTEM_GROUP)) {
+                    groupIdSets.add(groupId);
+                }
+            }
+            Map<String, ConsumerGroupDescription> descConsumerGroup = adminClient.describeConsumerGroups(groupIdSets).all().get();
+            for (String groupId : groupIdSets) {
+                if (descConsumerGroup.containsKey(groupId)) {// active
+                    ConsumerGroupDescription consumerGroupDescription = descConsumerGroup.get(groupId);
+                    ConsumerGroupInfo consumerGroupInfo = new ConsumerGroupInfo();
+                    consumerGroupInfo.setClusterId(kafkaClientInfo.getClusterId());
+                    consumerGroupInfo.setGroupId(groupId);
+                    consumerGroupInfo.setState(consumerGroupDescription.state().name());
+                    Node node = consumerGroupDescription.coordinator();
+                    consumerGroupInfo.setCoordinator(node.host() + ":" + node.port());
+                    Collection<MemberDescription> members = consumerGroupDescription.members();
+                    if (members != null && members.size() > 0) {
+                        members.iterator().forEachRemaining(member -> {
+                            consumerGroupInfo.setOwner(member.consumerId());
+                            consumerGroupInfo.setStatus(StrUtil.isNotBlank(member.consumerId()) == true ? KConstants.Topic.RUNNING : KConstants.Topic.SHUTDOWN);
+                            Set<TopicPartition> tps = member.assignment().topicPartitions();
+                            if (tps != null && tps.size() > 0) {
+                                Set<String> topics = tps.stream().map(TopicPartition::topic).collect(Collectors.toSet());
+                                topics.forEach(topic -> {
+                                    ConsumerGroupInfo consumerGroupInfoSub = null;
+                                    try {
+                                        consumerGroupInfoSub = (ConsumerGroupInfo) consumerGroupInfo.clone();
+                                        consumerGroupInfoSub.setTopicName(topic);
+                                    } catch (Exception e) {
+                                        log.error("Copy object value has error, msg is {}", e);
+                                    }
+                                    consumerGroupInfos.add(consumerGroupInfoSub);
+                                });
+                            } else {
+                                consumerGroupInfos.add(consumerGroupInfo);
+                            }
+                        });
+                    } else {
+                        consumerGroupInfos.add(consumerGroupInfo);
+                    }
+                } else {
+                    ConsumerGroupInfo consumerGroupInfo = new ConsumerGroupInfo();
+                    consumerGroupInfo.setClusterId(kafkaClientInfo.getClusterId());
+                    consumerGroupInfo.setGroupId(groupId);
+                    consumerGroupInfo.setState(ConsumerGroupState.DEAD.name());
+                    consumerGroupInfos.add(consumerGroupInfo);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failure while loading kafka client for database '{}': {}", kafkaClientInfo, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+
+        return consumerGroupInfos;
+    }
+
+    public ConsumerGroupDescInfo getKafkaConsumerGroups(KafkaClientInfo kafkaClientInfo) {
+        AdminClient adminClient = null;
+        ConsumerGroupDescInfo consumerGroupDescInfo = new ConsumerGroupDescInfo();
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
+            Iterator<ConsumerGroupListing> itors = adminClient.listConsumerGroups().all().get().iterator();
+            while (itors.hasNext()) {
+                String groupId = itors.next().groupId();
+                if (!groupId.equals(KConstants.Kafka.EFAK_SYSTEM_GROUP)) {
+                    consumerGroupDescInfo.getGroupIds().add(groupId);
+                }
+            }
+            Map<String, ConsumerGroupDescription> descConsumerGroup = adminClient.describeConsumerGroups(consumerGroupDescInfo.getGroupIds()).all().get();
+            consumerGroupDescInfo.getDescConsumerGroup().putAll(descConsumerGroup);
+        } catch (Exception e) {
+            log.error("Failure while get consumer group object for database '{}': {}", kafkaClientInfo, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+
+        return consumerGroupDescInfo;
+    }
+
     public static void main(String[] args) {
         KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
 
         KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
         kafkaClientInfo.setBrokerServer("127.0.0.1:9092");
-        // log.info("topic name is : {}", ksf.getTopicNames(kafkaClientInfo).toString());
-        Set<String> topicNames = new HashSet<>();
-        topicNames.add("ke28");
-        topicNames.add("k30");
-        topicNames.add("ke_test30");
-        log.info(topicNames.iterator().next());
-        Map<String, TopicMetadataInfo> metadataInfos = ksf.getTopicMetaData(kafkaClientInfo, topicNames);
-        log.info("metadataInfos: {}", metadataInfos.toString());
+
+        log.info("consumer groups:{}", JSON.toJSONString(ksf.getConsumerGroups(kafkaClientInfo)));
     }
 }

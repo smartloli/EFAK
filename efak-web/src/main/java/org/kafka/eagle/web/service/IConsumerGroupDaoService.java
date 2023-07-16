@@ -16,8 +16,13 @@ import java.util.Map;
  */
 public interface IConsumerGroupDaoService extends IService<ConsumerGroupInfo> {
 
-    ConsumerGroupInfo consumerById(Long id);
-    ConsumerGroupInfo consumerByObject(ConsumerGroupInfo consumerGroupInfo);
+    ConsumerGroupInfo consumerGroups(Long id);
+
+    List<ConsumerGroupInfo> consumerGroups(String clusterId);
+
+    ConsumerGroupInfo consumerGroups(ConsumerGroupInfo consumerGroupInfo);
+
+    Boolean consumerGroups(String clusterId, String groupId, String topicName);
 
     Integer totalOfConsumerGroups(ConsumerGroupInfo consumerGroupInfo);
 
@@ -30,8 +35,12 @@ public interface IConsumerGroupDaoService extends IService<ConsumerGroupInfo> {
      */
     Page<ConsumerGroupInfo> pages(Map<String,Object> params);
 
-    boolean batch(List<ConsumerGroupInfo> createInfos);
+    boolean update(ConsumerGroupInfo consumerGroupInfo);
+
+    boolean batch(List<ConsumerGroupInfo> consumerGroupInfos);
 
     boolean delete(Long id);
+
+    boolean delete(List<Long> consumerGroupIds);
 
 }

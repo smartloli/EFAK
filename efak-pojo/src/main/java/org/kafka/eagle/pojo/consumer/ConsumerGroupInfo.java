@@ -32,8 +32,8 @@ import java.time.LocalDateTime;
  * @Version: 3.4.0
  */
 @Data
-@TableName("ke_brokers")
-public class ConsumerGroupInfo {
+@TableName("ke_consumer_group")
+public class ConsumerGroupInfo implements Cloneable{
     /**
      * BrokerId AUTO_INCREMENT
      */
@@ -67,7 +67,35 @@ public class ConsumerGroupInfo {
     private Short status;
 
     /**
+     * @see org.apache.kafka.common.ConsumerGroupState
+     */
+    private String state;
+
+    /**
+     * Consumer owner
+     */
+    private String owner;
+
+    /**
      * Consumer modify time.
      */
     private LocalDateTime modifyTime = LocalDateTime.now();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConsumerGroupInfo consumerGroupInfo = (ConsumerGroupInfo) o;
+        return clusterId.equals(consumerGroupInfo.clusterId) && groupId.equals(consumerGroupInfo.groupId) && topicName.equals(consumerGroupInfo.getTopicName());
+    }
+
+    @Override
+    public int hashCode() {
+        return clusterId.hashCode() + groupId.hashCode() + topicName.hashCode();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }
