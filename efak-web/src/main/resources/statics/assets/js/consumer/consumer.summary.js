@@ -202,3 +202,19 @@ option = {
 };
 
 option && myChart.setOption(option);
+
+
+// get consumer groups summary
+try {
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/consumer/summary/groups/ajax',
+        success: function (datas) {
+            $("#efka_consumer_group_total").text(datas.total_group_size);
+            $("#efka_consumer_group_active").text(datas.active_group_size);
+        }
+    });
+}catch (e){
+    console.log(e);
+}

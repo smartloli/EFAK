@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.web.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -54,7 +55,11 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
 
     @Override
     public Boolean consumerGroups(String clusterId, String groupId, String topicName) {
-        return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).eq(ConsumerGroupInfo::getTopicName, topicName).exists();
+        if(StrUtil.isBlank(topicName)){
+            return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).exists();
+        }else {
+            return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).eq(ConsumerGroupInfo::getTopicName, topicName).exists();
+        }
     }
 
     @Override
@@ -89,7 +94,11 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
             return this.insert(consumerGroupInfo);
         } else {
             LambdaUpdateChainWrapper<ConsumerGroupInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<ConsumerGroupInfo>(this.consumerGroupDaoMapper);
-            lambdaUpdateChainWrapper.eq(ConsumerGroupInfo::getClusterId, consumerGroupInfo.getClusterId()).eq(ConsumerGroupInfo::getGroupId, consumerGroupInfo.getGroupId()).eq(ConsumerGroupInfo::getTopicName, consumerGroupInfo.getTopicName());
+            if (StrUtil.isBlank(consumerGroupInfo.getTopicName())) {
+                lambdaUpdateChainWrapper.eq(ConsumerGroupInfo::getClusterId, consumerGroupInfo.getClusterId()).eq(ConsumerGroupInfo::getGroupId, consumerGroupInfo.getGroupId());
+            } else {
+                lambdaUpdateChainWrapper.eq(ConsumerGroupInfo::getClusterId, consumerGroupInfo.getClusterId()).eq(ConsumerGroupInfo::getGroupId, consumerGroupInfo.getGroupId()).eq(ConsumerGroupInfo::getTopicName, consumerGroupInfo.getTopicName());
+            }
             return lambdaUpdateChainWrapper.update(consumerGroupInfo);
         }
     }

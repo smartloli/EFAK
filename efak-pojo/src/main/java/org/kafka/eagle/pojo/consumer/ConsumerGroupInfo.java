@@ -33,7 +33,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("ke_consumer_group")
-public class ConsumerGroupInfo implements Cloneable{
+public class ConsumerGroupInfo implements Cloneable {
     /**
      * BrokerId AUTO_INCREMENT
      */
@@ -43,38 +43,38 @@ public class ConsumerGroupInfo implements Cloneable{
     /**
      * clusterId
      */
-    private String clusterId;
+    private String clusterId = "";
 
     /**
      * Consumer group id.
      */
-    private String groupId;
+    private String groupId = "";
 
     /**
      * Consumer group id of topic name.
      */
-    private String topicName;
+    private String topicName = "";
 
     /**
      * Consumer by broker node.
      */
-    private String coordinator;
+    private String coordinator = "";
 
     /**
-     * Consumer of topic status.
+     * Consumer of topic status, default is shutdown.
      * Such as: running(0), shutdown(1), pending(2), all(-1)
      */
-    private Short status;
+    private Short status = Short.valueOf("1");
 
     /**
      * @see org.apache.kafka.common.ConsumerGroupState
      */
-    private String state;
+    private String state = "";
 
     /**
      * Consumer owner
      */
-    private String owner;
+    private String owner = "";
 
     /**
      * Consumer modify time.
@@ -86,12 +86,20 @@ public class ConsumerGroupInfo implements Cloneable{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ConsumerGroupInfo consumerGroupInfo = (ConsumerGroupInfo) o;
-        return clusterId.equals(consumerGroupInfo.clusterId) && groupId.equals(consumerGroupInfo.groupId) && topicName.equals(consumerGroupInfo.getTopicName());
+        if (topicName == null || consumerGroupInfo.topicName == null) {
+            return clusterId.equals(consumerGroupInfo.clusterId) && groupId.equals(consumerGroupInfo.groupId);
+        } else {
+            return clusterId.equals(consumerGroupInfo.clusterId) && groupId.equals(consumerGroupInfo.groupId) && topicName.equals(consumerGroupInfo.getTopicName());
+        }
     }
 
     @Override
     public int hashCode() {
-        return clusterId.hashCode() + groupId.hashCode() + topicName.hashCode();
+        if (topicName == null) {
+            return clusterId.hashCode() + groupId.hashCode();
+        } else {
+            return clusterId.hashCode() + groupId.hashCode() + topicName.hashCode();
+        }
     }
 
     @Override

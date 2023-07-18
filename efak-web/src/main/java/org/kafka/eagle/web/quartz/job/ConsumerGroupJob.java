@@ -17,7 +17,6 @@
  */
 package org.kafka.eagle.web.quartz.job;
 
-import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.core.kafka.KafkaSchemaFactory;
 import org.kafka.eagle.core.kafka.KafkaSchemaInitialize;
@@ -85,9 +84,6 @@ public class ConsumerGroupJob extends QuartzJobBean {
             List<ConsumerGroupInfo> consumerGroupDiffInfos = new ArrayList<>();
 //            consumerGroupRealtimeInfos.stream().filter(consumerGroupInfo -> !consumerGroupInfos.contains(consumerGroupInfo)).forEach(consumerGroupDiffInfos::add);
             consumerGroupInfos.stream().filter(consumerGroupInfo -> !consumerGroupRealtimeInfos.contains(consumerGroupInfo)).forEach(consumerGroupDiffInfos::add);
-            log.info("diff:" + JSON.toJSONString(consumerGroupDiffInfos));
-            log.info("realtime:" + JSON.toJSONString(consumerGroupRealtimeInfos));
-
             // clean shutdown consumer group
             List<Long> consumerGroupIds = consumerGroupDiffInfos.stream().map(ConsumerGroupInfo::getId).collect(Collectors.toList());
             if (consumerGroupIds != null && consumerGroupIds.size() > 0) {
