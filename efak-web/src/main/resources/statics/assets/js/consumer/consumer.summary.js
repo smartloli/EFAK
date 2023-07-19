@@ -3,7 +3,7 @@ if ($("#efak_consumer_group_list").length) {
         placeholder: "请选择消费者名称",
         allowClear: true,
         ajax: {
-            url: "/topic/name/mock/ajax",
+            url: "/consumer/summary/groups/set",
             dataType: 'json',
             delay: 250,
             data: function (params) {
@@ -213,6 +213,20 @@ try {
         success: function (datas) {
             $("#efka_consumer_group_total").text(datas.total_group_size);
             $("#efka_consumer_group_active").text(datas.active_group_size);
+        }
+    });
+}catch (e){
+    console.log(e);
+}
+
+// consumer group topology
+try {
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/consumer/summary/groups/ajax',
+        success: function (datas) {
+
         }
     });
 }catch (e){

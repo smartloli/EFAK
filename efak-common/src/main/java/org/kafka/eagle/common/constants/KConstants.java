@@ -30,13 +30,14 @@ import java.util.List;
  */
 public class KConstants {
 
-    public static DateTimeFormatter getFormatter(){
+    public static DateTimeFormatter getFormatter() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         return formatter;
     }
 
-    public final class TableCommon{
-        private TableCommon(){}
+    public final class TableCommon {
+        private TableCommon() {
+        }
 
         public static final int TR_LEN = 20;
     }
@@ -179,6 +180,14 @@ public class KConstants {
 
         public static final String EFAK_VERSION = "v3.4.0";
         public static final String EFAK_VERSION_DOC = "efakVersion";
+    }
+
+    public static final class Consumer {
+        private Consumer() {
+        }
+
+        public static final Integer TOPOLOGY_SIZE = 3;
+
     }
 
 }

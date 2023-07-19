@@ -18,6 +18,7 @@
 package org.kafka.eagle.web.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -50,14 +51,21 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
 
     @Override
     public List<ConsumerGroupInfo> consumerGroups(String clusterId) {
-        return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).list();
+        QueryWrapper<ConsumerGroupInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("DISTINCT group_id").lambda().eq(ConsumerGroupInfo::getClusterId, clusterId);
+        return this.consumerGroupDaoMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<ConsumerGroupInfo> consumerGroups(String clusterId, String groupId) {
+        return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).list();
     }
 
     @Override
     public Boolean consumerGroups(String clusterId, String groupId, String topicName) {
-        if(StrUtil.isBlank(topicName)){
+        if (StrUtil.isBlank(topicName)) {
             return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).exists();
-        }else {
+        } else {
             return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).eq(ConsumerGroupInfo::getTopicName, topicName).exists();
         }
     }
@@ -68,14 +76,14 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
     }
 
     @Override
-    public Integer totalOfConsumerGroups(ConsumerGroupInfo consumerGroupInfo) {
-        Integer size = 0;
+    public Long totalOfConsumerGroups(ConsumerGroupInfo consumerGroupInfo) {
+        QueryWrapper<ConsumerGroupInfo> queryWrapper = new QueryWrapper<>();
         if (consumerGroupInfo.getStatus() == KConstants.Topic.ALL) {// all consumer group include active and standby
-            size = new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, consumerGroupInfo.getClusterId()).groupBy(ConsumerGroupInfo::getGroupId).list().size();
+            queryWrapper.select("DISTINCT group_id").lambda().eq(ConsumerGroupInfo::getClusterId, consumerGroupInfo.getClusterId());
         } else if (consumerGroupInfo.getStatus() == KConstants.Topic.RUNNING) { // running
-            size = new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, consumerGroupInfo.getClusterId()).eq(ConsumerGroupInfo::getStatus, KConstants.Topic.RUNNING).groupBy(ConsumerGroupInfo::getGroupId).list().size();
+            queryWrapper.select("DISTINCT group_id").lambda().eq(ConsumerGroupInfo::getClusterId, consumerGroupInfo.getClusterId()).eq(ConsumerGroupInfo::getStatus, KConstants.Topic.RUNNING);
         }
-        return size;
+        return this.consumerGroupDaoMapper.selectCount(queryWrapper);
     }
 
     @Override
@@ -111,7 +119,6 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
         Page<ConsumerGroupInfo> pages = new Page<>(start, size);
 
         LambdaQueryChainWrapper<ConsumerGroupInfo> queryChainWrapper = new LambdaQueryChainWrapper<ConsumerGroupInfo>(this.consumerGroupDaoMapper);
-        // queryChainWrapper.like(AuditLogInfo::getHost, params.get("search").toString());
         return queryChainWrapper.orderByDesc(ConsumerGroupInfo::getModifyTime).page(pages);
     }
 
