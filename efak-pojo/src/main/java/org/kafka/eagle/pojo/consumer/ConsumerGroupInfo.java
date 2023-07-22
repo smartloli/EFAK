@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import org.kafka.eagle.common.utils.StrUtils;
 
 import java.time.LocalDateTime;
 
@@ -83,10 +84,10 @@ public class ConsumerGroupInfo implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        // if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ConsumerGroupInfo consumerGroupInfo = (ConsumerGroupInfo) o;
-        if (topicName == null || consumerGroupInfo.topicName == null) {
+        if (StrUtils.isNull(topicName) || StrUtils.isNull(consumerGroupInfo.topicName)) {
             return clusterId.equals(consumerGroupInfo.clusterId) && groupId.equals(consumerGroupInfo.groupId);
         } else {
             return clusterId.equals(consumerGroupInfo.clusterId) && groupId.equals(consumerGroupInfo.groupId) && topicName.equals(consumerGroupInfo.getTopicName());
@@ -95,7 +96,7 @@ public class ConsumerGroupInfo implements Cloneable {
 
     @Override
     public int hashCode() {
-        if (topicName == null) {
+        if (StrUtils.isNull(topicName)) {
             return clusterId.hashCode() + groupId.hashCode();
         } else {
             return clusterId.hashCode() + groupId.hashCode() + topicName.hashCode();

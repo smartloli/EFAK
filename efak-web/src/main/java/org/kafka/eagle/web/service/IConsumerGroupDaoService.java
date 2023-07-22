@@ -20,6 +20,8 @@ public interface IConsumerGroupDaoService extends IService<ConsumerGroupInfo> {
 
     List<ConsumerGroupInfo> consumerGroups(String clusterId);
 
+    List<ConsumerGroupInfo> consumerGroupList(String clusterId);
+
     ConsumerGroupInfo consumerGroups(ConsumerGroupInfo consumerGroupInfo);
 
     List<ConsumerGroupInfo> consumerGroups(String clusterId,String groupId);
@@ -27,6 +29,7 @@ public interface IConsumerGroupDaoService extends IService<ConsumerGroupInfo> {
     Boolean consumerGroups(String clusterId, String groupId, String topicName);
 
     Long totalOfConsumerGroups(ConsumerGroupInfo consumerGroupInfo);
+    Long totalOfConsumerGroupTopics(String clusterId, String groupId);
 
     boolean insert(ConsumerGroupInfo consumerGroupInfo);
 

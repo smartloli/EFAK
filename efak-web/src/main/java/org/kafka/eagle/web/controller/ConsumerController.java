@@ -23,6 +23,7 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.common.utils.Md5Util;
+import org.kafka.eagle.plugins.kafka.ChartTools;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
 import org.kafka.eagle.pojo.consumer.ConsumerGroupInfo;
 import org.kafka.eagle.web.service.IClusterDaoService;
@@ -121,8 +122,8 @@ public class ConsumerController {
         }
     }
 
-    @RequestMapping(value = "/summary/groups/topology", method = RequestMethod.GET)
-    public void getConsumerGroupTopologyAjax(@RequestParam("groupId") String groupId, HttpServletResponse response, HttpServletRequest request) {
+    @RequestMapping(value = "/summary/groups/one", method = RequestMethod.GET)
+    public void getConsumerGroupOneAjax(HttpServletResponse response, HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();
         String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
         log.info("Topic name mock list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
@@ -131,22 +132,35 @@ public class ConsumerController {
         ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
         JSONObject object = new JSONObject();
 
-        List<ConsumerGroupInfo> consumerGroupInfoList = this.consumerGroupDaoService.consumerGroups(clusterInfo.getClusterId(), groupId);
-        int offset = 0;
-        JSONArray topics = new JSONArray();
-        for (ConsumerGroupInfo consumerGroupInfo : consumerGroupInfoList) {
-            if (offset > KConstants.Consumer.TOPOLOGY_SIZE) {
-                // logic
-
-                break;
-            }else{
-
-            }
-
-            offset++;
+        List<ConsumerGroupInfo> consumerGroupInfoList = this.consumerGroupDaoService.consumerGroups(clusterInfo.getClusterId());
+        String groupId = "";
+        if (consumerGroupInfoList != null && consumerGroupInfoList.size() > 0) {
+            groupId = consumerGroupInfoList.get(0).getGroupId();
         }
+        object.put("groupId", groupId);
+        try {
+            byte[] output = object.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
-        object.put("items", topics);
+    @RequestMapping(value = "/summary/groups/topology/ajax", method = RequestMethod.GET)
+    public void getConsumerGroupTopologyAjax(@RequestParam("groupId") String groupId, HttpServletResponse response, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic name mock list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        HttpSession session = request.getSession();
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+        JSONObject object = new JSONObject();
+        List<ConsumerGroupInfo> consumerGroupInfoList = this.consumerGroupDaoService.consumerGroups(clusterInfo.getClusterId(), groupId);
+        Long size = this.consumerGroupDaoService.totalOfConsumerGroupTopics(clusterInfo.getClusterId(), groupId);
+        JSONArray chartNodes = ChartTools.generateTopologyData(consumerGroupInfoList);
+        JSONArray chartNodeLines = ChartTools.generateTopologyDataLine(size);
+        object.put("nodes", chartNodes);
+        object.put("linesData", chartNodeLines);
         try {
             byte[] output = object.toJSONString().getBytes();
             BaseController.response(output, response);

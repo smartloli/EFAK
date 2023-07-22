@@ -57,6 +57,11 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
     }
 
     @Override
+    public List<ConsumerGroupInfo> consumerGroupList(String clusterId) {
+        return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).list();
+    }
+
+    @Override
     public List<ConsumerGroupInfo> consumerGroups(String clusterId, String groupId) {
         return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).list();
     }
@@ -87,6 +92,13 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
     }
 
     @Override
+    public Long totalOfConsumerGroupTopics(String clusterId, String groupId) {
+        QueryWrapper<ConsumerGroupInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(ConsumerGroupInfo::getClusterId,clusterId).eq(ConsumerGroupInfo::getGroupId,groupId).ne(ConsumerGroupInfo::getTopicName,"");
+        return this.consumerGroupDaoMapper.selectCount(queryWrapper);
+    }
+
+    @Override
     public boolean insert(ConsumerGroupInfo consumerGroupInfo) {
         boolean status = false;
         int code = this.consumerGroupDaoMapper.insert(consumerGroupInfo);
@@ -98,6 +110,7 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
 
     @Override
     public boolean update(ConsumerGroupInfo consumerGroupInfo) {
+        System.out.println("consumerGroupInfo:"+consumerGroupInfo.toString());
         if (!this.consumerGroups(consumerGroupInfo.getClusterId(), consumerGroupInfo.getGroupId(), consumerGroupInfo.getTopicName())) {
             return this.insert(consumerGroupInfo);
         } else {
