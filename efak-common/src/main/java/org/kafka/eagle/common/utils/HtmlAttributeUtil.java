@@ -118,4 +118,26 @@ public class HtmlAttributeUtil {
         return result;
     }
 
+    public static String getConsumerGroupHtml(String state) {
+        String result = "";
+        if ("STABLE".equals(state)) {
+            result = "<span class='badge bg-success'>消费中</span>";
+        } else {
+            result = "<span class='badge bg-danger'>已停止</span>";
+        }
+        return result;
+    }
+
+    public static String getConsumerGroupTopicHtml(Short status) {
+        String result = "";
+        if (status == 0) {
+            result = "<span class='badge bg-success'>正常</span>";
+        } else if (status == 1) {
+            result = "<span class='badge bg-danger'>异常</span>";
+        } else if (status == 2) {
+            result = "<span class='badge bg-warning'>暂停</span>";
+        }
+        return result;
+    }
+
 }

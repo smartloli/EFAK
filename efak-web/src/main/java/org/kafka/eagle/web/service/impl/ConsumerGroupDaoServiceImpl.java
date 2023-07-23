@@ -128,11 +128,12 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
     public Page<ConsumerGroupInfo> pages(Map<String, Object> params) {
         int start = Integer.parseInt(params.get("start").toString());
         int size = Integer.parseInt(params.get("size").toString());
+        String search = params.get("search").toString();
 
         Page<ConsumerGroupInfo> pages = new Page<>(start, size);
 
         LambdaQueryChainWrapper<ConsumerGroupInfo> queryChainWrapper = new LambdaQueryChainWrapper<ConsumerGroupInfo>(this.consumerGroupDaoMapper);
-        return queryChainWrapper.orderByDesc(ConsumerGroupInfo::getModifyTime).page(pages);
+        return queryChainWrapper.like(ConsumerGroupInfo::getGroupId,search).or().like(ConsumerGroupInfo::getTopicName,search).orderByDesc(ConsumerGroupInfo::getModifyTime).page(pages);
     }
 
     @Override

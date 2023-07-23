@@ -18,10 +18,13 @@
 package org.kafka.eagle.web.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.KConstants;
+import org.kafka.eagle.common.utils.HtmlAttributeUtil;
 import org.kafka.eagle.common.utils.Md5Util;
 import org.kafka.eagle.plugins.kafka.ChartTools;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
@@ -35,7 +38,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The controller class that handles consumer-related operations.
@@ -59,6 +64,11 @@ public class ConsumerController {
     @GetMapping("/summary")
     public String consumerSummaryView() {
         return "consumer/summary.html";
+    }
+
+    @GetMapping("/detail")
+    public String consumerDetailView() {
+        return "consumer/detail.html";
     }
 
     @ResponseBody
@@ -163,6 +173,64 @@ public class ConsumerController {
         object.put("linesData", chartNodeLines);
         try {
             byte[] output = object.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+    @RequestMapping(value = "/detail/table/ajax", method = RequestMethod.GET)
+    public void pageConsumerDetailAjax(HttpServletResponse response, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic meta list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        HttpSession session = request.getSession();
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+
+        String aoData = request.getParameter("aoData");
+        JSONArray params = JSON.parseArray(aoData);
+        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+        String search = "";
+        for (Object object : params) {
+            JSONObject param = (JSONObject) object;
+            if ("sEcho".equals(param.getString("name"))) {
+                sEcho = param.getIntValue("value");
+            } else if ("iDisplayStart".equals(param.getString("name"))) {
+                iDisplayStart = param.getIntValue("value");
+            } else if ("iDisplayLength".equals(param.getString("name"))) {
+                iDisplayLength = param.getIntValue("value");
+            } else if ("sSearch".equals(param.getString("name"))) {
+                search = param.getString("value");
+            }
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("start", iDisplayStart / iDisplayLength + 1);
+        map.put("size", iDisplayLength);
+        map.put("search", search);
+
+        Page<ConsumerGroupInfo> pages = this.consumerGroupDaoService.pages(map);
+        JSONArray aaDatas = new JSONArray();
+
+        for (ConsumerGroupInfo consumerGroupInfo : pages.getRecords()) {
+            JSONObject target = new JSONObject();
+            target.put("groupId", consumerGroupInfo.getGroupId());
+            target.put("topicName", "<a href='/consumer/detail/view/" + consumerGroupInfo.getId() + "'>" + consumerGroupInfo.getTopicName() + "</a>");
+            target.put("coordinator", consumerGroupInfo.getCoordinator());
+            target.put("state", HtmlAttributeUtil.getConsumerGroupHtml(consumerGroupInfo.getState()));
+            target.put("owner", consumerGroupInfo.getOwner());
+            target.put("status", HtmlAttributeUtil.getConsumerGroupTopicHtml(consumerGroupInfo.getStatus()));
+            aaDatas.add(target);
+        }
+
+        JSONObject target = new JSONObject();
+        target.put("sEcho", sEcho);
+        target.put("iTotalRecords", pages.getTotal());
+        target.put("iTotalDisplayRecords", pages.getTotal());
+        target.put("aaData", aaDatas);
+        try {
+            byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
             ex.printStackTrace();
