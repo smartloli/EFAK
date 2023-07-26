@@ -297,3 +297,23 @@ CREATE TABLE IF NOT EXISTS ke_consumer_group(
     INDEX idx_cluster_group_id (cluster_id,group_id),
     INDEX idx_cluster_group_topic (cluster_id,group_id,topic_name)
 ) COMMENT 'Consumer Group Summary Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS ke_consumer_group_topic(
+    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key ClusterId',
+    cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
+    group_id VARCHAR(128) COMMENT 'Group Name',
+    topic_name VARCHAR(128) COMMENT 'Topic Name',
+    logsize BIGINT COMMENT 'Log Size',
+    logsize_diff BIGINT COMMENT 'Log Size Diff',
+    offsets BIGINT COMMENT 'Offset',
+    offsets_diff BIGINT COMMENT 'Offset Diff',
+    `lag` BIGINT COMMENT 'Lag',
+    day VARCHAR(8) COMMENT 'Topic Day',
+    timespan BIGINT COMMENT 'Collect Timespan',
+    modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
+    INDEX idx_cluster_id (cluster_id),
+    INDEX idx_cluster_group_id (cluster_id,group_id),
+    INDEX idx_cluster_group_topic (cluster_id,group_id,topic_name),
+    INDEX idx_cluster_group_topic_day (cluster_id,group_id,topic_name,day),
+    INDEX idx_cluster_group_topic_day_timespan (cluster_id,group_id,topic_name,day,timespan)
+) COMMENT 'Consumer Group Topic Lag Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

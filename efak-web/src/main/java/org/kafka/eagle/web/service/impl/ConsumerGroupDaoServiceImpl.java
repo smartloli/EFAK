@@ -110,7 +110,6 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
 
     @Override
     public boolean update(ConsumerGroupInfo consumerGroupInfo) {
-        System.out.println("consumerGroupInfo:"+consumerGroupInfo.toString());
         if (!this.consumerGroups(consumerGroupInfo.getClusterId(), consumerGroupInfo.getGroupId(), consumerGroupInfo.getTopicName())) {
             return this.insert(consumerGroupInfo);
         } else {
