@@ -25,6 +25,7 @@ public class JobConstans {
         put("org.kafka.eagle.web.quartz.job.TopicSummaryJob","Topic总览定时任务");
         put("org.kafka.eagle.web.quartz.job.DeleteJob","数据清理定时任务");
         put("org.kafka.eagle.web.quartz.job.ConsumerGroupJob","消费者总览定时任务");
+        put("org.kafka.eagle.web.quartz.job.ConsumerGroupTopicJob","消费者主题明细定时任务");
     }};
 
 }

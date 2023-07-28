@@ -21,8 +21,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import org.kafka.eagle.common.constants.KConstants;
+import org.kafka.eagle.common.utils.StrUtils;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Description: TODO
@@ -59,16 +62,47 @@ public class ConsumerGroupTopicInfo implements Cloneable {
 
     private Long offsetsDiff;
 
-    private Long lag;
+    private Long lags;
 
-    private String day;
+    /**
+     * Stats consumer group topic data day, such as 20230728
+     */
+    private String day = LocalDateTime.now().format(KConstants.getFormatter());;
 
-    private Long timespan;
+    /**
+     * Get consumer group topic timespan.
+     */
+    private Long timespan = new Date().getTime();
 
     /**
      * Update time.
      */
     private LocalDateTime modifyTime = LocalDateTime.now();
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ConsumerGroupTopicInfo consumerGroupInfo = (ConsumerGroupTopicInfo) o;
+        if (StrUtils.isNull(topicName) || StrUtils.isNull(consumerGroupInfo.topicName)) {
+            return clusterId.equals(consumerGroupInfo.clusterId) && groupId.equals(consumerGroupInfo.groupId);
+        } else {
+            return clusterId.equals(consumerGroupInfo.clusterId) && groupId.equals(consumerGroupInfo.groupId) && topicName.equals(consumerGroupInfo.topicName);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        if (StrUtils.isNull(topicName)) {
+            return clusterId.hashCode() + groupId.hashCode();
+        } else {
+            return clusterId.hashCode() + groupId.hashCode() + topicName.hashCode();
+        }
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
 
 }

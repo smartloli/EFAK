@@ -26,6 +26,7 @@ import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -40,6 +41,7 @@ import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.consumer.ConsumerGroupDescInfo;
 import org.kafka.eagle.pojo.consumer.ConsumerGroupInfo;
+import org.kafka.eagle.pojo.consumer.ConsumerGroupTopicInfo;
 import org.kafka.eagle.pojo.kafka.JMXInitializeInfo;
 import org.kafka.eagle.pojo.topic.*;
 
@@ -652,12 +654,64 @@ public class KafkaSchemaFactory {
         return consumerGroupDescInfo;
     }
 
+    /**
+     * Get consumer group topic logsize, offset.
+     *
+     * @param kafkaClientInfo
+     * @param groupIds
+     * @return
+     */
+    public List<ConsumerGroupTopicInfo> getKafkaConsumerGroupTopic(KafkaClientInfo kafkaClientInfo, Set<String> groupIds) {
+        List<ConsumerGroupTopicInfo> consumerGroupTopicInfos = new ArrayList<>();
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
+
+            for (String groupId : groupIds) {
+                Map<String,Long> topicOffsetsMap = new HashMap<>();
+                ListConsumerGroupOffsetsResult offsetsResult = adminClient.listConsumerGroupOffsets(groupId);
+                Map<TopicPartition, OffsetAndMetadata> offsets = offsetsResult.partitionsToOffsetAndMetadata().get();
+                if (offsets != null && offsets.size() > 0) {
+                    for (Map.Entry<TopicPartition, OffsetAndMetadata> entry : offsets.entrySet()) {
+                        if(topicOffsetsMap.containsKey(entry.getKey().topic())){
+                            topicOffsetsMap.put(entry.getKey().topic(),topicOffsetsMap.get(entry.getKey().topic())+entry.getValue().offset());
+                        }else{
+                            topicOffsetsMap.put(entry.getKey().topic(),entry.getValue().offset());
+                        }
+                    }
+                }
+                for(Map.Entry<String, Long> entry:topicOffsetsMap.entrySet()){
+                    ConsumerGroupTopicInfo consumerGroupTopicInfo = new ConsumerGroupTopicInfo();
+                    consumerGroupTopicInfo.setClusterId(kafkaClientInfo.getClusterId());
+                    consumerGroupTopicInfo.setGroupId(groupId);
+                    consumerGroupTopicInfo.setTopicName(entry.getKey());
+                    Long logsizeValue = getTopicOfTotalLogSize(kafkaClientInfo, entry.getKey());;
+                    Long offsetValue = entry.getValue();
+                    consumerGroupTopicInfo.setOffsets(offsetValue);
+                    consumerGroupTopicInfo.setLogsize(logsizeValue);
+                    // maybe server timespan is not synchronized.
+                    consumerGroupTopicInfo.setLags(Math.abs(logsizeValue - offsetValue));
+                    // add to list
+                    consumerGroupTopicInfos.add(consumerGroupTopicInfo);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failure while get consumer group topic offset has error, database {}: {} ", kafkaClientInfo, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+        return consumerGroupTopicInfos;
+    }
+
+
     public static void main(String[] args) {
         KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
 
         KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
         kafkaClientInfo.setBrokerServer("127.0.0.1:9092");
 
-        log.info("consumer groups:{}", JSON.toJSONString(ksf.getConsumerGroups(kafkaClientInfo)));
+        Set<String> groupIds = new HashSet<>();
+        groupIds.add("group_id_3");
+        log.info("consumer group toipc:{}", JSON.toJSONString(ksf.getKafkaConsumerGroupTopic(kafkaClientInfo,groupIds)));
     }
 }

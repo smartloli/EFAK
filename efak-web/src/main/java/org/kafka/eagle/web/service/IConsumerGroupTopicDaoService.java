@@ -14,6 +14,10 @@ import java.util.List;
  */
 public interface IConsumerGroupTopicDaoService extends IService<ConsumerGroupTopicInfo> {
 
+    List<ConsumerGroupTopicInfo> consumerGroupTopicList(String clusterId);
+
+    ConsumerGroupTopicInfo consumerGroupTopic(ConsumerGroupTopicInfo consumerGroupTopicInfo);
+
     Boolean consumerGroupTopic(String clusterId, String groupId, String topicName);
 
     boolean insert(ConsumerGroupTopicInfo consumerGroupTopicInfo);

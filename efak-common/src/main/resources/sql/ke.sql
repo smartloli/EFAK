@@ -307,7 +307,7 @@ CREATE TABLE IF NOT EXISTS ke_consumer_group_topic(
     logsize_diff BIGINT COMMENT 'Log Size Diff',
     offsets BIGINT COMMENT 'Offset',
     offsets_diff BIGINT COMMENT 'Offset Diff',
-    `lag` BIGINT COMMENT 'Lag',
+    lags BIGINT COMMENT 'Lag',
     day VARCHAR(8) COMMENT 'Topic Day',
     timespan BIGINT COMMENT 'Collect Timespan',
     modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',

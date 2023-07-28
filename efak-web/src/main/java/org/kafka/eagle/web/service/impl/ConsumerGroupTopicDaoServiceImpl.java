@@ -17,26 +17,40 @@
  */
 package org.kafka.eagle.web.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.kafka.eagle.pojo.consumer.ConsumerGroupTopicInfo;
 import org.kafka.eagle.web.dao.mapper.ConsumerGroupTopicDaoMapper;
 import org.kafka.eagle.web.service.IConsumerGroupTopicDaoService;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
 
 /**
  * Description: TODO
+ *
  * @Author: smartloli
  * @Date: 2023/7/26 22:36
  * @Version: 3.4.0
  */
+@Service
 public class ConsumerGroupTopicDaoServiceImpl extends ServiceImpl<ConsumerGroupTopicDaoMapper, ConsumerGroupTopicInfo> implements IConsumerGroupTopicDaoService {
 
     @Resource
     private ConsumerGroupTopicDaoMapper consumerGroupTopicDaoMapper;
+
+    @Override
+    public List<ConsumerGroupTopicInfo> consumerGroupTopicList(String clusterId) {
+        return new LambdaQueryChainWrapper<>(this.consumerGroupTopicDaoMapper).eq(ConsumerGroupTopicInfo::getClusterId, clusterId).list();
+    }
+
+    @Override
+    public ConsumerGroupTopicInfo consumerGroupTopic(ConsumerGroupTopicInfo consumerGroupTopicInfo) {
+        return this.consumerGroupTopicDaoMapper.selectOne(new QueryWrapper<ConsumerGroupTopicInfo>().lambda().eq(ConsumerGroupTopicInfo::getClusterId, consumerGroupTopicInfo.getClusterId()).eq(ConsumerGroupTopicInfo::getGroupId, consumerGroupTopicInfo.getGroupId()).eq(ConsumerGroupTopicInfo::getTopicName, consumerGroupTopicInfo.getTopicName()).orderByDesc(ConsumerGroupTopicInfo::getTimespan).last("limit 1"));
+    }
 
     @Override
     public boolean insert(ConsumerGroupTopicInfo consumerGroupTopicInfo) {
@@ -71,6 +85,7 @@ public class ConsumerGroupTopicDaoServiceImpl extends ServiceImpl<ConsumerGroupT
         if (code > 0) {
             status = true;
         }
+        System.out.println("Insert Code:" + code);
         return status;
     }
 

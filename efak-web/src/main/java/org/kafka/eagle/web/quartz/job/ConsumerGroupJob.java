@@ -81,13 +81,15 @@ public class ConsumerGroupJob extends QuartzJobBean {
             }
 
             List<ConsumerGroupInfo> consumerGroupInfos = this.consumerGroupDaoService.consumerGroupList(clusterInfo.getClusterId());
-            List<ConsumerGroupInfo> consumerGroupDiffInfos = new ArrayList<>();
-            consumerGroupInfos.stream().filter(consumerGroupInfo -> !consumerGroupRealtimeInfos.contains(consumerGroupInfo)).forEach(consumerGroupDiffInfos::add);
+            if (consumerGroupInfos != null && consumerGroupInfos.size() > 0) {
+                List<ConsumerGroupInfo> consumerGroupDiffInfos = new ArrayList<>();
+                consumerGroupInfos.stream().filter(consumerGroupInfo -> !consumerGroupRealtimeInfos.contains(consumerGroupInfo)).forEach(consumerGroupDiffInfos::add);
 
-            // clean shutdown consumer group
-            List<Long> consumerGroupIds = consumerGroupDiffInfos.stream().map(ConsumerGroupInfo::getId).collect(Collectors.toList());
-            if (consumerGroupIds != null && consumerGroupIds.size() > 0) {
-                this.consumerGroupDaoService.delete(consumerGroupIds);
+                // clean shutdown consumer group <maybe extract sub job to clean>
+                List<Long> consumerGroupIds = consumerGroupDiffInfos.stream().map(ConsumerGroupInfo::getId).collect(Collectors.toList());
+                if (consumerGroupIds != null && consumerGroupIds.size() > 0) {
+                    this.consumerGroupDaoService.delete(consumerGroupIds);
+                }
             }
 
             // add new consumer group
