@@ -128,7 +128,7 @@ public class SystemController {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get audit log info has error,msg is {}", ex);
         }
     }
 
@@ -191,7 +191,7 @@ public class SystemController {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get job info has error,msg is {}", ex);
         }
     }
 
@@ -233,7 +233,7 @@ public class SystemController {
             byte[] output = object.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get job name list has error,msg is {}", ex);
         }
     }
 

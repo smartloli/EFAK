@@ -39,9 +39,7 @@ import org.kafka.eagle.common.utils.CalendarUtil;
 import org.kafka.eagle.common.utils.StrUtils;
 import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
-import org.kafka.eagle.pojo.consumer.ConsumerGroupDescInfo;
-import org.kafka.eagle.pojo.consumer.ConsumerGroupInfo;
-import org.kafka.eagle.pojo.consumer.ConsumerGroupTopicInfo;
+import org.kafka.eagle.pojo.consumer.*;
 import org.kafka.eagle.pojo.kafka.JMXInitializeInfo;
 import org.kafka.eagle.pojo.topic.*;
 
@@ -290,6 +288,32 @@ public class KafkaSchemaFactory {
             }
         }
         return logSize;
+    }
+
+    public Map<TopicPartition, Long> getTopicOfEndLogSize(KafkaClientInfo kafkaClientInfo, String topic) {
+
+        Map<TopicPartition, Long> endLogSize = new HashMap<>();
+        // get topic logsize
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(plugin.getKafkaConsumerProps(kafkaClientInfo));
+
+        Set<Integer> partitionIds = getTopicPartitionsOfInt(kafkaClientInfo, topic);
+        Set<TopicPartition> tps = new HashSet<>();
+        for (int partitionid : partitionIds) {
+            TopicPartition tp = new TopicPartition(topic, partitionid);
+            tps.add(tp);
+        }
+        consumer.assign(tps);
+
+        try {
+            endLogSize = consumer.endOffsets(tps);
+        } catch (Exception e) {
+            log.error("Get topic[{}] real end object logsize has error, msg is {}", topic, e);
+        } finally {
+            if (consumer != null) {
+                consumer.close();
+            }
+        }
+        return endLogSize;
     }
 
     public TopicRecordPageInfo getTopicMetaPageOfRecord(KafkaClientInfo kafkaClientInfo, String topic, Map<String, Object> params) {
@@ -592,7 +616,7 @@ public class KafkaSchemaFactory {
                     Collection<MemberDescription> members = consumerGroupDescription.members();
                     if (members != null && members.size() > 0) {
                         members.iterator().forEachRemaining(member -> {
-                            consumerGroupInfo.setOwner(member.consumerId());
+                            consumerGroupInfo.setOwner(member.host().replaceAll("/", "") + "-" + member.consumerId());
                             consumerGroupInfo.setStatus(StrUtil.isNotBlank(member.consumerId()) == true ? KConstants.Topic.RUNNING : KConstants.Topic.SHUTDOWN);
                             Set<TopicPartition> tps = member.assignment().topicPartitions();
                             if (tps != null && tps.size() > 0) {
@@ -621,6 +645,64 @@ public class KafkaSchemaFactory {
                     consumerGroupInfo.setState(ConsumerGroupState.DEAD.name());
                     consumerGroupInfos.add(consumerGroupInfo);
                 }
+            }
+        } catch (Exception e) {
+            log.error("Failure while loading kafka client for database '{}': {}", kafkaClientInfo, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+
+        return consumerGroupInfos;
+    }
+
+    public List<ConsumerGroupInfo> getConsumerGroups(KafkaClientInfo kafkaClientInfo, String groupId) {
+        AdminClient adminClient = null;
+        List<ConsumerGroupInfo> consumerGroupInfos = new ArrayList<>();
+
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
+            Iterator<ConsumerGroupListing> itors = adminClient.listConsumerGroups().all().get().iterator();
+
+            Map<String, ConsumerGroupDescription> descConsumerGroup = adminClient.describeConsumerGroups(Collections.singleton(groupId)).all().get();
+            if (descConsumerGroup.containsKey(groupId)) {// active
+                ConsumerGroupDescription consumerGroupDescription = descConsumerGroup.get(groupId);
+                ConsumerGroupInfo consumerGroupInfo = new ConsumerGroupInfo();
+                consumerGroupInfo.setClusterId(kafkaClientInfo.getClusterId());
+                consumerGroupInfo.setGroupId(groupId);
+                consumerGroupInfo.setState(consumerGroupDescription.state().name());
+                Node node = consumerGroupDescription.coordinator();
+                consumerGroupInfo.setCoordinator(node.host() + ":" + node.port());
+                Collection<MemberDescription> members = consumerGroupDescription.members();
+                if (members != null && members.size() > 0) {
+                    members.iterator().forEachRemaining(member -> {
+                        consumerGroupInfo.setOwner(member.host().replaceAll("/", "") + "-" + member.consumerId());
+                        consumerGroupInfo.setStatus(StrUtil.isNotBlank(member.consumerId()) == true ? KConstants.Topic.RUNNING : KConstants.Topic.SHUTDOWN);
+                        Set<TopicPartition> tps = member.assignment().topicPartitions();
+                        if (tps != null && tps.size() > 0) {
+                            Set<String> topics = tps.stream().map(TopicPartition::topic).collect(Collectors.toSet());
+                            topics.forEach(topic -> {
+                                ConsumerGroupInfo consumerGroupInfoSub = null;
+                                try {
+                                    consumerGroupInfoSub = (ConsumerGroupInfo) consumerGroupInfo.clone();
+                                    consumerGroupInfoSub.setTopicName(topic);
+                                } catch (Exception e) {
+                                    log.error("Copy object value has error, msg is {}", e);
+                                }
+                                consumerGroupInfos.add(consumerGroupInfoSub);
+                            });
+                        } else {
+                            consumerGroupInfos.add(consumerGroupInfo);
+                        }
+                    });
+                } else {
+                    consumerGroupInfos.add(consumerGroupInfo);
+                }
+            } else {
+                ConsumerGroupInfo consumerGroupInfo = new ConsumerGroupInfo();
+                consumerGroupInfo.setClusterId(kafkaClientInfo.getClusterId());
+                consumerGroupInfo.setGroupId(groupId);
+                consumerGroupInfo.setState(ConsumerGroupState.DEAD.name());
+                consumerGroupInfos.add(consumerGroupInfo);
             }
         } catch (Exception e) {
             log.error("Failure while loading kafka client for database '{}': {}", kafkaClientInfo, e);
@@ -668,24 +750,25 @@ public class KafkaSchemaFactory {
             adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
 
             for (String groupId : groupIds) {
-                Map<String,Long> topicOffsetsMap = new HashMap<>();
+                Map<String, Long> topicOffsetsMap = new HashMap<>();
                 ListConsumerGroupOffsetsResult offsetsResult = adminClient.listConsumerGroupOffsets(groupId);
                 Map<TopicPartition, OffsetAndMetadata> offsets = offsetsResult.partitionsToOffsetAndMetadata().get();
                 if (offsets != null && offsets.size() > 0) {
                     for (Map.Entry<TopicPartition, OffsetAndMetadata> entry : offsets.entrySet()) {
-                        if(topicOffsetsMap.containsKey(entry.getKey().topic())){
-                            topicOffsetsMap.put(entry.getKey().topic(),topicOffsetsMap.get(entry.getKey().topic())+entry.getValue().offset());
-                        }else{
-                            topicOffsetsMap.put(entry.getKey().topic(),entry.getValue().offset());
+                        if (topicOffsetsMap.containsKey(entry.getKey().topic())) {
+                            topicOffsetsMap.put(entry.getKey().topic(), topicOffsetsMap.get(entry.getKey().topic()) + entry.getValue().offset());
+                        } else {
+                            topicOffsetsMap.put(entry.getKey().topic(), entry.getValue().offset());
                         }
                     }
                 }
-                for(Map.Entry<String, Long> entry:topicOffsetsMap.entrySet()){
+                for (Map.Entry<String, Long> entry : topicOffsetsMap.entrySet()) {
                     ConsumerGroupTopicInfo consumerGroupTopicInfo = new ConsumerGroupTopicInfo();
                     consumerGroupTopicInfo.setClusterId(kafkaClientInfo.getClusterId());
                     consumerGroupTopicInfo.setGroupId(groupId);
                     consumerGroupTopicInfo.setTopicName(entry.getKey());
-                    Long logsizeValue = getTopicOfTotalLogSize(kafkaClientInfo, entry.getKey());;
+                    Long logsizeValue = getTopicOfTotalLogSize(kafkaClientInfo, entry.getKey());
+                    ;
                     Long offsetValue = entry.getValue();
                     consumerGroupTopicInfo.setOffsets(offsetValue);
                     consumerGroupTopicInfo.setLogsize(logsizeValue);
@@ -703,6 +786,79 @@ public class KafkaSchemaFactory {
         return consumerGroupTopicInfos;
     }
 
+    public ConsumerOffsetPageInfo getConsumerOffsetPageOfRecord(KafkaClientInfo kafkaClientInfo, String groupId, String topicName, Map<String, Object> params) {
+        ConsumerOffsetPageInfo consumerOffsetPageInfo = new ConsumerOffsetPageInfo();
+        Integer partitions = 0;
+        AdminClient adminClient = null;
+        try {
+            adminClient = AdminClient.create(plugin.getKafkaAdminClientProps(kafkaClientInfo));
+
+            DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Collections.singleton(topicName));
+            List<TopicPartitionInfo> tps = describeTopicsResult.all().get().get(topicName).partitions();
+            partitions = tps.size();
+
+            List<TopicPartition> tpList = new ArrayList<>();
+
+            Set<Integer> partitionSet = new TreeSet<>();
+            for (TopicPartitionInfo tp : tps) {
+                partitionSet.add(tp.partition());
+                TopicPartition topicPartition = new TopicPartition(topicName, tp.partition());
+                tpList.add(topicPartition);
+            }
+
+            ListConsumerGroupOffsetsOptions consumerOffsetOptions = new ListConsumerGroupOffsetsOptions();
+            consumerOffsetOptions.topicPartitions(tpList);
+
+            // get offsets
+            ListConsumerGroupOffsetsResult offsets = adminClient.listConsumerGroupOffsets(groupId, consumerOffsetOptions);
+            // get end logsize
+            Map<TopicPartition, Long> endLogsizes = getTopicOfEndLogSize(kafkaClientInfo, topicName);
+            Set<Integer> partitionSortSet = new TreeSet<>(new Comparator<Integer>() {
+                @Override
+                public int compare(Integer o1, Integer o2) {
+                    int diff = o1 - o2;// asc
+                    if (diff > 0) {
+                        return 1;
+                    } else if (diff < 0) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            });
+            partitionSortSet.addAll(partitionSet);
+
+            // get topic meta page default 10 records
+            int start = Integer.parseInt(params.get("start").toString());
+            int length = Integer.parseInt(params.get("length").toString());
+            int offset = 0;
+            for (int partition : partitionSortSet) {
+                if (offset >= start && offset < (start + length)) {
+                    ConsumerOffsetInfo consumerOffsetInfo = new ConsumerOffsetInfo();
+                    consumerOffsetInfo.setGroupId(groupId);
+                    consumerOffsetInfo.setTopicName(topicName);
+                    consumerOffsetInfo.setPartitionId(partition);
+                    if (offsets.partitionsToOffsetAndMetadata().get().containsKey(new TopicPartition(topicName, partition))) {
+                        consumerOffsetInfo.setOffsets(offsets.partitionsToOffsetAndMetadata().get().get(new TopicPartition(topicName, partition)).offset());
+                    }
+                    if (endLogsizes.containsKey(new TopicPartition(topicName, partition))) {
+                        consumerOffsetInfo.setLogsize(endLogsizes.get(new TopicPartition(topicName, partition)));
+                    }
+                    consumerOffsetInfo.setLags(Math.abs(consumerOffsetInfo.getLogsize() - consumerOffsetInfo.getOffsets()));
+                    consumerOffsetPageInfo.getRecords().add(consumerOffsetInfo);
+                }
+                offset++;
+            }
+
+
+        } catch (Exception e) {
+            log.error("Failure while loading topic '{}' offset for kafka '{}': {}", kafkaClientInfo, topicName, e);
+        } finally {
+            plugin.registerToClose(adminClient);
+        }
+        consumerOffsetPageInfo.setTotal(partitions);
+        return consumerOffsetPageInfo;
+    }
+
 
     public static void main(String[] args) {
         KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
@@ -712,6 +868,6 @@ public class KafkaSchemaFactory {
 
         Set<String> groupIds = new HashSet<>();
         groupIds.add("group_id_3");
-        log.info("consumer group toipc:{}", JSON.toJSONString(ksf.getKafkaConsumerGroupTopic(kafkaClientInfo,groupIds)));
+        log.info("consumer group toipc:{}", JSON.toJSONString(ksf.getKafkaConsumerGroupTopic(kafkaClientInfo, groupIds)));
     }
 }

@@ -26,9 +26,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.common.utils.HtmlAttributeUtil;
 import org.kafka.eagle.common.utils.Md5Util;
+import org.kafka.eagle.core.kafka.KafkaSchemaFactory;
+import org.kafka.eagle.core.kafka.KafkaSchemaInitialize;
+import org.kafka.eagle.core.kafka.KafkaStoragePlugin;
 import org.kafka.eagle.plugins.kafka.ChartTools;
+import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
+import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.consumer.ConsumerGroupInfo;
+import org.kafka.eagle.pojo.consumer.ConsumerOffsetInfo;
+import org.kafka.eagle.pojo.consumer.ConsumerOffsetPageInfo;
+import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
 import org.kafka.eagle.web.service.IConsumerGroupDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +64,9 @@ import java.util.Map;
 public class ConsumerController {
 
     @Autowired
+    private IBrokerDaoService brokerDaoService;
+
+    @Autowired
     private IClusterDaoService clusterDaoService;
 
     @Autowired
@@ -69,6 +80,14 @@ public class ConsumerController {
     @GetMapping("/detail")
     public String consumerDetailView() {
         return "consumer/detail.html";
+    }
+
+    @GetMapping("/offset/{id}")
+    public String consumerOffsetView(@PathVariable("id") Long id) {
+        if (!consumerGroupDaoService.checkGroupIdExist(id)) {
+            return "redirect:/error/404";
+        }
+        return "consumer/offset.html";
     }
 
     @ResponseBody
@@ -127,8 +146,8 @@ public class ConsumerController {
         try {
             byte[] output = object.toJSONString().getBytes();
             BaseController.response(output, response);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            log.error("Get consumer group list has error, msg is {}", e);
         }
     }
 
@@ -151,8 +170,8 @@ public class ConsumerController {
         try {
             byte[] output = object.toJSONString().getBytes();
             BaseController.response(output, response);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            log.error("Get consumer group one has error, msg is {}", e);
         }
     }
 
@@ -174,11 +193,10 @@ public class ConsumerController {
         try {
             byte[] output = object.toJSONString().getBytes();
             BaseController.response(output, response);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            log.error("Get consumer group topology has error, msg is {}", e);
         }
     }
-
 
     @RequestMapping(value = "/detail/table/ajax", method = RequestMethod.GET)
     public void pageConsumerDetailAjax(HttpServletResponse response, HttpServletRequest request) {
@@ -216,7 +234,7 @@ public class ConsumerController {
         for (ConsumerGroupInfo consumerGroupInfo : pages.getRecords()) {
             JSONObject target = new JSONObject();
             target.put("groupId", consumerGroupInfo.getGroupId());
-            target.put("topicName", "<a href='/consumer/detail/view/" + consumerGroupInfo.getId() + "'>" + consumerGroupInfo.getTopicName() + "</a>");
+            target.put("topicName", "<a href='/consumer/offset/" + consumerGroupInfo.getId() + "'>" + consumerGroupInfo.getTopicName() + "</a>");
             target.put("coordinator", consumerGroupInfo.getCoordinator());
             target.put("state", HtmlAttributeUtil.getConsumerGroupHtml(consumerGroupInfo.getState()));
             target.put("owner", consumerGroupInfo.getOwner());
@@ -232,8 +250,68 @@ public class ConsumerController {
         try {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            log.error("Get consumer group detail has error, msg is {}", e);
+        }
+    }
+
+    @RequestMapping(value = "/offset/table/ajax", method = RequestMethod.GET)
+    public void pageConsumerOffsetAjax(@RequestParam("id") Long id,HttpServletResponse response, HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+        log.info("Topic meta list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+        HttpSession session = request.getSession();
+        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+        List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
+
+        String aoData = request.getParameter("aoData");
+        JSONArray params = JSON.parseArray(aoData);
+        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+        for (Object object : params) {
+            JSONObject param = (JSONObject) object;
+            if ("sEcho".equals(param.getString("name"))) {
+                sEcho = param.getIntValue("value");
+            } else if ("iDisplayStart".equals(param.getString("name"))) {
+                iDisplayStart = param.getIntValue("value");
+            } else if ("iDisplayLength".equals(param.getString("name"))) {
+                iDisplayLength = param.getIntValue("value");
+            }
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("start", iDisplayStart);
+        map.put("length", iDisplayLength);
+
+        KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+        KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
+
+        ConsumerGroupInfo consumerGroupInfo = this.consumerGroupDaoService.consumerGroups(id);
+        ConsumerOffsetPageInfo consumerOffsetPageInfo = new ConsumerOffsetPageInfo();
+        if (consumerGroupInfo != null && StrUtil.isNotBlank(consumerGroupInfo.getGroupId()) && StrUtil.isNotBlank(consumerGroupInfo.getTopicName())) {
+            consumerOffsetPageInfo = ksf.getConsumerOffsetPageOfRecord(kafkaClientInfo, consumerGroupInfo.getGroupId(), consumerGroupInfo.getTopicName(), map);
+        }
+        JSONArray aaDatas = new JSONArray();
+        for (ConsumerOffsetInfo consumerOffsetInfo : consumerOffsetPageInfo.getRecords()) {
+            JSONObject target = new JSONObject();
+            target.put("groupId", consumerOffsetInfo.getGroupId());
+            target.put("topicName", consumerOffsetInfo.getTopicName());
+            target.put("partitionId", consumerOffsetInfo.getPartitionId());
+            target.put("logsize", consumerOffsetInfo.getLogsize());
+            target.put("offset", consumerOffsetInfo.getOffsets());
+            target.put("lag", consumerOffsetInfo.getLags());
+            aaDatas.add(target);
+        }
+
+        JSONObject target = new JSONObject();
+        target.put("sEcho", sEcho);
+        target.put("iTotalRecords", consumerOffsetPageInfo.getTotal());
+        target.put("iTotalDisplayRecords", consumerOffsetPageInfo.getTotal());
+        target.put("aaData", aaDatas);
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception e) {
+            log.error("Get consumer offset has error, msg is {}", e);
         }
     }
 }

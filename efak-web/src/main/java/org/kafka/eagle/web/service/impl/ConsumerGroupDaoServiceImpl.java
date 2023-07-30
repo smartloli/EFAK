@@ -45,6 +45,11 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
     ConsumerGroupDaoMapper consumerGroupDaoMapper;
 
     @Override
+    public Boolean checkGroupIdExist(Long id) {
+        return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getId, id).exists();
+    }
+
+    @Override
     public ConsumerGroupInfo consumerGroups(Long id) {
         return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getId, id).one();
     }

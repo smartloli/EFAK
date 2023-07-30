@@ -17,7 +17,6 @@
  */
 package org.kafka.eagle.web.quartz.job;
 
-import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.ConsumerGroupState;
 import org.kafka.eagle.common.constants.KConstants;
@@ -135,7 +134,6 @@ public class ConsumerGroupTopicJob extends QuartzJobBean {
                 }
             }
 
-            System.out.println("storageConsumerTopicInfos final:" + JSON.toJSONString(storageConsumerTopicInfos));
             if (storageConsumerTopicInfos != null && storageConsumerTopicInfos.size() > 0) {
                 this.consumerGroupTopicDaoService.batch(storageConsumerTopicInfos);
                 storageConsumerTopicInfos.clear();

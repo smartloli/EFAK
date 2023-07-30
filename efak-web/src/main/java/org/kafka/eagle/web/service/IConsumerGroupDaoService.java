@@ -18,6 +18,8 @@ public interface IConsumerGroupDaoService extends IService<ConsumerGroupInfo> {
 
     ConsumerGroupInfo consumerGroups(Long id);
 
+    Boolean checkGroupIdExist(Long id);
+
     List<ConsumerGroupInfo> consumerGroups(String clusterId);
 
     List<ConsumerGroupInfo> consumerGroupList(String clusterId);

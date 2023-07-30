@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title th:text="#{kafka.eagle.consumers.group.offset.title}"></title>
+
+    <link rel="stylesheet" th:href="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css}">
+    <link rel="stylesheet" th:href="@{../../assets/vendors/bootstrap-datepicker/daterangepicker.css}">
+
+    <th:block th:replace="public/common :: css"></th:block>
+
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:menu -->
+    <div th:replace="public/header :: menu_header"></div>
+    <div th:replace="public/navbar :: menu_navbar"></div>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+
+        <div class="page-content">
+
+            <nav class="page-breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/consumer/detail" th:text="#{kafka.eagle.consumers.group.detail}"></a></li>
+                    <li class="breadcrumb-item active" aria-current="page"
+                        th:text="#{kafka.eagle.consumers.group.offset}"></li>
+                </ol>
+            </nav>
+
+            <div class="row">
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title" th:text="#{kafka.eagle.consumers.group.offset}"></h6>
+                            <p class="text-muted mb-3" th:utext="#{kafka.eagle.consumers.group.offset.desc}"></p>
+                            <div class="table-responsive">
+                                <table id="efak_consumer_group_offset_tbl" class="table table-striped" style="width:100%">
+                                    <thead>
+                                    <tr th:utext="#{kafka.eagle.consumers.group.offset.tr}">
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- partial:footer -->
+        <footer th:replace="public/common :: footer"></footer>
+        <!-- partial -->
+    </div>
+
+</div>
+
+<!-- core:js -->
+<th:block th:replace="public/common :: js"></th:block>
+
+<!-- plugins:js -->
+<script th:src="@{../../assets/vendors/datatables.net/jquery.dataTables.js}"></script>
+<script th:src="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js}"></script>
+<script th:src="@{../../assets/vendors/bootstrap-datepicker/moment.min.js}"></script>
+<script th:src="@{../../assets/vendors/bootstrap-datepicker/daterangepicker.js}"></script>
+<script th:src="@{../../assets/js/consumer/consumer.offset.js}"></script>
+
+</body>
+</html>

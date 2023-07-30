@@ -85,7 +85,6 @@ public class ConsumerGroupTopicDaoServiceImpl extends ServiceImpl<ConsumerGroupT
         if (code > 0) {
             status = true;
         }
-        System.out.println("Insert Code:" + code);
         return status;
     }
 

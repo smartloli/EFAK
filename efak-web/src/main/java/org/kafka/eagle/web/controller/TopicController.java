@@ -231,7 +231,7 @@ public class TopicController {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get topic name list has error, msg is {}", ex);
         }
     }
 
@@ -374,7 +374,7 @@ public class TopicController {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get topic metadata table info has error, msg is {}", ex);
         }
     }
 
@@ -451,7 +451,7 @@ public class TopicController {
             byte[] output = object.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get topic name mock list has error, msg is {}", ex);
         }
     }
 

@@ -91,7 +91,7 @@ public class DataSpaceController {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get dashboard panel ajax has error,msg is {}", ex);
         }
     }
 

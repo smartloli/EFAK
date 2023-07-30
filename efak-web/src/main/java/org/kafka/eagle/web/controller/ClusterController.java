@@ -197,8 +197,8 @@ public class ClusterController {
         try {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            log.error("Get cluster info error, msg: {}", e);
         }
     }
 
@@ -211,7 +211,7 @@ public class ClusterController {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get cluster size error, msg: {}", ex);
         }
     }
 
@@ -228,7 +228,7 @@ public class ClusterController {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get cluster info error, msg: {}", ex);
         }
     }
 
@@ -322,7 +322,7 @@ public class ClusterController {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get cluster table info error, msg: {}", ex);
         }
     }
 
@@ -332,7 +332,6 @@ public class ClusterController {
      *
      * @param response
      * @param request
-     * @param cid
      */
     @RequestMapping(value = "/kafka/table/ajax", method = RequestMethod.GET)
     public void pageKafkaAjax(HttpServletResponse response, HttpServletRequest request) {
@@ -392,7 +391,7 @@ public class ClusterController {
             byte[] output = target.toJSONString().getBytes();
             BaseController.response(output, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Get kafka table info error, msg: {}", ex);
         }
     }
 }
