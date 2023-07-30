@@ -67,6 +67,11 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
     }
 
     @Override
+    public List<ConsumerGroupInfo> consumerGroupEmptyList(String clusterId) {
+        return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getTopicName, "").list();
+    }
+
+    @Override
     public List<ConsumerGroupInfo> consumerGroups(String clusterId, String groupId) {
         return new LambdaQueryChainWrapper<>(this.consumerGroupDaoMapper).eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).list();
     }
@@ -99,7 +104,7 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
     @Override
     public Long totalOfConsumerGroupTopics(String clusterId, String groupId) {
         QueryWrapper<ConsumerGroupInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(ConsumerGroupInfo::getClusterId,clusterId).eq(ConsumerGroupInfo::getGroupId,groupId).ne(ConsumerGroupInfo::getTopicName,"");
+        queryWrapper.lambda().eq(ConsumerGroupInfo::getClusterId, clusterId).eq(ConsumerGroupInfo::getGroupId, groupId).ne(ConsumerGroupInfo::getTopicName, "");
         return this.consumerGroupDaoMapper.selectCount(queryWrapper);
     }
 
@@ -137,7 +142,7 @@ public class ConsumerGroupDaoServiceImpl extends ServiceImpl<ConsumerGroupDaoMap
         Page<ConsumerGroupInfo> pages = new Page<>(start, size);
 
         LambdaQueryChainWrapper<ConsumerGroupInfo> queryChainWrapper = new LambdaQueryChainWrapper<ConsumerGroupInfo>(this.consumerGroupDaoMapper);
-        return queryChainWrapper.like(ConsumerGroupInfo::getGroupId,search).or().like(ConsumerGroupInfo::getTopicName,search).orderByDesc(ConsumerGroupInfo::getModifyTime).page(pages);
+        return queryChainWrapper.like(ConsumerGroupInfo::getGroupId, search).or().like(ConsumerGroupInfo::getTopicName, search).orderByDesc(ConsumerGroupInfo::getModifyTime).page(pages);
     }
 
     @Override

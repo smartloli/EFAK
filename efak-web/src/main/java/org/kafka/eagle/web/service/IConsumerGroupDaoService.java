@@ -24,6 +24,8 @@ public interface IConsumerGroupDaoService extends IService<ConsumerGroupInfo> {
 
     List<ConsumerGroupInfo> consumerGroupList(String clusterId);
 
+    List<ConsumerGroupInfo> consumerGroupEmptyList(String clusterId);
+
     ConsumerGroupInfo consumerGroups(ConsumerGroupInfo consumerGroupInfo);
 
     List<ConsumerGroupInfo> consumerGroups(String clusterId,String groupId);
