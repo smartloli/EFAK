@@ -28,7 +28,8 @@
 
             <nav class="page-breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/consumer/detail" th:text="#{kafka.eagle.consumers.group.detail}"></a></li>
+                    <li class="breadcrumb-item"><a href="/consumer/detail"
+                                                   th:text="#{kafka.eagle.consumers.group.detail}"></a></li>
                     <li class="breadcrumb-item active" aria-current="page"
                         th:text="#{kafka.eagle.consumers.group.offset}"></li>
                 </ol>
@@ -41,12 +42,171 @@
                             <h6 class="card-title" th:text="#{kafka.eagle.consumers.group.offset}"></h6>
                             <p class="text-muted mb-3" th:utext="#{kafka.eagle.consumers.group.offset.desc}"></p>
                             <div class="table-responsive">
-                                <table id="efak_consumer_group_offset_tbl" class="table table-striped" style="width:100%">
+                                <table id="efak_consumer_group_offset_tbl" class="table table-striped"
+                                       style="width:100%">
                                     <thead>
                                     <tr th:utext="#{kafka.eagle.consumers.group.offset.tr}">
                                     </tr>
                                     </thead>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-xl-12 main-content ps-xl-4 pe-xl-5">
+                    <h4 th:utext="#{kafka.eagle.consumers.group.offset.rate}"></h4>
+                    <div class="row">
+                        <div id="efka_meta_panel1" class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-baseline">
+                                        <h6 class="card-title mb-0"
+                                            th:text="#{kafka.eagle.consumers.group.offset.rate.producer}"></h6>
+                                        <div class="dropdown mb-2">
+                                            <button class="btn p-0" type="button" id="dropdownMenuButtonLogSize"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false">
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButtonLogSize">
+                                                <a class="dropdown-item d-flex align-items-center"
+                                                   href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i>
+                                                    <span class="">View</span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xxl-8 col-md-12">
+                                            <h1 id="efak_offset_produce_rate" class="mb-2">0</h1>
+                                            <div class="d-flex align-items-baseline">
+                                                <p class="text-primary">
+                                                    <span th:text="#{kafka.eagle.consumers.group.offset.rate.unit}">条/每分</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-4 col-md-12">
+                                            <h3 class="mb-2"></h3>
+                                            <div class="d-flex align-items-baseline">
+                                                <p class="text-primary">
+                                                    <i data-feather="log-in" class="icon-xxl mb-1"></i>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="efka_meta_panel2" class="col-md-4 grid-margin stretch-card"></div>
+                        <div id="efka_meta_panel3" class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-baseline">
+                                        <h6 class="card-title mb-0"
+                                            th:text="#{kafka.eagle.consumers.group.offset.rate.consumer}"></h6>
+                                        <div class="dropdown mb-2">
+                                            <button class="btn p-0" type="button" id="dropdownMenuButtonCapacity"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false">
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButtonCapacity">
+                                                <a class="dropdown-item d-flex align-items-center"
+                                                   href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i>
+                                                    <span class="">View</span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xxl-8 col-md-12">
+                                            <h1 id="efak_offset_consumer_rate" class="mb-2">0</h1>
+                                            <div class="d-flex align-items-baseline">
+                                                <p class="text-success">
+                                                    <span th:text="#{kafka.eagle.consumers.group.offset.rate.unit}"></span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-4 col-md-12">
+                                            <h3 class="mb-2"></h3>
+                                            <div class="d-flex align-items-baseline">
+                                                <p class="text-success">
+                                                    <i data-feather="log-out" class="icon-xxl mb-1"></i>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-xl-12 main-content ps-xl-4 pe-xl-5">
+                    <h4 th:utext="#{kafka.eagle.consumers.group.offset.chart}"></h4>
+                    <div class="row">
+                        <div class="col-12 col-xl-12 grid-margin stretch-card">
+                            <div class="card overflow-hidden">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                        <h6 class="card-title mb-0"
+                                            th:text="#{kafka.eagle.consumers.group.offset.chart.lag}"></h6>
+                                    </div>
+                                    <div class="row align-items-start">
+                                        <div class="col-md-7">
+                                            <p class="text-muted tx-13 mb-3 mb-md-0"
+                                               th:text="#{kafka.eagle.consumers.group.offset.chart.lag.doc}"></p>
+                                        </div>
+                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                            <div id="efak_offsets_chart_date" class="ms-auto"
+                                                 style="border: 1px solid #6571ff;cursor: pointer; padding: 5px 10px;">
+                                                <i data-feather="calendar" class="icon-md text-primary"></i> &nbsp;
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="efak_offsets_lag_chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-xl-12 grid-margin stretch-card">
+                            <div class="card overflow-hidden">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                        <h6 class="card-title mb-0"
+                                            th:text="#{kafka.eagle.consumers.group.offset.chart.consumer}"></h6>
+                                    </div>
+                                    <div class="row align-items-start">
+                                        <div class="col-md-7">
+                                            <p class="text-muted tx-13 mb-3 mb-md-0"
+                                               th:text="#{kafka.eagle.consumers.group.offset.chart.consumer.doc}"></p>
+                                        </div>
+                                    </div>
+                                    <div id="efak_offsets_consumer_chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-xl-12 grid-margin stretch-card">
+                            <div class="card overflow-hidden">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                        <h6 class="card-title mb-0"
+                                            th:text="#{kafka.eagle.consumers.group.offset.chart.producer}"></h6>
+                                    </div>
+                                    <div class="row align-items-start">
+                                        <div class="col-md-7">
+                                            <p class="text-muted tx-13 mb-3 mb-md-0"
+                                               th:text="#{kafka.eagle.consumers.group.offset.chart.producer.doc}"></p>
+                                        </div>
+                                    </div>
+                                    <div id="efak_offsets_producer_chart"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
