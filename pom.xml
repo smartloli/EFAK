@@ -1,47 +1,47 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.kafka.eagle</groupId>
-  <artifactId>efak</artifactId>
-  <packaging>pom</packaging>
-  <version>${project.version}</version>
-  <name>efak</name>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>${spring.boot.version}</version>
-    <relativePath/>
-  </parent>
+    <properties>
+        <kafka.eagle.version>3.4.0</kafka.eagle.version>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-  <properties>
-    <project.version>3.4.0</project.version>
-    <spring.boot.version>2.7.0</spring.boot.version>
-    <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <groupId>org.kafka.eagle</groupId>
+    <artifactId>efak</artifactId>
+    <packaging>pom</packaging>
+    <version>${kafka.eagle.version}</version>
+    <name>efak</name>
 
-  <repositories>
-    <repository>
-      <id>nexus</id>
-      <name>nexus</name>
-      <url>https://repo1.maven.org/maven2/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.0</version>
+        <relativePath/>
+    </parent>
 
-  <modules>
-    <module>efak-common</module>
-    <module>efak-pojo</module>
-    <module>efak-core</module>
-    <module>efak-plugins</module>
-    <module>efak-ai</module>
-    <module>efak-web</module>
-  </modules>
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <name>nexus</name>
+            <url>https://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <modules>
+        <module>efak-common</module>
+        <module>efak-pojo</module>
+        <module>efak-core</module>
+        <module>efak-plugins</module>
+        <module>efak-ai</module>
+        <module>efak-web</module>
+    </modules>
 </project>

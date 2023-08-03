@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.kafka.eagle</groupId>
         <artifactId>efak</artifactId>
-        <version>${project.version}</version>
+        <version>${kafka.eagle.version}</version>
     </parent>
 
     <artifactId>efak-pojo</artifactId>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-common</artifactId>
-            <version>${project.version}</version>
+            <version>${kafka.eagle.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -48,13 +48,14 @@ public class LoggerAudit {
     @Autowired
     private IAuditDaoService auditDaoService;
 
-    @Pointcut("execution(* org.kafka.eagle.web.*.*(..))")
+    @Pointcut("execution(* org.kafka.eagle.web.controller.*.*(..))")
     public void audit() {
     }
 
     @Around("audit()")
     public Object loggerAudit(ProceedingJoinPoint joinPoint) throws Throwable {
         long stime = System.currentTimeMillis();
+
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         RequestContextHolder.setRequestAttributes(attributes, true);
         if (attributes == null) {

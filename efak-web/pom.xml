@@ -4,10 +4,10 @@
     <parent>
         <groupId>org.kafka.eagle</groupId>
         <artifactId>efak</artifactId>
-        <version>${project.version}</version>
+        <version>${kafka.eagle.version}</version>
     </parent>
     <artifactId>efak-web</artifactId>
-    <name>efak-web</name>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -18,12 +18,12 @@
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-core</artifactId>
-            <version>${project.version}</version>
+            <version>${kafka.eagle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-ai</artifactId>
-            <version>${project.version}</version>
+            <version>${kafka.eagle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

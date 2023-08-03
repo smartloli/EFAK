@@ -4,12 +4,13 @@
     <parent>
         <groupId>org.kafka.eagle</groupId>
         <artifactId>efak</artifactId>
-        <version>${project.version}</version>
+        <version>${kafka.eagle.version}</version>
     </parent>
     <artifactId>efak-common</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.boot.version>2.7.0</spring.boot.version>
     </properties>
 
     <dependencies>

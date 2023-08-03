@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS ke_users_info (
   password varchar(100) DEFAULT NULL COMMENT 'Password',
   roles varchar(50) DEFAULT NULL COMMENT 'Roles',
   INDEX idx_username (username),
-  INDEX idx_user_pwd (username,passwd)
+  INDEX idx_user_pwd (username,password)
 ) COMMENT 'User info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
