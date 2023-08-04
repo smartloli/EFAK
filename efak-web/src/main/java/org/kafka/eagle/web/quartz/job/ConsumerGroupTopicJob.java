@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Description: TODO
@@ -98,17 +97,17 @@ public class ConsumerGroupTopicJob extends QuartzJobBean {
                 consumerGroupTopicRealtimeInfos.add(consumerGroupTopicInfo);
             }
 
-            List<ConsumerGroupTopicInfo> consumerGroupTopicInfoList = this.consumerGroupTopicDaoService.consumerGroupTopicList(clusterInfo.getClusterId());
+//            List<ConsumerGroupTopicInfo> consumerGroupTopicInfoList = this.consumerGroupTopicDaoService.consumerGroupTopicList(clusterInfo.getClusterId());
 
-            List<ConsumerGroupTopicInfo> consumerGroupTopicDiffInfos = new ArrayList<>();
-            if (consumerGroupTopicInfoList != null && consumerGroupTopicInfoList.size() > 0) {
-                consumerGroupTopicInfoList.stream().filter(consumerGroupInfo -> !consumerGroupTopicRealtimeInfos.contains(consumerGroupInfo)).forEach(consumerGroupTopicDiffInfos::add);
-                // clean shutdown consumer group <maybe extract sub job to clean>
-                List<Long> consumerGroupTopicIds = consumerGroupTopicDiffInfos.stream().map(ConsumerGroupTopicInfo::getId).collect(Collectors.toList());
-                if (consumerGroupTopicIds != null && consumerGroupTopicIds.size() > 0) {
-                    this.consumerGroupTopicDaoService.delete(consumerGroupTopicIds);
-                }
-            }
+//            List<ConsumerGroupTopicInfo> consumerGroupTopicDiffInfos = new ArrayList<>();
+//            if (consumerGroupTopicInfoList != null && consumerGroupTopicInfoList.size() > 0) {
+//                consumerGroupTopicInfoList.stream().filter(consumerGroupInfo -> !consumerGroupTopicRealtimeInfos.contains(consumerGroupInfo)).forEach(consumerGroupTopicDiffInfos::add);
+//                // clean shutdown consumer group <maybe extract sub job to clean>
+//                List<Long> consumerGroupTopicIds = consumerGroupTopicDiffInfos.stream().map(ConsumerGroupTopicInfo::getId).collect(Collectors.toList());
+//                if (consumerGroupTopicIds != null && consumerGroupTopicIds.size() > 0) {
+//                    this.consumerGroupTopicDaoService.delete(consumerGroupTopicIds);
+//                }
+//            }
 
             List<ConsumerGroupTopicInfo> consumerGroupTopicInfos = ksf.getKafkaConsumerGroupTopic(kafkaClientInfo, groupIds);
             List<ConsumerGroupTopicInfo> storageConsumerTopicInfos = new ArrayList<>();

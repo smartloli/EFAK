@@ -107,16 +107,16 @@ try {
     var stime = reportrange[0].innerText.replace(/-/g, '').split("至")[0].trim();
     var etime = reportrange[0].innerText.replace(/-/g, '').split("至")[1].trim();
 
-    producerMsg(stime, etime);
+    chartMsg(stime, etime);
 
     reportrange.on('apply.daterangepicker', function (ev, picker) {
         stime = reportrange[0].innerText.replace(/-/g, '').split("至")[0].trim();
         etime = reportrange[0].innerText.replace(/-/g, '').split("至")[1].trim();
-        producerMsg(stime, etime);
+        chartMsg(stime, etime);
     });
     setInterval(function () {
-        producerMsg(stime, etime)
-    }, 1000 * 60 * 5); // 5min
+        chartMsg(stime, etime)
+    }, 1000 * 60 * 1); // 1min
 } catch (e) {
     console.log(e);
 }
@@ -235,20 +235,20 @@ efak_offsets_producer_chart.render();
 
 // Chart - END
 
-function producerMsg(stime, etime) {
+function chartMsg(stime, etime) {
     $.ajax({
         type: 'get',
         dataType: 'json',
-        url: '/topic/meta/msg/chart/ajax?stime=' + stime + '&etime=' + etime + '&topic=' + topicName,
+        url: '/consumer/offsets/realtime/chart/ajax?stime=' + stime + '&etime=' + etime + '&id=' + gid,
         beforeSend: function (xmlHttp) {
             xmlHttp.setRequestHeader("If-Modified-Since", "0");
             xmlHttp.setRequestHeader("Cache-Control", "no-cache");
         },
         success: function (datas) {
             if (datas != null) {
-                setChartData(efak_offsets_lag_chart, datas);
-                setChartData(efak_offsets_consumer_chart, datas);
-                setChartData(efak_offsets_producer_chart, datas);
+                setChartData(efak_offsets_lag_chart, datas.lags);
+                setChartData(efak_offsets_consumer_chart, datas.consumers);
+                setChartData(efak_offsets_producer_chart, datas.producers);
                 datas = null;
             }
         }

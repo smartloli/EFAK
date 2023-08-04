@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.kafka.eagle.pojo.consumer.ConsumerGroupTopicInfo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description: TODO
@@ -29,5 +30,12 @@ public interface IConsumerGroupTopicDaoService extends IService<ConsumerGroupTop
     boolean delete(Long id);
 
     boolean delete(List<Long> consumerGroupIds);
+
+    /**
+     * Page limit.
+     * @param params
+     * @return
+     */
+    List<ConsumerGroupTopicInfo> pages(Map<String,Object> params);
 
 }

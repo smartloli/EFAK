@@ -24,6 +24,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.KConstants;
+import org.kafka.eagle.common.utils.CalendarUtil;
 import org.kafka.eagle.common.utils.HtmlAttributeUtil;
 import org.kafka.eagle.common.utils.Md5Util;
 import org.kafka.eagle.core.kafka.KafkaSchemaFactory;
@@ -34,11 +35,13 @@ import org.kafka.eagle.pojo.cluster.BrokerInfo;
 import org.kafka.eagle.pojo.cluster.ClusterInfo;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.consumer.ConsumerGroupInfo;
+import org.kafka.eagle.pojo.consumer.ConsumerGroupTopicInfo;
 import org.kafka.eagle.pojo.consumer.ConsumerOffsetInfo;
 import org.kafka.eagle.pojo.consumer.ConsumerOffsetPageInfo;
 import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
 import org.kafka.eagle.web.service.IConsumerGroupDaoService;
+import org.kafka.eagle.web.service.IConsumerGroupTopicDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -71,6 +74,9 @@ public class ConsumerController {
 
     @Autowired
     private IConsumerGroupDaoService consumerGroupDaoService;
+
+    @Autowired
+    private IConsumerGroupTopicDaoService consumerGroupTopicDaoService;
 
     @GetMapping("/summary")
     public String consumerSummaryView() {
@@ -312,6 +318,66 @@ public class ConsumerController {
             BaseController.response(output, response);
         } catch (Exception e) {
             log.error("Get consumer offset has error, msg is {}", e);
+        }
+    }
+
+    /**
+     * Get offsets lag, producer, consumer chart data by ajax.
+     */
+    @RequestMapping(value = "/offsets/realtime/chart/ajax", method = RequestMethod.GET)
+    public void getTopicMetaMsgChartAjax(@RequestParam("id") Long id,HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+        try {
+            String remoteAddr = request.getRemoteAddr();
+            String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+            log.info("Topic meta chart :: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+            Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
+            ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+
+            ConsumerGroupInfo consumerGroupInfo = this.consumerGroupDaoService.consumerGroups(id);
+
+            Map<String, Object> param = new HashMap<>();
+            param.put("cid", clusterInfo.getClusterId());
+            param.put("group", consumerGroupInfo.getGroupId());
+            param.put("topic", consumerGroupInfo.getTopicName());
+            param.put("stime", request.getParameter("stime"));
+            param.put("etime", request.getParameter("etime"));
+
+            // consumer offsets lag
+            List<ConsumerGroupTopicInfo> consumerGroupTopicInfos = consumerGroupTopicDaoService.pages(param);
+
+            JSONArray lags = new JSONArray();
+            for (ConsumerGroupTopicInfo consumerGroupTopicInfo : consumerGroupTopicInfos) {
+                JSONObject object = new JSONObject();
+                object.put("x", CalendarUtil.convertUnixTime(consumerGroupTopicInfo.getTimespan(), "yyyy-MM-dd HH:mm"));
+                object.put("y", consumerGroupTopicInfo.getLags());
+                lags.add(object);
+            }
+
+            JSONArray producers = new JSONArray();
+            for (ConsumerGroupTopicInfo consumerGroupTopicInfo : consumerGroupTopicInfos) {
+                JSONObject object = new JSONObject();
+                object.put("x", CalendarUtil.convertUnixTime(consumerGroupTopicInfo.getTimespan(), "yyyy-MM-dd HH:mm"));
+                object.put("y", consumerGroupTopicInfo.getLogsizeDiff());
+                producers.add(object);
+            }
+
+            JSONArray consumers = new JSONArray();
+            for (ConsumerGroupTopicInfo consumerGroupTopicInfo : consumerGroupTopicInfos) {
+                JSONObject object = new JSONObject();
+                object.put("x", CalendarUtil.convertUnixTime(consumerGroupTopicInfo.getTimespan(), "yyyy-MM-dd HH:mm"));
+                object.put("y", consumerGroupTopicInfo.getOffsetsDiff());
+                consumers.add(object);
+            }
+
+            JSONObject target = new JSONObject();
+            target.put("lags",lags);
+            target.put("producers",producers);
+            target.put("consumers",consumers);
+
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception e) {
+            log.error("Get consumer offset chart has error, msg is {}", e);
         }
     }
 }

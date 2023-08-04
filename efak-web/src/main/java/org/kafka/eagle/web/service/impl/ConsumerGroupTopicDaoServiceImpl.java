@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description: TODO
@@ -101,5 +102,16 @@ public class ConsumerGroupTopicDaoServiceImpl extends ServiceImpl<ConsumerGroupT
             status = true;
         }
         return status;
+    }
+
+    @Override
+    public List<ConsumerGroupTopicInfo> pages(Map<String, Object> params) {
+        String cid = params.get("cid").toString();
+        String group = params.get("group").toString();
+        String topic = params.get("topic").toString();
+        String stime = params.get("stime").toString();
+        String etime = params.get("etime").toString();
+
+        return new LambdaQueryChainWrapper<>(this.consumerGroupTopicDaoMapper).eq(ConsumerGroupTopicInfo::getClusterId, cid).eq(ConsumerGroupTopicInfo::getGroupId,group).eq(ConsumerGroupTopicInfo::getTopicName, topic).between(ConsumerGroupTopicInfo::getDay,stime,etime).list();
     }
 }

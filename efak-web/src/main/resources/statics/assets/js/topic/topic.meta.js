@@ -175,7 +175,7 @@ try {
     });
     setInterval(function () {
         producerMsg(stime, etime)
-    }, 1000 * 60 * 5); // 5min
+    }, 1000 * 60 * 1); // 1min
 } catch (e) {
     console.log(e);
 }
