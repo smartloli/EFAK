@@ -114,4 +114,9 @@ public class ConsumerGroupTopicDaoServiceImpl extends ServiceImpl<ConsumerGroupT
 
         return new LambdaQueryChainWrapper<>(this.consumerGroupTopicDaoMapper).eq(ConsumerGroupTopicInfo::getClusterId, cid).eq(ConsumerGroupTopicInfo::getGroupId,group).eq(ConsumerGroupTopicInfo::getTopicName, topic).between(ConsumerGroupTopicInfo::getDay,stime,etime).list();
     }
+
+    @Override
+    public ConsumerGroupTopicInfo consumersOfLatest(String clusterId, String group, String topic) {
+        return this.consumerGroupTopicDaoMapper.selectOne(new QueryWrapper<ConsumerGroupTopicInfo>().lambda().eq(ConsumerGroupTopicInfo::getClusterId, clusterId).eq(ConsumerGroupTopicInfo::getGroupId, group).eq(ConsumerGroupTopicInfo::getTopicName, topic).orderByDesc(ConsumerGroupTopicInfo::getTimespan).last("limit 1"));
+    }
 }

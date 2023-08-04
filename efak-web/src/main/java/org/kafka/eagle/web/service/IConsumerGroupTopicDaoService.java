@@ -38,4 +38,11 @@ public interface IConsumerGroupTopicDaoService extends IService<ConsumerGroupTop
      */
     List<ConsumerGroupTopicInfo> pages(Map<String,Object> params);
 
+    /**
+     * get consumer and producer rate
+     *
+     * @return
+     */
+    ConsumerGroupTopicInfo consumersOfLatest(String clusterId, String group, String topic);
+
 }

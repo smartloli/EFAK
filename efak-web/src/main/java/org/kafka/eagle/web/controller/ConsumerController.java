@@ -325,11 +325,11 @@ public class ConsumerController {
      * Get offsets lag, producer, consumer chart data by ajax.
      */
     @RequestMapping(value = "/offsets/realtime/chart/ajax", method = RequestMethod.GET)
-    public void getTopicMetaMsgChartAjax(@RequestParam("id") Long id,HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+    public void getOffsetsMsgChartAjax(@RequestParam("id") Long id,HttpServletResponse response, HttpServletRequest request, HttpSession session) {
         try {
             String remoteAddr = request.getRemoteAddr();
             String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-            log.info("Topic meta chart :: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+            log.info("Consumer offsets chart :: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
             Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
             ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
 
@@ -378,6 +378,30 @@ public class ConsumerController {
             BaseController.response(output, response);
         } catch (Exception e) {
             log.error("Get consumer offset chart has error, msg is {}", e);
+        }
+    }
+
+    /**
+     * get consumer and producer rate
+     * @param id
+     * @param response
+     * @param request
+     * @param session
+     */
+    @RequestMapping(value = "/offsets/realtime/rate/ajax", method = RequestMethod.GET)
+    public void getOffsetsRateAjax(@RequestParam("id") Long id,HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+        try {
+            ConsumerGroupInfo consumerGroupInfo = this.consumerGroupDaoService.consumerGroups(id);
+            ConsumerGroupTopicInfo consumerGroupTopicInfo = consumerGroupTopicDaoService.consumersOfLatest(consumerGroupInfo.getClusterId(),consumerGroupInfo.getGroupId(),consumerGroupInfo.getTopicName());
+
+            JSONObject target = new JSONObject();
+            target.put("consumer_rate",consumerGroupTopicInfo.getOffsetsDiff());
+            target.put("producer_rate",consumerGroupTopicInfo.getLogsizeDiff());
+
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception e) {
+            log.error("Get consumer offset rate has error, msg is {}", e);
         }
     }
 }

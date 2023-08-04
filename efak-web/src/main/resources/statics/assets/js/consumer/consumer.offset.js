@@ -114,8 +114,10 @@ try {
         etime = reportrange[0].innerText.replace(/-/g, '').split("至")[1].trim();
         chartMsg(stime, etime);
     });
+    offsetRate();
     setInterval(function () {
-        chartMsg(stime, etime)
+        chartMsg(stime, etime);
+        offsetRate();
     }, 1000 * 60 * 1); // 1min
 } catch (e) {
     console.log(e);
@@ -249,6 +251,25 @@ function chartMsg(stime, etime) {
                 setChartData(efak_offsets_lag_chart, datas.lags);
                 setChartData(efak_offsets_consumer_chart, datas.consumers);
                 setChartData(efak_offsets_producer_chart, datas.producers);
+                datas = null;
+            }
+        }
+    });
+}
+
+function offsetRate() {
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/consumer/offsets/realtime/rate/ajax?id=' + gid,
+        beforeSend: function (xmlHttp) {
+            xmlHttp.setRequestHeader("If-Modified-Since", "0");
+            xmlHttp.setRequestHeader("Cache-Control", "no-cache");
+        },
+        success: function (datas) {
+            if (datas != null) {
+                $("#efak_offset_consumer_rate").text(datas.consumer_rate);
+                $("#efak_offset_producer_rate").text(datas.producer_rate);
                 datas = null;
             }
         }
