@@ -22,5 +22,10 @@
             <artifactId>efak-plugins</artifactId>
             <version>${kafka.eagle.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.kafka.eagle</groupId>
+            <artifactId>efak-pojo</artifactId>
+            <version>${kafka.eagle.version}</version>
+        </dependency>
     </dependencies>
 </project>

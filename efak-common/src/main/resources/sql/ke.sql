@@ -317,3 +317,17 @@ CREATE TABLE IF NOT EXISTS ke_consumer_group_topic(
     INDEX idx_cluster_group_topic_day (cluster_id,group_id,topic_name,day),
     INDEX idx_cluster_group_topic_day_timespan (cluster_id,group_id,topic_name,day,timespan)
 ) COMMENT 'Consumer Group Topic Lag Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS ke_kafka_mbean_metrics(
+    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key ClusterId',
+    cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
+    mbean_key VARCHAR(128) COMMENT 'MBean key',
+    mbean_value VARCHAR(128) COMMENT 'MBean value',
+    day VARCHAR(8) COMMENT 'Metrics Day',
+    timespan BIGINT COMMENT 'Collect Timespan',
+    modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
+    INDEX idx_cluster_id (cluster_id),
+    INDEX idx_cluster_key (cluster_id,mbean_key),
+    INDEX idx_cluster_key_day (cluster_id,mbean_key,day),
+    INDEX idx_cluster_key_day_timespan (cluster_id,mbean_key,day,timespan)
+) COMMENT 'Kafka MBean Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
