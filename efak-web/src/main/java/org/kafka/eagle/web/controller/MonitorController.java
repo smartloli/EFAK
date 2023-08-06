@@ -64,6 +64,11 @@ public class MonitorController {
         return "monitor/produce.html";
     }
 
+    @GetMapping("/kafka")
+    public String kafkaView() {
+        return "monitor/kafka.html";
+    }
+
     /**
      * Get producer chart data by ajax.
      */
