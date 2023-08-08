@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.web.service.impl;
 
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.kafka.eagle.pojo.cluster.KafkaMBeanInfo;
 import org.kafka.eagle.web.dao.mapper.KafkaMBeanDaoMapper;
@@ -82,6 +83,12 @@ public class KafkaMBeanDaoServiceImpl extends ServiceImpl<KafkaMBeanDaoMapper, K
 
     @Override
     public List<KafkaMBeanInfo> pages(Map<String, Object> params) {
-        return null;
+
+        String cid = params.get("cid").toString();
+        List<String> mbeans = (List<String>) params.get("modules");
+        String stime = params.get("stime").toString();
+        String etime = params.get("etime").toString();
+
+        return new LambdaQueryChainWrapper<>(this.kafkaMBeanDaoMapper).eq(KafkaMBeanInfo::getClusterId, cid).in(KafkaMBeanInfo::getMbeanKey, mbeans).between(KafkaMBeanInfo::getDay, stime, etime).list();
     }
 }
