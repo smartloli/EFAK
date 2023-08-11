@@ -43,7 +43,8 @@
                     <div class="mb-3">
                         <div id="efak_chk_top">
                             <div class="col-sm-3 form-check form-check-inline">
-                                <input type="checkbox" name="message_in" class="form-check-input" id="iMI" checked disabled>
+                                <input type="checkbox" name="message_in" class="form-check-input" id="iMI" checked
+                                       disabled>
                                 <label class="form-check-label" for="iMI">
                                     Message In
                                 </label>
@@ -67,43 +68,50 @@
                                 </label>
                             </div>
                             <div class="col-sm-3 form-check form-check-inline">
-                                <input type="checkbox" name="failed_fetch_request" class="form-check-input" id="iFFR" checked>
+                                <input type="checkbox" name="failed_fetch_request" class="form-check-input" id="iFFR"
+                                       checked>
                                 <label class="form-check-label" for="iFFR">
                                     Failed Fetch Request
                                 </label>
                             </div>
                             <div class="col-sm-3 form-check form-check-inline">
-                                <input type="checkbox" name="failed_produce_request" class="form-check-input" id="iFPR" checked>
+                                <input type="checkbox" name="failed_produce_request" class="form-check-input" id="iFPR"
+                                       checked>
                                 <label class="form-check-label" for="iFPR">
                                     Failed Produce Request
                                 </label>
                             </div>
                             <div class="col-sm-3 form-check form-check-inline">
-                                <input type="checkbox" name="produce_message_conversions" class="form-check-input" id="iPMC" checked>
+                                <input type="checkbox" name="produce_message_conversions" class="form-check-input"
+                                       id="iPMC" checked>
                                 <label class="form-check-label" for="iPMC">
                                     Produce Message Conversions
                                 </label>
                             </div>
                             <div class="col-sm-3 form-check form-check-inline">
-                                <input type="checkbox" name="total_fetch_requests" class="form-check-input" id="iTFR" checked>
+                                <input type="checkbox" name="total_fetch_requests" class="form-check-input" id="iTFR"
+                                       checked>
                                 <label class="form-check-label" for="iTFR">
                                     Total Fetch Requests
                                 </label>
                             </div>
                             <div class="col-sm-3 form-check form-check-inline">
-                                <input type="checkbox" name="total_produce_requests" class="form-check-input" id="iTPR" checked>
+                                <input type="checkbox" name="total_produce_requests" class="form-check-input" id="iTPR"
+                                       checked>
                                 <label class="form-check-label" for="iTPR">
                                     Total Produce Requests
                                 </label>
                             </div>
                             <div class="col-sm-3 form-check form-check-inline">
-                                <input type="checkbox" name="replication_bytes_out" class="form-check-input" id="iRBO" checked>
+                                <input type="checkbox" name="replication_bytes_out" class="form-check-input" id="iRBO"
+                                       checked>
                                 <label class="form-check-label" for="iRBO">
                                     Replication Bytes Out
                                 </label>
                             </div>
                             <div class="col-sm-3 form-check form-check-inline">
-                                <input type="checkbox" name="replication_bytes_in" class="form-check-input" id="iRBI" checked>
+                                <input type="checkbox" name="replication_bytes_in" class="form-check-input" id="iRBI"
+                                       checked>
                                 <label class="form-check-label" for="iRBI">
                                     Replication Bytes In
                                 </label>
@@ -118,270 +126,249 @@
                     </div>
                     <hr>
                     <h4 th:utext="#{kafka.eagle.monitor.kafka.mbean.chart}"></h4>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                    <div>
+                        <div class="row" id="message_in">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Messages In Per Sec (per/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
-                                            <div id="efak_kafka_mbean_chart_date" class="ms-auto"
-                                                 style="border: 1px solid #6571ff;cursor: pointer; padding: 5px 10px;">
-                                                <i data-feather="calendar" class="icon-md text-primary"></i> &nbsp;
-                                                <span></span>
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
+                                                <div id="efak_kafka_mbean_chart_date" class="ms-auto"
+                                                     style="border: 1px solid #6571ff;cursor: pointer; padding: 5px 10px;">
+                                                    <i data-feather="calendar" class="icon-md text-primary"></i> &nbsp;
+                                                    <span></span>
+                                                </div>
                                             </div>
                                         </div>
+                                        <div id="mbean_msg_in"></div>
                                     </div>
-                                    <div id="mbean_msg_in"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="byte_in">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Bytes In Per Sec (byte/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_msg_byte_in"></div>
                                     </div>
-                                    <div id="mbean_msg_byte_in"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="byte_out">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Bytes Out Per Sec (byte/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_msg_byte_out"></div>
                                     </div>
-                                    <div id="mbean_msg_byte_out"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="byte_rejected">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Bytes Rejected Per Sec (byte/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_byte_rejected"></div>
                                     </div>
-                                    <div id="mbean_byte_rejected"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="failed_fetch_request">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Failed Fetch Requests Per Sec (byte/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_failed_fetch_request"></div>
                                     </div>
-                                    <div id="mbean_failed_fetch_request"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="failed_produce_request">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Failed Produce Requests Per Sec (/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_failed_produce_request"></div>
                                     </div>
-                                    <div id="mbean_failed_produce_request"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="produce_message_conversions">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Produce Message Conversions Per Sec (/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_produce_message_conversions"></div>
                                     </div>
-                                    <div id="mbean_produce_message_conversions"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="total_fetch_requests">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Total Fetch Requests Per Sec (/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_total_fetch_requests"></div>
                                     </div>
-                                    <div id="mbean_total_fetch_requests"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="total_produce_requests">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Total Produce Requests Per Sec (/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_total_produce_requests"></div>
                                     </div>
-                                    <div id="mbean_total_produce_requests"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="replication_bytes_out">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Replication Bytes Out Per Sec (byte/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_replication_bytes_out"></div>
                                     </div>
-                                    <div id="mbean_replication_bytes_out"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="replication_bytes_in">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Replication Bytes In Per Sec (byte/sec)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_replication_bytes_in"></div>
                                     </div>
-                                    <div id="mbean_replication_bytes_in"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-xl-12 grid-margin stretch-card">
-                            <div class="card overflow-hidden">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                                        <h6 class="card-title mb-0"
-                                            th:text="#{kafka.eagle.dataspace.dashboard.messagein}"></h6>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col-md-7">
-                                            <p class="text-muted tx-13 mb-3 mb-md-0"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.messagein.doc}"></p>
+                        <div class="row" id="os_free_memory">
+                            <div class="col-12 col-xl-12 grid-margin stretch-card">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+                                            <h6 class="card-title mb-0">Free Physical Memory Size (byte/min)</h6>
                                         </div>
-                                        <div class="col-md-5 d-flex justify-content-md-end">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-7">
+                                                <p class="text-muted tx-13 mb-3 mb-md-0"></p>
+                                            </div>
+                                            <div class="col-md-5 d-flex justify-content-md-end">
 
+                                            </div>
                                         </div>
+                                        <div id="mbean_os_free_memory"></div>
                                     </div>
-                                    <div id="mbean_os_free_memory"></div>
                                 </div>
                             </div>
                         </div>
@@ -407,7 +394,7 @@
 <script th:src="@{../../assets/vendors/dropify/dist/dropify.min.js}"></script>
 <script th:src="@{../../assets/vendors/bootstrap-datepicker/moment.min.js}"></script>
 <script th:src="@{../../assets/vendors/bootstrap-datepicker/daterangepicker.js}"></script>
-<script th:src="@{../../assets/js/monitor/monitor.kafka.js}"></script>
+<script th:src="@{../../assets/js/monitor/monitor.kafka.js(v=3.4.0)}"></script>
 
 </body>
 </html>

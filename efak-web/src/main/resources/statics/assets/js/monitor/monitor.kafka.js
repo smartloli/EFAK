@@ -1,60 +1,8 @@
-
 // defined byte size
 var KB_IN_BYTES = 1024;
 var MB_IN_BYTES = 1024 * KB_IN_BYTES;
 var GB_IN_BYTES = 1024 * MB_IN_BYTES;
 var TB_IN_BYTES = 1024 * GB_IN_BYTES;
-
-// plugins by daterangepicker
-var start;
-var end;
-try {
-
-    start = moment();
-    end = moment();
-
-    function cb(start, end) {
-        $('#efak_kafka_mbean_chart_date span').html(start.format('YYYY-MM-DD') + ' 至 ' + end.format('YYYY-MM-DD'));
-    }
-
-    // daterangepicker
-    var reportrange = $('#efak_kafka_mbean_chart_date').daterangepicker({
-        startDate: start,
-        endDate: end,
-        ranges: {
-            '今天': [moment(), moment()],
-            '昨天': [moment().subtract(1, 'days'), moment()],
-            '最近3天': [moment().subtract(3, 'days'), moment()],
-            '最近7天': [moment().subtract(6, 'days'), moment()]
-        },
-        locale: {
-            applyLabel: '确定',
-            cancelLabel: '取消',
-            customRangeLabel: '自定义时间'
-        },
-        applyClass: 'btn-sm btn-primary',
-        cancelClass: 'btn-sm btn-secondary'
-
-    }, cb);
-
-    cb(start, end);
-    var stime = reportrange[0].innerText.replace(/-/g, '').split("至")[0].trim();
-    var etime = reportrange[0].innerText.replace(/-/g, '').split("至")[1].trim();
-
-    mbeanRealtime(stime, etime, getCheckedModules());
-
-    reportrange.on('apply.daterangepicker', function (ev, picker) {
-        stime = reportrange[0].innerText.replace(/-/g, '').split("至")[0].trim();
-        etime = reportrange[0].innerText.replace(/-/g, '').split("至")[1].trim();
-        mbeanRealtime(stime, etime, getCheckedModules());
-    });
-    setInterval(function () {
-        mbeanRealtime(stime, etime, getCheckedModules());
-    }, 1000 * 60 * 5); // 5min
-} catch (e) {
-    console.log(e);
-}
-
 
 // Color val
 var colors = {
@@ -83,101 +31,92 @@ var lineChartOptions = {
         toolbar: {
             show: false
         },
-    },
-    theme: {
+    }, theme: {
         mode: 'light'
-    },
-    tooltip: {
-        theme: 'light',
-        x: {
+    }, tooltip: {
+        theme: 'light', x: {
             format: 'yyyy-MM-dd HH:mm'
         }
-    },
-    colors: [colors.primary, colors.danger, colors.warning],
-    grid: {
+    }, colors: [colors.primary, colors.danger, colors.warning], grid: {
         padding: {
             bottom: -4,
-        },
-        borderColor: colors.gridBorder,
-        xaxis: {
+        }, borderColor: colors.gridBorder, xaxis: {
             lines: {
                 show: true
             }
         }
-    },
-    series: [
-        {
-            name: "",
-            data: []
-        },
-    ],
-    xaxis: {
-        type: "datetime",
-        labels: {
+    }, series: [{
+        name: '', data: []
+    },], xaxis: {
+        type: "datetime", labels: {
             datetimeUTC: false,
-        },
-        categories: [],
-        lines: {
+        }, categories: [], lines: {
             show: true
-        },
-        axisBorder: {
+        }, axisBorder: {
             color: colors.gridBorder,
-        },
-        axisTicks: {
+        }, axisTicks: {
             color: colors.gridBorder,
-        },
-        crosshairs: {
+        }, crosshairs: {
             stroke: {
                 color: colors.secondary,
             },
         },
-    },
-    yaxis: {
+    }, yaxis: {
         title: {
-            text: '量级 ( 条 )',
             style: {
-                size: 9,
-                color: colors.muted
+                size: 9, color: colors.muted
             }
-        },
-        tickAmount: 4,
-        tooltip: {
+        }, tickAmount: 4, tooltip: {
             enabled: true
-        },
-        crosshairs: {
+        }, crosshairs: {
             stroke: {
                 color: colors.secondary,
             },
         },
-    },
-    markers: {
+    }, markers: {
         size: 0,
-    },
-    stroke: {
-        width: 2,
-        curve: "straight",
-    },
-    legend: {
-        show: false
+    }, stroke: {
+        width: 2, curve: "straight",
+    }, legend: {
+        show: false, data: []
     }
 };
 
-initModuleVisualAndBindEvent();
+var mbean_msg_in = new ApexCharts(document.querySelector('#mbean_msg_in'), lineChartOptions);
+mbean_msg_in.render();
 
-var modules = getCheckedModules();
+var mbean_msg_byte_in = new ApexCharts(document.querySelector('#mbean_msg_byte_in'), lineChartOptions);
+mbean_msg_byte_in.render();
 
-var mbean_msg_in = chartLineInit('mbean_msg_in');
-var mbean_msg_byte_in = chartLineInit('mbean_msg_byte_in');
-var mbean_msg_byte_out = chartLineInit('mbean_msg_byte_out');
-var mbean_byte_rejected = chartLineInit('mbean_byte_rejected');
-var mbean_failed_fetch_request = chartLineInit('mbean_failed_fetch_request');
-var mbean_failed_produce_request = chartLineInit('mbean_failed_produce_request');
-var mbean_produce_message_conversions = chartLineInit('mbean_produce_message_conversions');
-var mbean_total_fetch_requests = chartLineInit('mbean_total_fetch_requests');
-var mbean_total_produce_requests = chartLineInit('mbean_total_produce_requests');
-var mbean_replication_bytes_out = chartLineInit('mbean_replication_bytes_out');
-var mbean_replication_bytes_in = chartLineInit('mbean_replication_bytes_in');
-var mbean_os_free_memory = chartLineInit('mbean_os_free_memory');
+var mbean_msg_byte_out = new ApexCharts(document.querySelector('#mbean_msg_byte_out'), lineChartOptions);
+mbean_msg_byte_out.render();
+
+var mbean_byte_rejected = new ApexCharts(document.querySelector('#mbean_byte_rejected'), lineChartOptions);
+mbean_byte_rejected.render();
+
+var mbean_failed_fetch_request = new ApexCharts(document.querySelector('#mbean_failed_fetch_request'), lineChartOptions);
+mbean_failed_fetch_request.render();
+
+var mbean_failed_produce_request = new ApexCharts(document.querySelector('#mbean_failed_produce_request'), lineChartOptions);
+mbean_failed_produce_request.render();
+
+var mbean_produce_message_conversions = new ApexCharts(document.querySelector('#mbean_produce_message_conversions'), lineChartOptions);
+mbean_produce_message_conversions.render();
+
+var mbean_total_fetch_requests = new ApexCharts(document.querySelector('#mbean_total_fetch_requests'), lineChartOptions);
+mbean_total_fetch_requests.render();
+
+var mbean_total_produce_requests = new ApexCharts(document.querySelector('#mbean_total_produce_requests'), lineChartOptions);
+mbean_total_produce_requests.render();
+
+var mbean_replication_bytes_out = new ApexCharts(document.querySelector('#mbean_replication_bytes_out'), lineChartOptions);
+mbean_replication_bytes_out.render();
+
+var mbean_replication_bytes_in = new ApexCharts(document.querySelector('#mbean_replication_bytes_in'), lineChartOptions);
+mbean_replication_bytes_in.render();
+
+var mbean_os_free_memory = new ApexCharts(document.querySelector('#mbean_os_free_memory'), lineChartOptions);
+mbean_os_free_memory.render();
 
 function mbeanRealtime(stime, etime, modules) {
     $.ajax({
@@ -206,13 +145,6 @@ function mbeanRealtime(stime, etime, modules) {
             }
         }
     });
-}
-
-// Chart init
-function chartLineInit(elment) {
-    var efakMetricsChart = new ApexCharts(document.querySelector("#" + elment), lineChartOptions);
-    efakMetricsChart.render();
-    return efakMetricsChart;
 }
 
 // module show or hide
@@ -257,11 +189,19 @@ function initModuleVisualAndBindEvent() {
 
 // set trend data
 function setTrendData(mbean, filed, data) {
-    lineChartOptions.xaxis.categories = filter(data, filed).x;
-    lineChartOptions.series[0].data = filter(data, filed).y;
-    lineChartOptions.series[0].name = filter(data, filed).name;
-    lineChartOptions.legend.data = [filter(data, filed).name];
-    mbean.updateOptions(lineChartOptions);
+    var dataSet = filter(data, filed);
+    mbean.updateOptions({
+        series: [{
+            data: dataSet.y,
+            name: dataSet.name
+        }],
+        xaxis: {
+            categories: dataSet.x
+        },
+        legend: {
+            data: [dataSet.name]
+        }
+    });
 }
 
 // filter data
@@ -273,7 +213,7 @@ function filter(datas, type) {
         case "message_in":
             for (var i = 0; i < datas.messageIns.length; i++) {
                 datax.push(datas.messageIns[i].x);
-                datay.push((datas.messageIns[i].y * 60).toFixed(2));
+                datay.push((datas.messageIns[i].y * 1.00).toFixed(2));
             }
             data.name = "MessagesInPerSec (msg/min)";
             break;
@@ -310,35 +250,35 @@ function filter(datas, type) {
         case "failed_fetch_request":
             for (var i = 0; i < datas.failedFetchRequest.length; i++) {
                 datax.push(datas.failedFetchRequest[i].x);
-                datay.push((datas.failedFetchRequest[i].y * 60).toFixed(2));
+                datay.push((datas.failedFetchRequest[i].y * 1.00).toFixed(2));
             }
             data.name = "FailedFetchRequestsPerSec (msg/min)";
             break;
         case "failed_produce_request":
             for (var i = 0; i < datas.failedProduceRequest.length; i++) {
                 datax.push(datas.failedProduceRequest[i].x);
-                datay.push((datas.failedProduceRequest[i].y * 60).toFixed(2));
+                datay.push((datas.failedProduceRequest[i].y * 1.00).toFixed(2));
             }
             data.name = "FailedProduceRequestsPerSec (msg/min)";
             break;
         case "produce_message_conversions":
             for (var i = 0; i < datas.produceMessageConversions.length; i++) {
                 datax.push(datas.produceMessageConversions[i].x);
-                datay.push((datas.produceMessageConversions[i].y * 60).toFixed(2));
+                datay.push((datas.produceMessageConversions[i].y * 1.00).toFixed(2));
             }
             data.name = "ProduceMessageConversionsPerSec (msg/min)";
             break;
         case "total_fetch_requests":
             for (var i = 0; i < datas.totalFetchRequests.length; i++) {
                 datax.push(datas.totalFetchRequests[i].x);
-                datay.push((datas.totalFetchRequests[i].y * 60).toFixed(2));
+                datay.push((datas.totalFetchRequests[i].y * 1.00).toFixed(2));
             }
             data.name = "TotalFetchRequestsPerSec (msg/min)";
             break;
         case "total_produce_requests":
             for (var i = 0; i < datas.totalProduceRequests.length; i++) {
                 datax.push(datas.totalProduceRequests[i].x);
-                datay.push((datas.totalProduceRequests[i].y * 60).toFixed(2));
+                datay.push((datas.totalProduceRequests[i].y * 1.00).toFixed(2));
             }
             data.name = "TotalProduceRequestsPerSec (msg/min)";
             break;
@@ -402,4 +342,50 @@ function stringify(byteNumber) {
         object.type = " (B/sec)";
         return object;
     }
+}
+
+// init chart
+initModuleVisualAndBindEvent();
+
+// plugins by daterangepicker
+var start;
+var end;
+try {
+
+    start = moment();
+    end = moment();
+
+    function cb(start, end) {
+        $('#efak_kafka_mbean_chart_date span').html(start.format('YYYY-MM-DD') + ' 至 ' + end.format('YYYY-MM-DD'));
+    }
+
+    // daterangepicker
+    var reportrange = $('#efak_kafka_mbean_chart_date').daterangepicker({
+        startDate: start, endDate: end, ranges: {
+            '今天': [moment(), moment()],
+            '昨天': [moment().subtract(1, 'days'), moment()],
+            '最近3天': [moment().subtract(3, 'days'), moment()],
+            '最近7天': [moment().subtract(6, 'days'), moment()]
+        }, locale: {
+            applyLabel: '确定', cancelLabel: '取消', customRangeLabel: '自定义时间'
+        }, applyClass: 'btn-sm btn-primary', cancelClass: 'btn-sm btn-secondary'
+
+    }, cb);
+
+    cb(start, end);
+    var stime = reportrange[0].innerText.replace(/-/g, '').split("至")[0].trim();
+    var etime = reportrange[0].innerText.replace(/-/g, '').split("至")[1].trim();
+
+    reportrange.on('apply.daterangepicker', function (ev, picker) {
+        stime = reportrange[0].innerText.replace(/-/g, '').split("至")[0].trim();
+        etime = reportrange[0].innerText.replace(/-/g, '').split("至")[1].trim();
+        mbeanRealtime(stime, etime, getCheckedModules());
+    });
+    setInterval(function () {
+        mbeanRealtime(stime, etime, getCheckedModules());
+    }, 1000 * 60 * 1); // 1min
+
+    mbeanRealtime(stime, etime, getCheckedModules());
+} catch (e) {
+    console.log(e);
 }
