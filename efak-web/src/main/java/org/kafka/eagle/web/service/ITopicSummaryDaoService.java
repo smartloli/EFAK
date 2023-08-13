@@ -54,6 +54,15 @@ public interface ITopicSummaryDaoService extends IService<TopicSummaryInfo> {
     boolean insert(TopicSummaryInfo topicInfo);
 
     /**
+     * Get active topic numbers.
+     * @param clusterId
+     * @param stime
+     * @param etime
+     * @return
+     */
+    Integer topicOfActiveNums(String clusterId,String stime,String etime);
+
+    /**
      * Page limit.
      * @param params
      * @return

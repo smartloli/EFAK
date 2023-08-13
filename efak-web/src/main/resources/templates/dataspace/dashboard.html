@@ -46,35 +46,28 @@
                                             </button>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                 <a class="dropdown-item d-flex align-items-center"
-                                                   href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i>
+                                                   href="/clusters/kafka"><i data-feather="eye" class="icon-sm me-2"></i>
                                                     <span class="" th:text="#{kafka.eagle.dataspace.dashboard.view}">View</span></a>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-6 col-md-12 col-xl-5">
+                                        <div class="col-6 col-md-12 col-xl-8">
                                             <h3 id="efak_dashboard_brokers_panel" class="mb-2">0</h3>
                                             <div class="d-flex align-items-baseline">
-                                                <p class="text-primary">
-                                                    <span>总数</span>
-                                                    <i data-feather="airplay" class="icon-sm mb-1"></i>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="col-6 col-md-12 col-xl-5">
-                                            <h3 class="mb-2" id="efak_dashboard_brokers_onlines_panel">0</h3>
-                                            <div class="d-flex align-items-baseline">
                                                 <p class="text-success">
-                                                    <span>在线</span>
+                                                    <span id="efak_dashboard_brokers_onlines_panel">0</span>
                                                     <i data-feather="check-circle" class="icon-sm mb-1"></i>
                                                 </p>
                                             </div>
                                         </div>
-                                        <!--                                        <div class="col-6 col-md-12 col-xl-7">-->
-                                        <div id="customersChart" style="display: none" class="mt-md-3 mt-xl-0"></div>
-                                        <!--                                            <div id="efak_dashboard1" class="">Controller</div>-->
-                                        <!--                                            <div id="efak_dashboard2" class="">健康度</div>-->
-                                        <!--                                        </div>-->
+                                        <div class="col-6 col-md-12 col-xl-4">
+                                            <div class="mt-md-3 mt-xl-0">
+                                                <p class="text-primary">
+                                                    <i data-feather="inbox" class="icon-xxl mb-1"></i>
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -93,23 +86,27 @@
                                             </button>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                                 <a class="dropdown-item d-flex align-items-center"
-                                                   href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i>
+                                                   href="/topic/manage"><i data-feather="eye" class="icon-sm me-2"></i>
                                                     <span class="" th:text="#{kafka.eagle.dataspace.dashboard.view}">View</span></a>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-6 col-md-12 col-xl-5">
-                                            <h3 class="mb-2">240</h3>
+                                        <div class="col-6 col-md-12 col-xl-8">
+                                            <h3 id="efak_dashboard_topic_total_panel" class="mb-2">0</h3>
                                             <div class="d-flex align-items-baseline">
                                                 <p class="text-danger">
-                                                    <span>空闲:20</span>
+                                                    <span id="efak_dashboard_topic_active_panel">0</span>
                                                     <i data-feather="arrow-down" class="icon-sm mb-1"></i>
                                                 </p>
                                             </div>
                                         </div>
-                                        <div class="col-6 col-md-12 col-xl-7">
-                                            <div id="ordersChart" class="mt-md-3 mt-xl-0"></div>
+                                        <div class="col-6 col-md-12 col-xl-4">
+                                            <div class="mt-md-3 mt-xl-0">
+                                                <p class="text-primary">
+                                                    <i data-feather="database" class="icon-xxl mb-1"></i>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -129,23 +126,27 @@
                                             </button>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
                                                 <a class="dropdown-item d-flex align-items-center"
-                                                   href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i>
+                                                   href="/consumer/summary"><i data-feather="eye" class="icon-sm me-2"></i>
                                                     <span class="" th:text="#{kafka.eagle.dataspace.dashboard.view}">View</span></a>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-6 col-md-12 col-xl-5">
-                                            <h3 class="mb-2">150</h3>
+                                        <div class="col-6 col-md-12 col-xl-8">
+                                            <h3 id="efak_dashboard_group_total_panel" class="mb-2">0</h3>
                                             <div class="d-flex align-items-baseline">
                                                 <p class="text-success">
-                                                    <span>活跃:10</span>
+                                                    <span id="efak_dashboard_group_active_panel">0</span>
                                                     <i data-feather="arrow-up" class="icon-sm mb-1"></i>
                                                 </p>
                                             </div>
                                         </div>
-                                        <div class="col-6 col-md-12 col-xl-7">
-                                            <div id="growthChart" class="mt-md-3 mt-xl-0"></div>
+                                        <div class="col-6 col-md-12 col-xl-4">
+                                            <div class="mt-md-3 mt-xl-0">
+                                                <p class="text-primary">
+                                                    <i data-feather="layers" class="icon-xxl mb-1"></i>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -168,7 +169,7 @@
                                         <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
+                                        <a class="dropdown-item d-flex align-items-center" href="/monitor/kafka"><i
                                                 data-feather="eye" class="icon-sm me-2"></i> <span class=""
                                                                                                    th:text="#{kafka.eagle.dataspace.dashboard.view}">View</span></a>
                                     </div>
@@ -184,19 +185,10 @@
                                 </div>
                                 <div class="col-md-5 d-flex justify-content-md-end">
                                     <div class="btn-group mb-3 mb-md-0" role="group" aria-label="Basic example">
-                                        <button type="button" class="btn btn-primary"
-                                                th:text="#{kafka.eagle.dataspace.dashboard.messagein.day}">天
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary d-none d-md-block"
-                                                th:text="#{kafka.eagle.dataspace.dashboard.messagein.weekly}">周
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary"
-                                                th:text="#{kafka.eagle.dataspace.dashboard.messagein.month}">月
-                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            <div id="revenueChart"></div>
+                            <div id="efak_dashboard_message_in_chart"></div>
                         </div>
                     </div>
                 </div>
@@ -215,14 +207,14 @@
                                         <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton4">
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
+                                        <a class="dropdown-item d-flex align-items-center" href="/monitor/produce"><i
                                                 data-feather="eye" class="icon-sm me-2"></i> <span class=""
                                                                                                    th:text="#{kafka.eagle.dataspace.dashboard.view}">View</span></a>
                                     </div>
                                 </div>
                             </div>
                             <p class="text-muted" th:text="#{kafka.eagle.dataspace.dashboard.topic.logsize.doc}"></p>
-                            <div id="monthlySalesChart"></div>
+                            <div id="efak_dashboard_producer_logsize_chart"></div>
                         </div>
                     </div>
                 </div>

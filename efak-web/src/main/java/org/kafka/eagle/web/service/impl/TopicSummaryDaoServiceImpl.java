@@ -87,6 +87,13 @@ public class TopicSummaryDaoServiceImpl extends ServiceImpl<TopicSummaryDaoMappe
     }
 
     @Override
+    public Integer topicOfActiveNums(String clusterId, String stime, String etime) {
+        QueryWrapper<TopicSummaryInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("COUNT(DISTINCT topic_name) AS active_numes").lambda().eq(TopicSummaryInfo::getClusterId, clusterId).gt(TopicSummaryInfo::getLogSizeDiffVal,0).between(TopicSummaryInfo::getDay,stime,etime);
+        return this.topicSummaryDaoMapper.selectList(queryWrapper).size();
+    }
+
+    @Override
     public List<TopicSummaryInfo> pages(Map<String, Object> params) {
         String cid = params.get("cid").toString();
         String topic = params.get("topic").toString();
