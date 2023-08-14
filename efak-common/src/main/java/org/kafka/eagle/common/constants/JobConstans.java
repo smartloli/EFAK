@@ -27,6 +27,8 @@ public class JobConstans {
         put("org.kafka.eagle.web.quartz.job.ConsumerGroupJob", "消费者总览定时任务");
         put("org.kafka.eagle.web.quartz.job.ConsumerGroupTopicJob", "消费者主题明细定时任务");
         put("org.kafka.eagle.web.quartz.job.KafkaMetricJob", "Kafka集群性能指标定时任务");
+        put("org.kafka.eagle.web.quartz.job.TopicLogSizeRankJob", "Topic消息记录正排定时任务");
+        put("org.kafka.eagle.web.quartz.job.TopicCapacityRankJob", "Topic容量大小正排定时任务");
         put("org.kafka.eagle.web.quartz.job.MockJob", "测试生产者应用定时任务"); // if release version, this feature must be remove
     }};
 

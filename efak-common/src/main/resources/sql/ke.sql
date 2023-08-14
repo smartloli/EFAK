@@ -341,5 +341,6 @@ CREATE TABLE IF NOT EXISTS ke_topic_rank(
     INDEX idx_cluster_id (cluster_id),
     INDEX idx_cluster_key (cluster_id,topic_key),
     INDEX idx_cluster_topic (cluster_id,topic_name),
-    INDEX idx_cluster_topic_key (cluster_id,topic_name,topic_key)
+    INDEX idx_cluster_topic_key (cluster_id,topic_name,topic_key),
+    UNIQUE KEY idx_unique_cluster_topic_key (cluster_id,topic_name,topic_key) USING BTREE
 ) COMMENT 'Kafka Topic Rank Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -395,7 +395,7 @@ public class TopicController {
         } else {
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
             KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
-            TopicJmxInfo topicJmxInfo = ksf.geTopicRecordCapacity(kafkaClientInfo, brokerInfos, topic);
+            TopicJmxInfo topicJmxInfo = ksf.getTopicRecordCapacity(kafkaClientInfo, brokerInfos, topic);
             Long logsize = ksf.getTopicOfLogSize(kafkaClientInfo, topic);
             target.put("logsize", logsize);
             target.put("capacity", topicJmxInfo.getCapacity());

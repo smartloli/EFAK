@@ -28,7 +28,6 @@ import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.topic.TopicSummaryInfo;
 import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
-import org.kafka.eagle.web.service.ITopicDaoService;
 import org.kafka.eagle.web.service.ITopicSummaryDaoService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -53,9 +52,6 @@ public class TopicSummaryJob extends QuartzJobBean {
 
     @Autowired
     private IBrokerDaoService brokerDaoService;
-
-    @Autowired
-    private ITopicDaoService topicDaoService;
 
     @Autowired
     private ITopicSummaryDaoService topicSummaryDaoService;

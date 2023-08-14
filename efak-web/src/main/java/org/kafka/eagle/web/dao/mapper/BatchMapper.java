@@ -13,5 +13,8 @@ import java.util.List;
  */
 public interface BatchMapper<T> extends BaseMapper<T> {
     Integer insertBatchSomeColumn(List<T> entityList);
+
+    // replace or update by batch
+    Integer replaceBatchSomeColumn(List<T> entityList);
     
 }
