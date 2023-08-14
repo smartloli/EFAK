@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.web.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.kafka.eagle.pojo.cluster.KafkaMBeanInfo;
@@ -90,5 +91,14 @@ public class KafkaMBeanDaoServiceImpl extends ServiceImpl<KafkaMBeanDaoMapper, K
         String etime = params.get("etime").toString();
 
         return new LambdaQueryChainWrapper<>(this.kafkaMBeanDaoMapper).eq(KafkaMBeanInfo::getClusterId, cid).in(KafkaMBeanInfo::getMbeanKey, mbeans).between(KafkaMBeanInfo::getDay, stime, etime).list();
+    }
+
+    @Override
+    public List<KafkaMBeanInfo> pagesOfLastest(Map<String, Object> params) {
+        String cid = params.get("cid").toString();
+        List<String> mbeans = (List<String>) params.get("modules");
+        Integer limit = (Integer) params.get("limit");
+
+        return this.kafkaMBeanDaoMapper.selectList(new QueryWrapper<KafkaMBeanInfo>().lambda().eq(KafkaMBeanInfo::getClusterId, cid).in(KafkaMBeanInfo::getMbeanKey, mbeans).orderByDesc(KafkaMBeanInfo::getTimespan).last("limit " + limit));
     }
 }

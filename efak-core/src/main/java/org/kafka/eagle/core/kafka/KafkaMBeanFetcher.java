@@ -108,7 +108,7 @@ public class KafkaMBeanFetcher {
      * @param initializeInfo
      * @return
      */
-    public static Map<String, MBeanInfo> mbean(JMXInitializeInfo initializeInfo, Map<String,String> mbeanMaps) {
+    public static Map<String, MBeanInfo> mbean(JMXInitializeInfo initializeInfo, Map<String, String> mbeanMaps) {
         BrokerInfo brokerInfo = new BrokerInfo();
         JMXConnector connector = null;
         String JMX = initializeInfo.getUri();
@@ -126,16 +126,24 @@ public class KafkaMBeanFetcher {
                 for (Map.Entry<String, String> mbean : mbeanMaps.entrySet()) {
                     MBeanInfo mBeanInfo = new MBeanInfo();
 
-                    if(MBean.OSFREEMEMORY.equals(mbean.getKey())){
+                    if (MBean.OSFREEMEMORY.equals(mbean.getKey())) {
                         MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
                         long memUsed = memBean.getHeapMemoryUsage().getUsed();
                         long memMax = memBean.getHeapMemoryUsage().getMax();
-                        double mem = StrUtils.numberic(String.valueOf(memUsed * 100.0 / memMax));
+                        double mem = StrUtils.numberic(String.valueOf((memMax - memUsed)));
                         mBeanInfo.setFifteenMinute("0.0");
                         mBeanInfo.setFiveMinute("0.0");
                         mBeanInfo.setMeanRate("0.0");
                         mBeanInfo.setOneMinute(String.valueOf(mem));
-                    }else if(MBean.CPUUSED.equals(mbean.getKey())){
+                    } else if (MBean.OSUSEDMEMORY.equals(mbean.getKey())) {
+                        MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mbeanConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class);
+                        long memUsed = memBean.getHeapMemoryUsage().getUsed();
+                        double mem = StrUtils.numberic(String.valueOf(memUsed));
+                        mBeanInfo.setFifteenMinute("0.0");
+                        mBeanInfo.setFiveMinute("0.0");
+                        mBeanInfo.setMeanRate("0.0");
+                        mBeanInfo.setOneMinute(String.valueOf(mem));
+                    } else if (MBean.CPUUSED.equals(mbean.getKey())) {
                         String cpuStr = mbeanConnection.getAttribute(new ObjectName(String.format(JmxConstants.BrokerServer.JMX_PERFORMANCE_TYPE.getValue(), initializeInfo.getBrokerId())), JmxConstants.BrokerServer.PROCESS_CPU_LOAD.getValue()).toString();
                         double cpuValue = Double.parseDouble(cpuStr);
                         double cpu = StrUtils.numberic(String.valueOf(cpuValue * 100.0));
@@ -143,7 +151,7 @@ public class KafkaMBeanFetcher {
                         mBeanInfo.setFiveMinute("0.0");
                         mBeanInfo.setMeanRate("0.0");
                         mBeanInfo.setOneMinute(String.valueOf(cpu));
-                    }else {
+                    } else {
                         if (mbeanConnection.isRegistered(new ObjectName(mbean.getValue()))) {
                             Object fifteenMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean.getValue()), MBean.FIFTEEN_MINUTE_RATE);
                             Object fiveMinuteRate = mbeanConnection.getAttribute(new ObjectName(mbean.getValue()), MBean.FIVE_MINUTE_RATE);

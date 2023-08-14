@@ -696,7 +696,7 @@ $(function() {
   if ($('#storageChart').length) {
     var options = {
       chart: {
-        height: 260,
+        height: 180,
         type: "radialBar"
       },
       series: [67],
@@ -720,11 +720,11 @@ $(function() {
               offsetY: -11,
               show: true,
               color: colors.muted,
-              fontSize: "13px"
+              fontSize: "12px"
             },
             value: {
               color: colors.bodyColor,
-              fontSize: "30px",
+              fontSize: "24px",
               show: true
             }
           }
@@ -736,11 +736,61 @@ $(function() {
       stroke: {
         lineCap: "round",
       },
-      labels: ["Storage Used"]
+      labels: ["CPU使用率"]
     };
     
     var chart = new ApexCharts(document.querySelector("#storageChart"), options);
     chart.render();    
+  }
+
+  if ($('#storageChart3').length) {
+    var options = {
+      chart: {
+        height: 180,
+        type: "radialBar"
+      },
+      series: [67],
+      colors: [colors.primary],
+      plotOptions: {
+        radialBar: {
+          hollow: {
+            margin: 15,
+            size: "70%"
+          },
+          track: {
+            show: true,
+            background: colors.dark,
+            strokeWidth: '100%',
+            opacity: 1,
+            margin: 5,
+          },
+          dataLabels: {
+            showOn: "always",
+            name: {
+              offsetY: -11,
+              show: true,
+              color: colors.muted,
+              fontSize: "12px"
+            },
+            value: {
+              color: colors.bodyColor,
+              fontSize: "24px",
+              show: true
+            }
+          }
+        }
+      },
+      fill: {
+        opacity: 1
+      },
+      stroke: {
+        lineCap: "round",
+      },
+      labels: ["CPU使用率"]
+    };
+
+    var chart = new ApexCharts(document.querySelector("#storageChart"), options);
+    chart.render();
   }
   // Cloud Storage Chart - END
 

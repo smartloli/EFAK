@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.common.utils.CalendarUtil;
 import org.kafka.eagle.common.utils.Md5Util;
+import org.kafka.eagle.common.utils.StrUtils;
 import org.kafka.eagle.core.kafka.KafkaSchemaFactory;
 import org.kafka.eagle.core.kafka.KafkaSchemaInitialize;
 import org.kafka.eagle.core.kafka.KafkaStoragePlugin;
@@ -188,11 +189,11 @@ public class DataSpaceController {
      * @param session
      */
     @RequestMapping(value = "/dashboard/{cid}/producer/chart/ajax", method = RequestMethod.GET)
-    public void getMonitorProduceMsgChartAjax(@PathVariable("cid") Long cid, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+    public void getProduceMsgChartAjax(@PathVariable("cid") Long cid, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
         try {
             String remoteAddr = request.getRemoteAddr();
             String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-            log.info("Get dashboard producer chart :: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+            log.info("Get dashboard os used chart :: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
             ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
 
             Map<String, Object> param = new HashMap<>();
@@ -241,6 +242,64 @@ public class DataSpaceController {
             BaseController.response(output, response);
         } catch (Exception e) {
             log.error("Get dashboard producer total msg chart has error, msg is {}", e);
+        }
+    }
+
+    /**
+     * Get kafka used rate chart.
+     *
+     * @param cid
+     * @param response
+     * @param request
+     * @param session
+     */
+    @RequestMapping(value = "/dashboard/{cid}/os/chart/ajax", method = RequestMethod.GET)
+    public void getOSUsedChartAjax(@PathVariable("cid") Long cid, HttpServletResponse response, HttpServletRequest request, HttpSession session) {
+        try {
+            String remoteAddr = request.getRemoteAddr();
+            String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+            log.info("Get dashboard os used chart :: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+            ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+            List<BrokerInfo> onlineBrokerInfos = this.brokerDaoService.brokerStatus(clusterInfo.getClusterId(), Short.valueOf("1"));
+            Integer brokerSize = 1;
+            if (onlineBrokerInfos != null && onlineBrokerInfos.size() > 0) {
+                brokerSize = onlineBrokerInfos.size();
+            }
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("cid", clusterInfo.getClusterId());
+            params.put("modules", Arrays.asList("os_used_memory"));
+            params.put("limit", 2);
+
+            // get memory used chart data
+            List<KafkaMBeanInfo> mems = kafkaMBeanDaoService.pagesOfLastest(params);
+            JSONObject object = new JSONObject();
+            if (mems != null && mems.size() == 2) {
+                Double valueFirst = StrUtils.numberic(mems.get(0).getMbeanValue(),"###.####");
+                Double valueSecond = StrUtils.numberic(mems.get(1).getMbeanValue(),"###.####");
+                if (valueFirst >= valueSecond) {
+                    object.put("mem", StrUtils.numberic(((valueFirst - valueSecond) * 100.0 / valueFirst) + "") / brokerSize);
+                } else {
+                    object.put("mem", StrUtils.numberic(((valueSecond - valueFirst) * 100.0 / valueSecond) + "") / brokerSize);
+                }
+            } else {
+                object.put("mem", "0.0");
+            }
+
+            // get cpu used chart data
+            params.put("modules", Arrays.asList("cpu_used"));
+            params.put("limit", 1);
+            List<KafkaMBeanInfo> cpus = kafkaMBeanDaoService.pagesOfLastest(params);
+            if (cpus != null && params.size() > 0) {
+                object.put("cpu", StrUtils.numberic(cpus.get(0).getMbeanValue()) / brokerSize);
+            } else {
+                object.put("cpu", "0.0");
+            }
+
+            byte[] output = object.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception e) {
+            log.error("Get dashboard os used chart has error, msg is {}", e);
         }
     }
 

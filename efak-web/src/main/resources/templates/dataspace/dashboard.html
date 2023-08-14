@@ -222,36 +222,17 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-baseline">
-                                <h6 class="card-title mb-0" th:text="#{kafka.eagle.dataspace.dashboard.capacity}">Cloud
-                                    storage</h6>
-                                <div class="dropdown mb-2">
-                                    <button class="btn p-0" type="button" id="dropdownMenuButton5"
-                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton5">
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-feather="eye" class="icon-sm me-2"></i> <span class=""
-                                                                                                   th:text="#{kafka.eagle.dataspace.dashboard.view}">View</span></a>
-                                    </div>
-                                </div>
+                                <h6 class="card-title mb-0" th:text="#{kafka.eagle.dataspace.dashboard.capacity}"></h6>
                             </div>
-                            <div id="storageChart"></div>
+                            <div id="efak_dashboard_mem_used"></div>
+                            <div id="efak_dashboard_cpu_used"></div>
                             <div class="row mb-3">
-                                <div class="col-6 d-flex justify-content-end">
+                                <div class="col-12 d-flex justify-content-center">
                                     <div>
-                                        <label class="d-flex align-items-center justify-content-end tx-10 text-uppercase fw-bolder"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.capacity.total}">Total
-                                            storage <span class="p-1 ms-1 rounded-circle bg-secondary"></span></label>
-                                        <h5 class="fw-bolder mb-0 text-end">8TB</h5>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div>
-                                        <label class="d-flex align-items-center tx-10 text-uppercase fw-bolder"
-                                               th:text="#{kafka.eagle.dataspace.dashboard.capacity.used}"><span
-                                                class="p-1 me-1 rounded-circle bg-primary"></span> Used storage</label>
-                                        <h5 class="fw-bolder mb-0">5TB</h5>
+                                        <label class="d-flex align-items-center justify-content-center tx-10 text-uppercase fw-bolder"
+                                               th:text="#{kafka.eagle.dataspace.dashboard.capacity.total}">
+                                            <span class="p-1 ms-1 rounded-circle bg-secondary"></span></label>
+                                        <h3 id="efak_dashboard_cluster_capacity" class="fw-bolder mb-0 text-center">0</h3>
                                     </div>
                                 </div>
                             </div>

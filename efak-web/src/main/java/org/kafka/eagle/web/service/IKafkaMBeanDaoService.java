@@ -36,4 +36,13 @@ public interface IKafkaMBeanDaoService extends IService<KafkaMBeanInfo> {
      */
     List<KafkaMBeanInfo> pages(Map<String,Object> params);
 
+
+    /**
+     * Get lastest data.
+     * @param params
+     * @return
+     */
+    List<KafkaMBeanInfo> pagesOfLastest(Map<String,Object> params);
+
+
 }

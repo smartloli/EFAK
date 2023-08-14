@@ -61,6 +61,7 @@ public class JmxConstants {
         BROKER_APP_INFO("kafka.server:type=app-info,id=%s"),
         BROKER_VERSION_VALUE("Version"),
         BROKER_OS_MEM_FREE("OS_MEM_FREE"),
+        BROKER_OS_MEM_USED("OS_MEM_USED"),
         BROKER_OS_CPU_USED("OS_CPU_USED"),
         BROKER_STARTTIME_VALUE("StartTimeMs");
 

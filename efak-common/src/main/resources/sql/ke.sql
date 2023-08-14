@@ -331,3 +331,15 @@ CREATE TABLE IF NOT EXISTS ke_kafka_mbean_metrics(
     INDEX idx_cluster_key_day (cluster_id,mbean_key,day),
     INDEX idx_cluster_key_day_timespan (cluster_id,mbean_key,day,timespan)
 ) COMMENT 'Kafka MBean Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS ke_topic_rank(
+    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key ClusterId',
+    cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
+    topic_name VARCHAR(128) COMMENT 'Topic Name',
+    topic_key VARCHAR(128) COMMENT 'Topic key',
+    topic_value VARCHAR(128) COMMENT 'Topic value',
+    INDEX idx_cluster_id (cluster_id),
+    INDEX idx_cluster_key (cluster_id,topic_key),
+    INDEX idx_cluster_topic (cluster_id,topic_name),
+    INDEX idx_cluster_topic_key (cluster_id,topic_name,topic_key)
+) COMMENT 'Kafka Topic Rank Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

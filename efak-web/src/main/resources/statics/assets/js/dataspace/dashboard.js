@@ -10,7 +10,6 @@ try {
         success: function (datas) {
             if (JSON.stringify(datas) === '{}') {
             } else {
-                console.log(datas.brokers)
                 $("#efak_dashboard_brokers_panel").text(datas.brokers);
                 $("#efak_dashboard_brokers_onlines_panel").text("在线: " + datas.onlines);
                 $("#efak_dashboard_topic_total_panel").text(datas.topic_total_nums);
@@ -151,9 +150,10 @@ function messageInChart() {
 
 // set chart data
 function setMessageInChartData(mbean, data) {
-    lineChartOptions.xaxis.categories = filter(data).x;
-    lineChartOptions.series[0].data = filter(data).y;
-    lineChartOptions.series[0].name = filter(data).name;
+    var dataSets = filter(data);
+    lineChartOptions.xaxis.categories = dataSets.x;
+    lineChartOptions.series[0].data = dataSets.y;
+    lineChartOptions.series[0].name = dataSets.name;
     mbean.updateOptions(lineChartOptions);
 }
 
@@ -300,7 +300,6 @@ function producerLogSizeChart() {
         },
         success: function (datas) {
             if (datas != null) {
-                console.log("s:"+datas);
                 setProducerChartData(efak_dashboard_producer_logsize_chart, datas);
                 datas = null;
             }
@@ -310,11 +309,143 @@ function producerLogSizeChart() {
 
 // set chart data
 function setProducerChartData(mbean, data) {
-    lineProducerChartOptions.xaxis.categories = filter(data).x;
-    lineProducerChartOptions.series[0].data = filter(data).y;
-    lineProducerChartOptions.series[0].name = filter(data).name;
+    var dataSets = filter(data);
+    lineProducerChartOptions.xaxis.categories = dataSets.x;
+    lineProducerChartOptions.series[0].data = dataSets.y;
+    lineProducerChartOptions.series[0].name = dataSets.name;
     mbean.updateOptions(lineProducerChartOptions);
 }
 
 // load producer logsize chart
 producerLogSizeChart();
+
+// Storage Chart
+if ($('#efak_dashboard_cpu_used').length) {
+    var cpuUserOptions = {
+        chart: {
+            height: 180,
+            type: "radialBar"
+        },
+        series: [0],
+        colors: [colors.primary],
+        plotOptions: {
+            radialBar: {
+                hollow: {
+                    margin: 15,
+                    size: "70%"
+                },
+                track: {
+                    show: true,
+                    background: colors.dark,
+                    strokeWidth: '100%',
+                    opacity: 1,
+                    margin: 5,
+                },
+                dataLabels: {
+                    showOn: "always",
+                    name: {
+                        offsetY: -11,
+                        show: true,
+                        color: colors.muted,
+                        fontSize: "12px"
+                    },
+                    value: {
+                        color: colors.bodyColor,
+                        fontSize: "20px",
+                        show: true
+                    }
+                }
+            }
+        },
+        fill: {
+            opacity: 1
+        },
+        stroke: {
+            lineCap: "round",
+        },
+        labels: ["CPU使用率"]
+    };
+
+    var efak_dashboard_cpu_used = new ApexCharts(document.querySelector("#efak_dashboard_cpu_used"), cpuUserOptions);
+    efak_dashboard_cpu_used.render();
+}
+
+if ($('#efak_dashboard_mem_used').length) {
+    var memUsedOptions = {
+        chart: {
+            height: 180,
+            type: "radialBar"
+        },
+        series: [0],
+        colors: [colors.primary],
+        plotOptions: {
+            radialBar: {
+                hollow: {
+                    margin: 15,
+                    size: "70%"
+                },
+                track: {
+                    show: true,
+                    background: colors.dark,
+                    strokeWidth: '100%',
+                    opacity: 1,
+                    margin: 5,
+                },
+                dataLabels: {
+                    showOn: "always",
+                    name: {
+                        offsetY: -11,
+                        show: true,
+                        color: colors.muted,
+                        fontSize: "12px"
+                    },
+                    value: {
+                        color: colors.bodyColor,
+                        fontSize: "20px",
+                        show: true
+                    }
+                }
+            }
+        },
+        fill: {
+            opacity: 1
+        },
+        stroke: {
+            lineCap: "round",
+        },
+        labels: ["内存使用率"]
+    };
+
+    var efak_dashboard_mem_used = new ApexCharts(document.querySelector("#efak_dashboard_mem_used"), memUsedOptions);
+    efak_dashboard_mem_used.render();
+}
+
+// Storage Chart - END
+
+function getOSUsedChart() {
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: pathname + '/os/chart/ajax',
+        beforeSend: function (xmlHttp) {
+            xmlHttp.setRequestHeader("If-Modified-Since", "0");
+            xmlHttp.setRequestHeader("Cache-Control", "no-cache");
+        },
+        success: function (datas) {
+            if (datas != null) {
+                setOsUsedChartData(efak_dashboard_mem_used, datas.mem);
+                setOsUsedChartData(efak_dashboard_cpu_used, datas.cpu);
+                datas = null;
+            }
+        }
+    });
+}
+
+function setOsUsedChartData(mbean, data) {
+    mbean.updateOptions({
+        series: [data]
+    });
+}
+
+// load os used chart
+getOSUsedChart();

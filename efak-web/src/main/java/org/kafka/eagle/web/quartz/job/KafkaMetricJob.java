@@ -18,7 +18,6 @@
 package org.kafka.eagle.web.quartz.job;
 
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.JmxConstants.BrokerServer;
 import org.kafka.eagle.common.constants.KConstants;
@@ -74,6 +73,7 @@ public class KafkaMetricJob extends QuartzJobBean {
         put(KConstants.MBean.REPLICATIONBYTESOUTPERSEC, BrokerServer.REPLICATION_BYTES_OUT_PER_SEC.getValue());
         put(KConstants.MBean.PRODUCEMESSAGECONVERSIONS, BrokerServer.PRODUCE_MESSAGE_CONVERSIONS_PER_SEC.getValue());
         put(KConstants.MBean.OSFREEMEMORY, BrokerServer.BROKER_OS_MEM_FREE.getValue());
+        put(KConstants.MBean.OSUSEDMEMORY, BrokerServer.BROKER_OS_MEM_USED.getValue());
         put(KConstants.MBean.CPUUSED, BrokerServer.BROKER_OS_CPU_USED.getValue());
     }};
 
@@ -97,7 +97,6 @@ public class KafkaMetricJob extends QuartzJobBean {
                 initializeInfo.setHost(clusterCreateInfo.getBrokerHost());
                 initializeInfo.setPort(clusterCreateInfo.getBrokerJmxPort());
                 Map<String, MBeanInfo> mBeanInfoMap = KafkaMBeanFetcher.mbean(initializeInfo, BROKER_MBEAN_MAP_KEYS);
-                System.out.println("mBeanInfoMap:" + JSON.toJSONString(mBeanInfoMap));
                 for (Map.Entry<String, MBeanInfo> entry : mBeanInfoMap.entrySet()) {
                     if (kafkaMBeanMap.containsKey(entry.getKey())) {
                         String value = kafkaMBeanMap.get(entry.getKey());
@@ -117,7 +116,6 @@ public class KafkaMetricJob extends QuartzJobBean {
                 kafkaMetricInfo.setMbeanValue(entry.getValue());
                 kafkaMetricInfos.add(kafkaMetricInfo);
             }
-            System.out.println("kafkaMetricInfos:" + JSON.toJSONString(kafkaMetricInfos));
             this.kafkaMBeanDaoService.batch(kafkaMetricInfos);
         }
     }

@@ -109,7 +109,6 @@ public class TopicSummaryDaoServiceImpl extends ServiceImpl<TopicSummaryDaoMappe
         String topic = params.get("topic").toString();
         String stime = params.get("stime").toString();
         String etime = params.get("etime").toString();
-        StringBuilder sb = new StringBuilder();
         Set<String> topics = new HashSet<>();
         QueryWrapper<TopicSummaryInfo> queryWrapper = new QueryWrapper<>();
         if(StrUtil.isNotBlank(topic)){
