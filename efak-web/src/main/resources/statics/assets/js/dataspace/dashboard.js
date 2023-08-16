@@ -433,8 +433,10 @@ function getOSUsedChart() {
         },
         success: function (datas) {
             if (datas != null) {
+                console.log(datas);
                 setOsUsedChartData(efak_dashboard_mem_used, datas.mem);
                 setOsUsedChartData(efak_dashboard_cpu_used, datas.cpu);
+                $("#efak_dashboard_cluster_capacity").text(datas.capacity)
                 datas = null;
             }
         }

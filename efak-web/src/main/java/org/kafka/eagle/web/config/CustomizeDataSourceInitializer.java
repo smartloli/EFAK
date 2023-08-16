@@ -32,7 +32,7 @@ import javax.sql.DataSource;
  * // NOTE
  *
  * @author smartloli.
- *
+ * <p>
  * Created by May 30, 2023
  */
 @Configuration

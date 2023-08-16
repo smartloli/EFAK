@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * String conversion tool and null convert.
+ *
  * @Author: smartloli
  * @Date: 2023/6/7 21:17
  * @Version: 3.4.0
@@ -73,21 +74,29 @@ public class StrUtils {
      * Formatter byte to kb,mb or gb etc.
      */
     public static JSONObject stringifyByObject(long byteNumber) {
+        return stringifyByObject((double) byteNumber);
+    }
+
+    public static JSONObject stringifyByObject(String byteNumber) {
+        return stringifyByObject(Double.valueOf(byteNumber));
+    }
+
+    public static JSONObject stringifyByObject(double byteNumber) {
         JSONObject object = new JSONObject();
-        if (byteNumber / TB_IN_BYTES > 0) {
-            object.put("size", df.format((double) byteNumber / (double) TB_IN_BYTES));
+        if (byteNumber / TB_IN_BYTES > 1) {
+            object.put("size", df.format(byteNumber / (double) TB_IN_BYTES));
             object.put("type", "TB");
             return object;
-        } else if (byteNumber / GB_IN_BYTES > 0) {
-            object.put("size", df.format((double) byteNumber / (double) GB_IN_BYTES));
+        } else if (byteNumber / GB_IN_BYTES > 1) {
+            object.put("size", df.format(byteNumber / (double) GB_IN_BYTES));
             object.put("type", "GB");
             return object;
-        } else if (byteNumber / MB_IN_BYTES > 0) {
-            object.put("size", df.format((double) byteNumber / (double) MB_IN_BYTES));
+        } else if (byteNumber / MB_IN_BYTES > 1) {
+            object.put("size", df.format(byteNumber / (double) MB_IN_BYTES));
             object.put("type", "MB");
             return object;
-        } else if (byteNumber / KB_IN_BYTES > 0) {
-            object.put("size", df.format((double) byteNumber / (double) KB_IN_BYTES));
+        } else if (byteNumber / KB_IN_BYTES > 1) {
+            object.put("size", df.format(byteNumber / (double) KB_IN_BYTES));
             object.put("type", "KB");
             return object;
         } else {

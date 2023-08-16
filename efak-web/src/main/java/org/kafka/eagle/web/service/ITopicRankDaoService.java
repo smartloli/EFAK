@@ -28,11 +28,12 @@ public interface ITopicRankDaoService extends IService<TopicRankInfo> {
     /**
      * Get topic info by clusterId and topic name and key.
      * @param clusterId
-     * @param topicName
      * @param topicKey
      * @return
      */
-    TopicRankInfo topics(String clusterId,String topicName,String topicKey);
+    List<TopicRankInfo> topics(String clusterId,String topicKey);
+
+    String topicCapacity(String clusterId,String topicKey);
 
     /**
      * Get topic info by id(topic id).
@@ -54,13 +55,6 @@ public interface ITopicRankDaoService extends IService<TopicRankInfo> {
      * @return
      */
     Page<TopicRankInfo> pages(Map<String,Object> params);
-
-    /**
-     * Update topic info by topic id.
-     * @param topicRankInfo
-     * @return
-     */
-    boolean update(TopicRankInfo topicRankInfo);
 
     /**
      * Delete topic info by topic id.

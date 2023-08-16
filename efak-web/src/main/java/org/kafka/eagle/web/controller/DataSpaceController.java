@@ -85,6 +85,9 @@ public class DataSpaceController {
     @Autowired
     private IKafkaMBeanDaoService kafkaMBeanDaoService;
 
+    @Autowired
+    private ITopicRankDaoService topicRankDaoService;
+
 
     @GetMapping("/dashboard/{cid}")
     public String dashboardView(@PathVariable("cid") Long cid, HttpSession session, HttpServletRequest request) {
@@ -275,8 +278,8 @@ public class DataSpaceController {
             List<KafkaMBeanInfo> mems = kafkaMBeanDaoService.pagesOfLastest(params);
             JSONObject object = new JSONObject();
             if (mems != null && mems.size() == 2) {
-                Double valueFirst = StrUtils.numberic(mems.get(0).getMbeanValue(),"###.####");
-                Double valueSecond = StrUtils.numberic(mems.get(1).getMbeanValue(),"###.####");
+                Double valueFirst = StrUtils.numberic(mems.get(0).getMbeanValue(), "###.####");
+                Double valueSecond = StrUtils.numberic(mems.get(1).getMbeanValue(), "###.####");
                 if (valueFirst >= valueSecond) {
                     object.put("mem", StrUtils.numberic(((valueFirst - valueSecond) * 100.0 / valueFirst) + "") / brokerSize);
                 } else {
@@ -295,6 +298,11 @@ public class DataSpaceController {
             } else {
                 object.put("cpu", "0.0");
             }
+
+            // get capacity
+            String capacityStrValue = this.topicRankDaoService.topicCapacity(clusterInfo.getClusterId(), "capacity");
+            JSONObject capacity = StrUtils.stringifyByObject(capacityStrValue);
+            object.put("capacity", capacity.getString("size") + " " + capacity.getString("type"));
 
             byte[] output = object.toJSONString().getBytes();
             BaseController.response(output, response);

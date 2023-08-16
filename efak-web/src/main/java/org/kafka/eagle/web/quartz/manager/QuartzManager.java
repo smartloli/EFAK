@@ -18,8 +18,6 @@
 package org.kafka.eagle.web.quartz.manager;
 
 import cn.hutool.core.util.StrUtil;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.JobConstans;
 import org.kafka.eagle.web.quartz.pojo.JobDetails;
@@ -184,8 +182,7 @@ public class QuartzManager {
         }
     }
 
-    public PageInfo<JobDetails> queryAllJobBean(int pageNum, int pageSize, String search) {
-        PageHelper.startPage(pageNum, pageSize);
+    public List<JobDetails> queryAllJobBean(String search) {
         List<JobDetails> jobList = new ArrayList<>();
         try {
             GroupMatcher<JobKey> matcher = GroupMatcher.anyJobGroup();
@@ -221,7 +218,8 @@ public class QuartzManager {
         } catch (SchedulerException e) {
             log.error("Get all job has error, msg is {}", e);
         }
-        return new PageInfo<>(jobList);
+
+        return jobList;
     }
 
     public List<String> getAllJobNames() {

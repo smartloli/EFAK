@@ -22,11 +22,11 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.JobConstans;
 import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.pojo.audit.AuditLogInfo;
+import org.kafka.eagle.pojo.page.PageInfo;
 import org.kafka.eagle.web.quartz.manager.QuartzManager;
 import org.kafka.eagle.web.quartz.pojo.JobDetails;
 import org.kafka.eagle.web.service.IAuditDaoService;
@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -158,14 +159,16 @@ public class SystemController {
                 search = param.getString("value");
             }
         }
-        Integer pageNum = iDisplayStart / iDisplayLength + 1;
+        Integer pageNum = iDisplayStart;
         Integer pageSize = iDisplayLength;
 
-        PageInfo<JobDetails> pageInfo = this.qtzManager.queryAllJobBean(pageNum, pageSize, search);
+        List<JobDetails> jobAndTrigger = this.qtzManager.queryAllJobBean(search);
+        PageInfo<JobDetails> pageInfo = new PageInfo<>(jobAndTrigger, pageNum, pageSize);
 
         JSONArray aaDatas = new JSONArray();
 
-        for (JobDetails jobDetails : pageInfo.getList()) {
+        for (Object object : pageInfo.getList()) {
+            JobDetails jobDetails = (JobDetails) object;
             JSONObject target = new JSONObject();
             target.put("group", jobDetails.getJobGroupName());
             target.put("name", JobConstans.JOBS.get(jobDetails.getJobName()) == null ? JobConstans.UNKOWN : JobConstans.JOBS.get(jobDetails.getJobName()));
@@ -184,8 +187,8 @@ public class SystemController {
 
         JSONObject target = new JSONObject();
         target.put("sEcho", sEcho);
-        target.put("iTotalRecords", pageInfo.getPageSize());
-        target.put("iTotalDisplayRecords", pageInfo.getPageSize());
+        target.put("iTotalRecords", pageInfo.getTotal());
+        target.put("iTotalDisplayRecords", pageInfo.getTotal());
         target.put("aaData", aaDatas);
         try {
             byte[] output = target.toJSONString().getBytes();

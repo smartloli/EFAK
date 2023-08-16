@@ -17,9 +17,8 @@
  */
 package org.kafka.eagle.web.service.impl;
 
-import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -58,8 +57,16 @@ public class TopicRankDaoServiceImpl extends ServiceImpl<TopicRankDaoMapper, Top
     }
 
     @Override
-    public TopicRankInfo topics(String clusterId, String topicName, String topicKey) {
-        return new LambdaQueryChainWrapper<>(this.topicRankDaoMapper).eq(TopicRankInfo::getClusterId, clusterId).eq(TopicRankInfo::getTopicName, topicName).eq(TopicRankInfo::getTopicKey, topicKey).one();
+    public String topicCapacity(String clusterId, String topicKey) {
+        QueryWrapper<TopicRankInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("SUM(topic_value) AS topic_capacity").lambda().eq(TopicRankInfo::getClusterId, clusterId).eq(TopicRankInfo::getTopicKey, topicKey);
+        List<java.util.Map<String, Object>> result = this.topicRankDaoMapper.selectMaps(queryWrapper);
+        return result.get(0).get("topic_capacity") == null ? "0.00" : result.get(0).get("topic_capacity").toString();
+    }
+
+    @Override
+    public List<TopicRankInfo> topics(String clusterId, String topicKey) {
+        return new LambdaQueryChainWrapper<>(this.topicRankDaoMapper).eq(TopicRankInfo::getClusterId, clusterId).eq(TopicRankInfo::getTopicKey, topicKey).list();
     }
 
     @Override
@@ -88,18 +95,6 @@ public class TopicRankDaoServiceImpl extends ServiceImpl<TopicRankDaoMapper, Top
         LambdaQueryChainWrapper<TopicRankInfo> queryChainWrapper = new LambdaQueryChainWrapper<TopicRankInfo>(this.topicRankDaoMapper);
         queryChainWrapper.eq(TopicRankInfo::getClusterId, cid).like(TopicRankInfo::getTopicName, params.get("search").toString());
         return queryChainWrapper.page(pages);
-    }
-
-    @Override
-    public boolean update(TopicRankInfo topicRankInfo) {
-        TopicRankInfo checkTopicInfo = this.topics(topicRankInfo.getClusterId(), topicRankInfo.getTopicName(), topicRankInfo.getTopicKey());
-        if (checkTopicInfo == null || StrUtil.isBlank(checkTopicInfo.getTopicName())) {
-            return this.insert(topicRankInfo);
-        } else {
-            LambdaUpdateChainWrapper<TopicRankInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<TopicRankInfo>(this.topicRankDaoMapper);
-            lambdaUpdateChainWrapper.eq(TopicRankInfo::getClusterId, topicRankInfo.getClusterId()).eq(TopicRankInfo::getTopicName, topicRankInfo.getTopicName()).eq(TopicRankInfo::getTopicKey, topicRankInfo.getTopicKey());
-            return lambdaUpdateChainWrapper.update(topicRankInfo);
-        }
     }
 
     @Override
