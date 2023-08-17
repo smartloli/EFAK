@@ -536,6 +536,17 @@ public class KafkaSchemaFactory {
         return capacity;
     }
 
+    public Long getTopicByteInNum(KafkaClientInfo kafkaClientInfo, List<BrokerInfo> brokerInfos, String topic) {
+        Long capacity = 0L;
+        List<MetadataInfo> metadataInfos = getTopicMetaData(kafkaClientInfo, topic);
+        for (MetadataInfo metadataInfo : metadataInfos) {
+            JMXInitializeInfo initializeInfo = getBrokerJmxRmiOfLeaderId(brokerInfos, metadataInfo.getLeader());
+            initializeInfo.setObjectName(String.format(JmxConstants.BrokerServer.BYTES_IN_PER_SEC_TOPIC.getValue(), topic));
+            capacity += KafkaClusterFetcher.getTopicRecordJmxInfo(initializeInfo);
+        }
+        return capacity;
+    }
+
     private JMXInitializeInfo getBrokerJmxRmiOfLeaderId(List<BrokerInfo> brokerInfos, Integer leadId) {
         JMXInitializeInfo initializeInfo = new JMXInitializeInfo();
         for (BrokerInfo brokerInfo : brokerInfos) {

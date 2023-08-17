@@ -59,7 +59,7 @@ public class TopicCapacityRankJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        log.info("Topic rank job has started, class = {}", this.getClass().getName());
+        log.info("Topic capacity rank job has started, class = {}", this.getClass().getName());
         // logics
         this.topicRank();
     }

@@ -19,12 +19,15 @@ package org.kafka.eagle.common.constants;
 
 /**
  * Description: TODO
+ *
  * @Author: smartloli
  * @Date: 2023/6/7 15:07
  * @Version: 3.4.0
  */
 public class JmxConstants {
     private static final String KAFKA_COMMON_VALUE = "Value";
+
+    public static final String MBEAN_KEY_SEPARATOR = "__EFAK__";
 
     public enum KafkaLog {
         SIZE("kafka.log:type=Log,name=Size,topic=%s,partition=%s"),

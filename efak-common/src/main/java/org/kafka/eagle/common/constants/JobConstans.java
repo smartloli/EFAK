@@ -29,6 +29,8 @@ public class JobConstans {
         put("org.kafka.eagle.web.quartz.job.KafkaMetricJob", "Kafka集群性能指标定时任务");
         put("org.kafka.eagle.web.quartz.job.TopicLogSizeRankJob", "Topic消息记录正排定时任务");
         put("org.kafka.eagle.web.quartz.job.TopicCapacityRankJob", "Topic容量大小正排定时任务");
+        put("org.kafka.eagle.web.quartz.job.TopicByteInRankJob", "Topic消息写入正排定时任务");
+        put("org.kafka.eagle.web.quartz.job.TopicByteOutRankJob", "Topic消息读取正排定时任务");
         put("org.kafka.eagle.web.quartz.job.MockJob", "测试生产者应用定时任务"); // if release version, this feature must be remove
     }};
 
