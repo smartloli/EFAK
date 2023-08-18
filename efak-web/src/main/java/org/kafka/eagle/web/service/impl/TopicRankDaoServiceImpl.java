@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.common.utils.StrUtils;
 import org.kafka.eagle.pojo.topic.TopicCapacityInfo;
 import org.kafka.eagle.pojo.topic.TopicRankInfo;
 import org.kafka.eagle.pojo.topic.TopicRankScatterInfo;
@@ -158,25 +159,37 @@ public class TopicRankDaoServiceImpl extends ServiceImpl<TopicRankDaoMapper, Top
             topicRankScatterInfo.setTopicName(topicRankInfo.getTopicName());
             topicRankInfo.setTopicKey(topicRankInfo.getTopicKey());
             if ("capacity".equals(topicKeyByOrder)) {
-                topicRankScatterInfo.setTopicCapacity(topicRankInfo.getTopicValue());
-                topicRankScatterInfo.setTopicByteIn(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_in").getTopicValue());
-                topicRankScatterInfo.setTopicByteOut(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_out").getTopicValue());
+                String capacity = StrUtils.stringifyByObject(topicRankInfo.getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicCapacity(capacity);
+                String byteIn = StrUtils.stringifyByObject(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_in").getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicByteIn(byteIn);
+                String byteOut = StrUtils.stringifyByObject(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_out").getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicByteOut(byteOut);
                 topicRankScatterInfo.setTopicLogSize(this.topic(clusterId, topicRankInfo.getTopicName(), "logsize").getTopicValue());
             } else if ("logsize".equals(topicKeyByOrder)) {
                 topicRankScatterInfo.setTopicLogSize(topicRankInfo.getTopicValue());
-                topicRankScatterInfo.setTopicCapacity(this.topic(clusterId, topicRankInfo.getTopicName(), "capacity").getTopicValue());
-                topicRankScatterInfo.setTopicByteIn(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_in").getTopicValue());
-                topicRankScatterInfo.setTopicByteOut(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_out").getTopicValue());
+                String capacity = StrUtils.stringifyByObject(this.topic(clusterId, topicRankInfo.getTopicName(), "capacity").getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicCapacity(capacity);
+                String byteIn = StrUtils.stringifyByObject(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_in").getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicByteIn(byteIn);
+                String byteOut = StrUtils.stringifyByObject(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_out").getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicByteOut(byteOut);
             } else if ("byte_in".equals(topicKeyByOrder)) {
-                topicRankScatterInfo.setTopicByteIn(topicRankInfo.getTopicValue());
-                topicRankScatterInfo.setTopicCapacity(this.topic(clusterId, topicRankInfo.getTopicName(), "capacity").getTopicValue());
+                String byteIn = StrUtils.stringifyByObject(topicRankInfo.getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicByteIn(byteIn);
+                String capacity = StrUtils.stringifyByObject(this.topic(clusterId, topicRankInfo.getTopicName(), "capacity").getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicCapacity(capacity);
                 topicRankScatterInfo.setTopicLogSize(this.topic(clusterId, topicRankInfo.getTopicName(), "logsize").getTopicValue());
-                topicRankScatterInfo.setTopicByteOut(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_out").getTopicValue());
+                String byteOut = StrUtils.stringifyByObject(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_out").getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicByteOut(byteOut);
             } else if ("byte_out".equals(topicKeyByOrder)) {
-                topicRankScatterInfo.setTopicByteOut(topicRankInfo.getTopicValue());
-                topicRankScatterInfo.setTopicCapacity(this.topic(clusterId, topicRankInfo.getTopicName(), "capacity").getTopicValue());
+                String byteOut = StrUtils.stringifyByObject(topicRankInfo.getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicByteOut(byteOut);
+                String capacity = StrUtils.stringifyByObject(this.topic(clusterId, topicRankInfo.getTopicName(), "capacity").getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicCapacity(capacity);
                 topicRankScatterInfo.setTopicLogSize(this.topic(clusterId, topicRankInfo.getTopicName(), "logsize").getTopicValue());
-                topicRankScatterInfo.setTopicByteIn(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_in").getTopicValue());
+                String byteIn = StrUtils.stringifyByObject(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_in").getTopicValue()).getString("value");
+                topicRankScatterInfo.setTopicByteIn(byteIn);
             }
             topicRankScatterInfos.add(topicRankScatterInfo);
         }

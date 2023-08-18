@@ -84,24 +84,39 @@ public class StrUtils {
     public static JSONObject stringifyByObject(double byteNumber) {
         JSONObject object = new JSONObject();
         if (byteNumber / TB_IN_BYTES > 1) {
-            object.put("size", df.format(byteNumber / (double) TB_IN_BYTES));
-            object.put("type", "TB");
+            String size = df.format(byteNumber / (double) TB_IN_BYTES);
+            String type = "TB";
+            object.put("size", size);
+            object.put("type", type);
+            object.put("value", size + type);
             return object;
         } else if (byteNumber / GB_IN_BYTES > 1) {
-            object.put("size", df.format(byteNumber / (double) GB_IN_BYTES));
-            object.put("type", "GB");
+            String size = df.format(byteNumber / (double) GB_IN_BYTES);
+            String type = "GB";
+            object.put("size", size);
+            object.put("type", type);
+            object.put("value", size + type);
             return object;
         } else if (byteNumber / MB_IN_BYTES > 1) {
-            object.put("size", df.format(byteNumber / (double) MB_IN_BYTES));
-            object.put("type", "MB");
+            String size = df.format(byteNumber / (double) MB_IN_BYTES);
+            String type = "MB";
+            object.put("size", size);
+            object.put("type", type);
+            object.put("value", size + type);
             return object;
         } else if (byteNumber / KB_IN_BYTES > 1) {
-            object.put("size", df.format(byteNumber / (double) KB_IN_BYTES));
-            object.put("type", "KB");
+            String size = df.format(byteNumber / (double) KB_IN_BYTES);
+            String type = "KB";
+            object.put("size", size);
+            object.put("type", type);
+            object.put("value", size + type);
             return object;
         } else {
-            object.put("size", String.valueOf(byteNumber));
-            object.put("type", "B");
+            String size = String.valueOf(byteNumber);
+            String type = "B";
+            object.put("size", size);
+            object.put("type", type);
+            object.put("value", size + type);
             return object;
         }
     }
