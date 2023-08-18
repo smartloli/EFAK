@@ -22,12 +22,15 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.pojo.topic.TopicCapacityInfo;
 import org.kafka.eagle.pojo.topic.TopicRankInfo;
+import org.kafka.eagle.pojo.topic.TopicRankScatterInfo;
 import org.kafka.eagle.web.dao.mapper.TopicRankDaoMapper;
 import org.kafka.eagle.web.service.ITopicRankDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -129,5 +132,59 @@ public class TopicRankDaoServiceImpl extends ServiceImpl<TopicRankDaoMapper, Top
             status = true;
         }
         return status;
+    }
+
+    @Override
+    public TopicCapacityInfo getTopicScatter(String clusterId, String topicKey) {
+        QueryWrapper<TopicRankInfo> queryWrapper = new QueryWrapper<>();
+
+        queryWrapper.select("COUNT(CASE WHEN topic_value between 0 and 104857600 then topic_value end) as `mb`,COUNT(CASE WHEN topic_value between 104857600 and 10737418240 then topic_value end) as `gb`,COUNT(CASE WHEN topic_value > 10737418240 then topic_value end) as `tb`").lambda().eq(TopicRankInfo::getClusterId, clusterId).eq(TopicRankInfo::getTopicKey, topicKey).ne(TopicRankInfo::getTopicValue, "0");
+        List<Map<String, Object>> result = this.topicRankDaoMapper.selectMaps(queryWrapper);
+
+        TopicCapacityInfo topicCapacityInfo = new TopicCapacityInfo();
+        topicCapacityInfo.setMb(result.get(0).get("mb") == null ? 0 : Long.parseLong(result.get(0).get("mb").toString()));
+        topicCapacityInfo.setGb(result.get(0).get("gb") == null ? 0 : Long.parseLong(result.get(0).get("gb").toString()));
+        topicCapacityInfo.setTb(result.get(0).get("Tb") == null ? 0 : Long.parseLong(result.get(0).get("Tb").toString()));
+
+        return topicCapacityInfo;
+    }
+
+    @Override
+    public List<TopicRankScatterInfo> pageTopicScatterOfTen(String clusterId, String topicKeyByOrder, List<String> topicKeys) {
+        List<TopicRankInfo> topicRankInfos = this.topicRankDaoMapper.selectList(new QueryWrapper<TopicRankInfo>().lambda().eq(TopicRankInfo::getClusterId, clusterId).eq(TopicRankInfo::getTopicKey, topicKeyByOrder).orderByDesc(TopicRankInfo::getTopicValue).last("limit 10"));
+        List<TopicRankScatterInfo> topicRankScatterInfos = new ArrayList<>();
+        for (TopicRankInfo topicRankInfo : topicRankInfos) {
+            TopicRankScatterInfo topicRankScatterInfo = new TopicRankScatterInfo();
+            topicRankScatterInfo.setTopicName(topicRankInfo.getTopicName());
+            topicRankInfo.setTopicKey(topicRankInfo.getTopicKey());
+            if ("capacity".equals(topicKeyByOrder)) {
+                topicRankScatterInfo.setTopicCapacity(topicRankInfo.getTopicValue());
+                topicRankScatterInfo.setTopicByteIn(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_in").getTopicValue());
+                topicRankScatterInfo.setTopicByteOut(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_out").getTopicValue());
+                topicRankScatterInfo.setTopicLogSize(this.topic(clusterId, topicRankInfo.getTopicName(), "logsize").getTopicValue());
+            } else if ("logsize".equals(topicKeyByOrder)) {
+                topicRankScatterInfo.setTopicLogSize(topicRankInfo.getTopicValue());
+                topicRankScatterInfo.setTopicCapacity(this.topic(clusterId, topicRankInfo.getTopicName(), "capacity").getTopicValue());
+                topicRankScatterInfo.setTopicByteIn(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_in").getTopicValue());
+                topicRankScatterInfo.setTopicByteOut(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_out").getTopicValue());
+            } else if ("byte_in".equals(topicKeyByOrder)) {
+                topicRankScatterInfo.setTopicByteIn(topicRankInfo.getTopicValue());
+                topicRankScatterInfo.setTopicCapacity(this.topic(clusterId, topicRankInfo.getTopicName(), "capacity").getTopicValue());
+                topicRankScatterInfo.setTopicLogSize(this.topic(clusterId, topicRankInfo.getTopicName(), "logsize").getTopicValue());
+                topicRankScatterInfo.setTopicByteOut(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_out").getTopicValue());
+            } else if ("byte_out".equals(topicKeyByOrder)) {
+                topicRankScatterInfo.setTopicByteOut(topicRankInfo.getTopicValue());
+                topicRankScatterInfo.setTopicCapacity(this.topic(clusterId, topicRankInfo.getTopicName(), "capacity").getTopicValue());
+                topicRankScatterInfo.setTopicLogSize(this.topic(clusterId, topicRankInfo.getTopicName(), "logsize").getTopicValue());
+                topicRankScatterInfo.setTopicByteIn(this.topic(clusterId, topicRankInfo.getTopicName(), "byte_in").getTopicValue());
+            }
+            topicRankScatterInfos.add(topicRankScatterInfo);
+        }
+        return topicRankScatterInfos;
+    }
+
+    @Override
+    public TopicRankInfo topic(String clusterId, String topicName, String topicKey) {
+        return new LambdaQueryChainWrapper<>(this.topicRankDaoMapper).eq(TopicRankInfo::getClusterId, clusterId).eq(TopicRankInfo::getTopicName, topicName).eq(TopicRankInfo::getTopicKey, topicKey).one();
     }
 }

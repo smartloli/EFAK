@@ -16,6 +16,22 @@ try {
                 $("#efak_dashboard_topic_active_panel").text("空闲: " + datas.topic_free_nums);
                 $("#efak_dashboard_group_total_panel").text(datas.group_total_nums);
                 $("#efak_dashboard_group_active_panel").text("活跃: " + datas.group_active_nums);
+
+                // topic scatter
+                var scatter = ((datas.topic_total_nums - datas.topic_free_nums) * 100.0 / datas.topic_total_nums).toFixed(2);
+                setTopicScatterData(efak_dashboard_topic_scatter, scatter);
+                $("#efak_dashboard_topic_scatter_active").text(datas.topic_total_nums - datas.topic_free_nums);
+                $("#efak_dashboard_topic_scatter_standby").text(datas.topic_free_nums);
+
+                var mb = (datas.mb * 100.0 / (datas.topic_total_nums - datas.topic_free_nums)).toFixed(0) + "%";
+                var gb = (datas.gb * 100.0 / (datas.topic_total_nums - datas.topic_free_nums)).toFixed(0) + "%";
+                var tb = (datas.tb * 100.0 / (datas.topic_total_nums - datas.topic_free_nums)).toFixed(0) + "%";
+                $("#efak_dashboard_topic_scatter_mb").text(mb);
+                $("#efak_dashboard_topic_scatter_mb").css("width", mb);
+                $("#efak_dashboard_topic_scatter_gb").text(gb);
+                $("#efak_dashboard_topic_scatter_gb").css("width", gb);
+                $("#efak_dashboard_topic_scatter_tb").text(tb);
+                $("#efak_dashboard_topic_scatter_tb").css("width", tb);
             }
 
         }
@@ -307,6 +323,57 @@ function producerLogSizeChart() {
     });
 }
 
+// topic scatter
+if ($('#efak_dashboard_topic_scatter').length) {
+    var topicScatterOptions = {
+        chart: {
+            height: 260,
+            type: "radialBar"
+        },
+        series: [],
+        colors: [colors.primary],
+        plotOptions: {
+            radialBar: {
+                hollow: {
+                    margin: 15,
+                    size: "70%"
+                },
+                track: {
+                    show: true,
+                    background: colors.dark,
+                    strokeWidth: '100%',
+                    opacity: 1,
+                    margin: 5,
+                },
+                dataLabels: {
+                    showOn: "always",
+                    name: {
+                        offsetY: -11,
+                        show: true,
+                        color: colors.muted,
+                        fontSize: "13px"
+                    },
+                    value: {
+                        color: colors.bodyColor,
+                        fontSize: "30px",
+                        show: true
+                    }
+                }
+            }
+        },
+        fill: {
+            opacity: 1
+        },
+        stroke: {
+            lineCap: "round",
+        },
+        labels: ["活跃主题占比"]
+    };
+
+    var efak_dashboard_topic_scatter = new ApexCharts(document.querySelector("#efak_dashboard_topic_scatter"), topicScatterOptions);
+    efak_dashboard_topic_scatter.render();
+}
+
 // set chart data
 function setProducerChartData(mbean, data) {
     var dataSets = filter(data);
@@ -433,7 +500,6 @@ function getOSUsedChart() {
         },
         success: function (datas) {
             if (datas != null) {
-                console.log(datas);
                 setOsUsedChartData(efak_dashboard_mem_used, datas.mem);
                 setOsUsedChartData(efak_dashboard_cpu_used, datas.cpu);
                 $("#efak_dashboard_cluster_capacity").text(datas.capacity)
@@ -451,3 +517,42 @@ function setOsUsedChartData(mbean, data) {
 
 // load os used chart
 getOSUsedChart();
+
+function setTopicScatterData(mbean, data) {
+    mbean.updateOptions({
+        series: [data]
+    });
+}
+
+function loadTopicScatterRank(topicOrderKey) {
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: pathname + '/topic/scatter/ajax?topic_order_key=' + topicOrderKey,
+        success: function (datas) {
+            if (datas != null) {
+                console.log(datas)
+                $("#efak_dashboard_topic_scatter_tbody").html("")
+                for (var i = 0; i < datas.length; i++) {
+                    var id = i + 1;
+                    var topic = datas[i].topicName;
+                    var logsize = datas[i].topicLogSize;
+                    var capacity = datas[i].topicCapacity;
+                    var byte_in = datas[i].topicByteIn;
+                    var byte_out = datas[i].topicByteOut;
+                    var tr = "<tr><td>" + id + "</td><td>" + topic + "</td><td>" + logsize + "</td><td>" + capacity + "</td><td>" + byte_in + "</td><td>" + byte_out + "</td></tr>"
+                    $("#efak_dashboard_topic_scatter_tbody").append(tr);
+                }
+            }
+        }
+    });
+}
+
+// load topic scatter table,default load topic logsize
+loadTopicScatterRank('logsize');
+
+// change topic scatter table order
+$(".topic-scatter-rank").click(function() {
+    var parameter = $(this).data("param");
+    loadTopicScatterRank(parameter);
+});

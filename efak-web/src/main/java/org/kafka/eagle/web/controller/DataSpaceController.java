@@ -18,6 +18,7 @@
 package org.kafka.eagle.web.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,8 @@ import org.kafka.eagle.pojo.cluster.ClusterInfo;
 import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
 import org.kafka.eagle.pojo.cluster.KafkaMBeanInfo;
 import org.kafka.eagle.pojo.consumer.ConsumerGroupInfo;
+import org.kafka.eagle.pojo.topic.TopicCapacityInfo;
+import org.kafka.eagle.pojo.topic.TopicRankScatterInfo;
 import org.kafka.eagle.pojo.topic.TopicSummaryInfo;
 import org.kafka.eagle.web.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +48,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The DashboardController handles requests for dashboard pages. This controller handles the following requests:
@@ -121,6 +121,8 @@ public class DataSpaceController {
         consumerGroupInfo.setStatus(KConstants.Topic.RUNNING);
         Long ActiveGroupSize = this.consumerGroupDaoService.totalOfConsumerGroups(consumerGroupInfo);
 
+        // topic scatter
+        TopicCapacityInfo topicCapacityInfo = this.topicRankDaoService.getTopicScatter(clusterInfo.getClusterId(), "capacity");
 
         JSONObject target = new JSONObject();
         target.put("brokers", brokerInfos.size());
@@ -129,7 +131,9 @@ public class DataSpaceController {
         target.put("topic_free_nums", topicOfTotal - topicOfActiveNums);
         target.put("group_total_nums", totalGroupSize);
         target.put("group_active_nums", ActiveGroupSize);
-
+        target.put("mb", topicCapacityInfo.getMb());
+        target.put("gb", topicCapacityInfo.getGb());
+        target.put("tb", topicCapacityInfo.getTb());
 
         try {
             byte[] output = target.toJSONString().getBytes();
@@ -308,6 +312,31 @@ public class DataSpaceController {
             BaseController.response(output, response);
         } catch (Exception e) {
             log.error("Get dashboard os used chart has error, msg is {}", e);
+        }
+    }
+
+    @RequestMapping(value = "/dashboard/{cid}/topic/scatter/ajax", method = RequestMethod.GET)
+    public void pageOfTopicScatterRankAjax(@PathVariable("cid") Long cid, HttpServletResponse response, HttpServletRequest request) {
+        try {
+            String remoteAddr = request.getRemoteAddr();
+            String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
+            log.info("Get dashboard os used chart :: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
+            ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
+            String topicOrderKey = request.getParameter("topic_order_key");
+            List<String> topicAllKeys = new ArrayList<String>() {{
+                add("capacity");
+                add("logsize");
+                add("byte_in");
+                add("byte_out");
+            }};
+            if (topicAllKeys.contains(topicOrderKey)) {
+                topicAllKeys.remove(topicOrderKey);
+            }
+            List<TopicRankScatterInfo> topicRankScatterInfos = this.topicRankDaoService.pageTopicScatterOfTen(clusterInfo.getClusterId(), topicOrderKey, topicAllKeys);
+            byte[] output = JSON.toJSONString(topicRankScatterInfos).getBytes();
+            BaseController.response(output, response);
+        } catch (Exception e) {
+            log.error("Get topic scatter rank has error, msg is {}", e);
         }
     }
 
