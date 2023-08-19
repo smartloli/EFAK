@@ -29,6 +29,8 @@ public interface IUserDaoService extends IService<UserInfo> {
      */
     UserInfo users(String username);
 
+    UserInfo users(String username,String password);
+
     /**
      * get user info by id.
      * @param id
@@ -57,6 +59,9 @@ public interface IUserDaoService extends IService<UserInfo> {
      */
     boolean update(UserInfo userInfo);
 
+    boolean reset(UserInfo userInfo);
+
     boolean delete(UserInfo userInfo);
+    boolean delete(Long id);
 
 }

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * Description: TODO
@@ -46,13 +47,23 @@ public class UserInfo implements Serializable {
     private String username;
 
     /**
-     * password, lenth default 100
+     * password, length default 100
      */
     private String password;
+
+    /**
+     * origin password, length default 100
+     */
+    private String originPassword;
 
     /**
      * roles, such as ADMIN, DEV, TEST
      */
     private String roles;
+
+    /**
+     * User modify time.
+     */
+    private LocalDateTime modifyTime = LocalDateTime.now();
 
 }

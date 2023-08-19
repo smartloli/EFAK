@@ -74,9 +74,12 @@ CREATE TABLE IF NOT EXISTS ke_users_info (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'UserId',
   username varchar(20) DEFAULT NULL COMMENT 'UserName',
   password varchar(100) DEFAULT NULL COMMENT 'Password',
+  origin_password varchar(100) DEFAULT NULL COMMENT 'Origin Password',
   roles varchar(50) DEFAULT NULL COMMENT 'Roles',
+  modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
   INDEX idx_username (username),
-  INDEX idx_user_pwd (username,password)
+  INDEX idx_user_pwd (username,passwd),
+  UNIQUE KEY idx_unique_username (username) USING BTREE
 ) COMMENT 'User info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 

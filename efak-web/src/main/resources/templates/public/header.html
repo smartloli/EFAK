@@ -202,7 +202,17 @@
                                 </div>
                                 <div class="text-center">
                                     <p class="tx-16 fw-bolder"><span sec:authentication="principal.username"></span></p>
-                                    <p class="tx-12 text-muted"><span sec:authentication="principal.authorities"></span></p>
+                                    <span sec:authorize="isAuthenticated()">
+                                        <span sec:authorize="hasRole('ADMIN')" class='badge bg-success'>
+                                            管理员
+                                        </span>
+                                        <span sec:authorize="hasRole('DEV')" class='badge bg-primary'>
+                                            开发
+                                        </span>
+                                        <span sec:authorize="hasRole('TEST')" class='badge bg-secondary'>
+                                            测试
+                                        </span>
+                                    </span>
                                 </div>
                             </div>
                             <ul class="list-unstyled p-1">

@@ -44,6 +44,18 @@ public class HtmlAttributeUtil {
         return result;
     }
 
+    public static String getUserRoleHtml(String role) {
+        String result = "";
+        if ("ROLE_ADMIN".equals(role)) {
+            result = "<span class='badge bg-success'>管理员</span>";
+        } else if ("ROLE_DEV".equals(role)) {
+            result = "<span class='badge bg-primary'>开发</span>";
+        } else if ("ROLE_TEST".equals(role)) {
+            result = "<span class='badge bg-secondary'>测试</span>";
+        }
+        return result;
+    }
+
     public static String getTopicSpreadHtml(int brokerSpread) {
         String result = "";
         if (brokerSpread < KConstants.Topic.TOPIC_BROKER_SPREAD_ERROR) {

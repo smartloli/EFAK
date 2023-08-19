@@ -25,14 +25,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.JobConstans;
 import org.kafka.eagle.common.constants.KConstants;
+import org.kafka.eagle.common.utils.HtmlAttributeUtil;
 import org.kafka.eagle.pojo.audit.AuditLogInfo;
 import org.kafka.eagle.pojo.page.PageInfo;
+import org.kafka.eagle.pojo.user.UserInfo;
 import org.kafka.eagle.web.quartz.manager.QuartzManager;
 import org.kafka.eagle.web.quartz.pojo.JobDetails;
 import org.kafka.eagle.web.service.IAuditDaoService;
+import org.kafka.eagle.web.service.IUserDaoService;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,9 +67,17 @@ public class SystemController {
     @Autowired
     private QuartzManager qtzManager;
 
+    @Autowired
+    private IUserDaoService userDaoService;
+
     @GetMapping("/profile")
     public String profileView() {
         return "system/profile.html";
+    }
+
+    @GetMapping("/user")
+    public String userView() {
+        return "system/user.html";
     }
 
     @GetMapping("/job")
@@ -290,6 +302,173 @@ public class SystemController {
             }
         } catch (Exception e) {
             log.error("Delete job name has error, msg is {}", e);
+        }
+        return status;
+    }
+
+    /**
+     * page user list
+     *
+     * @param response
+     * @param request
+     */
+    @RequestMapping(value = "/user/table/ajax", method = RequestMethod.GET)
+    public void pageUserAjax(HttpServletResponse response, HttpServletRequest request) {
+
+        String aoData = request.getParameter("aoData");
+        JSONArray params = JSON.parseArray(aoData);
+        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
+        String search = "";
+        for (Object object : params) {
+            JSONObject param = (JSONObject) object;
+            if ("sEcho".equals(param.getString("name"))) {
+                sEcho = param.getIntValue("value");
+            } else if ("iDisplayStart".equals(param.getString("name"))) {
+                iDisplayStart = param.getIntValue("value");
+            } else if ("iDisplayLength".equals(param.getString("name"))) {
+                iDisplayLength = param.getIntValue("value");
+            } else if ("sSearch".equals(param.getString("name"))) {
+                search = param.getString("value");
+            }
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("start", iDisplayStart / iDisplayLength + 1);
+        map.put("size", iDisplayLength);
+        map.put("search", search);
+
+        Page<UserInfo> pages = this.userDaoService.pages(map);
+        JSONArray aaDatas = new JSONArray();
+
+        for (UserInfo userInfo : pages.getRecords()) {
+            JSONObject target = new JSONObject();
+            target.put("id", userInfo.getId());
+            target.put("username", userInfo.getUsername());
+            target.put("password", userInfo.getPassword());
+            target.put("roles", HtmlAttributeUtil.getUserRoleHtml(userInfo.getRoles()));
+            target.put("modify_time", userInfo.getModifyTime());
+            if ("ROLE_ADMIN".equals(userInfo.getRoles())) {
+                target.put("operate", "");
+            } else {
+                target.put("operate", "<a href='' uid='" + userInfo.getId() + "' username='" + userInfo.getUsername() + "' password='" + userInfo.getOriginPassword() + "' roles='" + userInfo.getRoles() + "' name='efak_system_user_edit' class='badge border border-warning text-warning'>编辑</a> <a href='' username='" + userInfo.getUsername() + "' uid='" + userInfo.getId() + "' name='efak_system_user_delete' class='badge border border-danger text-danger'>删除</a>");
+            }
+            aaDatas.add(target);
+        }
+
+        JSONObject target = new JSONObject();
+        target.put("sEcho", sEcho);
+        target.put("iTotalRecords", pages.getTotal());
+        target.put("iTotalDisplayRecords", pages.getTotal());
+        target.put("aaData", aaDatas);
+        try {
+            byte[] output = target.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            log.error("Get user info has error,msg is {}", ex);
+        }
+    }
+
+    /**
+     * get user roles list.
+     *
+     * @param response
+     * @param request
+     */
+    @RequestMapping(value = "/user/roles/list/ajax", method = RequestMethod.GET)
+    public void pageUserRolesAjax(HttpServletResponse response, HttpServletRequest request) {
+        String name = request.getParameter("name");
+        JSONObject object = new JSONObject();
+
+        int offset = 0;
+        JSONArray topics = new JSONArray();
+        for (String role : KConstants.USER_ROLES_LIST) {
+            if (StrUtil.isNotBlank(name)) {
+                JSONObject topic = new JSONObject();
+                if (role.contains(name)) {
+                    topic.put("text", role);
+                    topic.put("id", offset);
+                }
+                topics.add(topic);
+            } else {
+                JSONObject topic = new JSONObject();
+                topic.put("text", role);
+                topic.put("id", offset);
+                topics.add(topic);
+            }
+
+            offset++;
+        }
+
+        object.put("items", topics);
+        try {
+            byte[] output = object.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            log.error("Get job name list has error,msg is {}", ex);
+        }
+    }
+
+    /**
+     * add or update user info.
+     *
+     * @param response
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/user/info/{action}", method = RequestMethod.POST)
+    public boolean addOrEditUserAjax(@PathVariable("action") String action, HttpServletResponse response, @RequestParam("uid") Long uid, @RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("roles") String roles) {
+        Boolean status = false;
+        try {
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUsername(username);
+            userInfo.setOriginPassword(password);
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            userInfo.setPassword(encoder.encode(password));
+            userInfo.setRoles(KConstants.USER_ROLES_MAP.get(roles));
+            if ("add".equals(action)) {
+                status = this.userDaoService.insert(userInfo);
+            } else if ("edit".equals(action)) {
+                userInfo.setId(uid);
+                status = this.userDaoService.update(userInfo);
+            }
+        } catch (Exception e) {
+            log.error("Add or update user info has error, msg is {}", e);
+        }
+        return status;
+    }
+
+    /**
+     * delete user info by uid.
+     *
+     * @param response
+     * @param uid
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/user/info/delete", method = RequestMethod.POST)
+    public boolean delUserAjax(HttpServletResponse response, @RequestParam("uid") Long uid) {
+        Boolean status = false;
+        try {
+            status = this.userDaoService.delete(uid);
+        } catch (Exception e) {
+            log.error("Delete user info has error, msg is {}", e);
+        }
+        return status;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/user/password/reset", method = RequestMethod.POST)
+    public boolean resetUserPasswordAjax(HttpServletResponse response, @RequestParam("username") String username, @RequestParam("passwordOld") String passwordOld, @RequestParam("passwordNew") String passwordNew) {
+        Boolean status = false;
+        try {
+            UserInfo userInfo = this.userDaoService.users(username, passwordOld);
+            if (userInfo != null) {
+                userInfo.setPassword(new BCryptPasswordEncoder().encode(passwordNew));
+                userInfo.setOriginPassword(passwordNew);
+                status = this.userDaoService.reset(userInfo);
+            }
+        } catch (Exception e) {
+            log.error("Reset user password has error, msg is {}", e);
         }
         return status;
     }

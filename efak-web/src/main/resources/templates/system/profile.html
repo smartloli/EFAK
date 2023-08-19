@@ -43,8 +43,18 @@
                     <h4 th:utext="#{kafka.eagle.system.profile.user}"></h4>
                     <div class="mb-3">
                         <div class="text-center">
-                            <p class="tx-16 fw-bolder"><span sec:authentication="principal.username"></span></p>
-                            <p class="tx-12 text-muted"><span sec:authentication="principal.authorities"></span></p>
+                            <p class="tx-16 fw-bolder"><span id="efak_system_profile_username" sec:authentication="principal.username"></span></p>
+                            <span sec:authorize="isAuthenticated()">
+                                <span sec:authorize="hasRole('ADMIN')" class='badge bg-success'>
+                                    管理员
+                                </span>
+                                <span sec:authorize="hasRole('DEV')" class='badge bg-primary'>
+                                    开发
+                                </span>
+                                <span sec:authorize="hasRole('TEST')" class='badge bg-secondary'>
+                                    测试
+                                </span>
+                            </span>
                         </div>
                     </div>
                     <hr>
@@ -54,17 +64,19 @@
                             <h5 th:utext="#{kafka.eagle.system.profile.password.old}"></h5>
                             <br/>
                             <div class="mb-3">
-                                <input type="password" class="form-control" id="efak_system_password_old"
+                                <input autocomplete="new-password" type="password" class="form-control"
+                                       id="efak_system_password_old"
                                        value=""
-                                       placeholder="">
+                                       placeholder="" maxlength="100">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <h5 th:utext="#{kafka.eagle.system.profile.password.new}"></h5>
                             <br/>
                             <div class="mb-3">
-                                <input type="password" class="form-control" id="efak_system_password_new"
-                                       value="">
+                                <input autocomplete="new-password" type="password" class="form-control"
+                                       id="efak_system_password_new"
+                                       value="" maxlength="100">
                             </div>
                         </div>
                     </div>
@@ -87,25 +99,6 @@
         <!-- partial -->
     </div>
 
-    <!-- view detail -->
-    <div class="modal fade" id="efak_system_audit_detail_modal" tabindex="-1" aria-labelledby="varyingModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="varyingModalLabel"
-                        th:utext="#{kafka.eagle.system.audit.log.detail}"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <textarea class="form-control" id="efak_system_audit_detail_textarea" value=""
-                                  rows="16"></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- core:js -->
@@ -114,7 +107,7 @@
 <!-- plugins:js -->
 <script th:src="@{../../assets/vendors/datatables.net/jquery.dataTables.js}"></script>
 <script th:src="@{../../assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js}"></script>
-<script th:src="@{../assets/js/system/system.audit.js}"></script>
+<script th:src="@{../assets/js/system/system.profile.js}"></script>
 
 </body>
 </html>

@@ -18,6 +18,7 @@
 package org.kafka.eagle.web.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ import java.util.Map;
 
 /**
  * Description: TODO
+ *
  * @Author: smartloli
  * @Date: 2023/6/28 23:14
  * @Version: 3.4.0
@@ -44,7 +46,7 @@ public class UserDaoServiceImpl extends ServiceImpl<UserDaoMapper, UserInfo> imp
     private UserDaoMapper userDaoMapper;
 
     @Override
-    public List<UserInfo> list(){
+    public List<UserInfo> list() {
         return new LambdaQueryChainWrapper<>(this.userDaoMapper).list();
     }
 
@@ -54,27 +56,58 @@ public class UserDaoServiceImpl extends ServiceImpl<UserDaoMapper, UserInfo> imp
     }
 
     @Override
+    public UserInfo users(String username, String password) {
+        return new LambdaQueryChainWrapper<>(this.userDaoMapper).eq(UserInfo::getUsername, username).eq(UserInfo::getOriginPassword, password).one();
+    }
+
+    @Override
     public UserInfo users(Long id) {
         return null;
     }
 
     @Override
     public boolean insert(UserInfo userInfo) {
-        return false;
+        boolean status = false;
+        int code = this.userDaoMapper.insert(userInfo);
+        if (code > 0) {
+            status = true;
+        }
+        return status;
     }
 
     @Override
     public Page<UserInfo> pages(Map<String, Object> params) {
-        return null;
+
+        int start = Integer.parseInt(params.get("start").toString());
+        int size = Integer.parseInt(params.get("size").toString());
+
+        Page<UserInfo> pages = new Page<>(start, size);
+        LambdaQueryChainWrapper<UserInfo> queryChainWrapper = new LambdaQueryChainWrapper<UserInfo>(this.userDaoMapper);
+        queryChainWrapper.like(UserInfo::getUsername, params.get("search").toString());
+        return queryChainWrapper.page(pages);
     }
 
     @Override
     public boolean update(UserInfo userInfo) {
-        return false;
+        LambdaUpdateChainWrapper<UserInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<UserInfo>(this.userDaoMapper);
+        lambdaUpdateChainWrapper.eq(UserInfo::getId, userInfo.getId());
+        return lambdaUpdateChainWrapper.update(userInfo);
+    }
+
+    @Override
+    public boolean reset(UserInfo userInfo) {
+        LambdaUpdateChainWrapper<UserInfo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<UserInfo>(this.userDaoMapper);
+        lambdaUpdateChainWrapper.eq(UserInfo::getUsername, userInfo.getUsername());
+        return lambdaUpdateChainWrapper.update(userInfo);
     }
 
     @Override
     public boolean delete(UserInfo userInfo) {
         return false;
+    }
+
+    @Override
+    public boolean delete(Long id) {
+        return new LambdaUpdateChainWrapper<>(this.userDaoMapper).eq(UserInfo::getId, id).remove();
     }
 }

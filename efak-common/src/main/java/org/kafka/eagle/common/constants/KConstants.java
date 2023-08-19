@@ -18,8 +18,7 @@
 package org.kafka.eagle.common.constants;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Description: TODO
@@ -249,5 +248,21 @@ public class KConstants {
         public static final String OSFREEMEMORY = "os_free_memory";
         public static final String CPUUSED = "cpu_used";
     }
+
+    public static List<String> USER_ROLES_LIST = new ArrayList<String>() {
+        {
+            add("管理员");
+            add("开发");
+            add("测试");
+        }
+    };
+
+    public static Map<String, String> USER_ROLES_MAP = new HashMap<String, String>() {
+        {
+            put("管理员", "ROLE_ADMIN");
+            put("开发", "ROLE_DEV");
+            put("测试", "ROLE_TEST");
+        }
+    };
 
 }
