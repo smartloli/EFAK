@@ -56,6 +56,29 @@ public class HtmlAttributeUtil {
         return result;
     }
 
+    public static String getAlertChannelHtml(String type) {
+        String result = "";
+        if (KConstants.AlertChannel.WECHAT.equals(type)) {
+            result = "<span class='badge bg-success'>" + KConstants.AlertChannel.WECHAT_NAME + "</span>";
+        } else if (KConstants.AlertChannel.DINGDING.equals(type)) {
+            result = "<span class='badge bg-primary'>" + KConstants.AlertChannel.DINGDING_NAME + "</span>";
+        } else if (KConstants.AlertChannel.EMAIL.equals(type)) {
+            result = "<span class='badge bg-secondary'>" + KConstants.AlertChannel.EMAIL_NAME + "</span>";
+        }
+        return result;
+    }
+
+    public static String getAlertChannelUrlHtml(String url, Long id) {
+        String result = "";
+        if (url.length() > 0 && url.length() < 20) {
+            result = "<a href='' alert_channel_url_len_id='" + id + "'>" + url + "</a>";
+        } else {
+            result = "<a href='' alert_channel_url_len_id='" + id + "'>" + url.substring(0, 20) + "...</a>";
+        }
+
+        return result;
+    }
+
     public static String getTopicSpreadHtml(int brokerSpread) {
         String result = "";
         if (brokerSpread < KConstants.Topic.TOPIC_BROKER_SPREAD_ERROR) {

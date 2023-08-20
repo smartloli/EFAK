@@ -1,5 +1,5 @@
 /**
- * AuditLogInfo.java
+ * AlertChannelInfo.java
  * <p>
  * Copyright 2023 smartloli
  * <p>
@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kafka.eagle.pojo.audit;
+package org.kafka.eagle.pojo.alert;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -26,13 +26,14 @@ import java.time.LocalDateTime;
 
 /**
  * Description: TODO
+ *
  * @Author: smartloli
- * @Date: 2023/7/7 21:08
+ * @Date: 2023/8/20 11:45
  * @Version: 3.4.0
  */
 @Data
-@TableName("ke_users_audit_log")
-public class AuditLogInfo {
+@TableName("ke_alert_channel")
+public class AlertChannelInfo {
 
     /**
      * AUTO_INCREMENT
@@ -40,17 +41,35 @@ public class AuditLogInfo {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private String host;
+    /**
+     * Alert channel cluster id.
+     */
+    private String clusterId;
 
-    private String uri;
+    /**
+     * Alert channel user role, such as 'ROLE_ADMIN'.
+     */
+    private String channelUserRoles;
 
-    private String method;
+    /**
+     * Alert channel name, such as 'DingDing Alert'.
+     */
+    private String channelName;
 
-    private String params;
+    /**
+     * Alert channel type, such as 'DingDing', 'WeChat', 'Email'.
+     */
+    private String channelType;
 
-    private Long spentTime;
+    /**
+     * Alert channel url, such as 'https://oapi.dingtalk.com/robot/send?access_token=xxxxxx'.
+     */
+    private String channelUrl;
 
-    private Integer code;
+    /**
+     * Alert channel auth json, such as 'xxxxxx'.
+     */
+    private String authJson;
 
     /**
      * Modify time.

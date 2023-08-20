@@ -265,4 +265,15 @@ public class KConstants {
         }
     };
 
+    public final class AlertChannel {
+        public static final String DINGDING = "dingding";
+        public static final String DINGDING_NAME = "钉钉";
+        public static final String EMAIL = "email";
+        public static final String EMAIL_NAME = "邮件";
+        public static final String WECHAT = "wechat";
+        public static final String WECHAT_NAME = "微信";
+
+
+    }
+
 }

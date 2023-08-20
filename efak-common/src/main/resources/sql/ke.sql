@@ -347,3 +347,18 @@ CREATE TABLE IF NOT EXISTS ke_topic_rank(
     INDEX idx_cluster_topic_key (cluster_id,topic_name,topic_key),
     UNIQUE KEY idx_unique_cluster_topic_key (cluster_id,topic_name,topic_key) USING BTREE
 ) COMMENT 'Kafka Topic Rank Collect Info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS ke_alert_channel (
+  id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key ClusterId',
+  cluster_id VARCHAR(8) NOT NULL COMMENT 'Cluster ID',
+  channel_user varchar(20) DEFAULT NULL COMMENT 'Alert Channel User',
+  channel_name varchar(128) DEFAULT NULL COMMENT 'Alert Channel Name',
+  channel_type varchar(32) DEFAULT NULL COMMENT 'Alert Channel Type',
+  channel_url varchar(256) DEFAULT NULL COMMENT 'Alert Channel URL',
+  auth_json varchar(256) DEFAULT NULL COMMENT 'Alert Channel Auth JSON',
+  modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
+  INDEX idx_channel_name (channel_name),
+  INDEX idx_channel_cluster_id (cluster_id),
+  INDEX idx_channel_user (channel_user),
+  INDEX idx_channel_name_type (channel_name,channel_type)
+) COMMENT 'Alert Channel info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
