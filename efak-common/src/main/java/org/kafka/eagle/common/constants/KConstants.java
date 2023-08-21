@@ -257,6 +257,23 @@ public class KConstants {
         }
     };
 
+    public static List<String> ALERT_CHANNEL_LIST = new ArrayList<String>() {
+        {
+            add("钉钉");
+            add("微信");
+            add("邮件");
+            // add("自定义");
+        }
+    };
+
+    public static Map<String, String> ALERT_CHANNEL_MAP = new HashMap<String, String>() {
+        {
+            put("钉钉", "dingding");
+            put("微信", "wechat");
+            put("邮件", "email");
+        }
+    };
+
     public static Map<String, String> USER_ROLES_MAP = new HashMap<String, String>() {
         {
             put("管理员", "ROLE_ADMIN");

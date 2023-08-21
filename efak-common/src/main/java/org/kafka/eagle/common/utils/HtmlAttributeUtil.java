@@ -17,6 +17,7 @@
  */
 package org.kafka.eagle.common.utils;
 
+import cn.hutool.core.util.StrUtil;
 import org.kafka.eagle.common.constants.KConstants;
 
 /**
@@ -68,12 +69,15 @@ public class HtmlAttributeUtil {
         return result;
     }
 
-    public static String getAlertChannelUrlHtml(String url, Long id) {
+    public static String getAlertChannelUrlHtml(String url, Long id, String type) {
         String result = "";
-        if (url.length() > 0 && url.length() < 20) {
-            result = "<a href='' alert_channel_url_len_id='" + id + "'>" + url + "</a>";
+        if (StrUtil.isBlank(url)) {
+            return "无";
+        }
+        if (url.length() > 0 && url.length() < 32) {
+            result = "<a href='' name='" + type + "' alert_channel_url_len_id='" + id + "'>" + url + "</a>";
         } else {
-            result = "<a href='' alert_channel_url_len_id='" + id + "'>" + url.substring(0, 20) + "...</a>";
+            result = "<a href='' name='" + type + "' alert_channel_url_len_id='" + id + "'>" + url.substring(0, 32) + "...</a>";
         }
 
         return result;

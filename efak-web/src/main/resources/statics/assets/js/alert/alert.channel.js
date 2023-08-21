@@ -65,24 +65,19 @@ setInterval(function () {
     channelTable.ajax.reload();
 }, 60000); // 1 min
 
-$("#efak_system_user_name").maxlength({
-    warningClass: "badge mt-1 bg-success",
-    limitReachedClass: "badge mt-1 bg-danger"
-});
-
-$("#efak_system_user_password").maxlength({
+$("#efak_alert_channel_name").maxlength({
     warningClass: "badge mt-1 bg-success",
     limitReachedClass: "badge mt-1 bg-danger"
 });
 
 // username role list
-if ($("#efak_system_user_roles").length) {
-    $("#efak_system_user_roles").select2({
-        placeholder: "请选择用户角色",
-        dropdownParent: $("#efak_system_user_add_modal"),
+if ($("#efak_alert_channel_type").length) {
+    $("#efak_alert_channel_type").select2({
+        placeholder: "请选择告警渠道",
+        dropdownParent: $("#efak_alert_channel_add_modal"),
         allowClear: true,
         ajax: {
-            url: "/system/user/roles/list/ajax",
+            url: "/alert/channel/type/list/ajax",
             dataType: 'json',
             delay: 250,
             data: function (params) {
@@ -124,9 +119,9 @@ if ($("#efak_system_user_roles").length) {
     });
 }
 
-$('#efak_system_user_roles').on('select2:select', function (evt) {
+$('#efak_alert_channel_type').on('select2:select', function (evt) {
     var text = evt.params.data.text;
-    $("#efak_system_user_roles_hidden").val(text);
+    $("#efak_alert_channel_type_hidden").val(text);
 });
 
 function alertNoti(msg, icon) {
@@ -150,111 +145,124 @@ function alertNoti(msg, icon) {
 }
 
 // add user
-$("#efak_system_user_submit").click(function () {
-    var username = $("#efak_system_user_name").val();
-    var password = $("#efak_system_user_password").val();
-    var roles = $("#efak_system_user_roles_hidden").val();
-    if (username.length == 0) {
-        alertNoti("用户名不能为空", "error");
+$("#efak_alert_channel_submit").click(function () {
+    var channel_name = $("#efak_alert_channel_name").val();
+    var channel_url = $("#efak_alert_channel_url").val();
+    var channel_type = $("#efak_alert_channel_type_hidden").val();
+    var channel_auth_json = $("#efak_alert_channel_auth_json").val();
+    if (channel_name.length == 0) {
+        alertNoti("名称不能为空", "error");
         return;
     }
-    if (password.length == 0) {
-        alertNoti("密码不能为空", "error");
+    if (channel_url.length == 0) {
+        alertNoti("地址不能为空", "error");
         return;
     }
-    if (roles.length == 0) {
-        alertNoti("角色不能为空", "error");
+    if (channel_type.length == 0) {
+        alertNoti("类型不能为空", "error");
         return;
     }
 
     $.ajax({
-        url: '/system/user/info/add',
+        url: '/alert/channel/info/add',
         method: 'POST',
         data: {
-            username: username,
-            password: password,
-            roles: roles,
+            channelName: channel_name,
+            channelType: channel_type,
+            channelUrl: channel_url,
+            channelAuthJson: channel_auth_json,
             uid: 0
         },
         success: function (response) {
             Swal.fire({
                 title: '成功',
                 icon: 'success',
-                html: '用户名[<code>' + username + '</code>]创建完成',
+                html: '名称[<code>' + channel_name + '</code>]创建完成',
                 allowOutsideClick: false
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/system/user';
+                    window.location.href = '/alert/channel';
                 }
             });
         },
         error: function (xhr, status, error) {
-            Swal.fire('失败', '新增用户发生异常', 'error');
+            Swal.fire('失败', '新增渠道名称发生异常', 'error');
         }
     });
 });
 
-// edit user
-$(document).on('click', 'a[name=efak_system_user_edit]', function (event) {
+// edit channel
+$(document).on('click', 'a[name=efak_alert_channel_edit]', function (event) {
     event.preventDefault();
-    var username = $(this).attr("username");
-    var password = $(this).attr("password");
-    var uid = $(this).attr("uid");
-    $('#efak_system_user_edit_modal').modal('show');
-    $("#efak_system_user_name_edit").val(username);
-    $("#efak_system_user_password_edit").val(password);
-    $("#efak_system_user_id_edit_hidden").val(uid);
+    var uid = $(this).attr("alert_channel_id");
+    $('#efak_alert_channel_edit_modal').modal('show');
+
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/alert/channel/get/info/ajax?uid=' + uid,
+        success: function (datas) {
+            $("#efak_alert_channel_name_edit").val(datas.name);
+            $("#efak_alert_channel_url_edit").val(datas.url);
+            $("#efak_alert_channel_type_edit_hidden").val(datas.type);
+            $("#efak_alert_channel_auth_json_edit").val(datas.auth);
+            $("#efak_alert_channel_id_edit_hidden").val(uid);
+        }
+    });
+
 });
 
 // edit sumbit
-$("#efak_system_user_edit_submit").click(function () {
-    var username = $("#efak_system_user_name_edit").val();
-    var password = $("#efak_system_user_password_edit").val();
-    var roles = $("#efak_system_user_roles_edit_hidden").val();
-    var uid = $("#efak_system_user_id_edit_hidden").val();
-    if (username.length == 0) {
-        alertNoti("用户名不能为空", "error");
+$("#efak_alert_channel_edit_submit").click(function () {
+    var channel_name = $("#efak_alert_channel_name_edit").val();
+    var channel_url = $("#efak_alert_channel_url_edit").val();
+    var channel_type = $("#efak_alert_channel_type_edit_hidden").val();
+    var channel_auth_json = $("#efak_alert_channel_auth_json_edit").val();
+    var uid = $("#efak_alert_channel_id_edit_hidden").val();
+    if (channel_name.length == 0) {
+        alertNoti("名称不能为空", "error");
         return;
     }
 
-    if (password.length == 0) {
-        alertNoti("密码不能为空", "error");
+    if (channel_url.length == 0) {
+        alertNoti("地址不能为空", "error");
         return;
     }
 
-    if (roles.length == 0) {
-        alertNoti("角色不能为空", "error");
+    if (channel_type.length == 0) {
+        alertNoti("类型不能为空", "error");
         return;
     }
 
     $.ajax({
-        url: '/system/user/info/edit',
+        url: '/alert/channel/info/edit',
         method: 'POST',
         data: {
-            username: username,
-            password: password,
-            roles: roles,
+            channelName: channel_name,
+            channelType: channel_type,
+            channelUrl: channel_url,
+            channelAuthJson: channel_auth_json,
             uid: uid
         },
         success: function (response) {
             Swal.fire({
                 title: '成功',
                 icon: 'success',
-                html: '用户名[<code>' + username + '</code>]修改完成',
+                html: '渠道名称[<code>' + channel_name + '</code>]修改完成',
                 allowOutsideClick: false
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/system/user';
+                    window.location.href = '/alert/channel';
                 }
             });
         },
         error: function (xhr, status, error) {
-            Swal.fire('失败', '修改用户信息发生异常', 'error');
+            Swal.fire('失败', '修改渠道信息发生异常', 'error');
         }
     });
 });
 
-function optNoti(uid, username, action, actionDesc, html) {
+function optNoti(uid, channelName, action, actionDesc, html) {
     Swal.fire({
         customClass: {
             confirmButton: 'efak-noti-custom-common-btn-submit'
@@ -274,7 +282,7 @@ function optNoti(uid, username, action, actionDesc, html) {
         if (result.isConfirmed) {
             // send ajax request
             $.ajax({
-                url: '/system/user/info/' + action,
+                url: '/alert/channel/info/' + action,
                 method: 'POST',
                 data: {
                     uid: uid
@@ -283,16 +291,16 @@ function optNoti(uid, username, action, actionDesc, html) {
                     Swal.fire({
                         title: '成功',
                         icon: 'success',
-                        html: '用户名 [<code>' + username + '</code>] 已被' + actionDesc,
+                        html: '渠道名称 [<code>' + channelName + '</code>] 已被' + actionDesc,
                         allowOutsideClick: false
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = '/system/user';
+                            window.location.href = '/alert/channel';
                         }
                     });
                 },
                 error: function (xhr, status, error) {
-                    Swal.fire('失败', '用户' + actionDesc + '发生异常', 'error');
+                    Swal.fire('失败', '渠道名称' + actionDesc + '发生异常', 'error');
                 }
             });
         }
@@ -300,22 +308,22 @@ function optNoti(uid, username, action, actionDesc, html) {
 }
 
 // delete user
-$(document).on('click', 'a[name=efak_system_user_delete]', function (event) {
+$(document).on('click', 'a[name=efak_alert_channel_delete]', function (event) {
     event.preventDefault();
-    var uid = $(this).attr("uid");
-    var username = $(this).attr("username");
-    optNoti(uid, username, 'delete', '删除', '用户 [<code>' + username + '</code>] 删除后不能被恢复!');
+    var uid = $(this).attr("alert_channel_id");
+    var channelName = $(this).attr("channel_name");
+    optNoti(uid, channelName, 'delete', '删除', '渠道名称 [<code>' + channelName + '</code>] 删除后不能被恢复!');
 });
 
 // edit user
 // username role list
-if ($("#efak_system_user_roles_edit").length) {
-    $("#efak_system_user_roles_edit").select2({
-        placeholder: "请选择用户角色",
-        dropdownParent: $("#efak_system_user_edit_modal"),
+if ($("#efak_alert_channel_type_edit").length) {
+    $("#efak_alert_channel_type_edit").select2({
+        placeholder: "请选择告警渠道",
+        dropdownParent: $("#efak_alert_channel_edit_modal"),
         allowClear: true,
         ajax: {
-            url: "/system/user/roles/list/ajax",
+            url: "/alert/channel/type/list/ajax",
             dataType: 'json',
             delay: 250,
             data: function (params) {
@@ -357,8 +365,24 @@ if ($("#efak_system_user_roles_edit").length) {
     });
 }
 
-$('#efak_system_user_roles_edit').on('select2:select', function (evt) {
+$('#efak_alert_channel_type_edit').on('select2:select', function (evt) {
     var text = evt.params.data.text;
-    $("#efak_system_user_roles_edit_hidden").val(text);
+    $("#efak_alert_channel_type_edit_hidden").val(text);
 });
 
+// view url details
+$(document).on('click', 'a[name=channel_view_url]', function (event) {
+    event.preventDefault();
+    var uid = $(this).attr("alert_channel_url_len_id");
+    $('#efak_alert_channel_view_modal').modal('show');
+
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/alert/channel/get/info/ajax?uid=' + uid,
+        success: function (datas) {
+            $("#efak_alert_channel_name_view").text(datas.url);
+        }
+    });
+
+});

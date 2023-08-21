@@ -65,42 +65,48 @@
         <!-- partial -->
     </div>
 
-    <!-- add job -->
-    <div class="modal fade" id="efak_system_user_add_modal" tabindex="-1" aria-labelledby="varyingModalLabel"
+    <!-- add channel -->
+    <div class="modal fade" id="efak_alert_channel_add_modal" tabindex="-1" aria-labelledby="varyingModalLabel"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="varyingModalLabel"
-                        th:utext="#{kafka.eagle.system.user.btn.add}"></h5>
+                        th:utext="#{kafka.eagle.alert.channel.btn.add}"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="efak_system_user_name" class="form-label"
-                               th:utext="#{kafka.eagle.system.user.name}"></label>
-                        <input autocomplete="off" type="text" class="form-control" id="efak_system_user_name"
-                               name="efak_system_user_name" maxlength="20">
+                        <label for="efak_alert_channel_name" class="form-label"
+                               th:utext="#{kafka.eagle.alert.channel.name}"></label>
+                        <input type="text" class="form-control" id="efak_alert_channel_name"
+                               name="efak_alert_channel_name" maxlength="64">
                     </div>
                     <div class="mb-3">
-                        <label for="efak_system_user_password" class="form-label"
-                               th:utext="#{kafka.eagle.system.user.password}"></label>
-                        <input autocomplete="new-password" type="password" class="form-control" id="efak_system_user_password"
-                               name="efak_system_user_password" maxlength="100">
-                    </div>
-                    <div class="mb-3">
-                        <label for="efak_system_user_roles" class="form-label"
-                               th:utext="#{kafka.eagle.system.user.role}"></label>
-                        <select id="efak_system_user_roles" class="form-select" data-width="100%">
+                        <label for="efak_alert_channel_type" class="form-label"
+                               th:utext="#{kafka.eagle.alert.channel.type}"></label>
+                        <select id="efak_alert_channel_type" class="form-select" data-width="100%">
                         </select>
-                        <input type="hidden" id="efak_system_user_roles_hidden" />
+                        <input type="hidden" id="efak_alert_channel_type_hidden" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="efak_alert_channel_url" class="form-label"
+                               th:utext="#{kafka.eagle.alert.channel.url}"></label>
+                        <input type="text" class="form-control" id="efak_alert_channel_url"
+                               name="efak_alert_channel_url">
+                    </div>
+                    <div class="mb-3">
+                        <label for="efak_alert_channel_auth_json" class="form-label"
+                               th:utext="#{kafka.eagle.alert.channel.auth.json}"></label>
+                        <input type="text" class="form-control" id="efak_alert_channel_auth_json"
+                               name="efak_alert_channel_auth_json">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             th:text="#{kafka.eagle.clusters.manage.button.close}">Close
                     </button>
-                    <button type="button" id="efak_system_user_submit" class="btn btn-primary"
+                    <button type="button" id="efak_alert_channel_submit" class="btn btn-primary"
                             th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
                     </button>
                 </div>
@@ -108,44 +114,76 @@
         </div>
     </div>
 
-    <!-- edit user -->
-    <div class="modal fade" id="efak_system_user_edit_modal" tabindex="-1" aria-labelledby="varyingModalLabelEdit"
+    <!-- edit channel -->
+    <div class="modal fade" id="efak_alert_channel_edit_modal" tabindex="-1" aria-labelledby="varyingModalLabelEdit"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="varyingModalLabelEdit"
-                        th:utext="#{kafka.eagle.system.user.btn.edit}"></h5>
+                        th:utext="#{kafka.eagle.alert.channel.btn.edit}"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="efak_system_user_name_edit" class="form-label"
-                               th:utext="#{kafka.eagle.system.user.name}"></label>
-                        <input autocomplete="off" type="text" class="form-control" id="efak_system_user_name_edit"
-                               name="efak_system_user_name_edit" maxlength="20">
+                        <label for="efak_alert_channel_name" class="form-label"
+                               th:utext="#{kafka.eagle.alert.channel.name}"></label>
+                        <input type="text" class="form-control" id="efak_alert_channel_name_edit"
+                               name="efak_alert_channel_name_edit" maxlength="64">
                     </div>
                     <div class="mb-3">
-                        <label for="efak_system_user_password_edit" class="form-label"
-                               th:utext="#{kafka.eagle.system.user.password}"></label>
-                        <input autocomplete="new-password" type="password" class="form-control" id="efak_system_user_password_edit"
-                               name="efak_system_user_password_edit" maxlength="100">
-                    </div>
-                    <div class="mb-3">
-                        <label for="efak_system_user_roles_edit" class="form-label"
-                               th:utext="#{kafka.eagle.system.user.role}"></label>
-                        <select id="efak_system_user_roles_edit" class="form-select" data-width="100%">
+                        <label for="efak_alert_channel_type_edit" class="form-label"
+                               th:utext="#{kafka.eagle.alert.channel.type}"></label>
+                        <select id="efak_alert_channel_type_edit" class="form-select" data-width="100%">
                         </select>
-                        <input type="hidden" id="efak_system_user_roles_edit_hidden" />
-                        <input type="hidden" id="efak_system_user_id_edit_hidden" />
+                        <input type="hidden" id="efak_alert_channel_type_edit_hidden" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="efak_alert_channel_url" class="form-label"
+                               th:utext="#{kafka.eagle.alert.channel.url}"></label>
+                        <input type="text" class="form-control" id="efak_alert_channel_url_edit"
+                               name="efak_alert_channel_url_edit">
+                    </div>
+                    <div class="mb-3">
+                        <label for="efak_alert_channel_auth_json" class="form-label"
+                               th:utext="#{kafka.eagle.alert.channel.auth.json}"></label>
+                        <input type="text" class="form-control" id="efak_alert_channel_auth_json_edit"
+                               name="efak_alert_channel_auth_json_edit">
+                        <input type="hidden" id="efak_alert_channel_id_edit_hidden">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             th:text="#{kafka.eagle.clusters.manage.button.close}">Close
                     </button>
-                    <button type="button" id="efak_system_user_edit_submit" class="btn btn-primary"
+                    <button type="button" id="efak_alert_channel_edit_submit" class="btn btn-primary"
                             th:text="#{kafka.eagle.clusters.manage.button.submit}">Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- view modal -->
+    <div class="modal fade" id="efak_alert_channel_view_modal" tabindex="-1" aria-labelledby="varyingModalLabelEdit"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="varyingModalLabelView"
+                        th:utext="#{kafka.eagle.alert.channel.btn.view}"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="efak_alert_channel_name_view" class="form-label"
+                               th:utext="#{kafka.eagle.alert.channel.view}"></label>
+                        <textarea id="efak_alert_channel_name_view" class="form-control" rows="10"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            th:text="#{kafka.eagle.clusters.manage.button.close}">Close
                     </button>
                 </div>
             </div>

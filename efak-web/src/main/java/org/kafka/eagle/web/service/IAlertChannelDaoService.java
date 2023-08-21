@@ -21,7 +21,7 @@ public interface IAlertChannelDaoService extends IService<AlertChannelInfo> {
      * @param id
      * @return
      */
-    AlertChannelInfo users(Long id);
+    AlertChannelInfo channel(Long id);
 
     /**
      * insert alert channel info.
