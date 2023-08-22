@@ -184,7 +184,7 @@ public class ClusterController {
             target.put("brokerHost", clusterCreateInfo.getBrokerHost());
             target.put("brokerPort", clusterCreateInfo.getBrokerPort());
             target.put("brokerJmxPort", clusterCreateInfo.getBrokerJmxPort());
-            target.put("modify", clusterCreateInfo.getBrokerJmxPort());
+            target.put("modify", clusterCreateInfo.getModifyTime());
             target.put("operate", "<a href='' name='efak_cluster_node_manage_edit' dataid='" + clusterCreateInfo.getId() + "' cid='" + clusterCreateInfo.getClusterId() + "' brokerId='" + clusterCreateInfo.getBrokerId() + "' brokerHost='" + clusterCreateInfo.getBrokerHost() + "' brokerPort='" + clusterCreateInfo.getBrokerPort() + "' brokerJmxPort='" + clusterCreateInfo.getBrokerJmxPort() + "' class='badge border border-primary text-primary'>编辑</a> <a href='' name='efak_cluster_node_manage_del' dataid='" + clusterCreateInfo.getId() + "' cid='" + clusterCreateInfo.getClusterId() + "' brokerId='" + clusterCreateInfo.getBrokerId() + "' brokerHost='" + clusterCreateInfo.getBrokerHost() + "' class='badge border border-danger text-danger'>删除</a>");
             aaDatas.add(target);
         }

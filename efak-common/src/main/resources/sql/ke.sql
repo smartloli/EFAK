@@ -78,7 +78,8 @@ CREATE TABLE IF NOT EXISTS ke_users_info (
   roles varchar(50) DEFAULT NULL COMMENT 'Roles',
   modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
   INDEX idx_username (username),
-  INDEX idx_user_pwd (username,passwd),
+  INDEX idx_roles (roles),
+  INDEX idx_user_pwd (username,password),
   UNIQUE KEY idx_unique_username (username) USING BTREE
 ) COMMENT 'User info' CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
