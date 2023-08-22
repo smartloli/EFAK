@@ -80,6 +80,11 @@ public class AlertController {
         return "alert/channel.html";
     }
 
+    @GetMapping("/rule")
+    public String rulelView() {
+        return "alert/rule.html";
+    }
+
     @RequestMapping(value = "/channel/table/ajax", method = RequestMethod.GET)
     public void pageAlertChannelAjax(HttpServletResponse response, HttpServletRequest request) {
 
