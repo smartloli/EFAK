@@ -5,111 +5,65 @@
 
 [![Stargazers over time](https://starchart.cc/smartloli/kafka-eagle.svg)](https://starchart.cc/smartloli/kafka-eagle)
 
-# EFAK (Eagle For Apache Kafka, previously known as Kafka Eagle)
+# EFAK (原名 Kafka Eagle)
 
-This is an monitor system and monitor your kafka clusters, and visual consumer thread,offsets,owners etc.
+`EAFK` 是一个开源的 Kafka 集群管理和监控工具，旨在帮助用户更好地管理和监控其 Kafka 集群。
 
-When you install [EFAK](https://www.kafka-eagle.org/), you can see the current consumer group,for each group the topics that they are consuming and the offsets, lag, logsize position of the group in each topic. This is useful to understand how fast you are consuming from a message queue and how quick the message queue is increase. This will help you debuging kafka producers and consumers or just to have an idea of what is going on in your system.
+## 功能特点
 
-The system shows the trend of consumer and producer trends on the same day, so you can see what happened that day.
+- **实时监控：** 实时监控 Kafka 集群的状态、健康状况以及性能指标。
+- **消费者组管理：** 查看和管理消费者组、消费者、消费者偏移等信息。
+- **Topic 管理：** 创建、修改、删除 Kafka Topic，并查看 Topic 详细信息。
+- **告警系统：** 支持配置告警规则，及时发现集群问题并通知管理员。
+- **图表和报表：** 提供可视化的图表和报表，帮助用户更好地理解集群情况。
+- **用户权限：** 支持多用户和角色权限管理，确保安全性。
+- **易于部署：** 提供简单的安装和部署流程，适用于各种规模的 Kafka 集群。
+- **跨平台：** 支持 Linux、Windows、Mac OS X 等多种平台。
+- **跨版本：** 支持 Kafka 0.8.x 到 3.x 版本。
 
-Supported on kafka version: ``` 0.8.2.x ```,``` 0.9.x ```,``` 0.10.x ```,``` 0.11.x ```,``` 1.x ```,``` 2.x ``` .
+## 快速开始
+- [官网地址](https://www.kafka-eagle.org/)
+- [用户手册](https://docs.kafka-eagle.org/)
 
-Supported platform: ```Mac OS X```,```Linux```,```Windows```.
+## 系统截图
+### 1.集群管理
+![集群管理](efak-docs/imgs/1.png)
 
-Supported JDK: ```JDK8+```
+### 2.创建集群
+![创建集群](efak-docs/imgs/2.png)
 
-Here are a few `EFAK` system screenshots:
-![efak_tv](https://www.kafka-eagle.org/images/docs/bscreen@2x.png)
+### 3.主题管理
+![主题管理](efak-docs/imgs/3.png)
 
-# Get started
-* [Get EFAK](https://www.kafka-eagle.org/)
-* [Installation guides](https://www.kafka-eagle.org/)
+### 4.消费详情
+![消费详情](efak-docs/imgs/4.png)
 
-Unsure if EFAK is for you? Watch EFAK video in action on [www.kafka-eagle.org](https://www.kafka-eagle.org)!
+### 5.消费者组
+![消费者组](efak-docs/imgs/5.png)
 
-# Alert Support
-`EFAK` supports currently popular IM alarm systems, such as:
-* DingDing
-* WeChat
-* Webhook
-* Email
-* ...
+### 6.集群信息
+![集群信息](efak-docs/imgs/6.png)
 
-# List of Consumer Groups & Active Group Graph
-![Consumer & Active Graph](http://www.kafka-eagle.org/images/docs/consumer@2x.png)
+### 7.主题量级
+![主题量级](efak-docs/imgs/7.png)
 
-# List of Topics Detail
-![Topics](http://www.kafka-eagle.org/images/docs/list@2x.png)
+### 8.告警设置
+![告警设置](efak-docs/imgs/8.png)
 
-# Consumer & Producer Rate Chart
-![Rate Chart](http://www.kafka-eagle.org/images/docs/consumer_rate_graph@2x.png)
+### 9.用户管理
+![用户管理](efak-docs/imgs/9.png)
 
-# Start EFAK
-![KE Script](http://www.kafka-eagle.org/images/docs/startup@2x.png)
+### 10.审计日志
+![审计日志](efak-docs/imgs/10.png)
 
-# Kafka Offset Types
+# 贡献代码
 
-Kafka is designed to be flexible on how the offsets are managed. Consumer can choose arbitrary storage and format to persist kafka offsets. `EFAK` currently support following popular storage format:
-  * Zookeeper. Old version of Kafka (0.8.2 before) default storage in Zookeeper.
-  * Kafka. New version of Kafka (0.10.0 in the future) default recommend storage in Kafka Topic(__consumer_offsets).
-  
-`EFAK` supports multiple offset storage paths. If you store them in Zookeeper and Kafka, you can configure them like this.
-```
-# Set kafka cluster alias
-efak.zk.cluster.alias=cluster1,cluster2
+`EFAK` 在 Apache 许可证下发布，我们欢迎在此许可证范围内的任何贡献。欢迎提交任何拉取请求，我们将尽快进行审查和合并。
+由于这是一个开源工具，请遵守相关法律法规，文明使用。
 
-# Set kafka cluster zookeeper address
-cluster1.zk.list=xdn1:2181,xdn2:2181,xdn3:2181
-cluster2.zk.list=tdn1:2181,tdn2:2181,tdn3:2181
+# 贡献者
 
-# Set kafka cluster offset storage path
-cluster1.efak.offset.storage=kafka
-cluster2.efak.offset.storage=zookeeper
-```
-
-# Kafka SQL
-
-Use the SQL statement to query the topic message log, and visualize the results, you can read [Kafka SQL](http://www.kafka-eagle.org/articles/docs/quickstart/ksql.html) to view the syntax.
-For example, if you kafka has a topic with three partitions, the ksql query statement is as follows.
-```
-select * from ke_p3_r2 where `partition` in (0,1,2) limit 10
-```
-
-![ksql](http://www.kafka-eagle.org/images/docs/kafka_ksql_v2@2x.png)
-![ksql_result](http://www.kafka-eagle.org/images/docs/kafka_ksql_result_v2@2x.png)
-
-# Quickstart
-
-Please read [EFAK Install](http://www.kafka-eagle.org/articles/docs/installation/linux-macos.html) for setting up and running `EFAK`.
-
-# Deploy
-
-The project is a maven project that uses the Maven command to pack the deployment as follows:
-```bash
-./build.sh
-```
-# More Information
-
-Please see the [EFAK Manual](http://www.kafka-eagle.org/articles/docs/documentation.html) for for more information including:
-  * System environment settings and installation instructions.
-  * Information about how to use script command.
-  * Visual kafka consumer group,topic,offset metadata information etc.
-  * Metadata collection and log change information.
- 
-# Contributing
-
-The `EFAK` is released under the Apache License and we welcome any contributions within this license. Any pull request is welcome and will be reviewed and merged as quickly as possible.
-
-Since this is an open source tool, please comply with the relevant laws and regulations, the use of civilization.
-
-# Project Name and Management
-
-`EFAK` was renamed from its previous name due to [this issue](https://github.com/smartloli/kafka-eagle/issues/525). `EFAK` is designed to be used with Apache Kafka and is offered to support the needs of the Kafka community. The project is open source by [Smartloli](https://www.kafka-eagle.org/articles/about/me.html) and maintained and managed in Github.
-
-# Contributors
-
-Thanks to the following members for maintaining the project. If this project help you reduce time to develop, you can give us a star. 
+感谢以下成员维护该项目。如果这个项目帮助您减少了开发时间，您可以给我们一个星星。
 
 |Alias |Github |Email |
 |:-- |:-- |:-- |
@@ -119,3 +73,6 @@ Thanks to the following members for maintaining the project. If this project hel
 |alisa|[alisa](https://github.com/zoumm)|alisazou1211@gmail.com|
 |iamwzt|[iamwzt](https://github.com/iamwzt)|981911861@qq.com|
 |JacobAP|[JacobAP](https://github.com/JacobAP)|jacobap@163.com|
+
+--
+© 2023 [Kafka Eagle](https://www.kafka-eagle.org/)
