@@ -83,13 +83,13 @@ $("#efak_alert_rule_wizard_one_name").maxlength({
 });
 
 // username role list
-if ($("#efak_alert_channel_type").length) {
-    $("#efak_alert_channel_type").select2({
-        placeholder: "请选择告警渠道",
-        dropdownParent: $("#efak_alert_channel_add_modal"),
+if ($("#efak_alert_rule_two_type").length) {
+    $("#efak_alert_rule_two_type").select2({
+        placeholder: "请选择监控类型",
+        dropdownParent: $("#efak_alert_rule_add_modal"),
         allowClear: true,
         ajax: {
-            url: "/alert/channel/type/list/ajax",
+            url: "/alert/rule/type/list/ajax",
             dataType: 'json',
             delay: 250,
             data: function (params) {
@@ -131,9 +131,9 @@ if ($("#efak_alert_channel_type").length) {
     });
 }
 
-$('#efak_alert_channel_type').on('select2:select', function (evt) {
+$('#efak_alert_rule_two_type').on('select2:select', function (evt) {
     var text = evt.params.data.text;
-    $("#efak_alert_channel_type_hidden").val(text);
+    $("#efak_alert_rule_two_type_hidden").val(text);
 });
 
 function alertNoti(msg, icon) {

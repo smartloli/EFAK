@@ -276,4 +276,43 @@ public class AlertController {
         return status;
     }
 
+    /**
+     * Get alert rule type list.
+     * @param response
+     * @param request
+     */
+    @RequestMapping(value = "/rule/type/list/ajax", method = RequestMethod.GET)
+    public void pageAlertRuleTypeAjax(HttpServletResponse response, HttpServletRequest request) {
+        String name = request.getParameter("name");
+        JSONObject object = new JSONObject();
+
+        int offset = 0;
+        JSONArray topics = new JSONArray();
+        for (String role : KConstants.ALERT_RULE_LIST) {
+            if (StrUtil.isNotBlank(name)) {
+                JSONObject topic = new JSONObject();
+                if (role.contains(name)) {
+                    topic.put("text", role);
+                    topic.put("id", offset);
+                }
+                topics.add(topic);
+            } else {
+                JSONObject topic = new JSONObject();
+                topic.put("text", role);
+                topic.put("id", offset);
+                topics.add(topic);
+            }
+
+            offset++;
+        }
+
+        object.put("items", topics);
+        try {
+            byte[] output = object.toJSONString().getBytes();
+            BaseController.response(output, response);
+        } catch (Exception ex) {
+            log.error("Get alert channel name list has error,msg is {}", ex);
+        }
+    }
+
 }

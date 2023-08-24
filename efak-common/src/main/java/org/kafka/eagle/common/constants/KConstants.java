@@ -266,6 +266,14 @@ public class KConstants {
         }
     };
 
+    public static List<String> ALERT_RULE_LIST = new ArrayList<String>() {
+        {
+            add("Kafka");
+            add("主题");
+//            add("消费者组");
+        }
+    };
+
     public static Map<String, String> ALERT_CHANNEL_MAP = new HashMap<String, String>() {
         {
             put("钉钉", "dingding");

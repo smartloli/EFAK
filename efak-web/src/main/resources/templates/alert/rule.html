@@ -120,7 +120,7 @@
                                        th:utext="#{kafka.eagle.alert.rule.wizard.one.frequency}"></label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="efak_alert_rule_wizard_one_frequency"
-                                           placeholder="1">
+                                           value="1">
                                     <div class="input-group-text"
                                          th:text="#{kafka.eagle.alert.rule.wizard.one.frequency.unit}">
                                     </div>
@@ -130,8 +130,33 @@
 
                         <h2 th:text="#{kafka.eagle.alert.rule.wizard.two}"></h2>
                         <section>
-                            <h4>Second Step</h4>
-                            <p></p>
+                            <div class="mb-3">
+                                <label for="efak_alert_rule_two_type" class="form-label"
+                                       th:utext="#{kafka.eagle.alert.rule.wizard.two.type}"></label>
+                                <select id="efak_alert_rule_two_type" class="form-select" data-width="100%">
+                                </select>
+                                <input type="hidden" id="efak_alert_rule_two_type_hidden" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="efak_alert_rule_two_metric" class="form-label"
+                                       th:utext="#{kafka.eagle.alert.rule.wizard.two.metric}"></label>
+                                <select id="efak_alert_rule_two_metric" class="form-select" data-width="100%">
+                                </select>
+                                <input type="hidden" id="efak_alert_rule_two_metric_hidden" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="efak_alert_rule_two_operator" class="form-label"
+                                       th:utext="#{kafka.eagle.alert.rule.wizard.two.operator}"></label>
+                                <select id="efak_alert_rule_two_operator" class="form-select" data-width="100%">
+                                </select>
+                                <input type="hidden" id="efak_alert_rule_two_operator_hidden" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="efak_alert_rule_two_value" class="form-label"
+                                       th:utext="#{kafka.eagle.alert.rule.wizard.two.value}"></label>
+                                <input type="text" class="form-control" id="efak_alert_rule_two_value"
+                                       name="efak_alert_rule_two_value">
+                            </div>
                         </section>
 
                         <h2 th:text="#{kafka.eagle.alert.rule.wizard.three}"></h2>
