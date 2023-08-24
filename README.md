@@ -1,6 +1,6 @@
 [![Build Status](https://app.travis-ci.com/smartloli/EFAK.svg?branch=master)](https://app.travis-ci.com/smartloli/EFAK)
 ![](https://img.shields.io/badge/language-java-orange.svg)
-[![codebeat badge](https://codebeat.co/badges/4c141093-e55d-464d-87ce-7431cde81398)](https://codebeat.co/projects/github-com-smartloli-efak-master)
+[![codebeat badge](https://codebeat.co/badges/8ef5790f-6c84-4641-92f6-a5cc41f02eb8)](https://codebeat.co/projects/github-com-smartloli-efak-main)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/smartloli/EFAK/blob/master/LICENSE)
 
 [![Stargazers over time](https://starchart.cc/smartloli/kafka-eagle.svg)](https://starchart.cc/smartloli/kafka-eagle)
