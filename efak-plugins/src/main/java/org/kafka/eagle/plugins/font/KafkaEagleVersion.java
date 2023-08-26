@@ -19,8 +19,10 @@ package org.kafka.eagle.plugins.font;
 
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.common.constants.KConstants;
+import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * Print kafka eagle system version.
@@ -47,11 +49,11 @@ public class KafkaEagleVersion {
 
     }
 
-    private static String getFontPath() {
+    private static String getFontPath() throws FileNotFoundException {
         String path = "";
         String osName = System.getProperty("os.name");
         if (osName.contains("Windows") || osName.contains("Mac")) {
-            path = "/Users/smartloli/workspace/kafka-eagle/efak-web/src/main/resources/font/slant.flf";
+            path = ResourceUtils.getFile("classpath:font/slant.flf").getPath();
         } else {
             path = System.getProperty("user.dir") + "/font/slant.flf";
         }

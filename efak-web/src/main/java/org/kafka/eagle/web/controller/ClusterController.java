@@ -35,6 +35,9 @@ import org.kafka.eagle.web.service.IBrokerDaoService;
 import org.kafka.eagle.web.service.IClusterCreateDaoService;
 import org.kafka.eagle.web.service.IClusterDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,10 +45,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The ClusterController is responsible for handling requests related to viewing and
@@ -277,6 +278,14 @@ public class ClusterController {
      */
     @RequestMapping(value = "/manage/table/ajax", method = RequestMethod.GET)
     public void pageClustersAjax(HttpServletResponse response, HttpServletRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
+        // get user roles
+        String roles = authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
         String aoData = request.getParameter("aoData");
         JSONArray params = JSON.parseArray(aoData);
         int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
@@ -309,7 +318,11 @@ public class ClusterController {
             target.put("node", clusterInfo.getNodes());
             target.put("modify", clusterInfo.getModifyTime());
             target.put("auth", HtmlAttributeUtil.getAuthHtml(clusterInfo.getAuth()));
-            target.put("operate", "<a href='/clusters/manage/create?cid=" + clusterInfo.getClusterId() + "' name='efak_cluster_node_manage_edit' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' class='badge border border-primary text-primary'>编辑</a> <a href='' name='efak_cluster_node_manage_del' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' clusterName='" + clusterInfo.getName() + "' class='badge border border-danger text-danger'>删除</a>");
+            if ("ROLE_ADMIN".equals(roles)) {
+                target.put("operate", "<a href='/clusters/manage/create?cid=" + clusterInfo.getClusterId() + "' name='efak_cluster_node_manage_edit' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' class='badge border border-primary text-primary'>编辑</a> <a href='' name='efak_cluster_node_manage_del' dataid='" + clusterInfo.getId() + "' cid='" + clusterInfo.getClusterId() + "' clusterName='" + clusterInfo.getName() + "' class='badge border border-danger text-danger'>删除</a>");
+            } else {
+                target.put("operate", "");
+            }
             aaDatas.add(target);
         }
 
