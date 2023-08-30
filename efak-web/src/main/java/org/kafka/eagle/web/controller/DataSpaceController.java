@@ -108,7 +108,7 @@ public class DataSpaceController {
         List<BrokerInfo> onlineBrokerInfos = this.brokerDaoService.brokerStatus(clusterInfo.getClusterId(), Short.valueOf("1"));
 
         // topic size
-        Integer topicOfActiveNums = topicSummaryDaoService.topicOfActiveNums(clusterInfo.getClusterId(), CalendarUtil.getCustomLastDay(2), CalendarUtil.getCustomLastDay(0));
+        Long topicOfActiveNums = topicSummaryDaoService.topicOfActiveNums(clusterInfo.getClusterId(), CalendarUtil.getCustomLastDay(2), CalendarUtil.getCustomLastDay(0));
         KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
         KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
         Integer topicOfTotal = ksf.getTopicNames(kafkaClientInfo).size();

@@ -295,6 +295,7 @@ CREATE TABLE IF NOT EXISTS ke_consumer_group(
     topic_name VARCHAR(128) COMMENT 'Topic Name',
     coordinator VARCHAR(128) COMMENT 'Coordinator',
     state VARCHAR(32) COMMENT 'State',
+    owner VARCHAR(128) COMMENT 'Consumer Owner',
     status SMALLINT COMMENT 'running(0), shutdown(1), pending(2)',
     modify_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
     INDEX idx_cluster_id (cluster_id),

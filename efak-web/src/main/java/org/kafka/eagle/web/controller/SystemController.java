@@ -36,6 +36,7 @@ import org.kafka.eagle.web.service.IUserDaoService;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -75,11 +76,13 @@ public class SystemController {
         return "system/profile.html";
     }
 
+    @Secured(value = "ROLE_ADMIN")
     @GetMapping("/user")
     public String userView() {
         return "system/user.html";
     }
 
+    @Secured(value = "ROLE_ADMIN")
     @GetMapping("/job")
     public String jobView() {
         return "system/job.html";

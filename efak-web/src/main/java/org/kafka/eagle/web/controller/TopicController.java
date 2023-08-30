@@ -41,6 +41,7 @@ import org.kafka.eagle.web.service.IClusterDaoService;
 import org.kafka.eagle.web.service.ITopicDaoService;
 import org.kafka.eagle.web.service.ITopicSummaryDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,6 +86,7 @@ public class TopicController {
      *
      * @return The name of the cluster management view template.
      */
+    @Secured(value = "ROLE_ADMIN")
     @GetMapping("/create")
     public String createView() {
         return "topic/create.html";

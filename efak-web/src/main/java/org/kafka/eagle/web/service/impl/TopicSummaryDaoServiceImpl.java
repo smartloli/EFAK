@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.common.constants.KConstants;
 import org.kafka.eagle.pojo.topic.TopicSummaryInfo;
 import org.kafka.eagle.web.dao.mapper.TopicSummaryDaoMapper;
 import org.kafka.eagle.web.service.ITopicSummaryDaoService;
@@ -87,10 +88,10 @@ public class TopicSummaryDaoServiceImpl extends ServiceImpl<TopicSummaryDaoMappe
     }
 
     @Override
-    public Integer topicOfActiveNums(String clusterId, String stime, String etime) {
+    public Long topicOfActiveNums(String clusterId, String stime, String etime) {
         QueryWrapper<TopicSummaryInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("COUNT(DISTINCT topic_name) AS active_numes").lambda().eq(TopicSummaryInfo::getClusterId, clusterId).gt(TopicSummaryInfo::getLogSizeDiffVal,0).between(TopicSummaryInfo::getDay,stime,etime);
-        return this.topicSummaryDaoMapper.selectList(queryWrapper).size();
+        queryWrapper.select("DISTINCT topic_name").lambda().eq(TopicSummaryInfo::getClusterId, clusterId).gt(TopicSummaryInfo::getLogSizeDiffVal,0).between(TopicSummaryInfo::getDay,stime,etime);
+        return this.topicSummaryDaoMapper.selectCount(queryWrapper);
     }
 
     @Override

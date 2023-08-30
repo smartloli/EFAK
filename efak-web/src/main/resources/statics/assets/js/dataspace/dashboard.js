@@ -500,8 +500,8 @@ function getOSUsedChart() {
         },
         success: function (datas) {
             if (datas != null) {
-                setOsUsedChartData(efak_dashboard_mem_used, datas.mem);
-                setOsUsedChartData(efak_dashboard_cpu_used, datas.cpu);
+                setOsUsedChartData(efak_dashboard_mem_used, datas.mem.toFixed(2));
+                setOsUsedChartData(efak_dashboard_cpu_used, datas.cpu.toFixed(2));
                 $("#efak_dashboard_cluster_capacity").text(datas.capacity)
                 datas = null;
             }

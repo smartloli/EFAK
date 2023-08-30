@@ -60,7 +60,7 @@ public interface ITopicSummaryDaoService extends IService<TopicSummaryInfo> {
      * @param etime
      * @return
      */
-    Integer topicOfActiveNums(String clusterId,String stime,String etime);
+    Long topicOfActiveNums(String clusterId,String stime,String etime);
 
     /**
      * Page limit.

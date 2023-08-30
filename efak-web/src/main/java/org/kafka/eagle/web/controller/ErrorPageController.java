@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Error page controller to viewer data.
+ *
  * @Author: smartloli
  * @Date: 2023/6/3 22:20
  * @Version: 3.4.0
@@ -32,6 +33,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/errors")
 @Slf4j
 public class ErrorPageController {
+
+    @GetMapping("/403")
+    public String e403() {
+        return "errors/403.html";
+    }
 
     @GetMapping("/404")
     public String e404() {

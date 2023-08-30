@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 
 /**
  * When requesting status 400, 401, 404, 500, jump to the specified page.
+ *
  * @Author: smartloli
  * @Date: 2023/6/10 19:48
  * @Version: 3.4.0
@@ -35,10 +36,11 @@ public class ErrorPageConf implements ErrorPageRegistrar {
     public void registerErrorPages(ErrorPageRegistry registry) {
         ErrorPage page400 = new ErrorPage(HttpStatus.BAD_REQUEST, "/errors/404");
         ErrorPage page401 = new ErrorPage(HttpStatus.UNAUTHORIZED, "/errors/404");
+        ErrorPage page403 = new ErrorPage(HttpStatus.FORBIDDEN, "/errors/403");
         ErrorPage page404 = new ErrorPage(HttpStatus.NOT_FOUND, "/errors/404");
         ErrorPage page500 = new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/errors/500");
 
-        registry.addErrorPages(page400,page401,page404,page500);
+        registry.addErrorPages(page400, page401, page403, page404, page500);
     }
 
 }

@@ -145,14 +145,14 @@ public class TopicRankDaoServiceImpl extends ServiceImpl<TopicRankDaoMapper, Top
         TopicCapacityInfo topicCapacityInfo = new TopicCapacityInfo();
         topicCapacityInfo.setMb(result.get(0).get("mb") == null ? 0 : Long.parseLong(result.get(0).get("mb").toString()));
         topicCapacityInfo.setGb(result.get(0).get("gb") == null ? 0 : Long.parseLong(result.get(0).get("gb").toString()));
-        topicCapacityInfo.setTb(result.get(0).get("Tb") == null ? 0 : Long.parseLong(result.get(0).get("Tb").toString()));
+        topicCapacityInfo.setTb(result.get(0).get("tb") == null ? 0 : Long.parseLong(result.get(0).get("tb").toString()));
 
         return topicCapacityInfo;
     }
 
     @Override
     public List<TopicRankScatterInfo> pageTopicScatterOfTen(String clusterId, String topicKeyByOrder, List<String> topicKeys) {
-        List<TopicRankInfo> topicRankInfos = this.topicRankDaoMapper.selectList(new QueryWrapper<TopicRankInfo>().lambda().eq(TopicRankInfo::getClusterId, clusterId).eq(TopicRankInfo::getTopicKey, topicKeyByOrder).orderByDesc(TopicRankInfo::getTopicValue).last("limit 10"));
+        List<TopicRankInfo> topicRankInfos = this.topicRankDaoMapper.selectList(new QueryWrapper<TopicRankInfo>().lambda().eq(TopicRankInfo::getClusterId, clusterId).eq(TopicRankInfo::getTopicKey, topicKeyByOrder).last("order by topic_value+0 desc limit 10"));
         List<TopicRankScatterInfo> topicRankScatterInfos = new ArrayList<>();
         for (TopicRankInfo topicRankInfo : topicRankInfos) {
             TopicRankScatterInfo topicRankScatterInfo = new TopicRankScatterInfo();
