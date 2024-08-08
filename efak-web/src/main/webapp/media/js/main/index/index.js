@@ -507,8 +507,8 @@ $(function () {
                 url: '/get/dashboard/mem/ajax',
                 success: function (datas) {
                     if (datas != null) {
-                        $("#efak_dashboard_mem_chart_id").text(datas.mem + "%");
-                        refreshMemOrCpu(efak_dashboard_mem_chart, "mem", datas.mem);
+                        $("#efak_dashboard_mem_chart_id").text(datas.mem.toFixed(2) + "%");
+                        refreshMemOrCpu(efak_dashboard_mem_chart, "mem", datas.mem.toFixed(2));
                     }
                 }
             });
