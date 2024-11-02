@@ -65,7 +65,7 @@ public class KConstants {
     /**
      * Schudle job submit to mysql default size.
      */
-    public static final int MYSQL_BATCH_SIZE = 500;
+    public static final int MYSQL_BATCH_SIZE = 50;
 
     public final class SessionClusterId {
         private SessionClusterId() {
@@ -148,7 +148,7 @@ public class KConstants {
         /**
          * used by batch quartz task.
          */
-        public static final int TOPIC_QUARTZ_BATCH_SIZE = 100;
+        public static final int TOPIC_QUARTZ_BATCH_SIZE = 50;
 
         public static final long TOPIC_BROKER_SPREAD_ERROR = 60;
         public static final long TOPIC_BROKER_SPREAD_NORMAL = 80;
@@ -177,7 +177,7 @@ public class KConstants {
         private Common() {
         }
 
-        public static final String EFAK_VERSION = "v3.4.0";
+        public static final String EFAK_VERSION = "v4.0.0";
         public static final String EFAK_VERSION_DOC = "efakVersion";
     }
 

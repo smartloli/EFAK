@@ -42,7 +42,7 @@ public class KafkaEagleVersion {
             String asciiArt = FigletFont.convertOneLine(file, "EFAK");
             System.out.println("Welcome to");
             System.out.println(asciiArt + "( Eagle For Apache Kafka® )\n");
-            System.out.println("Version " + version + " -- Copyright 2016-2023");
+            System.out.println("Version " + version + " -- Copyright 2016-2024");
         } catch (Exception e) {
             log.error("Get kafka eagle version has error, msg is {}", e);
         }
