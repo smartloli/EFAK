@@ -50,7 +50,7 @@
 ### 模块结构
 ```
 EFAK-AI/
-├── efak-ai/          # AI 功能模块
+├── efak-ai/          # 告警功能模块
 ├── efak-core/        # 核心功能模块 (Kafka 连接、监控逻辑)
 ├── efak-dto/         # 数据传输对象
 ├── efak-tool/        # 工具类模块
