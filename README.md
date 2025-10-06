@@ -224,7 +224,7 @@ ps aux | grep KafkaEagle
 
 完整的部署指南、配置说明和故障排查，请参阅：
 - 📖 [详细部署文档](efak-web/src/main/resources/docs/DEPLOY.md)
-- 🚀 [功能预览稳定](efak-web/src/main/resources/docs/FEATURE_PREVIEW.md)
+- 🚀 [功能预览文档](efak-web/src/main/resources/docs/FEATURE_PREVIEW.md)
 
 
 ## 开发指南
