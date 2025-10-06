@@ -1,407 +1,378 @@
-/**
- * ConsumerController.java
- * <p>
- * Copyright 2023 smartloli
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.kafka.eagle.web.controller;
 
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.kafka.eagle.common.constants.KConstants;
-import org.kafka.eagle.common.utils.CalendarUtil;
-import org.kafka.eagle.common.utils.HtmlAttributeUtil;
-import org.kafka.eagle.common.utils.Md5Util;
-import org.kafka.eagle.core.kafka.KafkaSchemaFactory;
-import org.kafka.eagle.core.kafka.KafkaSchemaInitialize;
-import org.kafka.eagle.core.kafka.KafkaStoragePlugin;
-import org.kafka.eagle.plugins.kafka.ChartTools;
-import org.kafka.eagle.pojo.cluster.BrokerInfo;
-import org.kafka.eagle.pojo.cluster.ClusterInfo;
-import org.kafka.eagle.pojo.cluster.KafkaClientInfo;
-import org.kafka.eagle.pojo.consumer.ConsumerGroupInfo;
-import org.kafka.eagle.pojo.consumer.ConsumerGroupTopicInfo;
-import org.kafka.eagle.pojo.consumer.ConsumerOffsetInfo;
-import org.kafka.eagle.pojo.consumer.ConsumerOffsetPageInfo;
-import org.kafka.eagle.web.service.IBrokerDaoService;
-import org.kafka.eagle.web.service.IClusterDaoService;
-import org.kafka.eagle.web.service.IConsumerGroupDaoService;
-import org.kafka.eagle.web.service.IConsumerGroupTopicDaoService;
+import org.kafka.eagle.dto.broker.BrokerInfo;
+import org.kafka.eagle.dto.cluster.KafkaClientInfo;
+import org.kafka.eagle.dto.cluster.KafkaClusterInfo;
+import org.kafka.eagle.dto.consumer.ConsumerGroupPageResponse;
+import org.kafka.eagle.web.service.BrokerService;
+import org.kafka.eagle.web.service.ClusterService;
+import org.kafka.eagle.web.service.ConsumerGroupTopicService;
+import org.kafka.eagle.web.util.KafkaClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * The controller class that handles consumer-related operations.
- * This class is responsible for handling requests and providing responses related to consumers.
- *
- * @Author: smartloli
- * @Date: 2023/7/12 21:39
- * @Version: 3.4.0
+ * <p>
+ * Consumer组管理控制器
+ * </p>
+ * @author Mr.SmartLoli
+ * @since 2025/08/24 14:03:44
+ * @version 5.0.0
  */
-@Controller
-@RequestMapping("/consumer")
 @Slf4j
+@Controller
+@RequestMapping("/consumers")
 public class ConsumerController {
 
     @Autowired
-    private IBrokerDaoService brokerDaoService;
+    private ConsumerGroupTopicService consumerGroupTopicService;
 
     @Autowired
-    private IClusterDaoService clusterDaoService;
+    private ClusterService clusterService;
 
     @Autowired
-    private IConsumerGroupDaoService consumerGroupDaoService;
+    private BrokerService brokerService;
 
-    @Autowired
-    private IConsumerGroupTopicDaoService consumerGroupTopicDaoService;
-
-    @GetMapping("/summary")
-    public String consumerSummaryView() {
-        return "consumer/summary.html";
-    }
-
-    @GetMapping("/detail")
-    public String consumerDetailView() {
-        return "consumer/detail.html";
-    }
-
-    @GetMapping("/offset/{id}")
-    public String consumerOffsetView(@PathVariable("id") Long id) {
-        if (!consumerGroupDaoService.checkGroupIdExist(id)) {
-            return "redirect:/error/404";
-        }
-        return "consumer/offset.html";
-    }
-
+    /**
+     * 获取消费者组统计信息
+     *
+     * @param clusterId 集群ID
+     * @return 统计信息响应
+     */
+    @GetMapping("/api/stats")
     @ResponseBody
-    @RequestMapping(value = "/summary/groups/ajax", method = RequestMethod.GET)
-    public String getConsumerGroupsSummary(HttpSession session, HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-        log.info("Topic partition add:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
-        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
-        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
-        JSONObject target = new JSONObject();
-        ConsumerGroupInfo consumerGroupInfo = new ConsumerGroupInfo();
-        consumerGroupInfo.setClusterId(clusterInfo.getClusterId());
-        consumerGroupInfo.setStatus(KConstants.Topic.ALL);
-        Long totalGroupSize = this.consumerGroupDaoService.totalOfConsumerGroups(consumerGroupInfo);
-        consumerGroupInfo.setStatus(KConstants.Topic.RUNNING);
-        Long ActiveGroupSize = this.consumerGroupDaoService.totalOfConsumerGroups(consumerGroupInfo);
-        target.put("total_group_size", totalGroupSize);
-        target.put("active_group_size", ActiveGroupSize);
-        return target.toString();
+    public ResponseEntity<Map<String, Object>> getConsumerStats(@RequestParam("cid") String clusterId) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (clusterId == null || clusterId.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "集群ID参数不能为空");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // 获取统计数据
+            Map<String, Object> stats = consumerGroupTopicService.getConsumerStats(clusterId);
+
+            response.put("success", true);
+            response.put("data", stats);
+            response.put("message", "获取统计信息成功");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "获取统计信息失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
     }
 
-    @RequestMapping(value = "/summary/groups/set", method = RequestMethod.GET)
-    public void getConsumerGroupSetsAjax(HttpServletResponse response, HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-        log.info("Topic name mock list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
-        HttpSession session = request.getSession();
-        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
-        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
-        String name = request.getParameter("name");
-        JSONObject object = new JSONObject();
+    /**
+     * 获取空闲消费者组趋势数据
+     *
+     * @param clusterId 集群ID
+     * @param timeRange 时间范围，默认1d（最近24小时）
+     * @return 趋势数据响应
+     */
+    @GetMapping("/api/idle-groups-trend")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getIdleGroupsTrend(@RequestParam("cid") String clusterId,
+                                                                  @RequestParam(value = "timeRange", defaultValue = "1d") String timeRange) {
+        Map<String, Object> response = new HashMap<>();
 
-        List<ConsumerGroupInfo> consumerGroupInfoList = this.consumerGroupDaoService.consumerGroups(clusterInfo.getClusterId());
-        int offset = 0;
-        JSONArray topics = new JSONArray();
-        for (ConsumerGroupInfo consumerGroupInfo : consumerGroupInfoList) {
-            if (StrUtil.isNotBlank(name)) {
-                JSONObject topic = new JSONObject();
-                if (consumerGroupInfo.getGroupId().contains(name)) {
-                    topic.put("text", consumerGroupInfo.getGroupId());
-                    topic.put("id", offset);
+        try {
+            if (clusterId == null || clusterId.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "集群ID参数不能为空");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // 获取趋势数据
+            List<Map<String, Object>> trendData = consumerGroupTopicService.getIdleGroupsTrend(clusterId, timeRange);
+
+            response.put("success", true);
+            response.put("data", trendData);
+            response.put("message", "获取趋势数据成功");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "获取趋势数据失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * 获取消费者组列表（分页）
+     *
+     * @param clusterId 集群ID
+     * @param search    搜索关键字（消费者组ID或主题名称）
+     * @param page      页码
+     * @param pageSize  每页大小
+     * @return 消费者组分页数据
+     */
+    @GetMapping("/api/list")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getConsumerGroupsList(@RequestParam("cid") String clusterId,
+                                                                     @RequestParam(value = "search", defaultValue = "") String search,
+                                                                     @RequestParam(value = "page", defaultValue = "1") int page,
+                                                                     @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (clusterId == null || clusterId.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "集群ID参数不能为空");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (page < 1) {
+                page = 1;
+            }
+            if (pageSize < 1 || pageSize > 100) {
+                pageSize = 10;
+            }
+
+            // 获取消费者组列表
+            ConsumerGroupPageResponse pageResponse = consumerGroupTopicService.getConsumerGroupsList(clusterId, search, page, pageSize);
+
+            response.put("success", true);
+            response.put("data", pageResponse);
+            response.put("message", "获取消费者组列表成功");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "获取消费者组列表失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * 获取消费者组详细信息
+     *
+     * @param clusterId 集群ID
+     * @param groupId   消费者组ID
+     * @param topic     主题名称
+     * @return 消费者组详细信息
+     */
+    @GetMapping("/api/detail")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getConsumerGroupDetail(@RequestParam("cid") String clusterId,
+                                                                      @RequestParam("groupId") String groupId,
+                                                                      @RequestParam("topic") String topic) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (clusterId == null || clusterId.trim().isEmpty() ||
+                    groupId == null || groupId.trim().isEmpty() ||
+                    topic == null || topic.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "必要参数不能为空");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // 获取消费者组详细信息
+            Map<String, Object> detailInfo = consumerGroupTopicService.getConsumerGroupDetail(clusterId, groupId, topic);
+
+            response.put("success", true);
+            response.put("data", detailInfo);
+            response.put("message", "获取消费者组详细信息成功");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "获取消费者组详细信息失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * 获取消费者组速度数据
+     *
+     * @param clusterId 集群ID
+     * @param groupId   消费者组ID
+     * @param topic     主题名称
+     * @return 速度数据
+     */
+    @GetMapping("/api/speed")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getConsumerGroupSpeed(@RequestParam("cid") String clusterId,
+                                                                     @RequestParam("groupId") String groupId,
+                                                                     @RequestParam("topic") String topic) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (clusterId == null || clusterId.trim().isEmpty() ||
+                    groupId == null || groupId.trim().isEmpty() ||
+                    topic == null || topic.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "必要参数不能为空");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // 获取消费者组速度数据
+            Map<String, Object> speedData = consumerGroupTopicService.getConsumerGroupSpeed(clusterId, groupId, topic);
+
+            response.put("success", true);
+            response.put("data", speedData);
+            response.put("message", "获取消费者组速度数据成功");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "获取消费者组速度数据失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * 获取消费者组延迟趋势数据
+     *
+     * @param clusterId 集群ID
+     * @param groupId   消费者组ID
+     * @param topic     主题名称
+     * @param timeRange 时间范围
+     * @return 延迟趋势数据
+     */
+    @GetMapping("/api/lag-trend")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getConsumerGroupLagTrend(@RequestParam("cid") String clusterId,
+                                                                        @RequestParam("groupId") String groupId,
+                                                                        @RequestParam("topic") String topic,
+                                                                        @RequestParam(value = "timeRange", defaultValue = "1d") String timeRange) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (clusterId == null || clusterId.trim().isEmpty() ||
+                    groupId == null || groupId.trim().isEmpty() ||
+                    topic == null || topic.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "必要参数不能为空");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // 获取消费者组延迟趋势数据
+            List<Map<String, Object>> lagTrendData = consumerGroupTopicService.getConsumerGroupLagTrend(clusterId, groupId, topic, timeRange);
+
+            response.put("success", true);
+            response.put("data", lagTrendData);
+            response.put("message", "获取消费者组延迟趋势数据成功");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "获取消费者组延迟趋势数据失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * 重置消费者组偏移量
+     *
+     * @param requestBody 请求体，包含消费者组ID、主题名称、重置类型和其他参数
+     * @return 重置结果响应
+     */
+    @PostMapping("/api/reset-offset")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> resetConsumerGroupOffset(@RequestBody Map<String, Object> requestBody) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // 从请求体中获取参数
+            String groupId = (String) requestBody.get("groupId");
+            String clusterId = (String) requestBody.get("cid");
+            String topic = (String) requestBody.get("topic");
+            String resetType = (String) requestBody.get("resetType");
+
+            // 验证必要参数
+            if (groupId == null || groupId.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "消费者组ID不能为空");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (clusterId == null || clusterId.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "集群ID不能为空");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (resetType == null || resetType.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "重置类型不能为空");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // 获取重置值（可选）
+            Long resetValue = null;
+            if (requestBody.containsKey("offsetValue")) {
+                Object offsetValueObj = requestBody.get("offsetValue");
+                if (offsetValueObj instanceof Number) {
+                    resetValue = ((Number) offsetValueObj).longValue();
                 }
-                topics.add(topic);
+            }
+            if (requestBody.containsKey("timestamp")) {
+                Object timestampObj = requestBody.get("timestamp");
+                if (timestampObj instanceof Number) {
+                    resetValue = ((Number) timestampObj).longValue();
+                }
+            }
+
+            // 1. 根据集群ID查询集群信息
+            KafkaClusterInfo cluster = clusterService.findByClusterId(clusterId);
+            if (cluster == null) {
+                response.put("success", false);
+                response.put("message", "未找到集群信息，集群ID: " + clusterId);
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // 2. 根据集群ID查询broker信息
+            List<BrokerInfo> brokerInfos = brokerService.getBrokersByClusterId(clusterId);
+            if (brokerInfos == null || brokerInfos.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "未找到集群的broker信息，集群ID: " + clusterId);
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // 3. 构建KafkaClientInfo，使用KafkaClientUtils工具类
+            KafkaClientInfo kafkaClientInfo = KafkaClientUtils.buildKafkaClientInfo(cluster, brokerInfos);
+
+            // 调用服务层重置偏移量，使用构建好的KafkaClientInfo
+            boolean success = consumerGroupTopicService.resetConsumerGroupOffsetWithClientInfo(
+                    kafkaClientInfo, groupId, topic, resetType, resetValue);
+
+            if (success) {
+                response.put("success", true);
+                response.put("message", "消费者组偏移量重置成功");
             } else {
-                JSONObject topic = new JSONObject();
-                topic.put("text", consumerGroupInfo.getGroupId());
-                topic.put("id", offset);
-                topics.add(topic);
+                response.put("success", false);
+                response.put("message", "消费者组偏移量重置失败");
+                log.warn("消费者组 {} 偏移量重置失败", groupId);
             }
 
-            offset++;
-        }
+            return ResponseEntity.ok(response);
 
-        object.put("items", topics);
-        try {
-            byte[] output = object.toJSONString().getBytes();
-            BaseController.response(output, response);
         } catch (Exception e) {
-            log.error("Get consumer group list has error, msg is {}", e);
+            String groupId = (String) requestBody.get("groupId");
+            String topic = (String) requestBody.get("topic");
+            log.error("重置消费者组 {} , topic:{} 偏移量失败: {}", groupId, topic, e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "重置失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
         }
     }
 
-    @RequestMapping(value = "/summary/groups/one", method = RequestMethod.GET)
-    public void getConsumerGroupOneAjax(HttpServletResponse response, HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-        log.info("Topic name mock list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
-        HttpSession session = request.getSession();
-        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
-        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
-        JSONObject object = new JSONObject();
-
-        List<ConsumerGroupInfo> consumerGroupInfoList = this.consumerGroupDaoService.consumerGroups(clusterInfo.getClusterId());
-        String groupId = "";
-        if (consumerGroupInfoList != null && consumerGroupInfoList.size() > 0) {
-            groupId = consumerGroupInfoList.get(0).getGroupId();
-        }
-        object.put("groupId", groupId);
-        try {
-            byte[] output = object.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception e) {
-            log.error("Get consumer group one has error, msg is {}", e);
-        }
-    }
-
-    @RequestMapping(value = "/summary/groups/topology/ajax", method = RequestMethod.GET)
-    public void getConsumerGroupTopologyAjax(@RequestParam("groupId") String groupId, HttpServletResponse response, HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-        log.info("Topic name mock list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
-        HttpSession session = request.getSession();
-        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
-        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
-        JSONObject object = new JSONObject();
-        List<ConsumerGroupInfo> consumerGroupInfoList = this.consumerGroupDaoService.consumerGroups(clusterInfo.getClusterId(), groupId);
-        Long size = this.consumerGroupDaoService.totalOfConsumerGroupTopics(clusterInfo.getClusterId(), groupId);
-        JSONArray chartNodes = ChartTools.generateTopologyData(consumerGroupInfoList);
-        JSONArray chartNodeLines = ChartTools.generateTopologyDataLine(size);
-        object.put("nodes", chartNodes);
-        object.put("linesData", chartNodeLines);
-        try {
-            byte[] output = object.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception e) {
-            log.error("Get consumer group topology has error, msg is {}", e);
-        }
-    }
-
-    @RequestMapping(value = "/detail/table/ajax", method = RequestMethod.GET)
-    public void pageConsumerDetailAjax(HttpServletResponse response, HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-        log.info("Topic meta list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
-        HttpSession session = request.getSession();
-        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
-        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
-
-        String aoData = request.getParameter("aoData");
-        JSONArray params = JSON.parseArray(aoData);
-        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
-        String search = "";
-        for (Object object : params) {
-            JSONObject param = (JSONObject) object;
-            if ("sEcho".equals(param.getString("name"))) {
-                sEcho = param.getIntValue("value");
-            } else if ("iDisplayStart".equals(param.getString("name"))) {
-                iDisplayStart = param.getIntValue("value");
-            } else if ("iDisplayLength".equals(param.getString("name"))) {
-                iDisplayLength = param.getIntValue("value");
-            } else if ("sSearch".equals(param.getString("name"))) {
-                search = param.getString("value");
-            }
-        }
-        Map<String, Object> map = new HashMap<>();
-        map.put("start", iDisplayStart / iDisplayLength + 1);
-        map.put("size", iDisplayLength);
-        map.put("search", search);
-
-        Page<ConsumerGroupInfo> pages = this.consumerGroupDaoService.pages(map);
-        JSONArray aaDatas = new JSONArray();
-
-        for (ConsumerGroupInfo consumerGroupInfo : pages.getRecords()) {
-            JSONObject target = new JSONObject();
-            target.put("groupId", consumerGroupInfo.getGroupId());
-            target.put("topicName", "<a href='/consumer/offset/" + consumerGroupInfo.getId() + "'>" + consumerGroupInfo.getTopicName() + "</a>");
-            target.put("coordinator", consumerGroupInfo.getCoordinator());
-            target.put("state", HtmlAttributeUtil.getConsumerGroupHtml(consumerGroupInfo.getState()));
-            target.put("owner", consumerGroupInfo.getOwner());
-            target.put("status", HtmlAttributeUtil.getConsumerGroupTopicHtml(consumerGroupInfo.getStatus()));
-            aaDatas.add(target);
-        }
-
-        JSONObject target = new JSONObject();
-        target.put("sEcho", sEcho);
-        target.put("iTotalRecords", pages.getTotal());
-        target.put("iTotalDisplayRecords", pages.getTotal());
-        target.put("aaData", aaDatas);
-        try {
-            byte[] output = target.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception e) {
-            log.error("Get consumer group detail has error, msg is {}", e);
-        }
-    }
-
-    @RequestMapping(value = "/offset/table/ajax", method = RequestMethod.GET)
-    public void pageConsumerOffsetAjax(@RequestParam("id") Long id,HttpServletResponse response, HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-        log.info("Topic meta list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
-        HttpSession session = request.getSession();
-        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
-        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
-        List<BrokerInfo> brokerInfos = brokerDaoService.clusters(clusterInfo.getClusterId());
-
-        String aoData = request.getParameter("aoData");
-        JSONArray params = JSON.parseArray(aoData);
-        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
-        for (Object object : params) {
-            JSONObject param = (JSONObject) object;
-            if ("sEcho".equals(param.getString("name"))) {
-                sEcho = param.getIntValue("value");
-            } else if ("iDisplayStart".equals(param.getString("name"))) {
-                iDisplayStart = param.getIntValue("value");
-            } else if ("iDisplayLength".equals(param.getString("name"))) {
-                iDisplayLength = param.getIntValue("value");
-            }
-        }
-        Map<String, Object> map = new HashMap<>();
-        map.put("start", iDisplayStart);
-        map.put("length", iDisplayLength);
-
-        KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
-        KafkaClientInfo kafkaClientInfo = KafkaSchemaInitialize.init(brokerInfos, clusterInfo);
-
-        ConsumerGroupInfo consumerGroupInfo = this.consumerGroupDaoService.consumerGroups(id);
-        ConsumerOffsetPageInfo consumerOffsetPageInfo = new ConsumerOffsetPageInfo();
-        if (consumerGroupInfo != null && StrUtil.isNotBlank(consumerGroupInfo.getGroupId()) && StrUtil.isNotBlank(consumerGroupInfo.getTopicName())) {
-            consumerOffsetPageInfo = ksf.getConsumerOffsetPageOfRecord(kafkaClientInfo, consumerGroupInfo.getGroupId(), consumerGroupInfo.getTopicName(), map);
-        }
-        JSONArray aaDatas = new JSONArray();
-        for (ConsumerOffsetInfo consumerOffsetInfo : consumerOffsetPageInfo.getRecords()) {
-            JSONObject target = new JSONObject();
-            target.put("groupId", consumerOffsetInfo.getGroupId());
-            target.put("topicName", consumerOffsetInfo.getTopicName());
-            target.put("partitionId", consumerOffsetInfo.getPartitionId());
-            target.put("logsize", consumerOffsetInfo.getLogsize());
-            target.put("offset", consumerOffsetInfo.getOffsets());
-            target.put("lag", consumerOffsetInfo.getLags());
-            aaDatas.add(target);
-        }
-
-        JSONObject target = new JSONObject();
-        target.put("sEcho", sEcho);
-        target.put("iTotalRecords", consumerOffsetPageInfo.getTotal());
-        target.put("iTotalDisplayRecords", consumerOffsetPageInfo.getTotal());
-        target.put("aaData", aaDatas);
-        try {
-            byte[] output = target.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception e) {
-            log.error("Get consumer offset has error, msg is {}", e);
-        }
-    }
-
-    /**
-     * Get offsets lag, producer, consumer chart data by ajax.
-     */
-    @RequestMapping(value = "/offsets/realtime/chart/ajax", method = RequestMethod.GET)
-    public void getOffsetsMsgChartAjax(@RequestParam("id") Long id,HttpServletResponse response, HttpServletRequest request, HttpSession session) {
-        try {
-            String remoteAddr = request.getRemoteAddr();
-            String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-            log.info("Consumer offsets chart :: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
-            Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
-            ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
-
-            ConsumerGroupInfo consumerGroupInfo = this.consumerGroupDaoService.consumerGroups(id);
-
-            Map<String, Object> param = new HashMap<>();
-            param.put("cid", clusterInfo.getClusterId());
-            param.put("group", consumerGroupInfo.getGroupId());
-            param.put("topic", consumerGroupInfo.getTopicName());
-            param.put("stime", request.getParameter("stime"));
-            param.put("etime", request.getParameter("etime"));
-
-            // consumer offsets lag
-            List<ConsumerGroupTopicInfo> consumerGroupTopicInfos = consumerGroupTopicDaoService.pages(param);
-
-            JSONArray lags = new JSONArray();
-            for (ConsumerGroupTopicInfo consumerGroupTopicInfo : consumerGroupTopicInfos) {
-                JSONObject object = new JSONObject();
-                object.put("x", CalendarUtil.convertUnixTime(consumerGroupTopicInfo.getTimespan(), "yyyy-MM-dd HH:mm"));
-                object.put("y", consumerGroupTopicInfo.getLags());
-                lags.add(object);
-            }
-
-            JSONArray producers = new JSONArray();
-            for (ConsumerGroupTopicInfo consumerGroupTopicInfo : consumerGroupTopicInfos) {
-                JSONObject object = new JSONObject();
-                object.put("x", CalendarUtil.convertUnixTime(consumerGroupTopicInfo.getTimespan(), "yyyy-MM-dd HH:mm"));
-                object.put("y", consumerGroupTopicInfo.getLogsizeDiff());
-                producers.add(object);
-            }
-
-            JSONArray consumers = new JSONArray();
-            for (ConsumerGroupTopicInfo consumerGroupTopicInfo : consumerGroupTopicInfos) {
-                JSONObject object = new JSONObject();
-                object.put("x", CalendarUtil.convertUnixTime(consumerGroupTopicInfo.getTimespan(), "yyyy-MM-dd HH:mm"));
-                object.put("y", consumerGroupTopicInfo.getOffsetsDiff());
-                consumers.add(object);
-            }
-
-            JSONObject target = new JSONObject();
-            target.put("lags",lags);
-            target.put("producers",producers);
-            target.put("consumers",consumers);
-
-            byte[] output = target.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception e) {
-            log.error("Get consumer offset chart has error, msg is {}", e);
-        }
-    }
-
-    /**
-     * get consumer and producer rate
-     * @param id
-     * @param response
-     * @param request
-     * @param session
-     */
-    @RequestMapping(value = "/offsets/realtime/rate/ajax", method = RequestMethod.GET)
-    public void getOffsetsRateAjax(@RequestParam("id") Long id,HttpServletResponse response, HttpServletRequest request, HttpSession session) {
-        try {
-            ConsumerGroupInfo consumerGroupInfo = this.consumerGroupDaoService.consumerGroups(id);
-            ConsumerGroupTopicInfo consumerGroupTopicInfo = consumerGroupTopicDaoService.consumersOfLatest(consumerGroupInfo.getClusterId(),consumerGroupInfo.getGroupId(),consumerGroupInfo.getTopicName());
-
-            JSONObject target = new JSONObject();
-            target.put("consumer_rate",consumerGroupTopicInfo.getOffsetsDiff());
-            target.put("producer_rate",consumerGroupTopicInfo.getLogsizeDiff());
-
-            byte[] output = target.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception e) {
-            log.error("Get consumer offset rate has error, msg is {}", e);
-        }
-    }
 }

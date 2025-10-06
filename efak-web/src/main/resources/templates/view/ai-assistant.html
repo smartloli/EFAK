@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK - AI助手</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <!-- Markdown渲染库 -->
+    <script th:src="@{/plugins/marked/marked.min.js}"></script>
+
+    <!-- 代码高亮库 -->
+    <link rel="stylesheet" th:href="@{/plugins/highlight/atom-one-dark.min.css}">
+    <script th:src="@{/plugins/highlight/highlight.min.js}"></script>
+
+    <!-- 图表库 -->
+    <script th:src="@{/plugins/chart/chart.umd.min.js}"></script>
+
+    <!-- Mermaid图表库 -->
+    <script th:src="@{/plugins/mermaid/mermaid.min.js}"></script>
+
+    <style>
+        .main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            padding: 16px 16px 8px 16px;
+            /* 确保内容可以正常滚动 */
+            position: relative;
+            /* 防止内容溢出 */
+            box-sizing: border-box;
+            /* 确保占据剩余空间 */
+            display: flex;
+            flex-direction: column;
+            /* 限制最大宽度，防止内容过宽 */
+            max-width: 100%;
+            /* 确保内容不会超出容器边界 */
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            /* 确保聊天消息区域不会增加容器高度 */
+            min-height: 0;
+            max-height: none;
+        }
+
+        /* 自定义滚动条样式 */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-radius: 4px;
+            margin: 2px 0;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+            border: 1px solid #f8fafc;
+            min-height: 30px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:active {
+            background: #64748b;
+        }
+
+        /* Firefox滚动条样式 */
+        .chat-messages {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f8fafc;
+        }
+
+        /* 确保聊天容器有固定高度 */
+        .chat-container {
+            height: calc(100vh - 200px);
+            min-height: 700px;
+            max-height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* 确保底部操作区域紧贴底部 */
+            justify-content: space-between;
+            /* 确保聊天区域有固定高度 */
+            position: relative;
+            /* 确保消息区域有足够空间 */
+            gap: 0;
+            /* 确保聊天消息区域能够正确滚动 */
+            flex: 1;
+            /* 确保聊天容器高度固定，不会随内容增加 */
+            flex-shrink: 0;
+        }
+
+        .message-bubble {
+            max-width: 85%;
+            min-width: 200px;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            animation: slideIn 0.3s ease-out;
+            /* 防止内容溢出 */
+            box-sizing: border-box;
+        }
+
+        .message-bubble.assistant {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            /* 固定AI回答内容宽度，防止挤压右侧布局 */
+            max-width: 60%;
+            min-width: 250px;
+            /* 确保AI回答内容不会超出容器边界 */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .message-bubble.user {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            color: white;
+            margin-left: auto;
+            /* 确保用户消息不会遮挡AI回答 */
+            max-width: 60%;
+            min-width: 200px;
+            /* 确保用户消息内容不会超出容器边界 */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.user {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            color: white;
+        }
+
+        .message-avatar.assistant {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: white;
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #94a3b8;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .model-selector {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .model-selector::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .model-selector::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .model-selector::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .model-selector::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .model-option {
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            margin-bottom: 4px;
+        }
+
+        .model-option:hover {
+            background: rgba(22, 93, 255, 0.1);
+            border-color: #165DFF;
+        }
+
+        .model-option.active {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            color: white;
+            border-color: #165DFF;
+        }
+
+        .model-option .text-xs {
+            color: #6b7280;
+        }
+
+        .model-option.active .font-medium,
+        .model-option.active .text-xs {
+            color: white;
+        }
+
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3 {
+            color: #1f2937;
+            margin: 16px 0 8px 0;
+        }
+
+        .markdown-content pre {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 12px 0;
+            /* 限制最大宽度，防止代码块挤压布局 */
+            max-width: 100%;
+            word-wrap: break-word;
+            word-break: break-word;
+            /* 确保代码块在容器内 */
+            box-sizing: border-box;
+            /* 确保代码块不会超出消息气泡边界 */
+            overflow-wrap: break-word;
+        }
+
+        /* 代码块包装器样式 */
+        .code-block-wrapper {
+            margin: 12px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-block-wrapper pre {
+            margin: 0;
+            border-radius: 0 0 8px 8px;
+            background: #282c34;
+            color: #abb2bf;
+        }
+
+        .code-block-wrapper pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .code-header {
+            background: #374151;
+            border-bottom: 1px solid #4b5563;
+        }
+
+        .copy-code-btn {
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .copy-code-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .markdown-content code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid #165DFF;
+            padding-left: 16px;
+            margin: 12px 0;
+            color: #6b7280;
+        }
+
+        /* 表格包装器样式 */
+        .table-wrapper {
+            margin: 16px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .copy-table-btn {
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .copy-table-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .markdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .markdown-table th {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1f2937;
+            font-weight: 600;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 2px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .markdown-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+            vertical-align: top;
+        }
+
+        .markdown-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .markdown-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-row-alternate {
+            background-color: #fafbfc;
+        }
+
+        .table-row-alternate:hover {
+            background-color: #f1f5f9 !important;
+        }
+
+        .table-scrollable {
+            overflow-x: auto;
+        }
+
+        .table-scrollable::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-scrollable::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .table-scrollable::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .table-scrollable::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* 表格列宽度优化 */
+        .markdown-table th:first-child,
+        .markdown-table td:first-child {
+            border-left: none;
+        }
+
+        .markdown-table th:last-child,
+        .markdown-table td:last-child {
+            border-right: none;
+        }
+
+        /* 响应式表格 */
+        @media (max-width: 768px) {
+            .table-container {
+                font-size: 12px;
+            }
+
+            .markdown-table th,
+            .markdown-table td {
+                padding: 8px 12px;
+            }
+        }
+
+        /* 兼容原有的表格样式 */
+        .markdown-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            /* 限制表格宽度，防止表格挤压布局 */
+            max-width: 100%;
+            overflow-x: auto;
+            display: block;
+            /* 确保表格在容器内 */
+            box-sizing: border-box;
+            /* 确保表格不会超出消息气泡边界 */
+            table-layout: fixed;
+        }
+
+        .markdown-content th,
+        .markdown-content td {
+            border: 1px solid #e5e7eb;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .markdown-content th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .message-bubble:hover .message-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            margin: 16px 0;
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            /* 限制图表宽度，防止图表挤压布局 */
+            max-width: 100%;
+            overflow-x: auto;
+            /* 确保图表在容器内 */
+            box-sizing: border-box;
+            /* 确保图表不会超出消息气泡边界 */
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .quick-action:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            transform: translateY(-1px);
+            border-color: #cbd5e1;
+            color: #1e293b;
+        }
+
+        /* 思考区域样式 */
+        .thinking-section {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #f9fafb;
+            margin-bottom: 12px;
+            /* 限制最大宽度 */
+            max-width: 100%;
+            overflow-x: auto;
+            /* 确保思考区域不会超出消息气泡边界 */
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .thinking-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .thinking-header:hover {
+            background: linear-gradient(135deg, #9ca3af 0%, #d1d5db 100%);
+        }
+
+        .thinking-content {
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 0 0 8px 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .thinking-text {
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #6b7280;
+            /* 防止长文本溢出 */
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+
+        .answer-content {
+            margin-top: 8px;
+        }
+
+        .thinking-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .thinking-header:hover .thinking-icon {
+            transform: scale(1.1);
+        }
+
+        /* 确保所有内容都在容器内 */
+        .message-container {
+            max-width: 100%;
+            overflow-x: hidden;
+            /* 确保消息容器不会产生横向滚动 */
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            /* 确保消息容器不会超出父容器边界 */
+            flex-shrink: 0;
+            min-width: 0;
+        }
+
+        /* 确保代码块内容不会溢出 */
+        .markdown-content code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+
+        /* 确保长URL和长文本能够换行 */
+        .markdown-content a {
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+
+        /* 确保列表项不会溢出 */
+        .markdown-content ul,
+        .markdown-content ol {
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* 确保引用块不会溢出 */
+        .markdown-content blockquote {
+            border-left: 4px solid #165DFF;
+            padding-left: 16px;
+            margin: 12px 0;
+            color: #6b7280;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* 确保消息间距合适，防止遮挡 */
+        .message-container {
+            margin-bottom: 16px;
+            /* 确保消息容器不会影响聊天区域高度 */
+            flex-shrink: 0;
+            min-height: 0;
+        }
+
+        /* 确保AI回答和用户消息有足够间距 */
+        .message-container:not(:last-child) {
+            margin-bottom: 20px;
+        }
+
+        /* 优化消息气泡内容布局 */
+        .message-bubble .markdown-content {
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        /* 确保长文本内容能够正确换行 */
+        .message-bubble p,
+        .message-bubble div,
+        .message-bubble span {
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        /* 确保聊天容器布局正确 */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* 确保聊天消息区域占据剩余空间 */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* 确保底部操作区域固定在底部 */
+        .chat-container>div:last-child {
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        /* 确保聊天消息区域在容器中正确显示 */
+        .chat-messages {
+            flex: 1;
+            min-height: 0;
+            max-height: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* 确保聊天消息区域在固定高度内滚动 */
+            height: auto;
+            /* 确保新消息添加时历史内容向上滚动 */
+            scroll-behavior: smooth;
+            /* 确保聊天消息区域不会增加容器高度 */
+            flex-shrink: 1;
+        }
+
+        /* 确保聊天容器在页面中正确显示 */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            /* 确保聊天容器不会超出父容器边界 */
+            overflow: hidden;
+            max-width: 100%;
+            /* 确保聊天容器高度固定，不会随内容增加 */
+            flex-shrink: 0;
+            flex-grow: 0;
+        }
+
+        /* 确保消息容器不会超出边界 */
+        .message-container {
+            flex-shrink: 0;
+        }
+
+        /* 确保AI回答内容中的长文本能够正确换行 */
+        .message-bubble.assistant .markdown-content {
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        /* 确保AI回答内容中的代码块能够正确换行 */
+        .message-bubble.assistant .markdown-content pre {
+            max-width: 100%;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        /* 确保AI回答内容中的表格能够正确显示 */
+        .message-bubble.assistant .markdown-content table {
+            max-width: 100%;
+            table-layout: fixed;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        /* AI回答中的表格包装器样式 */
+        .message-bubble.assistant .table-wrapper {
+            margin: 12px 0;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .message-bubble.assistant .table-container {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .message-bubble.assistant .markdown-table {
+            max-width: 100%;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .message-bubble.assistant .markdown-table th,
+        .message-bubble.assistant .markdown-table td {
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .message-bubble.assistant .table-header {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+
+        .message-bubble.assistant .copy-table-btn {
+            color: #6b7280;
+        }
+
+        .message-bubble.assistant .copy-table-btn:hover {
+            color: #374151;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 确保AI回答内容中的图片不会超出边界 */
+        .message-bubble.assistant .markdown-content img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* 确保AI回答内容中的链接不会超出边界 */
+        .message-bubble.assistant .markdown-content a {
+            max-width: 100%;
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+
+        /* 确保聊天消息区域内容正确滚动 */
+        .chat-messages>* {
+            flex-shrink: 0;
+        }
+
+        /* 确保聊天容器高度完全固定 */
+        .chat-container {
+            height: calc(100vh - 0px) !important;
+            max-height: calc(100vh - 0px) !important;
+        }
+
+        /* 确保聊天消息区域在固定高度内滚动 */
+        .chat-messages {
+            height: calc(100vh - 100px) !important;
+            max-height: calc(100vh - 100px) !important;
+            overflow-y: auto !important;
+        }
+    </style>
+</head>
+
+<body class="bg-light-bg text-dark font-inter">
+    <div class="flex min-h-screen overflow-hidden">
+        <th:block th:replace="~{public/navbar :: navbar}"></th:block>
+        <th:block th:replace="~{public/navbar :: overlay}"></th:block>
+
+        <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
+            <th:block th:replace="~{public/header :: header}"></th:block>
+
+            <main class="flex-1 overflow-hidden p-4 pt-20 pb-2">
+                <div class="flex h-full gap-4" style="min-width: 0; overflow: hidden;">
+                    <!-- 主聊天区域 -->
+                    <div class="flex-1 flex flex-col" style="min-width: 0; overflow: hidden; height: 100%;">
+                        <!-- 欢迎卡片 -->
+                        <div
+                            class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white mb-2 shadow-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h1 class="text-2xl font-bold mb-2">
+                                        <i class="fa fa-robot mr-2"></i>EFAK AI 智能助手
+                                    </h1>
+                                    <p class="text-blue-100">支持多种大模型，提供智能分析和可视化图表</p>
+                                </div>
+                                <div class="text-6xl opacity-20">
+                                    <i class="fa fa-magic"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 聊天容器 -->
+                        <div class="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 chat-container">
+                            <!-- 聊天消息区域 -->
+                            <div id="chat-messages" class="chat-messages space-y-4 overflow-y-auto">
+                                <!-- 欢迎消息 -->
+                                <div class="flex items-start space-x-3">
+                                    <div class="message-avatar assistant">
+                                        <img src="/images/ai_robot.jpg" alt="AI助手"
+                                            class="w-full h-full object-cover rounded-full">
+                                    </div>
+                                    <div class="message-bubble assistant p-4 rounded-lg">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="text-sm text-gray-600">AI助手</div>
+                                            <div class="text-xs text-gray-400" id="welcome-model-name">正在加载...</div>
+                                        </div>
+                                        <div class="markdown-content">
+                                            <p>您好！我是 EFAK AI 智能助手。我支持：</p>
+                                            <ul>
+                                                <li>🤖 <strong>多种大模型</strong> - GPT-4, Claude, DeepSeek等</li>
+                                                <li>📊 <strong>数据可视化</strong> - 自动生成图表和统计分析</li>
+                                                <li>📝 <strong>Markdown渲染</strong> - 支持代码高亮、表格、数学公式</li>
+                                                <li>🔍 <strong>Kafka专家</strong> - 集群分析、性能优化、故障诊断</li>
+                                            </ul>
+                                            <p>请选择您偏好的大模型，然后告诉我您需要什么帮助！</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 底部操作区域 -->
+                            <div class="border-t border-gray-200 bg-gray-50 rounded-b-xl flex-shrink-0"
+                                style="flex-shrink: 0;">
+                                <!-- 快捷操作区域 -->
+                                <div class="p-1 border-b border-gray-200">
+                                    <div class="quick-actions">
+                                        <div class="quick-action" data-action="alert-analysis">🔔 告警分析</div>
+                                        <div class="quick-action" data-action="analyze-performance">🚀 Broker资源分析</div>
+                                        <div class="quick-action" data-action="cluster-health">❤️ 集群健康检查</div>
+                                        <div class="quick-action" data-action="explain-kafka">📚 Kafka知识</div>
+                                    </div>
+                                </div>
+
+                                <!-- 输入区域 -->
+                                <div class="p-1">
+                                    <div class="flex space-x-3">
+                                        <div class="flex-1 relative">
+                                            <textarea id="chat-input" placeholder="请输入您的问题或需求... (支持Shift+Enter换行)"
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white"
+                                                rows="2"></textarea>
+                                            <div class="absolute right-3 bottom-3 flex items-center space-x-3">
+                                                <button id="new-chat-btn"
+                                                    class="text-gray-400 hover:text-blue-500 transition-colors text-xl">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                                <button id="send-btn"
+                                                    class="text-gray-400 hover:text-blue-500 transition-colors text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    disabled data-action="send">
+                                                    <i class="fa fa-arrow-up"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧控制面板 -->
+                    <div class="w-80 space-y-4" style="flex-shrink: 0; min-width: 320px;">
+                        <!-- 模型选择 -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                                <i class="fa fa-cogs mr-2 text-purple-500"></i>AI模型选择
+                            </h3>
+                            <div class="model-selector">
+                                <div class="space-y-2" id="model-options">
+                                    <!-- 模型选项将通过JavaScript动态加载 -->
+                                    <div class="text-center text-gray-500 py-4">
+                                        <i class="fa fa-spinner fa-spin mr-2"></i>正在加载模型...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 对话设置 -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                                <i class="fa fa-sliders mr-2 text-blue-500"></i>对话设置
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">启用图表生成</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="enable-charts" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">代码高亮</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="enable-highlight" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 对话历史 -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                                <i class="fa fa-history mr-2 text-green-500"></i>对话历史
+                            </h3>
+                            <div class="space-y-2" id="chat-history">
+                                <div class="p-2 hover:bg-gray-50 rounded cursor-pointer text-sm">
+                                    <div class="font-medium text-gray-700">Kafka性能优化分析</div>
+                                    <div class="text-gray-500 text-xs">2小时前 · GPT-4</div>
+                                </div>
+                                <div class="p-2 hover:bg-gray-50 rounded cursor-pointer text-sm">
+                                    <div class="font-medium text-gray-700">消费者延迟问题诊断</div>
+                                    <div class="text-gray-500 text-xs">昨天 · Claude-3</div>
+                                </div>
+                                <div class="p-2 hover:bg-gray-50 rounded cursor-pointer text-sm">
+                                    <div class="font-medium text-gray-700">集群容量规划</div>
+                                    <div class="text-gray-500 text-xs">3天前 · Gemini Pro</div>
+                                </div>
+                                <div class="p-2 hover:bg-gray-50 rounded cursor-pointer text-sm">
+                                    <div class="font-medium text-gray-700">Topic分区策略优化</div>
+                                    <div class="text-gray-500 text-xs">5天前 · DeepSeek</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <!-- Footer -->
+            <th:block th:replace="~{public/common :: footer_sub}"></th:block>
+        </div>
+    </div>
+
+    <!-- 开关样式 -->
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked+.slider {
+            background-color: #165DFF;
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #165DFF;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        .slider.round {
+            border-radius: 20px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+
+    <!-- AI助手专用JavaScript -->
+    <script th:src="@{/js/system/ai-assistant.js}"></script>
+</body>
+
+</html>

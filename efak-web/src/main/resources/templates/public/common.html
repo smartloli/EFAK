@@ -1,48 +1,498 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<!-- footer -->
-<footer class="footer border-top" th:fragment="footer">
-    <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between py-3 small">
-        <p class="text-muted mb-1 mb-md-0">Copyright © 2023 <a href="https://kafka-eagle.org/" target="_blank">Kafka Eagle</a></p>
-        <p class="text-muted">Star With <a href="https://github.com/smartloli/EFAK" target="_blank">Github</a></p>
+<!-- footer fragment -->
+<footer class="bg-white border-t border-gray-200 mt-auto" th:fragment="footer_sub">
+    <div class="px-8 py-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between text-sm text-gray-600">
+            <div class="flex items-center space-x-2 mb-2 sm:mb-0 ml-4">
+                <span>Copyright © 2025</span>
+                <a href="https://kafka-eagle.org/" target="_blank"
+                    class="font-semibold text-primary hover:text-primary/80 transition-colors">
+                    EFAK · AI
+                </a>
+                <span class="px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full"
+                    th:text="'v' + (${appVersion} ?: '5.0.0')">
+                    v5.0.0
+                </span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-500 hidden sm:inline">Eagle For Apache Kafka®</span>
+                <div class="flex items-center space-x-3">
+                    <a href="https://kafka-eagle.org/" target="_blank"
+                        class="flex items-center space-x-1 text-gray-600 hover:text-primary transition-colors text-xs">
+                        <i class="fa fa-home"></i>
+                        <span>官网</span>
+                    </a>
+                    <a href="https://github.com/smartloli/EFAK" target="_blank"
+                        class="flex items-center space-x-1 text-gray-600 hover:text-primary transition-colors text-xs">
+                        <i class="fa-brands fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://github.com/smartloli/EFAK/issues" target="_blank"
+                        class="flex items-center space-x-1 text-gray-600 hover:text-primary transition-colors text-xs">
+                        <i class="fa fa-bug"></i>
+                        <span>反馈</span>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </footer>
 
-<!-- script -->
+<footer class="bg-white border-t border-gray-200 py-6 mt-8" th:fragment="footer_main">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="text-center space-x-2 md:text-left mb-4 md:mb-0">
+                <span class="text-sm text-gray-500">Copyright © 2025</span>
+                <a href="https://kafka-eagle.org/" target="_blank"
+                   class="font-semibold text-primary hover:text-primary/80 transition-colors">
+                    EFAK · AI
+                </a>
+                <span class="px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full"
+                      th:text="'v' + (${appVersion} ?: '5.0.0')">
+                    v5.0.0
+                </span>
+            </div>
+            <div class="flex space-x-6">
+                <a href="https://kafka-eagle.org/" target="_blank" class="text-gray-500 hover:text-primary transition-colors">
+                    <i class="fa fa-home"></i>
+                    <span class="ml-1 text-sm">官网</span>
+                </a>
+                <a href="https://github.com/smartloli/EFAK" target="_blank" class="text-gray-500 hover:text-primary transition-colors">
+                    <i class="fa-brands fa-github"></i>
+                    <span class="ml-1 text-sm">GitHub</span>
+                </a>
+                <a href="https://github.com/smartloli/EFAK/issues" target="_blank" class="text-gray-500 hover:text-primary transition-colors">
+                    <i class="fa fa-bug"></i>
+                    <span class="ml-1 text-sm">反馈</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- script fragment -->
 <th:block th:fragment="js">
-    <!-- core:js -->
-    <script src="../../assets/vendors/core/core.js"></script>
+    <!-- plugins -->
+    <script th:src="@{/plugins/tailwindcss/tailwindcss.js}"></script>
+    <script th:src="@{/plugins/jquery/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/plugins/chart/chart.umd.min.js}"></script>
+    <script th:src="@{/plugins/select2/select2.min.js}"></script>
+    <script th:src="@{/plugins/fontawesome/all.min.js}"></script>
+    <!--  common  -->
+    <script th:src="@{/js/common/common.js}"></script>
 
-    <!-- Plugin js for this page -->
-    <script src="../../assets/vendors/chartjs/Chart.min.js"></script>
-    <script src="../../assets/vendors/jquery.flot/jquery.flot.js"></script>
-    <script src="../../assets/vendors/jquery.flot/jquery.flot.resize.js"></script>
-    <script src="../../assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
-    <script src="../../assets/vendors/sweetalert2/sweetalert2.min.js"></script>
-    <script src="../../assets/vendors/apexcharts/apexcharts.min.js"></script>
-    <script src="../../assets/vendors/pace/pace.min.js"></script>
-    <script src="../../assets/vendors/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
-    <!-- End plugin js for this page -->
-
-    <!-- inject:js -->
-    <script src="../../assets/vendors/feather-icons/feather.min.js"></script>
-    <script src="../../assets/js/template.js"></script>
-    <!-- endinject -->
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#FF4D4F',
+                        info: '#8C8C8C',
+                        dark: '#1F2329',
+                        'dark-light': '#303846',
+                        'light-bg': '#F2F3F5'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
 
 </th:block>
-<!-- css -->
+
+<th:block th:fragment="js_main">
+    <!-- plugins -->
+    <script th:src="@{/plugins/tailwindcss/tailwindcss.js}"></script>
+    <script th:src="@{/plugins/jquery/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/plugins/select2/select2.min.js}"></script>
+    <script th:src="@{/plugins/fontawesome/all.min.js}"></script>
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#FF4D4F',
+                        info: '#8C8C8C',
+                        dark: '#1F2329',
+                        'dark-light': '#303846',
+                        'light-bg': '#F2F3F5'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+
+</th:block>
+
+<!-- css fragment -->
 <th:block th:fragment="css">
-    <!-- plugins css start -->
-    <link rel="shortcut icon" href="../../assets/images/favicon.ico" />
-    <link rel="stylesheet" href="../../assets/vendors/sweetalert2/sweetalert2.min.css">
-    <link rel="stylesheet" href="../../assets/fonts/feather-font/css/iconfont.css">
-    <link rel="stylesheet" href="../../assets/vendors/flag-icon-css/css/flag-icon.min.css">
-    <link rel="stylesheet" href="../../assets/vendors/core/core.css">
-    <link rel="stylesheet" href="../../assets/vendors/pace/pace.min.css">
-    <link rel="stylesheet" href="../../assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css">
-    <!-- plugins css end -->
-    <!-- core css -->
-    <link rel="stylesheet" href="../../assets/css/main/style.css">
-    <link href="../../assets/css/public/gcss.css" rel="stylesheet">
+    <!-- logo icon -->
+    <link rel="shortcut icon" th:href="@{/images/efak_ai_logo.png}" />
+    <!-- plugins -->
+    <link th:href="@{/plugins/tailwindcss/tailwind.min.css}" rel="stylesheet">
+    <link th:href="@{/plugins/tailwindcss/tailwind-config.css}" rel="stylesheet">
+    <link th:href="@{/plugins/fontawesome/all.min.css}" rel="stylesheet">
+    <link th:href="@{/plugins/select2/select2.min.css}" rel="stylesheet">
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .sidebar-item-active {
+                @apply bg-primary/10 text-primary border-l-4 border-primary;
+            }
+            .chart-container {
+                @apply bg-white rounded-xl shadow-sm p-4 border border-gray-100;
+            }
+            .fixed-sidebar {
+                height: 100vh;
+                overflow-y: auto;
+            }
+            .fixed-header {
+                height: 65px;
+            }
+            
+            /* 侧边栏折叠状态样式 */
+            .sidebar-collapsed .sidebar-nav-item {
+                padding: 0.75rem;
+                margin: 0.25rem;
+                width: calc(100% - 0.5rem);
+            }
+            
+            .sidebar-collapsed .sidebar-icon {
+                margin: 0 !important;
+                width: 1.25rem;
+                height: 1.25rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .sidebar-collapsed .sidebar-logo-container {
+                padding: 0.5rem 0;
+            }
+            
+            .sidebar-collapsed .sidebar-logo-container:hover {
+                background-color: rgba(0, 0, 0, 0.05);
+                border-radius: 0.5rem;
+            }
+            
+            /* 圆形logo样式 */
+            .sidebar-logo-container img {
+                border-radius: 50%;
+                object-fit: cover;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            
+            /* 提示框样式 */
+            .sidebar-tooltip {
+                white-space: nowrap;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                border-radius: 0.5rem;
+                backdrop-filter: blur(4px);
+                max-width: 200px;
+                word-wrap: break-word;
+                white-space: normal;
+            }
+            
+            .sidebar-tooltip::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: -5px;
+                transform: translateY(-50%);
+                border: 5px solid transparent;
+                border-right-color: #374151;
+            }
+            
+            /* 侧边栏折叠时隐藏分组标题的间距 */
+            .sidebar-collapsed .sidebar-section-title {
+                display: none;
+            }
+            
+            /* 侧边栏过渡动画 */
+            #sidebar {
+                transition: width 0.3s ease-in-out;
+            }
+            
+            .sidebar-nav-item {
+                transition: all 0.2s ease;
+            }
+            
+            .sidebar-nav-item:hover {
+                transform: translateX(2px);
+            }
+            
+            .sidebar-collapsed .sidebar-nav-item:hover {
+                transform: none;
+                background-color: rgba(22, 93, 255, 0.1);
+            }
+            
+            /* 用户下拉菜单样式 */
+            .user-dropdown-menu {
+                top: calc(100% - 1px);
+                transform-origin: top right;
+                transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+                opacity: 0;
+                transform: scale(0.95) translateY(-10px);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 -1px 0 0 rgba(0, 0, 0, 0.05);
+            }
+            
+            #user-dropdown {
+                top: calc(100% - 1px);
+            }
+            
+            /* 确保下拉菜单与header无缝连接 */
+            .user-dropdown-menu::before {
+                content: '';
+                position: absolute;
+                top: -1px;
+                right: 0;
+                left: 0;
+                height: 1px;
+                background: white;
+                z-index: 1;
+            }
+            
+            #user-dropdown.hidden {
+                display: none;
+            }
+            
+            #user-dropdown:not(.hidden) {
+                display: block;
+            }
+            
+            /* 用户菜单箭头旋转动画 */
+            #user-menu-arrow {
+                transition: transform 0.2s ease-in-out;
+            }
+            
+            /* 通知面板样式 */
+            #notification-panel {
+                z-index: 1000;
+            }
+            
+            #notification-overlay {
+                z-index: 999;
+                opacity: 0;
+                transition: opacity 0.3s ease-in-out;
+            }
+            
+            .notification-item:hover {
+                background-color: #f9fafb;
+            }
+            
+            .notification-item .notification-badge {
+                animation: pulse 2s infinite;
+            }
+            
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.5;
+                }
+            }
+            
+            /* 通知面板滚动条样式 */
+            #notification-panel .overflow-y-auto::-webkit-scrollbar {
+                width: 4px;
+            }
+            
+            #notification-panel .overflow-y-auto::-webkit-scrollbar-track {
+                background: #f1f5f9;
+            }
+            
+            #notification-panel .overflow-y-auto::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 2px;
+            }
+            
+            #notification-panel .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
+            @media (max-width: 1024px) {
+                #sidebar {
+                    transform: translateX(-100%);
+                    transition: transform 0.3s ease-in-out;
+                }
+                #sidebar.mobile-open {
+                    transform: translateX(0);
+                }
+                .main-content-mobile {
+                    margin-left: 0 !important;
+                }
+                .header-mobile {
+                    left: 0 !important;
+                }
+                .main-content {
+                    transition: margin-left 0.3s ease;
+                }
+                header {
+                    transition: left 0.3s ease;
+                }
+            }
+            /* 分区和副本徽章样式 */
+            .partition-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                font-size: 0.75rem;
+                font-weight: 600;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.375rem;
+                min-width: 2rem;
+                height: 1.5rem;
+            }
+            .replication-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+                font-size: 0.75rem;
+                font-weight: 600;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.375rem;
+                min-width: 2rem;
+                height: 1.5rem;
+            }
+            /* 消费状态徽章样式 */
+            .status-active {
+                background-color: #D1FAE5;
+                color: #065F46;
+            }
+            .status-warning {
+                background-color: #FEF3C7;
+                color: #92400E;
+            }
+            .status-error {
+                background-color: #FEE2E2;
+                color: #991B1B;
+            }
+            /* 状态徽章圆角样式 */
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.5rem;
+                font-size: 0.75rem;
+                font-weight: 500;
+                min-width: 4rem;
+                height: 1.5rem;
+            }
+            /* 按钮hover效果 */
+            .rebalance-btn:hover,
+            .view-consumer-btn:hover {
+                text-decoration: underline;
+                transform: translateX(2px);
+                transition: all 0.2s ease;
+            }
+            /* 时间组件手型光标 */
+            input[type="date"] {
+                cursor: pointer;
+            }
+            /* 主题描述换行 */
+            .topic-description {
+                white-space: normal;
+                line-height: 1.4;
+            }
+            /* 对话框样式 */
+            .modal-overlay {
+                backdrop-filter: blur(4px);
+            }
+            .modal-content {
+                animation: modalFadeIn 0.3s ease-out;
+            }
+            @keyframes modalFadeIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9) translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+            }
+            /* Tooltip样式 */
+            .tooltip {
+                position: relative;
+                cursor: help;
+            }
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 220px;
+                background-color: #333;
+                color: #fff;
+                text-align: left;
+                border-radius: 6px;
+                padding: 8px 12px;
+                position: fixed;
+                z-index: 9999;
+                opacity: 0;
+                transition: opacity 0.3s;
+                font-size: 12px;
+                line-height: 1.4;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                pointer-events: none;
+                white-space: normal;
+                max-width: 280px;
+            }
+            .tooltip .tooltiptext::after {
+                content: "";
+                position: absolute;
+                top: var(--arrow-top, 100%);
+                left: var(--arrow-left, 20px);
+                border-width: 5px;
+                border-style: solid;
+                border-color: var(--arrow-border, transparent transparent #333 transparent);
+            }
+            /* 自定义时间选择器样式 */
+            .custom-date-picker {
+                position: relative;
+                display: inline-block;
+            }
+            .date-input-wrapper {
+                position: relative;
+                cursor: pointer;
+            }
+            .date-input-wrapper input[type="date"] {
+                cursor: pointer;
+            }
+            .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+                cursor: pointer;
+            }
+
+        }
+    </style>
 </th:block>

@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK·AI - 配置管理</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <style>
+        /* 基础布局 */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            transition: margin-left 0.3s ease-in-out;
+            min-height: calc(100vh - 64px);
+        }
+
+
+        /* 配置卡片样式 */
+        .config-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .config-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .config-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+
+        .config-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .config-title-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .config-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .config-title-area h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .config-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-indicator.healthy {
+            background-color: #10b981;
+        }
+
+        .status-indicator.warning {
+            background-color: #f59e0b;
+        }
+
+        .status-indicator.error {
+            background-color: #ef4444;
+        }
+
+        /* 配置项列表 */
+        .config-list {
+            overflow-y: visible;
+        }
+
+        .config-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-item-info {
+            flex: 1;
+        }
+
+        .config-item-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .config-item-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .config-item-value {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            color: #374151;
+            background: #f9fafb;
+            padding: 8px 12px;
+            border-radius: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .config-item-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 16px;
+        }
+
+        .config-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .config-btn.edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .config-btn.edit:hover {
+            background: #2563eb;
+        }
+
+        .config-btn.reset {
+            background: #6b7280;
+            color: white;
+        }
+
+        .config-btn.reset:hover {
+            background: #4b5563;
+        }
+
+        /* 模态框表单 */
+        .config-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .config-form.show {
+            display: flex;
+        }
+
+        .config-form-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .config-form-header {
+            margin-bottom: 24px;
+        }
+
+        .config-form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .config-form-subtitle {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .form-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .form-btn.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .form-btn.primary:hover {
+            background: #2563eb;
+        }
+
+        .form-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .form-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .form-btn.danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .form-btn.danger:hover {
+            background: #dc2626;
+        }
+
+        /* Toast 消息样式 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #10b981;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        .toast.loading {
+            background: #3b82f6;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0;
+                padding-top: 64px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .config-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .config-item-actions {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
+
+            .config-form-content {
+                padding: 24px;
+            }
+        }
+
+        /* Select2样式优化 */
+        .select2-container--default .select2-selection--single {
+            height: 48px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 46px;
+            color: #374151;
+            padding-left: 12px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 46px;
+            right: 8px;
+        }
+
+        .select2-dropdown {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+        }
+
+        .select2-container--default .select2-results__group {
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 8px 12px 4px 12px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin: 8px;
+            width: calc(100% - 16px);
+            font-size: 14px;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .select2-container--default .select2-results__option[data-selected=true] {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        /* 确保在模态框中的select2有正确的z-index */
+        .select2-container--open .select2-dropdown {
+            z-index: 9999;
+        }
+
+        /* 优化select2中图标的显示 */
+        .select2-results__option span,
+        .select2-selection__rendered span {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .select2-results__option span span:first-child,
+        .select2-selection__rendered span span:first-child {
+            font-size: 16px;
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 配置编辑对话框样式 */
+        .config-name-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .config-name-text {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 1rem;
+        }
+
+        .config-category-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+
+        .config-description-text {
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .config-value-input {
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: #1f2937;
+        }
+
+        /* 开关按钮样式 */
+        .config-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .config-toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .config-toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .config-toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .config-toggle-slider {
+            background-color: #10b981;
+        }
+
+        input:checked + .config-toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .config-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .config-toggle-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .config-value-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 8px;
+            font-size: 0.875rem;
+        }
+
+        .config-current-label,
+        .config-default-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .config-current-value {
+            color: #1f2937;
+            font-weight: 600;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .config-default-value {
+            color: #059669;
+            font-weight: 600;
+            background: #d1fae5;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+
+        .dynamic-config-group-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .dynamic-config-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .dynamic-config-item:last-child {
+            border-bottom: none;
+        }
+
+        .dynamic-config-info {
+            flex: 1;
+        }
+
+        .dynamic-config-name {
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .dynamic-config-desc {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .dynamic-config-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.75rem;
+            color: #374151;
+            background: #f9fafb;
+            padding: 4px 8px;
+            border-radius: 4px;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .dynamic-config-actions {
+            display: flex;
+            gap: 6px;
+            margin-left: 12px;
+        }
+
+        .dynamic-config-btn {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.625rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dynamic-config-btn.edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .dynamic-config-btn.edit:hover {
+            background: #2563eb;
+        }
+
+        .dynamic-config-btn.reset {
+            background: #6b7280;
+            color: white;
+        }
+
+        .dynamic-config-btn.reset:hover {
+            background: #4b5563;
+        }
+
+        /* SASL机制下拉框样式优化 */
+        .select2-sasl-mechanism {
+            width: 120px !important;
+        }
+
+        .select2-sasl-mechanism .select2-selection--single {
+            height: 32px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+
+        .select2-sasl-mechanism .select2-selection--single .select2-selection__rendered {
+            line-height: 30px;
+            color: #374151;
+            padding-left: 8px;
+        }
+
+        .select2-sasl-mechanism .select2-selection--single .select2-selection__arrow {
+            height: 30px;
+            right: 6px;
+        }
+
+        .select2-sasl-mechanism .select2-dropdown {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+        }
+
+        .select2-sasl-mechanism .select2-results__option {
+            padding: 6px 8px;
+            font-size: 0.75rem;
+            color: #374151;
+        }
+
+        .select2-sasl-mechanism .select2-results__option--highlighted[aria-selected] {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .select2-sasl-mechanism .select2-results__option[aria-selected=true] {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        /* 统计卡片样式 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+<!-- Navbar -->
+<th:block th:replace="~{public/navbar :: navbar}"></th:block>
+
+<div class="main-content lg:ml-64">
+    <!-- Header -->
+    <th:block th:replace="~{public/header :: header}"></th:block>
+
+    <!-- 页面内容 -->
+    <div class="p-6">
+        <!-- 页面标题 -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">配置管理</h1>
+            <p class="text-gray-600">管理不同的模型接口配置与状态</p>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalModels">5</div>
+                <div class="stat-label">总模型数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="onlineModels">3</div>
+                <div class="stat-label">在线模型</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="offlineModels">1</div>
+                <div class="stat-label">离线模型</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="disabledModels">1</div>
+                <div class="stat-label">禁用模型</div>
+            </div>
+        </div>
+
+        <!-- 模型列表 -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">大模型接口配置</h3>
+                    <p class="text-sm text-gray-600 mt-1">管理AI大模型的接口地址和配置信息</p>
+                </div>
+                <button id="add-model-btn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2">
+                    <i class="fa fa-plus"></i>
+                    添加模型
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            模型名称
+                        </th>
+                        <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            API类型
+                        </th>
+                        <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            接口地址
+                        </th>
+                        <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            状态
+                        </th>
+                        <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            创建时间
+                        </th>
+                        <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            操作
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody id="model-table-body" class="bg-white divide-y divide-gray-200">
+                    <!-- 表格内容将通过JavaScript动态填充 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页组件 -->
+            <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                <div class="text-sm text-gray-700">
+                    显示第 <span id="page-start">1</span> 到 <span id="page-end">5</span> 条，共 <span
+                        id="total-count">0</span> 条记录
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="prev-page"
+                            class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        上一页
+                    </button>
+                    <div id="page-numbers" class="flex space-x-1">
+                        <!-- 页码按钮将通过JavaScript动态生成 -->
+                    </div>
+                    <button id="next-page"
+                            class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        下一页
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <th:block th:replace="~{public/common :: footer_sub}"></th:block>
+</div>
+
+<!-- 添加模型对话框 -->
+<div id="add-model-modal" class="config-form">
+    <div class="config-form-content" style="max-width: 600px;">
+        <div class="config-form-header">
+            <h3 class="config-form-title">添加大模型</h3>
+            <p class="config-form-subtitle">配置新的AI大模型接口信息</p>
+        </div>
+
+        <form id="add-model-form">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label" for="model-name">模型名称 *</label>
+                    <input type="text" id="model-name" class="form-input" placeholder="例如：GPT-4, Claude-3" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="model-type">API类型 *</label>
+                    <select id="model-type" class="form-input select2-model-type" required>
+                        <option value="">请选择API类型</option>
+                        <option value="OpenAI" data-icon="/images/icons/openai.svg">OpenAI</option>
+                        <option value="Ollama" data-icon="/images/icons/ollama.png">Ollama</option>
+                        <option value="DeepSeek" data-icon="/images/icons/deepseek.svg">DeepSeek</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="model-endpoint">接口地址 *</label>
+                <input type="url" id="model-endpoint" class="form-input"
+                       placeholder="https://api.openai.com/v1/chat/completions" required>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label" for="model-api-key">API密钥</label>
+                    <input type="password" id="model-api-key" class="form-input" placeholder="sk-...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="model-timeout">超时时间(秒)</label>
+                    <input type="number" id="model-timeout" class="form-input" value="30" min="5" max="300">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="model-description">描述信息</label>
+                <textarea id="model-description" class="form-input" rows="3"
+                          placeholder="模型的详细描述信息"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="model-system-prompt">系统提示词</label>
+                <textarea id="model-system-prompt" class="form-input" rows="4"
+                          placeholder="设置模型的系统提示词，用于定义AI助手的角色和行为规则"></textarea>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <input type="checkbox" id="model-enabled" class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+                <label for="model-enabled" class="text-sm text-gray-700">启用此模型</label>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="form-btn secondary" onclick="closeAddModelModal()">取消</button>
+                <button type="button" class="form-btn secondary" onclick="testModelConnection()">测试连接</button>
+                <button type="submit" class="form-btn primary">添加模型</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 编辑模型对话框 -->
+<div id="edit-model-modal" class="config-form">
+    <div class="config-form-content" style="max-width: 600px;">
+        <div class="config-form-header">
+            <h3 class="config-form-title">编辑模型</h3>
+            <p class="config-form-subtitle">修改模型配置信息</p>
+        </div>
+
+        <form id="edit-model-form">
+            <input type="hidden" id="edit-model-id">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label" for="edit-model-name">模型名称 *</label>
+                    <input type="text" id="edit-model-name" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="edit-model-type">API类型 *</label>
+                    <select id="edit-model-type" class="form-input select2-edit-model-type" required>
+                        <option value="OpenAI" data-icon="/images/icons/openai.svg">OpenAI</option>
+                        <option value="Ollama" data-icon="/images/icons/ollama.png">Ollama</option>
+                        <option value="DeepSeek" data-icon="/images/icons/deepseek.svg">DeepSeek</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="edit-model-endpoint">接口地址 *</label>
+                <input type="url" id="edit-model-endpoint" class="form-input" required>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label" for="edit-model-api-key">API密钥</label>
+                    <input type="password" id="edit-model-api-key" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="edit-model-timeout">超时时间(秒)</label>
+                    <input type="number" id="edit-model-timeout" class="form-input" min="5" max="300">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="edit-model-description">描述信息</label>
+                <textarea id="edit-model-description" class="form-input" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="edit-model-system-prompt">系统提示词</label>
+                <textarea id="edit-model-system-prompt" class="form-input" rows="4"
+                          placeholder="设置模型的系统提示词，用于定义AI助手的角色和行为规则"></textarea>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <input type="checkbox" id="edit-model-enabled"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+                <label for="edit-model-enabled" class="text-sm text-gray-700">启用此模型</label>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="form-btn secondary" onclick="closeEditModelModal()">取消</button>
+                <button type="button" class="form-btn secondary" onclick="testEditModelConnection()">测试连接</button>
+                <button type="submit" class="form-btn primary">保存修改</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 删除确认对话框 -->
+<div id="delete-confirm-modal" class="config-form">
+    <div class="config-form-content" style="max-width: 400px;">
+        <div class="config-form-header">
+            <h3 class="config-form-title">确认删除</h3>
+            <p class="config-form-subtitle">此操作不可撤销，请谨慎操作</p>
+        </div>
+
+        <div class="mb-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <i class="fa fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900">删除模型</h4>
+                    <p class="text-sm text-gray-600">您即将删除以下模型：</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-4">
+                <div class="flex items-center gap-3">
+                    <img id="delete-model-icon" src="" alt="模型图标" class="w-6 h-6">
+                    <div>
+                        <div id="delete-model-name" class="font-medium text-gray-900"></div>
+                        <div id="delete-model-type" class="text-sm text-gray-600"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div class="flex items-start gap-2">
+                    <i class="fa fa-info-circle text-red-600 mt-0.5"></i>
+                    <div class="text-sm text-red-700">
+                        <strong>警告：</strong>删除后无法恢复，相关的AI助手功能将受到影响。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="form-btn secondary" onclick="closeDeleteConfirmModal()">取消</button>
+            <button type="button" class="form-btn danger" onclick="confirmDeleteModel()">确认删除</button>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script th:src="@{/js/system/config.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK - 消费者组管理</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- 图表库 -->
+    <script th:src="@{/plugins/chart/chart.umd.min.js}"></script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <style>
+        .main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-start), var(--color-end));
+            border-radius: 16px 16px 0 0;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+            border-color: var(--border-color);
+        }
+
+        .metric-card.active {
+            --color-start: #10b981;
+            --color-end: #34d399;
+            --border-color: #10b981;
+        }
+
+        .metric-card.inactive {
+            --color-start: #6b7280;
+            --color-end: #9ca3af;
+            --border-color: #6b7280;
+        }
+
+        .metric-card.slow {
+            --color-start: #f59e0b;
+            --color-end: #fbbf24;
+            --border-color: #f59e0b;
+        }
+
+        .metric-card.lagging {
+            --color-start: #ef4444;
+            --color-end: #f87171;
+            --border-color: #ef4444;
+        }
+
+        .metric-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .metric-icon.active {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .metric-icon.inactive {
+            background: linear-gradient(135deg, #6b7280, #9ca3af);
+            color: white;
+        }
+
+        .metric-icon.slow {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+        }
+
+        .metric-icon.lagging {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            color: white;
+        }
+
+        .overview-banner {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .overview-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .consumer-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .consumer-status.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .consumer-status.inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+
+        .consumer-status.slow {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .consumer-status.lagging {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .lag-indicator {
+            width: 100px;
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .lag-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .lag-fill.low {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .lag-fill.medium {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .lag-fill.high {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            padding: 16px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #6b7280;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            border-color: #165DFF;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%);
+            box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+        }
+
+        .action-btn.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-color: #ef4444;
+            color: white;
+        }
+
+        .action-btn.danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .toolbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 16px;
+        }
+
+        .search-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-input {
+            width: 280px;
+            padding: 10px 16px 10px 40px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #374151;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #374151;
+            background: white;
+            min-width: 140px;
+            position: relative;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQuNSA2LjVMOCAxMEwxMS41IDYuNSIgc3Ryb2tlPSIjNkI3MjgwIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+        }
+
+        .filter-select option {
+            padding: 8px 12px;
+            color: #374151;
+        }
+
+        .filter-select option[value="active"] {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+            color: #059669;
+        }
+
+        .filter-select option[value="inactive"] {
+            background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(156, 163, 175, 0.1));
+            color: #6b7280;
+        }
+
+        .filter-select option[value="slow"] {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1));
+            color: #d97706;
+        }
+
+        .filter-select option[value="lagging"] {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(248, 113, 113, 0.1));
+            color: #dc2626;
+        }
+
+        /* Enhanced select wrapper */
+        .select-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .select-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .select-wrapper.active::before {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+        }
+
+        .select-wrapper.inactive::before {
+            background: linear-gradient(135deg, #6b7280, #9ca3af);
+        }
+
+        .select-wrapper.slow::before {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+        }
+
+        .select-wrapper.lagging::before {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+        }
+
+        .select-wrapper .filter-select {
+            padding-left: 32px;
+        }
+
+        /* Pagination styles */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            background: #f9fafb;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-size-select {
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            margin-left: 8px;
+        }
+
+        /* Select2 自定义样式 */
+        .select2-container {
+            min-width: 140px !important;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 42px !important;
+            border: 2px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            background: white !important;
+            padding-left: 32px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 38px !important;
+            padding-left: 0 !important;
+            color: #374151 !important;
+            font-size: 14px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px !important;
+            right: 12px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #6b7280 transparent transparent transparent !important;
+            border-width: 6px 5px 0 5px !important;
+            margin-left: -5px !important;
+            margin-top: -3px !important;
+        }
+
+        .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+            border-color: transparent transparent #6b7280 transparent !important;
+            border-width: 0 5px 6px 5px !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #165DFF !important;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1) !important;
+        }
+
+        .select2-dropdown {
+            border: 2px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            margin-top: 4px !important;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 12px 16px !important;
+            font-size: 14px !important;
+            color: #374151 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted {
+            background-color: #f3f4f6 !important;
+            color: #374151 !important;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #165DFF !important;
+            color: white !important;
+        }
+
+        /* Status-specific colors for Select2 options */
+        .select2-results__option[data-status="active"] {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.05)) !important;
+            color: #059669 !important;
+        }
+
+        .select2-results__option[data-status="inactive"] {
+            background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(156, 163, 175, 0.05)) !important;
+            color: #6b7280 !important;
+        }
+
+        .select2-results__option[data-status="slow"] {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.05)) !important;
+            color: #d97706 !important;
+        }
+
+        .select2-results__option[data-status="lagging"] {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(248, 113, 113, 0.05)) !important;
+            color: #dc2626 !important;
+        }
+
+        .select2-results__option[data-status="all"] {
+            background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(156, 163, 175, 0.05)) !important;
+            color: #6b7280 !important;
+        }
+
+        /* Status indicator before select2 */
+        .select2-status-indicator {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .select2-status-indicator.active {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+        }
+
+        .select2-status-indicator.inactive {
+            background: linear-gradient(135deg, #6b7280, #9ca3af);
+        }
+
+        .select2-status-indicator.slow {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+        }
+
+        .select2-status-indicator.lagging {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+        }
+
+        .select2-status-indicator.all {
+            background: linear-gradient(135deg, #6b7280, #9ca3af);
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refresh-btn:hover {
+            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%);
+            box-shadow: 0 8px 25px rgba(22, 93, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .toolbar-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .search-filter-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-light-bg text-dark font-inter">
+    <div class="flex min-h-screen overflow-hidden">
+        <th:block th:replace="~{public/navbar :: navbar}"></th:block>
+        <th:block th:replace="~{public/navbar :: overlay}"></th:block>
+
+        <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
+            <th:block th:replace="~{public/header :: header}"></th:block>
+
+            <main class="flex-1 overflow-y-auto p-6 pt-20">
+                <!-- 概览横幅 -->
+                <div class="overview-banner">
+                    <div class="relative z-10">
+                        <h1 class="text-2xl font-bold mb-2">
+                            <i class="fa fa-users mr-3"></i>消费者组管理
+                        </h1>
+                        <p class="text-blue-100 mb-4">监控和管理Kafka消费者组，实时跟踪消费进度和性能指标</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div>
+                                <div class="text-2xl font-bold" id="total-groups">0</div>
+                                <div class="text-sm text-blue-200">消费者组总数</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold" id="active-groups">0</div>
+                                <div class="text-sm text-blue-200">活跃消费者组</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold" id="avg-lag-rate">0%</div>
+                                <div class="text-sm text-blue-200">平均延迟率</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold" id="avg-consumer-rate">0/s</div>
+                                <div class="text-sm text-blue-200">平均消费速度</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 关键指标卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+                    <div class="metric-card active">
+                        <div class="metric-icon active">
+                            <i class="fa fa-play"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1" id="active-card-count">0</div>
+                        <div class="text-sm text-gray-600 mb-2">活跃消费者组</div>
+                        <div class="consumer-status active">
+                            <i class="fa fa-circle text-xs"></i>
+                            正常运行
+                        </div>
+                    </div>
+
+                    <div class="metric-card inactive">
+                        <div class="metric-icon inactive">
+                            <i class="fa fa-pause"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1" id="inactive-card-count">0</div>
+                        <div class="text-sm text-gray-600 mb-2">空闲消费者组</div>
+                        <div class="consumer-status inactive">
+                            <i class="fa fa-circle text-xs"></i>
+                            空闲状态
+                        </div>
+                    </div>
+
+                    <div class="metric-card slow">
+                        <div class="metric-icon slow">
+                            <i class="fa fa-clock"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1" id="slow-card-count">0</div>
+                        <div class="text-sm text-gray-600 mb-2">缓慢消费者组</div>
+                        <div class="consumer-status slow">
+                            <i class="fa fa-exclamation-triangle text-xs"></i>
+                            消费缓慢
+                        </div>
+                    </div>
+
+                    <div class="metric-card lagging">
+                        <div class="metric-icon lagging">
+                            <i class="fa fa-warning"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1" id="lagging-card-count">0</div>
+                        <div class="text-sm text-gray-600 mb-2">延迟消费者组</div>
+                        <div class="consumer-status lagging">
+                            <i class="fa fa-exclamation-circle text-xs"></i>
+                            严重延迟
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 空闲消费者组趋势图表 -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fa fa-area-chart mr-2 text-blue-500"></i>
+                            空闲消费者组趋势
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">最近24小时</span>
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        </div>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="idleGroupsTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 工具栏 -->
+                <div class="toolbar-container">
+                    <div class="search-filter-group">
+                        <div class="search-container">
+                            <i class="fa fa-search search-icon"></i>
+                            <input type="text" id="consumer-search" class="search-input" placeholder="搜索消费者组和主题...">
+                        </div>
+                        <div class="select-wrapper" style="position: relative;">
+                            <div class="select2-status-indicator" id="status-indicator"></div>
+                            <select id="status-filter" class="filter-select enhanced-select">
+                                <option value="">所有状态</option>
+                                <option value="active" data-icon="fa-play" data-color="green">活跃</option>
+                                <option value="inactive" data-icon="fa-pause" data-color="gray">空闲</option>
+                                <option value="slow" data-icon="fa-clock" data-color="orange">缓慢</option>
+                                <option value="lagging" data-icon="fa-warning" data-color="red">延迟</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="refresh-consumers" class="refresh-btn">
+                        <i class="fa fa-refresh"></i>
+                        刷新数据
+                    </button>
+                </div>
+
+                <!-- 消费者组列表 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">
+                            <i class="fa fa-list mr-2 text-purple-500"></i>
+                            消费者组详情
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="data-table" style="min-width: 800px;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 200px; white-space: nowrap;">消费者组ID</th>
+                                    <th style="width: 150px; white-space: nowrap;">主题名称</th>
+                                    <th style="width: 100px; white-space: nowrap;">状态</th>
+                                    <th style="width: 120px; white-space: nowrap;">总延迟</th>
+                                    <th style="width: 140px; white-space: nowrap;">延迟率</th>
+                                    <th style="width: 100px; white-space: nowrap;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="consumers-tbody">
+                                <!-- 动态生成数据 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            显示第 <span id="page-start">1</span> - <span id="page-end">10</span> 条，共 <span id="total-records">0</span> 条记录
+                        </div>
+                        <div class="pagination-controls">
+                            <button id="prev-page" class="pagination-btn">
+                                <i class="fa fa-chevron-left"></i>
+                                上一页
+                            </button>
+                            <button id="next-page" class="pagination-btn">
+                                下一页
+                                <i class="fa fa-chevron-right"></i>
+                            </button>
+                            <span class="text-sm text-gray-500 ml-2">每页显示</span>
+                            <select id="page-size" class="page-size-select">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span class="text-sm text-gray-500">条</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <th:block th:replace="~{public/common :: footer_sub}"></th:block>
+        </div>
+    </div>
+
+    <!-- 消费者组管理脚本 -->
+    <script th:src="@{/js/system/consumers.js}"></script>
+</body>
+
+</html>

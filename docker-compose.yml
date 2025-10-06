@@ -1,0 +1,95 @@
+# Docker Compose 配置文件
+# 适用于 Docker Desktop 4.43.2+ 或 Docker Compose v2.x+
+#
+# 使用方法：
+#   1. 确保外部 MySQL 和 Redis 已启动
+#   2. 修改下面的数据库和 Redis 连接配置
+#   3. 执行: docker compose up -d --build
+#
+
+services:
+  efak-ai:
+    # 从当前目录的 Dockerfile 构建镜像
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # 可选：使用构建参数
+      # args:
+      #   - BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      #   - VERSION=5.0.0
+
+    image: efak-ai:5.0.0
+    container_name: efak-ai
+
+    # 使用 host 网络模式，容器与宿主机共享网络
+    # 优点：可直接使用 localhost 访问宿主机服务，无需端口映射
+    # 注意：host 模式仅在 Linux 下完全支持，macOS/Windows 下建议使用 bridge 模式
+    network_mode: "host"
+
+    # ========================================
+    # 环境变量配置（请根据实际情况修改）
+    # ========================================
+    environment:
+      # JVM 参数
+      JAVA_OPTS: "-Xms512m -Xmx2g -XX:+UseG1GC -XX:+UseStringDeduplication"
+
+      # Spring Boot 配置
+      SPRING_PROFILES_ACTIVE: "prod"
+
+      # ========================================
+      # MySQL 数据库配置（外部服务）
+      # ========================================
+      # 使用 host 网络模式时，可直接使用 localhost 或 127.0.0.1
+      SPRING_DATASOURCE_URL: "jdbc:mysql://192.168.31.72:3306/efak_ai?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai"
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "admin123"  # 请修改为实际密码
+
+      # ========================================
+      # Redis 配置（外部服务）
+      # ========================================
+      # 使用 host 网络模式时，可直接使用 localhost 或 127.0.0.1
+      SPRING_DATA_REDIS_HOST: "192.168.31.72"
+      SPRING_DATA_REDIS_PORT: "6379"
+      # SPRING_DATA_REDIS_PASSWORD: ""  # 如果 Redis 有密码，请填写
+      SPRING_DATA_REDIS_DATABASE: "0"
+
+      # 应用标识
+      APP_NAME: "KafkaEagle"
+
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    # 日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+    # 资源限制（适用于 Docker Compose v2.x+）
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # 重启策略
+    restart: unless-stopped
+
+    # 卷挂载
+    volumes:
+      # 日志目录挂载（建议）
+      - ./logs:/app/logs
+
+      # 自定义配置文件挂载（可选）
+      # 如需自定义配置，取消下面的注释并创建 config/application.yml 文件
+      # - ./config/application.yml:/app/config/application.yml:ro
+

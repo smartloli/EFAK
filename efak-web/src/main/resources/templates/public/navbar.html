@@ -1,140 +1,117 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
-<!-- navbar menu -->
-<div class="horizontal-menu" th:fragment="menu_navbar">
-    <nav class="bottom-navbar">
-        <div class="container">
-            <ul class="nav page-navigation">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="link-icon" data-feather="box"></i>
-                        <span class="menu-title" th:text="#{kafka.eagle.dataspace}">DataSpace</span>
-                        <i class="link-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <ul class="submenu-item">
-                            <li class="nav-item"><a class="nav-link" href="/clusters/manage" th:text="#{kafka.eagle.dataspace.dashboard}">Dashboard</a></li>
-<!--                            <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.dataspace.tv}">TV</a></li>-->
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="link-icon" data-feather="database"></i>
-                        <span class="menu-title" th:text="#{kafka.eagle.topics}">Topics</span>
-                        <i class="link-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <ul class="submenu-item">
-                            <li class="category-heading" th:text="#{kafka.eagle.topics.list}">Manager</li>
-                            <li class="nav-item"><a class="nav-link" href="/topic/create" th:text="#{kafka.eagle.topics.create}">Create</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/topic/manage" th:text="#{kafka.eagle.topics.manager}">Manager</a></li>
-<!--                            <li class="nav-item"><a class="nav-link" href="#" th:utext="#{kafka.eagle.topics.ksql}">KSQL</a></li>-->
-                            <li class="nav-item"><a class="nav-link" href="/topic/mock" th:text="#{kafka.eagle.topics.mock}">Mock</a></li>
-<!--                            <span sec:authorize="isAuthenticated()">-->
-<!--                                <span sec:authorize="hasRole('ADMIN')">-->
-<!--                                    <li class="category-heading" th:text="#{kafka.eagle.topics.metadata}">Metadata<li>-->
-<!--                                    <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.metadata.op}">MetadataOp</a></li>-->
-<!--                                    <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.balance}">Balance</a></li>-->
-<!--                                    <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.topics.balance.job}">Job</a></li>-->
-<!--                                </span>-->
-<!--                            </span>-->
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="link-icon" data-feather="layers"></i>
-                        <span class="menu-title" th:text="#{kafka.eagle.consumers.group}">Consumers</span>
-                        <i class="link-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <ul class="submenu-item">
-                            <li class="nav-item"><a class="nav-link" href="/consumer/summary" th:text="#{kafka.eagle.consumers.group.summary}">Overview</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/consumer/detail" th:text="#{kafka.eagle.consumers.group.detail}">Detail</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="link-icon" data-feather="inbox"></i>
-                        <span class="menu-title" th:text="#{kafka.eagle.clusters}">Clusters</span>
-                        <i class="link-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <ul class="submenu-item">
-                            <li class="nav-item"><a class="nav-link" href="/clusters/kafka" th:text="#{kafka.eagle.clusters.kafka}">Kafka</a></li>
-<!--                            <li class="nav-item"><a class="nav-link" href="/clusters/server" th:text="#{kafka.eagle.clusters.server}">Server</a></li>-->
-                            <li class="nav-item"><a class="nav-link" href="/clusters/manage" th:text="#{kafka.eagle.clusters.manager}">Manager</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="link-icon" data-feather="pie-chart"></i>
-                        <span class="menu-title" th:text="#{kafka.eagle.monitor}">Monitor</span>
-                        <i class="link-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <ul class="submenu-item pe-md-0">
-<!--                                    <li class="nav-item"><a class="nav-link" href="" th:text="#{kafka.eagle.monitor.mbean}">MBean</a></li>-->
-                                    <li class="nav-item"><a class="nav-link" href="/monitor/kafka" th:text="#{kafka.eagle.monitor.kafka}">Kafka</a></li>
-                                        <li class="nav-item"><a class="nav-link" href="/monitor/produce" th:text="#{kafka.eagle.monitor.produce}">Topic</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="link-icon" data-feather="cpu"></i>
-                        <span class="menu-title" th:text="#{kafka.eagle.plugins}">Connectors</span>
-                        <i class="link-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <ul class="submenu-item">
-                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.plugins.connector}">Connectors</a></li>
-<!--                            <li class="nav-item"><a class="nav-link" href="#" th:text="#{kafka.eagle.plugins.worker}">Workers</a></li>-->
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="link-icon" data-feather="bell"></i>
-                        <span class="menu-title" th:text="#{kafka.eagle.alert}">Alert</span>
-                        <i class="link-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <ul class="submenu-item">
-                            <li class="nav-item"><a class="nav-link" href="/alert/channel" th:text="#{kafka.eagle.alert.channel}"></a></li>
-                            <li class="nav-item"><a class="nav-link" href="/alert/rule" th:text="#{kafka.eagle.alert.rule}"></a></li>
-                            <li class="nav-item"><a class="nav-link" href="/alert/info" th:text="#{kafka.eagle.alert.info}"></a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="link-icon" data-feather="users"></i>
-                        <span class="menu-title" th:text="#{kafka.eagle.system}">System</span>
-                        <i class="link-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <ul class="submenu-item">
-                            <span sec:authorize="isAuthenticated()">
-                                <span sec:authorize="hasRole('ADMIN')">
-                                    <li class="nav-item"><a class="nav-link" href="/system/user" th:text="#{kafka.eagle.system.user}"></a></li>
-                                    <li class="nav-item"><a class="nav-link" href="/system/job" th:text="#{kafka.eagle.system.job}"></a></li>
-                                </span>
-                            </span>
-                            <li class="nav-item"><a class="nav-link" href="/system/audit" th:text="#{kafka.eagle.system.audit}"></a></li>
-                        </ul>
-                    </div>
-                </li>
-            </ul>
+<!-- sidebar -->
+<aside id="sidebar"
+    class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm flex-shrink-0 transition-all duration-300 ease-in-out z-30 fixed-sidebar lg:translate-x-0"
+    th:fragment="navbar">
+    <div class="flex items-center justify-between p-3 border-b border-gray-200">
+        <a href="/">
+            <div class="flex items-center space-x-3 sidebar-logo-container">
+                <img th:src="@{/images/efak_ai_logo.png}" alt="EFAK AI Logo"
+                    class="w-10 h-10 rounded-full object-cover flex-shrink-0 transition-transform hover:scale-110" />
+                <h1 class="text-xl font-bold sidebar-title">EFAK · <span class="text-primary">AI</span></h1>
+            </div>
+        </a>
+        <!-- 折叠按钮（展开状态时显示） -->
+        <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-colors sidebar-toggle">
+            <i class="fa fa-angle-left"></i>
+        </button>
+        <!-- 展开按钮（折叠状态时显示） -->
+        <button id="sidebar-expand" class="p-2 rounded-full hover:bg-gray-100 transition-colors sidebar-expand hidden">
+            <i class="fa fa-angle-right"></i>
+        </button>
+    </div>
+
+    <nav class="p-2 mt-2">
+        <!-- 主菜单 -->
+        <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2 sidebar-section-title">主菜单
         </div>
+        <a th:href="@{/dashboard(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'dashboard')} ? 'bg-primary text-white' : ''"
+            data-page="dashboard" data-tooltip="仪表盘">
+            <i class="fa fa-dashboard w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">仪表盘</span>
+        </a>
+        <a th:href="@{/cluster(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'cluster')} ? 'bg-primary text-white' : ''"
+            data-page="cluster" data-tooltip="集群管理">
+            <i class="fa fa-server w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">集群管理</span>
+        </a>
+        <a th:href="@{/topics(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'topics')} ? 'bg-primary text-white' : ''" data-page="topics"
+            data-tooltip="主题管理">
+            <i class="fa fa-list-ul w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">主题管理</span>
+        </a>
+        <a th:href="@{/consumers(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'consumers')} ? 'bg-primary text-white' : ''"
+            data-page="consumers" data-tooltip="消费者组">
+            <i class="fa fa-users w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">消费者组</span>
+        </a>
+        <a th:href="@{/monitoring(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'monitoring')} ? 'bg-primary text-white' : ''"
+            data-page="monitoring" data-tooltip="性能监控">
+            <i class="fa fa-tachometer w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">性能监控</span>
+        </a>
+        <a th:href="@{/alerts(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'alerts')} ? 'bg-primary text-white' : ''" data-page="alerts"
+            data-tooltip="系统告警">
+            <i class="fa fa-bell w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">系统告警</span>
+        </a>
+
+        <!-- AI助手 -->
+        <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mt-6 mb-2 sidebar-section-title">
+            AI助手
+        </div>
+        <a th:href="@{/ai-assistant(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative group"
+            th:classappend="${#strings.equals(activePage, 'ai-assistant')} ? 'bg-primary text-white' : ''"
+            data-page="ai-assistant" data-tooltip="AI智能助手">
+            <i
+                class="fa fa-comments w-5 h-5 mr-3 text-center sidebar-icon transition-all duration-300 group-hover:animate-pulse"></i>
+            <span class="sidebar-text">AI助手</span>
+        </a>
+
+        <!-- 系统管理 -->
+        <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mt-6 mb-2 sidebar-section-title"
+            th:if="${#strings.contains(userRole, '管理员')}">
+            系统管理
+        </div>
+        <a th:href="@{/config(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'config')} ? 'bg-primary text-white' : ''" data-page="config"
+            data-tooltip="配置管理" th:if="${#strings.contains(userRole, '管理员')}">
+            <i class="fa fa-cog w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">配置管理</span>
+        </a>
+        <a th:href="@{/users(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'users')} ? 'bg-primary text-white' : ''" data-page="users"
+            data-tooltip="用户管理" th:if="${#strings.contains(userRole, '管理员')}">
+            <i class="fa fa-user-circle w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">用户管理</span>
+        </a>
+        <a th:href="@{/scheduler(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'scheduler')} ? 'bg-primary text-white' : ''"
+            data-page="scheduler" data-tooltip="任务调度" th:if="${#strings.contains(userRole, '管理员')}">
+            <i class="fa fa-clock w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">任务调度</span>
+        </a>
     </nav>
+</aside>
+
+<!-- 移动端遮罩层 -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden hidden" th:fragment="overlay">
 </div>

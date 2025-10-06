@@ -1,43 +1,80 @@
-/**
- * LoginController.java
- * <p>
- * Copyright 2023 smartloli
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.kafka.eagle.web.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * Description: TODO
- *
- * @Author: smartloli
- * @Date: 2023/6/28 23:49
- * @Version: 3.4.0
+ * <p>
+ * Login 控制器
+ * </p>
+ * @author Mr.SmartLoli
+ * @since 2025/07/20 21:19:38
+ * @version 5.0.0
  */
 @Controller
 public class LoginController {
+
     @GetMapping("/login")
-    public String loginPage() {
-        return "login/login.html";
+    public String loginPage(@RequestParam(value = "targetUrl", required = false) String targetUrl,
+            @RequestParam(value = "error", required = false) String error,
+            Model model) {
+        if (targetUrl != null && !targetUrl.isEmpty()) {
+            // 验证URL安全性，只允许相对路径
+            if (isValidTargetUrl(targetUrl)) {
+                model.addAttribute("targetUrl", targetUrl);
+            }
+        }
+
+        // 处理错误信息
+        if (error != null) {
+            model.addAttribute("error", "用户名或密码错误");
+        }
+
+        return "view/login";
     }
 
-    @GetMapping("/deault")
+    /**
+     * 验证目标URL的安全性
+     * 只允许相对路径，防止重定向攻击
+     */
+    private boolean isValidTargetUrl(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return false;
+        }
+
+        // 检查是否以/开头（相对路径）
+        if (!url.startsWith("/")) {
+            return false;
+        }
+
+        // 检查是否包含危险字符
+        String lowerUrl = url.toLowerCase();
+        if (lowerUrl.contains("javascript:") ||
+                lowerUrl.contains("data:") ||
+                lowerUrl.contains("vbscript:") ||
+                lowerUrl.contains("onload=") ||
+                lowerUrl.contains("onerror=")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @GetMapping("/default")
     public String defaultPage() {
-        return "login/deault.html";
+        return "view/dashboard";
     }
 
+    @GetMapping("/password-tool")
+    public String passwordToolPage() {
+        return "view/password-tool";
+    }
+
+    @GetMapping("/test-login-redirect")
+    public String testLoginRedirectPage() {
+        return "view/test-login-redirect";
+    }
 
 }

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK - 多集群管理</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js_main}"></th:block>
+
+    <script th:src="@{/plugins/sheetjs/xlsx.full.min.js}"></script>
+
+    <!-- 配置Tailwind主题 -->
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#FF4D4F',
+                        info: '#1890FF',
+                        dark: '#1D2129',
+                        'light-dark': '#4E5969',
+                        'ultra-light': '#F2F3F5'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+
+    <th:block th:replace="~{public/css_pub :: pub}"></th:block>
+
+</head>
+
+<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+<!-- 顶部导航栏 -->
+<th:block th:replace="~{public/header_main :: header}"></th:block>
+
+<!-- 主内容区 -->
+<main class="flex-1 container mx-auto px-4 py-6">
+    <!-- 页面标题和操作区 -->
+    <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-dark">Kafka集群管理</h2>
+            <p class="text-gray-500 mt-1">管理和监控所有Kafka集群的运行状态</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <div class="relative">
+                <input id="cluster_search" type="text" placeholder="搜索集群..."
+                       class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all w-full md:w-64">
+                <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+            <button id="add-cluster-btn"
+                    class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-md hover:shadow-lg">
+                <i class="fa fa-plus"></i>
+                <span>新建集群</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 集群概览卡片 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">总集群数</p>
+                    <h3 id="totalClusters" class="text-3xl font-bold mt-1">0</h3>
+                    <p class="text-success text-sm mt-2 flex items-center">
+                        <i class="fa fa-arrow-up mr-1"></i> 实时统计
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <i class="fa fa-server text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">健康集群</p>
+                    <h3 id="onlineClusters" class="text-3xl font-bold mt-1">0</h3>
+                    <p id="healthRate" class="text-success text-sm mt-2 flex items-center">
+                        <i class="fa fa-check-circle mr-1"></i> 0% 健康率
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center text-success">
+                    <i class="fa fa-heartbeat text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">异常集群</p>
+                    <h3 id="offlineClusters" class="text-3xl font-bold mt-1">0</h3>
+                    <p class="text-warning text-sm mt-2 flex items-center">
+                        <i class="fa fa-exclamation-triangle mr-1"></i> 需要关注
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center text-warning">
+                    <i class="fa fa-warning text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">平均可用度</p>
+                    <h3 id="avgAvailability" class="text-3xl font-bold mt-1">0%</h3>
+                    <p class="text-info text-sm mt-2 flex items-center">
+                        <i class="fa fa-chart-line mr-1"></i> 集群可用度
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-info/10 flex items-center justify-center text-info">
+                    <i class="fa fa-microchip text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 集群列表 -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mt-6">
+        <div class="p-6">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 cluster-table">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            集群ID
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            集群名称
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            集群类型
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            节点 (在线/总数)
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            可用度
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            状态
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            认证
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            更新时间
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            操作
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody id="cluster-tbody" class="bg-white divide-y divide-gray-200">
+                    <!-- 集群数据将通过JavaScript动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页组件 -->
+            <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                <div class="text-sm text-gray-500">
+                    显示第 <span id="start-item">1</span> - <span id="end-item">5</span> 条，共 <span
+                        id="total-items">0</span> 条记录
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="prev-page"
+                            class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled>
+                        <i class="fa fa-chevron-left mr-1"></i>上一页
+                    </button>
+
+                    <div class="flex items-center space-x-1" id="page-numbers">
+                        <!-- 页码按钮将通过JavaScript动态生成 -->
+                    </div>
+
+                    <button id="next-page"
+                            class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        下一页<i class="fa fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- 页脚 -->
+<th:block th:replace="~{public/common :: footer_main}"></th:block>
+
+
+<!-- JavaScript -->
+<script src="/statics/js/system/manager.js" th:src="@{/statics/js/system/manager.js}"></script>
+<script>
+    // 导航栏滚动效果
+    window.addEventListener('scroll', function () {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 10) {
+            navbar.classList.add('shadow');
+        } else {
+            navbar.classList.remove('shadow');
+        }
+    });
+
+    // 为表格中的操作按钮添加交互效果（忽略已带有 inline onclick 的按钮，避免重复执行）
+    document.querySelectorAll('td button').forEach(button => {
+        button.addEventListener('click', function (e) {
+            if (this.hasAttribute('onclick')) return; // 已有内联事件的按钮，由 ManagerModule 处理
+            e.stopPropagation(); // 防止触发行的hover效果
+            const action = this.title;
+            const row = this.closest('tr');
+            const clusterName = row?.querySelector('td:nth-child(2) .text-gray-900')?.textContent || '';
+
+            if (action === '删除集群') {
+                if (confirm(`确定要删除集群 "${clusterName}" 吗？此操作不可恢复。`)) {
+                    alert(`集群 "${clusterName}" 已删除`);
+                }
+            } else if (action === '重启集群') {
+                if (confirm(`确定要重启集群 "${clusterName}" 吗？`)) {
+                    alert(`集群 "${clusterName}" 重启中...`);
+                }
+            } else if (action === '查看详情') {
+                alert(`查看集群 "${clusterName}" 的详细信息`);
+            } else if (action === '编辑集群') {
+                const clusterId = row?.getAttribute('data-cluster-id') || row?.querySelector('td:first-child')?.textContent?.trim() || '';
+                if (window.ManagerModule && clusterId) {
+                    window.ManagerModule.editCluster(clusterId);
+                } else {
+                    alert('无法获取集群ID，无法打开编辑窗口');
+                }
+            }
+        });
+    });
+</script>
+
+<!-- 创建集群对话框 -->
+<div id="create-cluster-modal" class="modal-overlay"
+     style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="cluster-modal-container">
+        <div class="modal-header">
+            <h3>创建新集群</h3>
+            <button class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="create-cluster-form">
+                <div class="form-section">
+                    <h4 class="form-section-title">基本信息</h4>
+                    <div class="form-group">
+                        <label class="form-label">集群名称 *</label>
+                        <input type="text" id="cluster-name" class="form-input" placeholder="请输入集群名称" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">环境类型 *</label>
+                        <select id="cluster-environment" name="clusterEnvironment" class="topic-icon-select"
+                                required>
+                            <option value="" disabled selected>请选择环境类型</option>
+                            <option value="dev" data-icon="fa-code" data-color="blue" data-description="用于开发和调试">
+                                开发环境
+                            </option>
+                            <option value="test" data-icon="fa-flask" data-color="green"
+                                    data-description="用于功能测试">
+                                测试环境
+                            </option>
+                            <option value="pre" data-icon="fa-rocket" data-color="orange"
+                                    data-description="用于预发验证">
+                                预发环境
+                            </option>
+                            <option value="prd" data-icon="fa-server" data-color="red" data-description="用于生产部署">
+                                生产环境
+                            </option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">
+                            <i class="fa fa-info-circle text-blue-500 mr-1"></i>
+                            选择合适的环境类型来标识集群用途
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tab栏切换 -->
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button type="button" class="tab-btn active" onclick="switchTab('single')">单个节点</button>
+                        <button type="button" class="tab-btn" onclick="switchTab('batch')">批量导入</button>
+                    </div>
+
+                    <!-- 单个节点Tab -->
+                    <div id="singleTab" class="tab-content active">
+                        <!-- 基本配置 -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h4>基本配置</h4>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="brokerId" class="form-label">Broker ID:</label>
+                                    <input type="number" id="brokerId" name="brokerId" class="form-input"
+                                           placeholder="请输入Broker ID">
+                                </div>
+                                <div class="form-group">
+                                    <label for="hostIp" class="form-label">主机IP:</label>
+                                    <input type="text" id="hostIp" name="hostIp" class="form-input"
+                                           placeholder="请输入主机IP地址">
+                                </div>
+                                <div class="form-group">
+                                    <label for="kafkaPort" class="form-label">Kafka端口:</label>
+                                    <input type="number" id="kafkaPort" name="kafkaPort" class="form-input"
+                                           placeholder="9092" value="9092">
+                                </div>
+                                <div class="form-group">
+                                    <label for="jmxPort" class="form-label">JMX端口:</label>
+                                    <input type="number" id="jmxPort" name="jmxPort" class="form-input"
+                                           placeholder="9999" value="9999">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kafka配置 -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h4>Kafka配置</h4>
+                            </div>
+                            <div class="security-switch">
+                                <label class="form-label">安全认证:</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="securityEnabled" onchange="toggleSecurityConfig()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div id="securityConfig" class="form-group" style="display: none;">
+                                <label for="securityJson" class="form-label">安全配置 (JSON格式):</label>
+                                <textarea id="securityJson" rows="8" name="securityJson" class="form-input form-textarea"
+                                          placeholder='{
+  "security.protocol": "SASL_PLAINTEXT",
+  "sasl.mechanism": "PLAIN",
+  "sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"user\" password=\"password\";"
+}'></textarea>
+                                <div id="jsonValidation" style="color: red; font-size: 12px; margin-top: 5px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="submit-btn" onclick="submitSingleNode()">
+                            <i class="fas fa-plus"></i>
+                            立即录入
+                        </button>
+                    </div>
+
+                    <!-- 批量导入Tab -->
+                    <div id="batchTab" class="tab-content">
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h4>批量导入</h4>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn-secondary" onclick="downloadTemplate()">
+                                    <i class="fas fa-download"></i>
+                                    下载Excel模板
+                                </button>
+                            </div>
+                            <div class="file-upload-area" onclick="document.getElementById('excelFile').click()"
+                                 style="border: 2px dashed #d1d5db; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s;">
+                                <div class="upload-icon"
+                                     style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="upload-text"
+                                     style="font-size: 16px; color: #374151; margin-bottom: 8px;">点击上传或拖拽文件到此区域
+                                </div>
+                                <div class="upload-hint" style="font-size: 14px; color: #9ca3af;">支持 .xlsx, .xls
+                                    格式文件
+                                </div>
+                                <input type="file" id="excelFile" class="file-input" accept=".xlsx,.xls"
+                                       onchange="handleFileSelect(event)" style="display: none;">
+                            </div>
+                            <div id="fileInfo" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
+                        </div>
+
+                        <button type="button" class="submit-btn" onclick="submitBatchImport()">
+                            <i class="fas fa-upload"></i>
+                            立即录入
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <div id="cluster-modal-message" class="modal-message" style="display: none;"></div>
+            <button type="button" class="btn-secondary">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑集群对话框 -->
+<div id="editClusterModal" class="modal-overlay"
+     style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+  <div class="cluster-modal-container">
+    <div class="modal-header">
+      <h3>编辑集群</h3>
+      <button class="modal-close" onclick="closeEditClusterModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="editClusterForm">
+        <div class="form-section">
+          <h4 class="form-section-title">基本信息</h4>
+          <!-- 集群ID不展示，仅作为隐藏字段保留 -->
+          <input type="hidden" id="editClusterId">
+          <div class="form-group">
+            <label class="form-label">集群名称 *</label>
+            <input type="text" id="editClusterName" class="form-input" placeholder="请输入集群名称" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">环境类型 *</label>
+            <select id="editClusterType" class="topic-icon-select" required>
+              <option value="" disabled>请选择环境类型</option>
+              <option value="dev" data-icon="fa-code" data-color="blue" data-description="用于开发和调试">开发环境</option>
+              <option value="test" data-icon="fa-flask" data-color="green" data-description="用于功能测试">测试环境</option>
+              <option value="pre" data-icon="fa-rocket" data-color="orange" data-description="用于预发验证">预发环境</option>
+              <option value="prd" data-icon="fa-server" data-color="red" data-description="用于生产部署">生产环境</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
+            <h4>Broker 节点</h4>
+            <button type="button" class="btn-secondary" onclick="addNewBrokerNode()">
+              <i class="fas fa-plus"></i>
+              添加节点
+            </button>
+          </div>
+          <div id="brokerNodesList"></div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <h4>Kafka配置</h4>
+          </div>
+          <div class="security-switch">
+            <label class="form-label">安全认证:</label>
+            <label class="switch">
+              <input type="checkbox" id="editSecurityEnabled" onchange="toggleEditSecurityConfig()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div id="editSecurityConfig" class="form-group" style="display: none;">
+            <label for="editSecurityJson" class="form-label">安全配置 (JSON格式):</label>
+            <textarea id="editSecurityJson" rows="8" class="form-input form-textarea" placeholder='{
+  "security.protocol": "SASL_PLAINTEXT",
+  "sasl.mechanism": "PLAIN",
+  "sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"user\" password=\"password\";"
+}'></textarea>
+            <div id="editJsonValidation" style="color: red; font-size: 12px; margin-top: 5px;"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div id="edit-cluster-modal-message" class="modal-message" style="display: none;"></div>
+      <button type="button" class="btn-secondary" onclick="closeEditClusterModal()">取消</button>
+      <button type="button" class="submit-btn" onclick="submitEditCluster()">
+        <i class="fas fa-save"></i>
+        确认编辑
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+
+</html>

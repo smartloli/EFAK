@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务器错误 - EFAK·AI</title>
+    <link rel="shortcut icon" th:href="@{/images/efak_ai_logo.png}" />
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}" />
+    <link th:href="@{/plugins/tailwindcss/tailwind.min.css}" rel="stylesheet">
+    <link th:href="@{/css/inter-font.css}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #165DFF;
+            --primary-dark: #0E4AE6;
+            --secondary-color: #4F46E5;
+            --error-color: #EF4444;
+            --error-dark: #DC2626;
+            --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6366f1 100%);
+            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .error-container {
+            min-height: 100vh;
+            background: var(--gradient-bg);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .error-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.08"><circle cx="40" cy="40" r="1.5"/></g></svg>');
+            opacity: 0.6;
+        }
+
+        .error-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 100%;
+            max-width: 500px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            box-shadow: 0 10px 25px rgba(22, 93, 255, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .brand-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+
+        .error-number {
+            font-size: 8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--error-color), var(--error-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 1rem;
+            animation: shake 2s infinite;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-3px);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(3px);
+            }
+        }
+
+        .error-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .error-details {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            color: var(--error-dark);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 14px rgba(22, 93, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(22, 93, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-primary);
+            border: 2px solid rgba(22, 93, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-refresh {
+            background: linear-gradient(135deg, var(--error-color), var(--error-dark));
+            color: white;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-refresh:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            color: var(--error-color);
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .error-card {
+                padding: 2rem 1.5rem;
+                border-radius: 16px;
+            }
+
+            .error-number {
+                font-size: 6rem;
+            }
+
+            .error-title {
+                font-size: 1.5rem;
+            }
+
+            .error-message {
+                font-size: 1rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="error-container">
+        <div class="floating-shapes">
+            <div class="shape">
+                <i class="fa fa-server" style="font-size: 2rem; color: white;"></i>
+            </div>
+            <div class="shape">
+                <i class="fa fa-exclamation-triangle" style="font-size: 1.5rem; color: white;"></i>
+            </div>
+            <div class="shape">
+                <i class="fa fa-bug" style="font-size: 2.5rem; color: white;"></i>
+            </div>
+        </div>
+
+        <div class="error-card">
+            <div class="logo-container">
+                <img th:src="@{/images/efak_ai_logo.png}" alt="EFAK AI Logo" class="logo">
+                <h1 class="brand-title">EFAK · AI</h1>
+                <p class="brand-subtitle">Eagle For Apache Kafka · 智能监控平台</p>
+            </div>
+
+            <div class="error-icon">
+                <i class="fa fa-exclamation-triangle"></i>
+            </div>
+            <div class="error-number">500</div>
+            <h2 class="error-title">服务器错误</h2>
+            <p class="error-message">
+                抱歉，服务器遇到了内部错误，无法完成您的请求。
+            </p>
+
+            <div class="button-group">
+                <a href="/" class="btn btn-primary">
+                    <i class="fa fa-home"></i>
+                    返回首页
+                </a>
+                <a href="javascript:history.back()" class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"></i>
+                    返回上页
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/plugins/jquery/jquery-3.6.0.min.js}"></script>
+    <script>
+        $(document).ready(function () {
+            // 添加页面加载动画
+            $('.error-card').addClass('animate-in');
+
+            // 添加按钮点击反馈
+            $('.btn').on('click', function (e) {
+                const $btn = $(this);
+                $btn.css('transform', 'scale(0.95)');
+                setTimeout(() => {
+                    $btn.css('transform', '');
+                }, 150);
+            });
+
+            // 键盘快捷键支持
+            $(document).on('keydown', function (e) {
+                if (e.key === 'r' || e.key === 'R') {
+                    window.location.reload();
+                } else if (e.key === 'h' || e.key === 'H') {
+                    window.location.href = '/dashboard';
+                } else if (e.key === 'b' || e.key === 'B') {
+                    history.back();
+                }
+            });
+
+            // 控制台彩蛋
+            console.log('%c🔥 EFAK·AI 500 错误页面', 'color: #EF4444; font-size: 20px; font-weight: bold;');
+            console.log('%c按 R 键刷新，按 H 键返回首页，按 B 键返回上页', 'color: #6b7280; font-size: 14px;');
+        });
+    </script>
+</body>
+
+</html>

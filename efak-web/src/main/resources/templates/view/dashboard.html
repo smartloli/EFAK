@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK·AI - 智能化仪表盘</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <style>
+        .main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        /* 英雄区域样式 */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 32px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            50% {
+                transform: scale(1.1) rotate(180deg);
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .hero-stat {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .hero-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* 卡片样式 */
+        .metric-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 28px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .metric-card.primary {
+            --primary-color: #3b82f6;
+            --secondary-color: #1d4ed8;
+        }
+
+        .metric-card.success {
+            --primary-color: #10b981;
+            --secondary-color: #059669;
+        }
+
+        .metric-card.warning {
+            --primary-color: #f59e0b;
+            --secondary-color: #d97706;
+        }
+
+        .metric-card.danger {
+            --primary-color: #ef4444;
+            --secondary-color: #dc2626;
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .metric-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            margin-right: 16px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .metric-info p {
+            font-size: 0.9rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .metric-change.positive {
+            color: #059669;
+        }
+
+        .metric-change.negative {
+            color: #dc2626;
+        }
+
+        .metric-change.neutral {
+            color: #6b7280;
+        }
+
+        /* 图表容器样式 */
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chart-title i {
+            color: #6366f1;
+            font-size: 1.3rem;
+        }
+
+        .chart-filters {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #6b7280;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: white;
+        }
+
+        .filter-btn:hover:not(.active) {
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .filter-btn.active:hover {
+            background: #5b5bf6;
+            border-color: #5b5bf6;
+            color: white;
+        }
+
+        .chart-content {
+            height: 400px;
+            position: relative;
+        }
+
+        /* 表格样式 */
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 32px;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 24px 32px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .table-title i {
+            color: #6366f1;
+        }
+
+        .table-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table-tab {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #6b7280;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .table-tab.active {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: white;
+        }
+
+        .table-tab:hover:not(.active) {
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .table-tab.active:hover {
+            background: #5b5bf6;
+            border-color: #5b5bf6;
+            color: white;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            padding: 16px 24px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+        }
+
+        .data-table td {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .rank-1 {
+            background: #ffd700;
+            color: #92400e;
+        }
+
+        .rank-2 {
+            background: #c0c0c0;
+            color: #78716c;
+        }
+
+        .rank-3 {
+            background: #cd7f32;
+            color: #92400e;
+        }
+
+        .rank-other {
+            background: #6b7280;
+        }
+
+        /* 24h变化趋势指示器样式 - 已弃用，改为数据倾斜指示器 */
+        /*
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .trend-down {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .trend-stable {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+        */
+
+        /* 数据倾斜指示器样式 */
+        .skew-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .skew-normal {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .skew-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .skew-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        /* 环形图样式 */
+        .resource-node-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .resource-node-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .resource-node-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .resource-charts-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .resource-chart-item {
+            flex: 1;
+            position: relative;
+        }
+
+        .resource-chart-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+
+        .resource-chart-center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .resource-chart-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1;
+        }
+
+        .resource-chart-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .resource-charts-row {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .resource-chart-wrapper {
+                width: 100px;
+                height: 100px;
+            }
+
+            .resource-chart-value {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 16px;
+            }
+
+            .metric-card {
+                padding: 20px;
+            }
+
+            .chart-container {
+                padding: 20px;
+            }
+
+            .table-header {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 24px;
+            }
+
+            .hero-title {
+                font-size: 1.5rem;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="flex min-h-screen overflow-hidden">
+        <!-- 侧边栏和遮罩层 -->
+        <th:block th:replace="~{public/navbar :: navbar}"></th:block>
+        <th:block th:replace="~{public/navbar :: overlay}"></th:block>
+
+        <!-- 主内容区域 -->
+        <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
+            <!-- 头部 -->
+            <th:block th:replace="~{public/header :: header}"></th:block>
+
+            <!-- 页面内容 -->
+            <main class="flex-1 overflow-y-auto p-6 pt-20">
+                <!-- 英雄区域 -->
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">EFAK·AI 智能监控</h1>
+                        <p class="hero-subtitle">实时监控 Kafka 集群性能与健康状态，AI 驱动的智能分析与预警</p>
+
+                        <div class="hero-stats">
+                            <div class="hero-stat">
+                                <div class="hero-stat-number" id="hero-clusters">3</div>
+                                <div class="hero-stat-label">在线节点</div>
+                            </div>
+                            <div class="hero-stat">
+                                <div class="hero-stat-number" id="hero-topics">28</div>
+                                <div class="hero-stat-label">主题总数</div>
+                            </div>
+                            <div class="hero-stat">
+                                <div class="hero-stat-number" id="hero-partitions">186</div>
+                                <div class="hero-stat-label">分区总数</div>
+                            </div>
+                            <div class="hero-stat">
+                                <div class="hero-stat-number" id="hero-consumers">24</div>
+                                <div class="hero-stat-label">消费者组</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 核心指标卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- 消息吞吐量 -->
+                    <div class="metric-card primary">
+                        <div class="metric-header">
+                            <div class="metric-icon">
+                                <i class="fa fa-exchange"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>消息吞吐量</h3>
+                                <p>实时消息流量监控，包含生产和消费速率统计</p>
+                            </div>
+                        </div>
+                        <div class="metric-value" id="throughput-value">0msg/s</div>
+                    </div>
+
+                    <!-- 集群健康度 -->
+                    <div class="metric-card success">
+                        <div class="metric-header">
+                            <div class="metric-icon">
+                                <i class="fa fa-heartbeat"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>集群健康度</h3>
+                                <p>综合评估集群运行状态，包含节点可用性和性能指标</p>
+                            </div>
+                        </div>
+                        <div class="metric-value" id="health-value">健康</div>
+                    </div>
+
+                    <!-- 平均延迟 -->
+                    <div class="metric-card warning">
+                        <div class="metric-header">
+                            <div class="metric-icon">
+                                <i class="fa fa-clock"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>平均延迟</h3>
+                                <p>端到端消息传输延迟，反映系统响应性能</p>
+                            </div>
+                        </div>
+                        <div class="metric-value" id="latency-value">0.00ms</div>
+                    </div>
+
+                    <!-- 平均消费速度 -->
+                    <div class="metric-card danger">
+                        <div class="metric-header">
+                            <div class="metric-icon">
+                                <i class="fa fa-database"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>平均消费速度</h3>
+                                <p>单位时间内消费者读取消息的速率，反映消费处理能力</p>
+                            </div>
+                        </div>
+                        <div class="metric-value" id="storage-value">0.00/s</div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- 集群性能趋势 -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h2 class="chart-title">
+                                <i class="fas fa-chart-line"></i>
+                                集群性能趋势
+                            </h2>
+                            <div class="chart-filters">
+                                <button class="filter-btn active" data-period="1h">1小时</button>
+                                <button class="filter-btn" data-period="24h">24小时</button>
+                                <button class="filter-btn" data-period="3d">3天</button>
+                                <button class="filter-btn" data-period="7d">7天</button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <canvas id="throughputChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 集群资源使用率 -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h2 class="chart-title">
+                                <i class="fas fa-server"></i>
+                                集群资源使用率
+                            </h2>
+                        </div>
+                        <div class="chart-content" style="padding: 20px;">
+                            <div id="resourceChartsContainer" class="flex justify-center">
+                                <!-- 动态生成的环形图将在这里插入 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 活跃主题占比分析 -->
+                <div class="chart-container mb-8">
+                    <div class="chart-header">
+                        <h2 class="chart-title">
+                            <i class="fa fa-pie-chart"></i>
+                            <span id="analysis-title">主题状态分析</span>
+                        </h2>
+                    </div>
+
+                    <!-- 主题统计概览 -->
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6" id="topic-stats-overview">
+                        <!-- 总主题数 -->
+                        <div class="stats-card">
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-2xl font-bold text-blue-700" id="total-topics-count">0</div>
+                                        <div class="text-sm text-blue-600">主题总数</div>
+                                    </div>
+                                    <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                                        <i class="fa fa-list text-white text-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 活跃主题数 -->
+                        <div class="stats-card">
+                            <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-2xl font-bold text-green-700" id="active-topics-count">0</div>
+                                        <div class="text-sm text-green-600">活跃主题</div>
+                                    </div>
+                                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                                        <i class="fa fa-check-circle text-white text-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 空闲主题数 -->
+                        <div class="stats-card">
+                            <div class="bg-gradient-to-r from-gray-50 to-slate-50 p-4 rounded-xl border border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-2xl font-bold text-gray-700" id="idle-topics-count">0</div>
+                                        <div class="text-sm text-gray-600">空闲主题</div>
+                                    </div>
+                                    <div class="w-12 h-12 bg-gray-500 rounded-lg flex items-center justify-center">
+                                        <i class="fa fa-pause-circle text-white text-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 活跃占比 -->
+                        <div class="stats-card">
+                            <div class="bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-xl border border-purple-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-2xl font-bold text-purple-700" id="active-percentage">0%</div>
+                                        <div class="text-sm text-purple-600">活跃占比</div>
+                                    </div>
+                                    <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                                        <i class="fa fa-percent text-white text-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 总容量 -->
+                        <div class="stats-card">
+                            <div class="bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-xl border border-orange-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-2xl font-bold text-orange-700" id="total-capacity">0B</div>
+                                        <div class="text-sm text-orange-600">总容量</div>
+                                    </div>
+                                    <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+                                        <i class="fa fa-database text-white text-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 图表区域 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- 主题状态饼图 -->
+                        <div class="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="fa fa-pie-chart text-blue-500"></i>
+                                主题活跃状态分布
+                            </h3>
+                            <div class="chart-content" style="height: 280px;">
+                                <canvas id="topicsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- 容量分布饼图 -->
+                        <div class="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="fa fa-chart-pie text-orange-500"></i>
+                                主题容量分布
+                            </h3>
+                            <div class="chart-content" style="height: 280px;">
+                                <canvas id="capacityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 性能指标表格 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2 class="table-title">
+                            <i class="fas fa-trophy"></i>
+                            性能指标 TOP 10
+                        </h2>
+                        <div class="table-tabs">
+                            <button class="table-tab active" data-dimension="messages">消息数量</button>
+                            <button class="table-tab" data-dimension="size">消息容量</button>
+                            <button class="table-tab" data-dimension="read">读取速率</button>
+                            <button class="table-tab" data-dimension="write">写入速率</button>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <table class="data-table">
+                            <thead>
+                                <tr id="table-header">
+                                    <th>排名</th>
+                                    <th>主题名称</th>
+                                    <th>消息数量</th>
+                                    <th>数据倾斜</th>
+                                    <th>分区数</th>
+                                    <th>副本数</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metrics-table-body">
+                                <!-- 动态内容将在这里插入 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <th:block th:replace="~{public/common :: footer_sub}"></th:block>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/system/dashboard.js}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,2490 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK - 集群管理</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <!-- Select2 CSS -->
+    <link href="/plugins/select2/select2.min.css" rel="stylesheet">
+    
+    <!-- Select2 JS -->
+    <script src="/plugins/select2/select2.min.js"></script>
+
+    <!-- 图表库 -->
+    <script th:src="@{/plugins/chart/chart.umd.min.js}"></script>
+    <!-- Cluster模块 -->
+    <script th:src="@{/statics/js/system/cluster.js}"></script>
+
+    <style>
+        .main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-start), var(--color-end));
+            border-radius: 16px 16px 0 0;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+            border-color: var(--border-color);
+        }
+
+        .metric-card.online {
+            --color-start: #10b981;
+            --color-end: #34d399;
+            --border-color: #10b981;
+        }
+
+        .metric-card.response {
+            --color-start: #8b5cf6;
+            --color-end: #a78bfa;
+            --border-color: #8b5cf6;
+        }
+
+        .metric-card.connections {
+            --color-start: #06b6d4;
+            --color-end: #22d3ee;
+            --border-color: #06b6d4;
+        }
+
+        .metric-card.memory {
+            --color-start: #ef4444;
+            --color-end: #f87171;
+            --border-color: #ef4444;
+        }
+
+        .metric-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .metric-icon.online {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .metric-icon.response {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+        }
+
+        .metric-icon.connections {
+            background: linear-gradient(135deg, #06b6d4, #22d3ee);
+            color: white;
+        }
+
+        .metric-icon.memory {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            color: white;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .metric-change {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .metric-change.positive {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .metric-change.negative {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .metric-change.stable {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+
+        .cluster-overview {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cluster-overview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cluster-overview h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cluster-overview p {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cluster-info {
+            display: flex;
+            gap: 32px;
+            margin-top: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cluster-info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cluster-info-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .cluster-info-text h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .cluster-info-text p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            height: 400px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .time-range-select {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .time-range-select:hover {
+            border-color: #9ca3af;
+        }
+
+        .time-range-select:focus {
+            outline: none;
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+        }
+
+        /* 美化后的时间选择器样式 */
+        /* 筛选器样式 */
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: white;
+            min-width: 120px;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 8px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 32px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-select:hover {
+            border-color: #9ca3af;
+        }
+
+        .refresh-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+        }
+
+        .filter-btn:hover {
+            background: #2563eb;
+        }
+
+        .filter-btn.secondary {
+            background: #6b7280;
+        }
+
+        .filter-btn.secondary:hover {
+            background: #4b5563;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.online {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .status-badge.monitoring {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: white;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(22, 93, 255, 0.3);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .data-table thead {
+            background: #f9fafb;
+        }
+
+        .data-table th {
+            padding: 16px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 13px;
+        }
+
+        .data-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        /* 分页样式 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-pages {
+            display: flex;
+            gap: 4px;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .page-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            border-color: #165DFF;
+            color: white;
+        }
+
+        .page-btn.active:hover {
+            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%);
+        }
+
+        .node-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .node-status.online {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .node-status.offline {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .node-status.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        /* 分布式节点状态样式 */
+        .distributed-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .distributed-status.online {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .distributed-status.offline {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .distributed-status.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .distributed-status.busy {
+            background: rgba(139, 92, 246, 0.1);
+            color: #7c3aed;
+        }
+
+        /* 负载状态样式 */
+        .load-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .load-status.low {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .load-status.medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .load-status.high {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .load-status.critical {
+            background: rgba(220, 38, 38, 0.1);
+            color: #b91c1c;
+        }
+
+        /* 任务执行状态样式 */
+        .task-execution {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .task-count {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .task-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            max-width: 200px;
+        }
+
+        .task-item {
+            background: rgba(139, 92, 246, 0.1);
+            color: #7c3aed;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
+        }
+
+        /* 心跳时间样式 */
+        .heartbeat-time {
+            font-size: 12px;
+            color: #6b7280;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        .heartbeat-time.recent {
+            color: #059669;
+        }
+
+        .heartbeat-time.warning {
+            color: #d97706;
+        }
+
+        .heartbeat-time.danger {
+            color: #dc2626;
+        }
+
+        .usage-bar {
+            width: 80px;
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .usage-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .usage-fill.low {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .usage-fill.medium {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .usage-fill.high {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #6b7280;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+        }
+
+        .action-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        .action-btn i {
+            font-size: 14px;
+            line-height: 1;
+            display: inline-block;
+            width: auto;
+            text-align: center;
+        }
+
+        /* 确保Font Awesome图标正确显示 */
+        .action-btn .fa {
+            font-family: FontAwesome;
+            font-style: normal;
+            font-weight: normal;
+            text-decoration: inherit;
+        }
+
+        /* 自定义Tooltip样式 */
+        .custom-tooltip {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .custom-tooltip::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+
+        .custom-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            border: 5px solid transparent;
+            border-top-color: #374151;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .custom-tooltip:hover::before,
+        .custom-tooltip:hover::after,
+        .custom-tooltip.tooltip-active::before,
+        .custom-tooltip.tooltip-active::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* 统一Tooltip样式，去掉颜色区分 */
+        .custom-tooltip::before {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+        }
+
+        .custom-tooltip::after {
+            border-top-color: #374151;
+        }
+
+        /* SSH配置区域特殊样式 */
+        #ssh-config-section .section-header h4 {
+            color: #059669;
+        }
+
+        #ssh-config-section .form-hint {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+        }
+
+        #ssh-config-section .form-hint i {
+            color: #10b981;
+        }
+
+        /* Kafka配置区域特殊样式 */
+        #kafka-config-section .section-header h4 {
+            color: #1e40af;
+        }
+
+        #kafka-config-section .form-hint {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid #93c5fd;
+            color: #1e40af;
+        }
+
+        #kafka-config-section .form-hint i {
+            color: #3b82f6;
+        }
+
+        /* 移动端Tooltip优化 */
+        @media (max-width: 768px) {
+            .custom-tooltip::before {
+                font-size: 11px;
+                padding: 6px 10px;
+                bottom: 130%;
+            }
+
+            .custom-tooltip::after {
+                bottom: 120%;
+            }
+
+            /* 在移动端，如果空间不足，可以调整tooltip位置 */
+            .action-btn {
+                position: relative;
+            }
+
+            .custom-tooltip:hover::before,
+            .custom-tooltip.tooltip-active::before {
+                left: auto;
+                right: 0;
+                transform: scale(1);
+            }
+
+            .custom-tooltip:hover::after,
+            .custom-tooltip.tooltip-active::after {
+                left: auto;
+                right: 10px;
+                transform: scale(1);
+            }
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            border-color: #165DFF;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%);
+            box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+        }
+
+        .action-btn.edit {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            border-color: #f59e0b;
+            color: white;
+        }
+
+        .action-btn.edit:hover {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* 弹出框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            transform: scale(0.95);
+            animation: modalShow 0.3s ease forwards;
+        }
+
+        @keyframes modalShow {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-body {
+            padding: 24px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .detail-group {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .detail-group h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 16px 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+            flex: 0 0 auto;
+            margin-right: 16px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .detail-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .modal-footer {
+            background: #f8fafc;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* 搜索框样式 */
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            width: 240px;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 40px;
+            padding: 0 40px 0 40px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #374151;
+            background: white;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            color: #6b7280;
+            font-size: 14px;
+            z-index: 1;
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .clear-search-btn:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        /* 工具栏布局 */
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: nowrap;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .toolbar-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .auto-refresh-indicator {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 68px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .refresh-countdown {
+            display: inline-block;
+            min-width: 22px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        /* 确认对话框样式 */
+        .confirm-modal-container {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            transform: scale(0.95);
+            animation: modalShow 0.3s ease forwards;
+        }
+
+        .confirm-modal-header {
+            padding: 32px 24px 24px;
+            text-align: center;
+        }
+
+        .confirm-icon-container {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .confirm-icon {
+            font-size: 28px;
+            color: white;
+        }
+
+        .confirm-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 8px 0;
+        }
+
+        .confirm-message {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .confirm-modal-footer {
+            background: #f8fafc;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .confirm-btn-cancel {
+            background: white;
+            border: 2px solid #d1d5db;
+            color: #6b7280;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .confirm-btn-cancel:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        .confirm-btn-ok {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: 2px solid #ef4444;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .confirm-btn-ok:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* 节点管理对话框样式 */
+        .node-modal-container {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            transform: scale(0.95);
+            animation: modalShow 0.3s ease forwards;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #374151;
+            background: white;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 16px 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        /* 可折叠配置区域样式 */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        .section-header h4 {
+            margin: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .toggle-section-btn {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-section-btn:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .toggle-section-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-all-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .toggle-all-btn:hover {
+            background: linear-gradient(135deg, #5b21b6, #7c3aed);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .toggle-section-btn.collapsed i {
+            transform: rotate(-90deg);
+        }
+
+        .section-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .section-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+        }
+
+        .section-content.expanded {
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        /* 可选标签样式 */
+        .optional-badge {
+            background: linear-gradient(135deg, #6b7280, #9ca3af);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* 表单提示信息样式 */
+        .form-hint {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-hint i {
+            color: #3b82f6;
+            margin-right: 8px;
+        }
+
+        .tab-container {
+            margin-bottom: 24px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn.active {
+            color: #165DFF;
+            border-bottom-color: #165DFF;
+        }
+
+        .tab-btn:hover {
+            color: #374151;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #f9fafb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: #165DFF;
+            background: rgba(22, 93, 255, 0.05);
+        }
+
+        .file-upload-area.dragover {
+            border-color: #165DFF;
+            background: rgba(22, 93, 255, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-table {
+            margin-top: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .preview-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+
+        .preview-table th {
+            background: #f3f4f6;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        @media (max-width: 768px) {
+            .metric-card {
+                padding: 16px;
+            }
+
+            .chart-container {
+                padding: 16px;
+                height: 300px;
+            }
+
+            .cluster-info {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .cluster-overview {
+                padding: 24px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .modal-container {
+                width: 95%;
+                margin: 20px;
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            /* 移动端工具栏优化 */
+            .table-toolbar {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .toolbar-controls {
+                justify-content: space-between;
+                gap: 8px;
+            }
+
+            .search-container {
+                width: 100%;
+                max-width: none;
+            }
+
+            .auto-refresh-indicator {
+                min-width: 60px;
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+
+            .refresh-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+
+            .node-modal-container {
+                width: 95%;
+                max-width: none;
+                margin: 10px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .tab-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .tab-btn {
+                padding: 10px 16px;
+                border-radius: 8px;
+                border: 1px solid #e5e7eb;
+                margin-bottom: 0;
+            }
+
+            .tab-btn.active {
+                background: #165DFF;
+                color: white;
+                border-color: #165DFF;
+            }
+        }
+
+        /* Select2 美化样式 - 参考scheduler.html */
+        .select2-container--default .select2-selection--single {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            height: 40px;
+            padding: 0;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+
+        .select2-container--default .select2-selection--single:hover {
+            border-color: #d1d5db;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+            outline: none;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #374151;
+            line-height: 36px;
+            padding-left: 16px;
+            padding-right: 40px;
+            font-size: 14px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #9ca3af;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px;
+            right: 12px;
+            top: 2px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #9ca3af transparent transparent transparent;
+            border-style: solid;
+            border-width: 6px 6px 0 6px;
+            height: 0;
+            left: 50%;
+            margin-left: -6px;
+            margin-top: -3px;
+            position: absolute;
+            top: 50%;
+            width: 0;
+        }
+
+        .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+            border-color: transparent transparent #9ca3af transparent;
+            border-width: 0 6px 6px 6px;
+        }
+
+        .select2-dropdown {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-top: 4px;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+
+        .select2-container--default .select2-results__option:hover {
+            background: #f3f4f6;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background: #165DFF;
+            color: white;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background: #f0f9ff;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .select2-results__option span {
+            display: flex;
+            align-items: center;
+        }
+
+        .select2-results__option span i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .select2-selection__rendered span i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* 图表时间选择器特殊样式 */
+        .chart-time-selector .select2-container {
+            width: 140px !important;
+        }
+
+        .chart-time-selector .select2-container--default .select2-selection--single {
+            height: 36px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+        }
+
+        .chart-time-selector .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 32px;
+            padding-left: 12px;
+            padding-right: 32px;
+            font-size: 13px;
+        }
+
+        .chart-time-selector .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 32px;
+            right: 8px;
+            top: 2px;
+        }
+    </style>
+</head>
+
+<body class="bg-light-bg text-dark font-inter">
+    <div class="flex min-h-screen overflow-hidden">
+        <th:block th:replace="~{public/navbar :: navbar}"></th:block>
+        <th:block th:replace="~{public/navbar :: overlay}"></th:block>
+
+        <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
+            <th:block th:replace="~{public/header :: header}"></th:block>
+
+            <main class="flex-1 overflow-y-auto p-6 pt-20">
+                <!-- 集群概览卡片 -->
+                <div class="cluster-overview">
+                    <h1><i class="fa fa-server mr-3"></i>Kafka 集群监控</h1>
+                    <p>实时监控集群状态，确保系统稳定运行</p>
+
+                    <div class="cluster-info">
+                        <div class="cluster-info-item">
+                            <div class="cluster-info-icon">
+                                <i class="fa fa-heartbeat"></i>
+                            </div>
+                            <div class="cluster-info-text">
+                                <h3>集群状态</h3>
+                                <p id="cluster-status">加载中...</p>
+                            </div>
+                        </div>
+
+                        <div class="cluster-info-item">
+                            <div class="cluster-info-icon">
+                                <i class="fa fa-clock"></i>
+                            </div>
+                            <div class="cluster-info-text">
+                                <h3>运行时长</h3>
+                                <p id="cluster-runtime">加载中...</p>
+                            </div>
+                        </div>
+
+                        <div class="cluster-info-item">
+                            <div class="cluster-info-icon">
+                                <i class="fa fa-tachometer"></i>
+                            </div>
+                            <div class="cluster-info-text">
+                                <h3>平均负载</h3>
+                                <p id="cluster-load">加载中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 关键指标卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+                    <!-- 在线节点 -->
+                    <div class="metric-card online">
+                        <div class="metric-icon online">
+                            <i class="fa fa-server"></i>
+                        </div>
+                        <div class="metric-value" id="online-nodes">-</div>
+                        <div class="metric-label">在线节点</div>
+                        <div class="metric-change" id="online-nodes-change">
+                            <i class="fa fa-circle"></i>
+                            加载中...
+                        </div>
+                    </div>
+
+                    <!-- 离线节点 -->
+                    <div class="metric-card response">
+                        <div class="metric-icon response">
+                            <i class="fa fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="metric-value" id="offline-nodes">-</div>
+                        <div class="metric-label">离线节点</div>
+                        <div class="metric-change" id="offline-nodes-change">
+                            <i class="fa fa-circle"></i>
+                            加载中...
+                        </div>
+                    </div>
+
+                    <!-- CPU使用率 -->
+                    <div class="metric-card connections">
+                        <div class="metric-icon connections">
+                            <i class="fa fa-microchip"></i>
+                        </div>
+                        <div class="metric-value" id="avg-cpu-usage">-</div>
+                        <div class="metric-label">CPU使用率</div>
+                        <div class="metric-change" id="cpu-usage-change">
+                            <i class="fa fa-circle"></i>
+                            加载中...
+                        </div>
+                    </div>
+
+                    <!-- 内存使用率 -->
+                    <div class="metric-card memory">
+                        <div class="metric-icon memory">
+                            <i class="fa fa-hdd"></i>
+                        </div>
+                        <div class="metric-value" id="avg-memory-usage">-</div>
+                        <div class="metric-label">内存使用率</div>
+                        <div class="metric-change" id="memory-usage-change">
+                            <i class="fa fa-circle"></i>
+                            加载中...
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Broker性能指标趋势图 -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+                    <!-- CPU使用率趋势 -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fa fa-microchip mr-2 text-orange-500"></i>
+                                Broker CPU使用率趋势
+                            </h3>
+                            <div class="chart-controls">
+                                <div class="chart-time-selector">
+                                    <select id="brokerCpuTimeRange" class="filter-select">
+                                        <option value="5m">最近5分钟</option>
+                                        <option value="15m">最近15分钟</option>
+                                        <option value="30m">最近30分钟</option>
+                                        <option value="1h">最近1小时</option>
+                                        <option value="6h">最近6小时</option>
+                                        <option value="24h" selected>最近24小时</option>
+                                        <option value="7d">最近7天</option>
+                                        <option value="30d">最近30天</option>
+                                    </select>
+                                </div>
+                                <button id="brokerCpuRefresh" class="filter-btn" title="刷新图表">
+                                    <i class="fa fa-refresh"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="height: 300px;">
+                            <canvas id="brokerCpuChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 内存使用率趋势 -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fa fa-hdd mr-2 text-purple-500"></i>
+                                Broker 内存使用率趋势
+                            </h3>
+                            <div class="chart-controls">
+                                <div class="chart-time-selector">
+                                    <select id="brokerMemoryTimeRange" class="filter-select">
+                                        <option value="5m">最近5分钟</option>
+                                        <option value="15m">最近15分钟</option>
+                                        <option value="30m">最近30分钟</option>
+                                        <option value="1h">最近1小时</option>
+                                        <option value="6h">最近6小时</option>
+                                        <option value="24h" selected>最近24小时</option>
+                                        <option value="7d">最近7天</option>
+                                        <option value="30d">最近30天</option>
+                                    </select>
+                                </div>
+                                <button id="brokerMemoryRefresh" class="filter-btn" title="刷新图表">
+                                    <i class="fa fa-refresh"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="height: 300px;">
+                            <canvas id="brokerMemoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Broker节点列表 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="flex items-center justify-between">
+                            <h3 class="table-title">
+                                <i class="fa fa-list mr-2 text-purple-500"></i>
+                                Broker节点详情
+                            </h3>
+                            <div class="table-toolbar">
+                                <!-- 左侧操作区域 -->
+                                <div class="toolbar-actions">
+                                    <!-- 搜索框 -->
+                                    <div class="search-container">
+                                        <i class="fa fa-search search-icon"></i>
+                                        <input type="text" id="search-input" class="search-input"
+                                            placeholder="搜索IP或Broker ID...">
+                                        <button id="clear-search" class="clear-search-btn" style="display: none;">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- 右侧控制区域 -->
+                                <div class="toolbar-controls">
+                                    <!-- 自动刷新指示器 -->
+                                    <div class="auto-refresh-indicator">
+                                        <i class="fa fa-clock mr-1"></i>
+                                        <span id="refresh-countdown" class="refresh-countdown">60</span>s
+                                    </div>
+                                    <button id="refresh-brokers" class="filter-btn" title="刷新表格">
+                                        <i class="fa fa-refresh"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="data-table" id="brokers-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 140px;">Broker ID</th>
+                                    <th style="width: 140px;">主机地址</th>
+                                    <th style="width: 70px;">端口</th>
+                                    <th style="width: 90px;">状态</th>
+                                    <th style="width: 110px;">CPU使用率</th>
+                                    <th style="width: 110px;">内存使用率</th>
+                                    <th style="width: 150px;">启动时间</th>
+                                    <th style="width: 90px;">版本号</th>
+                                </tr>
+                            </thead>
+                            <tbody id="brokers-tbody">
+                                <!-- 动态加载数据 -->
+                            </tbody>
+                        </table>
+
+                        <!-- 分页控件 -->
+                        <div class="pagination-container">
+                            <div class="pagination-info">
+                                显示 <span id="page-start">1</span> - <span id="page-end">5</span> 共 <span
+                                    id="total-count">15</span> 条记录
+                            </div>
+                            <div class="pagination-controls">
+                                <button id="first-page" class="pagination-btn" title="首页">
+                                    <i class="fa fa-angle-double-left"></i>
+                                </button>
+                                <button id="prev-page" class="pagination-btn" title="上一页">
+                                    <i class="fa fa-angle-left"></i>
+                                </button>
+                                <div class="pagination-pages" id="pagination-pages">
+                                    <!-- 动态生成页码 -->
+                                </div>
+                                <button id="next-page" class="pagination-btn" title="下一页">
+                                    <i class="fa fa-angle-right"></i>
+                                </button>
+                                <button id="last-page" class="pagination-btn" title="末页">
+                                    <i class="fa fa-angle-double-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分布式服务节点列表 -->
+                <div class="table-container" style="margin-top: 32px;">
+                    <div class="table-header">
+                        <div class="flex items-center justify-between">
+                            <h3 class="table-title">
+                                <i class="fa fa-sitemap mr-2 text-indigo-500"></i>
+                                分布式服务节点
+                            </h3>
+                            <div class="table-toolbar">
+                                <!-- 左侧操作区域 -->
+                                <div class="toolbar-actions">
+                                    <!-- 搜索框 -->
+                                    <div class="search-container">
+                                        <i class="fa fa-search search-icon"></i>
+                                        <input type="text" id="distributed-search-input" class="search-input"
+                                            placeholder="搜索IP或节点ID...">
+                                        <button id="clear-distributed-search" class="clear-search-btn"
+                                            style="display: none;">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- 右侧控制区域 -->
+                                <div class="toolbar-controls">
+                                    <!-- 自动刷新指示器 -->
+                                    <div class="auto-refresh-indicator">
+                                        <i class="fa fa-clock-o mr-1"></i>
+                                        <span id="distributed-refresh-countdown" class="refresh-countdown">60</span>s
+                                    </div>
+                                    <button id="refresh-distributed" class="filter-btn" title="刷新表格">
+                                        <i class="fa fa-refresh"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="data-table" id="distributed-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">节点ID</th>
+                                    <th style="width: 25%;">IP地址</th>
+                                    <th style="width: 20%;">PID</th>
+                                    <th style="width: 15%;">服务状态</th>
+                                    <th style="width: 15%;">最后心跳</th>
+                                </tr>
+                            </thead>
+                            <tbody id="distributed-tbody">
+                                <!-- 动态加载数据 -->
+                            </tbody>
+                        </table>
+
+                        <!-- 分页控件 -->
+                        <div class="pagination-container">
+                            <div class="pagination-info">
+                                显示 <span id="distributed-page-start">1</span> - <span id="distributed-page-end">5</span>
+                                共 <span id="distributed-total-count">0</span>
+                                条记录
+                            </div>
+                            <div class="pagination-controls">
+                                <button id="distributed-first-page" class="pagination-btn" title="首页">
+                                    <i class="fa fa-angle-double-left"></i>
+                                </button>
+                                <button id="distributed-prev-page" class="pagination-btn" title="上一页">
+                                    <i class="fa fa-angle-left"></i>
+                                </button>
+                                <div class="pagination-pages" id="distributed-pagination-pages">
+                                    <!-- 动态生成页码 -->
+                                </div>
+                                <button id="distributed-next-page" class="pagination-btn" title="下一页">
+                                    <i class="fa fa-angle-right"></i>
+                                </button>
+                                <button id="distributed-last-page" class="pagination-btn" title="末页">
+                                    <i class="fa fa-angle-double-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <th:block th:replace="~{public/common :: footer_sub}"></th:block>
+        </div>
+    </div>
+
+    <!-- 节点详情对话框 -->
+    <div id="broker-detail-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa fa-server mr-2"></i>
+                    节点详情信息
+                </h3>
+                <button id="close-modal" class="modal-close-btn">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-group">
+                        <h4>基本信息</h4>
+                        <div class="detail-row">
+                            <span class="detail-label">节点ID:</span>
+                            <span class="detail-value" id="detail-id"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">主机ID:</span>
+                            <span class="detail-value" id="detail-host-id"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">主机地址:</span>
+                            <span class="detail-value" id="detail-host"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">端口:</span>
+                            <span class="detail-value" id="detail-port"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">JMX端口:</span>
+                            <span class="detail-value" id="detail-jmx-port"></span>
+                        </div>
+                    </div>
+
+                    <div class="detail-group">
+                        <h4>运行状态</h4>
+                        <div class="detail-row">
+                            <span class="detail-label">状态:</span>
+                            <span class="detail-value" id="detail-status"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">版本号:</span>
+                            <span class="detail-value" id="detail-version"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">启动时间:</span>
+                            <span class="detail-value" id="detail-start-time"></span>
+                        </div>
+                    </div>
+
+                    <div class="detail-group">
+                        <h4>资源使用情况</h4>
+                        <div class="detail-row">
+                            <span class="detail-label">CPU使用率:</span>
+                            <div class="detail-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="detail-cpu-fill"></div>
+                                </div>
+                                <span class="detail-value" id="detail-cpu"></span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">内存使用率:</span>
+                            <div class="detail-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="detail-memory-fill"></div>
+                                </div>
+                                <span class="detail-value" id="detail-memory"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-group">
+                        <h4>配置信息</h4>
+                        <div class="detail-row">
+                            <span class="detail-label">Kafka目录:</span>
+                            <span class="detail-value" id="detail-kafka-home"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">启动脚本:</span>
+                            <span class="detail-value" id="detail-startup-script"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">配置文件:</span>
+                            <span class="detail-value" id="detail-config-file"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">SSH用户:</span>
+                            <span class="detail-value" id="detail-ssh-user"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">SSH端口:</span>
+                            <span class="detail-value" id="detail-ssh-port"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">备注:</span>
+                            <span class="detail-value" id="detail-remark"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="action-btn" onclick="closeModal()">
+                    <i class="fa fa-times mr-1"></i>
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div id="confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="confirm-modal-container">
+            <div class="confirm-modal-header">
+                <div class="confirm-icon-container">
+                    <i class="fa fa-exclamation-triangle confirm-icon"></i>
+                </div>
+                <h3 class="confirm-title" id="confirm-title">确认操作</h3>
+                <p class="confirm-message" id="confirm-message">您确定要执行此操作吗？</p>
+            </div>
+
+            <div class="confirm-modal-footer">
+                <button class="confirm-btn-cancel" onclick="closeConfirmModal()">
+                    <i class="fa fa-times mr-1"></i>
+                    取消
+                </button>
+                <button class="confirm-btn-ok" id="confirm-ok-btn">
+                    <i class="fa fa-check mr-1"></i>
+                    确认
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑节点对话框 -->
+    <div id="node-management-modal" class="modal-overlay" style="display: none;">
+        <div class="node-modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title" id="node-modal-title">
+                    <i class="fa fa-plus mr-2"></i>
+                    添加新节点
+                </h3>
+                <button id="close-node-modal" class="modal-close-btn">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- 标签切换 -->
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab('single')">
+                            <i class="fa fa-server mr-1"></i>
+                            单个节点
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('batch')">
+                            <i class="fa fa-upload mr-1"></i>
+                            批量导入
+                        </button>
+                    </div>
+
+                    <!-- 单个节点添加 -->
+                    <div id="single-tab" class="tab-content active">
+                        <form id="node-form">
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h4>
+                                        <i class="fa fa-server mr-2 text-purple-500"></i>
+                                        基本配置
+                                    </h4>
+                                    <button type="button" class="toggle-all-btn" onclick="toggleAllOptionalConfigs()"
+                                        title="切换所有可选配置">
+                                        <i class="fa fa-cogs"></i>
+                                    </button>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Broker ID *</label>
+                                        <input type="number" id="node-id" class="form-input" placeholder="如：1" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">主机IP *</label>
+                                        <input type="text" id="node-ip" class="form-input" placeholder="如：192.168.1.116"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Kafka端口 *</label>
+                                        <input type="number" id="kafka-port" class="form-input" placeholder="9092"
+                                            value="9092" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">JMX端口</label>
+                                        <input type="number" id="jmx-port" class="form-input" placeholder="9999"
+                                            value="9999">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section" id="kafka-config-section">
+                                <div class="section-header">
+                                    <h4>
+                                        <i class="fa fa-cog mr-2 text-blue-500"></i>
+                                        Kafka配置
+                                        <span class="optional-badge">可选</span>
+                                    </h4>
+                                    <button type="button" class="toggle-section-btn" onclick="toggleKafkaConfig()">
+                                        <i class="fa fa-chevron-down" id="kafka-toggle-icon"></i>
+                                    </button>
+                                </div>
+                                <div class="section-content" id="kafka-config-content">
+                                    <div class="form-hint">
+                                        <i class="fa fa-info-circle"></i>
+                                        配置Kafka相关路径，用于节点管理和监控功能
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Kafka安装目录</label>
+                                        <input type="text" id="kafka-home" class="form-input"
+                                            placeholder="如：/opt/kafka">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">启动脚本</label>
+                                        <input type="text" id="start-script" class="form-input"
+                                            placeholder="如：bin/kafka-server-start.sh" value="bin/kafka-server-start.sh">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">配置文件</label>
+                                        <input type="text" id="config-file" class="form-input"
+                                            placeholder="如：config/server.properties" value="config/server.properties">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section" id="ssh-config-section">
+                                <div class="section-header">
+                                    <h4>
+                                        <i class="fa fa-key mr-2 text-green-500"></i>
+                                        SSH连接配置
+                                        <span class="optional-badge">可选</span>
+                                    </h4>
+                                    <button type="button" class="toggle-section-btn" onclick="toggleSshConfig()">
+                                        <i class="fa fa-chevron-down" id="ssh-toggle-icon"></i>
+                                    </button>
+                                </div>
+                                <div class="section-content" id="ssh-config-content">
+                                    <div class="form-hint">
+                                        <i class="fa fa-info-circle"></i>
+                                        配置SSH连接信息，用于远程节点管理操作
+                                    </div>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label class="form-label">SSH用户名</label>
+                                            <input type="text" id="ssh-user" class="form-input" placeholder="如：kafka">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">SSH端口</label>
+                                            <input type="number" id="ssh-port" class="form-input" placeholder="22"
+                                                value="22">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">SSH密码（如果已配置免密登录可留空）</label>
+                                        <input type="password" id="ssh-password" class="form-input"
+                                            placeholder="SSH登录密码">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">私钥路径</label>
+                                        <input type="text" id="ssh-key-path" class="form-input"
+                                            placeholder="如：~/.ssh/id_rsa">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">备注信息</label>
+                                        <textarea id="node-remarks" class="form-input form-textarea"
+                                            placeholder="节点相关说明信息..."></textarea>
+                                    </div>
+                                </div>
+                        </form>
+                    </div>
+
+                    <!-- 批量导入 -->
+                    <div id="batch-tab" class="tab-content">
+                        <div class="file-upload-area" id="file-drop-area">
+                            <div class="upload-icon">
+                                <i class="fa fa-cloud-upload"></i>
+                            </div>
+                            <div class="upload-text">点击或拖拽上传Excel文件</div>
+                            <div class="upload-hint">支持 .xlsx, .xls 格式，文件大小不超过10MB</div>
+                            <input type="file" id="excel-file-input" class="file-input" accept=".xlsx,.xls">
+                        </div>
+
+                        <!-- 模板下载 -->
+                        <div style="margin-top: 16px; text-align: center;">
+                            <button type="button" class="action-btn" onclick="downloadTemplate()">
+                                <i class="fa fa-download mr-1"></i>
+                                下载Excel模板
+                            </button>
+                        </div>
+
+                        <!-- 数据预览 -->
+                        <div id="preview-container" class="preview-table" style="display: none;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Broker ID</th>
+                                        <th>主机IP</th>
+                                        <th>Kafka端口</th>
+                                        <th>JMX端口</th>
+                                        <th>Kafka目录</th>
+                                        <th>SSH用户</th>
+                                        <th>SSH端口</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="preview-tbody">
+                                    <!-- 动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="action-btn" onclick="closeNodeModal()">
+                    <i class="fa fa-times mr-1"></i>
+                    取消
+                </button>
+                <button class="action-btn primary" id="save-node-btn" onclick="saveNode()">
+                    <i class="fa fa-save mr-1"></i>
+                    保存节点
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Select2 初始化脚本 -->
+    <script>
+        $(document).ready(function() {
+            // 初始化CPU时间选择器的Select2
+            $('#brokerCpuTimeRange').select2({
+                placeholder: '选择时间范围',
+                allowClear: false,
+                width: '100%',
+                theme: 'default',
+                minimumResultsForSearch: Infinity // 禁用搜索框
+            });
+
+            // 初始化内存时间选择器的Select2
+            $('#brokerMemoryTimeRange').select2({
+                placeholder: '选择时间范围',
+                allowClear: false,
+                width: '100%',
+                theme: 'default',
+                minimumResultsForSearch: Infinity // 禁用搜索框
+            });
+
+            // 监听CPU时间选择器变化
+            $('#brokerCpuTimeRange').on('select2:select', function (e) {
+                var selectedValue = e.params.data.id;
+                console.log('CPU时间范围选择:', selectedValue);
+                // 自动触发CPU图表数据刷新
+                if (window.ClusterModule && window.ClusterModule.loadBrokerCpuData) {
+                    window.ClusterModule.loadBrokerCpuData(selectedValue);
+                }
+            });
+
+            // 监听内存时间选择器变化
+            $('#brokerMemoryTimeRange').on('select2:select', function (e) {
+                var selectedValue = e.params.data.id;
+                console.log('内存时间范围选择:', selectedValue);
+                // 自动触发内存图表数据刷新
+                if (window.ClusterModule && window.ClusterModule.loadBrokerMemoryData) {
+                    window.ClusterModule.loadBrokerMemoryData(selectedValue);
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- 顶部导航栏 -->
+<header class="bg-white shadow-sm sticky top-0 z-50 transition-all duration-300" id="navbar" th:fragment="header">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+            <!-- 左侧Logo和标题 -->
+            <a href="/">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center">
+                        <img src="/images/efak_ai_logo.png" alt="EFAK AI Logo"
+                             class="w-10 h-10 rounded-full object-cover flex-shrink-0 transition-transform hover:scale-110">
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold sidebar-title">EFAK · <span class="text-primary">AI</span></h1>
+                        <p class="text-xs text-gray-500">多集群智能管理平台</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 右侧用户信息和操作 -->
+            <div class="flex items-center space-x-4">
+                <!-- 用户菜单 -->
+                <div class="relative">
+                    <div id="user-menu-button"
+                         class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
+                        <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_profile.jpg' : '/images/user_profile_2.jpg'}"
+                             alt="用户头像" class="w-8 h-8 rounded-full object-cover border border-gray-200"/>
+                        <div class="hidden md:block">
+                            <div class="text-sm font-medium" th:text="${userName} ?: 'Admin'">Admin</div>
+                            <div class="text-xs text-gray-500" th:text="${userRole} ?: '管理员'">管理员</div>
+                        </div>
+                        <i class="fa fa-angle-down text-gray-500 transition-transform duration-200"
+                           id="user-menu-arrow"></i>
+                    </div>
+
+                    <!-- 用户下拉菜单 -->
+                    <div id="user-dropdown"
+                         class="absolute right-0 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 hidden user-dropdown-menu">
+                        <div class="px-4 py-2 border-b border-gray-100">
+                            <div class="text-sm font-medium text-gray-900" th:text="${userName} ?: 'Admin'">Admin</div>
+                            <div class="text-xs text-gray-500" th:text="${userRole} ?: '管理员'">管理员</div>
+                        </div>
+                        <button type="button" id="profile-btn"
+                                class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left">
+                            <i class="fa fa-user w-4 h-4 mr-3 text-gray-500"></i>
+                            个人信息
+                        </button>
+                        <button type="button" id="change-password-btn"
+                                class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left">
+                            <i class="fa fa-key w-4 h-4 mr-3 text-gray-500"></i>
+                            修改密码
+                        </button>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#"
+                           class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                           th:href="@{/logout}">
+                            <i class="fa fa-sign-out w-4 h-4 mr-3 text-red-500"></i>
+                            退出登录
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知面板遮罩层 -->
+    <div id="notification-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+
+    <!-- 个人信息模态框 -->
+    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">个人信息</h3>
+                <button id="close-profile-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="flex flex-col items-center mb-6">
+                    <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_profile.jpg' : '/images/user_profile_2.jpg'}"
+                         alt="用户头像" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 mb-4"/>
+                    <h4 class="text-xl font-semibold text-gray-900" th:text="${userName} ?: 'Admin'">Admin</h4>
+                    <p class="text-sm text-gray-500" th:text="${userRole} ?: '管理员'">管理员</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span class="text-sm font-medium text-gray-600">用户名</span>
+                        <span class="text-sm text-gray-900" th:text="${userName} ?: 'Admin'">Admin</span>
+                    </div>
+
+                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span class="text-sm font-medium text-gray-600">角色</span>
+                        <span class="text-sm text-gray-900" data-field="role"
+                              th:text="${userRole} ?: '管理员'">管理员</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span class="text-sm font-medium text-gray-600">最后登录</span>
+                        <span class="text-sm text-gray-900" data-field="lastLogin"
+                              th:text="${lastLoginTime} ?: '2024-01-15 14:30'">2024-01-15
+                            14:30</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-sm font-medium text-gray-600">账户状态</span>
+                        <span id="user-status-badge"
+                              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <i class="fa fa-check-circle mr-1"></i>
+                            活跃
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改密码模态框 -->
+    <div id="change-password-modal"
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">修改密码</h3>
+                <button id="close-password-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <form id="change-password-form" class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="current-password"
+                               class="block text-sm font-medium text-gray-700 mb-2">当前密码</label>
+                        <div class="relative">
+                            <input type="password" id="current-password" name="currentPassword" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                   placeholder="请输入当前密码">
+                            <button type="button" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                                    onclick="togglePasswordVisibility('current-password')">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="new-password" class="block text-sm font-medium text-gray-700 mb-2">新密码</label>
+                        <div class="relative">
+                            <input type="password" id="new-password" name="newPassword" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                   placeholder="请输入新密码">
+                            <button type="button" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                                    onclick="togglePasswordVisibility('new-password')">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">密码长度至少8位，包含字母和数字</p>
+                    </div>
+                    <div>
+                        <label for="confirm-password"
+                               class="block text-sm font-medium text-gray-700 mb-2">确认新密码</label>
+                        <div class="relative">
+                            <input type="password" id="confirm-password" name="confirmPassword" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                   placeholder="请再次输入新密码">
+                            <button type="button" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                                    onclick="togglePasswordVisibility('confirm-password')">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button type="submit"
+                            class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                        确认修改
+                    </button>
+                    <button type="button" id="cancel-password-change"
+                            class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+                        取消
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 美化提示框 -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Header JavaScript -->
+    <script>
+        // 美化提示函数
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            // 根据类型设置样式
+            let bgColor, textColor, icon;
+            switch (type) {
+                case 'success':
+                    bgColor = 'bg-green-500';
+                    textColor = 'text-white';
+                    icon = 'fa-check-circle';
+                    break;
+                case 'error':
+                    bgColor = 'bg-red-500';
+                    textColor = 'text-white';
+                    icon = 'fa-exclamation-circle';
+                    break;
+                case 'warning':
+                    bgColor = 'bg-yellow-500';
+                    textColor = 'text-white';
+                    icon = 'fa-exclamation-triangle';
+                    break;
+                default:
+                    bgColor = 'bg-blue-500';
+                    textColor = 'text-white';
+                    icon = 'fa-info-circle';
+            }
+
+            toast.className = `${bgColor} ${textColor} px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 transform translate-x-full transition-all duration-300 ease-in-out`;
+            toast.innerHTML = `
+            <i class="fa ${icon}"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-white hover:text-gray-200">
+                <i class="fa fa-times"></i>
+            </button>
+        `;
+
+            container.appendChild(toast);
+
+            // 动画效果
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+
+            // 自动移除
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // 密码可见性切换函数
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.nextElementSibling;
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa fa-eye';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOMContentLoaded 事件触发');
+
+            // 使用全局用户信息，避免重复请求
+            let currentUserId = null;
+            if (window.currentUser && window.currentUser.id) {
+                currentUserId = window.currentUser.id;
+            }
+
+            // 初始化用户菜单功能
+            initUserMenu();
+
+            // 初始化模态框功能
+            initModals();
+
+            // 用户菜单功能
+            function initUserMenu() {
+                const userMenuButton = document.getElementById('user-menu-button');
+                const userDropdown = document.getElementById('user-dropdown');
+                const userMenuArrow = document.getElementById('user-menu-arrow');
+                const userMenuContainer = userMenuButton?.parentElement;
+
+                if (!userMenuButton || !userDropdown || !userMenuContainer) return;
+
+                let isDropdownOpen = false;
+                let hideTimeout = null;
+
+                // 用户菜单按钮点击事件
+                userMenuButton.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    toggleUserDropdown();
+                });
+
+                // 鼠标进入菜单按钮时显示下拉菜单
+                userMenuButton.addEventListener('mouseenter', function () {
+                    clearTimeout(hideTimeout);
+                    showUserDropdown();
+                });
+
+                // 鼠标离开菜单按钮时延迟隐藏
+                userMenuButton.addEventListener('mouseleave', function () {
+                    hideTimeout = setTimeout(() => {
+                        hideUserDropdown();
+                    }, 100);
+                });
+
+                // 鼠标进入下拉菜单时取消隐藏
+                userDropdown.addEventListener('mouseenter', function () {
+                    clearTimeout(hideTimeout);
+                });
+
+                // 鼠标离开下拉菜单时隐藏
+                userDropdown.addEventListener('mouseleave', function () {
+                    hideTimeout = setTimeout(() => {
+                        hideUserDropdown();
+                    }, 100);
+                });
+
+                // 点击页面其他地方关闭下拉菜单
+                document.addEventListener('click', function (e) {
+                    if (!userMenuContainer.contains(e.target)) {
+                        hideUserDropdown();
+                    }
+                });
+
+                function toggleUserDropdown() {
+                    clearTimeout(hideTimeout);
+                    if (isDropdownOpen) {
+                        hideUserDropdown();
+                    } else {
+                        showUserDropdown();
+                    }
+                }
+
+                function showUserDropdown() {
+                    if (isDropdownOpen) return;
+
+                    userDropdown.classList.remove('hidden');
+                    // 强制重新渲染以触发CSS过渡动画
+                    requestAnimationFrame(() => {
+                        userDropdown.style.opacity = '1';
+                        userDropdown.style.transform = 'scale(1) translateY(0)';
+                    });
+
+                    if (userMenuArrow) {
+                        userMenuArrow.style.transform = 'rotate(180deg)';
+                    }
+                    isDropdownOpen = true;
+                }
+
+                function hideUserDropdown() {
+                    if (!isDropdownOpen) return;
+
+                    userDropdown.style.opacity = '0';
+                    userDropdown.style.transform = 'scale(0.95) translateY(-10px)';
+
+                    // 动画完成后隐藏元素
+                    setTimeout(() => {
+                        if (!isDropdownOpen) { // 确保在延迟期间没有重新打开
+                            userDropdown.classList.add('hidden');
+                        }
+                    }, 200);
+
+                    if (userMenuArrow) {
+                        userMenuArrow.style.transform = 'rotate(0deg)';
+                    }
+                    isDropdownOpen = false;
+                }
+            }
+
+            // 模态框功能
+            function initModals() {
+                initPasswordModal();
+                initProfileModal();
+            }
+
+            // 初始化修改密码模态框
+            function initPasswordModal() {
+                const changePasswordBtn = document.getElementById('change-password-btn');
+                const changePasswordModal = document.getElementById('change-password-modal');
+                const closePasswordModal = document.getElementById('close-password-modal');
+                const cancelPasswordChange = document.getElementById('cancel-password-change');
+                const changePasswordForm = document.getElementById('change-password-form');
+
+                if (!changePasswordBtn || !changePasswordModal) return;
+
+                // 打开修改密码模态框
+                changePasswordBtn.addEventListener('click', function () {
+                    changePasswordModal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+
+                    // 聚焦到当前密码输入框
+                    setTimeout(() => {
+                        const currentPasswordInput = document.getElementById('current-password');
+                        if (currentPasswordInput) {
+                            currentPasswordInput.focus();
+                        }
+                    }, 100);
+                });
+
+                // 关闭模态框事件
+                function closeModal() {
+                    changePasswordModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    if (changePasswordForm) changePasswordForm.reset();
+                }
+
+                if (closePasswordModal) {
+                    closePasswordModal.addEventListener('click', closeModal);
+                }
+
+                if (cancelPasswordChange) {
+                    cancelPasswordChange.addEventListener('click', closeModal);
+                }
+
+                // 点击模态框外部关闭
+                changePasswordModal.addEventListener('click', function (e) {
+                    if (e.target === changePasswordModal) {
+                        closeModal();
+                    }
+                });
+
+                // ESC键关闭
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && !changePasswordModal.classList.contains('hidden')) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // 初始化个人信息模态框
+            function initProfileModal() {
+                const profileBtn = document.getElementById('profile-btn');
+                const profileModal = document.getElementById('profile-modal');
+                const closeProfileModal = document.getElementById('close-profile-modal');
+
+                if (!profileBtn || !profileModal) return;
+
+                // 打开个人信息模态框
+                profileBtn.addEventListener('click', function () {
+                    profileModal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                // 关闭模态框事件
+                function closeModal() {
+                    profileModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+
+                if (closeProfileModal) {
+                    closeProfileModal.addEventListener('click', closeModal);
+                }
+
+                // 点击模态框外部关闭
+                profileModal.addEventListener('click', function (e) {
+                    if (e.target === profileModal) {
+                        closeModal();
+                    }
+                });
+
+                // ESC键关闭
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && !profileModal.classList.contains('hidden')) {
+                        closeModal();
+                    }
+                });
+            }
+        });
+    </script>
+</header>

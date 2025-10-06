@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK·AI - 用户管理</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <style>
+        .main-content {
+            transition: margin-left 0.3s ease-in-out;
+            min-height: calc(100vh - 64px);
+            padding-top: 64px;
+            /* 防止header遮挡 */
+        }
+
+        .user-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-table-container {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th {
+            background: #f8fafc;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .user-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+
+        .user-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .user-status.active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .user-status.inactive {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .user-role {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .user-role.admin {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .user-role.user {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .user-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-btn.edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .user-btn.view {
+            background: #10b981;
+            color: white;
+        }
+
+        .user-btn.delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 40px !important;
+            line-height: 40px !important;
+            min-width: 120px !important;
+            max-width: 120px !important;
+            width: 120px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 40px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+        }
+
+        /* 弹窗动画效果 */
+        .modal {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .modal:not(.hidden) {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal:not(.hidden) > div {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* 按钮悬停效果 */
+        .user-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 分页按钮样式 */
+        #pagination button {
+            padding: 8px 12px;
+            margin: 0 2px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #pagination button:hover:not(:disabled) {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        #pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #pagination button.bg-blue-500 {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        /* 确保page-btn的active状态不被覆盖 */
+        #pagination .page-btn.active {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%) !important;
+            border-color: #165DFF !important;
+            color: white !important;
+        }
+
+        #pagination .page-btn.active:hover {
+            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%) !important;
+        }
+
+        /* 弹窗中select2下拉框宽度适配 */
+        .modal .select2-container {
+            width: 100% !important;
+        }
+
+        .modal .select2-container .select2-selection--single {
+            width: 100% !important;
+            min-width: auto !important;
+            max-width: none !important;
+        }
+
+        /* 美化select2组件样式 */
+        .select2-container--default .select2-selection--single {
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            height: 48px !important;
+            line-height: 48px !important;
+            padding: 0 12px;
+            transition: all 0.2s ease;
+        }
+
+        .select2-container--default .select2-selection--single:hover {
+            border-color: #9ca3af;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #374151;
+            font-size: 14px;
+            line-height: 48px !important;
+            padding-left: 0;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 48px !important;
+            width: 20px;
+            right: 8px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #6b7280 transparent transparent transparent;
+            border-style: solid;
+            border-width: 5px 4px 0 4px;
+            height: 0;
+            left: 50%;
+            margin-left: -4px;
+            margin-top: -2px;
+            position: absolute;
+            top: 50%;
+            width: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+            border-color: transparent transparent #6b7280 transparent;
+            border-width: 0 4px 5px 4px;
+            margin-top: -3px;
+        }
+
+        /* 下拉选项样式 */
+        .select2-dropdown {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+            margin-top: 4px;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #374151;
+            transition: background-color 0.2s ease;
+        }
+
+        .select2-container--default .select2-results__option:hover {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        /* 自定义角色选项样式 */
+        .select2-results__option span {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .select2-results__option span i {
+            margin-right: 12px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .select2-results__option span div {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .select2-results__option span div div:first-child {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .select2-results__option span div div:last-child {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* 选中状态的图标颜色 */
+        .select2-results__option[aria-selected=true] span i {
+            color: #1d4ed8 !important;
+        }
+
+        .select2-results__option[aria-selected=true] span div div:last-child {
+            color: #1d4ed8 !important;
+        }
+
+        /* 悬停状态的图标颜色 */
+        .select2-results__option:hover span i {
+            color: #1f2937 !important;
+        }
+
+        .select2-results__option:hover span div div:last-child {
+            color: #374151 !important;
+        }
+
+        /* 清除按钮样式 */
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            color: #9ca3af;
+            font-size: 16px;
+            font-weight: bold;
+            margin-right: 20px;
+            transition: color 0.2s ease;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+            color: #ef4444;
+        }
+
+        /* 搜索框样式 */
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 角色选择框特殊样式 */
+        .select2-user-role .select2-selection--single {
+            height: 48px !important;
+            line-height: 48px !important;
+            padding: 0 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        .select2-user-role .select2-selection--single:hover {
+            border-color: #9ca3af;
+        }
+
+        .select2-user-role.select2-container--focus .select2-selection--single {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+
+        .select2-user-role .select2-selection--single .select2-selection__rendered {
+            color: #374151;
+            font-size: 14px;
+            line-height: 48px !important;
+            padding-left: 0;
+        }
+
+        .select2-user-role .select2-selection--single .select2-selection__placeholder {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .select2-user-role .select2-selection--single .select2-selection__arrow {
+            height: 48px !important;
+            width: 20px;
+            right: 8px;
+        }
+
+        /* 角色选项中的图标样式 */
+        .select2-results__option span i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .select2-selection__rendered span i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        /* 状态选择框特殊样式 */
+        .select2-user-status .select2-selection--single {
+            height: 48px !important;
+            line-height: 48px !important;
+            padding: 0 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            width: 100% !important;
+        }
+
+        .select2-user-status .select2-selection--single:hover {
+            border-color: #9ca3af;
+        }
+
+        .select2-user-status.select2-container--focus .select2-selection--single {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+
+        .select2-user-status .select2-selection--single .select2-selection__rendered {
+            color: #374151;
+            font-size: 14px;
+            line-height: 48px !important;
+            padding-left: 0;
+        }
+
+        .select2-user-status .select2-selection--single .select2-selection__placeholder {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .select2-user-status .select2-selection--single .select2-selection__arrow {
+            height: 48px !important;
+            width: 20px;
+            right: 8px;
+        }
+
+        /* 分页样式 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        #pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .pagination-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-pages {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .page-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%) !important;
+            border-color: #165DFF !important;
+            color: white !important;
+        }
+
+        .page-btn.active:hover {
+            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%) !important;
+        }
+
+        /* 确保分页容器在小屏幕上也能正常显示 */
+        @media (max-width: 768px) {
+            .pagination-container {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .pagination-controls {
+                justify-content: center;
+            }
+        }
+
+        /* 编辑用户弹窗中的select2容器宽度 */
+        .fixed .select2-container {
+            width: 100% !important;
+        }
+
+        .fixed .select2-container .select2-selection--single {
+            width: 100% !important;
+            min-width: auto !important;
+            max-width: none !important;
+        }
+    </style>
+</head>
+
+<body>
+<!-- 侧边栏 -->
+<div th:replace="~{public/navbar :: navbar}"></div>
+
+<!-- 主内容区域 -->
+<div class="main-content lg:ml-64">
+    <!-- 顶部导航栏 -->
+    <div th:replace="~{public/header :: header}"></div>
+
+    <!-- 页面内容 -->
+    <div class="p-6">
+        <!-- 页面标题 -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">用户管理</h1>
+            <p class="text-gray-600">管理系统用户、角色和权限</p>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">5</div>
+                <div class="stat-label">总用户数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeUsers">3</div>
+                <div class="stat-label">活跃用户</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="adminUsers">1</div>
+                <div class="stat-label">管理员</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="newUsers">2</div>
+                <div class="stat-label">本月新增</div>
+            </div>
+        </div>
+
+
+        <!-- 用户列表 -->
+        <div class="user-table-container">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900">用户列表</h3>
+                    <div class="flex gap-4">
+                        <div class="relative">
+                            <i
+                                    class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input id="userSearch" type="text" placeholder="搜索用户..."
+                                   class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-[40px]">
+                        </div>
+                        <button id="addUserBtn"
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                onclick="addUser()" style="display: none;">
+                            <i class="fa fa-plus mr-2"></i>添加用户
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <table class="user-table">
+                <thead>
+                <tr>
+                    <th>用户</th>
+                    <th>角色</th>
+                    <th>状态</th>
+                    <th>密码</th>
+                    <th>最后登录</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 由JS渲染 -->
+                </tbody>
+            </table>
+        </div>
+        <!-- 分页控件 -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                显示 <span id="page-start">1</span> - <span id="page-end">5</span> 共 <span id="total-count">0</span>
+                条记录
+            </div>
+            <div class="pagination-controls">
+                <div id="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- footer区域 -->
+    <div th:replace="~{public/common :: footer_sub}"></div>
+</div>
+
+<!-- 添加用户弹窗 -->
+<div id="userModal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 transform transition-all">
+        <!-- 弹窗头部 -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fa fa-user-plus text-blue-600 text-lg"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900">添加新用户</h2>
+            </div>
+            <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-700 text-2xl transition-colors">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <!-- 弹窗内容 -->
+        <form id="addUserForm" class="p-6">
+            <div class="space-y-6">
+                <!-- 用户名 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fa fa-user text-gray-400 mr-2"></i>用户名
+                    </label>
+                    <input type="text" name="username" id="usernameInput"
+                           placeholder="请输入用户名（仅限英文、数字、下划线）"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                           pattern="^[a-zA-Z0-9_]+$" title="用户名只能包含英文、数字和下划线" required>
+                    <div id="usernameError" class="text-red-500 text-sm mt-1 hidden">
+                        <i class="fa fa-exclamation-circle mr-1"></i>
+                        <span>用户名只能包含英文、数字和下划线</span>
+                    </div>
+                </div>
+
+                <!-- 角色选择 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fa fa-user-tag text-gray-400 mr-2"></i>用户角色
+                    </label>
+                    <select name="roles" id="userRoleSelect" class="form-input select2-user-role" required>
+                        <option value="">请选择用户角色</option>
+                        <option value="ROLE_USER" data-icon="fa-user" data-color="text-blue-600">普通用户</option>
+                        <option value="ROLE_ADMIN" data-icon="fa-shield" data-color="text-orange-600">管理员</option>
+                    </select>
+                </div>
+
+                <!-- 密码提示 -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fa fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                        <div>
+                            <h4 class="text-sm font-medium text-blue-800 mb-1">密码自动生成</h4>
+                            <p class="text-sm text-blue-700">系统将自动生成8位随机密码，创建成功后可在用户详情中查看。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 弹窗底部按钮 -->
+            <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+                <button type="button" onclick="closeUserModal()"
+                        class="px-6 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium">
+                    <i class="fa fa-times mr-2"></i>取消
+                </button>
+                <button type="submit"
+                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    <i class="fa fa-save mr-2"></i>保存用户
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- 角色管理弹窗 -->
+<div id="roleModal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">角色管理</h2>
+            <button onclick="closeRoleModal()" class="text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <div>角色管理功能开发中...</div>
+        <div class="flex justify-end mt-4">
+            <button type="button" onclick="closeRoleModal()" class="btn btn-secondary">关闭</button>
+        </div>
+    </div>
+</div>
+<!-- 用户详细信息弹窗 -->
+<div id="userDetailModal"
+     class="modal hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 transform transition-all">
+        <!-- 弹窗头部 -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fa fa-user text-blue-600 text-lg"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900">用户详细信息</h2>
+            </div>
+            <button onclick="closeUserDetailModal()"
+                    class="text-gray-400 hover:text-gray-700 text-2xl transition-colors">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <!-- 弹窗内容 -->
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 基本信息 -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                        <i class="fa fa-info-circle text-blue-500 mr-2"></i>基本信息
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium text-gray-600 w-20">用户ID:</span>
+                            <span id="detailUserId" class="text-sm text-gray-900"></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium text-gray-600 w-20">用户名:</span>
+                            <span id="detailUsername" class="text-sm text-gray-900"></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium text-gray-600 w-20">角色:</span>
+                            <span id="detailRole" class="text-sm text-gray-900"></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium text-gray-600 w-20">状态:</span>
+                            <span id="detailStatus" class="text-sm text-gray-900"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 登录信息 -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                        <i class="fa fa-clock text-green-500 mr-2"></i>登录信息
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium text-gray-600 w-20">最后登录:</span>
+                            <span id="detailLastLogin" class="text-sm text-gray-900"></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium text-gray-600 w-20">创建时间:</span>
+                            <span id="detailCreatedAt" class="text-sm text-gray-900"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 原始密码信息 -->
+                <div class="space-y-4" id="originPasswordSection" style="display: none;">
+                    <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                        <i class="fa fa-key text-orange-500 mr-2"></i>原始密码
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium text-gray-600 w-20">原始密码:</span>
+                            <span id="detailOriginPassword"
+                                  class="text-sm text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 弹窗底部按钮 -->
+            <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+                <button onclick="closeUserDetailModal()"
+                        class="px-6 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium">
+                    <i class="fa fa-times mr-2"></i>关闭
+                </button>
+                <button id="editUserFromDetailBtn" onclick="editUserFromDetail()"
+                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        style="display: none;">
+                    <i class="fa fa-edit mr-2"></i>编辑用户
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 引入用户管理JavaScript文件 -->
+<script th:src="@{/js/system/users.js}"></script>
+</body>
+
+</html>

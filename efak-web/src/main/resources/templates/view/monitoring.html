@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK·AI - 性能监控</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <style>
+        /* 基础布局 */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            transition: margin-left 0.3s ease-in-out;
+            min-height: calc(100vh - 64px);
+            /* 减去header高度 */
+        }
+
+
+
+        /* 性能概览区域 */
+        .performance-overview {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 32px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .performance-overview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            animation: performancePulse 6s ease-in-out infinite;
+        }
+
+        @keyframes performancePulse {
+
+            0%,
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            50% {
+                transform: scale(1.1) rotate(180deg);
+            }
+        }
+
+        .performance-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .performance-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .performance-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .performance-stat {
+            text-align: center;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .performance-stat:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .performance-stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .performance-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .performance-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .performance-stat-trend {
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        /* 监控卡片样式 */
+        .monitor-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .monitor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .monitor-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .monitor-card.throughput {
+            --primary-color: #7c3aed;
+            --secondary-color: #5b21b6;
+        }
+
+        .monitor-card.consume {
+            --primary-color: #059669;
+            --secondary-color: #047857;
+        }
+
+        .monitor-card.produce {
+            --primary-color: #3b82f6;
+            --secondary-color: #2563eb;
+        }
+
+
+
+        .monitor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .monitor-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .monitor-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .monitor-title h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .monitor-chart {
+            height: 300px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border-radius: 12px;
+            color: #6b7280;
+        }
+
+        .monitor-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .metric-change {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .metric-change.positive {
+            color: #059669;
+        }
+
+        .metric-change.negative {
+            color: #dc2626;
+        }
+
+        .metric-change.neutral {
+            color: #6b7280;
+        }
+
+        /* 时间选择器 */
+        .time-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .time-btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .time-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .time-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 警告区域 */
+        .alert-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 32px;
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .alert-count {
+            background: #ef4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .alert-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .alert-item:hover {
+            background: #fee2e2;
+        }
+
+        .alert-item.warning {
+            background: #fffbeb;
+            border-color: #fed7aa;
+        }
+
+        .alert-item.warning:hover {
+            background: #fef3c7;
+        }
+
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+
+        .alert-icon.critical {
+            background: #ef4444;
+        }
+
+        .alert-icon.warning {
+            background: #f59e0b;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-message {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .alert-time {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .alert-action {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .alert-action:hover {
+            background: #2563eb;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .performance-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .monitor-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .performance-title {
+                font-size: 2rem;
+            }
+
+            .performance-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .monitor-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .time-selector {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <th:block th:replace="~{public/navbar :: navbar}"></th:block>
+
+    <!-- Header -->
+    <th:block th:replace="~{public/header :: header}"></th:block>
+
+    <!-- Main Content -->
+    <main class="main-content ml-64 pt-16 transition-all duration-300 ease-in-out">
+        <div class="p-8">
+            <!-- Kafka性能概览区域 -->
+            <div class="performance-overview">
+                <div class="performance-content">
+                    <h1 class="performance-title">Kafka性能监控中心</h1>
+                    <p class="performance-subtitle">实时监控Kafka集群性能指标，确保消息流稳定可靠</p>
+
+                    <div class="performance-stats">
+                        <div class="performance-stat">
+                            <div class="performance-stat-icon">
+                                <i class="fa fa-exchange"></i>
+                            </div>
+                            <div class="performance-stat-number" id="message-throughput">-</div>
+                            <div class="performance-stat-label">消息吞吐量 (msg/s)</div>
+                        </div>
+
+                        <div class="performance-stat">
+                            <div class="performance-stat-icon">
+                                <i class="fa fa-download"></i>
+                            </div>
+                            <div class="performance-stat-number" id="message-consume">-</div>
+                            <div class="performance-stat-label">消息读取速率</div>
+                        </div>
+
+                        <div class="performance-stat">
+                            <div class="performance-stat-icon">
+                                <i class="fa fa-upload"></i>
+                            </div>
+                            <div class="performance-stat-number" id="message-produce">-</div>
+                            <div class="performance-stat-label">消息写入速率</div>
+                        </div>
+
+                        <div class="performance-stat">
+                            <div class="performance-stat-icon">
+                                <i class="fa fa-clock"></i>
+                            </div>
+                            <div class="performance-stat-number" id="message-lag">-</div>
+                            <div class="performance-stat-label">写入请求耗时</div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kafka监控模块网格 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- 消息吞吐量趋势 -->
+                <div class="monitor-card throughput lg:col-span-2">
+                    <div class="monitor-header">
+                        <div class="monitor-title">
+                            <div class="monitor-icon">
+                                <i class="fa fa-exchange"></i>
+                            </div>
+                            <h3>消息吞吐量趋势</h3>
+                        </div>
+                    </div>
+
+                    <div class="time-selector">
+                        <button class="time-btn" data-time="1h" data-chart="throughput">1小时</button>
+                        <button class="time-btn" data-time="6h" data-chart="throughput">6小时</button>
+                        <button class="time-btn active" data-time="24h" data-chart="throughput">24小时</button>
+                        <button class="time-btn" data-time="3d" data-chart="throughput">3天</button>
+                        <button class="time-btn" data-time="7d" data-chart="throughput">7天</button>
+                    </div>
+
+                    <div class="monitor-chart">
+                        <canvas id="throughput-chart"></canvas>
+                    </div>
+
+                    <div class="monitor-metrics">
+                        <div class="metric-item">
+                            <div class="metric-value" id="throughput-current">-</div>
+                            <div class="metric-label">当前总吞吐量 (msg/sec)</div>
+                            <div class="metric-change neutral" id="throughput-current-change">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="throughput-avg">-</div>
+                            <div class="metric-label">平均总吞吐量 (msg/sec)</div>
+                            <div class="metric-change neutral" id="throughput-avg-change">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="throughput-peak">-</div>
+                            <div class="metric-label">峰值总吞吐量 (msg/sec)</div>
+                            <div class="metric-change neutral" id="throughput-peak-change">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 消息读取趋势 -->
+                <div class="monitor-card consume">
+                    <div class="monitor-header">
+                        <div class="monitor-title">
+                            <div class="monitor-icon">
+                                <i class="fa fa-download"></i>
+                            </div>
+                            <h3>消息读取趋势</h3>
+                        </div>
+                    </div>
+
+                    <div class="time-selector">
+                        <button class="time-btn" data-time="1h" data-chart="consume">1小时</button>
+                        <button class="time-btn" data-time="6h" data-chart="consume">6小时</button>
+                        <button class="time-btn active" data-time="24h" data-chart="consume">24小时</button>
+                        <button class="time-btn" data-time="3d" data-chart="consume">3天</button>
+                    </div>
+
+                    <div class="monitor-chart">
+                        <canvas id="consume-chart"></canvas>
+                    </div>
+
+                    <div class="monitor-metrics">
+                        <div class="metric-item">
+                            <div class="metric-value" id="consume-rate">-</div>
+                            <div class="metric-label">读取速率</div>
+                            <div class="metric-change neutral" id="consume-rate-change">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="consume-lag">-</div>
+                            <div class="metric-label">消费延迟</div>
+                            <div class="metric-change neutral" id="consume-lag-change">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 消息写入趋势 -->
+                <div class="monitor-card produce">
+                    <div class="monitor-header">
+                        <div class="monitor-title">
+                            <div class="monitor-icon">
+                                <i class="fa fa-upload"></i>
+                            </div>
+                            <h3>消息写入趋势</h3>
+                        </div>
+                    </div>
+
+                    <div class="time-selector">
+                        <button class="time-btn" data-time="1h" data-chart="produce">1小时</button>
+                        <button class="time-btn" data-time="6h" data-chart="produce">6小时</button>
+                        <button class="time-btn active" data-time="24h" data-chart="produce">24小时</button>
+                        <button class="time-btn" data-time="3d" data-chart="produce">3天</button>
+                    </div>
+
+                    <div class="monitor-chart">
+                        <canvas id="produce-chart"></canvas>
+                    </div>
+
+                    <div class="monitor-metrics">
+                        <div class="metric-item">
+                            <div class="metric-value" id="produce-rate">-</div>
+                            <div class="metric-label">写入速率</div>
+                            <div class="metric-change neutral" id="produce-rate-change">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="produce-latency">-</div>
+                            <div class="metric-label">写入延迟</div>
+                            <div class="metric-change neutral" id="produce-latency-change">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <th:block th:replace="~{public/common :: footer_sub}"></th:block>
+    </main>
+
+    <!-- Scripts -->
+    <script th:src="@{/js/system/monitoring.js}"></script>
+</body>
+
+</html>

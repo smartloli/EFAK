@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK - 主题管理</title>
+    <!-- 本地CSS文件 -->
+    <th:block th:replace="~{public/common :: css}"></th:block>
+
+    <!-- 本地JS文件 -->
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <style>
+        /* 响应式布局样式 */
+        .main-content-mobile {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        .main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* Select2组件样式优化 */
+        .select2-container--default .select2-selection--multiple {
+            min-height: 32px;
+            height: auto;
+            max-height: 80px;
+            overflow-y: auto;
+            align-items: center;
+            display: flex;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 2px 6px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .select2-container--default .select2-selection--multiple:hover {
+            border-color: #9ca3af;
+        }
+
+        .select2-container--default .select2-selection--multiple:focus-within {
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            align-content: center;
+            min-height: 28px;
+            padding: 0;
+            line-height: 1.25rem;
+            width: 100%;
+            gap: 3px;
+        }
+
+        /* 隐藏默认的placeholder，使用搜索框的placeholder */
+        .select2-container--default .select2-selection--multiple .select2-selection__placeholder {
+            display: none !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-search--inline {
+            display: flex;
+            align-items: center;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            margin: 0;
+            padding: 4px 0;
+            height: 24px;
+            min-height: 24px;
+            width: 100% !important;
+            text-align: left;
+            background: transparent;
+            border: none;
+            outline: none;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 为搜索框设置placeholder样式 */
+        .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field::placeholder {
+            color: #6b7280;
+            font-size: 0.875rem;
+            text-align: left;
+            line-height: 1.25rem;
+            vertical-align: middle;
+        }
+
+        /* 确保placeholder在初始状态下正确显示 */
+        .select2-container--default .select2-selection--multiple:not(.select2-selection--focus) .select2-search--inline .select2-search__field {
+            width: 100% !important;
+        }
+
+        /* 自定义tooltip样式 - 修复表格中被遮挡的问题 */
+        .custom-tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .custom-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 12px 16px;
+            position: fixed;
+            z-index: 99999;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            font-size: 13px;
+            line-height: 1.5;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #374151;
+            pointer-events: none;
+        }
+
+        /* 确保表格容器不会裁剪tooltip */
+        .overflow-x-auto {
+            overflow: visible !important;
+        }
+
+        /* 表格wrapper允许tooltip溢出 */
+        .table-wrapper {
+            overflow: visible;
+            position: relative;
+        }
+    </style>
+
+    <script>
+        // 动态定位tooltip，确保在表格中正确显示
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltips = document.querySelectorAll('.custom-tooltip');
+
+            tooltips.forEach(tooltip => {
+                const tooltipText = tooltip.querySelector('.tooltip-text');
+
+                if (tooltipText) {
+                    // 鼠标进入时显示tooltip
+                    tooltip.addEventListener('mouseenter', function(e) {
+                        const rect = tooltip.getBoundingClientRect();
+                        const tooltipWidth = 280;
+                        const tooltipHeight = 80; // 估计tooltip高度
+
+                        // 计算居中位置
+                        let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+                        let top = rect.top - tooltipHeight - 10; // 在触发元素上方显示，留10px间距
+
+                        // 如果上方空间不够，显示在下方
+                        if (top < 10) {
+                            top = rect.bottom + 10;
+                        }
+
+                        // 确保左右不超出屏幕边界
+                        const finalLeft = Math.max(10, Math.min(left, window.innerWidth - tooltipWidth - 10));
+                        const finalTop = Math.max(10, Math.min(top, window.innerHeight - tooltipHeight - 10));
+
+                        tooltipText.style.left = finalLeft + 'px';
+                        tooltipText.style.top = finalTop + 'px';
+                        tooltipText.style.visibility = 'visible';
+                        tooltipText.style.opacity = '1';
+                    });
+
+                    // 鼠标离开时隐藏tooltip
+                    tooltip.addEventListener('mouseleave', function(e) {
+                        tooltipText.style.visibility = 'hidden';
+                        tooltipText.style.opacity = '0';
+                    });
+                }
+            });
+        });
+    </script>
+
+    <style>
+        /* 确保选择框与标签垂直对齐 */
+        .select2-container {
+            vertical-align: middle;
+        }
+
+        /* 优化下拉框样式 */
+        .select2-dropdown {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .select2-results__options {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .select2-results__option {
+            font-size: 0.875rem;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .select2-results__option:last-child {
+            border-bottom: none;
+        }
+
+        .select2-results__option--highlighted {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            color: white;
+        }
+
+        .select2-results__option:hover {
+            background-color: #f8fafc;
+        }
+
+        .select2-results__option--highlighted:hover {
+            background: linear-gradient(135deg, #0F4FFF 0%, #3F7AFF 100%);
+        }
+
+        /* 优化下拉框搜索 */
+        .select2-search--dropdown {
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+
+        .select2-search--dropdown .select2-search__field {
+            padding: 8px 12px;
+            font-size: 0.875rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .select2-search--dropdown .select2-search__field:focus {
+            border-color: #165DFF;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+        }
+
+        /* 修复placeholder位置错位问题 */
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered:before {
+            content: '';
+            display: none;
+        }
+
+        .select2-container--default .select2-selection--multiple.select2-selection--clearable .select2-selection__placeholder {
+            padding-right: 20px;
+        }
+
+        /* 确保搜索输入框位置正确 */
+        .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+            background: transparent;
+            border: none;
+            outline: 0;
+            box-shadow: none;
+            -webkit-appearance: textfield;
+            vertical-align: middle;
+        }
+
+        /* 确保搜索框在空状态时正确显示 */
+        .select2-container--default .select2-selection--multiple:empty .select2-selection__rendered {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 28px;
+            width: 100%;
+        }
+
+        /* 确保搜索框始终可见并占满容器 */
+        .select2-container--default .select2-selection--multiple .select2-search--inline {
+            flex: 1;
+            min-width: 150px;
+            display: flex !important;
+            align-items: center;
+            height: 24px;
+        }
+
+        /* 确保搜索框在初始状态就显示 */
+        .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        /* 当没有选择任何选项时，确保搜索框占满整个容器 */
+        .select2-container--default .select2-selection--multiple:not(.select2-selection--clearable) .select2-search--inline {
+            width: 100% !important;
+            flex: 1;
+        }
+
+        /* 优化清除按钮样式 */
+        .select2-container--default .select2-selection--multiple .select2-selection__clear {
+            cursor: pointer;
+            font-weight: bold;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-size: 16px;
+            z-index: 10;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__clear:hover {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            .select2-container--default .select2-selection--multiple {
+                min-height: 36px;
+                padding: 4px 8px;
+            }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__choice {
+                font-size: 0.75rem;
+                padding: 3px 6px;
+                max-width: 120px;
+                height: 22px;
+            }
+
+            .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+                min-height: 26px;
+                height: 26px;
+                padding: 5px 0;
+            }
+        }
+
+        /* 添加加载状态样式 */
+        .select2-container--default .select2-results__message {
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        /* 优化选择框在不同状态下的表现 */
+        .select2-container--default.select2-container--open .select2-selection--multiple {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .select2-container--default.select2-container--open .select2-dropdown--below {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-top: none;
+        }
+
+        /* 搜索框文字垂直居中修复 */
+        .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+            vertical-align: middle !important;
+            box-sizing: border-box !important;
+        }
+
+        /* 兼容不同浏览器的垂直居中 */
+        .select2-container--default .select2-selection--multiple .select2-search--inline {
+            line-height: 24px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+            line-height: normal !important;
+            vertical-align: baseline !important;
+            padding-top: 2px !important;
+            padding-bottom: 2px !important;
+        }
+
+        /* 操作按钮icon样式 */
+        .action-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease-in-out;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .action-icon-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-icon-btn.scale-btn {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            color: white;
+        }
+
+        .action-icon-btn.scale-btn:hover {
+            background: linear-gradient(135deg, #0F4FFF 0%, #3F7AFF 100%);
+        }
+
+        .action-icon-btn.delete-btn {
+            background: linear-gradient(135deg, #FF4757 0%, #FF6B7A 100%);
+            color: white;
+        }
+
+        .action-icon-btn.delete-btn:hover {
+            background: linear-gradient(135deg, #FF3742 0%, #FF5A6D 100%);
+        }
+
+        .action-icon-btn.retention-btn {
+            background: linear-gradient(135deg, #FFA726 0%, #FFB74D 100%);
+            color: white;
+        }
+
+        .action-icon-btn.retention-btn:hover {
+            background: linear-gradient(135deg, #FF9800 0%, #FFA726 100%);
+        }
+
+
+        /* 对话框中的Select2样式 */
+        .modal-content .select2-container {
+            width: 100% !important;
+        }
+
+        .modal-content .select2-container--default .select2-selection--single {
+            height: 42px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .modal-content .select2-container--default .select2-selection--single:focus-within,
+        .modal-content .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .modal-content .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #374151;
+            line-height: 40px;
+            padding-left: 12px;
+            padding-right: 32px;
+            font-size: 0.875rem;
+        }
+
+        .modal-content .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px;
+            right: 8px;
+            width: 20px;
+        }
+
+        .modal-content .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #6b7280 transparent transparent transparent;
+            border-style: solid;
+            border-width: 5px 4px 0 4px;
+            height: 0;
+            left: 50%;
+            margin-left: -4px;
+            margin-top: -2px;
+            position: absolute;
+            top: 50%;
+            width: 0;
+        }
+
+        /* 有效期下拉框样式 */
+        .retention-modal .select2-container--default .select2-selection--single:focus-within,
+        .retention-modal .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+
+        /* 下拉菜单样式 */
+        .select2-dropdown {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 9999;
+        }
+
+        .select2-results__options {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .select2-results__option {
+            padding: 10px 12px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .select2-results__option--highlighted {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .select2-results__option[aria-selected="true"] {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        /* 确保下拉菜单在对话框上方 */
+        .modal-overlay .select2-dropdown {
+            z-index: 10000 !important;
+        }
+
+        /* 有效期选择器特定样式 */
+        .retention-select2-dropdown {
+            border-color: #f59e0b !important;
+        }
+
+        .retention-select2-dropdown .select2-results__option--highlighted {
+            background-color: #fef3c7 !important;
+            color: #92400e !important;
+        }
+
+        .retention-select2-dropdown .select2-results__option[aria-selected="true"] {
+            background-color: #f59e0b !important;
+            color: white !important;
+        }
+
+        /* 数据类型选择器特定样式 */
+        .datatype-select2-dropdown {
+            border-color: #10b981 !important;
+        }
+
+        .datatype-select2-dropdown .select2-results__option--highlighted {
+            background-color: #d1fae5 !important;
+            color: #047857 !important;
+        }
+
+        .datatype-select2-dropdown .select2-results__option[aria-selected="true"] {
+            background-color: #10b981 !important;
+            color: white !important;
+        }
+
+        /* Select2容器在对话框中的响应式处理 */
+        @media (max-width: 640px) {
+            .modal-content .select2-container--default .select2-selection--single {
+                height: 44px;
+            }
+
+            .modal-content .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: 42px;
+                font-size: 0.875rem;
+            }
+        }
+
+        /* 创建主题对话框样式 */
+        .create-topic-modal .modal-content {
+            max-width: 600px;
+        }
+
+        /* 高级配置切换按钮样式 */
+        #advanced-config-toggle {
+            position: relative;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+        #advanced-config-toggle:hover {
+            background-color: #f3f4f6;
+        }
+
+        #advanced-config-toggle i.fa-chevron-down {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        #advanced-config-toggle.active i.fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        /* 表单输入框样式增强 */
+        .create-topic-modal input[type="text"],
+        .create-topic-modal input[type="number"] {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .create-topic-modal input[type="text"]:hover,
+        .create-topic-modal input[type="number"]:hover {
+            border-color: #9ca3af;
+        }
+
+        /* 帮助提示图标样式 */
+        .create-topic-modal .fa-info-circle {
+            cursor: help;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .create-topic-modal .fa-info-circle:hover {
+            color: #2563eb;
+        }
+
+        /* 清理策略选择器特定样式 */
+        .cleanup-policy-select {
+            width: 100%;
+        }
+
+        .cleanup-policy-dropdown .select2-results__option {
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .cleanup-policy-dropdown .select2-results__option::before {
+            content: "";
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            opacity: 0.5;
+        }
+
+        .cleanup-policy-dropdown .select2-results__option[aria-selected="true"]::before {
+            background-color: currentColor;
+            opacity: 1;
+        }
+
+        /* 保留时间单位选择器样式 */
+        .retention-time-unit-select {
+            min-width: 100px;
+        }
+
+        /* 主题类型图标选择器样式 */
+        .topic-icon-select {
+            width: 100%;
+        }
+
+        .topic-icon-dropdown .select2-results__option {
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topic-icon-dropdown .select2-results__option .icon-preview {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .topic-icon-dropdown .select2-results__option .icon-info {
+            flex-grow: 1;
+        }
+
+        .topic-icon-dropdown .select2-results__option .icon-title {
+            font-weight: 500;
+            margin-bottom: 2px;
+            padding: 4px;
+        }
+
+        .topic-icon-dropdown .select2-results__option .icon-description {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .topic-icon-dropdown .select2-results__option[aria-selected="true"] {
+            background-color: #f3f4f6;
+        }
+
+        .topic-icon-dropdown .select2-results__option--highlighted[aria-selected] {
+            background-color: #f9fafb;
+        }
+
+        /* 选中项的样式 */
+        .topic-icon-select + .select2 .select2-selection--single {
+            height: 42px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+        }
+
+        .topic-icon-select + .select2 .select2-selection__rendered {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topic-icon-select + .select2 .icon-preview {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 图标颜色定义 */
+        .icon-color-blue {
+            background-color: #EBF5FF;
+            color: #2563EB;
+        }
+
+        .icon-color-green {
+            background-color: #ECFDF5;
+            color: #059669;
+        }
+
+        .icon-color-purple {
+            background-color: #F5F3FF;
+            color: #7C3AED;
+        }
+
+        .icon-color-orange {
+            background-color: #FFF7ED;
+            color: #EA580C;
+        }
+
+        .icon-color-gray {
+            background-color: #F9FAFB;
+            color: #4B5563;
+        }
+
+        .icon-color-red {
+            background-color: #FEF2F2;
+            color: #DC2626;
+        }
+
+        .icon-color-brown {
+            background-color: #FDF6F3;
+            color: #92400E;
+        }
+
+        .icon-color-teal {
+            background-color: #F0FDFA;
+            color: #0D9488;
+        }
+
+        /* 创建主题对话框样式优化 */
+        .modal-dialog {
+            max-height: 90vh;
+            margin: 2.5vh auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content {
+            max-height: calc(90vh - 2rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            padding: 1.5rem;
+            flex: 1 1 auto;
+        }
+
+        /* 自定义滚动条样式 */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
+        /* 确保表单元素在滚动时保持可见 */
+        .modal-content .form-group {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 确保模态框底部按钮固定 */
+        .modal-footer {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            z-index: 2;
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* 优化高级配置展开面板 */
+        .advanced-config {
+            margin-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1rem;
+        }
+
+        .advanced-config-header {
+            cursor: pointer;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .advanced-config-header:hover {
+            background: #f3f4f6;
+        }
+
+        .advanced-config-content {
+            padding: 0.5rem 0;
+        }
+
+        /* 主题搜索输入框样式 */
+        .topic-search-container {
+            width: 320px;
+            position: relative;
+        }
+
+        .topic-search-input {
+            width: 100%;
+            height: 40px;
+            padding: 0 40px 0 36px;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            font-size: 0.875rem;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            outline: none;
+        }
+
+        .topic-search-input:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .topic-search-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: #ffffff;
+        }
+
+        /* 选中状态时的输入框样式 */
+        .topic-search-input.has-selection {
+            color: #1e40af;
+            font-weight: 500;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-color: #3b82f6;
+        }
+
+        .topic-clear-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .topic-clear-btn:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* 建议下拉框样式 */
+        .topic-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            z-index: 50;
+            margin-top: 4px;
+            overflow: hidden;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        .topic-suggestions-content {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: all 0.15s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover,
+        .suggestion-item.highlighted {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-color: #3b82f6;
+            transform: translateX(2px);
+        }
+
+        .suggestion-item .topic-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 0.75rem;
+        }
+
+        .suggestion-item .topic-info {
+            flex: 1;
+        }
+
+        .suggestion-item .topic-name {
+            font-weight: 500;
+            color: #1f2937;
+            font-size: 0.875rem;
+        }
+
+        .suggestion-item .topic-desc {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        /* 加载状态样式 */
+        .topic-loading {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 12px 16px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 4px;
+            z-index: 45;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        .topic-loading i {
+            margin-right: 8px;
+            color: #3b82f6;
+        }
+
+        /* 无结果状态 */
+        .no-results {
+            padding: 20px 16px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .no-results i {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: #d1d5db;
+        }
+
+        /* 动画效果 */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 自定义滚动条 */
+        .topic-suggestions-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .topic-suggestions-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .topic-suggestions-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .topic-suggestions-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            .topic-search-container {
+                width: 280px;
+            }
+
+            .topic-search-input {
+                height: 44px;
+                font-size: 16px; /* 防止iOS缩放 */
+            }
+
+            .suggestion-item {
+                padding: 14px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-light-bg text-dark font-inter">
+<div class="flex min-h-screen overflow-hidden">
+    <!-- 侧边栏 - 使用fragment引用 -->
+    <th:block th:replace="~{public/navbar :: navbar}"></th:block>
+
+    <!-- 移动端遮罩层 -->
+    <th:block th:replace="~{public/navbar :: overlay}"></th:block>
+
+    <!-- 主内容区域 -->
+    <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
+        <!-- 顶部导航栏 -->
+        <th:block th:replace="~{public/header :: header}"></th:block>
+        <!-- 页面内容 -->
+        <main class="flex-1 overflow-y-auto p-4 scrollbar-hide pt-20">
+            <!-- 状态卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div
+                        class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">总容量</p>
+                            <h3 class="text-2xl font-bold mt-1">0B</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center">
+                            <i class="fa fa-database text-warning text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                        class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">总记录数</p>
+                            <h3 class="text-2xl font-bold mt-1">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <i class="fa fa-list-alt text-primary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                        class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">读取速度</p>
+                            <h3 class="text-2xl font-bold mt-1">0.0B/s</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-info/10 flex items-center justify-center">
+                            <i class="fa fa-download text-info text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                        class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">写入速度</p>
+                            <h3 class="text-2xl font-bold mt-1">0.0B/s</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                            <i class="fa fa-upload text-secondary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主题趋势图表 -->
+            <div class="chart-container mb-6">
+                <div class="flex flex-col space-y-4 mb-4">
+                    <!-- 标题和主题筛选 -->
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-medium text-lg">总体趋势分析</h3>
+                        <div class="flex items-center space-x-3">
+                            <label class="text-sm font-medium text-gray-600">主题筛选:</label>
+                            <div class="relative topic-search-container">
+                                <div class="relative">
+                                    <input type="text"
+                                           id="topic-search-input"
+                                           class="topic-search-input"
+                                           placeholder="搜索并选择主题..."
+                                           autocomplete="off"
+                                           spellcheck="false">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-search text-gray-400"></i>
+                                    </div>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                        <button type="button"
+                                                id="clear-topic-search"
+                                                class="topic-clear-btn hidden"
+                                                title="清除选择">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 下拉建议列表 -->
+                                <div id="topic-suggestions" class="topic-suggestions hidden">
+                                    <div class="topic-suggestions-content">
+                                        <!-- 动态生成的建议项 -->
+                                    </div>
+                                </div>
+
+                                <!-- 加载状态 -->
+                                <div id="topic-search-loading" class="topic-loading hidden">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                    <span>搜索中...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 控制选项 -->
+                    <div class="flex items-center justify-between">
+                        <!-- 维度选择 -->
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm font-medium text-gray-600">数据维度:</span>
+                            <div class="flex space-x-2">
+                                <button id="capacity-btn"
+                                        class="px-4 py-1.5 text-sm bg-primary/10 text-primary rounded-lg border border-primary/20 hover:bg-primary/20 transition-colors">
+                                    总容量
+                                </button>
+                                <button id="messages-btn"
+                                        class="px-4 py-1.5 text-sm bg-gray-100 text-gray-600 rounded-lg border border-gray-200 hover:bg-gray-200 transition-colors">
+                                    总记录数
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 时间选择 -->
+                        <div class="flex items-center space-x-4">
+                            <!-- 自定义时间选择器 -->
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-medium text-gray-600">时间范围:</span>
+                                <div class="custom-date-picker">
+                                    <div class="date-input-wrapper">
+                                        <input type="date" id="start-date"
+                                               class="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                                               title="点击选择开始日期">
+                                    </div>
+                                </div>
+                                <span class="text-xs text-gray-400">至</span>
+                                <div class="custom-date-picker">
+                                    <div class="date-input-wrapper">
+                                        <input type="date" id="end-date"
+                                               class="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                                               title="点击选择结束日期">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-80">
+                    <canvas id="topicTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 主题详细信息表格 -->
+            <div class="chart-container">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-4">
+                        <h3 class="font-medium">主题详细信息</h3>
+                        <button id="create-topic-btn"
+                                class="flex items-center px-4 py-2 bg-gradient-to-r from-primary to-primary/80 text-white rounded-lg hover:from-primary/90 hover:to-primary/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 shadow-lg transform transition-all duration-200 ease-in-out hover:-translate-y-0.5">
+                            <i class="fa fa-plus-circle mr-2"></i>
+                            创建主题
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <!-- 搜索框 -->
+                        <div class="relative">
+                            <input type="text" id="topic-search" placeholder="搜索主题名称..."
+                                   class="pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary w-64">
+                            <i class="fa fa-search absolute left-2.5 top-2 text-gray-400 text-sm"></i>
+                        </div>
+
+
+                        <!-- 自动刷新状态显示 -->
+                        <div id="auto-refresh-status" class="flex items-center space-x-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg">
+                            <i class="fa fa-clock text-green-600"></i>
+                            <span class="text-sm text-green-700">自动刷新: <span id="refresh-countdown">60</span>s</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrapper overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                主题名称
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                分区数
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                副本数
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    <span>Broker Spread</span>
+                                    <div class="custom-tooltip ml-1">
+                                        <i class="fa fa-info-circle text-blue-500 cursor-help"></i>
+                                        <span class="tooltip-text">分区在Broker间的分布均匀度。显示主题的分区是否在所有可用的Broker节点间均匀分布。</span>
+                                    </div>
+                                </div>
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    <span>Broker Skewed</span>
+                                    <div class="custom-tooltip ml-1">
+                                        <i class="fa fa-info-circle text-blue-500 cursor-help"></i>
+                                        <span class="tooltip-text">分区分布是否倾斜。检查是否有某些Broker承载了过多的分区，导致负载不均。</span>
+                                    </div>
+                                </div>
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    <span>Leader Skewed</span>
+                                    <div class="custom-tooltip ml-1">
+                                        <i class="fa fa-info-circle text-blue-500 cursor-help"></i>
+                                        <span class="tooltip-text">Leader分区分布是否倾斜。检查Leader分区是否在Broker间均匀分布，影响读写性能。</span>
+                                    </div>
+                                </div>
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                保留时间
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                操作
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody id="topics-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- 表格内容将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页组件 -->
+                <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                    <div class="text-sm text-gray-500">
+                        显示第 <span id="start-item">1</span> - <span id="end-item">10</span> 条，共 <span
+                            id="total-items">128</span> 条记录
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="prev-page"
+                                class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled>
+                            <i class="fa fa-chevron-left mr-1"></i>上一页
+                        </button>
+
+                        <div class="flex items-center space-x-1" id="page-numbers">
+                            <!-- 页码按钮将通过JavaScript动态生成 -->
+                        </div>
+
+                        <button id="next-page"
+                                class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            下一页<i class="fa fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- 页脚 -->
+        <th:block th:replace="~{public/common :: footer_sub}"></th:block>
+    </div>
+</div>
+
+<script>
+    // 页面初始化
+    document.addEventListener('DOMContentLoaded', function () {
+        // 初始化侧边栏（使用common.js中的统一方法）
+        if (window.CommonModule) {
+            CommonModule.initSidebar();
+        }
+
+    });
+
+    // 用户菜单初始化函数（简化版）
+    function initUserMenu() {
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userDropdown = document.getElementById('user-dropdown');
+
+        // 如果找不到必要的元素，直接返回
+        if (!userMenuButton || !userDropdown) {
+            return;
+        }
+
+        // 简单的用户菜单切换
+        userMenuButton.addEventListener('click', function (e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('hidden');
+        });
+
+        // 点击页面其他地方关闭下拉菜单
+        document.addEventListener('click', function () {
+            if (!userDropdown.classList.contains('hidden')) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+    }
+</script>
+
+<!-- 个人信息对话框 -->
+<div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 max-h-[85vh] overflow-hidden flex flex-col">
+        <!-- 对话框头部 -->
+        <div class="bg-primary px-6 py-4 text-white">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold">个人信息</h3>
+                <button id="close-profile-modal" class="text-white hover:text-gray-200 transition-colors">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 对话框内容 -->
+        <div class="p-6 overflow-y-auto flex-1">
+            <!-- 头像区域 -->
+            <div class="flex items-center justify-center mb-6">
+                <img th:src="@{/images/user_profile.jpg}" alt="用户头像"
+                     class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"/>
+            </div>
+
+            <!-- 个人信息表单 -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                    <input type="text" value="Jason Smith"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                           readonly>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">角色</label>
+                    <input type="text" value="系统管理员"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                           readonly>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">最后登录时间</label>
+                    <input type="text" value="2024-06-21 15:30:45"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                           readonly>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">账户状态</label>
+                    <div class="flex items-center">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                                <i class="fa fa-check-circle mr-1"></i>
+                                正常
+                            </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 权限信息 -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <h4 class="text-sm font-medium text-gray-700 mb-3">系统权限</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fa fa-check text-green-500 mr-2"></i>
+                        集群管理
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fa fa-check text-green-500 mr-2"></i>
+                        主题管理
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fa fa-check text-green-500 mr-2"></i>
+                        用户管理
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fa fa-check text-green-500 mr-2"></i>
+                        系统配置
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fa fa-check text-green-500 mr-2"></i>
+                        监控查看
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fa fa-check text-green-500 mr-2"></i>
+                        日志查看
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 对话框底部 -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-center">
+            <button id="close-profile-btn"
+                    class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                <i class="fa fa-times mr-2"></i>
+                关闭
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 扩容对话框 -->
+<div id="scale-modal"
+     class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 modal-content">
+        <!-- 对话框头部 -->
+        <div class="bg-primary px-6 py-4 text-white rounded-t-xl">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold">
+                    <i class="fa fa-expand mr-2"></i>扩容主题
+                </h3>
+                <button id="close-scale-modal" class="text-white hover:text-gray-200 transition-colors">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 对话框内容 -->
+        <div class="p-6">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">新分区数量</label>
+                <input type="number" id="new-partitions" min="1"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                       placeholder="请输入新的分区数量">
+                <p class="text-xs text-gray-500 mt-1">
+                    <i class="fa fa-info-circle text-blue-500 mr-1"></i>
+                    分区数量只能增加，不能减少
+                </p>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <div class="flex items-start">
+                    <i class="fa fa-lightbulb-o text-blue-600 mr-2 mt-0.5"></i>
+                    <div class="text-sm text-blue-800">
+                        <p class="font-medium">注意事项：</p>
+                        <ul class="mt-1 space-y-1 text-xs">
+                            <li>• 扩容操作不可逆，请谨慎操作</li>
+                            <li>• 扩容可能会影响消费者的分区分配</li>
+                            <li>• 建议在业务低峰期进行扩容操作</li>
+                            <li>• 新分区数必须大于当前分区数</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 对话框底部 -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3 rounded-b-xl">
+            <button id="cancel-scale-btn"
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                取消
+            </button>
+            <button id="confirm-scale-btn"
+                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                <i class="fa fa-expand mr-2"></i>
+                确认扩容
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认对话框 -->
+<div id="delete-modal"
+     class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 modal-content">
+        <!-- 对话框头部 -->
+        <div class="bg-red-500 px-6 py-4 text-white rounded-t-xl">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold">
+                    <i class="fa fa-trash mr-2"></i>删除主题
+                </h3>
+                <button id="close-delete-modal" class="text-white hover:text-gray-200 transition-colors">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 对话框内容 -->
+        <div class="p-6">
+            <div class="mb-4">
+                <div class="flex items-center mb-3">
+                    <i class="fa fa-exclamation-triangle text-red-500 mr-2"></i>
+                    <span class="font-medium text-red-600">危险操作警告</span>
+                </div>
+                <div class="bg-red-50 p-3 rounded-lg border border-red-200">
+                    <p class="text-sm text-red-800">
+                        您即将删除主题：<span id="delete-topic-name" class="font-bold"></span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                <div class="flex items-start">
+                    <i class="fa fa-warning text-red-600 mr-2 mt-0.5"></i>
+                    <div class="text-sm text-red-800">
+                        <p class="font-medium">删除后果：</p>
+                        <ul class="mt-1 space-y-1 text-xs">
+                            <li>• 主题中的所有数据将被永久删除</li>
+                            <li>• 相关的生产者和消费者将无法正常工作</li>
+                            <li>• 此操作不可逆，无法恢复数据</li>
+                            <li>• 可能影响依赖此主题的应用程序</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    请输入主题名称以确认删除：
+                </label>
+                <input type="text" id="confirm-topic-name"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                       placeholder="请输入主题名称">
+            </div>
+        </div>
+
+        <!-- 对话框底部 -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3 rounded-b-xl">
+            <button id="cancel-delete-btn"
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                取消
+            </button>
+            <button id="confirm-delete-btn" disabled
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fa fa-trash mr-2"></i>
+                确认删除
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑保留时间对话框 -->
+<div id="edit-retention-modal"
+     class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 modal-content">
+        <!-- 对话框头部 -->
+        <div class="bg-orange-500 px-6 py-4 text-white rounded-t-xl">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold">
+                    <i class="fa fa-edit mr-2"></i>编辑保留时间
+                </h3>
+                <button id="close-edit-retention-modal" class="text-white hover:text-gray-200 transition-colors">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 对话框内容 -->
+        <div class="p-6">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">保留时间（小时）</label>
+                <input type="number" id="retention-time-input" min="1" max="8760" value="168"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                       placeholder="请输入保留时间（小时）">
+                <p class="text-xs text-gray-500 mt-1">
+                    <i class="fa fa-info-circle text-blue-500 mr-1"></i>
+                    保留时间决定了数据在主题中保留的时间长度，单位为小时
+                </p>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <div class="flex items-start">
+                    <i class="fa fa-lightbulb-o text-blue-600 mr-2 mt-0.5"></i>
+                    <div class="text-sm text-blue-800">
+                        <p class="font-medium">注意事项：</p>
+                        <ul class="mt-1 space-y-1 text-xs">
+                            <li>• 设置较短的保留时间可以节省存储空间</li>
+                            <li>• 设置较长的保留时间便于数据回溯和调试</li>
+                            <li>• 超过保留时间的数据将自动删除</li>
+                            <li>• 修改保留时间会影响现有和新产生的数据</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 对话框底部 -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3 rounded-b-xl">
+            <button id="cancel-edit-retention-btn"
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                取消
+            </button>
+            <button id="confirm-edit-retention-btn"
+                    class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                <i class="fa fa-save mr-2"></i>
+                保存
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 创建主题对话框 -->
+<div id="create-topic-modal"
+     class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay create-topic-modal">
+    <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full mx-4 modal-content">
+        <!-- 对话框头部 -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800">创建新主题</h3>
+            <button class="text-gray-400 hover:text-gray-500 focus:outline-none close-modal">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <!-- 对话框内容 -->
+        <div class="p-4">
+            <form id="create-topic-form" class="space-y-4">
+                <!-- 主题类型图标 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">主题类型图标</label>
+                    <select id="topic-icon" name="topicIcon" class="topic-icon-select">
+                        <option value="list-ul" data-icon="fa-list-ul" data-color="blue">
+                            通用列表
+                        </option>
+                        <option value="shopping-cart" data-icon="fa-shopping-cart" data-color="green">
+                            订单/交易
+                        </option>
+                        <option value="user" data-icon="fa-user" data-color="purple">
+                            用户数据
+                        </option>
+                        <option value="bell" data-icon="fa-bell" data-color="orange">
+                            通知/提醒
+                        </option>
+                        <option value="file-text" data-icon="fa-file-text" data-color="gray">
+                            日志/文档
+                        </option>
+                        <option value="line-chart" data-icon="fa-line-chart" data-color="red">
+                            指标/统计
+                        </option>
+                        <option value="cogs" data-icon="fa-cogs" data-color="brown">
+                            系统配置
+                        </option>
+                        <option value="database" data-icon="fa-database" data-color="teal">
+                            数据存储
+                        </option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="fa fa-info-circle text-blue-500 mr-1"></i>
+                        选择合适的图标来标识主题类型
+                    </p>
+                </div>
+
+                <!-- 主题名称 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">主题名称</label>
+                    <input type="text" id="topic-name" name="topicName" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                           placeholder="请输入主题名称">
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="fa fa-info-circle text-blue-500 mr-1"></i>
+                        主题名称只能包含字母、数字、下划线和中划线
+                    </p>
+                </div>
+
+                <!-- 分区数 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">分区数</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="partition-count" name="partitionCount" min="1" max="100" value="1"
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                        <div class="relative group">
+                            <i class="fa fa-info-circle text-blue-500 cursor-help"></i>
+                            <div
+                                    class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                                分区数决定了主题的并行处理能力，建议根据预期吞吐量设置
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 副本数 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">副本数</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="replication-factor" name="replicationFactor" min="1" max="5"
+                               value="1"
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                        <div class="relative group">
+                            <i class="fa fa-info-circle text-blue-500 cursor-help"></i>
+                            <div
+                                    class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                                副本数影响数据可靠性，建议设置为3以确保高可用
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据保留时间 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">数据保留时间</label>
+                    <div class="flex space-x-2">
+                        <input type="number" id="retention-time" name="retentionTime" min="1" max="365" value="7"
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                               placeholder="请输入数值">
+                        <select id="retention-time-unit" name="retentionTimeUnit"
+                                class="retention-time-unit-select">
+                            <option value="hours">小时</option>
+                            <option value="days" selected>天</option>
+                            <option value="weeks">周</option>
+                            <option value="months">月</option>
+                        </select>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="fa fa-info-circle text-blue-500 mr-1"></i>
+                        设置数据在主题中保留的时间长度
+                    </p>
+                </div>
+
+                <!-- 高级配置（可展开） -->
+                <div>
+                    <button type="button" id="advanced-config-toggle"
+                            class="flex items-center text-sm text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <i class="fa fa-cog mr-2"></i>
+                        高级配置
+                        <i class="fa fa-chevron-down ml-2 transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="advanced-config-panel" class="hidden mt-3 space-y-4">
+                        <!-- 清理策略 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">清理策略</label>
+                            <select id="cleanup-policy" name="cleanupPolicy" class="cleanup-policy-select">
+                                <option value="delete" selected>删除</option>
+                                <option value="compact">压缩</option>
+                                <option value="compact,delete">压缩和删除</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">
+                                <i class="fa fa-info-circle text-blue-500 mr-1"></i>
+                                选择过期数据的处理方式
+                            </p>
+                        </div>
+
+                        <!-- 最大消息大小 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">最大消息大小 (KB)</label>
+                            <input type="number" id="max-message-size" name="maxMessageSize" min="1" value="1024"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 对话框底部 -->
+        <div class="flex items-center justify-end space-x-3 p-4 border-t border-gray-200">
+            <button class="px-4 py-2 text-gray-600 hover:text-gray-800 focus:outline-none close-modal">
+                取消
+            </button>
+            <button id="create-topic-submit"
+                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2">
+                创建主题
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 页面特定JavaScript -->
+<script th:src="@{/js/system/topics.js}"></script>
+
+<!-- 扩容主题对话框 -->
+<div id="scale-topic-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">扩容主题</h3>
+                <button onclick="TopicsModule.hideScaleModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">主题名称</label>
+                    <div class="px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600">
+                        <span id="scale-topic-name"></span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">当前分区数</label>
+                    <div class="px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600">
+                        <span id="current-partitions"></span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">新分区数</label>
+                    <div class="relative">
+                        <input type="number" id="new-partitions" name="newPartitions" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-16"
+                               placeholder="请输入新的分区数">
+                        <div class="absolute right-1 top-1 flex flex-col">
+                            <button type="button" onclick="document.getElementById('new-partitions').stepUp()"
+                                    class="px-2 py-1 text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                                <i class="fa fa-chevron-up"></i>
+                            </button>
+                            <button type="button" onclick="document.getElementById('new-partitions').stepDown()"
+                                    class="px-2 py-1 text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                                <i class="fa fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="fa fa-info-circle text-blue-500 mr-1"></i>
+                        注意：分区数只能增加，不能减少
+                    </p>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="TopicsModule.hideScaleModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+                    取消
+                </button>
+                <button type="button" onclick="TopicsModule.scaleTopic()"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors">
+                    确认扩容
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑保留时间对话框 -->
+<div id="edit-retention-modal"
+     class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">编辑保留时间</h3>
+                <button onclick="TopicsModule.hideEditRetentionModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">保留时间（小时）</label>
+                    <div class="relative">
+                        <input type="number" id="retention-time-input" name="retentionTime" min="1" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 pr-16"
+                               placeholder="请输入保留时间（小时）">
+                        <div class="absolute right-1 top-1 flex flex-col">
+                            <button type="button" onclick="document.getElementById('retention-time-input').stepUp()"
+                                    class="px-2 py-1 text-xs text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition-colors">
+                                <i class="fa fa-chevron-up"></i>
+                            </button>
+                            <button type="button" onclick="document.getElementById('retention-time-input').stepDown()"
+                                    class="px-2 py-1 text-xs text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition-colors">
+                                <i class="fa fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="fa fa-info-circle text-green-500 mr-1"></i>
+                        设置主题数据的保留时间，超过此时间的数据将被自动删除
+                    </p>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="TopicsModule.hideEditRetentionModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+                    取消
+                </button>
+                <button type="button" onclick="TopicsModule.updateRetentionTime()"
+                        class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors">
+                    确认更新
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

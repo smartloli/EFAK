@@ -1,7 +1,7 @@
 /**
  * KafkaEagle.java
  * <p>
- * Copyright 2023 smartloli
+ * Copyright 2025 smartloli
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,28 @@
  */
 package org.kafka.eagle.web;
 
-import lombok.extern.slf4j.Slf4j;
-import org.kafka.eagle.plugins.font.KafkaEagleVersion;
-import org.kafka.eagle.plugins.mysql.MySqlRecordSchema;
-import org.kafka.eagle.pojo.mysql.MySQLDataSource;
+import org.kafka.eagle.tool.version.KafkaEagleVersion;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 /**
- *  KafkaEagle is a web-based monitoring and management platform for Apache Kafka clusters.
- *  This Spring Boot application initializes the KafkaEagle web application and starts an embedded Tomcat server
- *  that serves the web pages and REST APIs.
- *
- * @Author: smartloli
- * @Date: 2023/5/13 21:11
- * @Version: 3.4.0
+ * <p>
+ * EFAK-AI主应用启动类
+ * Eagle For Apache Kafka - AI Enhanced，基于AI增强的Kafka监控管理平台
+ * </p>
+ * @author Mr.SmartLoli
+ * @since 2025/07/13 21:13:55
+ * @version 5.0.0
  */
-@SpringBootApplication
-@EnableGlobalMethodSecurity(securedEnabled = true)
-@Slf4j
+@SpringBootApplication(scanBasePackages = "org.kafka.eagle")
+@MapperScan("org.kafka.eagle.web.mapper")
+@EnableMethodSecurity(securedEnabled = true)
+@EnableScheduling
 public class KafkaEagle {
 
     @Value("${spring.datasource.url}")
@@ -54,20 +53,9 @@ public class KafkaEagle {
     private String dbDriverName;
 
     public static void main(String[] args) {
-        SpringApplication application=new SpringApplication(KafkaEagle.class);
+        SpringApplication application = new SpringApplication(KafkaEagle.class);
         application.setBannerMode(Banner.Mode.OFF);
         application.run(args);
         KafkaEagleVersion.version();
-    }
-
-    @Bean
-    public void initKafkaEagleDatabase() {
-        MySQLDataSource mySQLDataSource = new MySQLDataSource();
-        mySQLDataSource.setDbUrl(this.dbUrl);
-        mySQLDataSource.setDbUserName(this.dbUserName);
-        mySQLDataSource.setDbPassword(this.dbPassword);
-        mySQLDataSource.setDbDriverName(this.dbDriverName);
-        MySqlRecordSchema.schema(mySQLDataSource);
-        log.info("MySQLDataSource initialization: {}",mySQLDataSource);
     }
 }

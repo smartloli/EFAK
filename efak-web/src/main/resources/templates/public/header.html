@@ -1,242 +1,272 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
-<!-- header menu -->
-<div class="horizontal-menu" th:fragment="menu_header">
-    <nav class="navbar top-navbar">
-        <div class="container">
-            <div class="navbar-content">
-                <a href="/" class="navbar-brand">
-                    Kafka&nbsp;<span style="font-weight:bold">Eagle</span>
-                </a>
-<!--                <form class="search-form">-->
-<!--                    <div class="input-group">-->
-<!--                        <div class="input-group-text">-->
-<!--                            <i data-feather="search"></i>-->
-<!--                        </div>-->
-<!--                        <input type="text" class="form-control" id="navbarForm" placeholder="Search here..." th:placeholder="#{kafka.eagle.dataspace.search}">-->
-<!--                    </div>-->
-<!--                </form>-->
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<!--                            <i class="link-icon" data-feather="feather"></i>-->
-                            <span class="ms-1 me-1 d-none d-md-inline-block">v4.0.0</span>
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="appsDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i data-feather="grid"></i>
-                        </a>
-                        <div class="dropdown-menu p-0" aria-labelledby="appsDropdown">
-                            <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
-                                <p class="mb-0 fw-bold" th:text="#{kafka.eagle.header.quick}">Quick</p>
-                            </div>
-                            <div class="row g-0 p-1">
-                                <div class="col-3 text-center">
-                                    <a href="#"
-                                       class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70"><i
-                                            data-feather="message-square" class="icon-lg mb-1"></i>
-                                        <p class="tx-12" th:text="#{kafka.eagle.header.chatgpt}">AI助手</p></a>
-                                </div>
-                                <div class="col-3 text-center">
-                                    <a href="#"
-                                       class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70"><i
-                                            data-feather="calendar" class="icon-lg mb-1"></i>
-                                        <p class="tx-12" th:text="#{kafka.eagle.header.calendar}">Calendar</p></a>
-                                </div>
-                                <div class="col-3 text-center">
-                                    <a href="/clusters/manage"
-                                       class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70"><i
-                                            data-feather="inbox" class="icon-lg mb-1"></i>
-                                        <p class="tx-12" th:text="#{kafka.eagle.header.manager.change}">Manager</p></a>
-                                </div>
-                                <div class="col-3 text-center">
-                                    <a href="/system/profile"
-                                       class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70"><i
-                                            data-feather="instagram" class="icon-lg mb-1"></i>
-                                        <p class="tx-12" th:text="#{kafka.eagle.header.profile}">Profile</p></a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="messageDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i data-feather="help-circle"></i>
-                        </a>
-                        <div class="dropdown-menu p-0" aria-labelledby="messageDropdown">
-                            <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
-                                <p>FAQ</p>
-                            </div>
-                            <div class="p-1">
-                                <a href="https://github.com/smartloli/EFAK" class="dropdown-item d-flex align-items-center py-2">
-                                    <div class="me-3">
-                                        <i data-feather="github"></i>
-                                    </div>
-                                    <div class="d-flex justify-content-between flex-grow-1">
-                                        <div class="me-4">
-                                            <p th:text="#{kafka.eagle.faq.github}">Github</p>
-                                            <p class="tx-12 text-muted" th:text="#{kafka.eagle.faq.github.doc}">Github Doc</p>
-                                        </div>
-                                    </div>
-                                </a>
-                                <a href="http://docs.kafka-eagle.org/" class="dropdown-item d-flex align-items-center py-2">
-                                    <div class="me-3">
-                                        <i data-feather="book"></i>
-                                    </div>
-                                    <div class="d-flex justify-content-between flex-grow-1">
-                                        <div class="me-4">
-                                            <p th:text="#{kafka.eagle.faq.document}">Docs</p>
-                                            <p class="tx-12 text-muted" th:text="#{kafka.eagle.faq.document.doc}">Docs</p>
-                                        </div>
-                                    </div>
-                                </a>
-                                <a href="http://www.kafka-eagle.org/" class="dropdown-item d-flex align-items-center py-2">
-                                    <div class="me-3">
-                                        <i data-feather="download"></i>
-                                    </div>
-                                    <div class="d-flex justify-content-between flex-grow-1">
-                                        <div class="me-4">
-                                            <p th:text="#{kafka.eagle.faq.download}">Downloads</p>
-                                            <p class="tx-12 text-muted" th:text="#{kafka.eagle.faq.download.doc}">Downloads</p>
-                                        </div>
-                                    </div>
-                                </a>
-                                <a href="https://github.com/smartloli/EFAK/discussions" class="dropdown-item d-flex align-items-center py-2">
-                                    <div class="me-3">
-                                        <i data-feather="users"></i>
-                                    </div>
-                                    <div class="d-flex justify-content-between flex-grow-1">
-                                        <div class="me-4">
-                                            <p th:text="#{kafka.eagle.faq.forum}">Forum</p>
-                                            <p class="tx-12 text-muted" th:text="#{kafka.eagle.faq.forum.doc}">Forums</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-<!--                            <div class="px-3 py-2 d-flex align-items-center justify-content-center border-top">-->
-<!--                                <a href="javascript:;">View all</a>-->
-<!--                            </div>-->
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i data-feather="bell"></i>
-                            <div class="indicator">
-                                <div class="circle"></div>
-                            </div>
-                        </a>
-                        <div class="dropdown-menu p-0" aria-labelledby="notificationDropdown">
-                            <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
-                                <p th:text="#{kafka.eagle.notify}"></p>
-<!--                                <a href="javascript:;" class="text-muted">Clear all</a>-->
-                            </div>
-                            <div class="p-1">
-                                <a href="javascript:;" class="dropdown-item d-flex align-items-center py-2">
-                                    <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
-                                        <i class="icon-sm text-white" data-feather="gift"></i>
-                                    </div>
-                                    <div class="flex-grow-1 me-2">
-                                        <p>alert message 1</p>
-                                        <p class="tx-12 text-muted">1 min ago</p>
-                                    </div>
-                                </a>
-                                <a href="javascript:;" class="dropdown-item d-flex align-items-center py-2">
-                                    <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
-                                        <i class="icon-sm text-white" data-feather="alert-circle"></i>
-                                    </div>
-                                    <div class="flex-grow-1 me-2">
-                                        <p>alert message 2</p>
-                                        <p class="tx-12 text-muted">5 min ago</p>
-                                    </div>
-                                </a>
-                                <a href="javascript:;" class="dropdown-item d-flex align-items-center py-2">
-                                    <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
-                                        <i class="icon-sm text-white" data-feather="box"></i>
-                                    </div>
-                                    <div class="flex-grow-1 me-2">
-                                        <p>alert message 3</p>
-                                        <p class="tx-12 text-muted">8 min ago</p>
-                                    </div>
-                                </a>
-                                <a href="javascript:;" class="dropdown-item d-flex align-items-center py-2">
-                                    <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
-                                        <i class="icon-sm text-white" data-feather="layers"></i>
-                                    </div>
-                                    <div class="flex-grow-1 me-2">
-                                        <p>alert message 4</p>
-                                        <p class="tx-12 text-muted">10 min ago</p>
-                                    </div>
-                                </a>
-                                <a href="javascript:;" class="dropdown-item d-flex align-items-center py-2">
-                                    <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
-                                        <i class="icon-sm text-white" data-feather="download"></i>
-                                    </div>
-                                    <div class="flex-grow-1 me-2">
-                                        <p>alert message 5</p>
-                                        <p class="tx-12 text-muted">15 min ago</p>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="px-3 py-2 d-flex align-items-center justify-content-center border-top">
-                                <a href="javascript:;">更多详情</a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img class="wd-30 ht-30 rounded-circle" src="../../assets/images/profile.png"
-                                 alt="profile">
-                        </a>
-                        <div class="dropdown-menu p-0" aria-labelledby="profileDropdown">
-                            <div class="d-flex flex-column align-items-center border-bottom px-5 py-3">
-                                <div class="mb-3">
-                                    <img class="wd-80 ht-80 rounded-circle" src="../../assets/images/profile.png"
-                                         alt="">
-                                </div>
-                                <div class="text-center">
-                                    <p class="tx-16 fw-bolder"><span sec:authentication="principal.username"></span></p>
-                                    <span sec:authorize="isAuthenticated()">
-                                        <span sec:authorize="hasRole('ADMIN')" class='badge bg-success'>
-                                            管理员
-                                        </span>
-                                        <span sec:authorize="hasRole('DEV')" class='badge bg-primary'>
-                                            开发
-                                        </span>
-                                        <span sec:authorize="hasRole('TEST')" class='badge bg-secondary'>
-                                            测试
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                            <ul class="list-unstyled p-1">
-                                <li class="dropdown-item py-2">
-                                    <a href="/system/profile" class="text-body ms-0">
-                                        <i class="me-2 icon-md" data-feather="user"></i>
-                                        <span th:text="#{kafka.eagle.header.profile}">Profile</span>
-                                    </a>
-                                </li>
-                                <li class="dropdown-item py-2">
-                                    <a href="/logout" class="text-body ms-0">
-                                        <i class="me-2 icon-md" data-feather="log-out"></i>
-                                        <span th:text="#{kafka.eagle.account.signout}">Log Out</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
-                        data-toggle="horizontal-menu-toggle">
-                    <i data-feather="menu"></i>
+<!-- 顶部导航栏 -->
+<header class="fixed top-0 right-0 bg-white border-b border-gray-200 shadow-sm z-20 fixed-header header-mobile"
+    style="left: 256px;" th:fragment="header">
+    <div class="flex items-center justify-between px-4 py-3">
+        <div class="flex items-center">
+            <button id="mobile-sidebar-toggle" class="p-2 rounded-lg lg:hidden hover:bg-gray-100 transition-colors">
+                <i class="fa fa-bars"></i>
+            </button>
+            <div class="ml-4">
+                <h2 id="page-title" class="text-lg font-semibold" th:text="${pageTitle} ?: 'EFAK监控系统'">EFAK监控系统</h2>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <!-- 通知按钮 -->
+            <div class="relative">
+                <button id="notification-button" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <i class="fa fa-bell"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full notification-badge"
+                        th:if="${hasNotifications}"></span>
+                </button>
+            </div>
+
+            <!-- 用户菜单 -->
+            <div class="relative">
+                <div id="user-menu-button"
+                    class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
+                    <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_profile.jpg' : '/images/user_profile_2.jpg'}"
+                        alt="用户头像" class="w-8 h-8 rounded-full object-cover border border-gray-200" />
+                    <div class="hidden md:block">
+                        <div class="text-sm font-medium" th:text="${userName} ?: 'Admin'">Admin</div>
+                        <div class="text-xs text-gray-500" th:text="${userRole} ?: '管理员'">管理员</div>
+                    </div>
+                    <i class="fa fa-angle-down text-gray-500 transition-transform duration-200"
+                        id="user-menu-arrow"></i>
+                </div>
+
+                <!-- 用户下拉菜单 -->
+                <div id="user-dropdown"
+                    class="absolute right-0 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 hidden user-dropdown-menu">
+                    <div class="px-4 py-2 border-b border-gray-100">
+                        <div class="text-sm font-medium text-gray-900" th:text="${userName} ?: 'Admin'">Admin</div>
+                        <div class="text-xs text-gray-500" th:text="${userRole} ?: '管理员'">管理员</div>
+                    </div>
+                    <button type="button" id="profile-btn"
+                        class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left">
+                        <i class="fa fa-user w-4 h-4 mr-3 text-gray-500"></i>
+                        个人信息
+                    </button>
+                    <button type="button" id="change-password-btn"
+                        class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left">
+                        <i class="fa fa-key w-4 h-4 mr-3 text-gray-500"></i>
+                        修改密码
+                    </button>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="#"
+                        class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        th:href="@{/logout}">
+                        <i class="fa fa-sign-out w-4 h-4 mr-3 text-red-500"></i>
+                        退出登录
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知面板 -->
+    <div id="notification-panel"
+        class="fixed right-0 top-0 h-full w-80 bg-white shadow-xl border-l border-gray-200 z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="flex flex-col h-full">
+            <!-- 通知面板头部 -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">通知中心</h3>
+                <button id="close-notification-panel" class="p-1 rounded-full hover:bg-gray-100 transition-colors">
+                    <i class="fa fa-times text-gray-400 hover:text-gray-600"></i>
+                </button>
+            </div>
+
+            <!-- 通知操作栏 -->
+            <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
+                <div class="flex space-x-2">
+                    <button id="mark-all-read"
+                        class="text-xs px-3 py-1 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors">
+                        全部已读
+                    </button>
+                    <button id="clear-all"
+                        class="text-xs px-3 py-1 text-gray-600 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors">
+                        清空全部
+                    </button>
+                </div>
+                <span class="text-xs text-gray-500" id="notification-count">3条未读</span>
+            </div>
+
+            <!-- 通知列表 -->
+            <div class="flex-1 overflow-y-auto">
+                <div class="notification-list" id="notification-list">
+                    <!-- 动态加载告警通知 -->
+                </div>
+
+                <!-- 空状态 -->
+                <div id="empty-notifications"
+                    class="hidden flex flex-col items-center justify-center h-64 text-gray-500">
+                    <i class="fa fa-bell-slash text-4xl mb-4"></i>
+                    <p class="text-lg font-medium mb-2">暂无通知</p>
+                    <p class="text-sm">所有通知都已处理完毕</p>
+                </div>
+            </div>
+
+            <!-- 通知面板底部 -->
+            <div class="border-t border-gray-200 p-4">
+                <button id="view-all-alerts" class="w-full text-center text-sm text-primary hover:text-primary/80 transition-colors">
+                    查看所有告警
                 </button>
             </div>
         </div>
-    </nav>
-</div>
+    </div>
+
+    <!-- 通知面板遮罩层 -->
+    <div id="notification-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+
+    <!-- 个人信息模态框 -->
+    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">个人信息</h3>
+                <button id="close-profile-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="flex flex-col items-center mb-6">
+                    <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_profile.jpg' : '/images/user_profile_2.jpg'}"
+                        alt="用户头像" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 mb-4" />
+                    <h4 class="text-xl font-semibold text-gray-900" th:text="${userName} ?: 'Admin'">Admin</h4>
+                    <p class="text-sm text-gray-500" th:text="${userRole} ?: '管理员'">管理员</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span class="text-sm font-medium text-gray-600">用户名</span>
+                        <span class="text-sm text-gray-900" th:text="${userName} ?: 'Admin'">Admin</span>
+                    </div>
+
+                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span class="text-sm font-medium text-gray-600">角色</span>
+                        <span class="text-sm text-gray-900" data-field="role" th:text="${userRole} ?: '管理员'">管理员</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span class="text-sm font-medium text-gray-600">最后登录</span>
+                        <span class="text-sm text-gray-900" data-field="lastLogin"
+                            th:text="${lastLoginTime} ?: '2024-01-15 14:30'">2024-01-15
+                            14:30</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-sm font-medium text-gray-600">账户状态</span>
+                        <span id="user-status-badge"
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <i class="fa fa-check-circle mr-1"></i>
+                            活跃
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改密码模态框 -->
+    <div id="change-password-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">修改密码</h3>
+                <button id="close-password-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <form id="change-password-form" class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="current-password" class="block text-sm font-medium text-gray-700 mb-2">当前密码</label>
+                        <div class="relative">
+                            <input type="password" id="current-password" name="currentPassword" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                placeholder="请输入当前密码">
+                            <button type="button" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                                onclick="togglePasswordVisibility('current-password')">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="new-password" class="block text-sm font-medium text-gray-700 mb-2">新密码</label>
+                        <div class="relative">
+                            <input type="password" id="new-password" name="newPassword" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                placeholder="请输入新密码">
+                            <button type="button" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                                onclick="togglePasswordVisibility('new-password')">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">密码长度至少8位，包含字母和数字</p>
+                    </div>
+                    <div>
+                        <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">确认新密码</label>
+                        <div class="relative">
+                            <input type="password" id="confirm-password" name="confirmPassword" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                placeholder="请再次输入新密码">
+                            <button type="button" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                                onclick="togglePasswordVisibility('confirm-password')">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button type="submit"
+                        class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                        确认修改
+                    </button>
+                    <button type="button" id="cancel-password-change"
+                        class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+                        取消
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 美化提示框 -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+</header>
+
+<script>
+    // 全局测试函数 - 可从控制台调用
+    window.testNotificationAPI = function() {
+        console.log('=== 手动测试通知API ===');
+        // 调用common.js中的函数
+        if (window.CommonModule && window.CommonModule.testLoadAlertNotifications) {
+            window.CommonModule.testLoadAlertNotifications();
+        }
+    };
+
+    // 全局测试函数 - 测试面板显示
+    window.testNotificationPanel = function() {
+        console.log('=== 手动测试通知面板显示 ===');
+        const panel = document.getElementById('notification-panel');
+        const overlay = document.getElementById('notification-overlay');
+        if (panel && overlay) {
+            panel.classList.remove('translate-x-full');
+            overlay.classList.remove('hidden');
+        }
+    };
+
+    // 密码可见性切换函数
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const button = input.nextElementSibling;
+        const icon = button.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fa fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fa fa-eye';
+        }
+    }
+</script>

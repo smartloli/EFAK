@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK - 消费者组详情</title>
+    <!-- 本地CSS文件 -->
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <!-- 本地JS文件 -->
+    <!-- 消费者组详情JS文件 -->
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <style>
+        /* 主要内容区域布局 */
+        .main-content-mobile {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        .main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(229, 231, 235, 0.6);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #165DFF, #36CFC9);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card.write-speed::before {
+            background: linear-gradient(90deg, #52C41A, #73D13D);
+        }
+
+        .stat-card.read-speed::before {
+            background: linear-gradient(90deg, #FF4D4F, #FF7875);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1F2937;
+        }
+
+        .stat-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .stat-icon.write-speed {
+            background: linear-gradient(135deg, #52C41A, #73D13D);
+        }
+
+        .stat-icon.read-speed {
+            background: linear-gradient(135deg, #FF4D4F, #FF7875);
+        }
+
+        .stat-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #165DFF;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-description {
+            color: #6B7280;
+            font-size: 0.8rem;
+            line-height: 1.2;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(229, 231, 235, 0.6);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #F3F4F6;
+        }
+
+        .section-title {
+            font-size: 1.375rem;
+            font-weight: 600;
+            color: #1F2937;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.5rem;
+            background: linear-gradient(135deg, #165DFF, #4F8AFF);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .chart-container {
+            height: 350px;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #6B7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #165DFF, #4F8AFF);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-btn:hover {
+            background: linear-gradient(135deg, #0F4FFF, #3F7AFF);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+        }
+
+        /* 时间范围选择器样式 */
+        .time-range-select {
+            min-width: 140px;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .select2-container--default .select2-selection--single:focus-within,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #374151;
+            line-height: 36px;
+            padding-left: 12px;
+            padding-right: 32px;
+            font-size: 0.875rem;
+            white-space: nowrap !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px;
+            right: 8px;
+            width: 20px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #6b7280 transparent transparent transparent;
+            border-style: solid;
+            border-width: 5px 4px 0 4px;
+            height: 0;
+            left: 50%;
+            margin-left: -4px;
+            margin-top: -2px;
+            position: absolute;
+            top: 50%;
+            width: 0;
+        }
+
+        .select2-dropdown {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 9999;
+        }
+
+        .select2-results__option {
+            padding: 10px 12px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            white-space: nowrap !important;
+        }
+
+        .select2-results__option--highlighted {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .select2-results__option[aria-selected="true"] {
+            background-color: #165DFF;
+            color: white;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid #E5E7EB;
+            border-top: 3px solid #165DFF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .flex.items-center.justify-between {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .flex.items-center.gap-3 {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-light-bg text-dark font-inter">
+    <div class="flex min-h-screen overflow-hidden">
+        <!-- 侧边栏 -->
+        <th:block th:replace="~{public/navbar :: navbar}"></th:block>
+
+        <!-- 移动端遮罩层 -->
+        <th:block th:replace="~{public/navbar :: overlay}"></th:block>
+
+        <!-- 加载遮罩 -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
+            <!-- 顶部导航栏 -->
+            <th:block th:replace="~{public/header :: header}"></th:block>
+
+            <!-- 页面内容 -->
+            <main class="flex-1 overflow-y-auto p-6 scrollbar-hide pt-20">
+                <!-- 页面标题 -->
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <div class="flex items-center gap-6 mt-2 text-sm text-gray-600">
+                            <span>集群: <span id="clusterName" class="font-medium">-</span></span>
+                            <span>消费者组: <span id="consumerGroupName" class="font-medium">-</span></span>
+                            <span>主题名称: <span id="topicName" class="font-medium">-</span></span>
+                        </div>
+                    </div>
+                    <button class="refresh-btn" onclick="refreshConsumerData()">
+                        <i class="fa fa-sync-alt"></i>
+                        刷新数据
+                    </button>
+                </div>
+
+                <!-- 速度统计卡片网格 -->
+                <div class="stats-grid">
+                    <div class="stat-card write-speed">
+                        <div class="stat-header">
+                            <div class="stat-title">写入速度</div>
+                            <div class="stat-icon write-speed">
+                                <i class="fa fa-sign-in text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="writeSpeed">0 条/s</div>
+                        <div class="stat-description">每秒消息写入速度</div>
+                    </div>
+
+                    <div class="stat-card read-speed">
+                        <div class="stat-header">
+                            <div class="stat-title">读取速度</div>
+                            <div class="stat-icon read-speed">
+                                <i class="fa fa-sign-out text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="readSpeed">0 条/s</div>
+                        <div class="stat-description">每秒消息读取速度</div>
+                    </div>
+                </div>
+
+                <!-- 消息积压趋势图表 -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <div class="section-icon">
+                                <i class="fa fa-area-chart"></i>
+                            </div>
+                            消息积压趋势
+                        </div>
+                        <div class="flex items-center gap-3 whitespace-nowrap">
+                            <label class="text-sm font-medium text-gray-600 flex-shrink-0">时间范围:</label>
+                            <select id="timeRangeSelect" class="time-range-select" onchange="updateTimeRange()">
+                                <option value="1h">最近1小时</option>
+                                <option value="6h">最近6小时</option>
+                                <option value="1d" selected>最近24小时</option>
+                                <option value="7d">最近3天</option>
+                                <option value="7d">最近7天</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="lagTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 消费者组详细信息 -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <div class="section-icon">
+                                <i class="fa fa-info-circle"></i>
+                            </div>
+                            基本信息
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">消费者组ID</div>
+                            <div class="font-medium" id="detailGroupId">-</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">状态</div>
+                            <div class="font-medium" id="detailGroupState">-</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">平均消费速度</div>
+                            <div class="font-medium" id="avgOffsetRate">-</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">总延迟</div>
+                            <div class="font-medium" id="totalLag">-</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">平均延迟率</div>
+                            <div class="font-medium" id="avgLagRate">-</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">最后更新</div>
+                            <div class="font-medium" id="lastUpdated">-</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 消费者组详情JS文件 -->
+    <script th:src="@{/js/system/consumer-detail.js}"></script>
+</body>
+
+</html>

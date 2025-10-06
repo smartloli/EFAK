@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK·AI - 任务调度</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <!-- Select2 CSS -->
+    <link href="/plugins/select2/select2.min.css" rel="stylesheet">
+
+    <!-- Select2 JS -->
+    <script src="/plugins/select2/select2.min.js"></script>
+
+    <style>
+        .main-content {
+            transition: margin-left 0.3s ease-in-out;
+            min-height: calc(100vh - 64px);
+            padding-top: 64px;
+        }
+
+        .scheduler-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .scheduler-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .scheduler-table-container {
+            background: white;
+            border-radius: 16px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .scheduler-table {
+            width: 100%;
+            min-width: 1200px;
+            border-collapse: collapse;
+        }
+
+        .scheduler-table th {
+            background: #f8fafc;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .scheduler-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .scheduler-table tr:hover {
+            background: #f9fafb;
+        }
+
+        /* 任务表格列宽设置 */
+        .scheduler-table th:nth-child(1), .scheduler-table td:nth-child(1) { width: 15%; min-width: 150px; }
+        .scheduler-table th:nth-child(2), .scheduler-table td:nth-child(2) { width: 12%; min-width: 120px; }
+        .scheduler-table th:nth-child(3), .scheduler-table td:nth-child(3) { width: 12%; min-width: 120px; }
+        .scheduler-table th:nth-child(4), .scheduler-table td:nth-child(4) { width: 18%; min-width: 180px; }
+        .scheduler-table th:nth-child(5), .scheduler-table td:nth-child(5) { width: 8%; min-width: 80px; }
+        .scheduler-table th:nth-child(6), .scheduler-table td:nth-child(6) { width: 8%; min-width: 80px; }
+        .scheduler-table th:nth-child(7), .scheduler-table td:nth-child(7) { width: 12%; min-width: 120px; }
+        .scheduler-table th:nth-child(8), .scheduler-table td:nth-child(8) { width: 12%; min-width: 120px; }
+        .scheduler-table th:nth-child(9), .scheduler-table td:nth-child(9) { width: 15%; min-width: 150px; }
+
+        /* 表格滚动条样式 */
+        .scheduler-table-container::-webkit-scrollbar,
+        .history-table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .scheduler-table-container::-webkit-scrollbar-track,
+        .history-table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .scheduler-table-container::-webkit-scrollbar-thumb,
+        .history-table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .scheduler-table-container::-webkit-scrollbar-thumb:hover,
+        .history-table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .task-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .task-status.enabled {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .task-status.disabled {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .task-status.running {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .task-status.error {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .execution-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .execution-status.SUCCESS {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .execution-status.FAILED {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .execution-status.RUNNING {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .execution-status.CANCELLED {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .task-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .task-type.topic_monitor {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .task-type.consumer_monitor {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .task-type.cluster_monitor {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .task-type.alert_monitor {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .task-type.data_cleanup {
+            background: #fce7f3;
+            color: #ec4899;
+        }
+
+        .task-type.performance_stats {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .filter-bar {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 180px;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+            min-width: 180px;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: white;
+            min-width: 180px;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 8px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 32px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-select:hover {
+            border-color: #9ca3af;
+        }
+
+        /* 美化表单样式 */
+        .form-input {
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 8px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 32px;
+        }
+
+        .form-textarea {
+            resize: none;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .form-label i {
+            color: #6b7280;
+        }
+
+        /* 美化按钮样式 */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        /* 美化模态框样式 */
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid #e2e8f0;
+            border-radius: 16px 16px 0 0;
+        }
+
+        /* 美化表格样式 */
+        .scheduler-table th {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .scheduler-table tr:hover {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        /* 美化卡片样式 */
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        /* 动画效果 */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-in-up {
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* 加载动画 */
+        .loading-spinner {
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: #2563eb;
+        }
+
+        .filter-btn.secondary {
+            background: #6b7280;
+        }
+
+        .filter-btn.secondary:hover {
+            background: #4b5563;
+        }
+
+        /* 分页样式 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        #pagination,
+        #historyPagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .pagination-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-pages {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .page-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%) !important;
+            border-color: #165DFF !important;
+            color: white !important;
+        }
+
+        .page-btn.active:hover {
+            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%) !important;
+        }
+
+        /* 确保分页容器在小屏幕上也能正常显示 */
+        @media (max-width: 768px) {
+            .pagination-container {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .pagination-controls {
+                justify-content: center;
+            }
+        }
+
+
+        .task-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            justify-content: center;
+            min-width: 150px;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.enable {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .action-btn.enable:hover {
+            background: #bbf7d0;
+        }
+
+        .action-btn.disable {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .action-btn.disable:hover {
+            background: #fde68a;
+        }
+
+        .action-btn.execute {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .action-btn.execute:hover {
+            background: #bfdbfe;
+        }
+
+        .action-btn.edit {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .action-btn.edit:hover {
+            background: #e9d5ff;
+        }
+
+        .action-btn.delete {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .action-btn.delete:hover {
+            background: #fecaca;
+        }
+
+        /* 图标按钮样式 */
+        .action-btn-icon {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            margin: 0 2px;
+        }
+
+        .action-btn-icon.view {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .action-btn-icon.view:hover {
+            background: #bfdbfe;
+            transform: scale(1.05);
+        }
+
+        .action-btn-icon.enable {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .action-btn-icon.enable:hover {
+            background: #bbf7d0;
+            transform: scale(1.05);
+        }
+
+        .action-btn-icon.disable {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .action-btn-icon.disable:hover {
+            background: #fde68a;
+            transform: scale(1.05);
+        }
+
+        .action-btn-icon.execute {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .action-btn-icon.execute:hover {
+            background: #e9d5ff;
+            transform: scale(1.05);
+        }
+
+        .action-btn-icon.edit {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .action-btn-icon.edit:hover {
+            background: #bae6fd;
+            transform: scale(1.05);
+        }
+
+        .action-btn-icon.delete {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .action-btn-icon.delete:hover {
+            background: #fecaca;
+            transform: scale(1.05);
+        }
+
+        /* 美化提示框样式 */
+        .custom-tooltip {
+            position: absolute;
+            background: #1f2937;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .custom-tooltip.show {
+            opacity: 1;
+        }
+
+        /* 确认对话框样式 */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .confirm-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .confirm-modal.show .confirm-content {
+            transform: scale(1);
+        }
+
+        .confirm-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .confirm-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .confirm-icon.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .confirm-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .confirm-message {
+            color: #6b7280;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .confirm-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .confirm-btn.cancel {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .confirm-btn.cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .confirm-btn.confirm {
+            background: #ef4444;
+            color: white;
+        }
+
+        .confirm-btn.confirm:hover {
+            background: #dc2626;
+        }
+
+        .add-task-btn {
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-task-btn:hover {
+            background: #059669;
+        }
+
+        .cron-expression {
+            font-family: 'Courier New', monospace;
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .task-description {
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        /* 执行次数样式 */
+        .execution-count {
+            font-weight: 600;
+            color: #1f2937;
+            text-align: center;
+            padding: 4px 8px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            display: inline-block;
+            min-width: 40px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .modal:not(.hidden) {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Select2 美化样式 - 参考用户管理页面 */
+        .select2-container--default .select2-selection--single {
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            height: 48px !important;
+            line-height: 48px !important;
+            padding: 0 12px;
+            transition: all 0.2s ease;
+        }
+
+        .select2-container--default .select2-selection--single:hover {
+            border-color: #9ca3af;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #374151;
+            font-size: 14px;
+            line-height: 48px !important;
+            padding-left: 0;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 48px !important;
+            width: 20px;
+            right: 8px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #6b7280 transparent transparent transparent;
+            border-style: solid;
+            border-width: 5px 4px 0 4px;
+            height: 0;
+            left: 50%;
+            margin-left: -4px;
+            margin-top: -2px;
+            position: absolute;
+            top: 50%;
+            width: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+            border-color: transparent transparent #6b7280 transparent;
+            border-width: 0 4px 5px 4px;
+            margin-top: -3px;
+        }
+
+        /* 下拉选项样式 */
+        .select2-dropdown {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+            margin-top: 4px;
+            min-width: 200px;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #374151;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .select2-container--default .select2-results__option:hover {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        /* 自定义任务类型选项样式 */
+        .select2-results__option span {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .select2-results__option span i {
+            margin-right: 12px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .select2-results__option span div {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .select2-results__option span div div:first-child {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .select2-results__option span div div:last-child {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* 选中状态的图标颜色 */
+        .select2-results__option[aria-selected=true] span i {
+            color: #1d4ed8 !important;
+        }
+
+        .select2-results__option[aria-selected=true] span div div:last-child {
+            color: #1d4ed8 !important;
+        }
+
+        /* 悬停状态的图标颜色 */
+        .select2-results__option:hover span i {
+            color: #1f2937 !important;
+        }
+
+        .select2-results__option:hover span div div:last-child {
+            color: #374151 !important;
+        }
+
+        /* 选中状态的图标颜色 */
+        .select2-selection__rendered span i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        /* 任务类型选项中的图标样式 */
+        .select2-results__option span i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        /* 清除按钮样式 */
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            color: #9ca3af;
+            font-size: 16px;
+            font-weight: bold;
+            margin-right: 20px;
+            transition: color 0.2s ease;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+            color: #ef4444;
+        }
+
+        /* 搜索框样式 */
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 筛选栏中的select2样式 */
+        .filter-bar .select2-container {
+            width: 100% !important;
+        }
+
+        .filter-bar .select2-container .select2-selection--single {
+            height: 40px !important;
+            line-height: 40px !important;
+            min-width: 180px !important;
+            max-width: 180px !important;
+            width: 180px !important;
+        }
+
+        .filter-bar .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 40px !important;
+        }
+
+        .filter-bar .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+        }
+
+        /* 模态框中的select2样式调整 */
+        .modal-content .select2-container {
+            width: 100% !important;
+        }
+
+        .modal-content .select2-container .select2-selection--single {
+            width: 100% !important;
+            min-width: auto !important;
+            max-width: none !important;
+            height: 48px !important;
+            line-height: 48px !important;
+        }
+
+        .modal-content .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 48px !important;
+        }
+
+        .modal-content .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 48px !important;
+        }
+
+        /* 历史任务执行表格样式 - 防止换行 */
+        .history-table-container {
+            background: white;
+            border-radius: 16px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-table {
+            width: 100%;
+            min-width: 1000px;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            background: #f8fafc;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .history-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .history-table tr:hover {
+            background: #f9fafb;
+        }
+
+        /* 历史表格列宽设置 */
+        .history-table th:nth-child(1),
+        .history-table td:nth-child(1) {
+            width: 20%;
+        }
+
+        .history-table th:nth-child(2),
+        .history-table td:nth-child(2) {
+            width: 15%;
+        }
+
+        .history-table th:nth-child(3),
+        .history-table td:nth-child(3) {
+            width: 10%;
+        }
+
+        .history-table th:nth-child(4),
+        .history-table td:nth-child(4) {
+            width: 12%;
+        }
+
+        .history-table th:nth-child(5),
+        .history-table td:nth-child(5) {
+            width: 15%;
+        }
+
+        .history-table th:nth-child(6),
+        .history-table td:nth-child(6) {
+            width: 12%;
+        }
+
+        .history-table th:nth-child(7),
+        .history-table td:nth-child(7) {
+            width: 6%;
+        }
+
+        /* 历史表格内容样式 */
+
+        .history-table .execution-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .history-table .execution-status.SUCCESS {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .history-table .execution-status.FAILED {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .history-table .execution-status.RUNNING {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .history-table .execution-status.CANCELLED {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .history-table .task-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .history-table .task-type.topic_monitor {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .history-table .task-type.consumer_monitor {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .history-table .task-type.cluster_monitor {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .history-table .task-type.alert_monitor {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .history-table .task-type.data_cleanup {
+            background: #fce7f3;
+            color: #ec4899;
+        }
+
+        .history-table .task-type.performance_stats {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .history-table .duration {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .history-table .executor-node {
+            font-size: 12px;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-table .trigger-type {
+            font-size: 12px;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        .history-table .action-btn-icon {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            margin: 0 1px;
+        }
+
+        .history-table .action-btn-icon.view {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .history-table .action-btn-icon.view:hover {
+            background: #bfdbfe;
+            transform: scale(1.05);
+        }
+
+        /* 历史表格响应式设计 */
+        @media (max-width: 1200px) {
+            .history-table-container {
+                overflow-x: auto;
+                border-radius: 12px;
+            }
+
+            .history-table {
+                min-width: 1000px;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 10px 6px;
+                font-size: 12px;
+            }
+
+            .history-table .execution-status,
+            .history-table .task-type {
+                padding: 1px 6px;
+                font-size: 10px;
+            }
+
+            .history-table .action-btn-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .history-table {
+                min-width: 800px;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 8px 4px;
+                font-size: 11px;
+            }
+
+            .history-table .execution-status,
+            .history-table .task-type {
+                padding: 1px 4px;
+                font-size: 9px;
+            }
+
+            .history-table .action-btn-icon {
+                width: 20px;
+                height: 20px;
+                font-size: 9px;
+            }
+        }
+
+        /* 任务详情模态框样式 */
+        .task-detail-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .task-detail-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .task-detail-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .task-detail-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .task-detail-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .detail-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .detail-card-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .detail-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .detail-card-content {
+            padding: 20px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .detail-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .detail-label i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .cron-code {
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stats-grid-detail {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-item.success {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-color: #86efac;
+        }
+
+        .stat-item.error {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-color: #fca5a5;
+        }
+
+        .stat-item .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .stat-item.success .stat-number {
+            color: #166534;
+        }
+
+        .stat-item.error .stat-number {
+            color: #dc2626;
+        }
+
+        .stat-item .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .detail-description {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .error-card {
+            border-color: #fca5a5;
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        }
+
+        .error-card .detail-card-header {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-bottom-color: #fca5a5;
+        }
+
+        .error-message {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #fca5a5;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #dc2626;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .config-content {
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .config-code {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 16px;
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid-detail {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .detail-card-content {
+                padding: 16px;
+            }
+
+            .detail-card-header {
+                padding: 12px 16px;
+            }
+        }
+
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- 侧边栏 -->
+    <div th:replace="~{public/navbar :: navbar}"></div>
+
+    <!-- 头部 -->
+    <div th:replace="~{public/header :: header}"></div>
+
+    <!-- 主内容区域 -->
+    <main class="main-content" style="margin-left: 256px;">
+        <div class="p-6">
+            <!-- 页面标题 -->
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">任务调度</h1>
+                <p class="text-gray-600">管理系统中的定时任务，包括监控、清理、备份等自动化任务</p>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalTasks">8</div>
+                    <div class="stat-label">总任务数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="enabledTasks">7</div>
+                    <div class="stat-label">启用任务</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="runningTasks">0</div>
+                    <div class="stat-label">运行中任务</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="errorTasks">0</div>
+                    <div class="stat-label">错误任务</div>
+                </div>
+            </div>
+
+            <!-- 筛选栏 -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label class="filter-label">任务名称</label>
+                    <input type="text" id="taskNameFilter" class="filter-input" placeholder="输入任务名称">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">任务类型</label>
+                    <select id="taskTypeFilter" class="filter-select">
+                        <option value="">全部类型</option>
+                        <option value="topic_monitor" data-icon="fa-chart-line" data-color="text-purple-600">主题监控
+                        </option>
+                        <option value="consumer_monitor" data-icon="fa-users" data-color="text-blue-600">消费者监控</option>
+                        <option value="cluster_monitor" data-icon="fa-server" data-color="text-green-600">集群监控</option>
+                        <option value="alert_monitor" data-icon="fa-bell" data-color="text-orange-600">告警监控</option>
+                        <option value="data_cleanup" data-icon="fa-trash" data-color="text-red-600">数据清理</option>
+                        <option value="performance_stats" data-icon="fa-chart-bar" data-color="text-indigo-600">性能统计
+                        </option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">任务状态</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">全部状态</option>
+                        <option value="enabled" data-icon="fa-check-circle" data-color="text-green-600">启用</option>
+                        <option value="disabled" data-icon="fa-times-circle" data-color="text-gray-600">禁用</option>
+                        <option value="running" data-icon="fa-play-circle" data-color="text-blue-600">运行中</option>
+                        <option value="error" data-icon="fa-exclamation-circle" data-color="text-red-600">错误</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">&nbsp;</label>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="searchBtn" class="filter-btn">搜索</button>
+                        <button id="resetBtn" class="filter-btn secondary">重置</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务表格 -->
+            <div class="scheduler-table-container">
+                <table class="scheduler-table">
+                    <thead>
+                        <tr>
+                            <th>任务名称</th>
+                            <th>任务类型</th>
+                            <th>Cron表达式</th>
+                            <th>任务描述</th>
+                            <th>状态</th>
+                            <th>总执行次数</th>
+                            <th>上次执行</th>
+                            <th>下次执行</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedulerTableBody">
+                        <!-- 任务数据将通过JavaScript动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页控件 -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    显示 <span id="page-start">1</span> - <span id="page-end">5</span> 共 <span id="total-count">0</span>
+                    条记录
+                </div>
+                <div class="pagination-controls">
+                    <div id="pagination"></div>
+                </div>
+            </div>
+
+            <!-- 历史任务执行列表 -->
+            <div class="mt-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">历史任务执行</h2>
+                    <div class="flex gap-2">
+                        <button id="refreshHistoryBtn" class="filter-btn">
+                            <i class="fa fa-refresh"></i>
+                            刷新
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 历史执行筛选栏 -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label class="filter-label">任务名称</label>
+                        <input type="text" id="historyTaskNameFilter" class="filter-input" placeholder="输入任务名称">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">执行状态</label>
+                        <select id="historyStatusFilter" class="filter-select">
+                            <option value="">全部状态</option>
+                            <option value="SUCCESS" data-icon="fa-check-circle" data-color="text-green-600">成功</option>
+                            <option value="FAILED" data-icon="fa-times-circle" data-color="text-red-600">失败</option>
+                            <option value="RUNNING" data-icon="fa-play-circle" data-color="text-blue-600">运行中</option>
+                            <option value="CANCELLED" data-icon="fa-stop-circle" data-color="text-gray-600">已取消</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">执行时间</label>
+                        <input type="date" id="historyStartDate" class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">至</label>
+                        <input type="date" id="historyEndDate" class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">&nbsp;</label>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="searchHistoryBtn" class="filter-btn">搜索</button>
+                            <button id="resetHistoryBtn" class="filter-btn secondary">重置</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 历史执行表格 -->
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>任务名称</th>
+                                <th>任务类型</th>
+                                <th>执行状态</th>
+                                <th>结束时间</th>
+                                <th>执行节点</th>
+                                <th>触发类型</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- 历史执行数据将通过JavaScript动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 历史执行分页控件 -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        显示 <span id="history-page-start">1</span> - <span id="history-page-end">5</span> 共 <span
+                            id="history-total-count">0</span>
+                        条记录
+                    </div>
+                    <div class="pagination-controls">
+                        <div id="historyPagination"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- footer区域 -->
+        <div th:replace="~{public/common :: footer_sub}"></div>
+    </main>
+
+    <!-- 任务详情模态框 -->
+    <div id="taskDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="modal-content">
+            <div class="modal-header flex items-center justify-between p-6">
+                <h3 class="text-lg font-semibold text-gray-900">任务详情</h3>
+                <button id="closeTaskDetailModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="taskDetailContent">
+                    <!-- 任务详情内容将通过JavaScript动态加载 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-content">
+            <div class="confirm-header">
+                <div class="confirm-icon warning">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </div>
+                <div class="confirm-title">确认操作</div>
+            </div>
+            <div class="confirm-message" id="confirmMessage">
+                确定要执行此操作吗？
+            </div>
+            <div class="confirm-actions">
+                <button class="confirm-btn cancel" id="cancelConfirm">取消</button>
+                <button class="confirm-btn confirm" id="confirmAction">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑任务模态框 -->
+    <div id="taskFormModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="modal-content">
+            <div class="modal-header flex items-center justify-between p-6">
+                <h3 class="text-lg font-semibold text-gray-900" id="taskFormTitle">编辑任务</h3>
+                <button id="closeTaskFormModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="taskForm">
+                    <div class="space-y-6">
+                        <!-- Cron表达式 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 form-label">
+                                <i class="fa fa-clock"></i>Cron表达式
+                            </label>
+                            <input type="text" id="cronExpression" name="cronExpression"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors font-mono form-input"
+                                placeholder="0 */5 * * * ?" required>
+                            <p class="text-xs text-gray-500 mt-1">格式：秒 分 时 日 月 周</p>
+                        </div>
+
+                        <!-- 任务描述 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 form-label">
+                                <i class="fa fa-align-left"></i>任务描述
+                            </label>
+                            <textarea id="description" name="description" rows="3"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors form-textarea"
+                                placeholder="请描述任务的功能和用途..."></textarea>
+                        </div>
+
+                        <!-- 超时时间 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 form-label">
+                                <i class="fa fa-hourglass-half"></i>超时时间(秒)
+                            </label>
+                            <input type="number" id="timeout" name="timeout"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors form-input"
+                                value="300" min="60" max="3600">
+                            <p class="text-xs text-gray-500 mt-1">建议范围：60-3600秒</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-4 mt-6">
+                        <button type="button" id="cancelTaskBtn" class="btn-secondary">取消</button>
+                        <button type="submit" id="saveTaskBtn" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载任务调度模块的JavaScript -->
+    <script src="/js/system/scheduler.js"></script>
+
+    <!-- Select2 初始化脚本 -->
+    <script>
+        $(document).ready(function () {
+            // 初始化筛选栏的select2下拉框
+            $('#taskTypeFilter').select2({
+                placeholder: '请选择任务类型',
+                allowClear: true,
+                width: '100%',
+                theme: 'default',
+                templateResult: function (data) {
+                    if (!data.id) return data.text;
+                    var icon = $(data.element).data('icon');
+                    var color = $(data.element).data('color');
+                    if (icon) {
+                        return $('<span><i class="fa ' + icon + ' ' + color + ' mr-2"></i>' + data.text + '</span>');
+                    }
+                    return $('<span>' + data.text + '</span>');
+                },
+                templateSelection: function (data) {
+                    if (!data.id) return data.text;
+                    var icon = $(data.element).data('icon');
+                    var color = $(data.element).data('color');
+                    if (icon) {
+                        return $('<span><i class="fa ' + icon + ' ' + color + ' mr-2"></i>' + data.text + '</span>');
+                    }
+                    return $('<span>' + data.text + '</span>');
+                }
+            });
+
+            $('#statusFilter').select2({
+                placeholder: '请选择任务状态',
+                allowClear: true,
+                width: '100%',
+                theme: 'default',
+                templateResult: function (data) {
+                    if (!data.id) return data.text;
+                    var icon = $(data.element).data('icon');
+                    var color = $(data.element).data('color');
+                    if (icon) {
+                        return $('<span><i class="fa ' + icon + ' ' + color + ' mr-2"></i>' + data.text + '</span>');
+                    }
+                    return $('<span>' + data.text + '</span>');
+                },
+                templateSelection: function (data) {
+                    if (!data.id) return data.text;
+                    var icon = $(data.element).data('icon');
+                    var color = $(data.element).data('color');
+                    if (icon) {
+                        return $('<span><i class="fa ' + icon + ' ' + color + ' mr-2"></i>' + data.text + '</span>');
+                    }
+                    return $('<span>' + data.text + '</span>');
+                }
+            });
+
+            $('#historyStatusFilter').select2({
+                placeholder: '请选择执行状态',
+                allowClear: true,
+                width: '100%',
+                theme: 'default',
+                templateResult: function (data) {
+                    if (!data.id) return data.text;
+                    var icon = $(data.element).data('icon');
+                    var color = $(data.element).data('color');
+                    if (icon) {
+                        return $('<span><i class="fa ' + icon + ' ' + color + ' mr-2"></i>' + data.text + '</span>');
+                    }
+                    return $('<span>' + data.text + '</span>');
+                },
+                templateSelection: function (data) {
+                    if (!data.id) return data.text;
+                    var icon = $(data.element).data('icon');
+                    var color = $(data.element).data('color');
+                    if (icon) {
+                        return $('<span><i class="fa ' + icon + ' ' + color + ' mr-2"></i>' + data.text + '</span>');
+                    }
+                    return $('<span>' + data.text + '</span>');
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>

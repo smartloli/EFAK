@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EFAK·AI - 系统告警</title>
+    <th:block th:replace="~{public/common :: css}"></th:block>
+    <th:block th:replace="~{public/common :: js}"></th:block>
+
+    <style>
+        /* 基础布局 */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            transition: margin-left 0.3s ease-in-out;
+            min-height: calc(100vh - 64px);
+        }
+
+        /* 告警统计卡片 */
+        .alert-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid var(--accent-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card.critical {
+            --accent-color: #ef4444;
+        }
+
+        .stat-card.warning {
+            --accent-color: #f59e0b;
+        }
+
+        .stat-card.info {
+            --accent-color: #3b82f6;
+        }
+
+        .stat-card.success {
+            --accent-color: #10b981;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-color);
+            color: white;
+            font-size: 20px;
+        }
+
+        .stat-trend {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .stat-trend.up {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .stat-trend.down {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* 筛选和搜索区域 */
+        .filter-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
+            gap: 16px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .filter-input {
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .filter-btn.primary:hover {
+            background: #2563eb;
+        }
+
+        .filter-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .filter-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* 告警表格 */
+        .alerts-table {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-radius: 0 0 16px 16px;
+            position: relative;
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .table-header {
+            background: #f8fafc;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .alert-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+            table-layout: fixed;
+        }
+
+        .alert-table th {
+            background: #f8fafc;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .alert-table th:nth-child(1) {
+            width: 160px;
+        }
+
+        /* 告警时间 */
+        .alert-table th:nth-child(2) {
+            width: 120px;
+        }
+
+        /* 类型 */
+        .alert-table th:nth-child(3) {
+            width: 300px;
+        }
+
+        /* 标题 - 增加宽度因为去掉了级别列 */
+        .alert-table th:nth-child(4) {
+            width: 120px;
+        }
+
+        /* 来源 */
+        .alert-table th:nth-child(5) {
+            width: 100px;
+        }
+
+        /* 状态 */
+        .alert-table th:nth-child(6) {
+            width: 140px;
+        }
+
+        /* 告警渠道 - 增加宽度用于显示渠道名称 */
+        .alert-table th:nth-child(7) {
+            width: 120px;
+        }
+
+        /* 持续时间 */
+        .alert-table th:nth-child(8) {
+            width: 180px;
+        }
+
+        /* 操作 */
+
+        .alert-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .alert-table td:nth-child(1),
+        .alert-table td:nth-child(2),
+        .alert-table td:nth-child(6) {
+            white-space: nowrap !important;
+            overflow: visible !important;
+            text-overflow: initial !important;
+        }
+
+        .alert-table td:nth-child(3) {
+            white-space: normal;
+            line-height: 1.4;
+            max-height: 3.2em;
+        }
+
+        .alert-table td:nth-child(3)>div:first-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .alert-table td:nth-child(3)>div:last-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .alert-table tr:hover {
+            background: #f8fafc;
+        }
+
+        /* 告警级别标签 */
+        .alert-level {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .alert-level.critical {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .alert-level.warning {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .alert-level.info {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .alert-level-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .alert-level.critical .alert-level-dot {
+            background: #dc2626;
+        }
+
+        .alert-level.warning .alert-level-dot {
+            background: #d97706;
+        }
+
+        .alert-level.info .alert-level-dot {
+            background: #2563eb;
+        }
+
+        /* 告警状态 */
+        .alert-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .alert-status.active {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .alert-status.resolved {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .alert-status.acknowledged {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        /* 告警类型标签 */
+        .alert-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        /* 告警渠道图标组 */
+        .alert-channels {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .channel-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .channel-icon.success {
+            background: #10b981;
+            color: white;
+        }
+
+        .channel-icon.pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .channel-icon.failed {
+            background: #ef4444;
+            color: white;
+        }
+
+        .channel-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .channel-icon:hover .channel-tooltip {
+            opacity: 1;
+        }
+
+        /* 操作按钮 */
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .action-btn:last-child {
+            margin-right: 0;
+        }
+
+        /* 新的外层提示样式 */
+        .action-btn-tooltip {
+            position: fixed;
+            background: #1f2937;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            opacity: 0;
+        }
+
+        .action-btn-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: #1f2937;
+        }
+
+        .action-btn.resolve {
+            background: #10b981;
+            color: white;
+        }
+
+        .action-btn.resolve:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.acknowledge {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .action-btn.acknowledge:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.view {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .action-btn.view:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.rebalance {
+            background: #06b6d4;
+            color: white;
+        }
+
+        .action-btn.rebalance:hover {
+            background: #0891b2;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.ignore {
+            background: #6b7280;
+            color: white;
+        }
+
+        .action-btn.ignore:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            padding: 20px 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-info {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .pagination-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 告警详情模态框 */
+        .alert-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert-modal.show {
+            display: flex;
+        }
+
+        .alert-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .alert-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .alert-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-modal-title i {
+            color: #3b82f6;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #374151;
+            background: #f3f4f6;
+        }
+
+        .alert-detail-section {
+            margin-bottom: 24px;
+        }
+
+        .alert-detail-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .alert-detail-label i {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .alert-detail-value {
+            color: #4b5563;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            border: 1px solid #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .alert-detail-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .alert-meta-item {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .alert-meta-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .alert-meta-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .alert-channels-detail {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .channel-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        .channel-detail-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .channel-detail-status.success {
+            background: #10b981;
+        }
+
+        .channel-detail-status.pending {
+            background: #f59e0b;
+        }
+
+        .channel-detail-status.failed {
+            background: #ef4444;
+        }
+
+        /* 数据均衡操作区域 */
+        .rebalance-section {
+            background: #fffbeb;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .rebalance-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .rebalance-icon {
+            color: #d97706;
+            font-size: 1.2rem;
+        }
+
+        .rebalance-title {
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .rebalance-description {
+            color: #d97706;
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+        }
+
+        .rebalance-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* 告警类型配置区域 */
+        .alert-type-config {
+            margin-bottom: 20px;
+        }
+
+        .config-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .config-item-info {
+            flex: 1;
+        }
+
+        .config-item-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .config-item-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .config-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .config-threshold {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 12px;
+        }
+
+        .config-threshold-input {
+            width: 80px;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .config-threshold-unit {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .config-toggle {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .config-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .config-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d1d5db;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .config-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.config-slider {
+            background-color: #3b82f6;
+        }
+
+        input:checked+.config-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* 创建告警类型模态框样式 */
+        #create-alert-type-modal .alert-modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--multiple {
+            min-height: 44px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 6px 12px;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin: 2px;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white;
+            margin-right: 4px;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #fef2f2;
+        }
+
+        /* 告警渠道下拉框样式优化 */
+        #create-alert-type-modal .select2-container--default .select2-results__option {
+            padding: 8px 12px;
+            font-size: 0.875rem;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3b82f6;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--multiple:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--multiple .select2-selection__placeholder {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        /* 创建告警类型模态框中的单选Select2样式 */
+        #create-alert-type-modal .select2-container--default .select2-selection--single {
+            height: 44px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #374151;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding: 0;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px;
+            display: flex;
+            align-items: center;
+        }
+
+        #create-alert-type-modal .select2-container--default .select2-selection--single:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 删除确认模态框样式 */
+        #delete-confirm-modal .alert-modal-content,
+        #delete-alert-type-confirm-modal .alert-modal-content {
+            max-width: 500px;
+        }
+
+        #delete-confirm-modal .alert-modal-header,
+        #delete-alert-type-confirm-modal .alert-modal-header {
+            border-bottom: 1px solid #fecaca;
+            background: #fef2f2;
+            margin: -32px -32px 24px -32px;
+            padding: 24px 32px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        #delete-confirm-modal .alert-modal-title,
+        #delete-alert-type-confirm-modal .alert-modal-title {
+            color: #dc2626;
+        }
+
+        #delete-confirm-modal .alert-modal-title i,
+        #delete-alert-type-confirm-modal .alert-modal-title i {
+            color: #dc2626;
+        }
+
+        /* 编辑告警类型配置模态框样式 */
+        #edit-alert-type-modal .alert-modal-content {
+            max-width: 600px;
+        }
+
+        #edit-alert-type-modal input[disabled] {
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        #edit-alert-type-modal .alert-type-display {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 编辑渠道模态框样式 */
+        #edit-channel-modal .alert-modal-content {
+            max-width: 600px;
+        }
+
+        #edit-channel-modal input[disabled] {
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        #edit-channel-modal .channel-type-display {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Select2 样式优化 */
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 6px 12px;
+            line-height: 28px;
+            display: flex;
+            align-items: center;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #374151;
+            font-size: 0.875rem;
+            line-height: 28px;
+            padding-left: 0;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px;
+            right: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .select2-dropdown {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 8px 12px;
+            font-size: 0.875rem;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3b82f6;
+        }
+
+        .select2-container--default .select2-selection--single:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 创建渠道模态框中的Select2样式 */
+        #create-channel-modal .select2-container--default .select2-selection--single {
+            height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        #create-channel-modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding: 0;
+        }
+
+        #create-channel-modal .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0;
+                padding-top: 64px;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .alert-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .table-container {
+                padding-bottom: 10px;
+            }
+
+            .table-container::after {
+                content: "← 左右滑动查看更多 →";
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 0.75rem;
+                color: #6b7280;
+                background: #f8fafc;
+                padding: 4px 12px;
+                border-radius: 12px;
+                pointer-events: none;
+                z-index: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .alert-table {
+                font-size: 0.75rem;
+                min-width: 1000px;
+            }
+
+            .alert-table th,
+            .alert-table td {
+                padding: 8px 6px;
+            }
+
+            .alert-modal-content {
+                padding: 24px;
+                margin: 16px;
+            }
+
+            .table-container {
+                border-radius: 0;
+            }
+
+            .alerts-table {
+                border-radius: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .alert-table {
+                min-width: 900px;
+            }
+
+            .alert-table th:nth-child(3) {
+                width: 250px;
+            }
+
+            /* 标题列在小屏幕上缩短 */
+            .alert-table th:nth-child(8) {
+                width: 180px;
+            }
+
+            /* 操作列在小屏幕上缩短 */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <th:block th:replace="~{public/navbar :: navbar}"></th:block>
+    <th:block th:replace="~{public/navbar :: overlay}"></th:block>
+
+    <!-- Header -->
+    <th:block th:replace="~{public/header :: header}"></th:block>
+
+    <!-- Main Content -->
+    <main class="main-content ml-64 pt-16 transition-all duration-300 ease-in-out">
+        <div class="p-8">
+            <!-- 页面标题 -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">系统告警</h1>
+                <p class="text-gray-600">监控 Kafka 集群运行状态，及时处理异常告警</p>
+            </div>
+
+            <!-- 告警统计 -->
+            <div class="alert-stats">
+                <div class="stat-card critical">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fa fa-exclamation-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-number" id="critical-count">0</div>
+                    <div class="stat-label">未处理告警</div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fa fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-number" id="warning-count">0</div>
+                    <div class="stat-label">已处理告警</div>
+                </div>
+
+                <div class="stat-card info">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fa fa-minus-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-number" id="info-count">0</div>
+                    <div class="stat-label">已忽略告警</div>
+                </div>
+
+
+
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fa fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-number" id="resolved-count">0</div>
+                    <div class="stat-label">已解决</div>
+                </div>
+            </div>
+
+            <!-- 筛选区域 -->
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label">搜索关键词</label>
+                        <input type="text" id="search-input" class="filter-input" placeholder="搜索告警标题、描述或来源...">
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">告警状态</label>
+                        <select id="status-filter" class="filter-input select2-filter">
+                            <option value="">全部状态</option>
+                            <option value="0">未处理</option>
+                            <option value="1">已处理</option>
+                            <option value="2">已忽略</option>
+                            <option value="3">已解决</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">告警渠道</label>
+                        <select id="channel-filter" class="filter-input select2-filter">
+                            <option value="">全部渠道</option>
+                            <option value="dingtalk">钉钉</option>
+                            <option value="feishu">飞书</option>
+                            <option value="webhook">Webhook</option>
+                            <option value="wechat">微信</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">时间范围</label>
+                        <select id="time-filter" class="filter-input select2-filter">
+                            <option value="1h">最近1小时</option>
+                            <option value="3h">最近3小时</option>
+                            <option value="6h">最近6小时</option>
+                            <option value="12h">最近12小时</option>
+                            <option value="24h" selected>最近24小时</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <button class="filter-btn primary" onclick="applyFilters()">
+                            <i class="fa fa-search"></i>
+                            搜索
+                        </button>
+                    </div>
+
+                    <div class="filter-group">
+                        <button class="filter-btn secondary" onclick="resetFilters()">
+                            <i class="fa fa-refresh"></i>
+                            重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 告警列表 -->
+            <div class="alerts-table">
+                <div class="table-header">
+                    <div class="table-title">告警列表</div>
+                    <div class="table-actions">
+                        <button class="filter-btn secondary" onclick="configAlertTypes()">
+                            <i class="fa fa-bell"></i>
+                            告警配置
+                        </button>
+                        <button class="filter-btn secondary" onclick="configChannels()">
+                            <i class="fa fa-cog"></i>
+                            渠道配置
+                        </button>
+                        <button class="filter-btn secondary" onclick="refreshAlerts()">
+                            <i class="fa fa-refresh"></i>
+                            刷新
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="alert-table">
+                        <thead>
+                            <tr>
+                                <th>告警时间</th>
+                                <th>类型</th>
+                                <th>标题</th>
+                                <th>来源</th>
+                                <th>状态</th>
+                                <th>告警渠道</th>
+                                <th>持续时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alerts-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <div class="pagination-info">
+                        显示第 <span id="page-start">0</span> 到 <span id="page-end">0</span> 条，共 <span
+                            id="total-alerts">0</span> 条告警
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="pagination-btn" id="prev-btn" onclick="prevPage()">
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        <div id="page-numbers">
+                            <!-- 动态页码 -->
+                        </div>
+                        <button class="pagination-btn" id="next-btn" onclick="nextPage()">
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <th:block th:replace="~{public/common :: footer_sub}"></th:block>
+    </main>
+
+    <!-- 告警详情模态框 -->
+    <div id="alert-detail-modal" class="alert-modal">
+        <div class="alert-modal-content">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    告警详情
+                </div>
+                <button class="close-btn" onclick="closeAlertDetail()">&times;</button>
+            </div>
+
+            <div id="alert-detail-content">
+                <!-- 动态内容 -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="filter-btn secondary" onclick="closeAlertDetail()">
+                    <i class="fa fa-times"></i>
+                    关闭
+                </button>
+                <button class="filter-btn primary" onclick="acknowledgeAlert()" id="acknowledge-btn">
+                    <i class="fa fa-check"></i>
+                    确认告警
+                </button>
+                <button class="filter-btn primary" onclick="resolveAlert()" id="resolve-btn">
+                    <i class="fa fa-check-circle"></i>
+                    解决告警
+                </button>
+                <button class="filter-btn rebalance" onclick="performRebalance()" id="rebalance-btn"
+                    style="display: none;">
+                    <i class="fa fa-balance-scale"></i>
+                    数据均衡
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 告警类型配置模态框 -->
+    <div id="alert-type-config-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 1200px; width: 95%;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">告警类型配置</div>
+                <button class="close-btn" onclick="closeAlertTypeConfig()">&times;</button>
+            </div>
+
+            <div id="alert-type-config-content">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建告警类型模态框 -->
+    <div id="create-alert-type-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 700px;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">创建告警类型</div>
+                <button class="close-btn" onclick="closeCreateAlertType()">&times;</button>
+            </div>
+
+            <div id="create-alert-type-content">
+                <!-- 动态内容 -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="filter-btn secondary" onclick="closeCreateAlertType()">取消</button>
+                <button class="filter-btn primary" onclick="saveCreateAlertType()">创建配置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 告警渠道配置模态框 -->
+    <div id="channel-config-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 1000px; width: 95%;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">告警渠道配置</div>
+                <button class="close-btn" onclick="closeChannelConfig()">&times;</button>
+            </div>
+
+            <div id="channel-config-content">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建渠道模态框 -->
+    <div id="create-channel-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 600px;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">创建告警渠道</div>
+                <button class="close-btn" onclick="closeCreateChannel()">&times;</button>
+            </div>
+
+            <div id="create-channel-content">
+                <!-- 动态内容 -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="filter-btn secondary" onclick="closeCreateChannel()">取消</button>
+                <button class="filter-btn primary" onclick="saveCreateChannel()">创建渠道</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 查看渠道详情模态框 -->
+    <div id="view-channel-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 700px;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">
+                    <i class="fa fa-eye"></i>
+                    渠道详情
+                </div>
+                <button class="close-btn" onclick="closeViewChannel()">&times;</button>
+            </div>
+
+            <div id="view-channel-content">
+                <!-- 动态内容 -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="filter-btn secondary" onclick="closeViewChannel()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑渠道模态框 -->
+    <div id="edit-channel-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 600px;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">
+                    <i class="fa fa-edit"></i>
+                    编辑渠道
+                </div>
+                <button class="close-btn" onclick="closeEditChannel()">&times;</button>
+            </div>
+
+            <div id="edit-channel-content">
+                <!-- 动态内容 -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="filter-btn secondary" onclick="closeEditChannel()">取消</button>
+                <button class="filter-btn primary" onclick="saveEditChannel()">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 查看告警类型配置模态框 -->
+    <div id="view-alert-type-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 700px;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">
+                    <i class="fa fa-eye"></i>
+                    告警类型配置详情
+                </div>
+                <button class="close-btn" onclick="closeViewAlertType()">&times;</button>
+            </div>
+
+            <div id="view-alert-type-content">
+                <!-- 动态内容 -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="filter-btn secondary" onclick="closeViewAlertType()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑告警类型配置模态框 -->
+    <div id="edit-alert-type-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 600px;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">
+                    <i class="fa fa-edit"></i>
+                    编辑告警类型配置
+                </div>
+                <button class="close-btn" onclick="closeEditAlertType()">&times;</button>
+            </div>
+
+            <div id="edit-alert-type-content">
+                <!-- 动态内容 -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="filter-btn secondary" onclick="closeEditAlertType()">取消</button>
+                <button class="filter-btn primary" onclick="saveEditAlertType()">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除告警类型配置确认模态框 -->
+    <div id="delete-alert-type-confirm-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 500px;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">
+                    <i class="fa fa-exclamation-triangle" style="color: #ef4444;"></i>
+                    确认删除告警类型配置
+                </div>
+                <button class="close-btn" onclick="closeDeleteAlertTypeConfirm()">&times;</button>
+            </div>
+
+            <div id="delete-alert-type-confirm-content">
+                <!-- 动态内容 -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="filter-btn secondary" onclick="closeDeleteAlertTypeConfirm()">取消</button>
+                <button class="filter-btn" onclick="confirmDeleteAlertType()"
+                    style="background: #ef4444; color: white;">
+                    <i class="fa fa-trash"></i>
+                    确认删除
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div id="delete-confirm-modal" class="alert-modal">
+        <div class="alert-modal-content" style="max-width: 500px;">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">
+                    <i class="fa fa-exclamation-triangle" style="color: #ef4444;"></i>
+                    确认删除
+                </div>
+                <button class="close-btn" onclick="closeDeleteConfirm()">&times;</button>
+            </div>
+
+            <div id="delete-confirm-content">
+                <!-- 动态内容 -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="filter-btn secondary" onclick="closeDeleteConfirm()">取消</button>
+                <button class="filter-btn" onclick="confirmDeleteChannel()" style="background: #ef4444; color: white;">
+                    <i class="fa fa-trash"></i>
+                    确认删除
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/system/alerts.js}"></script>
+</body>
+
+</html>

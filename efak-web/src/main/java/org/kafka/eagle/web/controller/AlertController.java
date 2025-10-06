@@ -1,318 +1,308 @@
-/**
- * AlertController.java
- * <p>
- * Copyright 2023 smartloli
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.kafka.eagle.web.controller;
 
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.extern.slf4j.Slf4j;
-import org.kafka.eagle.common.constants.KConstants;
-import org.kafka.eagle.common.utils.HtmlAttributeUtil;
-import org.kafka.eagle.common.utils.Md5Util;
-import org.kafka.eagle.pojo.alert.AlertChannelInfo;
-import org.kafka.eagle.pojo.cluster.ClusterInfo;
-import org.kafka.eagle.web.service.IAlertChannelDaoService;
-import org.kafka.eagle.web.service.IClusterDaoService;
+import org.kafka.eagle.dto.alert.*;
+import org.kafka.eagle.web.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
- * The `AlertController` class handles incoming requests related to alerts.
- * This controller provides endpoints to trigger alerts through various communication channels
- * such as WeChat, DingTalk, and email.
  * <p>
- * The class implements a set of methods for sending alerts, allowing users to select the desired
- * communication channel for alert notifications. The available channels are defined by their
- * respective services: `WeChatAlertService`, `DingTalkAlertService`, and `EmailAlertService`.
- * <p>
- * This controller aims to provide a flexible and extensible way to manage and distribute alerts
- * to relevant parties based on the chosen communication channel.
- * <p>
- * Note that appropriate authentication and authorization mechanisms should be implemented to
- * ensure that only authorized users can trigger alerts through this controller.
- *
- * @Author: smartloli
- * @Date: 2023/8/20 11:35
- * @Version: 3.4.0
+ * 告警管理控制器
+ * 提供告警查询、状态更新、渠道管理、类型配置等功能接口
+ * </p>
+ * @author Mr.SmartLoli
+ * @since 2025/09/30 01:38:38
+ * @version 5.0.0
  */
-@Controller
-@RequestMapping("/alert")
-@Slf4j
+@RestController
+@RequestMapping("/api/alerts")
 public class AlertController {
 
     @Autowired
-    private IAlertChannelDaoService alertChannelDaoService;
+    private AlertService alertService;
 
-    @Autowired
-    private IClusterDaoService clusterDaoService;
-
-    @GetMapping("/channel")
-    public String channelView() {
-        return "alert/channel.html";
+    /**
+     * 查询告警列表
+     */
+    @PostMapping("/query")
+    public ResponseEntity<AlertPageResponse> queryAlerts(@RequestBody AlertQueryRequest request, @RequestParam String cid) {
+        request.setClusterId(cid);
+        AlertPageResponse response = alertService.queryAlerts(request);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/rule")
-    public String rulelView() {
-        return "alert/rule.html";
+    /**
+     * 根据ID查询告警详情
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<AlertInfo> getAlertById(@PathVariable Long id) {
+        AlertInfo alert = alertService.getAlertById(id);
+        if (alert == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(alert);
     }
 
-    @RequestMapping(value = "/channel/table/ajax", method = RequestMethod.GET)
-    public void pageAlertChannelAjax(HttpServletResponse response, HttpServletRequest request) {
-
-        String remoteAddr = request.getRemoteAddr();
-        HttpSession session = request.getSession();
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-        log.info("Alert channel table list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
-        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
-        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-
-        // get user roles
-        String roles = authorities.stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        String aoData = request.getParameter("aoData");
-        JSONArray params = JSON.parseArray(aoData);
-        int sEcho = 0, iDisplayStart = 0, iDisplayLength = 0;
-        String search = "";
-        for (Object object : params) {
-            JSONObject param = (JSONObject) object;
-            if ("sEcho".equals(param.getString("name"))) {
-                sEcho = param.getIntValue("value");
-            } else if ("iDisplayStart".equals(param.getString("name"))) {
-                iDisplayStart = param.getIntValue("value");
-            } else if ("iDisplayLength".equals(param.getString("name"))) {
-                iDisplayLength = param.getIntValue("value");
-            } else if ("sSearch".equals(param.getString("name"))) {
-                search = param.getString("value");
-            }
-        }
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("start", iDisplayStart / iDisplayLength + 1);
-        map.put("size", iDisplayLength);
-        map.put("cid", clusterInfo.getClusterId());
-        map.put("roles", roles);
-        map.put("search", search);
-
-        Page<AlertChannelInfo> pages = this.alertChannelDaoService.pages(map);
-        JSONArray aaDatas = new JSONArray();
-
-        for (AlertChannelInfo alertChannelInfo : pages.getRecords()) {
-            JSONObject target = new JSONObject();
-            target.put("id", alertChannelInfo.getId());
-            target.put("channel_name", alertChannelInfo.getChannelName());
-            target.put("channel_type", HtmlAttributeUtil.getAlertChannelHtml(alertChannelInfo.getChannelType()));
-            target.put("channel_url", HtmlAttributeUtil.getAlertChannelUrlHtml(alertChannelInfo.getChannelUrl(), alertChannelInfo.getId(), "channel_view_url"));
-            target.put("channel_auth_json", HtmlAttributeUtil.getAlertChannelUrlHtml(alertChannelInfo.getAuthJson(), alertChannelInfo.getId(), "channel_view_auth"));
-            target.put("modify_time", alertChannelInfo.getModifyTime());
-            target.put("operate", "<a href='' alert_channel_id='" + alertChannelInfo.getId() + "' channel_name='" + alertChannelInfo.getChannelName() + "' name='efak_alert_channel_edit' class='badge border border-warning text-warning'>编辑</a> <a href='' channel_name='" + alertChannelInfo.getChannelName() + "' alert_channel_id='" + alertChannelInfo.getId() + "' name='efak_alert_channel_delete' class='badge border border-danger text-danger'>删除</a>");
-
-            aaDatas.add(target);
-        }
-
-        JSONObject target = new JSONObject();
-        target.put("sEcho", sEcho);
-        target.put("iTotalRecords", pages.getTotal());
-        target.put("iTotalDisplayRecords", pages.getTotal());
-        target.put("aaData", aaDatas);
-        try {
-            byte[] output = target.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception ex) {
-            log.error("Get alert channel info has error,msg is {}", ex);
+    /**
+     * 更新告警状态
+     */
+    @PutMapping("/{id}/status")
+    public ResponseEntity<String> updateAlertStatus(
+            @PathVariable Long id,
+            @RequestParam Integer status,
+            @RequestParam String cid) {
+        boolean success = alertService.updateAlertStatusById(id, cid, status);
+        if (success) {
+            return ResponseEntity.ok("状态更新成功");
+        } else {
+            return ResponseEntity.badRequest().body("状态更新失败");
         }
     }
 
     /**
-     * Get alert channel type list.
-     *
-     * @param response
-     * @param request
+     * 查询告警渠道列表
      */
-    @RequestMapping(value = "/channel/type/list/ajax", method = RequestMethod.GET)
-    public void pageAlertChannelTypeAjax(HttpServletResponse response, HttpServletRequest request) {
-        String name = request.getParameter("name");
-        JSONObject object = new JSONObject();
+    @GetMapping("/channels")
+    public ResponseEntity<List<AlertChannel>> getAlertChannels(@RequestParam String cid) {
+        List<AlertChannel> channels = alertService.getAlertChannels(cid);
+        return ResponseEntity.ok(channels);
+    }
 
-        int offset = 0;
-        JSONArray topics = new JSONArray();
-        for (String role : KConstants.ALERT_CHANNEL_LIST) {
-            if (StrUtil.isNotBlank(name)) {
-                JSONObject topic = new JSONObject();
-                if (role.contains(name)) {
-                    topic.put("text", role);
-                    topic.put("id", offset);
-                }
-                topics.add(topic);
-            } else {
-                JSONObject topic = new JSONObject();
-                topic.put("text", role);
-                topic.put("id", offset);
-                topics.add(topic);
-            }
-
-            offset++;
+    /**
+     * 根据ID查询告警渠道
+     */
+    @GetMapping("/channels/{id}")
+    public ResponseEntity<AlertChannel> getAlertChannelById(@PathVariable Long id) {
+        AlertChannel channel = alertService.getAlertChannelById(id);
+        if (channel == null) {
+            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(channel);
+    }
 
-        object.put("items", topics);
-        try {
-            byte[] output = object.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception ex) {
-            log.error("Get alert channel name list has error,msg is {}", ex);
+    /**
+     * 创建告警渠道
+     */
+    @PostMapping("/channels")
+    public ResponseEntity<String> createAlertChannel(@RequestBody AlertChannel channel, @RequestParam String cid) {
+        channel.setClusterId(cid);
+        boolean success = alertService.createAlertChannel(channel);
+        if (success) {
+            return ResponseEntity.ok("渠道创建成功");
+        } else {
+            return ResponseEntity.badRequest().body("渠道创建失败");
         }
     }
 
     /**
-     * Add or edit alert channel.
-     *
-     * @param action
-     * @param response
-     * @return
+     * 更新告警渠道
      */
-    @ResponseBody
-    @RequestMapping(value = "/channel/info/{action}", method = RequestMethod.POST)
-    public boolean addOrEditChannelAjax(@PathVariable("action") String action, HttpServletRequest request, HttpServletResponse response, @RequestParam("uid") Long uid, @RequestParam("channelName") String channelName, @RequestParam("channelType") String channelType, @RequestParam("channelUrl") String channelUrl, @RequestParam("channelAuthJson") String channelAuthJson) {
-        String remoteAddr = request.getRemoteAddr();
-        HttpSession session = request.getSession();
-        String clusterAlias = Md5Util.generateMD5(KConstants.SessionClusterId.CLUSTER_ID + remoteAddr);
-        log.info("Alert channel name list:: get remote[{}] clusterAlias from session md5 = {}", remoteAddr, clusterAlias);
-        Long cid = Long.parseLong(session.getAttribute(clusterAlias).toString());
-        ClusterInfo clusterInfo = clusterDaoService.clusters(cid);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-
-        // get user roles
-        String roles = authorities.stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        Boolean status = false;
-        try {
-            AlertChannelInfo alertChannelInfo = new AlertChannelInfo();
-            alertChannelInfo.setChannelName(channelName);
-            alertChannelInfo.setChannelType(KConstants.ALERT_CHANNEL_MAP.get(channelType));
-            alertChannelInfo.setChannelUrl(channelUrl);
-            alertChannelInfo.setAuthJson(channelAuthJson);
-            alertChannelInfo.setClusterId(clusterInfo.getClusterId());
-            alertChannelInfo.setChannelUserRoles(roles);
-            if ("add".equals(action)) {
-                status = this.alertChannelDaoService.insert(alertChannelInfo);
-            } else if ("edit".equals(action)) {
-                alertChannelInfo.setId(uid);
-                status = this.alertChannelDaoService.update(alertChannelInfo);
-            }
-        } catch (Exception e) {
-            log.error("Add or update alert channel info has error, msg is {}", e);
-        }
-        return status;
-    }
-
-    @RequestMapping(value = "/channel/get/info/ajax", method = RequestMethod.GET)
-    public void getAlertChannelInfoAjax(HttpServletResponse response, @RequestParam("uid") Long uid) {
-        JSONObject object = new JSONObject();
-        AlertChannelInfo alertChannelInfo = this.alertChannelDaoService.channel(uid);
-        object.put("name", alertChannelInfo.getChannelName());
-        object.put("type", KConstants.ALERT_CHANNEL_MAP.get(alertChannelInfo.getChannelType()));
-        object.put("url", alertChannelInfo.getChannelUrl());
-        object.put("auth", alertChannelInfo.getAuthJson());
-
-        try {
-            byte[] output = object.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception ex) {
-            log.error("Get alert channel name one has error,msg is {}", ex);
+    @PutMapping("/channels/{id}")
+    public ResponseEntity<String> updateAlertChannel(
+            @PathVariable Long id,
+            @RequestBody AlertChannel channel,
+            @RequestParam String cid) {
+        channel.setId(id);
+        channel.setClusterId(cid);
+        boolean success = alertService.updateAlertChannel(channel);
+        if (success) {
+            return ResponseEntity.ok("渠道更新成功");
+        } else {
+            return ResponseEntity.badRequest().body("渠道更新失败");
         }
     }
 
     /**
-     * delete alert channel.
-     *
-     * @param response
-     * @param uid
-     * @return
+     * 删除告警渠道
      */
-    @ResponseBody
-    @RequestMapping(value = "/channel/info/delete", method = RequestMethod.POST)
-    public boolean delAlertChannelAjax(HttpServletResponse response, @RequestParam("uid") Long uid) {
-        Boolean status = false;
-        try {
-            status = this.alertChannelDaoService.delete(uid);
-        } catch (Exception e) {
-            log.error("Delete alert channel info has error, msg is {}", e);
+    @DeleteMapping("/channels/{id}")
+    public ResponseEntity<String> deleteAlertChannel(@PathVariable Long id) {
+        boolean success = alertService.deleteAlertChannel(id);
+        if (success) {
+            return ResponseEntity.ok("渠道删除成功");
+        } else {
+            return ResponseEntity.badRequest().body("渠道删除失败");
         }
-        return status;
     }
 
     /**
-     * Get alert rule type list.
-     * @param response
-     * @param request
+     * 查询告警类型配置列表
      */
-    @RequestMapping(value = "/rule/type/list/ajax", method = RequestMethod.GET)
-    public void pageAlertRuleTypeAjax(HttpServletResponse response, HttpServletRequest request) {
-        String name = request.getParameter("name");
-        JSONObject object = new JSONObject();
+    @GetMapping("/type-configs")
+    public ResponseEntity<List<AlertTypeConfig>> getAlertTypeConfigs(@RequestParam String cid) {
+        List<AlertTypeConfig> configs = alertService.getAlertTypeConfigs(cid);
+        return ResponseEntity.ok(configs);
+    }
 
-        int offset = 0;
-        JSONArray topics = new JSONArray();
-        for (String role : KConstants.ALERT_RULE_LIST) {
-            if (StrUtil.isNotBlank(name)) {
-                JSONObject topic = new JSONObject();
-                if (role.contains(name)) {
-                    topic.put("text", role);
-                    topic.put("id", offset);
-                }
-                topics.add(topic);
-            } else {
-                JSONObject topic = new JSONObject();
-                topic.put("text", role);
-                topic.put("id", offset);
-                topics.add(topic);
-            }
+    /**
+     * 分页查询告警类型配置列表
+     */
+    @GetMapping("/type-configs/page")
+    public ResponseEntity<AlertPageResponse> getAlertTypeConfigsPage(
+            @RequestParam String cid,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "5") Integer pageSize) {
+        AlertPageResponse response = alertService.getAlertTypeConfigsPage(cid, page, pageSize);
+        return ResponseEntity.ok(response);
+    }
 
-            offset++;
+    /**
+     * 根据ID查询告警类型配置
+     */
+    @GetMapping("/type-configs/{id}")
+    public ResponseEntity<AlertTypeConfig> getAlertTypeConfigById(@PathVariable Long id) {
+        AlertTypeConfig config = alertService.getAlertTypeConfigById(id);
+        if (config == null) {
+            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(config);
+    }
 
-        object.put("items", topics);
-        try {
-            byte[] output = object.toJSONString().getBytes();
-            BaseController.response(output, response);
-        } catch (Exception ex) {
-            log.error("Get alert channel name list has error,msg is {}", ex);
+    /**
+     * 创建告警类型配置
+     */
+    @PostMapping("/type-configs")
+    public ResponseEntity<String> createAlertTypeConfig(@RequestBody AlertTypeConfig config, @RequestParam String cid) {
+        config.setClusterId(cid);
+        boolean success = alertService.createAlertTypeConfig(config);
+        if (success) {
+            return ResponseEntity.ok("配置创建成功");
+        } else {
+            return ResponseEntity.badRequest().body("配置创建失败");
         }
     }
 
+    /**
+     * 更新告警类型配置
+     */
+    @PutMapping("/type-configs/{id}")
+    public ResponseEntity<String> updateAlertTypeConfig(@PathVariable Long id, @RequestBody AlertTypeConfig config, @RequestParam String cid) {
+        config.setId(id);
+        config.setClusterId(cid);
+        boolean success = alertService.updateAlertTypeConfig(config);
+        if (success) {
+            return ResponseEntity.ok("配置更新成功");
+        } else {
+            return ResponseEntity.badRequest().body("配置更新失败");
+        }
+    }
+
+    /**
+     * 删除告警类型配置
+     */
+    @DeleteMapping("/type-configs/{id}")
+    public ResponseEntity<String> deleteAlertTypeConfig(@PathVariable Long id) {
+        boolean success = alertService.deleteAlertTypeConfig(id);
+        if (success) {
+            return ResponseEntity.ok("配置删除成功");
+        } else {
+            return ResponseEntity.badRequest().body("配置删除失败");
+        }
+    }
+
+    /**
+     * 检查监控目标是否存在
+     */
+    @GetMapping("/check-target")
+    public ResponseEntity<Map<String, Object>> checkTargetExists(
+            @RequestParam String cid,
+            @RequestParam String target) {
+        boolean exists = alertService.checkTargetExists(cid, target);
+        Map<String, Object> response = new java.util.HashMap<>();
+        response.put("exists", exists);
+        response.put("target", target);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 根据类型和目标查询告警类型配置
+     */
+    @GetMapping("/type-configs/by-type-target")
+    public ResponseEntity<List<AlertTypeConfig>> getAlertTypeConfigsByTypeAndTarget(
+            @RequestParam String cid,
+            @RequestParam String type,
+            @RequestParam String target) {
+        List<AlertTypeConfig> configs = alertService.getAlertTypeConfigsByTypeAndTarget(cid, type, target);
+        return ResponseEntity.ok(configs);
+    }
+
+    /**
+     * 执行数据均衡操作
+     */
+    @PostMapping("/{id}/rebalance")
+    public ResponseEntity<String> performRebalance(
+            @PathVariable Long id,
+            @RequestParam String cid) {
+        boolean success = alertService.performRebalanceById(id, cid);
+        if (success) {
+            return ResponseEntity.ok("数据均衡操作完成");
+        } else {
+            return ResponseEntity.badRequest().body("数据均衡操作失败");
+        }
+    }
+
+    /**
+     * 获取Broker列表（用于告警配置）
+     */
+    @GetMapping("/brokers")
+    public ResponseEntity<List<Map<String, Object>>> getBrokers(@RequestParam String cid) {
+        List<Map<String, Object>> brokers = alertService.getBrokersByClusterId(cid);
+        return ResponseEntity.ok(brokers);
+    }
+
+    /**
+     * 获取消费者组列表（用于告警配置）
+     */
+    @GetMapping("/consumer-groups")
+    public ResponseEntity<List<Map<String, Object>>> getConsumerGroups(@RequestParam String cid) {
+        List<Map<String, Object>> groups = alertService.getConsumerGroupsByClusterId(cid);
+        return ResponseEntity.ok(groups);
+    }
+
+    /**
+     * 根据消费者组获取Topic列表（用于告警配置）
+     */
+    @GetMapping("/consumer-topics")
+    public ResponseEntity<List<Map<String, Object>>> getConsumerTopics(
+            @RequestParam String cid,
+            @RequestParam String groupId) {
+        List<Map<String, Object>> topics = alertService.getConsumerTopicsByGroupId(cid, groupId);
+        return ResponseEntity.ok(topics);
+    }
+
+    /**
+     * 获取告警通知（用于通知中心）
+     */
+    @GetMapping("/notifications")
+    public ResponseEntity<List<AlertInfo>> getAlertNotifications(
+            @RequestParam String cid,
+            @RequestParam(defaultValue = "5") Integer limit) {
+
+        // 创建查询请求，查询告警通知
+        AlertQueryRequest request = new AlertQueryRequest();
+        request.setClusterId(cid);
+        request.setPage(1);
+        request.setPageSize(limit);
+        request.setSortField("updatedAt");  // 按更新时间排序
+        request.setSortOrder("desc");
+
+        // 查询告警通知
+        AlertPageResponse response = alertService.queryAlertsForNotifications(request);
+        return ResponseEntity.ok(response.getAlerts());
+    }
+
+    /**
+     * 根据指标类型获取Topic列表（用于告警配置）
+     */
+    @GetMapping("/topics-by-metric")
+    public ResponseEntity<List<Map<String, Object>>> getTopicsByMetric(
+            @RequestParam String cid,
+            @RequestParam String metricType) {
+        List<Map<String, Object>> topics = alertService.getTopicsByMetricType(cid, metricType);
+        return ResponseEntity.ok(topics);
+    }
 }
