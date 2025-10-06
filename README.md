@@ -317,15 +317,15 @@ JAVA_OPTS="-Xms1g -Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
 ### 健康检查 API
 ```bash
 # 基础健康检查
-GET /actuator/health
+GET /health/check
 
 # 响应示例
 {
-  "status": "UP",
-  "components": {
-    "db": {"status": "UP"},
-    "redis": {"status": "UP"}
-  }
+    "application": "EFAK-AI",
+    "port": "8080",
+    "version": "5.0.0",
+    "status": "UP",
+    "timestamp": "2025-10-06T23:32:47.392037"
 }
 ```
 
