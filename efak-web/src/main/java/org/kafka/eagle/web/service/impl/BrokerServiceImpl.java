@@ -87,9 +87,9 @@ public class BrokerServiceImpl implements BrokerService {
     @Override
     public boolean createBroker(BrokerInfo broker) {
         // 检查Broker是否已存在
-        if (checkBrokerExists(broker.getBrokerId(), broker.getHostIp(), broker.getPort())) {
+        if (checkBrokerExists(broker.getClusterId(), broker.getBrokerId(), broker.getHostIp(), broker.getPort())) {
             throw new IllegalArgumentException(
-                    "Broker已存在: " + broker.getBrokerId() + "@" + broker.getHostIp() + ":" + broker.getPort());
+                    "Broker已存在: " + broker.getClusterId() + ":" + broker.getBrokerId() + "@" + broker.getHostIp() + ":" + broker.getPort());
         }
 
         // 检查连接状态
@@ -126,8 +126,8 @@ public class BrokerServiceImpl implements BrokerService {
     }
 
     @Override
-    public boolean checkBrokerExists(Integer brokerId, String hostIp, Integer port) {
-        return brokerMapper.checkBrokerExists(brokerId, hostIp, port) > 0;
+    public boolean checkBrokerExists(String clusterId, Integer brokerId, String hostIp, Integer port) {
+        return brokerMapper.checkBrokerExists(clusterId, brokerId, hostIp, port) > 0;
     }
 
     @Override

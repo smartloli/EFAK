@@ -55,7 +55,7 @@ public interface BrokerService {
     /**
      * 检查Broker是否存在
      */
-    boolean checkBrokerExists(Integer brokerId, String hostIp, Integer port);
+    boolean checkBrokerExists(String clusterId, Integer brokerId, String hostIp, Integer port);
 
     /**
      * 检查Broker连接状态

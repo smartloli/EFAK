@@ -677,7 +677,14 @@ public class TaskExecutorManager {
 
                 // 更新broker信息到数据库
                 try {
-                    updateBrokerInfoInDatabase(broker);
+                    // 从assignedBrokers中找到对应的broker信息获取clusterId
+                    String clusterId = assignedBrokers.stream()
+                            .filter(b -> b.getBrokerId().equals(broker.getBrokerId()))
+                            .map(BrokerInfo::getClusterId)
+                            .findFirst()
+                            .orElse("default"); // 默认集群ID
+
+                    updateBrokerInfoInDatabase(broker, clusterId);
                     updatedBrokers++;
                 } catch (Exception e) {
                     log.error("更新broker {} 信息到数据库失败: {}", broker.getBrokerId(), e.getMessage(), e);
@@ -1608,14 +1615,15 @@ public class TaskExecutorManager {
      * 更新broker信息到数据库
      * 注意：host、port、jmx_port字段不会被覆盖，保持原有值
      */
-    private void updateBrokerInfoInDatabase(BrokerDetailedInfo broker) {
+    private void updateBrokerInfoInDatabase(BrokerDetailedInfo broker, String clusterId) {
         try {
-            // 检查broker是否已存在
-            BrokerInfo existingBroker = brokerMapper.getBrokerByBrokerId(broker.getBrokerId());
+            // 检查broker是否已存在 - 使用新的方法确保唯一性
+            BrokerInfo existingBroker = brokerMapper.getBrokerByClusterIdAndBrokerId(clusterId, broker.getBrokerId());
 
             if (existingBroker != null) {
                 // 更新现有broker的动态信息，不更新host、port、jmx_port字段
                 int updateResult = brokerMapper.updateBrokerDynamicInfo(
+                        clusterId,
                         broker.getBrokerId(),
                         broker.getStatus().toLowerCase(),
                         java.math.BigDecimal.valueOf(broker.getCpuUsagePercent()),
@@ -1630,6 +1638,7 @@ public class TaskExecutorManager {
             } else {
                 // 创建新的broker信息
                 BrokerInfo newBroker = new BrokerInfo();
+                newBroker.setClusterId(clusterId);
                 newBroker.setBrokerId(broker.getBrokerId());
                 newBroker.setHostIp(broker.getHost());
                 newBroker.setPort(broker.getPort());

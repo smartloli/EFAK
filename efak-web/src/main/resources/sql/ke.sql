@@ -77,10 +77,12 @@ CREATE TABLE `ke_broker_info` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_broker_host_port` (`broker_id`,`host_ip`,`port`),
+  UNIQUE KEY `uk_cluster_broker_host_port` (`cluster_id`,`broker_id`,`host_ip`,`port`),
   KEY `idx_status` (`status`),
   KEY `idx_host_ip` (`host_ip`),
-  KEY `idx_created_at` (`created_at`)
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_cluster_id` (`cluster_id`),
+  KEY `idx_cluster_broker_id` (`cluster_id`,`broker_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Kafka Broker信息表'
 
 -- 创建Broker性能指标历史数据表

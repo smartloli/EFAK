@@ -142,6 +142,28 @@ public interface BrokerMapper {
         BrokerInfo getBrokerByBrokerId(@Param("brokerId") Integer brokerId);
 
         /**
+         * 根据集群ID和Broker ID查询Broker信息（确保唯一性）
+         */
+        @Select("SELECT " +
+                        "  id, " +
+                        "  cluster_id as clusterId, " +
+                        "  broker_id as brokerId, " +
+                        "  host_ip as hostIp, " +
+                        "  port, " +
+                        "  port as kafkaPort, " +
+                        "  jmx_port as jmxPort, " +
+                        "  status, " +
+                        "  cpu_usage as cpuUsage, " +
+                        "  memory_usage as memoryUsage, " +
+                        "  startup_time as startupTime, " +
+                        "  version, " +
+                        "  created_by as createdBy, " +
+                        "  created_at as createdAt, " +
+                        "  updated_at as updatedAt " +
+                        "FROM ke_broker_info WHERE cluster_id = #{clusterId} AND broker_id = #{brokerId}")
+        BrokerInfo getBrokerByClusterIdAndBrokerId(@Param("clusterId") String clusterId, @Param("brokerId") Integer brokerId);
+
+        /**
          * 根据IP查询Broker信息
          */
         @Select("SELECT " +
@@ -236,8 +258,9 @@ public interface BrokerMapper {
                         "  startup_time = #{startupTime}, " +
                         "  version = #{version}, " +
                         "  updated_at = NOW() " +
-                        "WHERE broker_id = #{brokerId}")
-        int updateBrokerDynamicInfo(@Param("brokerId") Integer brokerId,
+                        "WHERE cluster_id = #{clusterId} AND broker_id = #{brokerId}")
+        int updateBrokerDynamicInfo(@Param("clusterId") String clusterId,
+                        @Param("brokerId") Integer brokerId,
                         @Param("status") String status,
                         @Param("cpuUsage") java.math.BigDecimal cpuUsage,
                         @Param("memoryUsage") java.math.BigDecimal memoryUsage,
@@ -247,8 +270,9 @@ public interface BrokerMapper {
         /**
          * 检查Broker是否存在
          */
-        @Select("SELECT COUNT(*) FROM ke_broker_info WHERE broker_id = #{brokerId} AND host_ip = #{hostIp} AND port = #{port}")
-        int checkBrokerExists(@Param("brokerId") Integer brokerId,
+        @Select("SELECT COUNT(*) FROM ke_broker_info WHERE cluster_id = #{clusterId} AND broker_id = #{brokerId} AND host_ip = #{hostIp} AND port = #{port}")
+        int checkBrokerExists(@Param("clusterId") String clusterId,
+                        @Param("brokerId") Integer brokerId,
                         @Param("hostIp") String hostIp,
                         @Param("port") Integer port);
 
