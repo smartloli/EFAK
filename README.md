@@ -5,6 +5,8 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-green.svg)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
+[![Stargazers over time](https://starchart.cc/smartloli/EFAK.svg?variant=adaptive)](https://starchart.cc/smartloli/EFAK)
+
 ## 项目简介
 
 **EFAK-AI (Eagle For Apache Kafka - AI)** 是一款开源的 Kafka 智能监控与管理平台，融合了人工智能技术，为 Kafka 运维提供智能化、可视化、自动化的全方位解决方案。
