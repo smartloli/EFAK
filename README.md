@@ -1,6 +1,6 @@
 # EFAK-AI (Eagle For Apache Kafka - AI Enhanced)
 
-[![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)](https://github.com/smartloli/EFAK-AI)
+[![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)](https://github.com/smartloli/EFAK)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.java.net/projects/jdk/17/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-green.svg)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
