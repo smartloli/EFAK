@@ -110,6 +110,9 @@ docker-compose logs -f efak-ai
 # 4. 访问应用
 # http://localhost:8080
 # 默认账号: admin / admin
+
+# 5. 重置密码
+# http://localhost:8080/password-tool
 ```
 
 #### 启动 Nginx 反向代理（可选）
