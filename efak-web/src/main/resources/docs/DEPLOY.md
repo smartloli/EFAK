@@ -50,8 +50,8 @@ docker-compose --version  # 需要 2.0+
 #### 2. 获取源代码
 
 ```bash
-git clone https://github.com/smartloli/EFAK-AI.git
-cd EFAK-AI
+git clone https://github.com/smartloli/EFAK.git
+cd EFAK
 ```
 
 #### 3. 启动所有服务
@@ -577,9 +577,9 @@ curl http://localhost:8080/actuator/metrics/jvm.memory.used
 
 ## 支持与反馈
 
-- **文档**: [https://github.com/smartloli/EFAK-AI](https://github.com/smartloli/EFAK-AI)
-- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK-AI/issues)
-- **社区讨论**: [GitHub Discussions](https://github.com/smartloli/EFAK-AI/discussions)
+- **文档**: [https://github.com/smartloli/EFAK](https://github.com/smartloli/EFAK)
+- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK/issues)
+- **社区讨论**: [GitHub Discussions](https://github.com/smartloli/EFAK/discussions)
 
 ---
 

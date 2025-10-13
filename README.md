@@ -98,8 +98,8 @@ cd EFAK-AI
 #### 一键启动
 ```bash
 # 1. 克隆项目
-git clone https://github.com/smartloli/EFAK-AI.git
-cd EFAK-AI
+git clone https://github.com/smartloli/EFAK.git
+cd EFAK
 
 # 2. 启动所有服务（包括 MySQL、Redis）
 docker-compose up -d
@@ -148,13 +148,13 @@ docker-compose logs -f
 #### 1. 构建安装包
 ```bash
 # 克隆项目
-git clone https://github.com/smartloli/EFAK-AI.git
-cd EFAK-AI
+git clone https://github.com/smartloli/EFAK.git
+cd EFAK
 
 # 执行构建脚本
 ./build-package.sh
 
-# 生成安装包: efak-ai-5.0.0.tar.gz
+# 生成安装包: efak-5.0.0.tar.gz
 ```
 
 #### 2. 部署安装包
@@ -245,8 +245,8 @@ ps aux | grep KafkaEagle
 #### 开发步骤
 ```bash
 # 1. 克隆项目
-git clone https://github.com/smartloli/EFAK-AI.git
-cd EFAK-AI
+git clone https://github.com/smartloli/EFAK.git
+cd EFAK
 
 # 2. 创建数据库并导入 SQL 脚本
 mysql -u root -p
@@ -406,8 +406,8 @@ efak-web/src/main/java/org/kafka/eagle/
 ## 联系方式
 
 - 官网主页: https://www.kafka-eagle.org/
-- 项目主页: https://github.com/smartloli/EFAK-AI
-- 问题反馈: https://github.com/smartloli/EFAK-AI/issues
+- 项目主页: https://github.com/smartloli/EFAK
+- 问题反馈: https://github.com/smartloli/EFAK/issues
 - 作者: Mr.SmartLoli
 
 ## 更新日志

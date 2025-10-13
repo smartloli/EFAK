@@ -450,10 +450,9 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ## 链接
 
-- **GitHub**: [https://github.com/smartloli/EFAK-AI](https://github.com/smartloli/EFAK-AI)
+- **GitHub**: [https://github.com/smartloli/EFAK](https://github.com/smartloli/EFAK)
 - **官方网站**: [https://www.kafka-eagle.org](https://www.kafka-eagle.org)
-- **文档**: [https://docs.kafka-eagle.org](https://docs.kafka-eagle.org)
-- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK-AI/issues)
+- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK/issues)
 
 ---
 
