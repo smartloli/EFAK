@@ -1,8 +1,9 @@
 -- 创建数据库
 CREATE DATABASE IF NOT EXISTS efak_ai;
+use efak_ai;
 
 -- 创建告警渠道表
-CREATE TABLE `ke_alert_channels` (
+CREATE TABLE if not exists efak_ai.`ke_alert_channels` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_id` varchar(50) NOT NULL DEFAULT '' COMMENT '集群ID',
   `name` varchar(255) NOT NULL COMMENT '渠道名称',
@@ -20,7 +21,7 @@ CREATE TABLE `ke_alert_channels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='告警渠道表';
 
 -- 创建告警类型配置表
-CREATE TABLE `ke_alert_type_configs` (
+CREATE TABLE if not exists efak_ai.`ke_alert_type_configs` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_id` varchar(50) NOT NULL DEFAULT '' COMMENT '集群ID',
   `type` varchar(50) NOT NULL COMMENT '告警类型',
@@ -43,7 +44,7 @@ CREATE TABLE `ke_alert_type_configs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='告警类型配置表';
 
 -- 创建告警任务表
-CREATE TABLE `ke_alerts` (
+CREATE TABLE if not exists efak_ai.`ke_alerts` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增ID字段',
   `alert_task_id` bigint NOT NULL COMMENT '告警任务ID（关联 ke_alert_type_configs 表的 ID）',
   `cluster_id` varchar(255) NOT NULL COMMENT '集群ID',
@@ -61,7 +62,7 @@ CREATE TABLE `ke_alerts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='告警信息表';
 
 -- 创建Broker信息表
-CREATE TABLE `ke_broker_info` (
+CREATE TABLE if not exists efak_ai.`ke_broker_info` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_id` varchar(255) NOT NULL COMMENT '唯一集群ID',
   `broker_id` int NOT NULL COMMENT 'Broker ID',
@@ -86,7 +87,7 @@ CREATE TABLE `ke_broker_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Kafka Broker信息表';
 
 -- 创建Broker性能指标历史数据表
-CREATE TABLE `ke_broker_metrics` (
+CREATE TABLE if not exists efak_ai.`ke_broker_metrics` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `broker_id` int NOT NULL COMMENT 'Broker ID',
   `host_ip` varchar(50) NOT NULL COMMENT '主机IP',
@@ -105,7 +106,7 @@ CREATE TABLE `ke_broker_metrics` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Broker性能指标历史数据表';
 
 -- AI对话消息表
-CREATE TABLE `ke_chat_message` (
+CREATE TABLE if not exists efak_ai.`ke_chat_message` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `session_id` varchar(64) NOT NULL COMMENT '会话ID',
   `username` varchar(100) NOT NULL COMMENT '用户名',
@@ -127,7 +128,7 @@ CREATE TABLE `ke_chat_message` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI对话消息表';
 
 --  AI对话会话表
-CREATE TABLE `ke_chat_session` (
+CREATE TABLE if not exists efak_ai.`ke_chat_session` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `username` varchar(100) NOT NULL COMMENT '用户名',
   `session_id` varchar(64) NOT NULL COMMENT '会话ID',
@@ -145,7 +146,7 @@ CREATE TABLE `ke_chat_session` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI对话会话表';
 
 -- 集群信息表
-CREATE TABLE `ke_cluster` (
+CREATE TABLE if not exists efak_ai.`ke_cluster` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `cluster_id` varchar(255) NOT NULL,
   `cluster_name` varchar(255) NOT NULL,
@@ -163,7 +164,7 @@ CREATE TABLE `ke_cluster` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='集群信息表';
 
 -- 消费者组主题信息表
-CREATE TABLE `ke_consumer_group_topic` (
+CREATE TABLE if not exists efak_ai.`ke_consumer_group_topic` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增主键ID',
   `cluster_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '集群ID',
   `group_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '消费者组ID',
@@ -190,7 +191,7 @@ CREATE TABLE `ke_consumer_group_topic` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='消费者组主题延迟数据采集表';
 
 -- 大模型配置表
-CREATE TABLE `ke_model_config` (
+CREATE TABLE if not exists efak_ai.`ke_model_config` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `model_name` varchar(100) NOT NULL COMMENT '模型名称',
   `api_type` varchar(50) NOT NULL COMMENT 'API类型',
@@ -214,7 +215,7 @@ CREATE TABLE `ke_model_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='大模型配置表';
 
 -- 性能监控表
-CREATE TABLE `ke_performance_monitor` (
+CREATE TABLE if not exists efak_ai.`ke_performance_monitor` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增ID',
   `cluster_id` varchar(255) NOT NULL COMMENT '集群ID',
   `kafka_host` varchar(255) NOT NULL DEFAULT '' COMMENT 'Kafka节点HOST',
@@ -235,7 +236,7 @@ CREATE TABLE `ke_performance_monitor` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='性能监控表';
 
 -- 任务执行历史表
-CREATE TABLE `ke_task_execution_history` (
+CREATE TABLE if not exists efak_ai.`ke_task_execution_history` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `task_id` bigint NOT NULL COMMENT '任务ID',
   `task_name` varchar(100) NOT NULL COMMENT '任务名称',
@@ -261,7 +262,7 @@ CREATE TABLE `ke_task_execution_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='任务执行历史表';
 
 -- 任务调度表
-CREATE TABLE `ke_task_scheduler` (
+CREATE TABLE if not exists efak_ai.`ke_task_scheduler` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `task_name` varchar(100) NOT NULL COMMENT '任务名称',
   `task_type` varchar(50) NOT NULL COMMENT '任务类型',
@@ -292,7 +293,7 @@ CREATE TABLE `ke_task_scheduler` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='任务调度表';
 
 -- Topic信息表
-CREATE TABLE `ke_topic_info` (
+CREATE TABLE if not exists efak_ai.`ke_topic_info` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `topic_name` varchar(255) NOT NULL COMMENT 'Topic名称',
   `partitions` int NOT NULL DEFAULT '0' COMMENT '分区数',
@@ -314,7 +315,7 @@ CREATE TABLE `ke_topic_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Topic信息表';
 
 -- Topic实例指标表
-CREATE TABLE `ke_topic_instant_metrics` (
+CREATE TABLE if not exists efak_ai.`ke_topic_instant_metrics` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_id` varchar(64) NOT NULL COMMENT '集群ID',
   `topic_name` varchar(255) NOT NULL COMMENT 'Topic名称',
@@ -333,7 +334,7 @@ CREATE TABLE `ke_topic_instant_metrics` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Topic当前实时指标表';
 
 -- Topic历史指标表
-CREATE TABLE `ke_topics_metrics` (
+CREATE TABLE if not exists efak_ai.`ke_topics_metrics` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `topic_name` varchar(255) NOT NULL COMMENT 'Topic名称',
   `record_count` bigint NOT NULL DEFAULT '0' COMMENT '记录数',
@@ -352,7 +353,7 @@ CREATE TABLE `ke_topics_metrics` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Topic指标采集明细表';
 
 -- 用户信息表
-CREATE TABLE `ke_users_info` (
+CREATE TABLE if not exists efak_ai.`ke_users_info` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `username` varchar(20) NOT NULL COMMENT '用户名',
   `password` varchar(100) NOT NULL COMMENT '密码',
@@ -365,7 +366,7 @@ CREATE TABLE `ke_users_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户信息表';
 
 -- 登录信息表
-CREATE TABLE `persistent_logins` (
+CREATE TABLE if not exists efak_ai.`persistent_logins` (
   `username` varchar(64) NOT NULL,
   `series` varchar(64) NOT NULL,
   `token` varchar(64) NOT NULL,
@@ -374,12 +375,12 @@ CREATE TABLE `persistent_logins` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='登录信息表';
 
 -- 插入默认管理员用户
-INSERT INTO `ke_users_info` (`username`, `password`, `origin_password`, `roles`, `status`) VALUES
+INSERT INTO efak_ai.`ke_users_info` (`username`, `password`, `origin_password`, `roles`, `status`) VALUES
 ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'ROLE_ADMIN', 'ACTIVE')
 ON DUPLICATE KEY UPDATE `password` = VALUES(`password`), `status` = VALUES(`status`);
 
 -- 插入默认任务调度配置
-INSERT INTO `ke_task_scheduler` (
+INSERT INTO efak_ai.`ke_task_scheduler` (
     task_name, task_type, cron_expression, description, status,
     last_execute_time, next_execute_time, execute_count, success_count, fail_count,
     last_execute_result, error_message, created_by, create_time, updated_by, update_time,
