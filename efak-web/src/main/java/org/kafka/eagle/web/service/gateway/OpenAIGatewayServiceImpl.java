@@ -262,9 +262,10 @@ public class OpenAIGatewayServiceImpl implements GatewayService {
                                 }
                             }
                         }
-                    } catch (IOException e) {
-                        log.error("解析OpenAI响应失败", e);
-                        sendError(emitter, "解析OpenAI响应失败: " + e.getMessage());
+                    } catch (Exception e) {
+                        // 这里可能包含JSON解析异常、客户端断开导致的send异常等，统一兜底避免线程异常退出
+                        log.error("处理OpenAI流式响应失败", e);
+                        sendError(emitter, "处理OpenAI流式响应失败: " + e.getMessage());
                     }
                 });
     }
@@ -375,8 +376,13 @@ public class OpenAIGatewayServiceImpl implements GatewayService {
                     .name("message")
                     .data(objectMapper.writeValueAsString(errorData)));
             emitter.complete();
-        } catch (IOException e) {
-            emitter.completeWithError(e);
+        } catch (Exception ignore) {
+            // 客户端断开/主动取消时，这里可能抛出异常，直接结束即可
+            try {
+                emitter.complete();
+            } catch (Exception e) {
+                // ignore
+            }
         }
     }
 }

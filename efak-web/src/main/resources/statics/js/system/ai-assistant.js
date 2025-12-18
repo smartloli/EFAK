@@ -15,6 +15,7 @@
     let eventSource = null; // SSE连接
     let isStreaming = false; // 是否正在流式传输
     let currentStreamId = null; // 当前流式传输ID
+    let isUserStopRequested = false; // 用户是否主动点击“停止”（用于抑制onerror误报）
 
     // 从URL参数中获取集群ID
     function getClusterIdFromUrl() {
@@ -430,6 +431,9 @@
         }
 
         try {
+            // 新一轮请求开始，重置“主动停止”标记
+            isUserStopRequested = false;
+
             // 生成流式传输ID
             currentStreamId = Date.now().toString();
 
@@ -444,7 +448,8 @@
             }
 
             // 建立SSE连接
-            eventSource = new EventSource(url);
+            const es = new EventSource(url);
+            eventSource = es;
 
             // 设置流式传输状态
             isStreaming = true;
@@ -455,9 +460,21 @@
             let aiResponse = '';
             let thinkingContent = '';
             let isThinking = false;
+            let isTerminal = false; // 是否已收到end/error
 
-            eventSource.onmessage = async function (event) {
-                const data = JSON.parse(event.data);
+            es.onmessage = async function (event) {
+                let data;
+                try {
+                    // 服务端可能发送ping/非JSON帧，这里做容错，避免一次解析失败导致“无返回”
+                    data = JSON.parse(event.data);
+                } catch (e) {
+                    console.warn('SSE消息解析失败，已忽略:', event.data, e);
+                    return;
+                }
+
+                if (!data || !data.type) {
+                    return;
+                }
 
                 if (data.type === 'thinking') {
                     // 处理思考内容
@@ -484,8 +501,11 @@
                     isThinking = false;
                     updateTypingMessage('', thinkingContent, false);
                 } else if (data.type === 'end') {
-                    eventSource.close();
-                    eventSource = null;
+                    isTerminal = true;
+                    es.close();
+                    if (eventSource === es) {
+                        eventSource = null;
+                    }
                     hideTypingIndicator();
                     addMessage(aiResponse, 'assistant', true, thinkingContent);
                     await saveMessageToDatabase(aiResponse, 'assistant');
@@ -494,19 +514,35 @@
                     // 重置发送按钮
                     resetSendButton();
                 } else if (data.type === 'error') {
-                    eventSource.close();
-                    eventSource = null;
+                    isTerminal = true;
+                    es.close();
+                    if (eventSource === es) {
+                        eventSource = null;
+                    }
                     hideTypingIndicator();
                     addMessage('AI回复出错: ' + data.message, 'assistant');
                     await saveMessageToDatabase('AI回复出错: ' + data.message, 'assistant');
                     // 重置发送按钮
                     resetSendButton();
+                } else if (data.type === 'ping') {
+                    // SSE保活帧：前端无需处理
+                    return;
                 }
             };
 
-            eventSource.onerror = async function (event) {
-                eventSource.close();
-                eventSource = null;
+            es.onerror = async function (event) {
+                // 正常结束/主动停止时，浏览器也可能触发onerror，这里避免误报
+                if (isTerminal || isUserStopRequested) {
+                    return;
+                }
+
+                try {
+                    es.close();
+                } catch (e) {
+                }
+                if (eventSource === es) {
+                    eventSource = null;
+                }
                 hideTypingIndicator();
                 addMessage('AI服务连接失败，请稍后重试', 'assistant');
                 await saveMessageToDatabase('AI服务连接失败，请稍后重试', 'assistant');
@@ -933,6 +969,9 @@
         }
 
         try {
+            // 标记为用户主动停止，避免关闭连接触发onerror误报
+            isUserStopRequested = true;
+
             // 关闭SSE连接
             if (eventSource) {
                 eventSource.close();
@@ -966,6 +1005,7 @@
             // 重置状态
             isStreaming = false;
             currentStreamId = null;
+            isUserStopRequested = false;
             hideTypingIndicator();
             resetSendButton();
         }
