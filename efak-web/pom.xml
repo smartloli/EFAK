@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kafka.eagle</groupId>
         <artifactId>efak</artifactId>
-        <version>${kafka.eagle.version}</version>
+        <version>5.0.0</version>
     </parent>
 
     <artifactId>efak-web</artifactId>
@@ -21,22 +21,22 @@
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-core</artifactId>
-            <version>${kafka.eagle.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-ai</artifactId>
-            <version>${kafka.eagle.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-tool</artifactId>
-            <version>${kafka.eagle.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-dto</artifactId>
-            <version>${kafka.eagle.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

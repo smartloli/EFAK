@@ -6,7 +6,11 @@ import org.kafka.eagle.core.util.NetUtils;
 import org.kafka.eagle.web.config.DistributedTaskConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -41,7 +45,6 @@ public class DistributedTaskCoordinator {
     private static final String SERVICE_REGISTRY_KEY = "efak:services:registry";
     private static final String SERVICE_HEARTBEAT_KEY = "efak:services:heartbeat:";
     private static final String TASK_SHARD_LOCK_KEY = "efak:task:shard:lock:";
-    private static final String SHARD_RESULT_KEY = "efak:task:shard:result:";
     private static final String TASK_SHARD_RESULT_KEY = "efak:task:shard:result:";
     
     // 服务心跳超时时间（秒）
@@ -60,13 +63,13 @@ public class DistributedTaskCoordinator {
     
     /**
      * 生成节点ID
-     * 使用IP地址作为唯一标识，避免同一台服务器多个进程被识别为不同服务
+     * 使用 IP+端口+进程信息，确保同一台机器上不同实例也能正确参与分片与统计
      */
     private String generateNodeId() {
         String hostName = NetUtils.getLocalAddress();
         String pid = String.valueOf(ProcessHandle.current().pid());
-        // 保持完整的节点ID用于内部标识和日志
-        return hostName + "-" + pid + "-" + System.currentTimeMillis();
+        // 关键逻辑：加入端口避免“同IP不同实例”被误判为同一个服务
+        return hostName + "-" + serverPort + "-" + pid + "-" + System.currentTimeMillis();
     }
     
     /**
@@ -76,13 +79,19 @@ public class DistributedTaskCoordinator {
         if (nodeId == null) {
             return null;
         }
-        // 从nodeId中提取IP地址部分，并结合端口作为服务唯一标识
-        int firstDashIndex = nodeId.indexOf('-');
-        if (firstDashIndex > 0) {
-            String ipAddress = nodeId.substring(0, firstDashIndex);
+        // 关键逻辑：兼容老格式 nodeId=ip-pid-ts，以及新格式 nodeId=ip-port-pid-ts
+        String[] parts = nodeId.split("-");
+        if (parts.length >= 4) {
+            String ipAddress = parts[0];
+            String port = parts[1];
+            return ipAddress + ":" + port;
+        }
+        if (parts.length >= 2) {
+            String ipAddress = parts[0];
+            // 老节点ID不含端口时，只能退化为“当前端口”
             return ipAddress + ":" + serverPort;
         }
-        return nodeId + ":" + serverPort;
+        return nodeId;
     }
     
     /**
@@ -93,6 +102,7 @@ public class DistributedTaskCoordinator {
             Map<String, Object> serviceInfo = new HashMap<>();
             serviceInfo.put("nodeId", currentNodeId);
             serviceInfo.put("hostname", NetUtils.getLocalAddress());
+            serviceInfo.put("port", serverPort);
             serviceInfo.put("pid", ProcessHandle.current().pid());
             serviceInfo.put("startTime", LocalDateTime.now().toString());
             serviceInfo.put("lastHeartbeat", LocalDateTime.now().toString());
@@ -212,12 +222,14 @@ public class DistributedTaskCoordinator {
                     
                     // 解析节点ID获取IP和端口
                     String[] parts = nodeId.split("-");
-                    if (parts.length >= 2) {
+                    if (parts.length >= 4) {
                         String ipAddress = parts[0];
-                        String pid = parts[1];
+                        String port = parts[1];
+                        String pid = parts[2];
                         
                         serviceInfo.put("nodeId", nodeId);
                         serviceInfo.put("ipAddress", ipAddress);
+                        serviceInfo.put("port", port);
                         serviceInfo.put("pid", pid);
                         serviceInfo.put("status", "ONLINE");
                         
@@ -229,6 +241,18 @@ public class DistributedTaskCoordinator {
                             serviceInfo.put("lastHeartbeat", "未知");
                         }
                         
+                        serviceDetails.add(serviceInfo);
+                    } else if (parts.length >= 2) {
+                        // 兼容老格式 nodeId=ip-pid-ts
+                        String ipAddress = parts[0];
+                        String pid = parts[1];
+                        serviceInfo.put("nodeId", nodeId);
+                        serviceInfo.put("ipAddress", ipAddress);
+                        serviceInfo.put("port", String.valueOf(serverPort));
+                        serviceInfo.put("pid", pid);
+                        serviceInfo.put("status", "ONLINE");
+                        Object heartbeatTime = redisTemplate.opsForValue().get(heartbeatKey);
+                        serviceInfo.put("lastHeartbeat", heartbeatTime != null ? heartbeatTime.toString() : "未知");
                         serviceDetails.add(serviceInfo);
                     }
                 }
@@ -554,15 +578,29 @@ public class DistributedTaskCoordinator {
     public Map<String, Object> getAllShardResults(String taskType) {
         try {
             String pattern = TASK_SHARD_RESULT_KEY + taskType + ":*";
-            Set<String> keys = redisTemplate.keys(pattern);
-            
+            Set<String> keys = scanKeys(pattern);
+            String keyPrefix = TASK_SHARD_RESULT_KEY + taskType + ":";
+
             Map<String, Object> allResults = new HashMap<>();
-            if (keys != null) {
-                for (String key : keys) {
-                    Object result = redisTemplate.opsForValue().get(key);
-                    if (result != null) {
-                        String nodeId = key.substring(key.lastIndexOf(":") + 1);
-                        allResults.put(nodeId, result);
+            if (keys != null && !keys.isEmpty()) {
+                // 关键逻辑：批量拉取结果，减少 Redis 往返次数
+                List<String> keyList = new ArrayList<>(keys);
+                final int batchSize = 200;
+                for (int i = 0; i < keyList.size(); i += batchSize) {
+                    List<String> batchKeys = keyList.subList(i, Math.min(i + batchSize, keyList.size()));
+                    List<Object> batchValues = redisTemplate.opsForValue().multiGet(batchKeys);
+                    if (batchValues == null) {
+                        continue;
+                    }
+                    for (int j = 0; j < batchKeys.size(); j++) {
+                        Object value = batchValues.get(j);
+                        if (value == null) {
+                            continue;
+                        }
+                        String key = batchKeys.get(j);
+                        String nodeId = key.startsWith(keyPrefix) ? key.substring(keyPrefix.length())
+                                : key.substring(key.lastIndexOf(":") + 1);
+                        allResults.put(nodeId, value);
                     }
                 }
             }
@@ -581,13 +619,39 @@ public class DistributedTaskCoordinator {
     public void clearShardResults(String taskType) {
         try {
             String pattern = TASK_SHARD_RESULT_KEY + taskType + ":*";
-            Set<String> keys = redisTemplate.keys(pattern);
-            
-            if (keys != null && !keys.isEmpty()) {
-                redisTemplate.delete(keys);
+            Set<String> keys = scanKeys(pattern);
+            if (keys == null || keys.isEmpty()) {
+                return;
+            }
+
+            // 关键逻辑：分批删除，避免一次性删除过多 key
+            List<String> keyList = new ArrayList<>(keys);
+            final int batchSize = 500;
+            for (int i = 0; i < keyList.size(); i += batchSize) {
+                List<String> batchKeys = keyList.subList(i, Math.min(i + batchSize, keyList.size()));
+                redisTemplate.delete(batchKeys);
             }
         } catch (Exception e) {
             log.error("清理分片任务结果失败", e);
         }
+    }
+
+    private Set<String> scanKeys(String pattern) {
+        // 关键逻辑：用 SCAN 替代 KEYS，避免 Redis 阻塞
+        return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = new LinkedHashSet<>();
+            RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
+            ScanOptions options = ScanOptions.scanOptions().match(pattern).count(1000).build();
+
+            try (Cursor<byte[]> cursor = connection.scan(options)) {
+                while (cursor.hasNext()) {
+                    String key = serializer.deserialize(cursor.next());
+                    if (key != null) {
+                        keys.add(key);
+                    }
+                }
+            }
+            return keys;
+        });
     }
 }

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kafka.eagle</groupId>
         <artifactId>efak</artifactId>
-        <version>${kafka.eagle.version}</version>
+        <version>5.0.0</version>
     </parent>
 
     <artifactId>efak-core</artifactId>
@@ -22,12 +22,12 @@
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-tool</artifactId>
-            <version>${kafka.eagle.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-dto</artifactId>
-            <version>${kafka.eagle.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Kafka Dependencies -->

@@ -19,6 +19,9 @@ package org.kafka.eagle.web.util;
 
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.common.config.SslConfigs;
 import org.kafka.eagle.dto.broker.BrokerInfo;
 import org.kafka.eagle.dto.cluster.KafkaClusterInfo;
 import org.kafka.eagle.dto.cluster.KafkaClientInfo;
@@ -38,6 +41,23 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class KafkaClientUtils {
+
+    private static String getString(Map<String, Object> map, String key) {
+        // 关键逻辑：兼容 JSON 值为非 String 的情况（例如被解析为 Number/Boolean）
+        if (map == null || key == null) {
+            return null;
+        }
+        Object value = map.get(key);
+        return value == null ? null : String.valueOf(value);
+    }
+
+    private static String maskJaas(String jaas) {
+        // 关键逻辑：避免日志输出敏感信息
+        if (jaas == null || jaas.isBlank()) {
+            return "<empty>";
+        }
+        return "<configured>";
+    }
 
     /**
      * 构建KafkaClientInfo对象
@@ -66,32 +86,68 @@ public class KafkaClientUtils {
 
         // 从数据库ke_cluster获取当前集群是否需要认证
         if ("Y".equals(cluster.getAuth())) {
-            kafkaClientInfo.setSasl(true);
-
             // 解析auth_config的JSON字符串
             String authConfig = cluster.getAuthConfig();
             if (authConfig != null && !authConfig.trim().isEmpty()) {
                 try {
-                    Map<String, String> authMap = JSON.parseObject(authConfig, Map.class);
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> authMap = JSON.parseObject(authConfig, Map.class);
 
-                    String securityProtocol = authMap.get("security.protocol");
-                    if (securityProtocol != null) {
+                    String securityProtocol = getString(authMap, CommonClientConfigs.SECURITY_PROTOCOL_CONFIG);
+                    if (securityProtocol == null || securityProtocol.isBlank()) {
+                        throw new IllegalArgumentException("Kafka认证已启用但缺少 security.protocol");
+                    }
+
+                    // 关键逻辑：根据 security.protocol 判断启用 SASL/SSL（支持 SASL_PLAINTEXT / SASL_SSL / SSL）
+                    if (securityProtocol.startsWith("SASL_")) {
+                        kafkaClientInfo.setSasl(true);
                         kafkaClientInfo.setSaslProtocol(securityProtocol);
+
+                        kafkaClientInfo.setSaslClientId(getString(authMap, CommonClientConfigs.CLIENT_ID_CONFIG));
+                        kafkaClientInfo.setSaslMechanism(getString(authMap, SaslConfigs.SASL_MECHANISM));
+                        kafkaClientInfo.setSaslJaasConfig(getString(authMap, SaslConfigs.SASL_JAAS_CONFIG));
+
+                        if (kafkaClientInfo.getSaslMechanism() == null || kafkaClientInfo.getSaslMechanism().isBlank()) {
+                            throw new IllegalArgumentException("Kafka认证已启用但缺少 sasl.mechanism");
+                        }
+                        if (kafkaClientInfo.getSaslJaasConfig() == null || kafkaClientInfo.getSaslJaasConfig().isBlank()) {
+                            throw new IllegalArgumentException("Kafka认证已启用但缺少 sasl.jaas.config");
+                        }
+
+                        // SASL_SSL 场景需要 SSL 参数（证书可选：可走 JVM 默认信任库）
+                        if (securityProtocol.endsWith("_SSL")) {
+                            kafkaClientInfo.setSsl(true);
+                            kafkaClientInfo.setSslProtocol(securityProtocol);
+                            kafkaClientInfo.setSslTruststoreLocation(getString(authMap, SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG));
+                            kafkaClientInfo.setSslTruststorePassword(getString(authMap, SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
+                            kafkaClientInfo.setSslKeystoreLocation(getString(authMap, SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG));
+                            kafkaClientInfo.setSslKeystorePassword(getString(authMap, SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG));
+                            kafkaClientInfo.setSslKeyPassword(getString(authMap, SslConfigs.SSL_KEY_PASSWORD_CONFIG));
+                            kafkaClientInfo.setSslAlgorithm(getString(authMap, SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG));
+                        }
+                    } else if ("SSL".equalsIgnoreCase(securityProtocol)) {
+                        kafkaClientInfo.setSsl(true);
+                        kafkaClientInfo.setSslProtocol("SSL");
+                        kafkaClientInfo.setSslTruststoreLocation(getString(authMap, SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG));
+                        kafkaClientInfo.setSslTruststorePassword(getString(authMap, SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
+                        kafkaClientInfo.setSslKeystoreLocation(getString(authMap, SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG));
+                        kafkaClientInfo.setSslKeystorePassword(getString(authMap, SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG));
+                        kafkaClientInfo.setSslKeyPassword(getString(authMap, SslConfigs.SSL_KEY_PASSWORD_CONFIG));
+                        kafkaClientInfo.setSslAlgorithm(getString(authMap, SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG));
+                    } else {
+                        // 关键逻辑：认证开关已开启，但协议不支持，直接失败以便快速暴露配置问题
+                        throw new IllegalArgumentException("Kafka认证已启用但 security.protocol 不支持: " + securityProtocol);
                     }
 
-                    String saslMechanism = authMap.get("sasl.mechanism");
-                    if (saslMechanism != null) {
-                        kafkaClientInfo.setSaslMechanism(saslMechanism);
-                    }
-
-                    String saslJaasConfig = authMap.get("sasl.jaas.config");
-                    if (saslJaasConfig != null) {
-                        kafkaClientInfo.setSaslJaasConfig(saslJaasConfig);
-                    }
-
+                    log.info("构建KafkaClientInfo完成: clusterId={}, security.protocol={}, sasl={}, ssl={}, sasl.mechanism={}, sasl.jaas={}",
+                            cluster.getClusterId(), securityProtocol, kafkaClientInfo.isSasl(), kafkaClientInfo.isSsl(),
+                            kafkaClientInfo.getSaslMechanism(), maskJaas(kafkaClientInfo.getSaslJaasConfig()));
                 } catch (Exception e) {
-                    log.warn("解析集群 {} 的认证配置失败: {}", cluster.getClusterId(), e.getMessage());
+                    log.warn("解析集群 {} 的认证配置失败: {}", cluster.getClusterId(), e.getMessage(), e);
+                    throw e;
                 }
+            } else {
+                throw new IllegalArgumentException("Kafka认证已启用但 auth_config 为空");
             }
         }
 
@@ -152,6 +208,14 @@ public class KafkaClientUtils {
         if (kafkaClientInfo.isSasl()) {
             if (kafkaClientInfo.getSaslProtocol() == null || kafkaClientInfo.getSaslProtocol().trim().isEmpty()) {
                 log.warn("SASL认证已启用但缺少安全协议配置");
+                return false;
+            }
+            if (kafkaClientInfo.getSaslMechanism() == null || kafkaClientInfo.getSaslMechanism().trim().isEmpty()) {
+                log.warn("SASL认证已启用但缺少 sasl.mechanism 配置");
+                return false;
+            }
+            if (kafkaClientInfo.getSaslJaasConfig() == null || kafkaClientInfo.getSaslJaasConfig().trim().isEmpty()) {
+                log.warn("SASL认证已启用但缺少 sasl.jaas.config 配置");
                 return false;
             }
         }

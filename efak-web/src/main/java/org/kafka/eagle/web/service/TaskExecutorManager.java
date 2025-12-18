@@ -197,6 +197,15 @@ public class TaskExecutorManager {
             List<String> assignedTopicNames = taskCoordinator.shardTopics(allTopicNames);
 
             if (assignedTopicNames.isEmpty()) {
+                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
+                Map<String, Object> shardResult = new HashMap<>();
+                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
+                shardResult.put("assignedTopicCount", 0);
+                shardResult.put("partitionCount", 0L);
+                shardResult.put("processedTopicNames", Collections.emptyList());
+                shardResult.put("savedToDatabase", 0);
+                taskCoordinator.saveShardResult("topic_monitor", shardResult);
+
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到主题，任务完成");
                 return result;
@@ -453,6 +462,16 @@ public class TaskExecutorManager {
             List<String> assignedConsumerGroupIds = taskCoordinator.shardConsumerGroups(allConsumerGroupIds);
 
             if (assignedConsumerGroupIds.isEmpty()) {
+                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
+                Map<String, Object> shardResult = new HashMap<>();
+                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
+                shardResult.put("assignedConsumerGroupCount", 0);
+                shardResult.put("activeConsumers", 0);
+                shardResult.put("lagConsumers", 0);
+                shardResult.put("totalLag", 0L);
+                shardResult.put("processedConsumerGroupIds", Collections.emptyList());
+                taskCoordinator.saveShardResult("consumer_monitor", shardResult);
+
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到消费者组，任务完成");
                 return result;
@@ -615,6 +634,17 @@ public class TaskExecutorManager {
             List<Integer> assignedBrokerIds = taskCoordinator.shardBrokers(allBrokerIds);
 
             if (assignedBrokerIds.isEmpty()) {
+                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
+                Map<String, Object> shardResult = new HashMap<>();
+                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
+                shardResult.put("assignedBrokerCount", 0);
+                shardResult.put("onlineBrokers", 0);
+                shardResult.put("offlineBrokers", 0);
+                shardResult.put("updatedBrokers", 0);
+                shardResult.put("savedMetrics", 0);
+                shardResult.put("processedBrokerIds", Collections.emptyList());
+                taskCoordinator.saveShardResult("cluster_monitor", shardResult);
+
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到broker，任务完成");
                 return result;
@@ -824,6 +854,16 @@ public class TaskExecutorManager {
             List<Long> assignedConfigIds = taskCoordinator.shardAlertConfigs(allConfigIds);
 
             if (assignedConfigIds.isEmpty()) {
+                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
+                Map<String, Object> shardResult = new HashMap<>();
+                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
+                shardResult.put("assignedConfigCount", 0);
+                shardResult.put("evaluatedCount", 0);
+                shardResult.put("triggeredCount", 0);
+                shardResult.put("sentCount", 0);
+                shardResult.put("processedConfigIds", Collections.emptyList());
+                taskCoordinator.saveShardResult("alert_monitor", shardResult);
+
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到告警配置，任务完成");
                 return result;
@@ -1366,6 +1406,16 @@ public class TaskExecutorManager {
             List<String> assignedTables = taskCoordinator.shardTables(tableNames);
 
             if (assignedTables.isEmpty()) {
+                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
+                Map<String, Object> shardResult = new HashMap<>();
+                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
+                shardResult.put("assignedTableCount", 0);
+                shardResult.put("cleanedRecords", 0);
+                shardResult.put("freedSpace", 0L);
+                shardResult.put("cleanupResults", Collections.emptyMap());
+                shardResult.put("processedTables", Collections.emptyList());
+                taskCoordinator.saveShardResult("data_cleanup", shardResult);
+
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到清理表，任务完成");
                 return result;
@@ -1455,6 +1505,16 @@ public class TaskExecutorManager {
             List<Integer> assignedBrokerIds = taskCoordinator.shardBrokers(allBrokerIds);
 
             if (assignedBrokerIds.isEmpty()) {
+                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
+                Map<String, Object> shardResult = new HashMap<>();
+                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
+                shardResult.put("assignedBrokerCount", 0);
+                shardResult.put("successCount", 0);
+                shardResult.put("failureCount", 0);
+                shardResult.put("savedCount", 0);
+                shardResult.put("processedBrokerIds", Collections.emptyList());
+                taskCoordinator.saveShardResult("performance_stats", shardResult);
+
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到broker，任务完成");
                 return result;

@@ -81,9 +81,18 @@ public class KafkaSchemaInitialize {
         JSONObject configJson = JSON.parseObject(authConfig);
         String securityProtocol = configJson.getString(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG);
 
-        if (ClusterMetricsConst.Cluster.AUTH_TYPE_SASL.key().equals(securityProtocol)) {
+        if (StrUtil.isBlank(securityProtocol)) {
+            return;
+        }
+
+        // 关键逻辑：Kafka 的 security.protocol 通常为 SASL_PLAINTEXT / SASL_SSL / SSL / PLAINTEXT
+        if (securityProtocol.startsWith("SASL_")) {
             configureSasl(clientInfo, configJson);
-        } else if (ClusterMetricsConst.Cluster.AUTH_TYPE_SSL.key().equals(securityProtocol)) {
+            // SASL_SSL 同时需要 SSL 参数（证书配置可选）
+            if (securityProtocol.endsWith("_SSL")) {
+                configureSsl(clientInfo, configJson);
+            }
+        } else if ("SSL".equalsIgnoreCase(securityProtocol)) {
             configureSsl(clientInfo, configJson);
         }
     }

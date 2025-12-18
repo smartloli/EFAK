@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <kafka.eagle.version>5.0.0</kafka.eagle.version>
+        <!-- 统一版本号：子模块/内部依赖使用 ${project.version} 继承即可 -->
         <kafka.version>4.0.0</kafka.version>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,7 +17,7 @@
     <groupId>org.kafka.eagle</groupId>
     <artifactId>efak</artifactId>
     <packaging>pom</packaging>
-    <version>${kafka.eagle.version}</version>
+    <version>5.0.0</version>
     <name>efak</name>
 
     <parent>

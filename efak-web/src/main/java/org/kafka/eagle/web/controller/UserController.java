@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.kafka.eagle.web.service.UserService;
 import org.kafka.eagle.dto.user.UserInfo;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -43,6 +44,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    // 关键逻辑：生成密码应使用强随机数，避免 Random 的可预测性
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     /**
      * 分页获取所有用户列表
@@ -480,11 +485,9 @@ public class UserController {
      * 生成随机密码
      */
     private String generateRandomPassword() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder();
-        Random random = new Random();
         for (int i = 0; i < 8; i++) {
-            sb.append(chars.charAt(random.nextInt(chars.length())));
+            sb.append(PASSWORD_CHARS.charAt(SECURE_RANDOM.nextInt(PASSWORD_CHARS.length())));
         }
         return sb.toString();
     }

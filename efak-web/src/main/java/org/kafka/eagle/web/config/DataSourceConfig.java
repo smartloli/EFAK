@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 
 /**
  * <p>
@@ -64,11 +65,14 @@ public class DataSourceConfig {
                     .build();
 
             // 测试连接
-            dataSource.getConnection().close();
+            // 关键逻辑：使用 try-with-resources，确保连接在异常情况下也能正确释放
+            try (Connection connection = dataSource.getConnection()) {
+                // no-op
+            }
             return dataSource;
 
         } catch (Exception e) {
-            log.error("数据库连接失败，使用H2内存数据库: {}", e.getMessage());
+            log.error("数据库连接失败，使用H2内存数据库: {}", e.getMessage(), e);
 
             // 降级到H2内存数据库
             return DataSourceBuilder.create()
