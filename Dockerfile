@@ -30,7 +30,7 @@ RUN mvn clean package -DskipTests -B
 # ========================================
 # 第二阶段：运行阶段
 # ========================================
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 
 # 设置维护者信息
 LABEL maintainer="Mr.SmartLoli <smartloli.org@gmail.com>"
