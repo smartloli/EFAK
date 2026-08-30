@@ -39,15 +39,16 @@ echo -e "${GREEN}================================${NC}"
 echo ""
 echo "请选择部署方式:"
 echo ""
-echo "  1) Docker Compose 部署 (推荐)"
+echo "  1) Docker Compose 部署 (单节点)"
 echo "  2) Docker 手动构建并部署"
 echo "  3) 构建 tar.gz 安装包"
 echo "  4) 停止 Docker 服务"
 echo "  5) 查看 Docker 日志"
 echo "  6) 查看 Docker 状态"
-echo "  7) 退出"
+echo "  7) 分布式 Docker 部署 (Web + Worker，一键)"
+echo "  8) 退出"
 echo ""
-read -p "请输入选项 [1-7]: " choice
+read -p "请输入选项 [1-8]: " choice
 
 case $choice in
     1)
@@ -246,6 +247,21 @@ case $choice in
         ;;
 
     7)
+        echo -e "${YELLOW}使用分布式 Docker 部署 (Web + Worker)...${NC}"
+        if [ ! -f "./deploy-distributed.sh" ]; then
+            echo -e "${RED}错误: 未找到 deploy-distributed.sh${NC}"
+            exit 1
+        fi
+        chmod +x ./deploy-distributed.sh
+        echo ""
+        read -p "Web 副本数 [1]: " web_n
+        read -p "Worker 副本数 [2]: " worker_n
+        web_n="${web_n:-1}"
+        worker_n="${worker_n:-2}"
+        ./deploy-distributed.sh --web "${web_n}" --workers "${worker_n}"
+        ;;
+
+    8)
         echo -e "${GREEN}退出${NC}"
         exit 0
         ;;

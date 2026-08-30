@@ -796,52 +796,9 @@ const TopicsModule = {
 
     // 显示提示信息
     showAlert(message, type = 'info') {
-        // 创建提示框
-        const alert = document.createElement('div');
-        alert.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-md shadow-lg transition-all duration-300 transform translate-x-full`;
-        
-        const typeClasses = {
-            'success': 'bg-green-100 border border-green-400 text-green-700',
-            'error': 'bg-red-100 border border-red-400 text-red-700',
-            'warning': 'bg-yellow-100 border border-yellow-400 text-yellow-700',
-            'info': 'bg-blue-100 border border-blue-400 text-blue-700'
-        };
-        
-        alert.className += ' ' + (typeClasses[type] || typeClasses['info']);
-        
-        const icons = {
-            'success': 'fa-check-circle',
-            'error': 'fa-exclamation-circle',
-            'warning': 'fa-exclamation-triangle',
-            'info': 'fa-info-circle'
-        };
-        
-        alert.innerHTML = `
-            <div class="flex items-center">
-                <i class="fa ${icons[type] || icons['info']} mr-2"></i>
-                <span>${message}</span>
-                <button class="ml-4 text-gray-400 hover:text-gray-600" onclick="this.parentElement.parentElement.remove()">
-                    <i class="fa fa-times"></i>
-                </button>
-            </div>
-        `;
-        
-        document.body.appendChild(alert);
-        
-        // 显示动画
-        setTimeout(() => {
-            alert.classList.remove('translate-x-full');
-        }, 100);
-        
-        // 自动隐藏
-        setTimeout(() => {
-            alert.classList.add('translate-x-full');
-            setTimeout(() => {
-                if (alert.parentElement) {
-                    alert.remove();
-                }
-            }, 300);
-        }, 3000);
+        if (window.efakShowToast) {
+            window.efakShowToast(message, type);
+        }
     },
 
     // 初始化表格功能
@@ -972,12 +929,12 @@ const TopicsModule = {
                 </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                     ${topic.partitions || 0}
                 </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                     ${topic.replicas || 0}
                 </span>
             </td>
@@ -1000,7 +957,7 @@ const TopicsModule = {
                 </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
                     ${retentionTimeText}
                 </span>
             </td>
@@ -1454,12 +1411,12 @@ const TopicsModule = {
         const iconColor = $icon.data('color');
 
         return $(`
-            <div class="flex items-center">
+            <div class="flex items-center gap-3">
                 <div class="icon-preview icon-color-${iconColor}">
                     <i class="fa ${iconClass}"></i>
                 </div>
                 <div class="icon-info">
-                    <div class="icon-title">${icon.text}</div>
+                    <div class="icon-title">${icon.text.trim()}</div>
                 </div>
             </div>
         `);
@@ -1735,8 +1692,8 @@ const TopicsModule = {
         const datasets = (data.datasets || []).map(dataset => ({
             label: dataset.label,
             data: dataset.data,
-            borderColor: dataset.borderColor || '#3b82f6',
-            backgroundColor: dataset.backgroundColor || 'rgba(59, 130, 246, 0.1)',
+            borderColor: dataset.borderColor || '#165DFF',
+            backgroundColor: dataset.backgroundColor || 'rgba(22, 93, 255, 0.1)',
             fill: true, // 使用area样式
             tension: 0.4
         }));

@@ -32,18 +32,18 @@
 
         .stat-card {
             background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border-left: 4px solid var(--accent-color);
+            border-radius: 2px;
+            padding: 16px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+            border-left: 2px solid var(--accent-color);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
         }
 
         .stat-card.critical {
@@ -55,7 +55,7 @@
         }
 
         .stat-card.info {
-            --accent-color: #3b82f6;
+            --accent-color: #165DFF;
         }
 
         .stat-card.success {
@@ -72,7 +72,7 @@
         .stat-icon {
             width: 48px;
             height: 48px;
-            border-radius: 12px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -84,7 +84,7 @@
         .stat-trend {
             font-size: 12px;
             padding: 4px 8px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-weight: 500;
         }
 
@@ -114,7 +114,7 @@
         /* 筛选和搜索区域 */
         .filter-section {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             padding: 24px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             margin-bottom: 24px;
@@ -142,20 +142,20 @@
         .filter-input {
             padding: 12px 16px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             transition: border-color 0.2s ease;
         }
 
         .filter-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         .filter-btn {
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-weight: 500;
             border: none;
             cursor: pointer;
@@ -166,12 +166,12 @@
         }
 
         .filter-btn.primary {
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
         }
 
         .filter-btn.primary:hover {
-            background: #2563eb;
+            background: #0E4AE6;
         }
 
         .filter-btn.secondary {
@@ -186,7 +186,7 @@
         /* 告警表格 */
         .alerts-table {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
@@ -194,7 +194,7 @@
         .table-container {
             overflow-x: auto;
             overflow-y: hidden;
-            border-radius: 0 0 16px 16px;
+            border-radius: 0 0 4px 4px;
             position: relative;
         }
 
@@ -204,12 +204,12 @@
 
         .table-container::-webkit-scrollbar-track {
             background: #f1f5f9;
-            border-radius: 4px;
+            border-radius: 2px;
         }
 
         .table-container::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-            border-radius: 4px;
+            border-radius: 2px;
         }
 
         .table-container::-webkit-scrollbar-thumb:hover {
@@ -340,7 +340,7 @@
             align-items: center;
             gap: 6px;
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 600;
         }
@@ -357,7 +357,7 @@
 
         .alert-level.info {
             background: #eff6ff;
-            color: #2563eb;
+            color: #0E4AE6;
         }
 
         .alert-level-dot {
@@ -375,7 +375,7 @@
         }
 
         .alert-level.info .alert-level-dot {
-            background: #2563eb;
+            background: #0E4AE6;
         }
 
         /* 告警状态 */
@@ -384,7 +384,7 @@
             align-items: center;
             gap: 6px;
             padding: 4px 8px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
         }
@@ -410,7 +410,7 @@
             align-items: center;
             gap: 6px;
             padding: 4px 8px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
             background: #f1f5f9;
@@ -427,7 +427,7 @@
         .channel-icon {
             width: 20px;
             height: 20px;
-            border-radius: 4px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -459,7 +459,7 @@
             background: #1f2937;
             color: white;
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
             font-size: 0.75rem;
             white-space: nowrap;
             z-index: 100;
@@ -476,7 +476,7 @@
         .action-btn {
             width: 32px;
             height: 32px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             border: none;
             cursor: pointer;
@@ -498,7 +498,7 @@
             background: #1f2937;
             color: white;
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
             font-size: 0.75rem;
             white-space: nowrap;
             z-index: 1000;
@@ -538,12 +538,12 @@
         }
 
         .action-btn.view {
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
         }
 
         .action-btn.view:hover {
-            background: #2563eb;
+            background: #0E4AE6;
             transform: translateY(-1px);
         }
 
@@ -591,7 +591,7 @@
             padding: 8px 12px;
             border: 1px solid #d1d5db;
             background: white;
-            border-radius: 6px;
+            border-radius: 2px;
             font-size: 0.875rem;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -602,9 +602,9 @@
         }
 
         .pagination-btn.active {
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
-            border-color: #3b82f6;
+            border-color: #165DFF;
         }
 
         .pagination-btn:disabled {
@@ -632,7 +632,7 @@
 
         .alert-modal-content {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             padding: 32px;
             max-width: 800px;
             width: 90%;
@@ -660,7 +660,7 @@
         }
 
         .alert-modal-title i {
-            color: #3b82f6;
+            color: #165DFF;
         }
 
         .close-btn {
@@ -670,7 +670,7 @@
             cursor: pointer;
             color: #6b7280;
             padding: 4px;
-            border-radius: 4px;
+            border-radius: 2px;
             transition: all 0.2s ease;
         }
 
@@ -701,7 +701,7 @@
             color: #4b5563;
             background: #f8fafc;
             padding: 16px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-family: 'Courier New', monospace;
             white-space: pre-wrap;
             border: 1px solid #e2e8f0;
@@ -718,7 +718,7 @@
         .alert-meta-item {
             background: #f8fafc;
             padding: 16px;
-            border-radius: 8px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
         }
 
@@ -749,7 +749,7 @@
             gap: 8px;
             padding: 8px 12px;
             background: #f8fafc;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
         }
 
@@ -775,7 +775,7 @@
         .rebalance-section {
             background: #fffbeb;
             border: 1px solid #fed7aa;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 16px;
             margin-top: 16px;
         }
@@ -819,7 +819,7 @@
             justify-content: space-between;
             padding: 16px;
             background: #f8fafc;
-            border-radius: 8px;
+            border-radius: 2px;
             margin-bottom: 12px;
             border: 1px solid #e2e8f0;
         }
@@ -856,7 +856,7 @@
             width: 80px;
             padding: 6px 8px;
             border: 1px solid #d1d5db;
-            border-radius: 4px;
+            border-radius: 2px;
             font-size: 0.875rem;
             text-align: center;
         }
@@ -888,7 +888,7 @@
             bottom: 0;
             background-color: #d1d5db;
             transition: 0.3s;
-            border-radius: 24px;
+            border-radius: 2px;
         }
 
         .config-slider:before {
@@ -904,7 +904,7 @@
         }
 
         input:checked+.config-slider {
-            background-color: #3b82f6;
+            background-color: #165DFF;
         }
 
         input:checked+.config-slider:before {
@@ -920,15 +920,15 @@
         #create-alert-type-modal .select2-container--default .select2-selection--multiple {
             min-height: 44px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 6px 12px;
         }
 
         #create-alert-type-modal .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 2px;
             padding: 2px 8px;
             margin: 2px;
         }
@@ -949,12 +949,12 @@
         }
 
         #create-alert-type-modal .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #3b82f6;
+            background-color: #165DFF;
         }
 
         #create-alert-type-modal .select2-container--default .select2-selection--multiple:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         #create-alert-type-modal .select2-container--default .select2-selection--multiple .select2-selection__rendered {
@@ -973,7 +973,7 @@
         #create-alert-type-modal .select2-container--default .select2-selection--single {
             height: 44px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 6px 12px;
             display: flex;
             align-items: center;
@@ -995,8 +995,8 @@
         }
 
         #create-alert-type-modal .select2-container--default .select2-selection--single:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         /* 删除确认模态框样式 */
@@ -1011,7 +1011,7 @@
             background: #fef2f2;
             margin: -32px -32px 24px -32px;
             padding: 24px 32px;
-            border-radius: 16px 16px 0 0;
+            border-radius: 2px 4px 0 0;
         }
 
         #delete-confirm-modal .alert-modal-title,
@@ -1038,7 +1038,7 @@
         #edit-alert-type-modal .alert-type-display {
             background: #f3f4f6;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 12px 16px;
             display: flex;
             align-items: center;
@@ -1059,7 +1059,7 @@
         #edit-channel-modal .channel-type-display {
             background: #f3f4f6;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 12px 16px;
             display: flex;
             align-items: center;
@@ -1074,7 +1074,7 @@
         .select2-container--default .select2-selection--single {
             height: 40px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 6px 12px;
             line-height: 28px;
             display: flex;
@@ -1100,7 +1100,7 @@
 
         .select2-dropdown {
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
@@ -1110,12 +1110,12 @@
         }
 
         .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #3b82f6;
+            background-color: #165DFF;
         }
 
         .select2-container--default .select2-selection--single:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         /* 创建渠道模态框中的Select2样式 */
@@ -1168,7 +1168,7 @@
                 color: #6b7280;
                 background: #f8fafc;
                 padding: 4px 12px;
-                border-radius: 12px;
+                border-radius: 2px;
                 pointer-events: none;
                 z-index: 1;
             }
@@ -1195,7 +1195,7 @@
             }
 
             .alerts-table {
-                border-radius: 12px;
+                border-radius: 2px;
             }
         }
 
@@ -1230,9 +1230,8 @@
     <main class="main-content ml-64 pt-16 transition-all duration-300 ease-in-out">
         <div class="p-8">
             <!-- 页面标题 -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">系统告警</h1>
-                <p class="text-gray-600">监控 Kafka 集群运行状态，及时处理异常告警</p>
+            <div class="page-header">
+                <h1 class="page-header-title">告警</h1>
             </div>
 
             <!-- 告警统计 -->
@@ -1244,7 +1243,7 @@
                         </div>
                     </div>
                     <div class="stat-number" id="critical-count">0</div>
-                    <div class="stat-label">未处理告警</div>
+                    <div class="stat-label">未处理</div>
                 </div>
 
                 <div class="stat-card warning">
@@ -1254,7 +1253,7 @@
                         </div>
                     </div>
                     <div class="stat-number" id="warning-count">0</div>
-                    <div class="stat-label">已处理告警</div>
+                    <div class="stat-label">已处理</div>
                 </div>
 
                 <div class="stat-card info">
@@ -1264,7 +1263,7 @@
                         </div>
                     </div>
                     <div class="stat-number" id="info-count">0</div>
-                    <div class="stat-label">已忽略告警</div>
+                    <div class="stat-label">已忽略</div>
                 </div>
 
 

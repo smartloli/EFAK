@@ -299,7 +299,7 @@ cat > "${PACKAGE_DIR}/README.txt" << 'README'
 EFAK-AI v5.0.0
 ================================
 
-Kafka AI 智能监控与管理平台
+企业级 Kafka AI 助手与监控平台
 
 ## 目录结构
 
@@ -308,6 +308,7 @@ Kafka AI 智能监控与管理平台
 - libs/       : JAR 包目录
 - logs/       : 日志文件目录
 - sql/        : SQL 初始化脚本
+- font/       : 字体文件目录（ASCII 艺术字体）
 
 ## 安装步骤
 
@@ -351,8 +352,8 @@ Kafka AI 智能监控与管理平台
 
 ## 支持
 
-文档: https://github.com/smartloli/EFAK
-问题: https://github.com/smartloli/EFAK/issues
+文档: https://github.com/smartloli/EFAK-AI
+问题: https://github.com/smartloli/EFAK-AI/issues
 
 ================================
 README

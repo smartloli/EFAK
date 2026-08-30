@@ -3,6 +3,87 @@
  * 提供配置项的查看、编辑、重置等功能
  */
 
+const MODEL_PROVIDERS = {
+    OpenAI: {
+        icon: '/images/icons/openai.svg',
+        protocol: 'OpenAI 协议',
+        endpoint: 'https://api.openai.com/v1/chat/completions',
+        model: 'gpt-4o'
+    },
+    Anthropic: {
+        icon: '/images/icons/anthropic.svg',
+        protocol: 'Anthropic 协议',
+        endpoint: 'https://api.anthropic.com/v1/messages',
+        model: 'claude-sonnet-4-20250514'
+    },
+    DeepSeek: {
+        icon: '/images/icons/deepseek.svg',
+        protocol: 'OpenAI 协议',
+        endpoint: 'https://api.deepseek.com/v1/chat/completions',
+        model: 'deepseek-chat'
+    },
+    Kimi: {
+        icon: '/images/icons/kimi.svg',
+        protocol: 'OpenAI 协议',
+        endpoint: 'https://api.moonshot.cn/v1/chat/completions',
+        model: 'moonshot-v1-8k'
+    },
+    Qwen: {
+        icon: '/images/icons/qwen.svg',
+        protocol: 'OpenAI 协议',
+        endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+        model: 'qwen-plus'
+    },
+    Doubao: {
+        icon: '/images/icons/doubao.svg',
+        protocol: 'OpenAI 协议',
+        endpoint: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+        model: 'doubao-seed-1-6-250615'
+    },
+    GLM: {
+        icon: '/images/icons/glm.png',
+        protocol: 'OpenAI 协议',
+        endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+        model: 'glm-4'
+    },
+    Custom: {
+        icon: '/images/icons/custom.svg',
+        protocol: '内部部署',
+        endpoint: '',
+        model: 'your-model-name'
+    },
+    'Custom-OpenAI': {
+        icon: '/images/icons/custom.svg',
+        protocol: 'OpenAI 协议',
+        endpoint: '',
+        model: 'your-model-name'
+    },
+    'Custom-Anthropic': {
+        icon: '/images/icons/custom.svg',
+        protocol: 'Anthropic 协议',
+        endpoint: '',
+        model: 'your-model-name'
+    },
+    'Custom-Ollama': {
+        icon: '/images/icons/custom.svg',
+        protocol: 'Ollama 协议',
+        endpoint: '',
+        model: 'llama3'
+    },
+    Ollama: {
+        icon: '/images/icons/ollama.svg',
+        protocol: 'Ollama 协议',
+        endpoint: 'http://localhost:11434/api/chat',
+        model: 'llama3'
+    }
+};
+
+const CUSTOM_PROTOCOL_ENDPOINTS = {
+    openai: 'http://127.0.0.1:8000/v1/chat/completions',
+    anthropic: 'http://127.0.0.1:8000/v1/messages',
+    ollama: 'http://127.0.0.1:11434/api/chat'
+};
+
 class ConfigManager {
     constructor() {
         this.currentEditConfig = null;
@@ -227,50 +308,8 @@ class ConfigManager {
      * 显示Toast消息
      */
     showToast(message, type = 'success') {
-        // 移除已存在的toast
-        const existingToast = document.querySelector('.toast');
-        if (existingToast) {
-            existingToast.remove();
-        }
-
-        // 创建新的toast
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-
-        // 添加图标
-        let icon = '';
-        switch (type) {
-            case 'success':
-                icon = '<i class="fa fa-check"></i>';
-                break;
-            case 'error':
-                icon = '<i class="fa fa-times"></i>';
-                break;
-            case 'loading':
-                icon = '<i class="fa fa-spinner fa-spin"></i>';
-                break;
-            default:
-                icon = '<i class="fa fa-info"></i>';
-        }
-
-        toast.innerHTML = `${icon} ${message}`;
-        document.body.appendChild(toast);
-
-        // 显示动画
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 100);
-
-        // 自动隐藏（loading类型除外）
-        if (type !== 'loading') {
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.parentNode.removeChild(toast);
-                    }
-                }, 300);
-            }, 3000);
+        if (window.efakShowToast) {
+            window.efakShowToast(message, type);
         }
     }
 
@@ -314,10 +353,11 @@ class ConfigManager {
                     </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                        <img src="${this.getApiTypeIcon(model.apiType)}" style="width: 14px; height: 14px; margin-right: 6px;" />
-                        ${model.apiType}
+                    <span class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded bg-blue-100 text-blue-800">
+                        <img src="${this.getApiTypeIcon(model.apiType)}" alt="" style="width: 14px; height: 14px; margin-right: 6px;" />
+                        ${this.getProviderLabel(model.apiType)}
                     </span>
+                    <div class="text-xs text-gray-500 mt-1">${this.getProviderProtocol(model.apiType)}</div>
                 </td>
                 <td class="px-6 py-4">
                     <div class="text-sm text-gray-900 max-w-xs truncate" title="${model.endpoint}">
@@ -361,12 +401,165 @@ class ConfigManager {
      * 获取API类型图标
      */
     getApiTypeIcon(type) {
-        const icons = {
-            'OpenAI': '/images/icons/openai.svg',
-            'Ollama': '/images/icons/ollama.png',
-            'DeepSeek': '/images/icons/deepseek.svg'
-        };
-        return icons[type] || '';
+        if (type === 'Ollama') {
+            return '/images/icons/ollama.svg';
+        }
+        const decoded = this.decodeApiType(type);
+        if (decoded.vendor === 'Custom') {
+            return '/images/icons/custom.svg';
+        }
+        return (MODEL_PROVIDERS[type] && MODEL_PROVIDERS[type].icon) || '/images/icons/openai.svg';
+    }
+
+    getProviderLabel(type) {
+        if (type === 'Ollama') {
+            return 'Ollama';
+        }
+        const decoded = this.decodeApiType(type);
+        if (decoded.vendor === 'Custom') {
+            return '自定义';
+        }
+        if (type === 'Doubao') {
+            return '豆包';
+        }
+        return type || '未知';
+    }
+
+    getProviderProtocol(type) {
+        const decoded = this.decodeApiType(type);
+        if (decoded.vendor === 'Custom') {
+            if (decoded.protocol === 'anthropic') return 'Anthropic 协议';
+            if (decoded.protocol === 'ollama') return 'Ollama 协议';
+            return 'OpenAI 协议';
+        }
+        return (MODEL_PROVIDERS[type] && MODEL_PROVIDERS[type].protocol) || 'OpenAI 协议';
+    }
+
+    encodeApiType(vendor, protocol) {
+        if (vendor !== 'Custom') {
+            return vendor;
+        }
+        if (protocol === 'anthropic') return 'Custom-Anthropic';
+        if (protocol === 'ollama') return 'Custom-Ollama';
+        return 'Custom';
+    }
+
+    decodeApiType(apiType) {
+        if (!apiType) {
+            return { vendor: '', protocol: 'openai' };
+        }
+        if (apiType === 'Custom-Anthropic') {
+            return { vendor: 'Custom', protocol: 'anthropic' };
+        }
+        if (apiType === 'Custom-Ollama' || apiType === 'Ollama') {
+            return { vendor: 'Custom', protocol: 'ollama' };
+        }
+        if (apiType === 'Custom' || apiType === 'Custom-OpenAI') {
+            return { vendor: 'Custom', protocol: 'openai' };
+        }
+        return { vendor: apiType, protocol: 'openai' };
+    }
+
+    toggleProtocolGroup(prefix, vendor) {
+        const group = document.getElementById(prefix + 'protocol-group');
+        const $select = $('#' + prefix + 'protocol');
+        if (!group) {
+            return;
+        }
+        if (vendor === 'Custom') {
+            group.classList.remove('hidden');
+            const dropdownParent = prefix === 'edit-model-' ? $('#edit-model-modal') : $('#add-model-modal');
+            const endpointId = prefix === 'edit-model-' ? 'edit-model-endpoint' : 'model-endpoint';
+            const nameId = prefix === 'edit-model-' ? 'edit-model-name' : 'model-name';
+            this.initBeautifiedSelect($select, dropdownParent, '请选择接口协议', () => {
+                this.applyProviderDefaults('Custom', endpointId, nameId, false, prefix + 'protocol');
+            });
+        } else {
+            this.destroySelect2($select);
+            group.classList.add('hidden');
+        }
+    }
+
+    formatModelProviderOption(option) {
+        if (!option.id) {
+            return option.text;
+        }
+        const icon = $(option.element).data('icon') || this.getApiTypeIcon(option.id);
+        return $(`
+            <span class="model-provider-option">
+                <span class="model-provider-icon"><img src="${icon}" alt=""></span>
+                <span class="model-provider-name">${option.text}</span>
+            </span>
+        `);
+    }
+
+    applyProviderDefaults(selectedType, endpointInputId, nameInputId, overwriteName, protocolSelectId) {
+        const provider = MODEL_PROVIDERS[selectedType] || MODEL_PROVIDERS.Custom;
+        const endpointInput = document.getElementById(endpointInputId);
+        if (!endpointInput) {
+            return;
+        }
+        if (selectedType === 'Custom') {
+            const protocol = protocolSelectId ? document.getElementById(protocolSelectId)?.value : 'openai';
+            const sample = CUSTOM_PROTOCOL_ENDPOINTS[protocol] || CUSTOM_PROTOCOL_ENDPOINTS.openai;
+            const known = Object.values(CUSTOM_PROTOCOL_ENDPOINTS);
+            if (!endpointInput.value.trim() || known.includes(endpointInput.value.trim())) {
+                endpointInput.value = sample;
+            }
+            endpointInput.placeholder = sample;
+        } else if (provider.endpoint) {
+            endpointInput.value = provider.endpoint;
+        }
+        const nameInput = nameInputId ? document.getElementById(nameInputId) : null;
+        if (nameInput && (overwriteName || !nameInput.value.trim())) {
+            nameInput.placeholder = provider.model;
+        }
+    }
+
+    destroySelect2($select) {
+        if (!$select || !$select.length) {
+            return;
+        }
+        $select.off('change select2:open.scrollfix');
+        if ($select.hasClass('select2-hidden-accessible')) {
+            $select.select2('destroy');
+        }
+    }
+
+    initBeautifiedSelect($select, dropdownParent, placeholder, onChange) {
+        const self = this;
+        this.destroySelect2($select);
+        $select.select2({
+            placeholder: placeholder,
+            allowClear: false,
+            width: '100%',
+            minimumResultsForSearch: Infinity,
+            dropdownParent: dropdownParent,
+            scrollAfterSelect: false,
+            templateResult: (option) => self.formatModelProviderOption(option),
+            templateSelection: (option) => self.formatModelProviderOption(option)
+        });
+        $select.off('select2:open.scrollfix').on('select2:open.scrollfix', function () {
+            const $results = $(this).data('select2')?.$dropdown?.find('.select2-results__options');
+            if (!$results || !$results.length) {
+                return;
+            }
+            let scrollTimer = null;
+            $results.off('wheel.scrollfix mousewheel.scrollfix touchmove.scrollfix')
+                .on('wheel.scrollfix mousewheel.scrollfix touchmove.scrollfix', function (e) {
+                    e.stopPropagation();
+                    $results.addClass('is-scrolling');
+                    clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(() => $results.removeClass('is-scrolling'), 120);
+                });
+        });
+        if (onChange) {
+            $select.on('change', onChange);
+        }
+    }
+
+    initProviderSelect($select, dropdownParent, onChange) {
+        this.initBeautifiedSelect($select, dropdownParent, '请选择大模型厂商', onChange);
     }
 
     /**
@@ -374,9 +567,9 @@ class ConfigManager {
      */
     getStatusBadge(status) {
         const badges = {
-            0: '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">离线</span>',
-            1: '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">在线</span>',
-            2: '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">错误</span>'
+            0: '<span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded bg-gray-100 text-gray-800">离线</span>',
+            1: '<span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded bg-green-100 text-green-800">在线</span>',
+            2: '<span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded bg-red-100 text-red-800">错误</span>'
         };
         return badges[status] || badges[0];
     }
@@ -452,58 +645,24 @@ class ConfigManager {
 
             // 清空接口地址输入框
             document.getElementById('model-endpoint').value = '';
+            const apiKeyInput = document.getElementById('model-api-key');
+            if (apiKeyInput) {
+                apiKeyInput.value = '';
+                apiKeyInput.setAttribute('readonly', 'readonly');
+            }
 
             modal.classList.add('show');
 
-            // 初始化select2
+            this.toggleProtocolGroup('model-', '');
             setTimeout(() => {
-                $('.select2-model-type').select2({
-                    placeholder: '请选择API类型',
-                    allowClear: false,
-                    width: '100%',
-                    minimumResultsForSearch: Infinity, // 禁用搜索功能
-                    dropdownParent: $('#add-model-modal'),
-                    templateResult: function (option) {
-                        if (!option.id) return option.text;
-                        const icon = $(option.element).data('icon');
-                        if (icon) {
-                            return $('<span><img src="' + icon + '" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" />' + option.text + '</span>');
-                        }
-                        return option.text;
-                    },
-                    templateSelection: function (option) {
-                        if (!option.id) return option.text;
-                        const icon = $(option.element).data('icon');
-                        if (icon) {
-                            return $('<span><img src="' + icon + '" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" />' + option.text + '</span>');
-                        }
-                        return option.text;
-                    }
-                });
-
-                // 监听API类型变化，自动填充接口地址
-                $('.select2-model-type').on('change', function () {
-                    const selectedType = $(this).val();
-                    const endpointInput = document.getElementById('model-endpoint');
+                this.initProviderSelect($('.select2-model-type'), $('#add-model-modal'), () => {
+                    const selectedType = $('.select2-model-type').val();
                     const apiKeyInput = document.getElementById('model-api-key');
-
-                    // 清空API密钥输入框
-                    apiKeyInput.value = '';
-
-                    // 根据选择的API类型自动填充接口地址
-                    switch (selectedType) {
-                        case 'OpenAI':
-                            endpointInput.value = 'https://api.openai.com/v1/chat/completions';
-                            break;
-                        case 'Ollama':
-                            endpointInput.value = 'http://localhost:11434/api/chat';
-                            break;
-                        case 'DeepSeek':
-                            endpointInput.value = 'https://api.deepseek.com/v1/chat/completions';
-                            break;
-                        default:
-                            endpointInput.value = '';
+                    if (apiKeyInput) {
+                        apiKeyInput.value = '';
                     }
+                    this.toggleProtocolGroup('model-', selectedType);
+                    this.applyProviderDefaults(selectedType, 'model-endpoint', 'model-name', false, 'model-protocol');
                 });
             }, 50);
 
@@ -522,12 +681,8 @@ class ConfigManager {
         const modal = document.getElementById('add-model-modal');
         if (modal) {
             // 移除事件监听器
-            $('.select2-model-type').off('change');
-
-            // 销毁select2实例
-            if ($('.select2-model-type').hasClass('select2-hidden-accessible')) {
-                $('.select2-model-type').select2('destroy');
-            }
+            this.destroySelect2($('.select2-model-type'));
+            this.destroySelect2($('.select2-model-protocol'));
             modal.classList.remove('show');
         }
     }
@@ -537,7 +692,9 @@ class ConfigManager {
      */
     async addModel() {
         const modelName = document.getElementById('model-name').value.trim();
-        const apiType = document.getElementById('model-type').value;
+        const vendor = document.getElementById('model-type').value;
+        const protocol = document.getElementById('model-protocol')?.value || 'openai';
+        const apiType = this.encodeApiType(vendor, protocol);
         const endpoint = document.getElementById('model-endpoint').value.trim();
         const apiKey = document.getElementById('model-api-key').value.trim();
         const systemPrompt = document.getElementById('model-system-prompt').value.trim();
@@ -546,16 +703,15 @@ class ConfigManager {
         const enabled = document.getElementById('model-enabled').checked ? 1 : 0;
 
         // 验证必填字段
-        if (!modelName || !apiType || !endpoint) {
+        if (!modelName || !vendor || !endpoint) {
             this.showToast('请填写所有必填字段', 'error');
             return;
         }
 
-        // 验证接口地址格式
         try {
             new URL(endpoint);
         } catch (e) {
-            this.showToast('接口地址格式不正确', 'error');
+            this.showToast('接口地址格式不正确，请包含 http:// 或 https://', 'error');
             return;
         }
 
@@ -610,11 +766,17 @@ class ConfigManager {
         }
 
         // 填充编辑表单
+        const decoded = this.decodeApiType(model.apiType);
         document.getElementById('edit-model-id').value = model.id;
         document.getElementById('edit-model-name').value = model.modelName;
-        document.getElementById('edit-model-type').value = model.apiType;
+        document.getElementById('edit-model-type').value = decoded.vendor;
+        document.getElementById('edit-model-protocol').value = decoded.protocol;
         document.getElementById('edit-model-endpoint').value = model.endpoint;
-        document.getElementById('edit-model-api-key').value = model.apiKey || '';
+        const editApiKeyInput = document.getElementById('edit-model-api-key');
+        if (editApiKeyInput) {
+            editApiKeyInput.value = model.apiKey || '';
+            editApiKeyInput.setAttribute('readonly', 'readonly');
+        }
         document.getElementById('edit-model-timeout').value = model.timeout;
         document.getElementById('edit-model-description').value = model.description || '';
         document.getElementById('edit-model-system-prompt').value = model.systemPrompt || '';
@@ -625,59 +787,23 @@ class ConfigManager {
         if (modal) {
             modal.classList.add('show');
 
-            // 初始化select2
             setTimeout(() => {
-                $('.select2-edit-model-type').select2({
-                    placeholder: '请选择API类型',
-                    allowClear: false,
-                    width: '100%',
-                    minimumResultsForSearch: Infinity, // 禁用搜索功能
-                    dropdownParent: $('#edit-model-modal'),
-                    templateResult: function (option) {
-                        if (!option.id) return option.text;
-                        const icon = $(option.element).data('icon');
-                        if (icon) {
-                            return $('<span><img src="' + icon + '" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" />' + option.text + '</span>');
-                        }
-                        return option.text;
-                    },
-                    templateSelection: function (option) {
-                        if (!option.id) return option.text;
-                        const icon = $(option.element).data('icon');
-                        if (icon) {
-                            return $('<span><img src="' + icon + '" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" />' + option.text + '</span>');
-                        }
-                        return option.text;
+                let currentType = decoded.vendor;
+                this.initProviderSelect($('.select2-edit-model-type'), $('#edit-model-modal'), () => {
+                    const selectedType = $('.select2-edit-model-type').val();
+                    if (!selectedType || selectedType === currentType) {
+                        return;
                     }
-                });
-
-                // 设置选中值
-                $('.select2-edit-model-type').val(model.apiType).trigger('change');
-
-                // 监听API类型变化，自动填充接口地址
-                $('.select2-edit-model-type').on('change', function () {
-                    const selectedType = $(this).val();
-                    const endpointInput = document.getElementById('edit-model-endpoint');
+                    currentType = selectedType;
                     const apiKeyInput = document.getElementById('edit-model-api-key');
-
-                    // 清空API密钥输入框
-                    apiKeyInput.value = '';
-
-                    // 根据选择的API类型自动填充接口地址
-                    switch (selectedType) {
-                        case 'OpenAI':
-                            endpointInput.value = 'https://api.openai.com/v1/chat/completions';
-                            break;
-                        case 'Ollama':
-                            endpointInput.value = 'http://localhost:11434/api/chat';
-                            break;
-                        case 'DeepSeek':
-                            endpointInput.value = 'https://api.deepseek.com/v1/chat/completions';
-                            break;
-                        default:
-                            endpointInput.value = '';
+                    if (apiKeyInput) {
+                        apiKeyInput.value = '';
                     }
+                    this.toggleProtocolGroup('edit-model-', selectedType);
+                    this.applyProviderDefaults(selectedType, 'edit-model-endpoint', 'edit-model-name', false, 'edit-model-protocol');
                 });
+                this.toggleProtocolGroup('edit-model-', decoded.vendor);
+                $('.select2-edit-model-type').val(decoded.vendor).trigger('change');
             }, 50);
         }
     }
@@ -688,13 +814,8 @@ class ConfigManager {
     closeEditModelModal() {
         const modal = document.getElementById('edit-model-modal');
         if (modal) {
-            // 移除事件监听器
-            $('.select2-edit-model-type').off('change');
-
-            // 销毁select2实例
-            if ($('.select2-edit-model-type').hasClass('select2-hidden-accessible')) {
-                $('.select2-edit-model-type').select2('destroy');
-            }
+            this.destroySelect2($('.select2-edit-model-type'));
+            this.destroySelect2($('.select2-edit-model-protocol'));
             modal.classList.remove('show');
         }
     }
@@ -705,7 +826,9 @@ class ConfigManager {
     async updateModel() {
         const id = parseInt(document.getElementById('edit-model-id').value);
         const modelName = document.getElementById('edit-model-name').value.trim();
-        const apiType = document.getElementById('edit-model-type').value;
+        const vendor = document.getElementById('edit-model-type').value;
+        const protocol = document.getElementById('edit-model-protocol')?.value || 'openai';
+        const apiType = this.encodeApiType(vendor, protocol);
         const endpoint = document.getElementById('edit-model-endpoint').value.trim();
         const apiKey = document.getElementById('edit-model-api-key').value.trim();
         const systemPrompt = document.getElementById('edit-model-system-prompt').value.trim();
@@ -714,8 +837,14 @@ class ConfigManager {
         const enabled = document.getElementById('edit-model-enabled').checked ? 1 : 0;
 
         // 验证必填字段
-        if (!modelName || !apiType || !endpoint) {
+        if (!modelName || !vendor || !endpoint) {
             this.showToast('请填写所有必填字段', 'error');
+            return;
+        }
+        try {
+            new URL(endpoint);
+        } catch (e) {
+            this.showToast('接口地址格式不正确，请包含 http:// 或 https://', 'error');
             return;
         }
 
@@ -884,7 +1013,7 @@ class ConfigManager {
         if (modal) {
             modal.classList.remove('show');
         }
-        // 注意：不要在这里清空modelToDelete，因为确认删除时还需要使用
+        // Keep modelToDelete until the delete request completes.
         // this.modelToDelete = null;
     }
 

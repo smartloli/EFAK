@@ -32,6 +32,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * Description: Web安全配置
@@ -58,6 +63,20 @@ public class WebSecurityConfig {
                 // 创建自定义的RequestCache
                 HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
                 requestCache.setMatchingRequestParameterName(null); // 禁用默认的continue参数
+                RequestMatcher ignoredRequests = new OrRequestMatcher(
+                                new AntPathRequestMatcher("/sm/**"),
+                                new AntPathRequestMatcher("/**/*.map"),
+                                new AntPathRequestMatcher("/css/**"),
+                                new AntPathRequestMatcher("/js/**"),
+                                new AntPathRequestMatcher("/images/**"),
+                                new AntPathRequestMatcher("/fonts/**"),
+                                new AntPathRequestMatcher("/webfonts/**"),
+                                new AntPathRequestMatcher("/plugins/**"),
+                                new AntPathRequestMatcher("/statics/**"),
+                                new AntPathRequestMatcher("/favicon.ico"));
+                requestCache.setRequestMatcher(new AndRequestMatcher(
+                                new AntPathRequestMatcher("/**", "GET"),
+                                new NegatedRequestMatcher(ignoredRequests)));
                 
                 // 创建自定义的AuthenticationEntryPoint
                 LoginUrlAuthenticationEntryPoint authenticationEntryPoint = new LoginUrlAuthenticationEntryPoint("/login");
@@ -65,8 +84,8 @@ public class WebSecurityConfig {
                 
                 http.authorizeHttpRequests(authz -> authz
                                 .requestMatchers("/login", "/error/**", "/statics/**", "/css/**", "/js/**",
-                                                "/images/**", "/fonts/**",
-                                                "/plugins/**", "/api/password/**", "/password-tool")
+                                                "/images/**", "/fonts/**", "/webfonts/**", "/sm/**",
+                                                "/plugins/**", "/api/password/**", "/password-tool", "/health/**")
                                 .permitAll()
                                 .requestMatchers("/users", "/config", "/scheduler").hasRole("ADMIN")
                                 .anyRequest().authenticated())

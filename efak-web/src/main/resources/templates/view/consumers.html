@@ -23,11 +23,11 @@
         }
 
         .metric-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            padding: 16px;
+            transition: border-color 0.15s ease;
             position: relative;
             overflow: hidden;
         }
@@ -38,14 +38,14 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--color-start), var(--color-end));
-            border-radius: 16px 16px 0 0;
+            height: 2px;
+            background: var(--color-start);
+            border-radius: 0;
         }
 
         .metric-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+            transform: none;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
             border-color: var(--border-color);
         }
 
@@ -76,7 +76,7 @@
         .metric-icon {
             width: 56px;
             height: 56px;
-            border-radius: 16px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -105,24 +105,18 @@
         }
 
         .overview-banner {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 32px;
-            color: white;
+            background: var(--efak-hero-bg);
+            border-radius: 2px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            color: var(--efak-hero-text);
             position: relative;
             overflow: hidden;
+            border: 1px solid var(--efak-hero-border);
         }
 
         .overview-banner::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            pointer-events: none;
+            display: none;
         }
 
         .consumer-status {
@@ -130,7 +124,7 @@
             align-items: center;
             gap: 8px;
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-size: 12px;
             font-weight: 600;
         }
@@ -159,13 +153,13 @@
             width: 100px;
             height: 8px;
             background: #f3f4f6;
-            border-radius: 4px;
+            border-radius: 2px;
             overflow: hidden;
         }
 
         .lag-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 2px;
             transition: width 0.3s ease;
         }
 
@@ -183,7 +177,7 @@
 
         .table-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -236,7 +230,7 @@
             border: 1px solid #d1d5db;
             color: #6b7280;
             padding: 8px 12px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -253,13 +247,13 @@
         }
 
         .action-btn.primary {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            background: #165DFF;
             border-color: #165DFF;
             color: white;
         }
 
         .action-btn.primary:hover {
-            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%);
+            background: #0E4AE6;
             box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
         }
 
@@ -276,7 +270,7 @@
 
         .chart-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
             padding: 24px;
             margin-bottom: 24px;
@@ -315,7 +309,7 @@
             width: 280px;
             padding: 10px 16px 10px 40px;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 14px;
             color: #374151;
             background: white;
@@ -344,7 +338,7 @@
         .filter-select {
             padding: 10px 16px;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 14px;
             color: #374151;
             background: white;
@@ -458,7 +452,7 @@
             border: 1px solid #d1d5db;
             background: white;
             color: #374151;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -480,7 +474,7 @@
         .page-size-select {
             padding: 6px 10px;
             border: 1px solid #d1d5db;
-            border-radius: 6px;
+            border-radius: 2px;
             font-size: 14px;
             background: white;
             margin-left: 8px;
@@ -494,7 +488,7 @@
         .select2-container--default .select2-selection--single {
             height: 42px !important;
             border: 2px solid #e2e8f0 !important;
-            border-radius: 12px !important;
+            border-radius: 2px !important;
             background: white !important;
             padding-left: 32px !important;
         }
@@ -530,7 +524,7 @@
 
         .select2-dropdown {
             border: 2px solid #e2e8f0 !important;
-            border-radius: 12px !important;
+            border-radius: 2px !important;
             margin-top: 4px !important;
         }
 
@@ -617,11 +611,11 @@
         }
 
         .refresh-btn {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            background: #165DFF;
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
@@ -632,7 +626,7 @@
         }
 
         .refresh-btn:hover {
-            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%);
+            background: #0E4AE6;
             box-shadow: 0 8px 25px rgba(22, 93, 255, 0.3);
             transform: translateY(-1px);
         }
@@ -666,31 +660,23 @@
             <th:block th:replace="~{public/header :: header}"></th:block>
 
             <main class="flex-1 overflow-y-auto p-6 pt-20">
-                <!-- 概览横幅 -->
-                <div class="overview-banner">
-                    <div class="relative z-10">
-                        <h1 class="text-2xl font-bold mb-2">
-                            <i class="fa fa-users mr-3"></i>消费者组管理
-                        </h1>
-                        <p class="text-blue-100 mb-4">监控和管理Kafka消费者组，实时跟踪消费进度和性能指标</p>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                            <div>
-                                <div class="text-2xl font-bold" id="total-groups">0</div>
-                                <div class="text-sm text-blue-200">消费者组总数</div>
-                            </div>
-                            <div>
-                                <div class="text-2xl font-bold" id="active-groups">0</div>
-                                <div class="text-sm text-blue-200">活跃消费者组</div>
-                            </div>
-                            <div>
-                                <div class="text-2xl font-bold" id="avg-lag-rate">0%</div>
-                                <div class="text-sm text-blue-200">平均延迟率</div>
-                            </div>
-                            <div>
-                                <div class="text-2xl font-bold" id="avg-consumer-rate">0/s</div>
-                                <div class="text-sm text-blue-200">平均消费速度</div>
-                            </div>
-                        </div>
+                <!-- KPI -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div class="kpi-card">
+                        <div class="kpi-label">消费组</div>
+                        <div class="kpi-value" id="total-groups">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">活跃</div>
+                        <div class="kpi-value" id="active-groups">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">延迟率</div>
+                        <div class="kpi-value" id="avg-lag-rate">0%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">消费速率</div>
+                        <div class="kpi-value" id="avg-consumer-rate">0/s</div>
                     </div>
                 </div>
 
@@ -701,7 +687,7 @@
                             <i class="fa fa-play"></i>
                         </div>
                         <div class="text-2xl font-bold text-gray-800 mb-1" id="active-card-count">0</div>
-                        <div class="text-sm text-gray-600 mb-2">活跃消费者组</div>
+                        <div class="text-sm text-gray-600 mb-2">活跃</div>
                         <div class="consumer-status active">
                             <i class="fa fa-circle text-xs"></i>
                             正常运行
@@ -713,7 +699,7 @@
                             <i class="fa fa-pause"></i>
                         </div>
                         <div class="text-2xl font-bold text-gray-800 mb-1" id="inactive-card-count">0</div>
-                        <div class="text-sm text-gray-600 mb-2">空闲消费者组</div>
+                        <div class="text-sm text-gray-600 mb-2">空闲</div>
                         <div class="consumer-status inactive">
                             <i class="fa fa-circle text-xs"></i>
                             空闲状态
@@ -725,7 +711,7 @@
                             <i class="fa fa-clock"></i>
                         </div>
                         <div class="text-2xl font-bold text-gray-800 mb-1" id="slow-card-count">0</div>
-                        <div class="text-sm text-gray-600 mb-2">缓慢消费者组</div>
+                        <div class="text-sm text-gray-600 mb-2">缓慢</div>
                         <div class="consumer-status slow">
                             <i class="fa fa-exclamation-triangle text-xs"></i>
                             消费缓慢
@@ -737,7 +723,7 @@
                             <i class="fa fa-warning"></i>
                         </div>
                         <div class="text-2xl font-bold text-gray-800 mb-1" id="lagging-card-count">0</div>
-                        <div class="text-sm text-gray-600 mb-2">延迟消费者组</div>
+                        <div class="text-sm text-gray-600 mb-2">积压</div>
                         <div class="consumer-status lagging">
                             <i class="fa fa-exclamation-circle text-xs"></i>
                             严重延迟
@@ -807,7 +793,7 @@
                                 </tr>
                             </thead>
                             <tbody id="consumers-tbody">
-                                <!-- 动态生成数据 -->
+                                <!-- Table body -->
                             </tbody>
                         </table>
                     </div>

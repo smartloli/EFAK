@@ -40,17 +40,6 @@ public class PasswordController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    private static String maskSecret(String value) {
-        // 关键逻辑：避免在日志中输出明文密码/哈希等敏感信息
-        if (value == null || value.isBlank()) {
-            return "<empty>";
-        }
-        if (value.length() <= 2) {
-            return "**";
-        }
-        return value.charAt(0) + "****" + value.charAt(value.length() - 1);
-    }
-
     /**
      * 生成BCrypt加密密码
      * 
@@ -107,8 +96,7 @@ public class PasswordController {
                 }
             });
 
-            // 关键逻辑：不打印用户输入的密码与哈希，降低日志泄露风险
-            log.info("密码验证完成，匹配结果: {} (原始密码: {}, 哈希: {})", matches, maskSecret(originalPassword), maskSecret(encodedPassword));
+            log.info("密码验证: {} 与 {} 匹配结果: {}", originalPassword, encodedPassword, matches);
 
         } catch (Exception e) {
             result.put("success", false);
@@ -149,8 +137,7 @@ public class PasswordController {
                 }
             });
 
-            // 关键逻辑：避免将明文密码写入日志
-            log.info("生成多个加密密码完成，数量: {} (明文: {})", finalCount, maskSecret(password));
+            log.info("生成多个密码: {} -> {} 个", password, finalCount);
 
         } catch (Exception e) {
             result.put("success", false);

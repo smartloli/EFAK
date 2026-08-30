@@ -142,7 +142,7 @@ function loadInitialData() {
 }
 
 /**
- * 加载英雄区统计数据
+ * Load cluster inventory metrics (brokers, topics, partitions, consumer groups).
  */
 function loadHeroStats() {
     return $.ajax({
@@ -158,7 +158,7 @@ function loadHeroStats() {
 }
 
 /**
- * 更新英雄区统计数据
+ * Render cluster inventory metrics.
  */
 function updateHeroStats(stats) {
     $('#hero-clusters').text(stats.onlineNodes || 0);
@@ -224,8 +224,8 @@ function initializeThroughputChart() {
                 {
                     label: '写入耗时',
                     data: [],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: '#165DFF',
+                    backgroundColor: 'rgba(22, 93, 255, 0.1)',
                     tension: 0.4,
                     fill: true,
                     pointRadius: 0,
@@ -359,7 +359,7 @@ function getUsageColor(value, type) {
     } else { // memory
         if (value >= 85) return '#ef4444'; // 红色 - 高使用率
         if (value >= 70) return '#f59e0b'; // 黄色 - 中等使用率
-        return '#3b82f6'; // 蓝色 - 低使用率
+        return '#165DFF'; // 蓝色 - 低使用率
     }
 }
 
@@ -449,7 +449,7 @@ function initializeCapacityChart() {
                 data: [],
                 backgroundColor: [
                     '#10b981', // 0-100MB - 绿色
-                    '#3b82f6', // 100MB-1GB - 蓝色
+                    '#165DFF', // 100MB-1GB - 蓝色
                     '#f59e0b', // 1GB-10GB - 黄色
                     '#ef4444'  // 10GB+ - 红色
                 ],
@@ -600,17 +600,17 @@ function updateResourceChart(data) {
             <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 12px;">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-server" style="color: #6366f1;"></i>
+                        <i class="fas fa-server" style="color: #165DFF;"></i>
                         在线节点: <strong style="color: #1f2937;">${data.onlineNodes}/${data.totalNodes}</strong>
                     </span>
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-clock" style="color: #6366f1;"></i>
+                        <i class="fas fa-clock" style="color: #165DFF;"></i>
                         运行时间: <strong style="color: #1f2937;">${data.runtime}</strong>
                     </span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #6b7280;">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-chart-line" style="color: #6366f1;"></i>
+                        <i class="fas fa-chart-line" style="color: #165DFF;"></i>
                         在线率: <strong style="color: #1f2937;">${data.onlineRate}%</strong>
                     </span>
                     <span style="display: flex; align-items: center; gap: 8px;">
@@ -709,7 +709,7 @@ function updateCapacityChart(capacityData) {
 
     charts.capacity.data.labels = capacityData.labels || [];
     charts.capacity.data.datasets[0].data = capacityData.values || [];
-    charts.capacity.data.datasets[0].backgroundColor = capacityData.colors || ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
+    charts.capacity.data.datasets[0].backgroundColor = capacityData.colors || ['#10b981', '#165DFF', '#f59e0b', '#ef4444'];
     charts.capacity.update();
 }
 
@@ -809,7 +809,7 @@ function createTableRow(item, rank) {
             <td>${item.partitions}</td>
             <td>${item.replicas}</td>
             <td>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${item.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
                     ${item.status === 'active' ? '活跃' : '空闲'}
                 </span>
             </td>
@@ -911,31 +911,9 @@ function stopAutoRefresh() {
  * 显示提示消息
  */
 function showToast(message, type = 'info') {
-    const toast = $(`
-        <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg text-white transform transition-all duration-300 ${type === 'success' ? 'bg-green-500' :
-            type === 'error' ? 'bg-red-500' :
-                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-        } translate-x-full">
-            <div class="flex items-center gap-2">
-                <i class="fa ${type === 'success' ? 'fa-check-circle' :
-            type === 'error' ? 'fa-exclamation-circle' :
-                type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'
-        }"></i>
-                <span>${message}</span>
-            </div>
-        </div>
-    `);
-
-    $('body').append(toast);
-
-    setTimeout(() => {
-        toast.removeClass('translate-x-full');
-    }, 100);
-
-    setTimeout(() => {
-        toast.addClass('translate-x-full');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    if (window.efakShowToast) {
+        window.efakShowToast(message, type);
+    }
 }
 
 // 页面离开时清理资源

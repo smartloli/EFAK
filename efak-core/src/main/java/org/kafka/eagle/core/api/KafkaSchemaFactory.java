@@ -29,6 +29,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Node;
+import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.TopicPartitionInfo;
 import org.apache.kafka.common.config.ConfigResource;
@@ -38,7 +39,6 @@ import org.kafka.eagle.core.constant.ConsumerGroupConst;
 import org.kafka.eagle.core.constant.JmxMetricsConst;
 import org.kafka.eagle.core.dto.ConsumerGroupDescInfo;
 import org.kafka.eagle.core.util.MathUtils;
-import org.kafka.eagle.core.util.NetUtils;
 import org.kafka.eagle.core.util.StrUtils;
 import org.kafka.eagle.dto.broker.BrokerInfo;
 import org.kafka.eagle.dto.cluster.KafkaClientInfo;
@@ -67,6 +67,46 @@ public class KafkaSchemaFactory {
 
     public KafkaSchemaFactory(KafkaStoragePlugin plugin) {
         this.plugin = plugin;
+    }
+
+    private AdminClient admin(KafkaClientInfo clientInfo) {
+        return KafkaAdminClientPool.getInstance().get(clientInfo, plugin);
+    }
+
+    private void invalidateAdmin(KafkaClientInfo clientInfo) {
+        KafkaAdminClientPool.getInstance().invalidate(clientInfo);
+    }
+
+    private void handleAdminFailure(KafkaClientInfo clientInfo, Exception e, String action) {
+        if (isStaleAdminConnection(e)) {
+            invalidateAdmin(clientInfo);
+        }
+        log.error("{} failed for cluster {}", action, clientInfo != null ? clientInfo.getClusterId() : "-", e);
+    }
+
+    private boolean isStaleAdminConnection(Throwable error) {
+        Throwable current = error;
+        while (current != null) {
+            if (current instanceof org.apache.kafka.common.errors.TimeoutException
+                    || current instanceof org.apache.kafka.common.errors.DisconnectException
+                    || current instanceof org.apache.kafka.common.errors.NetworkException
+                    || current instanceof java.util.concurrent.TimeoutException
+                    || current instanceof java.net.ConnectException
+                    || current instanceof java.io.IOException) {
+                return true;
+            }
+            String message = current.getMessage();
+            if (message != null) {
+                String lower = message.toLowerCase(Locale.ROOT);
+                if (lower.contains("disconnect") || lower.contains("timed out")
+                        || lower.contains("timeout") || lower.contains("bootstrap")
+                        || lower.contains("connection")) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     /* ======================= TOPIC MANAGEMENT ======================= */
@@ -115,13 +155,14 @@ public class KafkaSchemaFactory {
      */
     public Map<String, String> getTopicConfig(KafkaClientInfo clientInfo, String topic) {
         Map<String, String> configMap = new HashMap<>();
-        try (AdminClient admin = AdminClient.create(plugin.buildAdminClientProps(clientInfo))) {
+        try {
+            AdminClient admin = admin(clientInfo);
             ConfigResource resource = new ConfigResource(ConfigResource.Type.TOPIC, topic);
             DescribeConfigsResult result = admin.describeConfigs(Collections.singleton(resource));
             Config config = result.all().get().get(resource);
             config.entries().forEach(entry -> configMap.put(entry.name(), entry.value()));
         } catch (Exception e) {
-            log.error("获取主题 '{}' 在 '{}' 的配置失败：", topic, clientInfo, e);
+            handleAdminFailure(clientInfo, e, "describe topic config " + topic);
         }
 
         return configMap;
@@ -157,11 +198,12 @@ public class KafkaSchemaFactory {
      */
     public Set<Integer> listTopicPartitions(KafkaClientInfo clientInfo, String topic) {
         Set<Integer> partitions = new HashSet<>();
-        try (AdminClient admin = AdminClient.create(plugin.buildAdminClientProps(clientInfo))) {
+        try {
+            AdminClient admin = admin(clientInfo);
             DescribeTopicsResult result = admin.describeTopics(Collections.singleton(topic));
             result.allTopicNames().get().get(topic).partitions().forEach(tp -> partitions.add(tp.partition()));
         } catch (Exception e) {
-            log.error("获取主题 '{}' 的分区列表失败（{}）：", topic, clientInfo, e);
+            handleAdminFailure(clientInfo, e, "list partitions " + topic);
         }
         return partitions;
     }
@@ -195,39 +237,16 @@ public class KafkaSchemaFactory {
      * 获取主题所有分区的日志总大小
      */
     public long getTotalTopicLogSize(KafkaClientInfo clientInfo, String topic) {
-        long total = 0;
-        Set<Integer> partitions = listTopicPartitions(clientInfo, topic);
-        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(plugin.buildConsumerProps(clientInfo))) {
-            Set<TopicPartition> tps = partitions.stream().map(p -> new TopicPartition(topic, p)).collect(Collectors.toSet());
-            consumer.assign(tps);
-            Map<TopicPartition, Long> endOffsets = consumer.endOffsets(tps);
-            for (TopicPartition tp : tps) {
-                total += endOffsets.get(tp);
-            }
-        } catch (Exception e) {
-            log.error("获取主题 '{}' 的日志总大小失败：", topic, e);
-        }
-        return total;
+        Map<String, Long> sizes = getTopicLogSizes(clientInfo, Collections.singleton(topic));
+        return sizes.getOrDefault(topic, 0L);
     }
 
     /**
      * 获取主题的实际日志大小（消息总数）
      */
     public long getTotalActualTopicLogSize(KafkaClientInfo clientInfo, String topic) {
-        long total = 0;
-        Set<Integer> partitions = listTopicPartitions(clientInfo, topic);
-        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(plugin.buildConsumerProps(clientInfo))) {
-            Set<TopicPartition> tps = partitions.stream().map(p -> new TopicPartition(topic, p)).collect(Collectors.toSet());
-            consumer.assign(tps);
-            Map<TopicPartition, Long> startOffsets = consumer.beginningOffsets(tps);
-            Map<TopicPartition, Long> endOffsets = consumer.endOffsets(tps);
-            for (TopicPartition tp : tps) {
-                total += endOffsets.get(tp) - startOffsets.get(tp);
-            }
-        } catch (Exception e) {
-            log.error("获取主题 '{}' 的实际日志大小失败：", topic, e);
-        }
-        return total;
+        Map<String, Long> sizes = getTopicLogSizes(clientInfo, Collections.singleton(topic));
+        return sizes.getOrDefault(topic, 0L);
     }
 
 
@@ -266,26 +285,66 @@ public class KafkaSchemaFactory {
      * 从指定分区拉取最新消息（默认最近10条）
      */
     public String fetchLatestMessages(KafkaClientInfo clientInfo, String topic, int partitionId) {
-        JSONArray results = new JSONArray();
-        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(plugin.buildConsumerProps(clientInfo))) {
-            TopicPartition tp = new TopicPartition(topic, partitionId);
-            consumer.assign(Collections.singleton(tp));
-            long end = consumer.endOffsets(Collections.singleton(tp)).get(tp);
-            long start = Math.max(0, end - 10);
-            consumer.seek(tp, start);
+        return fetchLatestMessages(clientInfo, topic, partitionId, 10);
+    }
 
-            boolean polling = true;
-            while (polling) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+    /**
+     * 拉取主题最新消息。
+     *
+     * @param partitionId 指定分区；小于 0 表示所有分区
+     * @param limit       最多返回条数，上限 10000
+     */
+    public String fetchLatestMessages(KafkaClientInfo clientInfo, String topic, int partitionId, int limit) {
+        JSONArray results = new JSONArray();
+        int cap = Math.min(Math.max(limit, 1), 10000);
+        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(plugin.buildConsumerProps(clientInfo))) {
+            List<TopicPartition> tps = new ArrayList<>();
+            if (partitionId >= 0) {
+                tps.add(new TopicPartition(topic, partitionId));
+            } else {
+                List<PartitionInfo> partitionInfos = consumer.partitionsFor(topic);
+                if (partitionInfos != null) {
+                    for (PartitionInfo info : partitionInfos) {
+                        tps.add(new TopicPartition(topic, info.partition()));
+                    }
+                }
+            }
+            if (tps.isEmpty()) {
+                return results.toJSONString();
+            }
+
+            consumer.assign(tps);
+            Map<TopicPartition, Long> ends = consumer.endOffsets(tps);
+            Map<TopicPartition, Long> begins = consumer.beginningOffsets(tps);
+            int perPart = Math.max(1, cap / tps.size());
+            for (TopicPartition tp : tps) {
+                long end = ends.getOrDefault(tp, 0L);
+                long begin = begins.getOrDefault(tp, 0L);
+                long start = Math.max(begin, end - perPart);
+                consumer.seek(tp, start);
+            }
+
+            int collected = 0;
+            int emptyPolls = 0;
+            while (collected < cap && emptyPolls < 3) {
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(300));
+                if (records.isEmpty()) {
+                    emptyPolls++;
+                    continue;
+                }
+                emptyPolls = 0;
                 for (ConsumerRecord<String, String> record : records) {
                     JSONObject obj = new JSONObject();
                     obj.put("partition", record.partition());
                     obj.put("offset", record.offset());
+                    obj.put("key", record.key());
                     obj.put("value", record.value());
                     obj.put("timestamp", record.timestamp());
                     results.add(obj);
+                    if (++collected >= cap) {
+                        break;
+                    }
                 }
-                if (records.isEmpty()) polling = false;
             }
         } catch (Exception e) {
             log.error("获取主题 '{}' 的最新消息失败：", topic, e);
@@ -299,11 +358,11 @@ public class KafkaSchemaFactory {
      * 执行 AdminClient 操作（带错误处理）
      */
     private boolean executeAdmin(KafkaClientInfo clientInfo, AdminAction action, String actionDesc) {
-        try (AdminClient admin = AdminClient.create(plugin.buildAdminClientProps(clientInfo))) {
-            action.execute(admin);
+        try {
+            action.execute(admin(clientInfo));
             return true;
         } catch (Exception e) {
-            log.error("{} 在 '{}' 上执行失败：", actionDesc, clientInfo, e);
+            handleAdminFailure(clientInfo, e, actionDesc);
             return false;
         }
     }
@@ -315,7 +374,8 @@ public class KafkaSchemaFactory {
      * @return List<BrokerInfo> Broker 详情列表（brokerId、host、port）
      */
     public List<BrokerInfo> getClusterBrokers(KafkaClientInfo clientInfo) {
-        try (AdminClient adminClient = AdminClient.create(plugin.buildAdminClientProps(clientInfo))) {
+        try {
+            AdminClient adminClient = admin(clientInfo);
             DescribeClusterResult clusterResult = adminClient.describeCluster();
             Collection<Node> nodes = clusterResult.nodes().get();
 
@@ -329,7 +389,7 @@ public class KafkaSchemaFactory {
                     })
                     .toList(); // Java 16+，如果你用的是 Java 8，可以换成 collect(Collectors.toList())
         } catch (Exception e) {
-            log.error("获取 '{}' 的集群 Broker 列表失败：", clientInfo, e);
+            handleAdminFailure(clientInfo, e, "describe cluster brokers");
         }
         return Collections.emptyList();
     }
@@ -351,7 +411,7 @@ public class KafkaSchemaFactory {
 
         AdminClient adminClient = null;
         try {
-            adminClient = AdminClient.create(plugin.buildAdminClientProps(clientInfo));
+            adminClient = admin(clientInfo);
 
             // 1. Get topics description
             DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(topics);
@@ -394,11 +454,7 @@ public class KafkaSchemaFactory {
                 topicMetas.put(topicName, topicMetaData);
             }
         } catch (Exception e) {
-            log.error("获取集群 '{}' 中主题 '{}' 的元数据失败: ", clientInfo.getClusterId(), topics, e);
-        } finally {
-            if (adminClient != null) {
-                plugin.registerResourceForClose(adminClient);
-            }
+            handleAdminFailure(clientInfo, e, "describe topic metadata");
         }
 
         return topicMetas;
@@ -529,20 +585,144 @@ public class KafkaSchemaFactory {
      * @return Total record count across all partitions
      */
     public Long getTopicRecordCapacityNum(KafkaClientInfo kafkaClientInfo, List<BrokerInfo> brokerInfos, String topic) {
-        Long capacity = 0L;
+        return getTopicCapacities(kafkaClientInfo, brokerInfos, Collections.singleton(topic)).getOrDefault(topic, 0L);
+    }
+
+    /**
+     * End-offset (log size) for many topics using one AdminClient and one listOffsets call.
+     */
+    public Map<String, Long> getTopicLogSizes(KafkaClientInfo clientInfo, Set<String> topics) {
+        Map<String, Long> sizes = new HashMap<>();
+        if (topics == null || topics.isEmpty()) {
+            return sizes;
+        }
         try {
-            List<MetadataInfo> metadataInfos = getTopicPartitionMetadata(kafkaClientInfo, topic);
-            for (MetadataInfo metadataInfo : metadataInfos) {
-                JMXInitializeInfo initializeInfo = getBrokerJmxRmiOfLeaderId(brokerInfos, metadataInfo.getLeader());
-                if (NetUtils.telnet(initializeInfo.getHost(), initializeInfo.getPort())) {
-                    initializeInfo.setObjectName(String.format(JmxMetricsConst.Log.SIZE.key(), topic, metadataInfo.getPartitionId()));
-                    capacity += KafkaClusterFetcher.fetchTopicRecordCount(initializeInfo);
+            AdminClient adminClient = admin(clientInfo);
+            Map<String, TopicDescription> descriptions = adminClient.describeTopics(topics).allTopicNames().get();
+            Map<TopicPartition, OffsetSpec> latest = new HashMap<>();
+            for (Map.Entry<String, TopicDescription> entry : descriptions.entrySet()) {
+                for (TopicPartitionInfo partition : entry.getValue().partitions()) {
+                    latest.put(new TopicPartition(entry.getKey(), partition.partition()), OffsetSpec.latest());
+                }
+            }
+            if (latest.isEmpty()) {
+                return sizes;
+            }
+            ListOffsetsResult offsetsResult = adminClient.listOffsets(latest);
+            for (TopicPartition tp : latest.keySet()) {
+                try {
+                    long offset = offsetsResult.partitionResult(tp).get().offset();
+                    sizes.merge(tp.topic(), Math.max(offset, 0L), Long::sum);
+                } catch (Exception e) {
+                    log.debug("listOffsets failed for {}", tp, e);
                 }
             }
         } catch (Exception e) {
-            log.error("获取主题 '{}' 的记录容量失败: ", topic, e);
+            handleAdminFailure(clientInfo, e, "batch log size");
         }
-        return capacity;
+        return sizes;
+    }
+
+    /**
+     * Partition log Size JMX values grouped by leader broker (one connection per broker).
+     */
+    public Map<String, Long> getTopicCapacities(KafkaClientInfo clientInfo, List<BrokerInfo> brokerInfos, Set<String> topics) {
+        Map<String, Long> capacities = new HashMap<>();
+        if (topics == null || topics.isEmpty() || brokerInfos == null || brokerInfos.isEmpty()) {
+            return capacities;
+        }
+        Map<String, Integer> leaderByTopicPartition = new HashMap<>();
+        try {
+            Map<String, TopicDescription> descriptions = admin(clientInfo).describeTopics(topics).allTopicNames().get();
+            for (Map.Entry<String, TopicDescription> entry : descriptions.entrySet()) {
+                for (TopicPartitionInfo partition : entry.getValue().partitions()) {
+                    if (partition.leader() != null) {
+                        leaderByTopicPartition.put(entry.getKey() + ":" + partition.partition(), partition.leader().id());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            handleAdminFailure(clientInfo, e, "describe topics for capacity");
+            return capacities;
+        }
+        for (BrokerInfo broker : brokerInfos) {
+            if (broker.getJmxPort() == null || broker.getJmxPort() <= 0 || broker.getBrokerId() == null) {
+                continue;
+            }
+            int brokerId = broker.getBrokerId();
+            JMXInitializeInfo init = new JMXInitializeInfo();
+            init.setBrokerId(String.valueOf(brokerId));
+            init.setHost(broker.getHostIp());
+            init.setPort(broker.getJmxPort());
+            init.setTimeout(5L);
+            JmxConnectionManager.execute(init, connection -> {
+                javax.management.ObjectName pattern = new javax.management.ObjectName("kafka.log:type=Log,name=Size,topic=*,partition=*");
+                for (javax.management.ObjectName name : connection.queryNames(pattern, null)) {
+                    String topic = name.getKeyProperty("topic");
+                    String partition = name.getKeyProperty("partition");
+                    if (topic == null || partition == null || !topics.contains(topic)) {
+                        continue;
+                    }
+                    Integer leader = leaderByTopicPartition.get(topic + ":" + partition);
+                    if (leader == null || leader != brokerId) {
+                        continue;
+                    }
+                    try {
+                        Object value = connection.getAttribute(name, JmxMetricsConst.Log.VALUE.key());
+                        if (value != null) {
+                            capacities.merge(topic, Long.parseLong(value.toString()), Long::sum);
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+            });
+        }
+        return capacities;
+    }
+
+    /**
+     * BytesIn/BytesOut OneMinuteRate per topic, one JMX session per broker.
+     */
+    public Map<String, long[]> getTopicByteRates(List<BrokerInfo> brokerInfos, Set<String> topics) {
+        Map<String, long[]> rates = new HashMap<>();
+        if (topics == null || topics.isEmpty() || brokerInfos == null) {
+            return rates;
+        }
+        for (BrokerInfo broker : brokerInfos) {
+            if (broker.getJmxPort() == null || broker.getJmxPort() <= 0) {
+                continue;
+            }
+            JMXInitializeInfo init = new JMXInitializeInfo();
+            init.setBrokerId(String.valueOf(broker.getBrokerId()));
+            init.setHost(broker.getHostIp());
+            init.setPort(broker.getJmxPort());
+            init.setTimeout(5L);
+            JmxConnectionManager.execute(init, connection -> {
+                collectByteRate(connection, "BytesInPerSec", topics, rates, 0);
+                collectByteRate(connection, "BytesOutPerSec", topics, rates, 1);
+            });
+        }
+        return rates;
+    }
+
+    private void collectByteRate(javax.management.MBeanServerConnection connection, String metric,
+                                 Set<String> topics, Map<String, long[]> rates, int index) throws Exception {
+        javax.management.ObjectName pattern = new javax.management.ObjectName(
+                "kafka.server:type=BrokerTopicMetrics,name=" + metric + ",topic=*");
+        for (javax.management.ObjectName name : connection.queryNames(pattern, null)) {
+            String topic = name.getKeyProperty("topic");
+            if (topic == null || !topics.contains(topic)) {
+                continue;
+            }
+            try {
+                Object value = connection.getAttribute(name, "OneMinuteRate");
+                if (value != null) {
+                    long[] slot = rates.computeIfAbsent(topic, key -> new long[]{0L, 0L});
+                    slot[index] += Math.round(Double.parseDouble(value.toString()));
+                }
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     /**
@@ -555,7 +735,8 @@ public class KafkaSchemaFactory {
     public List<MetadataInfo> getTopicPartitionMetadata(KafkaClientInfo kafkaClientInfo, String topic) {
         List<MetadataInfo> metadataInfos = new ArrayList<>();
 
-        try (AdminClient adminClient = AdminClient.create(plugin.buildAdminClientProps(kafkaClientInfo))) {
+        try {
+            AdminClient adminClient = admin(kafkaClientInfo);
             DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Collections.singleton(topic));
             TopicDescription description = describeTopicsResult.allTopicNames().get().get(topic);
 
@@ -624,7 +805,7 @@ public class KafkaSchemaFactory {
         AdminClient adminClient = null;
 
         try {
-            adminClient = AdminClient.create(plugin.buildAdminClientProps(kafkaClientInfo));
+            adminClient = admin(kafkaClientInfo);
             DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Collections.singleton(topic));
 
             Map<String, TopicDescription> topicDescriptions = describeTopicsResult.allTopicNames().get();
@@ -662,9 +843,7 @@ public class KafkaSchemaFactory {
             log.error("获取集群 '{}' 中主题 '{}' 的分区页面失败: ", kafkaClientInfo.getClusterId(), topic, e);
             result.setTotal(0);
         } finally {
-            if (adminClient != null) {
-                plugin.registerResourceForClose(adminClient);
-            }
+
         }
 
         return result;
@@ -741,7 +920,7 @@ public class KafkaSchemaFactory {
         AdminClient adminClient = null;
         ConsumerGroupDescInfo consumerGroupDescInfo = new ConsumerGroupDescInfo();
         try {
-            adminClient = AdminClient.create(plugin.buildAdminClientProps(kafkaClientInfo));
+            adminClient = admin(kafkaClientInfo);
             for (ConsumerGroupListing consumerGroupListing : adminClient.listConsumerGroups().all().get()) {
                 String groupId = consumerGroupListing.groupId();
                 if (!groupId.equals(ClusterMetricsConst.Cluster.EFAK_SYSTEM_GROUP.key())) {
@@ -753,9 +932,7 @@ public class KafkaSchemaFactory {
         } catch (Exception e) {
             log.error("获取数据库 '{}' 的消费者组对象失败: ", kafkaClientInfo, e);
         } finally {
-            if (adminClient != null) {
-                plugin.registerResourceForClose(adminClient);
-            }
+
         }
 
         return consumerGroupDescInfo;
@@ -772,7 +949,7 @@ public class KafkaSchemaFactory {
         List<ConsumerGroupTopicInfo> consumerGroupTopicInfos = new ArrayList<>();
         AdminClient adminClient = null;
         try {
-            adminClient = AdminClient.create(plugin.buildAdminClientProps(kafkaClientInfo));
+            adminClient = admin(kafkaClientInfo);
 
             // 批量获取消费者组状态，减少API请求次数
             Map<String, ConsumerGroupDescription> descConsumerGroup = adminClient.describeConsumerGroups(groupIds).all().get();
@@ -822,9 +999,7 @@ public class KafkaSchemaFactory {
         } catch (Exception e) {
             log.error("获取消费者组主题偏移量时出错，数据库 {}: ", kafkaClientInfo, e);
         } finally {
-            if (adminClient != null) {
-                plugin.registerResourceForClose(adminClient);
-            }
+
         }
         return consumerGroupTopicInfos;
     }
@@ -836,7 +1011,7 @@ public class KafkaSchemaFactory {
         AdminClient adminClient = null;
         Set<String> groupIdSets = new HashSet<>();
         try {
-            adminClient = AdminClient.create(plugin.buildAdminClientProps(kafkaClientInfo));
+            adminClient = admin(kafkaClientInfo);
 
             for (ConsumerGroupListing consumerGroupListing : adminClient.listConsumerGroups().all().get()) {
                 String groupId = consumerGroupListing.groupId();
@@ -848,9 +1023,7 @@ public class KafkaSchemaFactory {
         } catch (Exception e) {
             log.error("加载数据库 '{}' 的 Kafka 客户端失败: ", kafkaClientInfo, e);
         } finally {
-            if (adminClient != null) {
-                plugin.registerResourceForClose(adminClient);
-            }
+
         }
         return groupIdSets;
     }
@@ -866,7 +1039,7 @@ public class KafkaSchemaFactory {
         List<ConsumerGroupDetailInfo> consumerGroupInfos = new ArrayList<>();
 
         try {
-            adminClient = AdminClient.create(plugin.buildAdminClientProps(kafkaClientInfo));
+            adminClient = admin(kafkaClientInfo);
             Iterator<ConsumerGroupListing> itors = adminClient.listConsumerGroups().all().get().iterator();
             Set<String> groupIdSets = new HashSet<>();
             while (itors.hasNext()) {
@@ -921,9 +1094,7 @@ public class KafkaSchemaFactory {
         } catch (Exception e) {
             log.error("加载数据库 '{}' 的 Kafka 客户端失败: ", kafkaClientInfo, e);
         } finally {
-            if (adminClient != null) {
-                plugin.registerResourceForClose(adminClient);
-            }
+
         }
 
         return consumerGroupInfos;
@@ -941,7 +1112,7 @@ public class KafkaSchemaFactory {
         List<ConsumerGroupDetailInfo> consumerGroupInfos = new ArrayList<>();
 
         try {
-            adminClient = AdminClient.create(plugin.buildAdminClientProps(kafkaClientInfo));
+            adminClient = admin(kafkaClientInfo);
 
             Map<String, ConsumerGroupDescription> descConsumerGroup = adminClient.describeConsumerGroups(groupIds).all().get();
             for (String groupId : groupIds) {
@@ -989,9 +1160,7 @@ public class KafkaSchemaFactory {
         } catch (Exception e) {
             log.error("Failure while loading kafka client for database '{}': ", kafkaClientInfo, e);
         } finally {
-            if (adminClient != null) {
-                plugin.registerResourceForClose(adminClient);
-            }
+
         }
 
         return consumerGroupInfos;
@@ -1020,7 +1189,7 @@ public class KafkaSchemaFactory {
                                            String topic, String mode, Long value) {
         AdminClient adminClient = null;
         try {
-            adminClient = AdminClient.create(plugin.buildAdminClientProps(clientInfo));
+            adminClient = admin(clientInfo);
 
             // 1. 获取 topic 的分区信息
             DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Collections.singleton(topic));
@@ -1105,9 +1274,7 @@ public class KafkaSchemaFactory {
                     groupId, topic, mode, e);
             return false;
         } finally {
-            if (adminClient != null) {
-                plugin.registerResourceForClose(adminClient);
-            }
+
         }
     }
 
@@ -1126,7 +1293,7 @@ public class KafkaSchemaFactory {
                                                         String mode, Long value) {
         AdminClient adminClient = null;
         try {
-            adminClient = AdminClient.create(plugin.buildAdminClientProps(clientInfo));
+            adminClient = admin(clientInfo);
 
             // 1. 获取消费者组消费的所有 topic 和分区
             ListConsumerGroupOffsetsResult offsetsResult = adminClient.listConsumerGroupOffsets(groupId);
@@ -1220,9 +1387,7 @@ public class KafkaSchemaFactory {
                     groupId, mode, e);
             return false;
         } finally {
-            if (adminClient != null) {
-                plugin.registerResourceForClose(adminClient);
-            }
+
         }
     }
 }

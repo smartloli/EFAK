@@ -6,12 +6,12 @@
     <div class="px-8 py-4">
         <div class="flex flex-col sm:flex-row items-center justify-between text-sm text-gray-600">
             <div class="flex items-center space-x-2 mb-2 sm:mb-0 ml-4">
-                <span>Copyright © 2025</span>
+                <span>Copyright © 2026</span>
                 <a href="https://kafka-eagle.org/" target="_blank"
                     class="font-semibold text-primary hover:text-primary/80 transition-colors">
                     EFAK · AI
                 </a>
-                <span class="px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full"
+                <span class="px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded"
                     th:text="'v' + (${appVersion} ?: '5.0.0')">
                     v5.0.0
                 </span>
@@ -44,12 +44,12 @@
     <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
             <div class="text-center space-x-2 md:text-left mb-4 md:mb-0">
-                <span class="text-sm text-gray-500">Copyright © 2025</span>
+                <span class="text-sm text-gray-500">Copyright © 2026</span>
                 <a href="https://kafka-eagle.org/" target="_blank"
                    class="font-semibold text-primary hover:text-primary/80 transition-colors">
                     EFAK · AI
                 </a>
-                <span class="px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full"
+                <span class="px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded"
                       th:text="'v' + (${appVersion} ?: '5.0.0')">
                     v5.0.0
                 </span>
@@ -87,6 +87,17 @@
         window.tailwind = window.tailwind || {};
         window.tailwind.config = {
             theme: {
+                borderRadius: {
+                    none: '0px',
+                    sm: '2px',
+                    DEFAULT: '2px',
+                    md: '2px',
+                    lg: '2px',
+                    xl: '2px',
+                    '2xl': '2px',
+                    '3xl': '2px',
+                    full: '9999px'
+                },
                 extend: {
                     colors: {
                         primary: '#165DFF',
@@ -119,6 +130,17 @@
         window.tailwind = window.tailwind || {};
         window.tailwind.config = {
             theme: {
+                borderRadius: {
+                    none: '0px',
+                    sm: '2px',
+                    DEFAULT: '2px',
+                    md: '2px',
+                    lg: '2px',
+                    xl: '2px',
+                    '2xl': '2px',
+                    '3xl': '2px',
+                    full: '9999px'
+                },
                 extend: {
                     colors: {
                         primary: '#165DFF',
@@ -144,10 +166,11 @@
 <!-- css fragment -->
 <th:block th:fragment="css">
     <!-- logo icon -->
-    <link rel="shortcut icon" th:href="@{/images/efak_ai_logo.png}" />
+    <link rel="shortcut icon" th:href="@{/images/efak_ai_login.png?v1}" />
     <!-- plugins -->
     <link th:href="@{/plugins/tailwindcss/tailwind.min.css}" rel="stylesheet">
     <link th:href="@{/plugins/tailwindcss/tailwind-config.css}" rel="stylesheet">
+    <link th:href="@{/css/design-tokens.css}" rel="stylesheet">
     <link th:href="@{/plugins/fontawesome/all.min.css}" rel="stylesheet">
     <link th:href="@{/plugins/select2/select2.min.css}" rel="stylesheet">
 
@@ -167,14 +190,15 @@
                 @apply bg-primary/10 text-primary border-l-4 border-primary;
             }
             .chart-container {
-                @apply bg-white rounded-xl shadow-sm p-4 border border-gray-100;
+                @apply bg-white rounded shadow-sm p-4 border border-gray-100;
             }
             .fixed-sidebar {
                 height: 100vh;
                 overflow-y: auto;
+                overscroll-behavior: contain;
             }
             .fixed-header {
-                height: 65px;
+                height: var(--efak-topbar-height, 64px);
             }
             
             /* 侧边栏折叠状态样式 */
@@ -193,28 +217,13 @@
                 justify-content: center;
             }
             
-            .sidebar-collapsed .sidebar-logo-container {
-                padding: 0.5rem 0;
-            }
-            
-            .sidebar-collapsed .sidebar-logo-container:hover {
-                background-color: rgba(0, 0, 0, 0.05);
-                border-radius: 0.5rem;
-            }
-            
-            /* 圆形logo样式 */
-            .sidebar-logo-container img {
-                border-radius: 50%;
-                object-fit: cover;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
             
             /* 提示框样式 */
             .sidebar-tooltip {
                 white-space: nowrap;
                 font-size: 0.875rem;
                 line-height: 1.25rem;
-                border-radius: 0.5rem;
+                border-radius: 2px;
                 backdrop-filter: blur(4px);
                 max-width: 200px;
                 word-wrap: break-word;
@@ -364,12 +373,12 @@
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: #165DFF;
                 color: white;
                 font-size: 0.75rem;
                 font-weight: 600;
                 padding: 0.25rem 0.5rem;
-                border-radius: 0.375rem;
+                border-radius: 2px;
                 min-width: 2rem;
                 height: 1.5rem;
             }
@@ -377,12 +386,12 @@
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                background: #64748b;
                 color: white;
                 font-size: 0.75rem;
                 font-weight: 600;
                 padding: 0.25rem 0.5rem;
-                border-radius: 0.375rem;
+                border-radius: 2px;
                 min-width: 2rem;
                 height: 1.5rem;
             }
@@ -405,7 +414,7 @@
                 align-items: center;
                 justify-content: center;
                 padding: 0.25rem 0.5rem;
-                border-radius: 0.5rem;
+                border-radius: 2px;
                 font-size: 0.75rem;
                 font-weight: 500;
                 min-width: 4rem;
@@ -455,7 +464,7 @@
                 background-color: #333;
                 color: #fff;
                 text-align: left;
-                border-radius: 6px;
+                border-radius: 2px;
                 padding: 8px 12px;
                 position: fixed;
                 z-index: 9999;

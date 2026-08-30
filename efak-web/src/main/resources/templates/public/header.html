@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <!-- 顶部导航栏 -->
-<header class="fixed top-0 right-0 bg-white border-b border-gray-200 shadow-sm z-20 fixed-header header-mobile"
+<header class="fixed top-0 right-0 bg-white border-b border-gray-200 z-20 fixed-header header-mobile"
     style="left: 256px;" th:fragment="header">
-    <div class="flex items-center justify-between px-4 py-3">
+    <div class="flex items-center justify-between px-4 h-full">
         <div class="flex items-center">
             <button id="mobile-sidebar-toggle" class="p-2 rounded-lg lg:hidden hover:bg-gray-100 transition-colors">
                 <i class="fa fa-bars"></i>
@@ -19,8 +19,8 @@
             <div class="relative">
                 <button id="notification-button" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
                     <i class="fa fa-bell"></i>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full notification-badge"
-                        th:if="${hasNotifications}"></span>
+                    <span id="notification-badge"
+                        class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full notification-badge hidden"></span>
                 </button>
             </div>
 
@@ -28,7 +28,7 @@
             <div class="relative">
                 <div id="user-menu-button"
                     class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
-                    <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_profile.jpg' : '/images/user_profile_2.jpg'}"
+                    <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_admin_logo.png' : '/images/user_logo.png'}"
                         alt="用户头像" class="w-8 h-8 rounded-full object-cover border border-gray-200" />
                     <div class="hidden md:block">
                         <div class="text-sm font-medium" th:text="${userName} ?: 'Admin'">Admin</div>
@@ -91,13 +91,13 @@
                         清空全部
                     </button>
                 </div>
-                <span class="text-xs text-gray-500" id="notification-count">3条未读</span>
+                <span class="text-xs text-gray-500" id="notification-count">暂无未读</span>
             </div>
 
             <!-- 通知列表 -->
             <div class="flex-1 overflow-y-auto">
                 <div class="notification-list" id="notification-list">
-                    <!-- 动态加载告警通知 -->
+                    <!-- Alert notifications -->
                 </div>
 
                 <!-- 空状态 -->
@@ -132,7 +132,7 @@
             </div>
             <div class="p-6">
                 <div class="flex flex-col items-center mb-6">
-                    <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_profile.jpg' : '/images/user_profile_2.jpg'}"
+                    <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_admin_logo.png' : '/images/user_logo.png'}"
                         alt="用户头像" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 mb-4" />
                     <h4 class="text-xl font-semibold text-gray-900" th:text="${userName} ?: 'Admin'">Admin</h4>
                     <p class="text-sm text-gray-500" th:text="${userRole} ?: '管理员'">管理员</p>
@@ -230,31 +230,10 @@
         </div>
     </div>
 
-    <!-- 美化提示框 -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <div id="toast-container"></div>
 </header>
 
 <script>
-    // 全局测试函数 - 可从控制台调用
-    window.testNotificationAPI = function() {
-        console.log('=== 手动测试通知API ===');
-        // 调用common.js中的函数
-        if (window.CommonModule && window.CommonModule.testLoadAlertNotifications) {
-            window.CommonModule.testLoadAlertNotifications();
-        }
-    };
-
-    // 全局测试函数 - 测试面板显示
-    window.testNotificationPanel = function() {
-        console.log('=== 手动测试通知面板显示 ===');
-        const panel = document.getElementById('notification-panel');
-        const overlay = document.getElementById('notification-overlay');
-        if (panel && overlay) {
-            panel.classList.remove('translate-x-full');
-            overlay.classList.remove('hidden');
-        }
-    };
-
     // 密码可见性切换函数
     function togglePasswordVisibility(inputId) {
         const input = document.getElementById(inputId);

@@ -22,6 +22,7 @@ import org.kafka.eagle.dto.consumer.ConsumerGroupDetailInfo;
 import org.kafka.eagle.dto.consumer.ConsumerGroupTopicInfo;
 import org.kafka.eagle.dto.jmx.JMXInitializeInfo;
 import org.kafka.eagle.dto.performance.PerformanceMonitor;
+import org.kafka.eagle.dto.scheduler.CollectRound;
 import org.kafka.eagle.dto.scheduler.TaskExecutionResult;
 import org.kafka.eagle.dto.scheduler.TaskScheduler;
 import org.kafka.eagle.dto.topic.TopicDetailedStats;
@@ -93,17 +94,24 @@ public class TaskExecutorManager {
     @Autowired
     private DataCleanupService dataCleanupService;
 
+    @Autowired
+    private CollectRoundMapper collectRoundMapper;
+
     @Value("${efak.data-retention-days:30}")
     private int dataRetentionDays;
+
+    private final KafkaSchemaFactory schemaFactory = new KafkaSchemaFactory(new KafkaStoragePlugin());
+    private static final ThreadLocal<String> COLLECT_ROUND = new ThreadLocal<>();
 
     /**
      * 执行任务
      */
     public TaskExecutionResult executeTask(TaskScheduler task) {
         TaskExecutionResult result = new TaskExecutionResult();
-
+        String roundId = System.currentTimeMillis() + "-" + taskCoordinator.getCurrentNodeId() + "-" + task.getTaskType();
+        COLLECT_ROUND.set(roundId);
+        CollectRound round = beginRound(task, roundId);
         try {
-            // 根据任务类型执行不同的任务
             switch (task.getTaskType()) {
                 case TaskConfig.TASK_TYPE_TOPIC_MONITOR:
                     result = executeTopicMonitorTask(task);
@@ -132,6 +140,9 @@ public class TaskExecutorManager {
             log.error("任务执行异常: {}", e.getMessage(), e);
             result.setSuccess(false);
             result.setErrorMessage("任务执行异常：" + e.getMessage());
+        } finally {
+            finishRound(round, result);
+            COLLECT_ROUND.remove();
         }
 
         return result;
@@ -171,7 +182,7 @@ public class TaskExecutorManager {
                     KafkaClientInfo kafkaClientInfo = KafkaClientUtils.buildKafkaClientInfo(cluster, brokers);
 
                     // 使用KafkaSchemaFactory获取主题名称
-                    KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+                    KafkaSchemaFactory ksf = schemaFactory;
                     Set<String> clusterTopics = ksf.listTopicNames(kafkaClientInfo);
 
                     // 将主题添加到总列表，并记录所属集群
@@ -197,15 +208,6 @@ public class TaskExecutorManager {
             List<String> assignedTopicNames = taskCoordinator.shardTopics(allTopicNames);
 
             if (assignedTopicNames.isEmpty()) {
-                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
-                Map<String, Object> shardResult = new HashMap<>();
-                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
-                shardResult.put("assignedTopicCount", 0);
-                shardResult.put("partitionCount", 0L);
-                shardResult.put("processedTopicNames", Collections.emptyList());
-                shardResult.put("savedToDatabase", 0);
-                taskCoordinator.saveShardResult("topic_monitor", shardResult);
-
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到主题，任务完成");
                 return result;
@@ -213,6 +215,7 @@ public class TaskExecutorManager {
 
             // 4. 获取分配给当前节点的主题详细统计信息
             List<TopicDetailedStats> topicStats = new ArrayList<>();
+            List<TopicMetrics> collectedTopicMetrics = new ArrayList<>();
             int totalPartitions = 0;
 
             // 按集群分组处理主题，实现批量获取
@@ -251,43 +254,35 @@ public class TaskExecutorManager {
                     // 构建KafkaClientInfo，使用KafkaClientUtils工具类
                     KafkaClientInfo kafkaClientInfo = KafkaClientUtils.buildKafkaClientInfo(cluster, brokers);
 
-                    // 使用批量方法获取该集群所有主题的元数据，传递broker信息用于计算
-                    KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+                    KafkaSchemaFactory ksf = schemaFactory;
                     Set<String> topicsSet = new HashSet<>(clusterTopicNames);
                     Map<String, TopicDetailedStats> topicMetadataMap = ksf.getTopicMetaData(kafkaClientInfo, topicsSet, brokers);
 
-                    // 处理每个主题的元数据
                     for (String topicName : clusterTopicNames) {
                         TopicDetailedStats topicMetadata = topicMetadataMap.get(topicName);
-
                         if (topicMetadata == null) {
                             log.warn("未能获取主题 {} 的元数据，跳过", topicName);
                             continue;
                         }
-
-                        // 设置额外属性
                         topicMetadata.setClusterId(clusterId);
-
-                        // 收集额外的主题指标数据
-                        try {
-                            TopicMetrics topicMetrics = collectTopicMetrics(kafkaClientInfo, brokers, topicName, ksf);
-                            if (topicMetrics != null) {
-                                // 保存主题指标到数据库
-                                saveTopicMetrics(topicMetrics);
-                            }
-                            List<TopicInstantMetrics> topicInstantMetrics = collectTopicInstantMetrics(kafkaClientInfo, brokers, topicName, ksf);
-                            if (topicInstantMetrics.size() > 0) {
-                                // 保存主题即时指标
-                                topicInstantMetricsMapper.batchUpsertMetrics(topicInstantMetrics);
-                            }
-
-                        } catch (Exception e) {
-                            log.error("收集主题 {} 指标数据失败: {}", topicName, e.getMessage(), e);
-                        }
-
                         topicStats.add(topicMetadata);
                         totalPartitions += topicMetadata.getPartitionCount();
+                    }
 
+                    try {
+                        Map<String, Long> capacities = ksf.getTopicCapacities(kafkaClientInfo, brokers, topicsSet);
+                        Map<String, Long> logSizes = ksf.getTopicLogSizes(kafkaClientInfo, topicsSet);
+                        Map<String, long[]> rates = ksf.getTopicByteRates(brokers, topicsSet);
+                        String roundId = currentCollectRound();
+                        collectedTopicMetrics.addAll(collectTopicMetricsBatch(
+                                kafkaClientInfo, clusterTopicNames, capacities, logSizes, rates, roundId));
+                        List<TopicInstantMetrics> batchInstant = collectTopicInstantMetricsBatch(
+                                kafkaClientInfo, clusterTopicNames, capacities, logSizes, rates, roundId);
+                        if (!batchInstant.isEmpty()) {
+                            topicInstantMetricsMapper.batchUpsertMetrics(batchInstant);
+                        }
+                    } catch (Exception metricEx) {
+                        log.error("集群 {} 主题指标写入失败: {}", clusterId, metricEx.getMessage(), metricEx);
                     }
 
                 } catch (Exception e) {
@@ -297,6 +292,7 @@ public class TaskExecutorManager {
 
             // 5. 将统计信息保存到数据库
             int savedCount = saveTopicStatsToDatabase(topicStats);
+            saveTopicMetricsBatch(collectedTopicMetrics);
 
             // 6. 构建返回数据
             Map<String, Object> data = new HashMap<>();
@@ -348,30 +344,36 @@ public class TaskExecutorManager {
      * 将主题统计信息保存到数据库
      */
     private int saveTopicStatsToDatabase(List<TopicDetailedStats> topicStats) {
-        int savedCount = 0;
-
+        if (topicStats == null || topicStats.isEmpty()) {
+            return 0;
+        }
         try {
+            List<TopicInfo> topicInfos = new ArrayList<>(topicStats.size());
             for (TopicDetailedStats stats : topicStats) {
                 TopicInfo topicInfo = convertToTopicInfo(stats);
                 topicInfo.setCreateBy("system");
                 topicInfo.setUpdateBy("system");
-
-                try {
-                    // 使用基于topic_name和cluster_id的插入/更新方法
-                    int result = topicInfoMapper.insertOrUpdateByTopicAndCluster(topicInfo);
-                    if (result > 0) {
-                        savedCount++;
-                    }
-                } catch (Exception e) {
-                    log.error("保存主题统计信息失败: {} (集群: {}), 错误: {}",
-                            stats.getTopicName(), stats.getClusterId(), e.getMessage(), e);
-                }
+                topicInfos.add(topicInfo);
             }
+            return topicInfoMapper.batchInsertOrUpdateByTopicAndCluster(topicInfos);
         } catch (Exception e) {
             log.error("批量保存主题统计信息时发生异常", e);
+            return 0;
         }
+    }
 
-        return savedCount;
+    private void saveTopicMetricsBatch(List<TopicMetrics> metricsList) {
+        if (metricsList == null || metricsList.isEmpty()) {
+            return;
+        }
+        try {
+            int result = topicMetricsMapper.batchInsert(metricsList);
+            if (result <= 0) {
+                log.warn("批量保存主题指标失败，影响行数为0, size={}", metricsList.size());
+            }
+        } catch (Exception e) {
+            log.error("批量保存主题指标失败, size={}", metricsList.size(), e);
+        }
     }
 
     /**
@@ -436,7 +438,7 @@ public class TaskExecutorManager {
                     KafkaClientInfo kafkaClientInfo = KafkaClientUtils.buildKafkaClientInfo(cluster, brokers);
 
                     // 使用KafkaSchemaFactory获取消费者组集合
-                    KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+                    KafkaSchemaFactory ksf = schemaFactory;
                     Set<String> groupIds = ksf.getConsumerGroupIds(kafkaClientInfo);
 
                     // 将消费者组添加到总列表，并记录所属集群
@@ -462,16 +464,6 @@ public class TaskExecutorManager {
             List<String> assignedConsumerGroupIds = taskCoordinator.shardConsumerGroups(allConsumerGroupIds);
 
             if (assignedConsumerGroupIds.isEmpty()) {
-                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
-                Map<String, Object> shardResult = new HashMap<>();
-                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
-                shardResult.put("assignedConsumerGroupCount", 0);
-                shardResult.put("activeConsumers", 0);
-                shardResult.put("lagConsumers", 0);
-                shardResult.put("totalLag", 0L);
-                shardResult.put("processedConsumerGroupIds", Collections.emptyList());
-                taskCoordinator.saveShardResult("consumer_monitor", shardResult);
-
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到消费者组，任务完成");
                 return result;
@@ -520,7 +512,7 @@ public class TaskExecutorManager {
                     KafkaClientInfo kafkaClientInfo = KafkaClientUtils.buildKafkaClientInfo(cluster, brokers);
 
                     // 使用批量方法获取该集群所有消费者组的主题信息
-                    KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
+                    KafkaSchemaFactory ksf = schemaFactory;
                     Set<String> groupIdsSet = new HashSet<>(clusterGroupIds);
 
                     // 获取消费者组详细信息（用于统计活跃消费者）
@@ -634,17 +626,6 @@ public class TaskExecutorManager {
             List<Integer> assignedBrokerIds = taskCoordinator.shardBrokers(allBrokerIds);
 
             if (assignedBrokerIds.isEmpty()) {
-                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
-                Map<String, Object> shardResult = new HashMap<>();
-                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
-                shardResult.put("assignedBrokerCount", 0);
-                shardResult.put("onlineBrokers", 0);
-                shardResult.put("offlineBrokers", 0);
-                shardResult.put("updatedBrokers", 0);
-                shardResult.put("savedMetrics", 0);
-                shardResult.put("processedBrokerIds", Collections.emptyList());
-                taskCoordinator.saveShardResult("cluster_monitor", shardResult);
-
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到broker，任务完成");
                 return result;
@@ -671,6 +652,7 @@ public class TaskExecutorManager {
             int updatedBrokers = 0;
             int createdBrokers = 0;
             int savedMetrics = 0;
+            List<BrokerMetrics> collectedBrokerMetrics = new ArrayList<>();
 
             for (BrokerDetailedInfo broker : brokerInfos) {
                 if ("ONLINE".equals(broker.getStatus())) {
@@ -707,14 +689,7 @@ public class TaskExecutorManager {
 
                 // 更新broker信息到数据库
                 try {
-                    // 从assignedBrokers中找到对应的broker信息获取clusterId
-                    String clusterId = assignedBrokers.stream()
-                            .filter(b -> b.getBrokerId().equals(broker.getBrokerId()))
-                            .map(BrokerInfo::getClusterId)
-                            .findFirst()
-                            .orElse("default"); // 默认集群ID
-
-                    updateBrokerInfoInDatabase(broker, clusterId);
+                    updateBrokerInfoInDatabase(broker);
                     updatedBrokers++;
                 } catch (Exception e) {
                     log.error("更新broker {} 信息到数据库失败: {}", broker.getBrokerId(), e.getMessage(), e);
@@ -736,28 +711,23 @@ public class TaskExecutorManager {
                             .orElse("default"); // 默认集群ID
                     metrics.setClusterId(clusterId);
 
-                    // 转换CPU和内存使用率为BigDecimal
-                    if (broker.getCpuUsagePercent() != 0.0) {
-                        metrics.setCpuUsage(BigDecimal.valueOf(broker.getCpuUsagePercent()));
-                    }
-                    if (broker.getMemoryUsagePercent() != 0.0) {
-                        metrics.setMemoryUsage(BigDecimal.valueOf(broker.getMemoryUsagePercent()));
-                    }
+                    metrics.setCpuUsage(BigDecimal.valueOf(broker.getCpuUsagePercent()));
+                    metrics.setMemoryUsage(BigDecimal.valueOf(broker.getMemoryUsagePercent()));
 
                     LocalDateTime now = LocalDateTime.now();
                     metrics.setCollectTime(now);
                     metrics.setCreateTime(now);
-
-                    boolean saved = brokerMetricsService.saveBrokerMetrics(metrics);
-                    if (saved) {
-                        savedMetrics++;
-                    } else {
-                        log.warn("保存broker {} 性能指标数据失败", broker.getBrokerId());
-                    }
+                    metrics.setCollectRound(currentCollectRound());
+                    collectedBrokerMetrics.add(metrics);
                 } catch (Exception e) {
                     log.error("保存broker {} 性能指标数据失败: {}", broker.getBrokerId(), e.getMessage(), e);
                     // 不抛出异常，继续处理其他broker
                 }
+            }
+
+            if (!collectedBrokerMetrics.isEmpty()) {
+                boolean saved = brokerMetricsService.batchSaveBrokerMetrics(collectedBrokerMetrics);
+                savedMetrics = saved ? collectedBrokerMetrics.size() : 0;
             }
 
             Map<String, Object> data = new HashMap<>();
@@ -854,16 +824,6 @@ public class TaskExecutorManager {
             List<Long> assignedConfigIds = taskCoordinator.shardAlertConfigs(allConfigIds);
 
             if (assignedConfigIds.isEmpty()) {
-                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
-                Map<String, Object> shardResult = new HashMap<>();
-                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
-                shardResult.put("assignedConfigCount", 0);
-                shardResult.put("evaluatedCount", 0);
-                shardResult.put("triggeredCount", 0);
-                shardResult.put("sentCount", 0);
-                shardResult.put("processedConfigIds", Collections.emptyList());
-                taskCoordinator.saveShardResult("alert_monitor", shardResult);
-
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到告警配置，任务完成");
                 return result;
@@ -1406,16 +1366,6 @@ public class TaskExecutorManager {
             List<String> assignedTables = taskCoordinator.shardTables(tableNames);
 
             if (assignedTables.isEmpty()) {
-                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
-                Map<String, Object> shardResult = new HashMap<>();
-                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
-                shardResult.put("assignedTableCount", 0);
-                shardResult.put("cleanedRecords", 0);
-                shardResult.put("freedSpace", 0L);
-                shardResult.put("cleanupResults", Collections.emptyMap());
-                shardResult.put("processedTables", Collections.emptyList());
-                taskCoordinator.saveShardResult("data_cleanup", shardResult);
-
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到清理表，任务完成");
                 return result;
@@ -1505,16 +1455,6 @@ public class TaskExecutorManager {
             List<Integer> assignedBrokerIds = taskCoordinator.shardBrokers(allBrokerIds);
 
             if (assignedBrokerIds.isEmpty()) {
-                // 关键逻辑：即使当前节点未分配到任务，也上报空分片结果，便于统计/汇总口径一致
-                Map<String, Object> shardResult = new HashMap<>();
-                shardResult.put("nodeId", taskCoordinator.getCurrentNodeId());
-                shardResult.put("assignedBrokerCount", 0);
-                shardResult.put("successCount", 0);
-                shardResult.put("failureCount", 0);
-                shardResult.put("savedCount", 0);
-                shardResult.put("processedBrokerIds", Collections.emptyList());
-                taskCoordinator.saveShardResult("performance_stats", shardResult);
-
                 result.setSuccess(true);
                 result.setResult("当前节点没有分配到broker，任务完成");
                 return result;
@@ -1675,15 +1615,14 @@ public class TaskExecutorManager {
      * 更新broker信息到数据库
      * 注意：host、port、jmx_port字段不会被覆盖，保持原有值
      */
-    private void updateBrokerInfoInDatabase(BrokerDetailedInfo broker, String clusterId) {
+    private void updateBrokerInfoInDatabase(BrokerDetailedInfo broker) {
         try {
-            // 检查broker是否已存在 - 使用新的方法确保唯一性
-            BrokerInfo existingBroker = brokerMapper.getBrokerByClusterIdAndBrokerId(clusterId, broker.getBrokerId());
+            // 检查broker是否已存在
+            BrokerInfo existingBroker = brokerMapper.getBrokerByBrokerId(broker.getBrokerId());
 
             if (existingBroker != null) {
                 // 更新现有broker的动态信息，不更新host、port、jmx_port字段
                 int updateResult = brokerMapper.updateBrokerDynamicInfo(
-                        clusterId,
                         broker.getBrokerId(),
                         broker.getStatus().toLowerCase(),
                         java.math.BigDecimal.valueOf(broker.getCpuUsagePercent()),
@@ -1698,7 +1637,6 @@ public class TaskExecutorManager {
             } else {
                 // 创建新的broker信息
                 BrokerInfo newBroker = new BrokerInfo();
-                newBroker.setClusterId(clusterId);
                 newBroker.setBrokerId(broker.getBrokerId());
                 newBroker.setHostIp(broker.getHost());
                 newBroker.setPort(broker.getPort());
@@ -1835,6 +1773,143 @@ public class TaskExecutorManager {
             log.error("通过JMX获取broker {} 详细信息失败: {}", brokerInfo.getBrokerId(), e.getMessage(), e);
             throw e;
         }
+    }
+
+    private String currentCollectRound() {
+        return COLLECT_ROUND.get();
+    }
+
+    private CollectRound beginRound(TaskScheduler task, String roundId) {
+        CollectRound round = new CollectRound();
+        round.setRoundId(roundId);
+        round.setTaskType(task.getTaskType());
+        round.setNodeId(taskCoordinator.getCurrentNodeId());
+        round.setAssignedCount(0);
+        round.setSuccessCount(0);
+        round.setSkippedCount(0);
+        round.setStartedAt(LocalDateTime.now());
+        try {
+            collectRoundMapper.insert(round);
+        } catch (Exception e) {
+            log.debug("Collect round insert skipped: {}", e.getMessage());
+        }
+        return round;
+    }
+
+    private void finishRound(CollectRound round, TaskExecutionResult result) {
+        if (round == null) {
+            return;
+        }
+        round.setFinishedAt(LocalDateTime.now());
+        if (result != null && result.getData() != null) {
+            Object assigned = result.getData().getOrDefault("assignedTopicCount",
+                    result.getData().getOrDefault("assignedBrokerCount",
+                            result.getData().getOrDefault("assignedConsumerGroupCount", 0)));
+            if (assigned instanceof Number) {
+                round.setAssignedCount(((Number) assigned).intValue());
+                round.setSuccessCount(result.isSuccess() ? round.getAssignedCount() : 0);
+            }
+        }
+        if (result != null && !result.isSuccess()) {
+            round.setErrorMessage(result.getErrorMessage());
+        }
+        try {
+            collectRoundMapper.finish(round);
+        } catch (Exception e) {
+            log.debug("Collect round finish skipped: {}", e.getMessage());
+        }
+    }
+
+    private List<TopicMetrics> collectTopicMetricsBatch(KafkaClientInfo kafkaClientInfo,
+                                                       List<String> topicNames,
+                                                       Map<String, Long> capacities,
+                                                       Map<String, Long> logSizes,
+                                                       Map<String, long[]> rates,
+                                                       String roundId) {
+        List<TopicMetrics> metricsList = new ArrayList<>();
+        if (topicNames == null || topicNames.isEmpty()) {
+            return metricsList;
+        }
+        LocalDateTime collectTime = LocalDateTime.now();
+        for (String topicName : topicNames) {
+            boolean hasCapacity = capacities.containsKey(topicName);
+            boolean hasLogSize = logSizes.containsKey(topicName);
+            boolean hasRate = rates.containsKey(topicName);
+            if (!hasCapacity && !hasLogSize && !hasRate) {
+                continue;
+            }
+            TopicMetrics metrics = new TopicMetrics();
+            metrics.setTopicName(topicName);
+            metrics.setClusterId(kafkaClientInfo.getClusterId());
+            metrics.setCollectTime(collectTime);
+            metrics.setCreateTime(collectTime);
+            metrics.setCollectRound(roundId);
+            metrics.setCapacity(hasCapacity ? capacities.get(topicName) : 0L);
+            metrics.setRecordCount(hasLogSize ? logSizes.get(topicName) : 0L);
+            long[] rate = hasRate ? rates.get(topicName) : new long[]{0L, 0L};
+            metrics.setWriteSpeed(BigDecimal.valueOf(rate[0]));
+            metrics.setReadSpeed(BigDecimal.valueOf(rate[1]));
+            try {
+                TopicMetrics latest = topicMetricsMapper.selectLatestTopicMetricsByClusterAndTopic(
+                        kafkaClientInfo.getClusterId(), topicName);
+                if (latest != null) {
+                    metrics.setRecordCountDiff(metrics.getRecordCount() - latest.getRecordCount());
+                    metrics.setCapacityDiff(metrics.getCapacity() - latest.getCapacity());
+                } else {
+                    metrics.setRecordCountDiff(0L);
+                    metrics.setCapacityDiff(0L);
+                }
+            } catch (Exception e) {
+                metrics.setRecordCountDiff(0L);
+                metrics.setCapacityDiff(0L);
+            }
+            metricsList.add(metrics);
+        }
+        return metricsList;
+    }
+
+    private List<TopicInstantMetrics> collectTopicInstantMetricsBatch(KafkaClientInfo kafkaClientInfo,
+                                                                     List<String> topicNames,
+                                                                     Map<String, Long> capacities,
+                                                                     Map<String, Long> logSizes,
+                                                                     Map<String, long[]> rates,
+                                                                     String roundId) {
+        List<TopicInstantMetrics> metricsList = new ArrayList<>();
+        if (topicNames == null || topicNames.isEmpty()) {
+            return metricsList;
+        }
+        LocalDateTime collectTime = LocalDateTime.now();
+        for (String topicName : topicNames) {
+            if (capacities.containsKey(topicName)) {
+                metricsList.add(instantMetric(kafkaClientInfo, topicName, MBeanMetricsConst.Topic.CAPACITY.key(),
+                        String.valueOf(capacities.get(topicName)), collectTime, roundId));
+            }
+            if (logSizes.containsKey(topicName)) {
+                metricsList.add(instantMetric(kafkaClientInfo, topicName, MBeanMetricsConst.Topic.LOG_SIZE.key(),
+                        String.valueOf(logSizes.get(topicName)), collectTime, roundId));
+            }
+            if (rates.containsKey(topicName)) {
+                long[] rate = rates.get(topicName);
+                metricsList.add(instantMetric(kafkaClientInfo, topicName, MBeanMetricsConst.Topic.BYTE_IN.key(),
+                        String.valueOf(rate[0]), collectTime, roundId));
+                metricsList.add(instantMetric(kafkaClientInfo, topicName, MBeanMetricsConst.Topic.BYTE_OUT.key(),
+                        String.valueOf(rate[1]), collectTime, roundId));
+            }
+        }
+        return metricsList;
+    }
+
+    private TopicInstantMetrics instantMetric(KafkaClientInfo clientInfo, String topicName, String type,
+                                             String value, LocalDateTime collectTime, String roundId) {
+        TopicInstantMetrics metrics = new TopicInstantMetrics();
+        metrics.setClusterId(clientInfo.getClusterId());
+        metrics.setTopicName(topicName);
+        metrics.setMetricType(type);
+        metrics.setMetricValue(value);
+        metrics.setLastUpdated(collectTime);
+        metrics.setCreateTime(collectTime);
+        metrics.setCollectRound(roundId);
+        return metrics;
     }
 
     /**
@@ -2045,25 +2120,7 @@ public class TaskExecutorManager {
      * 执行JMX操作的辅助方法
      */
     private void executeJmxOperation(JMXInitializeInfo initializeInfo, JMXOperation operation) {
-        javax.management.remote.JMXConnector connector = null;
-        try {
-            javax.management.remote.JMXServiceURL jmxUrl = new javax.management.remote.JMXServiceURL(
-                    String.format(initializeInfo.getUri(), initializeInfo.getHost() + ":" + initializeInfo.getPort()));
-            initializeInfo.setUrl(jmxUrl);
-
-            // 创建连接
-            connector = javax.management.remote.JMXConnectorFactory.connect(jmxUrl);
-            operation.execute(connector.getMBeanServerConnection());
-        } catch (Exception e) {
-        } finally {
-            if (connector != null) {
-                try {
-                    connector.close();
-                } catch (java.io.IOException e) {
-                    log.error("Failed to close JMX connector: {}", e.getMessage());
-                }
-            }
-        }
+        org.kafka.eagle.core.api.JmxConnectionManager.execute(initializeInfo, operation::execute);
     }
 
     /**

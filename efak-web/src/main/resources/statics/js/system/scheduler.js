@@ -676,7 +676,7 @@ class TaskSchedulerManager {
             dialog.className = 'confirm-dialog';
             dialog.style.cssText = `
                 background: white;
-                border-radius: 12px;
+                border-radius: 2px;
                 padding: 24px;
                 max-width: 400px;
                 width: 90%;
@@ -735,7 +735,7 @@ class TaskSchedulerManager {
                 border: 1px solid #d1d5db;
                 background: white;
                 color: #374151;
-                border-radius: 6px;
+                border-radius: 2px;
                 font-size: 14px;
                 font-weight: 500;
                 cursor: pointer;
@@ -752,7 +752,7 @@ class TaskSchedulerManager {
                 border: none;
                 background: #f59e0b;
                 color: white;
-                border-radius: 6px;
+                border-radius: 2px;
                 font-size: 14px;
                 font-weight: 500;
                 cursor: pointer;
@@ -1344,44 +1344,23 @@ class TaskSchedulerManager {
     }
 
     showMessage(message, type = 'info') {
-        // 创建消息提示元素
+        if (window.efakShowToast) {
+            window.efakShowToast(message, type);
+            return;
+        }
         const messageDiv = document.createElement('div');
+        messageDiv.className = 'header-toast';
         messageDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 8px;
+            background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#165DFF'};
             color: white;
             font-weight: 500;
-            z-index: 10000;
-            max-width: 400px;
-            word-wrap: break-word;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
         `;
-
-        // 根据类型设置样式
-        if (type === 'error') {
-            messageDiv.style.backgroundColor = '#ef4444';
-        } else if (type === 'success') {
-            messageDiv.style.backgroundColor = '#10b981';
-        } else {
-            messageDiv.style.backgroundColor = '#3b82f6';
-        }
-
         messageDiv.textContent = message;
         document.body.appendChild(messageDiv);
-
-        // 3秒后自动移除
         setTimeout(() => {
-            messageDiv.style.opacity = '0';
-            messageDiv.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (messageDiv.parentNode) {
-                    messageDiv.parentNode.removeChild(messageDiv);
-                }
-            }, 300);
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
         }, 3000);
     }
 }

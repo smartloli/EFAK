@@ -253,7 +253,6 @@ public class MenuController {
         }
 
         model.addAttribute("userInitials", "AD");
-        model.addAttribute("hasNotifications", true);
         model.addAttribute("hasUserManagementPermission", true);
     }
 

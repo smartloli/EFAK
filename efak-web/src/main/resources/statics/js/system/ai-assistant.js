@@ -15,12 +15,179 @@
     let eventSource = null; // SSE连接
     let isStreaming = false; // 是否正在流式传输
     let currentStreamId = null; // 当前流式传输ID
-    let isUserStopRequested = false; // 用户是否主动点击“停止”（用于抑制onerror误报）
+    let historySessions = [];
+    let historyPage = 1;
+    const historyPageSize = 8;
+    let historyQuery = '';
+    let isAdminUser = false;
+    let lastSkillId = '';
+    const INPUT_HISTORY_KEY = 'efak.ai.inputHistory';
+    const INPUT_HISTORY_MAX = 80;
+    const SLASH_COMMANDS = [
+        { cmd: '/new', label: '新建对话', desc: '清空当前会话并开始新对话' }
+    ];
+    let inputHistory = [];
+    let inputHistoryIndex = -1;
+    let inputDraft = '';
+    let slashActiveIndex = 0;
+    let stickToBottom = true;
+    let scrollFrame = 0;
 
-    // 从URL参数中获取集群ID
+    const INTENT_CARDS = [
+        { id: 'topic_inspect', label: 'Topic 体检', desc: '存在性、分区、ISR 与副本', icon: 'fa-layer-group', adminOnly: false,
+            prompt: '帮我看看当前选中集群里，我关心的 topic 是否存在，分区、ISR 和副本是否正常。',
+            followUps: ['查这个 topic 的最近消息', '谁在消费这个 topic？', '生产和消费速度是否匹配？'] },
+        { id: 'consumer_lag', label: '消费积压', desc: 'lag 与消费速度是否卡住', icon: 'fa-gauge-high', adminOnly: false,
+            prompt: '帮我诊断当前选中集群的消费积压（lag）和消费速度。',
+            followUps: ['这个消费者组是否卡住？', '看一下生产和消费速度', '列出这个 topic 的消费者'] },
+        { id: 'message_lookup', label: '查最近消息', desc: '按关键字查看最近 100 条', icon: 'fa-inbox', adminOnly: false,
+            prompt: '帮我查当前选中集群某个 topic 的最近消息（默认最近 100 条）。',
+            followUps: ['缩小到某个分区再查', '对照消费积压看一下', '检查 topic 分区是否倾斜'] },
+        { id: 'alert_triage', label: '当前告警', desc: '未处理告警与关联对象', icon: 'fa-bell', adminOnly: false,
+            prompt: '当前选中集群有哪些告警？',
+            followUps: ['告警对应的 topic 是否健康？', '和 Broker 在线情况对照一下', '给出处理建议'] },
+        { id: 'cluster_health', label: '集群健康简报', desc: 'Broker 在线、资源与性能', icon: 'fa-heart-pulse', adminOnly: true,
+            prompt: '给一份当前选中集群的健康简报：broker 在线、资源与性能，不要编造磁盘或 controller。',
+            followUps: ['哪些 Broker 资源最紧张？', '最近有哪些告警？', '告警渠道是否启用？'] },
+        { id: 'alert_channels', label: '告警渠道', desc: '渠道是否已启用', icon: 'fa-tower-broadcast', adminOnly: true,
+            prompt: '当前选中集群的告警渠道是否启用？',
+            followUps: ['看看当前有哪些告警', '给一份集群健康简报', '哪些告警还没处理？'] }
+    ];
+
+    const TOOL_LABELS = {
+        get_topic_info: 'Topic 信息',
+        get_topic_partitions: '分区与 ISR',
+        get_topic_messages: '最近消息',
+        get_topic_consumers: 'Topic 消费者',
+        get_topic_consume_speed: '生产/消费速度',
+        get_topic_consumer_lag: '消费积压',
+        get_topic_instant_metrics: '即时指标',
+        get_topic_metrics_history: '历史指标',
+        get_topic_config: 'Topic 配置',
+        get_consumer_groups: '消费者组',
+        get_consumer_members: '消费者成员',
+        get_cluster_info: '集群概况',
+        get_cluster_brokers: 'Broker 列表',
+        get_cluster_health_snapshot: '健康快照',
+        get_alerts: '告警',
+        get_alert_channels: '告警渠道',
+        get_broker_metrics: 'Broker 指标',
+        get_performance_monitor: '性能监控'
+    };
+
     function getClusterIdFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get('cid') || '';
+    }
+
+    function setStage(mode) {
+        const page = document.querySelector('.ai-page');
+        if (!page) return;
+        page.classList.toggle('is-empty', mode === 'empty');
+        clearFollowUps();
+    }
+
+    function isEmptyStage() {
+        const page = document.querySelector('.ai-page');
+        return page ? page.classList.contains('is-empty') : false;
+    }
+
+    function renderIntentGrid() {
+        const grid = document.getElementById('intent-grid');
+        if (!grid) return;
+        const cards = INTENT_CARDS.filter(card => !card.adminOnly || isAdminUser);
+        grid.innerHTML = cards.map(card => `
+            <button type="button" class="intent-card" data-intent="${card.id}">
+                <div class="intent-card-label"><i class="fa-solid ${card.icon}"></i>${card.label}</div>
+                <div class="intent-card-desc">${card.desc}</div>
+            </button>
+        `).join('');
+    }
+
+    function bindIntentGrid() {
+        const grid = document.getElementById('intent-grid');
+        if (!grid) return;
+        grid.addEventListener('click', function (e) {
+            const card = e.target.closest('.intent-card');
+            if (!card) return;
+            const intent = INTENT_CARDS.find(item => item.id === card.getAttribute('data-intent'));
+            if (intent) {
+                sendUserPrompt(intent.prompt, intent.id);
+            }
+        });
+    }
+
+    async function loadAgentRole() {
+        try {
+            const response = await fetch('/api/mcp/tools');
+            if (response.ok) {
+                const data = await response.json();
+                isAdminUser = !!data.admin;
+            }
+        } catch (e) {
+            isAdminUser = false;
+        }
+        renderIntentGrid();
+        const hint = document.getElementById('agent-cluster-hint');
+        if (hint) {
+            hint.textContent = currentClusterId ? `集群 ${currentClusterId}` : '未选择集群';
+        }
+        const sub = document.getElementById('agent-empty-sub');
+        if (sub && !currentClusterId) {
+            sub.textContent = '先在侧栏选择集群，再描述 Topic / 消费者 / 集群问题。概念问题可以随时问。';
+        }
+    }
+
+    function clearFollowUps() {
+        const box = document.getElementById('follow-ups');
+        if (!box) return;
+        box.hidden = true;
+        box.innerHTML = '';
+    }
+
+    function renderFollowUps(items) {
+        const box = document.getElementById('follow-ups');
+        if (!box) return;
+        const list = (items || []).filter(Boolean).slice(0, 3);
+        if (!list.length) {
+            clearFollowUps();
+            return;
+        }
+        box.hidden = false;
+        box.innerHTML = list.map(text => `<button type="button" class="follow-up">${escapeHtml(text)}</button>`).join('');
+    }
+
+    function defaultFollowUps() {
+        const skill = INTENT_CARDS.find(item => item.id === lastSkillId);
+        return skill ? skill.followUps : ['帮我看看这个 topic 是否健康', '诊断一下消费积压', '当前集群有哪些告警？'];
+    }
+
+    function toolLabel(name) {
+        return TOOL_LABELS[name] || name || '数据';
+    }
+
+    function appendAgentStep(name, pending) {
+        const typing = document.getElementById('typing-indicator');
+        if (!typing) return;
+        let trace = typing.querySelector('.agent-trace');
+        if (!trace) {
+            trace = document.createElement('div');
+            trace.className = 'agent-trace';
+            const bubble = typing.querySelector('.message-bubble');
+            if (bubble) bubble.insertBefore(trace, bubble.firstChild);
+        }
+        let step = trace.querySelector('[data-tool="' + String(name).replace(/"/g, '') + '"]');
+        if (!step) {
+            step = document.createElement('div');
+            step.className = 'agent-step';
+            step.setAttribute('data-tool', name);
+            trace.appendChild(step);
+        }
+        step.classList.toggle('is-pending', !!pending);
+        step.innerHTML = pending
+            ? `<i class="fa-solid fa-circle-notch fa-spin"></i><span>正在查询${toolLabel(name)}</span>`
+            : `<i class="fa-solid fa-circle-nodes"></i><span>已查询${toolLabel(name)}</span>`;
+        scrollToBottom();
     }
 
     // 初始化页面
@@ -35,8 +202,8 @@
         initMarkdownRenderer();
         initMermaid();
         loadModelConfigs();
-        // 加载最近一次对话历史
-        loadLatestChatHistory();
+        loadAgentRole();
+        loadChatHistory();
     });
 
     // 初始化AI助手
@@ -45,18 +212,46 @@
         const sendBtn = document.getElementById('send-btn');
         const chatMessages = document.getElementById('chat-messages');
         const modelOptions = document.querySelectorAll('.model-option');
-        const quickActions = document.querySelectorAll('.quick-action');
 
-        // 监听输入变化
+        loadInputHistory();
+        bindStickToBottom();
+
         chatInput.addEventListener('input', function () {
+            inputHistoryIndex = -1;
             if (!isStreaming) {
                 sendBtn.disabled = this.value.trim() === '';
             }
             autoResize(this);
+            updateSlashMenu(this.value);
         });
 
-        // 监听键盘事件
         chatInput.addEventListener('keydown', function (e) {
+            const slashOpen = isSlashMenuOpen();
+            if (slashOpen && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                e.preventDefault();
+                moveSlashHighlight(e.key === 'ArrowUp' ? -1 : 1);
+                return;
+            }
+            if (slashOpen && e.key === 'Escape') {
+                e.preventDefault();
+                hideSlashMenu();
+                return;
+            }
+            if (slashOpen && e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                runActiveSlashCommand();
+                return;
+            }
+            if (e.key === 'ArrowUp' && shouldRecallInputHistory(this, 'up')) {
+                e.preventDefault();
+                recallInputHistory('up', this);
+                return;
+            }
+            if (e.key === 'ArrowDown' && shouldRecallInputHistory(this, 'down')) {
+                e.preventDefault();
+                recallInputHistory('down', this);
+                return;
+            }
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 if (!isTyping && !isStreaming && this.value.trim()) {
@@ -68,11 +263,24 @@
         // 发送按钮点击
         sendBtn.addEventListener('click', handleSendButtonClick);
 
+        const modelPicker = document.getElementById('model-picker');
+        const modelPickerBtn = document.getElementById('model-picker-btn');
+        if (modelPickerBtn && modelPicker) {
+            modelPickerBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                modelPicker.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!modelPicker.contains(e.target)) {
+                    modelPicker.classList.remove('open');
+                }
+            });
+        }
+
         // 模型选择事件委托
         document.getElementById('model-options').addEventListener('click', function (e) {
             const modelOption = e.target.closest('.model-option');
             if (modelOption) {
-                // 如果正在流式传输，不允许切换模型
                 if (isStreaming) {
                     showToast('请等待当前AI回答完成', 'warning');
                     return;
@@ -82,60 +290,45 @@
                 modelOption.classList.add('active');
                 currentModel = modelOption.getAttribute('data-model');
                 currentModelId = modelOption.getAttribute('data-model-id');
+                saveSelectedModel(currentModelId, currentModel);
                 updateModelDisplay();
+                if (modelPicker) modelPicker.classList.remove('open');
 
-                // 关闭之前的SSE连接
                 if (eventSource) {
                     eventSource.close();
                 }
             }
         });
 
-        // 快捷操作
-        quickActions.forEach(action => {
-            action.addEventListener('click', function () {
-                const actionType = this.getAttribute('data-action');
-                handleQuickAction(actionType);
+        bindIntentGrid();
+        const slashMenu = document.getElementById('slash-menu');
+        if (slashMenu) {
+            slashMenu.addEventListener('mousedown', function (e) {
+                const item = e.target.closest('.slash-item');
+                if (!item) return;
+                e.preventDefault();
+                runSlashCommand(item.getAttribute('data-cmd'));
             });
-        });
+        }
+        const followUps = document.getElementById('follow-ups');
+        if (followUps) {
+            followUps.addEventListener('click', function (e) {
+                const btn = e.target.closest('.follow-up');
+                if (!btn) return;
+                sendUserPrompt(btn.textContent.trim(), lastSkillId);
+            });
+        }
 
-        // 创建新会话
         document.getElementById('new-chat-btn').addEventListener('click', function () {
-            // 如果正在流式传输，不允许创建新会话
             if (isStreaming) {
                 showToast('请等待当前AI回答完成', 'warning');
                 return;
             }
-
-            showConfirmDialog('确定要创建新会话吗？当前会话将被保存。', function () {
-                createNewChat();
-            });
+            createNewChat();
         });
 
-        // 加载对话历史
+        initHistoryDialog();
         loadChatHistory();
-
-        // 监听设置变更
-        document.getElementById('enable-highlight').addEventListener('change', function () {
-            // 重新初始化Markdown渲染器
-            reinitMarkdownRenderer();
-
-            // 重新应用代码高亮到所有现有消息
-            const chatMessages = document.getElementById('chat-messages');
-            const assistantMessages = chatMessages.querySelectorAll('.message-bubble.assistant');
-            assistantMessages.forEach(message => {
-                applyCodeHighlighting(message);
-            });
-
-            // 如果正在流式传输，也要重新应用代码高亮
-            const typingIndicator = document.getElementById('typing-indicator');
-            if (typingIndicator) {
-                const markdownContent = typingIndicator.querySelector('.markdown-content');
-                if (markdownContent) {
-                    applyCodeHighlighting(markdownContent);
-                }
-            }
-        });
     }
 
     // 处理发送按钮点击
@@ -156,6 +349,15 @@
         const message = chatInput.value.trim();
 
         if (!message || isTyping || isStreaming) return;
+
+        const slashCmd = matchSlashCommand(message);
+        if (slashCmd) {
+            await runSlashCommand(slashCmd);
+            return;
+        }
+
+        setStage('thread');
+        clearFollowUps();
 
         // 确保流式传输状态已重置
         if (eventSource) {
@@ -193,6 +395,8 @@
             }
         }
 
+        pushInputHistory(message);
+
         // 添加用户消息到界面
         addMessage(message, 'user');
 
@@ -206,94 +410,215 @@
         // 重置高度
         chatInput.style.height = 'auto';
 
-        // 禁用输入框，防止重复发送
-        chatInput.disabled = true;
-
-        // 显示AI正在输入
         showTypingIndicator();
 
         // 调用AI API获取回复
         await callAIAPI(message);
     }
 
-    // 处理快捷操作
-    async function handleQuickAction(actionType) {
-        // 如果正在流式传输，不允许快捷操作
-        if (isStreaming) {
-            showToast('请等待当前AI回答完成', 'warning');
+    async function sendUserPrompt(message, skillId) {
+        if (!message || isTyping || isStreaming) {
+            if (isStreaming) {
+                showToast('请等待当前AI回答完成', 'warning');
+            }
             return;
         }
 
-        // 确保流式传输状态已重置
-        if (eventSource) {
-            eventSource.close();
-            eventSource = null;
+        lastSkillId = skillId || lastSkillId;
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.value = message;
         }
-        isStreaming = false;
-        currentStreamId = null;
+        await sendMessage();
+    }
 
-        const actionMap = {
-            'alert-analysis': `请分析当前集群的告警情况并提供优化建议：
-1. 查询集群的所有告警信息（使用get_alerts函数）
-2. 统计告警类型、严重程度和发生频率
-3. 分析告警产生的根本原因
-4. 提供针对性的解决方案和预防措施
-5. 如果有告警，请用表格展示关键告警信息`,
-            'analyze-performance': `查询所有Broker的CPU和内存使用率`,
-            'cluster-health': '请检查集群健康状态',
-            'explain-kafka': '请解释Kafka的核心概念和架构'
+    function loadInputHistory() {
+        try {
+            const raw = JSON.parse(localStorage.getItem(INPUT_HISTORY_KEY) || '[]');
+            inputHistory = Array.isArray(raw) ? raw.filter(item => typeof item === 'string' && item.trim()) : [];
+        } catch (e) {
+            inputHistory = [];
+        }
+        inputHistoryIndex = -1;
+        inputDraft = '';
+    }
+
+    function pushInputHistory(text) {
+        const value = (text || '').trim();
+        if (!value || matchSlashCommand(value)) return;
+        if (inputHistory[inputHistory.length - 1] === value) {
+            inputHistoryIndex = -1;
+            inputDraft = '';
+            return;
+        }
+        inputHistory.push(value);
+        if (inputHistory.length > INPUT_HISTORY_MAX) {
+            inputHistory = inputHistory.slice(-INPUT_HISTORY_MAX);
+        }
+        try {
+            localStorage.setItem(INPUT_HISTORY_KEY, JSON.stringify(inputHistory));
+        } catch (e) { /* ignore quota */ }
+        inputHistoryIndex = -1;
+        inputDraft = '';
+    }
+
+    function caretLineInfo(textarea) {
+        const value = textarea.value;
+        const start = textarea.selectionStart || 0;
+        const before = value.slice(0, start);
+        const after = value.slice(start);
+        return {
+            onFirstLine: before.indexOf('\n') === -1,
+            onLastLine: after.indexOf('\n') === -1
         };
+    }
 
-        const message = actionMap[actionType];
-        if (message) {
-            // 如果没有当前会话，先创建一个
-            if (!currentSessionId) {
-                try {
-                    const response = await fetch('/api/chat/session', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            title: message.length > 50 ? message.substring(0, 50) + '...' : message,
-                            modelName: currentModel || 'GPT-4'
-                        })
-                    });
+    function shouldRecallInputHistory(textarea, direction) {
+        if (!inputHistory.length) return false;
+        const lines = caretLineInfo(textarea);
+        if (direction === 'up') return lines.onFirstLine;
+        return inputHistoryIndex !== -1 || lines.onLastLine;
+    }
 
-                    const data = await response.json();
-                    if (data.success) {
-                        currentSessionId = data.session.sessionId;
-                    } else {
-                        showToast('创建会话失败: ' + data.message, 'error');
-                        return;
-                    }
-                } catch (error) {
-                    console.error('创建会话失败:', error);
-                    showToast('创建会话失败', 'error');
-                    return;
-                }
+    function recallInputHistory(direction, textarea) {
+        if (!inputHistory.length) return;
+        if (inputHistoryIndex === -1) {
+            inputDraft = textarea.value;
+        }
+        if (direction === 'up') {
+            if (inputHistoryIndex === -1) {
+                inputHistoryIndex = inputHistory.length - 1;
+            } else if (inputHistoryIndex > 0) {
+                inputHistoryIndex -= 1;
             }
+        } else {
+            if (inputHistoryIndex === -1) return;
+            if (inputHistoryIndex < inputHistory.length - 1) {
+                inputHistoryIndex += 1;
+            } else {
+                inputHistoryIndex = -1;
+                textarea.value = inputDraft;
+                autoResize(textarea);
+                document.getElementById('send-btn').disabled = !textarea.value.trim() || isStreaming;
+                return;
+            }
+        }
+        textarea.value = inputHistory[inputHistoryIndex] || '';
+        autoResize(textarea);
+        const sendBtn = document.getElementById('send-btn');
+        if (sendBtn && !isStreaming) {
+            sendBtn.disabled = textarea.value.trim() === '';
+        }
+        const end = textarea.value.length;
+        textarea.setSelectionRange(end, end);
+        hideSlashMenu();
+    }
 
-            // 添加用户消息到界面
-            addMessage(message, 'user');
+    function matchSlashCommand(text) {
+        const value = (text || '').trim().toLowerCase();
+        if (!value.startsWith('/')) return null;
+        const token = value.split(/\s+/)[0];
+        const found = SLASH_COMMANDS.find(item => item.cmd === token);
+        return found ? found.cmd : null;
+    }
 
-            // 保存用户消息到数据库
-            await saveMessageToDatabase(message, 'user');
+    function filteredSlashCommands(text) {
+        const value = (text || '').trim().toLowerCase();
+        if (!value.startsWith('/')) return [];
+        return SLASH_COMMANDS.filter(item => item.cmd.indexOf(value.split(/\s+/)[0]) === 0);
+    }
 
-            // 清空输入框并禁用
-            const chatInput = document.getElementById('chat-input');
+    function isSlashMenuOpen() {
+        const menu = document.getElementById('slash-menu');
+        return !!(menu && menu.classList.contains('open'));
+    }
+
+    function hideSlashMenu() {
+        const menu = document.getElementById('slash-menu');
+        if (!menu) return;
+        menu.classList.remove('open');
+        menu.hidden = true;
+        menu.innerHTML = '';
+    }
+
+    function updateSlashMenu(text) {
+        const menu = document.getElementById('slash-menu');
+        if (!menu) return;
+        const items = filteredSlashCommands(text);
+        if (!items.length) {
+            hideSlashMenu();
+            return;
+        }
+        slashActiveIndex = 0;
+        menu.hidden = false;
+        menu.classList.add('open');
+        menu.innerHTML = items.map((item, index) => `
+            <button type="button" class="slash-item${index === slashActiveIndex ? ' active' : ''}" data-cmd="${item.cmd}">
+                <span class="slash-item-cmd">${item.cmd}</span>
+                <span class="slash-item-desc">${item.desc}</span>
+            </button>
+        `).join('');
+    }
+
+    function moveSlashHighlight(delta) {
+        const menu = document.getElementById('slash-menu');
+        if (!menu) return;
+        const items = menu.querySelectorAll('.slash-item');
+        if (!items.length) return;
+        slashActiveIndex = (slashActiveIndex + delta + items.length) % items.length;
+        items.forEach((item, index) => item.classList.toggle('active', index === slashActiveIndex));
+    }
+
+    function runActiveSlashCommand() {
+        const menu = document.getElementById('slash-menu');
+        const active = menu && menu.querySelector('.slash-item.active');
+        const cmd = active ? active.getAttribute('data-cmd') : matchSlashCommand(document.getElementById('chat-input').value);
+        if (cmd) {
+            runSlashCommand(cmd);
+        }
+    }
+
+    async function runSlashCommand(cmd) {
+        hideSlashMenu();
+        const chatInput = document.getElementById('chat-input');
+        if (cmd === '/new') {
+            if (isStreaming) {
+                showToast('请等待当前AI回答完成', 'warning');
+                return;
+            }
             if (chatInput) {
                 chatInput.value = '';
-                chatInput.disabled = true;
+                autoResize(chatInput);
+                document.getElementById('send-btn').disabled = true;
             }
-            document.getElementById('send-btn').disabled = true;
-
-            // 显示AI正在输入
-            showTypingIndicator();
-
-            // 调用AI API获取回复
-            await callAIAPI(message);
+            await createNewChat();
+            if (chatInput) chatInput.focus();
         }
+    }
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    function buildThinkingHtml(thinkingContent, isStreamingThink, isOpen) {
+        const stateClass = isStreamingThink ? 'is-streaming open' : (isOpen ? 'is-done open' : 'is-done');
+        const title = isStreamingThink ? '正在思考' : '已完成思考';
+        const icon = isOpen || isStreamingThink ? 'fa-chevron-up' : 'fa-chevron-down';
+        return `
+            <div class="thinking-section ${stateClass}">
+                <button type="button" class="thinking-header" onclick="toggleThinking(this)">
+                    <span class="thinking-pulse"></span>
+                    <span class="thinking-title">${title}</span>
+                    <i class="fa-solid ${icon} thinking-icon ml-auto"></i>
+                </button>
+                <div class="thinking-content">
+                    <div class="thinking-text">${escapeHtml(thinkingContent)}</div>
+                </div>
+            </div>
+        `;
     }
 
     // 添加消息到聊天区域
@@ -301,23 +626,11 @@
         const chatMessages = document.getElementById('chat-messages');
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message-container';
-        // 确保消息容器不会超出父容器宽度
         messageDiv.style.maxWidth = '100%';
         messageDiv.style.overflowX = 'hidden';
 
-        const avatar = document.createElement('div');
-        avatar.className = `message-avatar ${sender}`;
-
-        if (sender === 'user') {
-            // 使用当前登录用户头像
-            avatar.innerHTML = '<img src="/images/user_profile.jpg" alt="用户" class="w-full h-full object-cover rounded-full">';
-        } else {
-            // 使用图片作为AI助手头像
-            avatar.innerHTML = '<img src="/images/ai_robot.jpg" alt="AI助手" class="w-full h-full object-cover rounded-full">';
-        }
-
         const bubble = document.createElement('div');
-        bubble.className = `message-bubble ${sender} p-4 rounded-lg`;
+        bubble.className = `message-bubble ${sender}`;
 
         const content = document.createElement('div');
         content.className = enableMarkdown ? 'markdown-content' : '';
@@ -326,22 +639,8 @@
             let displayContent = '';
 
             if (thinkingContent) {
-                // 显示思考内容和正式回答
-                displayContent = `
-                    <div class="thinking-section mb-3">
-                        <div class="thinking-header" onclick="toggleThinking(this)">
-                            <i class="fa fa-cog text-gray-300 mr-2"></i>
-                            <span class="thinking-title">AI思考过程</span>
-                            <i class="fa fa-chevron-up thinking-icon ml-auto"></i>
-                        </div>
-                        <div class="thinking-content">
-                            <div class="thinking-text">${thinkingContent}</div>
-                        </div>
-                    </div>
-                    <div class="answer-content">
-                        ${renderMarkdown(text)}
-                    </div>
-                `;
+                displayContent = buildThinkingHtml(thinkingContent, false, false) +
+                    `<div class="answer-content">${renderMarkdown(text)}</div>`;
             } else {
                 displayContent = renderMarkdown(text);
             }
@@ -362,16 +661,16 @@
             const actions = document.createElement('div');
             actions.className = 'message-actions';
             actions.innerHTML = `
-                <button class="action-btn" onclick="copyMessage(this)">
-                    <i class="fa fa-copy"></i> 复制
+                <button class="action-btn" onclick="copyMessage(this)" title="复制">
+                    <i class="fa fa-copy"></i>
                 </button>
-                <button class="action-btn" onclick="regenerateResponse(this)">
-                    <i class="fa fa-refresh"></i> 重新生成
+                <button class="action-btn" onclick="regenerateResponse(this)" title="重新生成">
+                    <i class="fa fa-refresh"></i>
                 </button>
-                <button class="action-btn" onclick="rateMessage(this, 'good')">
+                <button class="action-btn" onclick="rateMessage(this, 'good')" title="有帮助">
                     <i class="fa fa-thumbs-up"></i>
                 </button>
-                <button class="action-btn" onclick="rateMessage(this, 'bad')">
+                <button class="action-btn" onclick="rateMessage(this, 'bad')" title="没帮助">
                     <i class="fa fa-thumbs-down"></i>
                 </button>
             `;
@@ -381,36 +680,17 @@
         bubble.appendChild(content);
 
         if (sender === 'user') {
-            messageDiv.className += ' flex flex-col items-end';
-            // 创建用户消息容器
-            const userMessageContainer = document.createElement('div');
-            userMessageContainer.className = 'flex items-start space-x-3';
-            userMessageContainer.style.maxWidth = '100%';
-            messageDiv.appendChild(userMessageContainer);
-
-            // 将消息和头像添加到容器中（头像在消息末尾）
-            userMessageContainer.appendChild(bubble);
-            userMessageContainer.appendChild(avatar);
+            messageDiv.className += ' user';
         } else {
-            messageDiv.className += ' flex items-start space-x-3';
-            messageDiv.style.maxWidth = '100%';
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(bubble);
+            messageDiv.className += ' assistant';
         }
-
-        // 添加时间戳（仅用户消息）
-        if (sender === 'user') {
-            const timestampDiv = document.createElement('div');
-            timestampDiv.className = 'text-xs text-gray-400 mt-1';
-            timestampDiv.textContent = new Date().toLocaleTimeString();
-            messageDiv.appendChild(timestampDiv);
-        }
+        messageDiv.appendChild(bubble);
 
         chatMessages.appendChild(messageDiv);
 
-        // 只有在添加新消息时才滚动到底部，加载历史消息时不滚动
         if (!isLoadingHistory) {
-            scrollToBottom(chatMessages);
+            stickToBottom = true;
+            scrollToBottom();
         }
 
         // 保存到对话历史
@@ -431,9 +711,6 @@
         }
 
         try {
-            // 新一轮请求开始，重置“主动停止”标记
-            isUserStopRequested = false;
-
             // 生成流式传输ID
             currentStreamId = Date.now().toString();
 
@@ -448,8 +725,7 @@
             }
 
             // 建立SSE连接
-            const es = new EventSource(url);
-            eventSource = es;
+            eventSource = new EventSource(url);
 
             // 设置流式传输状态
             isStreaming = true;
@@ -460,21 +736,9 @@
             let aiResponse = '';
             let thinkingContent = '';
             let isThinking = false;
-            let isTerminal = false; // 是否已收到end/error
 
-            es.onmessage = async function (event) {
-                let data;
-                try {
-                    // 服务端可能发送ping/非JSON帧，这里做容错，避免一次解析失败导致“无返回”
-                    data = JSON.parse(event.data);
-                } catch (e) {
-                    console.warn('SSE消息解析失败，已忽略:', event.data, e);
-                    return;
-                }
-
-                if (!data || !data.type) {
-                    return;
-                }
+            eventSource.onmessage = async function (event) {
+                const data = JSON.parse(event.data);
 
                 if (data.type === 'thinking') {
                     // 处理思考内容
@@ -497,52 +761,41 @@
                     aiResponse += '\n\n```chart\n' + data.chartData + '\n```\n\n';
                     updateTypingMessage(aiResponse, thinkingContent, false);
                 } else if (data.type === 'thinking_end') {
-                    // 思考结束，准备开始正式回答
                     isThinking = false;
                     updateTypingMessage('', thinkingContent, false);
+                } else if (data.type === 'function_call' || data.type === 'agent_step') {
+                    appendAgentStep(data.name || data.tool || data.title || '数据', data.phase !== 'observe');
+                } else if (data.type === 'function_result') {
+                    appendAgentStep(data.name || '数据', false);
+                } else if (data.type === 'agent_skill') {
+                    lastSkillId = data.skillId || lastSkillId;
+                } else if (data.type === 'follow_ups') {
+                    renderFollowUps(data.items || data.follow_ups || []);
                 } else if (data.type === 'end') {
-                    isTerminal = true;
-                    es.close();
-                    if (eventSource === es) {
-                        eventSource = null;
-                    }
-                    hideTypingIndicator();
-                    addMessage(aiResponse, 'assistant', true, thinkingContent);
+                    eventSource.close();
+                    eventSource = null;
+                    finalizeStreamingMessage(aiResponse, thinkingContent);
                     await saveMessageToDatabase(aiResponse, 'assistant');
-                    // 自动折叠思考内容
                     autoCollapseThinking();
-                    // 重置发送按钮
+                    const followBox = document.getElementById('follow-ups');
+                    if (!followBox || followBox.hidden) {
+                        renderFollowUps(defaultFollowUps());
+                    }
                     resetSendButton();
                 } else if (data.type === 'error') {
-                    isTerminal = true;
-                    es.close();
-                    if (eventSource === es) {
-                        eventSource = null;
-                    }
+                    eventSource.close();
+                    eventSource = null;
                     hideTypingIndicator();
                     addMessage('AI回复出错: ' + data.message, 'assistant');
                     await saveMessageToDatabase('AI回复出错: ' + data.message, 'assistant');
                     // 重置发送按钮
                     resetSendButton();
-                } else if (data.type === 'ping') {
-                    // SSE保活帧：前端无需处理
-                    return;
                 }
             };
 
-            es.onerror = async function (event) {
-                // 正常结束/主动停止时，浏览器也可能触发onerror，这里避免误报
-                if (isTerminal || isUserStopRequested) {
-                    return;
-                }
-
-                try {
-                    es.close();
-                } catch (e) {
-                }
-                if (eventSource === es) {
-                    eventSource = null;
-                }
+            eventSource.onerror = async function (event) {
+                eventSource.close();
+                eventSource = null;
                 hideTypingIndicator();
                 addMessage('AI服务连接失败，请稍后重试', 'assistant');
                 await saveMessageToDatabase('AI服务连接失败，请稍后重试', 'assistant');
@@ -573,60 +826,19 @@
                 let displayContent = '';
 
                 if (isThinking && thinkingContent) {
-                    // 显示思考内容
-                    displayContent = `
-                        <div class="thinking-section mb-3">
-                            <div class="thinking-header" onclick="toggleThinking(this)">
-                                <i class="fa fa-cog text-gray-300 mr-2"></i>
-                                <span class="thinking-title">AI思考过程</span>
-                                <i class="fa fa-chevron-down thinking-icon ml-auto"></i>
-                            </div>
-                            <div class="thinking-content">
-                                <div class="thinking-text">${thinkingContent}</div>
-                            </div>
-                        </div>
-                    `;
+                    displayContent = buildThinkingHtml(thinkingContent, true, true);
                 } else if (thinkingContent && content) {
-                    // 显示思考内容和正式回答
-                    displayContent = `
-                        <div class="thinking-section mb-3">
-                            <div class="thinking-header" onclick="toggleThinking(this)">
-                                <i class="fa fa-cog text-gray-300 mr-2"></i>
-                                <span class="thinking-title">AI思考过程</span>
-                                <i class="fa fa-chevron-up thinking-icon ml-auto"></i>
-                            </div>
-                            <div class="thinking-content">
-                                <div class="thinking-text">${thinkingContent}</div>
-                            </div>
-                        </div>
-                        <div class="answer-content">
-                            ${renderMarkdown(content)}
-                        </div>
-                    `;
+                    displayContent = buildThinkingHtml(thinkingContent, false, false) +
+                        `<div class="answer-content">${renderMarkdown(content)}</div>`;
                 } else if (content) {
-                    // 只显示正式回答
                     displayContent = renderMarkdown(content);
                 } else if (thinkingContent) {
-                    // 只有思考内容，没有正式回答
-                    displayContent = `
-                        <div class="thinking-section mb-3">
-                            <div class="thinking-header" onclick="toggleThinking(this)">
-                                <i class="fa fa-cog text-gray-300 mr-2"></i>
-                                <span class="thinking-title">AI思考过程</span>
-                                <i class="fa fa-chevron-up thinking-icon ml-auto"></i>
-                            </div>
-                            <div class="thinking-content">
-                                <div class="thinking-text">${thinkingContent}</div>
-                            </div>
-                        </div>
-                    `;
+                    displayContent = buildThinkingHtml(thinkingContent, false, true);
                 }
 
                 markdownContent.innerHTML = displayContent;
 
-                // 应用代码高亮
-                const enableHighlight = document.getElementById('enable-highlight');
-                if (enableHighlight && enableHighlight.checked) {
+                if (isHighlightEnabled()) {
                     setTimeout(() => {
                         applyCodeHighlighting(markdownContent);
                     }, 50);
@@ -642,6 +854,7 @@
                 if (typingContent) {
                     typingContent.style.display = 'none';
                 }
+                scrollToBottom();
             }
         }
     }
@@ -678,18 +891,27 @@
         }
     }
 
-    // 平滑滚动到底部
-    function scrollToBottom(element) {
-        // 确保元素存在且有滚动功能
-        if (element) {
-            // 强制滚动到底部，确保新消息可见
-            setTimeout(() => {
-                element.scrollTo({
-                    top: element.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }, 10);
-        }
+    function getScrollRoot() {
+        return document.getElementById('agent-scroll') || document.getElementById('chat-messages');
+    }
+
+    function bindStickToBottom() {
+        const root = getScrollRoot();
+        if (!root) return;
+        root.addEventListener('scroll', function () {
+            const gap = root.scrollHeight - root.scrollTop - root.clientHeight;
+            stickToBottom = gap < 72;
+        }, { passive: true });
+    }
+
+    function scrollToBottom() {
+        const root = getScrollRoot();
+        if (!root || !stickToBottom) return;
+        if (scrollFrame) return;
+        scrollFrame = requestAnimationFrame(function () {
+            scrollFrame = 0;
+            root.scrollTop = root.scrollHeight;
+        });
     }
 
     // 初始化Markdown渲染器
@@ -698,8 +920,7 @@
             marked.setOptions({
                 highlight: function (code, lang) {
                     // 检查是否启用了代码高亮
-                    const enableHighlight = document.getElementById('enable-highlight');
-                    if (enableHighlight && enableHighlight.checked && typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+                    if (isHighlightEnabled() && typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
                         try {
                             return hljs.highlight(code, { language: lang }).value;
                         } catch (e) {
@@ -724,8 +945,7 @@
             marked.setOptions({
                 highlight: function (code, lang) {
                     // 检查是否启用了代码高亮
-                    const enableHighlight = document.getElementById('enable-highlight');
-                    if (enableHighlight && enableHighlight.checked && typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+                    if (isHighlightEnabled() && typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
                         try {
                             return hljs.highlight(code, { language: lang }).value;
                         } catch (e) {
@@ -791,10 +1011,14 @@
         return html;
     }
 
+    function isHighlightEnabled() {
+        const enableHighlight = document.getElementById('enable-highlight');
+        return !enableHighlight || enableHighlight.checked;
+    }
+
     // 应用代码高亮
     function applyCodeHighlighting(container) {
-        const enableHighlight = document.getElementById('enable-highlight');
-        if (!enableHighlight || !enableHighlight.checked || typeof hljs === 'undefined') {
+        if (!isHighlightEnabled() || typeof hljs === 'undefined') {
             return;
         }
 
@@ -924,14 +1148,13 @@
 
         const typingDiv = document.createElement('div');
         typingDiv.id = 'typing-indicator';
-        typingDiv.className = 'flex items-start space-x-3';
-
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar assistant';
-        avatar.innerHTML = '<img src="/images/ai_robot.jpg" alt="AI助手" class="w-full h-full object-cover rounded-full">';
+        typingDiv.className = 'message-container assistant';
 
         const bubble = document.createElement('div');
-        bubble.className = 'message-bubble assistant p-4 rounded-lg';
+        bubble.className = 'message-bubble assistant';
+
+        const trace = document.createElement('div');
+        trace.className = 'agent-trace';
 
         const typingContent = document.createElement('div');
         typingContent.className = 'typing-indicator';
@@ -939,7 +1162,7 @@
                 <span class="typing-dot"></span>
                 <span class="typing-dot"></span>
                 <span class="typing-dot"></span>
-                <span class="ml-2 text-sm text-gray-500">AI正在思考...</span>
+                <span class="ml-2 text-sm text-gray-500">正在排查...</span>
             `;
 
         // 添加Markdown内容容器
@@ -947,19 +1170,68 @@
         markdownContent.className = 'markdown-content mt-2';
         markdownContent.style.display = 'none';
 
+        bubble.appendChild(trace);
         bubble.appendChild(typingContent);
         bubble.appendChild(markdownContent);
-        typingDiv.appendChild(avatar);
         typingDiv.appendChild(bubble);
 
         chatMessages.appendChild(typingDiv);
-        scrollToBottom(chatMessages);
+        stickToBottom = true;
+        scrollToBottom();
+    }
 
-        // 禁用输入框，防止重复发送
-        const chatInput = document.getElementById('chat-input');
-        if (chatInput) {
-            chatInput.disabled = true;
+    function assistantActionsHtml() {
+        return `
+                <button class="action-btn" onclick="copyMessage(this)" title="复制">
+                    <i class="fa fa-copy"></i>
+                </button>
+                <button class="action-btn" onclick="regenerateResponse(this)" title="重新生成">
+                    <i class="fa fa-refresh"></i>
+                </button>
+                <button class="action-btn" onclick="rateMessage(this, 'good')" title="有帮助">
+                    <i class="fa fa-thumbs-up"></i>
+                </button>
+                <button class="action-btn" onclick="rateMessage(this, 'bad')" title="没帮助">
+                    <i class="fa fa-thumbs-down"></i>
+                </button>
+            `;
+    }
+
+    function finalizeStreamingMessage(text, thinkingContent) {
+        const typing = document.getElementById('typing-indicator');
+        if (!typing) {
+            addMessage(text, 'assistant', true, thinkingContent);
+            return;
         }
+        typing.removeAttribute('id');
+        const dots = typing.querySelector('.typing-indicator');
+        if (dots) dots.remove();
+        const markdown = typing.querySelector('.markdown-content');
+        if (markdown) {
+            markdown.style.display = 'block';
+            let html = '';
+            if (thinkingContent) {
+                html += buildThinkingHtml(thinkingContent, false, false);
+            }
+            html += `<div class="answer-content">${renderMarkdown(text || '')}</div>`;
+            markdown.innerHTML = html;
+            const actions = document.createElement('div');
+            actions.className = 'message-actions';
+            actions.innerHTML = assistantActionsHtml();
+            markdown.appendChild(actions);
+            processCharts(markdown);
+            processTables(markdown);
+            applyCodeHighlighting(markdown);
+        }
+        isTyping = false;
+        stickToBottom = true;
+        scrollToBottom();
+        conversationHistory.push({
+            sender: 'assistant',
+            text: text || '',
+            timestamp: new Date(),
+            model: currentModel
+        });
     }
 
     // 停止流式传输
@@ -969,9 +1241,6 @@
         }
 
         try {
-            // 标记为用户主动停止，避免关闭连接触发onerror误报
-            isUserStopRequested = true;
-
             // 关闭SSE连接
             if (eventSource) {
                 eventSource.close();
@@ -1005,7 +1274,6 @@
             // 重置状态
             isStreaming = false;
             currentStreamId = null;
-            isUserStopRequested = false;
             hideTypingIndicator();
             resetSendButton();
         }
@@ -1015,9 +1283,10 @@
     function updateSendButtonToStop() {
         const sendBtn = document.getElementById('send-btn');
         sendBtn.setAttribute('data-action', 'stop');
-        sendBtn.innerHTML = '<i class="fa fa-stop-circle"></i>';
-        sendBtn.className = 'text-black hover:text-gray-800 transition-colors text-xl';
+        sendBtn.innerHTML = '<i class="fa fa-stop"></i>';
+        sendBtn.className = 'composer-send';
         sendBtn.disabled = false;
+        sendBtn.title = '停止';
     }
 
     // 重置发送按钮
@@ -1027,8 +1296,9 @@
 
         sendBtn.setAttribute('data-action', 'send');
         sendBtn.innerHTML = '<i class="fa fa-arrow-up"></i>';
-        sendBtn.className = 'text-gray-400 hover:text-blue-500 transition-colors text-xl disabled:opacity-50 disabled:cursor-not-allowed';
-        sendBtn.disabled = chatInput.value.trim() === '';
+        sendBtn.className = 'composer-send';
+        sendBtn.title = '发送';
+        sendBtn.disabled = !chatInput || chatInput.value.trim() === '';
 
         // 确保流式传输状态重置
         isStreaming = false;
@@ -1071,10 +1341,50 @@
         return modelConfig ? modelConfig.modelName : model;
     }
 
+    const SELECTED_MODEL_KEY = 'efak.ai.selectedModel';
+
+    function saveSelectedModel(modelId, modelName) {
+        try {
+            localStorage.setItem(SELECTED_MODEL_KEY, JSON.stringify({
+                id: String(modelId || ''),
+                name: modelName || ''
+            }));
+        } catch (e) {
+            console.warn('保存模型选择失败:', e);
+        }
+    }
+
+    function readSelectedModel() {
+        try {
+            const raw = localStorage.getItem(SELECTED_MODEL_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed || (!parsed.id && !parsed.name)) return null;
+            return parsed;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function applySelectedModel(model, silent) {
+        currentModel = model.modelName;
+        currentModelId = model.id;
+        document.querySelectorAll('.model-option').forEach((opt) => {
+            opt.classList.toggle('active', String(opt.getAttribute('data-model-id')) === String(model.id));
+        });
+        const pickerLabel = document.getElementById('model-picker-label');
+        if (pickerLabel) {
+            pickerLabel.textContent = currentModel;
+            pickerLabel.title = currentModel;
+        }
+        if (!silent) {
+            showToast(`已切换到${getModelDisplayName(currentModel)}`, 'success');
+        }
+    }
+
     // 更新模型显示
     function updateModelDisplay() {
-        // 这里可以添加模型切换的UI反馈
-        showToast(`已切换到${getModelDisplayName(currentModel)}`, 'success');
+        applySelectedModel({ id: currentModelId, modelName: currentModel }, false);
     }
 
     // 加载模型配置
@@ -1097,21 +1407,11 @@
                 modelConfigs = data.modelConfigs;
                 renderModelOptions();
 
-                // 设置默认选中的模型
-                if (modelConfigs.length > 0) {
-                    currentModel = modelConfigs[0].modelName;
-                    currentModelId = modelConfigs[0].id;
-                    const firstOption = document.querySelector('.model-option');
-                    if (firstOption) {
-                        firstOption.classList.add('active');
-                    }
-
-                    // 更新欢迎消息中的模型名称
-                    const welcomeModelName = document.getElementById('welcome-model-name');
-                    if (welcomeModelName) {
-                        welcomeModelName.textContent = currentModel;
-                    }
-                }
+                const saved = readSelectedModel();
+                const savedModel = saved
+                    ? modelConfigs.find((m) => String(m.id) === String(saved.id) || m.modelName === saved.name)
+                    : null;
+                applySelectedModel(savedModel || modelConfigs[0], true);
             } else {
                 showToast('未找到可用的模型配置', 'error');
             }
@@ -1128,9 +1428,9 @@
 
         modelOptionsContainer.innerHTML = '';
 
-        modelConfigs.forEach((model, index) => {
+        modelConfigs.forEach((model) => {
             const modelOption = document.createElement('div');
-            modelOption.className = `model-option ${index === 0 ? 'active' : ''}`;
+            modelOption.className = 'model-option';
             modelOption.setAttribute('data-model', model.modelName);
             modelOption.setAttribute('data-model-id', model.id);
 
@@ -1139,13 +1439,31 @@
             const statusText = model.status === 1 ? '在线' :
                 model.status === 2 ? '错误' : '离线';
 
+            const providerIcon = {
+                OpenAI: '/images/icons/openai.svg',
+                Anthropic: '/images/icons/anthropic.svg',
+                DeepSeek: '/images/icons/deepseek.svg',
+                Kimi: '/images/icons/kimi.svg',
+                Qwen: '/images/icons/qwen.svg',
+                Doubao: '/images/icons/doubao.svg',
+                GLM: '/images/icons/glm.png',
+                Custom: '/images/icons/custom.svg',
+                'Custom-OpenAI': '/images/icons/custom.svg',
+                'Custom-Anthropic': '/images/icons/custom.svg',
+                'Custom-Ollama': '/images/icons/custom.svg',
+                Ollama: '/images/icons/ollama.svg'
+            }[model.apiType] || '/images/icons/openai.svg';
+
             modelOption.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <div class="font-medium">${model.modelName}</div>
-                            <div class="text-xs">${model.description || model.apiType}</div>
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <img src="${providerIcon}" alt="" class="w-5 h-5 flex-shrink-0 object-contain">
+                            <div class="min-w-0">
+                                <div class="font-medium text-sm truncate">${model.modelName}</div>
+                                <div class="text-xs text-gray-500 truncate">${model.apiType || ''}${model.description ? ' · ' + model.description : ''}</div>
+                            </div>
                         </div>
-                        <div class="w-2 h-2 ${statusClass} rounded-full" title="${statusText}"></div>
+                        <div class="w-2 h-2 ${statusClass} rounded-full flex-shrink-0" title="${statusText}"></div>
                     </div>
                 `;
 
@@ -1348,34 +1666,14 @@
         }
     }
 
-    // 显示提示消息
     function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        let bgColor = 'bg-blue-500';
-
-        switch (type) {
-            case 'success':
-                bgColor = 'bg-green-500';
-                break;
-            case 'error':
-                bgColor = 'bg-red-500';
-                break;
-            case 'warning':
-                bgColor = 'bg-yellow-500';
-                break;
-            default:
-                bgColor = 'bg-blue-500';
+        if (window.efakShowToast) {
+            window.efakShowToast(message, type);
         }
+    }
 
-        toast.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white transform transition-all duration-300 ${bgColor}`;
-        toast.textContent = message;
-
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => document.body.removeChild(toast), 300);
-        }, 2000);
+    function welcomeMessageHTML() {
+        return '';
     }
 
     // 创建新会话
@@ -1404,36 +1702,19 @@
                 // 清空聊天区域
                 const chatMessages = document.getElementById('chat-messages');
                 chatMessages.innerHTML = '';
-
-                // 重新添加欢迎消息
-                const welcomeMessageHTML = `
-                    <div class="flex items-start space-x-3">
-                        <div class="message-avatar assistant">
-                            <img src="/images/ai_robot.jpg" alt="AI助手"
-                                class="w-full h-full object-cover rounded-full">
-                        </div>
-                        <div class="message-bubble assistant p-4 rounded-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="text-sm text-gray-600">AI助手</div>
-                                <div class="text-xs text-gray-400" id="new-welcome-model-name">${currentModel || '正在加载...'}</div>
-                            </div>
-                            <div class="markdown-content">
-                                <p>您好！我是 EFAK AI 智能助手。我支持：</p>
-                                <ul>
-                                    <li>🤖 <strong>多种大模型</strong> - OpenAI, Claude, DeepSeek等</li>
-                                    <li>📊 <strong>数据可视化</strong> - 自动生成图表和统计分析</li>
-                                    <li>📝 <strong>Markdown渲染</strong> - 支持代码高亮、表格、数学公式</li>
-                                    <li>🔍 <strong>Kafka专家</strong> - 集群分析、性能优化、故障诊断</li>
-                                </ul>
-                                <p>请选择您偏好的大模型，然后告诉我您需要什么帮助！</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                chatMessages.innerHTML = welcomeMessageHTML;
-
-                // 清空对话历史
                 conversationHistory = [];
+                lastSkillId = '';
+                inputHistoryIndex = -1;
+                inputDraft = '';
+                hideSlashMenu();
+                const chatInput = document.getElementById('chat-input');
+                if (chatInput) {
+                    chatInput.value = '';
+                    autoResize(chatInput);
+                    document.getElementById('send-btn').disabled = true;
+                }
+                setStage('empty');
+                renderIntentGrid();
 
                 // 显示创建成功提示
                 showToast('新会话已创建', 'success');
@@ -1469,7 +1750,8 @@
 
             const data = await response.json();
             if (data.success && data.sessions) {
-                renderChatHistory(data.sessions);
+                historySessions = data.sessions;
+                renderChatHistory();
             } else {
                 console.error('加载对话历史失败:', data.message);
             }
@@ -1504,7 +1786,7 @@
 
                 console.log('已加载最近一次对话历史:', latestSession.title);
             } else {
-                console.log('没有找到历史对话，显示欢迎消息');
+                console.log('No conversation history; rendering initial prompt');
             }
         } catch (error) {
             console.error('加载最近对话历史失败:', error);
@@ -1538,40 +1820,117 @@
         }
     }
 
+    function getFilteredHistory() {
+        const query = historyQuery.trim().toLowerCase();
+        if (!query) return historySessions.slice();
+        return historySessions.filter((session) => {
+            const title = (session.title || '').toLowerCase();
+            const model = (session.modelName || '').toLowerCase();
+            return title.includes(query) || model.includes(query);
+        });
+    }
+
+    function initHistoryDialog() {
+        const modal = document.getElementById('history-modal');
+        const openBtn = document.getElementById('history-chat-btn');
+        const closeBtn = document.getElementById('history-close-btn');
+        const searchInput = document.getElementById('history-search-input');
+        const prevBtn = document.getElementById('history-prev-btn');
+        const nextBtn = document.getElementById('history-next-btn');
+        if (!modal || !openBtn) return;
+
+        openBtn.addEventListener('click', async function () {
+            await loadChatHistory();
+            historyPage = 1;
+            renderChatHistory();
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            if (searchInput) searchInput.focus();
+        });
+
+        function closeHistory() {
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        if (closeBtn) closeBtn.addEventListener('click', closeHistory);
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeHistory();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('open')) {
+                closeHistory();
+            }
+        });
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                historyQuery = this.value || '';
+                historyPage = 1;
+                renderChatHistory();
+            });
+        }
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function () {
+                if (historyPage > 1) {
+                    historyPage -= 1;
+                    renderChatHistory();
+                }
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () {
+                const totalPages = Math.max(1, Math.ceil(getFilteredHistory().length / historyPageSize));
+                if (historyPage < totalPages) {
+                    historyPage += 1;
+                    renderChatHistory();
+                }
+            });
+        }
+    }
+
     // 渲染对话历史
-    function renderChatHistory(sessions) {
+    function renderChatHistory() {
         const chatHistoryContainer = document.getElementById('chat-history');
         if (!chatHistoryContainer) return;
 
-        chatHistoryContainer.innerHTML = '';
+        const filtered = getFilteredHistory();
+        const totalPages = Math.max(1, Math.ceil(filtered.length / historyPageSize));
+        if (historyPage > totalPages) historyPage = totalPages;
+        const start = (historyPage - 1) * historyPageSize;
+        const pageItems = filtered.slice(start, start + historyPageSize);
 
-        if (sessions.length === 0) {
-            chatHistoryContainer.innerHTML = `
-                <div class="text-center text-gray-500 text-sm py-4">
-                    暂无对话历史
-                </div>
-            `;
-            return;
+        chatHistoryContainer.innerHTML = '';
+        if (pageItems.length === 0) {
+            chatHistoryContainer.innerHTML = `<div class="history-empty">暂无匹配的对话</div>`;
+        } else {
+            pageItems.forEach((session) => {
+                const sessionDiv = document.createElement('div');
+                sessionDiv.className = 'history-item' + (session.sessionId === currentSessionId ? ' active' : '');
+                sessionDiv.setAttribute('data-session-id', session.sessionId);
+                const timeAgo = getTimeAgo(session.updateTime);
+                sessionDiv.innerHTML = `
+                    <div class="history-item-title">${escapeHtml(session.title || '未命名对话')}</div>
+                    <div class="history-item-meta">${timeAgo} · ${escapeHtml(session.modelName || '')}</div>
+                `;
+                sessionDiv.addEventListener('click', () => {
+                    loadSession(session.sessionId);
+                    const modal = document.getElementById('history-modal');
+                    if (modal) {
+                        modal.classList.remove('open');
+                        modal.setAttribute('aria-hidden', 'true');
+                    }
+                });
+                chatHistoryContainer.appendChild(sessionDiv);
+            });
         }
 
-        sessions.forEach(session => {
-            const sessionDiv = document.createElement('div');
-            sessionDiv.className = 'p-2 hover:bg-gray-50 rounded cursor-pointer text-sm';
-            sessionDiv.setAttribute('data-session-id', session.sessionId);
-
-            const timeAgo = getTimeAgo(session.updateTime);
-
-            sessionDiv.innerHTML = `
-                <div class="font-medium text-gray-700">${session.title}</div>
-                <div class="text-gray-500 text-xs">${timeAgo} · ${session.modelName}</div>
-            `;
-
-            sessionDiv.addEventListener('click', () => {
-                loadSession(session.sessionId);
-            });
-
-            chatHistoryContainer.appendChild(sessionDiv);
-        });
+        const pageInfo = document.getElementById('history-page-info');
+        const prevBtn = document.getElementById('history-prev-btn');
+        const nextBtn = document.getElementById('history-next-btn');
+        if (pageInfo) pageInfo.textContent = `第 ${historyPage} / ${totalPages} 页 · ${filtered.length} 条`;
+        if (prevBtn) prevBtn.disabled = historyPage <= 1;
+        if (nextBtn) nextBtn.disabled = historyPage >= totalPages;
     }
 
     // 加载指定会话
@@ -1619,49 +1978,19 @@
         chatMessages.innerHTML = '';
 
         if (history.messages && history.messages.length > 0) {
-            // 设置加载历史标志
             isLoadingHistory = true;
-
-            // 显示历史消息
+            setStage('thread');
             history.messages.forEach(message => {
                 addMessage(message.content, message.sender, message.enableMarkdown === 1);
             });
-
-            // 重置加载历史标志
             isLoadingHistory = false;
-
-            // 滚动到底部，确保所有内容都加载完成
+            stickToBottom = true;
             setTimeout(() => {
-                scrollToBottom(chatMessages);
-            }, 200);
+                scrollToBottom();
+            }, 50);
         } else {
-            // 显示欢迎消息
-            const welcomeMessageHTML = `
-                <div class="flex items-start space-x-3">
-                    <div class="message-avatar assistant">
-                        <img src="/images/ai_robot.jpg" alt="AI助手"
-                            class="w-full h-full object-cover rounded-full">
-                    </div>
-                    <div class="message-bubble assistant p-4 rounded-lg">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="text-sm text-gray-600">AI助手</div>
-                            <div class="text-xs text-gray-400">${history.modelName || '正在加载...'}</div>
-                            <div class="text-xs text-gray-400" id="welcome-model-name">${currentModel || '正在加载...'}</div>
-                        </div>
-                        <div class="markdown-content">
-                            <p>您好！我是 EFAK AI 智能助手。我支持：</p>
-                            <ul>
-                                <li>🤖 <strong>多种大模型</strong> - OpenAI, Claude, DeepSeek等</li>
-                                <li>📊 <strong>数据可视化</strong> - 自动生成图表和统计分析</li>
-                                <li>📝 <strong>Markdown渲染</strong> - 支持代码高亮、表格、数学公式</li>
-                                <li>🔍 <strong>Kafka专家</strong> - 集群分析、性能优化、故障诊断</li>
-                            </ul>
-                            <p>请选择您偏好的大模型，然后告诉我您需要什么帮助！</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            chatMessages.innerHTML = welcomeMessageHTML;
+            setStage('empty');
+            renderIntentGrid();
         }
     }
 
@@ -1684,39 +2013,30 @@
     // 切换思考内容显示/隐藏
     window.toggleThinking = function (header) {
         const thinkingSection = header.closest('.thinking-section');
-        const thinkingContent = thinkingSection.querySelector('.thinking-content');
+        if (!thinkingSection) return;
         const thinkingIcon = header.querySelector('.thinking-icon');
-        const thinkingTitle = header.querySelector('.thinking-title');
-
-        if (thinkingContent.style.display === 'none' || !thinkingContent.style.display) {
-            // 展开
-            thinkingContent.style.display = 'block';
-            thinkingIcon.className = 'fa fa-chevron-up thinking-icon ml-auto';
-            thinkingTitle.textContent = 'AI思考过程';
-        } else {
-            // 折叠
-            thinkingContent.style.display = 'none';
-            thinkingIcon.className = 'fa fa-chevron-down thinking-icon ml-auto';
-            thinkingTitle.textContent = 'AI思考过程 (已折叠)';
+        const isOpen = thinkingSection.classList.toggle('open');
+        if (thinkingIcon) {
+            thinkingIcon.className = `fa-solid ${isOpen ? 'fa-chevron-up' : 'fa-chevron-down'} thinking-icon ml-auto`;
         }
     };
 
     // 自动折叠思考内容
     function autoCollapseThinking() {
         setTimeout(() => {
-            const thinkingSections = document.querySelectorAll('.thinking-section');
-            thinkingSections.forEach(section => {
-                const header = section.querySelector('.thinking-header');
-                const thinkingContent = section.querySelector('.thinking-content');
-                const thinkingIcon = header.querySelector('.thinking-icon');
-                const thinkingTitle = header.querySelector('.thinking-title');
-
-                // 自动折叠
-                thinkingContent.style.display = 'none';
-                thinkingIcon.className = 'fa fa-chevron-down thinking-icon ml-auto';
-                thinkingTitle.textContent = 'AI思考过程 (已折叠)';
+            document.querySelectorAll('.thinking-section').forEach((section) => {
+                section.classList.remove('open');
+                section.classList.add('is-done');
+                const thinkingIcon = section.querySelector('.thinking-icon');
+                const thinkingTitle = section.querySelector('.thinking-title');
+                if (thinkingIcon) {
+                    thinkingIcon.className = 'fa-solid fa-chevron-down thinking-icon ml-auto';
+                }
+                if (thinkingTitle && !section.classList.contains('is-streaming')) {
+                    thinkingTitle.textContent = '已完成思考';
+                }
             });
-        }, 2000); // 2秒后自动折叠
+        }, 400);
     }
 
     // 显示确认对话框

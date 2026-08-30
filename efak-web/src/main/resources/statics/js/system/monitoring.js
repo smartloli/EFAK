@@ -321,8 +321,8 @@ class KafkaMonitoring {
                 datasets: [{
                     label: '写入速率',
                     data: [],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderColor: '#165DFF',
+                    backgroundColor: 'rgba(22, 93, 255, 0.2)',
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4,

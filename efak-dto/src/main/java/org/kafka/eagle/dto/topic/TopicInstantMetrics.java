@@ -49,4 +49,5 @@ public class TopicInstantMetrics {
      */
     private LocalDateTime createTime;
 
+    private String collectRound;
 }

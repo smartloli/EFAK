@@ -6,17 +6,9 @@
     <div class="container mx-auto px-4">
         <div class="flex justify-between items-center h-16">
             <!-- 左侧Logo和标题 -->
-            <a href="/">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-lg flex items-center justify-center">
-                        <img src="/images/efak_ai_logo.png" alt="EFAK AI Logo"
-                             class="w-10 h-10 rounded-full object-cover flex-shrink-0 transition-transform hover:scale-110">
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold sidebar-title">EFAK · <span class="text-primary">AI</span></h1>
-                        <p class="text-xs text-gray-500">多集群智能管理平台</p>
-                    </div>
-                </div>
+            <a href="/" class="brand-link" aria-label="EFAK AI">
+                <img th:src="@{/images/efak_ai_title.png}" alt="EFAK AI"
+                     class="brand-lockup" width="215" height="50">
             </a>
 
             <!-- 右侧用户信息和操作 -->
@@ -25,7 +17,7 @@
                 <div class="relative">
                     <div id="user-menu-button"
                          class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
-                        <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_profile.jpg' : '/images/user_profile_2.jpg'}"
+                        <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_admin_logo.png' : '/images/user_logo.png'}"
                              alt="用户头像" class="w-8 h-8 rounded-full object-cover border border-gray-200"/>
                         <div class="hidden md:block">
                             <div class="text-sm font-medium" th:text="${userName} ?: 'Admin'">Admin</div>
@@ -79,7 +71,7 @@
             </div>
             <div class="p-6">
                 <div class="flex flex-col items-center mb-6">
-                    <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_profile.jpg' : '/images/user_profile_2.jpg'}"
+                    <img th:src="@{${#strings.contains(userRole, '管理员')} ? '/images/user_admin_logo.png' : '/images/user_logo.png'}"
                          alt="用户头像" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 mb-4"/>
                     <h4 class="text-xl font-semibold text-gray-900" th:text="${userName} ?: 'Admin'">Admin</h4>
                     <p class="text-sm text-gray-500" th:text="${userRole} ?: '管理员'">管理员</p>
@@ -180,12 +172,12 @@
         </div>
     </div>
 
-    <!-- 美化提示框 -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <!-- Toast -->
+    <div id="toast-container"></div>
 
     <!-- Header JavaScript -->
     <script>
-        // 美化提示函数
+        // Toast notification
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -214,7 +206,7 @@
                     icon = 'fa-info-circle';
             }
 
-            toast.className = `${bgColor} ${textColor} px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 transform translate-x-full transition-all duration-300 ease-in-out`;
+            toast.className = `${bgColor} ${textColor} header-toast flex items-center space-x-2`;
             toast.innerHTML = `
             <i class="fa ${icon}"></i>
             <span>${message}</span>
@@ -225,20 +217,11 @@
 
             container.appendChild(toast);
 
-            // 动画效果
             setTimeout(() => {
-                toast.classList.remove('translate-x-full');
-            }, 100);
-
-            // 自动移除
-            setTimeout(() => {
-                toast.classList.add('translate-x-full');
-                setTimeout(() => {
-                    if (toast.parentElement) {
-                        toast.remove();
-                    }
-                }, 300);
-            }, 5000);
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 3000);
         }
 
         // 密码可见性切换函数

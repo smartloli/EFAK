@@ -23,4 +23,5 @@ public class BrokerMetrics {
     private BigDecimal memoryUsage;
     private LocalDateTime collectTime;
     private LocalDateTime createTime;
+    private String collectRound;
 }

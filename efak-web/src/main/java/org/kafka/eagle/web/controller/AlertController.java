@@ -36,6 +36,40 @@ public class AlertController {
     }
 
     /**
+     * 获取告警通知（用于通知中心）。仅返回未处理告警，避免红点与列表不一致。
+     */
+    @GetMapping("/notifications")
+    public ResponseEntity<AlertPageResponse> getAlertNotifications(
+            @RequestParam String cid,
+            @RequestParam(defaultValue = "5") Integer limit) {
+        AlertQueryRequest request = new AlertQueryRequest();
+        request.setClusterId(cid);
+        request.setPage(1);
+        request.setPageSize(limit);
+        request.setSortField("updatedAt");
+        request.setSortOrder("desc");
+        return ResponseEntity.ok(alertService.queryAlertsForNotifications(request));
+    }
+
+    /**
+     * 通知中心：将当前集群未处理告警全部标记为已处理
+     */
+    @PutMapping("/notifications/read-all")
+    public ResponseEntity<Map<String, Object>> markAllNotificationsRead(@RequestParam String cid) {
+        int updated = alertService.markUnprocessedAlerts(cid, AlertInfo.STATUS_PROCESSED);
+        return ResponseEntity.ok(Map.of("updated", updated));
+    }
+
+    /**
+     * 通知中心：将当前集群未处理告警全部忽略，使其不再出现在红点/列表中
+     */
+    @PutMapping("/notifications/clear-all")
+    public ResponseEntity<Map<String, Object>> clearAllNotifications(@RequestParam String cid) {
+        int updated = alertService.markUnprocessedAlerts(cid, AlertInfo.STATUS_IGNORED);
+        return ResponseEntity.ok(Map.of("updated", updated));
+    }
+
+    /**
      * 根据ID查询告警详情
      */
     @GetMapping("/{id}")
@@ -272,27 +306,6 @@ public class AlertController {
             @RequestParam String groupId) {
         List<Map<String, Object>> topics = alertService.getConsumerTopicsByGroupId(cid, groupId);
         return ResponseEntity.ok(topics);
-    }
-
-    /**
-     * 获取告警通知（用于通知中心）
-     */
-    @GetMapping("/notifications")
-    public ResponseEntity<List<AlertInfo>> getAlertNotifications(
-            @RequestParam String cid,
-            @RequestParam(defaultValue = "5") Integer limit) {
-
-        // 创建查询请求，查询告警通知
-        AlertQueryRequest request = new AlertQueryRequest();
-        request.setClusterId(cid);
-        request.setPage(1);
-        request.setPageSize(limit);
-        request.setSortField("updatedAt");  // 按更新时间排序
-        request.setSortOrder("desc");
-
-        // 查询告警通知
-        AlertPageResponse response = alertService.queryAlertsForNotifications(request);
-        return ResponseEntity.ok(response.getAlerts());
     }
 
     /**

@@ -1,11 +1,9 @@
 # EFAK-AI (Eagle For Apache Kafka - AI Enhanced)
 
-[![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)](https://github.com/smartloli/EFAK)
+[![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)](https://github.com/smartloli/EFAK-AI)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.java.net/projects/jdk/17/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-green.svg)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-
-[![Stargazers over time](https://starchart.cc/smartloli/EFAK.svg?variant=adaptive)](https://starchart.cc/smartloli/EFAK)
 
 ## 项目简介
 
@@ -42,7 +40,7 @@
 - **单节点优化**: 自动检测单节点环境，跳过分片逻辑
 
 ### 🚨 告警管理
-- **多渠道告警**: 支持钉钉、微信、飞书等多种告警渠道
+- **多渠道告警**: 支持邮件、钉钉、企业微信等多种告警渠道
 - **智能阈值**: 基于历史数据的动态阈值调整
 - **告警聚合**: 避免告警风暴，提供告警聚合和降噪
 - **可视化配置**: 直观的告警规则配置界面
@@ -52,7 +50,7 @@
 ### 模块结构
 ```
 EFAK-AI/
-├── efak-ai/          # 告警功能模块
+├── efak-ai/          # AI 功能模块
 ├── efak-core/        # 核心功能模块 (Kafka 连接、监控逻辑)
 ├── efak-dto/         # 数据传输对象
 ├── efak-tool/        # 工具类模块
@@ -65,7 +63,7 @@ EFAK-AI/
 - **缓存**: Redis 6.0+ (分布式锁、任务调度)
 - **消息队列**: Apache Kafka 4.0.0
 - **ORM**: MyBatis 3.0.4
-- **前端**: Thymeleaf
+- **前端**: Thymeleaf + JavaScript + TailwindCSS
 - **构建工具**: Maven 3.6+
 - **Java 版本**: JDK 17
 
@@ -98,8 +96,8 @@ cd EFAK-AI
 #### 一键启动
 ```bash
 # 1. 克隆项目
-git clone https://github.com/smartloli/EFAK.git
-cd EFAK
+git clone https://github.com/smartloli/EFAK-AI.git
+cd EFAK-AI
 
 # 2. 启动所有服务（包括 MySQL、Redis）
 docker-compose up -d
@@ -109,10 +107,7 @@ docker-compose logs -f efak-ai
 
 # 4. 访问应用
 # http://localhost:8080
-# 默认账号: admin / admin
-
-# 5. 重置密码
-# http://localhost:8080/password-tool
+# 默认账号: admin / admin123
 ```
 
 #### 启动 Nginx 反向代理（可选）
@@ -148,13 +143,13 @@ docker-compose logs -f
 #### 1. 构建安装包
 ```bash
 # 克隆项目
-git clone https://github.com/smartloli/EFAK.git
-cd EFAK
+git clone https://github.com/smartloli/EFAK-AI.git
+cd EFAK-AI
 
 # 执行构建脚本
 ./build-package.sh
 
-# 生成安装包: efak-5.0.0.tar.gz
+# 生成安装包: efak-ai-5.0.0.tar.gz
 ```
 
 #### 2. 部署安装包
@@ -228,8 +223,8 @@ ps aux | grep KafkaEagle
 ### 详细部署文档
 
 完整的部署指南、配置说明和故障排查，请参阅：
-- 📖 [详细部署文档](efak-web/src/main/resources/docs/DEPLOY.md)
-- 🚀 [功能预览文档](efak-web/src/main/resources/docs/FEATURE_PREVIEW.md)
+- 📖 [详细部署文档](DEPLOY.md)
+- 🚀 [功能预览文档](FEATURE_PREVIEW.md)
 
 
 ## 开发指南
@@ -245,8 +240,8 @@ ps aux | grep KafkaEagle
 #### 开发步骤
 ```bash
 # 1. 克隆项目
-git clone https://github.com/smartloli/EFAK.git
-cd EFAK
+git clone https://github.com/smartloli/EFAK-AI.git
+cd EFAK-AI
 
 # 2. 创建数据库并导入 SQL 脚本
 mysql -u root -p
@@ -322,15 +317,15 @@ JAVA_OPTS="-Xms1g -Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
 ### 健康检查 API
 ```bash
 # 基础健康检查
-GET /health/check
+GET /actuator/health
 
 # 响应示例
 {
-    "application": "EFAK-AI",
-    "port": "8080",
-    "version": "5.0.0",
-    "status": "UP",
-    "timestamp": "2025-10-06T23:32:47.392037"
+  "status": "UP",
+  "components": {
+    "db": {"status": "UP"},
+    "redis": {"status": "UP"}
+  }
 }
 ```
 
@@ -406,13 +401,13 @@ efak-web/src/main/java/org/kafka/eagle/
 ## 联系方式
 
 - 官网主页: https://www.kafka-eagle.org/
-- 项目主页: https://github.com/smartloli/EFAK
-- 问题反馈: https://github.com/smartloli/EFAK/issues
+- 项目主页: https://github.com/smartloli/EFAK-AI
+- 问题反馈: https://github.com/smartloli/EFAK-AI/issues
 - 作者: Mr.SmartLoli
 
 ## 更新日志
 
-### v5.0.0 (2025-10-06)
+### v5.0.0 (2025-01-27)
 - ✨ 集成 AI 智能助手功能
 - ✨ 实现分布式任务调度系统
 - ✨ 支持多种大语言模型

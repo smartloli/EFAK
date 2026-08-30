@@ -136,5 +136,29 @@ public class WeChatWorkAlertSender {
 
         return "HTTP响应码: " + responseCode + "\n响应内容: " + response.toString();
     }
-    
+
+    public static void main(String[] args) {
+        // 使用示例
+        String webhook = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=your_access_token";
+
+
+        CompletableFuture.runAsync(() -> {
+            WeChatWorkAlertSender sender = new WeChatWorkAlertSender(webhook);
+
+            try {
+                // 发送Markdown告警
+                String markdownContent = "# 系统严重告警\n" +
+                        "服务器CPU使用率超过90%!\n" +
+                        "**时间**: " + new java.util.Date() + "\n" +
+                        "**服务器**: 192.168.1.1\n" +
+                        "请相关人员立即处理！<@13800138000>";
+                String markdownResult = sender.sendMarkdownAlert(markdownContent);
+                System.out.println("Markdown消息发送结果: " + markdownResult);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+
+    }
 }

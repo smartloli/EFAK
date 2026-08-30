@@ -46,15 +46,14 @@
 <!-- 主内容区 -->
 <main class="flex-1 container mx-auto px-4 py-6">
     <!-- 页面标题和操作区 -->
-    <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="page-header mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-            <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-dark">Kafka集群管理</h2>
-            <p class="text-gray-500 mt-1">管理和监控所有Kafka集群的运行状态</p>
+            <h2 class="page-header-title">集群</h2>
         </div>
         <div class="flex flex-wrap gap-3">
             <div class="relative">
                 <input id="cluster_search" type="text" placeholder="搜索集群..."
-                       class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all w-full md:w-64">
+                       class="pl-10 pr-4 py-2 border border-gray-300 bg-white text-gray-900 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all w-full md:w-64">
                 <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             </div>
             <button id="add-cluster-btn"
@@ -70,10 +69,10 @@
         <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm">总集群数</p>
+                    <p class="text-gray-500 text-sm">集群</p>
                     <h3 id="totalClusters" class="text-3xl font-bold mt-1">0</h3>
                     <p class="text-success text-sm mt-2 flex items-center">
-                        <i class="fa fa-arrow-up mr-1"></i> 实时统计
+                        <i class="fa fa-arrow-up mr-1"></i> 实时
                     </p>
                 </div>
                 <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
@@ -85,7 +84,7 @@
         <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm">健康集群</p>
+                    <p class="text-gray-500 text-sm">健康</p>
                     <h3 id="onlineClusters" class="text-3xl font-bold mt-1">0</h3>
                     <p id="healthRate" class="text-success text-sm mt-2 flex items-center">
                         <i class="fa fa-check-circle mr-1"></i> 0% 健康率
@@ -100,10 +99,10 @@
         <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm">异常集群</p>
+                    <p class="text-gray-500 text-sm">异常</p>
                     <h3 id="offlineClusters" class="text-3xl font-bold mt-1">0</h3>
                     <p class="text-warning text-sm mt-2 flex items-center">
-                        <i class="fa fa-exclamation-triangle mr-1"></i> 需要关注
+                        <i class="fa fa-exclamation-triangle mr-1"></i> 关注
                     </p>
                 </div>
                 <div class="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center text-warning">
@@ -115,10 +114,10 @@
         <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm">平均可用度</p>
+                    <p class="text-gray-500 text-sm">可用度</p>
                     <h3 id="avgAvailability" class="text-3xl font-bold mt-1">0%</h3>
                     <p class="text-info text-sm mt-2 flex items-center">
-                        <i class="fa fa-chart-line mr-1"></i> 集群可用度
+                        <i class="fa fa-chart-line mr-1"></i> SLA
                     </p>
                 </div>
                 <div class="w-12 h-12 rounded-lg bg-info/10 flex items-center justify-center text-info">
@@ -174,7 +173,7 @@
                     </tr>
                     </thead>
                     <tbody id="cluster-tbody" class="bg-white divide-y divide-gray-200">
-                    <!-- 集群数据将通过JavaScript动态加载 -->
+                    <!-- Cluster list -->
                     </tbody>
                 </table>
             </div>
@@ -193,7 +192,7 @@
                     </button>
 
                     <div class="flex items-center space-x-1" id="page-numbers">
-                        <!-- 页码按钮将通过JavaScript动态生成 -->
+                        <!-- Pagination -->
                     </div>
 
                     <button id="next-page"
@@ -381,7 +380,7 @@
                                 </button>
                             </div>
                             <div class="file-upload-area" onclick="document.getElementById('excelFile').click()"
-                                 style="border: 2px dashed #d1d5db; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s;">
+                                 style="border: 2px dashed #d1d5db; border-radius: 2px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s;">
                                 <div class="upload-icon"
                                      style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;">
                                     <i class="fas fa-cloud-upload-alt"></i>

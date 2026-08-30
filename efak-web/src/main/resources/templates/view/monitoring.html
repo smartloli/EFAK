@@ -27,37 +27,18 @@
 
         /* 性能概览区域 */
         .performance-overview {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border-radius: 24px;
-            padding: 40px;
-            margin-bottom: 32px;
-            color: white;
+            background: var(--efak-hero-bg);
+            border-radius: 2px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            color: var(--efak-hero-text);
             position: relative;
             overflow: hidden;
+            border: 1px solid var(--efak-hero-border);
         }
 
         .performance-overview::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-            animation: performancePulse 6s ease-in-out infinite;
-        }
-
-        @keyframes performancePulse {
-
-            0%,
-            100% {
-                transform: scale(1) rotate(0deg);
-            }
-
-            50% {
-                transform: scale(1.1) rotate(180deg);
-            }
+            display: none;
         }
 
         .performance-content {
@@ -66,55 +47,54 @@
         }
 
         .performance-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
         .performance-subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 24px;
+            font-size: 0.8125rem;
+            opacity: 0.7;
+            margin-bottom: 16px;
         }
 
         .performance-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-            margin-top: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
         }
 
         .performance-stat {
-            text-align: center;
-            padding: 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+            text-align: left;
+            padding: 12px 14px;
+            background: var(--efak-hero-chip-bg);
+            border-radius: 2px;
+            border: 1px solid var(--efak-hero-chip-border);
+            transition: background 0.15s ease;
         }
 
         .performance-stat:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.1);
+            transform: none;
         }
 
         .performance-stat-icon {
-            font-size: 2.5rem;
-            margin-bottom: 16px;
-            opacity: 0.9;
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+            opacity: 0.7;
         }
 
         .performance-stat-number {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
+            font-variant-numeric: tabular-nums;
         }
 
         .performance-stat-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
+            font-size: 0.75rem;
+            opacity: 0.7;
         }
 
         .performance-stat-trend {
@@ -126,7 +106,7 @@
         .monitor-card {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 2px;
             padding: 24px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -140,20 +120,20 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border-radius: 20px 20px 0 0;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 2px 4px 0 0;
         }
 
         .monitor-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+            border-color: #d1d5db;
         }
 
         .monitor-card.throughput {
-            --primary-color: #7c3aed;
-            --secondary-color: #5b21b6;
+            --primary-color: #165DFF;
+            --secondary-color: #0E4AE6;
         }
 
         .monitor-card.consume {
@@ -162,8 +142,8 @@
         }
 
         .monitor-card.produce {
-            --primary-color: #3b82f6;
-            --secondary-color: #2563eb;
+            --primary-color: #165DFF;
+            --secondary-color: #0E4AE6;
         }
 
 
@@ -184,7 +164,7 @@
         .monitor-icon {
             width: 48px;
             height: 48px;
-            border-radius: 12px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -207,7 +187,7 @@
             align-items: center;
             justify-content: center;
             background: #f8fafc;
-            border-radius: 12px;
+            border-radius: 2px;
             color: #6b7280;
         }
 
@@ -222,7 +202,7 @@
             text-align: center;
             padding: 16px;
             background: #f8fafc;
-            border-radius: 12px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
         }
 
@@ -267,7 +247,7 @@
             padding: 8px 16px;
             border: 1px solid #d1d5db;
             background: white;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             font-weight: 500;
             color: #374151;
@@ -276,13 +256,20 @@
         }
 
         .time-btn:hover {
-            background: #f3f4f6;
-            border-color: #9ca3af;
+            background: rgba(22, 93, 255, 0.08);
+            border-color: #165DFF;
+            color: #165DFF;
         }
 
         .time-btn.active {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
+            background: #165DFF;
+            border-color: #165DFF;
+            color: white;
+        }
+
+        .time-btn.active:hover {
+            background: #0E4AE6;
+            border-color: #0E4AE6;
             color: white;
         }
 
@@ -290,7 +277,7 @@
         .alert-section {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 2px;
             padding: 24px;
             margin-top: 32px;
         }
@@ -306,7 +293,7 @@
             background: #ef4444;
             color: white;
             padding: 4px 8px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 600;
         }
@@ -324,7 +311,7 @@
             padding: 16px;
             background: #fef2f2;
             border: 1px solid #fecaca;
-            border-radius: 12px;
+            border-radius: 2px;
             transition: all 0.2s ease;
         }
 
@@ -344,7 +331,7 @@
         .alert-icon {
             width: 40px;
             height: 40px;
-            border-radius: 10px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -377,10 +364,10 @@
 
         .alert-action {
             padding: 8px 16px;
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
@@ -388,7 +375,7 @@
         }
 
         .alert-action:hover {
-            background: #2563eb;
+            background: #0E4AE6;
         }
 
         /* 响应式设计 */
@@ -432,47 +419,22 @@
     <!-- Main Content -->
     <main class="main-content ml-64 pt-16 transition-all duration-300 ease-in-out">
         <div class="p-8">
-            <!-- Kafka性能概览区域 -->
-            <div class="performance-overview">
-                <div class="performance-content">
-                    <h1 class="performance-title">Kafka性能监控中心</h1>
-                    <p class="performance-subtitle">实时监控Kafka集群性能指标，确保消息流稳定可靠</p>
-
-                    <div class="performance-stats">
-                        <div class="performance-stat">
-                            <div class="performance-stat-icon">
-                                <i class="fa fa-exchange"></i>
-                            </div>
-                            <div class="performance-stat-number" id="message-throughput">-</div>
-                            <div class="performance-stat-label">消息吞吐量 (msg/s)</div>
-                        </div>
-
-                        <div class="performance-stat">
-                            <div class="performance-stat-icon">
-                                <i class="fa fa-download"></i>
-                            </div>
-                            <div class="performance-stat-number" id="message-consume">-</div>
-                            <div class="performance-stat-label">消息读取速率</div>
-                        </div>
-
-                        <div class="performance-stat">
-                            <div class="performance-stat-icon">
-                                <i class="fa fa-upload"></i>
-                            </div>
-                            <div class="performance-stat-number" id="message-produce">-</div>
-                            <div class="performance-stat-label">消息写入速率</div>
-                        </div>
-
-                        <div class="performance-stat">
-                            <div class="performance-stat-icon">
-                                <i class="fa fa-clock"></i>
-                            </div>
-                            <div class="performance-stat-number" id="message-lag">-</div>
-                            <div class="performance-stat-label">写入请求耗时</div>
-                        </div>
-
-
-                    </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div class="kpi-card">
+                    <div class="kpi-label">吞吐</div>
+                    <div class="kpi-value" id="message-throughput">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">读取</div>
+                    <div class="kpi-value" id="message-consume">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">写入</div>
+                    <div class="kpi-value" id="message-produce">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">写入耗时</div>
+                    <div class="kpi-value" id="message-lag">—</div>
                 </div>
             </div>
 
@@ -504,17 +466,17 @@
                     <div class="monitor-metrics">
                         <div class="metric-item">
                             <div class="metric-value" id="throughput-current">-</div>
-                            <div class="metric-label">当前总吞吐量 (msg/sec)</div>
+                            <div class="metric-label">当前</div>
                             <div class="metric-change neutral" id="throughput-current-change">-</div>
                         </div>
                         <div class="metric-item">
                             <div class="metric-value" id="throughput-avg">-</div>
-                            <div class="metric-label">平均总吞吐量 (msg/sec)</div>
+                            <div class="metric-label">平均</div>
                             <div class="metric-change neutral" id="throughput-avg-change">-</div>
                         </div>
                         <div class="metric-item">
                             <div class="metric-value" id="throughput-peak">-</div>
-                            <div class="metric-label">峰值总吞吐量 (msg/sec)</div>
+                            <div class="metric-label">峰值</div>
                             <div class="metric-change neutral" id="throughput-peak-change">-</div>
                         </div>
                     </div>

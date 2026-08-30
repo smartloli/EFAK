@@ -60,6 +60,10 @@ spring:
           max-idle: 10
           min-idle: 5
           max-wait: 3000ms
+  session:
+    timeout: 30m
+    redis:
+      namespace: efak:session
 
 # Server Configuration
 server:
@@ -95,13 +99,17 @@ logging:
 
 # EFAK Distributed Task Configuration
 efak:
+  # Process role: all (UI+collector, default), web (UI only), worker (collector only).
+  role: all
+  # Stable node identity. Empty = ip:listenPort.
+  node-id: ""
   distributed:
     task:
       # 节点离线超时时间（秒）
       offline-timeout: 120
 
-      # 分片结果等待时间（秒）
-      shard-result-wait-time: 30
+      # Kept for compatibility. Aggregation no longer sleeps.
+      shard-result-wait-time: 0
 
       # 分片结果过期时间（分钟）
       shard-result-expire-minutes: 10

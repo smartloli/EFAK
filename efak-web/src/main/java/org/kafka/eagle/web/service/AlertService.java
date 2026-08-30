@@ -45,6 +45,11 @@ public interface AlertService {
     boolean updateAlertStatusById(Long id, String clusterId, Integer status);
 
     /**
+     * 将当前集群未处理告警批量更新为指定状态
+     */
+    int markUnprocessedAlerts(String clusterId, Integer status);
+
+    /**
      * 查询告警渠道列表
      */
     List<AlertChannel> getAlertChannels(String clusterId);

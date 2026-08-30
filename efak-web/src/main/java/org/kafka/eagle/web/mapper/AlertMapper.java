@@ -118,7 +118,7 @@ public interface AlertMapper {
                         "FROM ke_alerts a " +
                         "LEFT JOIN ke_alert_channels c ON a.channel_id = c.id " +
                         "LEFT JOIN ke_alert_type_configs config ON a.alert_task_id = config.id " +
-                        "WHERE 1=1 " +
+                        "WHERE a.status = 0 " +
                         "<if test=\"clusterId != null and clusterId != ''\">" +
                         "  AND a.cluster_id = #{clusterId} " +
                         "</if>" +
@@ -130,7 +130,10 @@ public interface AlertMapper {
                         "  <when test='sortField == \"type\"'>config.type</when>" +
                         "  <otherwise>a.updated_at</otherwise>" +
                         "</choose> " +
-                        "${sortOrder} " +
+                        "<choose>" +
+                        "  <when test='sortOrder == \"asc\" or sortOrder == \"ASC\"'>ASC</when>" +
+                        "  <otherwise>DESC</otherwise>" +
+                        "</choose> " +
                         "LIMIT #{offset}, #{pageSize}" +
                         "</script>")
         List<AlertInfo> queryAlertsForNotifications(@Param("clusterId") String clusterId,
@@ -140,11 +143,11 @@ public interface AlertMapper {
                         @Param("pageSize") Integer pageSize);
 
         /**
-         * 查询告警通知总数（用于通知中心）
+         * 查询未处理告警通知总数（用于通知中心红点）
          */
         @Select("<script>" +
                         "SELECT COUNT(*) FROM ke_alerts a " +
-                        "WHERE 1=1 " +
+                        "WHERE a.status = 0 " +
                         "<if test=\"clusterId != null and clusterId != ''\">" +
                         "  AND a.cluster_id = #{clusterId} " +
                         "</if>" +
@@ -259,6 +262,14 @@ public interface AlertMapper {
                         "WHERE id = #{id} AND cluster_id = #{clusterId}")
         int updateAlertStatusById(@Param("id") Long id,
                         @Param("clusterId") String clusterId,
+                        @Param("status") Integer status);
+
+        /**
+         * 将当前集群未处理告警批量更新为指定状态
+         */
+        @Update("UPDATE ke_alerts SET status = #{status}, updated_at = NOW() "
+                        + "WHERE cluster_id = #{clusterId} AND status = 0")
+        int updateUnprocessedAlertsStatus(@Param("clusterId") String clusterId,
                         @Param("status") Integer status);
 
         /**

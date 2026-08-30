@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.kafka.eagle.web.service.UserService;
 import org.kafka.eagle.dto.user.UserInfo;
 
-import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -44,10 +43,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    // 关键逻辑：生成密码应使用强随机数，避免 Random 的可预测性
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     /**
      * 分页获取所有用户列表
@@ -102,13 +97,13 @@ public class UserController {
 
                 // 设置显示信息
                 String displayRole = "用户";
-                String avatar = "/images/user_profile_2.jpg"; // 默认普通用户头像
+                String avatar = "/images/user_logo.png"; // 默认普通用户头像
                 String roleType = "user";
 
                 if (userInfo.getRoles() != null && userInfo.getRoles().contains("ROLE_ADMIN")) {
                     displayRole = "管理员";
                     roleType = "admin";
-                    avatar = "/images/user_profile.jpg"; // 管理员头像
+                    avatar = "/images/user_admin_logo.png"; // 管理员头像
                 }
 
                 userMap.put("displayRole", displayRole);
@@ -485,9 +480,11 @@ public class UserController {
      * 生成随机密码
      */
     private String generateRandomPassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder();
+        Random random = new Random();
         for (int i = 0; i < 8; i++) {
-            sb.append(PASSWORD_CHARS.charAt(SECURE_RANDOM.nextInt(PASSWORD_CHARS.length())));
+            sb.append(chars.charAt(random.nextInt(chars.length())));
         }
         return sb.toString();
     }
@@ -522,13 +519,13 @@ public class UserController {
 
         // 设置显示信息
         String displayRole = "用户";
-        String avatar = "/images/user_profile_2.jpg"; // 默认普通用户头像
+        String avatar = "/images/user_logo.png"; // 默认普通用户头像
         String roleType = "user";
 
         if (userInfo.getRoles() != null && userInfo.getRoles().contains("ROLE_ADMIN")) {
             displayRole = "管理员";
             roleType = "admin";
-            avatar = "/images/user_profile.jpg"; // 管理员头像
+            avatar = "/images/user_admin_logo.png"; // 管理员头像
         }
 
         userMap.put("displayRole", displayRole);
@@ -638,12 +635,12 @@ public class UserController {
             String displayName = userInfo.getUsername();
             String displayRole = "用户";
             String email = username + "@efak.ai";
-            String avatar = "/images/user_profile_2.jpg"; // 默认普通用户头像
+            String avatar = "/images/user_logo.png"; // 默认普通用户头像
 
             if (userInfo.getRoles() != null && userInfo.getRoles().contains("ROLE_ADMIN")) {
                 displayRole = "管理员";
                 email = "admin@efak.ai";
-                avatar = "/images/user_profile.jpg"; // 管理员头像
+                avatar = "/images/user_admin_logo.png"; // 管理员头像
             }
 
             // 设置状态显示信息

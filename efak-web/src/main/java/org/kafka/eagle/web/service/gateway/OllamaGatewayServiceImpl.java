@@ -8,6 +8,7 @@ import org.kafka.eagle.dto.ai.FunctionDefinition;
 import org.kafka.eagle.dto.ai.FunctionResult;
 import org.kafka.eagle.dto.config.ModelConfig;
 import org.kafka.eagle.web.service.ModelConfigService;
+import org.kafka.eagle.web.service.mcp.McpToolRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -37,6 +38,9 @@ public class OllamaGatewayServiceImpl implements GatewayService {
 
     @Autowired(required = false)
     private Map<String, FunctionExecutor> functionExecutors = new HashMap<>();
+
+    @Autowired
+    private McpToolRegistry mcpToolRegistry;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newHttpClient();
@@ -211,21 +215,12 @@ public class OllamaGatewayServiceImpl implements GatewayService {
 
                                             // 收集函数参数
                                             if (function.has("arguments")) {
-                                                // Ollama会多次发送完整的arguments对象，每次内容可能更完整
-                                                // 例如: {"cluster_id":"xxx"} -> {"cluster_id":"xxx","topic":"yyy"}
-                                                // 策略：每次都替换为最新的完整参数（不追加）
                                                 JsonNode argsNode = function.get("arguments");
-                                                String argsStr;
-                                                if (argsNode.isTextual()) {
-                                                    argsStr = argsNode.asText();
-                                                } else {
-                                                    argsStr = objectMapper.writeValueAsString(argsNode);
-                                                }
-
-                                                // 清空并设置为最新参数
-                                                functionArgs.setLength(0);
-                                                functionArgs.append(argsStr);
-                                                log.info("更新函数参数: {}", functionArgs.toString());
+                                                String argsStr = argsNode.isTextual()
+                                                        ? argsNode.asText()
+                                                        : objectMapper.writeValueAsString(argsNode);
+                                                org.kafka.eagle.web.util.ToolCallArguments.accumulate(functionArgs, argsStr);
+                                                log.info("更新函数参数: {}", functionArgs);
                                             }
 
                                             // 发送函数调用信息到前端
@@ -300,10 +295,9 @@ public class OllamaGatewayServiceImpl implements GatewayService {
                                 }
                             }
                         }
-                    } catch (Exception e) {
-                        // 这里可能包含JSON解析异常、客户端断开导致的send异常等，统一兜底避免线程异常退出
-                        log.error("处理Ollama流式响应失败", e);
-                        sendError(emitter, "处理Ollama流式响应失败: " + e.getMessage());
+                    } catch (IOException e) {
+                        log.error("解析Ollama响应失败", e);
+                        sendError(emitter, "解析Ollama响应失败: " + e.getMessage());
                     }
                 });
     }
@@ -319,23 +313,20 @@ public class OllamaGatewayServiceImpl implements GatewayService {
         try {
             log.info("【Ollama】执行函数: {}, 参数: {}", functionName, functionArgs);
 
-            // 执行函数
-            FunctionExecutor executor = functionExecutors.get(functionName);
-            if (executor == null) {
-                log.error("【Ollama】未找到函数执行器: {}", functionName);
-                sendError(emitter, "未找到函数执行器: " + functionName);
-                return;
-            }
-
-            // 构建FunctionCall对象
             FunctionCall functionCall = FunctionCall.builder()
                     .name(functionName)
                     .arguments(functionArgs)
                     .build();
 
-            // 执行函数
             log.info("【Ollama】开始执行函数...");
-            FunctionResult result = executor.execute(functionCall);
+            FunctionResult result = mcpToolRegistry != null
+                    ? mcpToolRegistry.execute(functionName, functionCall)
+                    : executeLegacy(functionName, functionCall);
+            if (result == null) {
+                log.error("【Ollama】未找到函数执行器: {}", functionName);
+                sendError(emitter, "未找到函数执行器: " + functionName);
+                return;
+            }
             log.info("【Ollama】函数执行完成, success={}, result长度={}",
                 result.isSuccess(), result.getResult() != null ? result.getResult().length() : 0);
 
@@ -506,6 +497,14 @@ public class OllamaGatewayServiceImpl implements GatewayService {
         }
     }
 
+    private FunctionResult executeLegacy(String functionName, FunctionCall functionCall) {
+        FunctionExecutor executor = functionExecutors.get(functionName);
+        if (executor == null) {
+            return null;
+        }
+        return executor.execute(functionCall);
+    }
+
     private void sendError(SseEmitter emitter, String message) {
         try {
             Map<String, Object> errorData = Map.of(
@@ -515,13 +514,8 @@ public class OllamaGatewayServiceImpl implements GatewayService {
                     .name("message")
                     .data(objectMapper.writeValueAsString(errorData)));
             emitter.complete();
-        } catch (Exception ignore) {
-            // 客户端断开/主动取消时，这里可能抛出异常，直接结束即可
-            try {
-                emitter.complete();
-            } catch (Exception e) {
-                // ignore
-            }
+        } catch (IOException e) {
+            emitter.completeWithError(e);
         }
     }
 }

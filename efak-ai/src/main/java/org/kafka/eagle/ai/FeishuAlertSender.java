@@ -165,4 +165,26 @@ public class FeishuAlertSender {
         return "HTTP响应码: " + responseCode + "\n响应内容: " + response.toString();
     }
 
+    public static void main(String[] args) {
+        // 使用示例
+        String webhook = "https://open.feishu.cn/open-apis/bot/v2/hook/your_access_token";
+
+        CompletableFuture.runAsync(() -> {
+            FeishuAlertSender sender = new FeishuAlertSender(webhook);
+
+            try {
+                // 发送富文本告警
+                String postContent = "服务器CPU使用率超过90%!\n" +
+                        "- **时间**: " + new java.util.Date() + "\n" +
+                        "- **服务器**: 192.168.1.1\n" +
+                        "- 请及时处理!";
+                String postResult = sender.sendPostAlert("系统告警", postContent, "13800138000");
+                System.out.println("富文本消息发送结果: " + postResult);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+
+    }
 }

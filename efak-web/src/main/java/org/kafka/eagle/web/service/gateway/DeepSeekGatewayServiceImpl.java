@@ -8,6 +8,7 @@ import org.kafka.eagle.dto.ai.FunctionDefinition;
 import org.kafka.eagle.dto.ai.FunctionResult;
 import org.kafka.eagle.dto.config.ModelConfig;
 import org.kafka.eagle.web.service.ModelConfigService;
+import org.kafka.eagle.web.service.mcp.McpToolRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -38,6 +39,9 @@ public class DeepSeekGatewayServiceImpl implements GatewayService {
 
     @Autowired(required = false)
     private Map<String, FunctionExecutor> functionExecutors = new HashMap<>();
+
+    @Autowired
+    private McpToolRegistry mcpToolRegistry;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newHttpClient();
@@ -198,26 +202,12 @@ public class DeepSeekGatewayServiceImpl implements GatewayService {
                                                     functionName[0] = function.get("name").asText();
                                                 }
 
-                                                // 收集函数参数
-                                                // DeepSeek在流式传输中可能逐步发送arguments片段或多次发送完整JSON
-                                                // 策略：检测JSON完整性，只保留最后一个完整的JSON
                                                 if (function.has("arguments")) {
-                                                    String argsStr = function.get("arguments").asText();
-                                                    if (!argsStr.isEmpty()) {
-                                                        // 尝试判断是否是完整的JSON对象
-                                                        String trimmed = argsStr.trim();
-                                                        if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
-                                                            // 看起来是完整的JSON，替换
-                                                            functionArgs.setLength(0);
-                                                            functionArgs.append(argsStr);
-                                                        } else if (functionArgs.length() == 0) {
-                                                            // 第一次接收，可能是片段的开始
-                                                            functionArgs.append(argsStr);
-                                                        } else {
-                                                            // 追加片段
-                                                            functionArgs.append(argsStr);
-                                                        }
-                                                    }
+                                                    JsonNode argsNode = function.get("arguments");
+                                                    String argsStr = argsNode.isTextual()
+                                                            ? argsNode.asText()
+                                                            : objectMapper.writeValueAsString(argsNode);
+                                                    org.kafka.eagle.web.util.ToolCallArguments.accumulate(functionArgs, argsStr);
                                                 }
 
                                                 // 发送函数调用信息到前端
@@ -262,10 +252,9 @@ public class DeepSeekGatewayServiceImpl implements GatewayService {
                                 }
                             }
                         }
-                    } catch (Exception e) {
-                        // 这里可能包含JSON解析异常、客户端断开导致的send异常等，统一兜底避免线程异常退出
-                        log.error("处理DeepSeek流式响应失败", e);
-                        sendError(emitter, "处理DeepSeek流式响应失败: " + e.getMessage());
+                    } catch (IOException e) {
+                        log.error("解析DeepSeek响应失败", e);
+                        sendError(emitter, "解析DeepSeek响应失败: " + e.getMessage());
                     }
                 });
     }
@@ -281,22 +270,19 @@ public class DeepSeekGatewayServiceImpl implements GatewayService {
         try {
             log.info("执行函数: {}, 参数: {}", functionName, functionArgs);
 
-            // 执行函数
-            FunctionExecutor executor = functionExecutors.get(functionName);
-            if (executor == null) {
-                log.error("未找到函数执行器: {}", functionName);
-                sendError(emitter, "未找到函数执行器: " + functionName);
-                return;
-            }
-
-            // 构建FunctionCall对象
             FunctionCall functionCall = FunctionCall.builder()
                     .name(functionName)
                     .arguments(functionArgs)
                     .build();
 
-            // 执行函数
-            FunctionResult result = executor.execute(functionCall);
+            FunctionResult result = mcpToolRegistry != null
+                    ? mcpToolRegistry.execute(functionName, functionCall)
+                    : executeLegacy(functionName, functionCall);
+            if (result == null) {
+                log.error("未找到函数执行器: {}", functionName);
+                sendError(emitter, "未找到函数执行器: " + functionName);
+                return;
+            }
 
             // 发送函数执行结果到前端
             Map<String, Object> functionResultData = Map.of(
@@ -367,6 +353,14 @@ public class DeepSeekGatewayServiceImpl implements GatewayService {
         }
     }
 
+    private FunctionResult executeLegacy(String functionName, FunctionCall functionCall) {
+        FunctionExecutor executor = functionExecutors.get(functionName);
+        if (executor == null) {
+            return null;
+        }
+        return executor.execute(functionCall);
+    }
+
     private void sendError(SseEmitter emitter, String message) {
         try {
             Map<String, Object> errorData = Map.of(
@@ -376,13 +370,8 @@ public class DeepSeekGatewayServiceImpl implements GatewayService {
                     .name("message")
                     .data(objectMapper.writeValueAsString(errorData)));
             emitter.complete();
-        } catch (Exception ignore) {
-            // 客户端断开/主动取消时，这里可能抛出异常，直接结束即可
-            try {
-                emitter.complete();
-            } catch (Exception e) {
-                // ignore
-            }
+        } catch (IOException e) {
+            emitter.completeWithError(e);
         }
     }
 }

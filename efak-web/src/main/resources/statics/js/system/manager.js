@@ -904,7 +904,7 @@ window.ManagerModule = {
         const row = $(`tr[data-cluster-id="${clusterId}"]`);
         const clusterName = row.find('td:nth-child(2) .text-gray-900').text() || '未知集群';
 
-        // 显示美化的确认对话框
+        // Confirm dialog
         this.showDeleteConfirmModal({
             title: '删除集群确认',
             message: `确定要删除集群 "${clusterName}" (${clusterId}) 吗？`,
@@ -1265,7 +1265,7 @@ window.ManagerModule.submitBatchImport = async function () {
     }
 };
 
-// ===== 美化提示框函数 =====
+// Toast
 window.ManagerModule.showToast = function (message, type, title, duration) {
     const container = document.getElementById('toast-container') || this.createToastContainer();
     const toast = document.createElement('div');
@@ -1375,10 +1375,17 @@ window.confirmDelete = function () {
 };
 
 window.ManagerModule.createToastContainer = function () {
+    if (window.CommonModule && typeof CommonModule.getToastContainer === 'function') {
+        return CommonModule.getToastContainer();
+    }
+    const header = document.querySelector('header.fixed-header, header');
     const container = document.createElement('div');
     container.id = 'toast-container';
-    container.className = 'toast-container';
-    document.body.appendChild(container);
+    if (header) {
+        header.appendChild(container);
+    } else {
+        document.body.appendChild(container);
+    }
     return container;
 };
 
@@ -1478,7 +1485,7 @@ window.ManagerModule.openEditClusterModal = function (clusterData) {
     $('#editClusterId').val(clusterData.clusterId);
     $('#editClusterName').val(clusterData.name);
 
-    // 初始化并设置环境类型下拉（Select2 美化）
+    // Initialize environment Select2
     if (typeof $ !== 'undefined') {
         const editTypeEl = $('#editClusterType');
         if (editTypeEl.length && !editTypeEl.hasClass('select2-hidden-accessible')) {

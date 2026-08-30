@@ -78,12 +78,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserInfo getUserByUsernameAndPassword(String username, String password) {
         try {
-            // 关键逻辑：BCrypt 每次加盐，无法通过 SQL 直接用明文匹配到哈希；应先查用户再做本地校验
-            UserInfo user = getUserByUsername(username);
-            if (user == null) {
-                return null;
-            }
-            return verifyPassword(user, password) ? user : null;
+            return userMapper.findByUsernameAndPassword(username, password);
         } catch (Exception e) {
             log.warn("数据库查询失败: {}", e.getMessage());
             return null;

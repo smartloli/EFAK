@@ -1,32 +1,26 @@
 package org.kafka.eagle.web.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.kafka.eagle.core.api.JmxConnectionManager;
 import org.kafka.eagle.core.api.KafkaSchemaFactory;
 import org.kafka.eagle.core.api.KafkaStoragePlugin;
 import org.kafka.eagle.core.constant.JmxMetricsConst;
 import org.kafka.eagle.core.constant.MBeanMetricsConst;
 import org.kafka.eagle.dto.broker.BrokerInfo;
-import org.kafka.eagle.dto.cluster.KafkaClusterInfo;
 import org.kafka.eagle.dto.cluster.KafkaClientInfo;
 import org.kafka.eagle.dto.jmx.JMXInitializeInfo;
 import org.kafka.eagle.dto.topic.*;
 import org.kafka.eagle.web.mapper.BrokerMapper;
-import org.kafka.eagle.web.mapper.ClusterMapper;
 import org.kafka.eagle.web.mapper.ConsumerGroupTopicMapper;
 import org.kafka.eagle.web.mapper.TopicInstantMetricsMapper;
 import org.kafka.eagle.web.mapper.TopicMapper;
 import org.kafka.eagle.web.mapper.TopicMetricsMapper;
 import org.kafka.eagle.web.service.TopicService;
-import org.kafka.eagle.web.util.KafkaClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.management.MBeanServerConnection;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,9 +46,6 @@ public class TopicServiceImpl implements TopicService {
     private BrokerMapper brokerMapper;
 
     @Autowired
-    private ClusterMapper clusterMapper;
-
-    @Autowired
     private TopicInstantMetricsMapper topicInstantMetricsMapper;
 
     @Autowired
@@ -62,28 +53,6 @@ public class TopicServiceImpl implements TopicService {
 
     @Autowired
     private ConsumerGroupTopicMapper consumerGroupTopicMapper;
-
-    private KafkaClientInfo buildKafkaClientInfo(String clusterId, List<BrokerInfo> brokerInfos) {
-        // 关键逻辑：统一构建 KafkaClientInfo，确保开启认证时所有入口都带上认证参数
-        if (!StringUtils.hasText(clusterId)) {
-            throw new IllegalArgumentException("clusterId不能为空");
-        }
-
-        KafkaClusterInfo clusterInfo = clusterMapper.findByClusterId(clusterId);
-        if (clusterInfo == null) {
-            throw new IllegalArgumentException("集群不存在: " + clusterId);
-        }
-
-        List<BrokerInfo> brokers = brokerInfos;
-        if (brokers == null || brokers.isEmpty()) {
-            brokers = brokerMapper.getBrokersByClusterId(clusterId);
-        }
-        if (brokers == null || brokers.isEmpty()) {
-            throw new IllegalArgumentException("集群没有可用的broker信息: " + clusterId);
-        }
-
-        return KafkaClientUtils.buildKafkaClientInfo(clusterInfo, brokers);
-    }
 
     @Override
     public TopicPageResponse getTopicPage(TopicQueryRequest request) {
@@ -145,9 +114,27 @@ public class TopicServiceImpl implements TopicService {
             // 1. 先调用KafkaSchemaFactory创建Kafka中的Topic
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
 
-            // 获取集群的broker信息用于连接（用于同时支持 SASL/SSL 认证）
-            List<BrokerInfo> brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
-            KafkaClientInfo kafkaClientInfo = buildKafkaClientInfo(clusterId, brokerInfos);
+            // 创建KafkaClientInfo
+            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
+            kafkaClientInfo.setClusterId(clusterId);
+
+            // 获取集群的broker信息用于连接
+            List<BrokerInfo> brokerInfos = List.of();
+            if (StringUtils.hasText(clusterId)) {
+                brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
+            } else {
+                log.warn("集群ID为空，将使用默认连接配置");
+            }
+
+            if (!brokerInfos.isEmpty()) {
+                // 使用第一个broker的信息作为连接信息
+                BrokerInfo firstBroker = brokerInfos.get(0);
+                kafkaClientInfo.setBrokerServer(firstBroker.getHostIp() + ":" + firstBroker.getPort());
+                log.info("使用broker连接信息: {}:{}", firstBroker.getHostIp(), firstBroker.getPort());
+            } else {
+                log.error("集群 {} 没有可用的broker信息，请检查配置", clusterId);
+                return false;
+            }
 
             // 创建NewTopicInfo
             NewTopicInfo newTopicInfo = new NewTopicInfo();
@@ -231,8 +218,24 @@ public class TopicServiceImpl implements TopicService {
             // 1. 先调用KafkaSchemaFactory删除Kafka中的主题
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
 
-            List<BrokerInfo> brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
-            KafkaClientInfo kafkaClientInfo = buildKafkaClientInfo(clusterId, brokerInfos);
+            // 创建KafkaClientInfo
+            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
+            kafkaClientInfo.setClusterId(clusterId);
+
+            // 获取集群的broker信息用于连接
+            List<BrokerInfo> brokerInfos = List.of();
+            if (StringUtils.hasText(clusterId)) {
+                brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
+            }
+
+            if (!brokerInfos.isEmpty()) {
+                // 使用第一个broker的信息作为连接信息
+                BrokerInfo firstBroker = brokerInfos.get(0);
+                kafkaClientInfo.setBrokerServer(firstBroker.getHostIp() + ":" + firstBroker.getPort());
+            } else {
+                log.error("删除Topic失败：集群 [{}] 中没有Broker信息", clusterId);
+                return false;
+            }
 
             // 调用KafkaSchemaFactory删除Topic
             boolean kafkaDeleteSuccess = ksf.removeTopic(kafkaClientInfo, topicName);
@@ -293,8 +296,26 @@ public class TopicServiceImpl implements TopicService {
             }
 
             // 3. 获取broker信息
-            List<BrokerInfo> brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
-            KafkaClientInfo kafkaClientInfo = buildKafkaClientInfo(clusterId, brokerInfos);
+            List<BrokerInfo> brokerInfos = List.of();
+            if (StringUtils.hasText(clusterId)) {
+                brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
+                if (brokerInfos.isEmpty()) {
+                    log.warn("集群 {} 中未找到broker信息，尝试使用默认连接", clusterId);
+                }
+            }
+
+            // 4. 创建KafkaClientInfo
+            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
+            kafkaClientInfo.setClusterId(clusterId);
+
+            if (!brokerInfos.isEmpty()) {
+                // 使用第一个broker的信息作为连接信息
+                BrokerInfo firstBroker = brokerInfos.get(0);
+                kafkaClientInfo.setBrokerServer(firstBroker.getHostIp() + ":" + firstBroker.getPort());
+            } else {
+                log.error("扩容Topic失败：集群 {} 中未找到broker信息，请检查配置", clusterId);
+                return false;
+            }
 
             // 5. 创建NewTopicInfo用于扩容操作
             NewTopicInfo newTopicInfo = new NewTopicInfo();
@@ -343,8 +364,24 @@ public class TopicServiceImpl implements TopicService {
             // 1. 先调用KafkaSchemaFactory更新Kafka中的保留时间
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
 
-            List<BrokerInfo> brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
-            KafkaClientInfo kafkaClientInfo = buildKafkaClientInfo(clusterId, brokerInfos);
+            // 创建KafkaClientInfo
+            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
+            kafkaClientInfo.setClusterId(clusterId);
+
+            // 获取集群的broker信息用于连接
+            List<BrokerInfo> brokerInfos = List.of();
+            if (StringUtils.hasText(clusterId)) {
+                brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
+            }
+
+            if (!brokerInfos.isEmpty()) {
+                // 使用第一个broker的信息作为连接信息
+                BrokerInfo firstBroker = brokerInfos.get(0);
+                kafkaClientInfo.setBrokerServer(firstBroker.getHostIp() + ":" + firstBroker.getPort());
+            } else {
+                log.error("集群 {} 中未找到broker信息，请检查配置", clusterId);
+                return false;
+            }
 
             // 创建NewTopicInfo
             NewTopicInfo newTopicInfo = new NewTopicInfo();
@@ -432,12 +469,23 @@ public class TopicServiceImpl implements TopicService {
             }
 
             // 获取集群的broker信息
-            List<BrokerInfo> brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
-            if (brokerInfos.isEmpty()) {
-                log.warn("集群 {} 中未找到任何broker信息", clusterId);
-                return stats;
+            List<BrokerInfo> brokerInfos = List.of();
+            if (StringUtils.hasText(clusterId)) {
+                brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
+                if (brokerInfos.isEmpty()) {
+                    log.warn("集群 {} 中未找到任何broker信息", clusterId);
+                    return stats;
+                }
             }
-            KafkaClientInfo kafkaClientInfo = buildKafkaClientInfo(clusterId, brokerInfos);
+
+            // 创建KafkaClientInfo
+            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
+            kafkaClientInfo.setClusterId(clusterId);
+            if (!brokerInfos.isEmpty()) {
+                // 使用第一个broker的信息作为连接信息
+                BrokerInfo firstBroker = brokerInfos.get(0);
+                kafkaClientInfo.setBrokerServer(firstBroker.getHostIp() + ":" + firstBroker.getPort());
+            }
 
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
 
@@ -495,7 +543,12 @@ public class TopicServiceImpl implements TopicService {
                 return result;
             }
 
-            KafkaClientInfo kafkaClientInfo = buildKafkaClientInfo(clusterId, brokerInfos);
+            // 创建KafkaClientInfo
+            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
+            kafkaClientInfo.setClusterId(clusterId);
+            // 使用第一个broker的信息作为连接信息
+            BrokerInfo firstBroker = brokerInfos.get(0);
+            kafkaClientInfo.setBrokerServer(firstBroker.getHostIp() + ":" + firstBroker.getPort());
 
             // 调用KafkaSchemaFactory获取分区分页数据
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
@@ -514,10 +567,14 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     public List<Map<String, Object>> getTopicPartitionMessages(String topicName, String clusterId, Integer partition, Integer limit) {
+        return getTopicPartitionMessages(topicName, clusterId, partition, limit, null);
+    }
+
+    @Override
+    public List<Map<String, Object>> getTopicPartitionMessages(String topicName, String clusterId, Integer partition, Integer limit, String keyword) {
         List<Map<String, Object>> messages = new ArrayList<>();
 
         try {
-            // 获取broker信息
             List<BrokerInfo> brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
 
             if (brokerInfos.isEmpty()) {
@@ -525,26 +582,37 @@ public class TopicServiceImpl implements TopicService {
                 return messages;
             }
 
-            KafkaClientInfo kafkaClientInfo = buildKafkaClientInfo(clusterId, brokerInfos);
+            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
+            kafkaClientInfo.setClusterId(clusterId);
+            BrokerInfo firstBroker = brokerInfos.get(0);
+            kafkaClientInfo.setBrokerServer(firstBroker.getHostIp() + ":" + firstBroker.getPort());
 
-            // 调用KafkaSchemaFactory获取分区消息
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
-            String messagesJson = ksf.fetchLatestMessages(kafkaClientInfo, topicName, partition);
+            int cap = limit == null ? 10 : Math.min(Math.max(limit, 1), 10000);
+            int partitionId = partition == null ? -1 : partition;
+            String messagesJson = ksf.fetchLatestMessages(kafkaClientInfo, topicName, partitionId, cap);
 
-            // 解析JSON字符串为List<Map<String, Object>>
             if (messagesJson != null && !messagesJson.trim().isEmpty()) {
                 try {
                     com.alibaba.fastjson2.JSONArray jsonArray = com.alibaba.fastjson2.JSONArray.parseArray(messagesJson);
+                    String filter = keyword == null ? "" : keyword.trim().toLowerCase();
                     for (int i = 0; i < jsonArray.size(); i++) {
                         com.alibaba.fastjson2.JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        String value = jsonObject.getString("value");
+                        String key = jsonObject.containsKey("key") ? jsonObject.getString("key") : "";
+                        if (!filter.isEmpty()) {
+                            String haystack = ((key == null ? "" : key) + " " + (value == null ? "" : value)).toLowerCase();
+                            if (!haystack.contains(filter)) {
+                                continue;
+                            }
+                        }
                         Map<String, Object> messageMap = new HashMap<>();
                         messageMap.put("partition", jsonObject.getInteger("partition"));
                         messageMap.put("offset", jsonObject.getLong("offset"));
-                        messageMap.put("value", jsonObject.getString("value"));
+                        messageMap.put("value", value);
                         messageMap.put("timestamp", jsonObject.getLong("timestamp"));
-                        // 检查是否有key字段
                         if (jsonObject.containsKey("key")) {
-                            messageMap.put("key", jsonObject.getString("key"));
+                            messageMap.put("key", key);
                         }
                         messages.add(messageMap);
                     }
@@ -571,17 +639,25 @@ public class TopicServiceImpl implements TopicService {
             }
 
             // 获取集群的broker信息
-            if (!StringUtils.hasText(clusterId)) {
+            List<BrokerInfo> brokerInfos = List.of();
+            if (StringUtils.hasText(clusterId)) {
+                brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
+                if (brokerInfos.isEmpty()) {
+                    log.warn("集群 {} 中未找到任何broker信息", clusterId);
+                    return topicConfig;
+                }
+            } else {
                 log.warn("集群ID为空，无法获取主题配置");
                 return topicConfig;
             }
-            List<BrokerInfo> brokerInfos = brokerMapper.getBrokersByClusterId(clusterId);
-            if (brokerInfos.isEmpty()) {
-                log.warn("集群 {} 中未找到任何broker信息", clusterId);
-                return topicConfig;
-            }
 
-            KafkaClientInfo kafkaClientInfo = buildKafkaClientInfo(clusterId, brokerInfos);
+            // 创建KafkaClientInfo
+            KafkaClientInfo kafkaClientInfo = new KafkaClientInfo();
+            kafkaClientInfo.setClusterId(clusterId);
+
+            // 使用第一个broker的信息作为连接信息
+            BrokerInfo firstBroker = brokerInfos.get(0);
+            kafkaClientInfo.setBrokerServer(firstBroker.getHostIp() + ":" + firstBroker.getPort());
 
             // 调用KafkaSchemaFactory获取主题配置
             KafkaSchemaFactory ksf = new KafkaSchemaFactory(new KafkaStoragePlugin());
@@ -639,29 +715,14 @@ public class TopicServiceImpl implements TopicService {
      * 执行JMX操作
      */
     private BigDecimal executeJmxOperation(JMXInitializeInfo jmxInfo, String objectName, String attribute) {
-        JMXConnector connector = null;
-        try {
-            String jmxUrl = String.format("service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi", jmxInfo.getHost(), jmxInfo.getPort());
-            JMXServiceURL serviceURL = new JMXServiceURL(jmxUrl);
-            connector = JMXConnectorFactory.connect(serviceURL);
-            MBeanServerConnection connection = connector.getMBeanServerConnection();
-
+        final BigDecimal[] result = {null};
+        JmxConnectionManager.execute(jmxInfo, connection -> {
             Object value = connection.getAttribute(new javax.management.ObjectName(objectName), attribute);
             if (value instanceof Number) {
-                return new BigDecimal(value.toString());
+                result[0] = new BigDecimal(value.toString());
             }
-        } catch (Exception e) {
-            log.warn("执行JMX操作失败：{}", e.getMessage());
-        } finally {
-            if (connector != null) {
-                try {
-                    connector.close();
-                } catch (Exception e) {
-                    log.warn("关闭JMX连接失败：{}", e.getMessage());
-                }
-            }
-        }
-        return null;
+        });
+        return result[0];
     }
 
     /**

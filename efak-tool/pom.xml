@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kafka.eagle</groupId>
         <artifactId>efak</artifactId>
-        <version>5.0.0</version>
+        <version>${kafka.eagle.version}</version>
     </parent>
 
     <artifactId>efak-tool</artifactId>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-dto</artifactId>
-            <version>${project.version}</version>
+            <version>${kafka.eagle.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -37,7 +37,7 @@
             align-items: center;
             display: flex;
             border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
+            border-radius: 2px;
             padding: 2px 6px;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -117,7 +117,7 @@
             background-color: #1f2937;
             color: #fff;
             text-align: left;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 12px 16px;
             position: fixed;
             z-index: 99999;
@@ -195,7 +195,7 @@
         /* 优化下拉框样式 */
         .select2-dropdown {
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border-radius: 2px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             overflow: hidden;
         }
@@ -218,7 +218,7 @@
         }
 
         .select2-results__option--highlighted {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            background: #165DFF;
             color: white;
         }
 
@@ -241,7 +241,7 @@
             padding: 8px 12px;
             font-size: 0.875rem;
             border: 1px solid #d1d5db;
-            border-radius: 6px;
+            border-radius: 2px;
             width: 100%;
             box-sizing: border-box;
         }
@@ -393,7 +393,7 @@
             justify-content: center;
             width: 32px;
             height: 32px;
-            border-radius: 6px;
+            border-radius: 2px;
             border: 1px solid transparent;
             transition: all 0.2s ease-in-out;
             position: relative;
@@ -406,7 +406,7 @@
         }
 
         .action-icon-btn.scale-btn {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            background: #165DFF;
             color: white;
         }
 
@@ -441,7 +441,7 @@
         .modal-content .select2-container--default .select2-selection--single {
             height: 42px;
             border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -491,7 +491,7 @@
         /* 下拉菜单样式 */
         .select2-dropdown {
             border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
+            border-radius: 2px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             z-index: 9999;
         }
@@ -574,7 +574,7 @@
         #advanced-config-toggle {
             position: relative;
             padding: 0.5rem;
-            border-radius: 0.5rem;
+            border-radius: 2px;
             transition: all 0.2s ease-in-out;
         }
 
@@ -608,7 +608,7 @@
         }
 
         .create-topic-modal .fa-info-circle:hover {
-            color: #2563eb;
+            color: #0E4AE6;
         }
 
         /* 清理策略选择器特定样式 */
@@ -653,12 +653,24 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            color: #111827 !important;
+            background-color: #ffffff !important;
+        }
+
+        .topic-icon-dropdown .select2-results__option > * {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            min-width: 0;
+            background: transparent !important;
+            color: inherit !important;
         }
 
         .topic-icon-dropdown .select2-results__option .icon-preview {
             width: 32px;
             height: 32px;
-            border-radius: 6px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -666,26 +678,51 @@
         }
 
         .topic-icon-dropdown .select2-results__option .icon-info {
-            flex-grow: 1;
+            flex: 1;
+            min-width: 0;
+            background: transparent !important;
         }
 
         .topic-icon-dropdown .select2-results__option .icon-title {
             font-weight: 500;
-            margin-bottom: 2px;
-            padding: 4px;
+            color: #111827 !important;
+            background: transparent !important;
         }
 
         .topic-icon-dropdown .select2-results__option .icon-description {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: #6b7280 !important;
+            background: transparent !important;
         }
 
-        .topic-icon-dropdown .select2-results__option[aria-selected="true"] {
-            background-color: #f3f4f6;
+        .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted,
+        .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted.select2-results__option--selectable,
+        .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted[aria-selected],
+        .topic-icon-dropdown .select2-results__option--highlighted,
+        .topic-icon-dropdown .select2-results__option--highlighted:hover,
+        .topic-icon-dropdown .select2-results__option:hover {
+            background: rgba(22, 93, 255, 0.08) !important;
+            background-image: none !important;
+            color: #111827 !important;
         }
 
-        .topic-icon-dropdown .select2-results__option--highlighted[aria-selected] {
-            background-color: #f9fafb;
+        .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted .icon-title,
+        .topic-icon-dropdown .select2-results__option--highlighted .icon-title,
+        .topic-icon-dropdown .select2-results__option:hover .icon-title,
+        .topic-icon-dropdown .select2-results__option--highlighted .icon-description,
+        .topic-icon-dropdown .select2-results__option:hover .icon-description {
+            color: #111827 !important;
+        }
+
+        .select2-container--default .topic-icon-dropdown .select2-results__option--selected,
+        .select2-container--default .topic-icon-dropdown .select2-results__option[aria-selected="true"]:not(.select2-results__option--highlighted) {
+            background: rgba(22, 93, 255, 0.12) !important;
+            color: #165DFF !important;
+        }
+
+        .select2-container--default .topic-icon-dropdown .select2-results__option--selected .icon-title,
+        .select2-container--default .topic-icon-dropdown .select2-results__option[aria-selected="true"]:not(.select2-results__option--highlighted) .icon-title {
+            color: #165DFF !important;
         }
 
         /* 选中项的样式 */
@@ -705,7 +742,7 @@
         .topic-icon-select + .select2 .icon-preview {
             width: 24px;
             height: 24px;
-            border-radius: 4px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -714,7 +751,7 @@
         /* 图标颜色定义 */
         .icon-color-blue {
             background-color: #EBF5FF;
-            color: #2563EB;
+            color: #0E4AE6;
         }
 
         .icon-color-green {
@@ -781,12 +818,12 @@
 
         .modal-content::-webkit-scrollbar-track {
             background: #f1f1f1;
-            border-radius: 4px;
+            border-radius: 2px;
         }
 
         .modal-content::-webkit-scrollbar-thumb {
             background: #c1c1c1;
-            border-radius: 4px;
+            border-radius: 2px;
         }
 
         .modal-content::-webkit-scrollbar-thumb:hover {
@@ -820,7 +857,7 @@
             cursor: pointer;
             padding: 0.75rem;
             background: #f9fafb;
-            border-radius: 0.5rem;
+            border-radius: 2px;
             margin-bottom: 1rem;
             transition: all 0.2s ease-in-out;
         }
@@ -844,7 +881,7 @@
             height: 40px;
             padding: 0 40px 0 36px;
             border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
+            border-radius: 2px;
             background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
             font-size: 0.875rem;
             transition: all 0.2s ease-in-out;
@@ -853,22 +890,22 @@
         }
 
         .topic-search-input:hover {
-            border-color: #3b82f6;
-            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 4px 8px rgba(22, 93, 255, 0.1);
         }
 
         .topic-search-input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: #0E4AE6;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
             background: #ffffff;
         }
 
         /* 选中状态时的输入框样式 */
         .topic-search-input.has-selection {
-            color: #1e40af;
+            color: #0E4AE6;
             font-weight: 500;
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border-color: #3b82f6;
+            border-color: #165DFF;
         }
 
         .topic-clear-btn {
@@ -899,7 +936,7 @@
             right: 0;
             background: white;
             border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
+            border-radius: 2px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             z-index: 50;
             margin-top: 4px;
@@ -929,7 +966,7 @@
         .suggestion-item:hover,
         .suggestion-item.highlighted {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border-color: #3b82f6;
+            border-color: #165DFF;
             transform: translateX(2px);
         }
 
@@ -941,7 +978,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #2563eb;
+            color: #0E4AE6;
             font-size: 0.75rem;
         }
 
@@ -969,7 +1006,7 @@
             right: 0;
             background: white;
             border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
+            border-radius: 2px;
             padding: 12px 16px;
             text-align: center;
             color: #6b7280;
@@ -981,7 +1018,7 @@
 
         .topic-loading i {
             margin-right: 8px;
-            color: #3b82f6;
+            color: #165DFF;
         }
 
         /* 无结果状态 */
@@ -1062,16 +1099,19 @@
         <th:block th:replace="~{public/header :: header}"></th:block>
         <!-- 页面内容 -->
         <main class="flex-1 overflow-y-auto p-4 scrollbar-hide pt-20">
+            <div class="page-header">
+                <h1 class="page-header-title">主题</h1>
+            </div>
             <!-- 状态卡片 -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div
                         class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">总容量</p>
+                            <p class="text-gray-500 text-sm">容量</p>
                             <h3 class="text-2xl font-bold mt-1">0B</h3>
                         </div>
-                        <div class="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded bg-warning/10 flex items-center justify-center">
                             <i class="fa fa-database text-warning text-xl"></i>
                         </div>
                     </div>
@@ -1081,10 +1121,10 @@
                         class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">总记录数</p>
+                            <p class="text-gray-500 text-sm">记录</p>
                             <h3 class="text-2xl font-bold mt-1">0</h3>
                         </div>
-                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
                             <i class="fa fa-list-alt text-primary text-xl"></i>
                         </div>
                     </div>
@@ -1094,10 +1134,10 @@
                         class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">读取速度</p>
+                            <p class="text-gray-500 text-sm">读取</p>
                             <h3 class="text-2xl font-bold mt-1">0.0B/s</h3>
                         </div>
-                        <div class="w-12 h-12 rounded-full bg-info/10 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded bg-info/10 flex items-center justify-center">
                             <i class="fa fa-download text-info text-xl"></i>
                         </div>
                     </div>
@@ -1107,10 +1147,10 @@
                         class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">写入速度</p>
+                            <p class="text-gray-500 text-sm">写入</p>
                             <h3 class="text-2xl font-bold mt-1">0.0B/s</h3>
                         </div>
-                        <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded bg-secondary/10 flex items-center justify-center">
                             <i class="fa fa-upload text-secondary text-xl"></i>
                         </div>
                     </div>
@@ -1149,7 +1189,7 @@
                                 <!-- 下拉建议列表 -->
                                 <div id="topic-suggestions" class="topic-suggestions hidden">
                                     <div class="topic-suggestions-content">
-                                        <!-- 动态生成的建议项 -->
+                                        <!-- Suggestions -->
                                     </div>
                                 </div>
 
@@ -1292,7 +1332,7 @@
                         </tr>
                         </thead>
                         <tbody id="topics-table-body" class="bg-white divide-y divide-gray-200">
-                        <!-- 表格内容将通过JavaScript动态生成 -->
+                        <!-- Table body -->
                         </tbody>
                     </table>
                 </div>
@@ -1311,7 +1351,7 @@
                         </button>
 
                         <div class="flex items-center space-x-1" id="page-numbers">
-                            <!-- 页码按钮将通过JavaScript动态生成 -->
+                            <!-- Pagination -->
                         </div>
 
                         <button id="next-page"
@@ -1379,7 +1419,7 @@
         <div class="p-6 overflow-y-auto flex-1">
             <!-- 头像区域 -->
             <div class="flex items-center justify-center mb-6">
-                <img th:src="@{/images/user_profile.jpg}" alt="用户头像"
+                <img th:src="@{/images/user_admin_logo.png}" alt="用户头像"
                      class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"/>
             </div>
 

@@ -25,11 +25,11 @@
         }
 
         .metric-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            padding: 16px;
+            transition: border-color 0.15s ease;
             position: relative;
             overflow: hidden;
         }
@@ -40,69 +40,69 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--color-start), var(--color-end));
-            border-radius: 16px 16px 0 0;
+            height: 2px;
+            background: var(--color-start);
+            border-radius: 0;
         }
 
         .metric-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+            transform: none;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
             border-color: var(--border-color);
         }
 
         .metric-card.online {
-            --color-start: #10b981;
-            --color-end: #34d399;
-            --border-color: #10b981;
+            --color-start: #059669;
+            --color-end: #059669;
+            --border-color: #d1d5db;
         }
 
         .metric-card.response {
-            --color-start: #8b5cf6;
-            --color-end: #a78bfa;
-            --border-color: #8b5cf6;
+            --color-start: #6b7280;
+            --color-end: #6b7280;
+            --border-color: #d1d5db;
         }
 
         .metric-card.connections {
-            --color-start: #06b6d4;
-            --color-end: #22d3ee;
-            --border-color: #06b6d4;
+            --color-start: #165DFF;
+            --color-end: #165DFF;
+            --border-color: #d1d5db;
         }
 
         .metric-card.memory {
-            --color-start: #ef4444;
-            --color-end: #f87171;
-            --border-color: #ef4444;
+            --color-start: #d97706;
+            --color-end: #d97706;
+            --border-color: #d1d5db;
         }
 
         .metric-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin-bottom: 16px;
+            font-size: 16px;
+            margin-bottom: 12px;
         }
 
         .metric-icon.online {
-            background: linear-gradient(135deg, #10b981, #34d399);
+            background: #059669;
             color: white;
         }
 
         .metric-icon.response {
-            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            background: #6b7280;
             color: white;
         }
 
         .metric-icon.connections {
-            background: linear-gradient(135deg, #06b6d4, #22d3ee);
+            background: #165DFF;
             color: white;
         }
 
         .metric-icon.memory {
-            background: linear-gradient(135deg, #ef4444, #f87171);
+            background: #d97706;
             color: white;
         }
 
@@ -124,7 +124,7 @@
             font-size: 12px;
             font-weight: 600;
             padding: 4px 8px;
-            border-radius: 8px;
+            border-radius: 2px;
             display: inline-flex;
             align-items: center;
             gap: 4px;
@@ -146,80 +146,79 @@
         }
 
         .cluster-overview {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 32px;
-            color: white;
+            background: var(--efak-hero-bg);
+            border-radius: 2px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            color: var(--efak-hero-text);
             position: relative;
             overflow: hidden;
+            border: 1px solid var(--efak-hero-border);
         }
 
         .cluster-overview::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            pointer-events: none;
+            display: none;
         }
 
         .cluster-overview h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 4px;
             position: relative;
             z-index: 1;
+            letter-spacing: -0.01em;
         }
 
-        .cluster-overview p {
-            font-size: 16px;
-            opacity: 0.9;
+        .cluster-overview > p {
+            font-size: 0.8125rem;
+            opacity: 0.7;
             position: relative;
             z-index: 1;
         }
 
         .cluster-info {
             display: flex;
-            gap: 32px;
-            margin-top: 24px;
+            gap: 12px;
+            margin-top: 16px;
             position: relative;
             z-index: 1;
+            flex-wrap: wrap;
         }
 
         .cluster-info-item {
             display: flex;
             align-items: center;
             gap: 12px;
+            padding: 12px 14px;
+            flex: 1;
+            min-width: 180px;
         }
 
         .cluster-info-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 16px;
         }
 
         .cluster-info-text h3 {
-            font-size: 18px;
+            font-size: 0.8125rem;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .cluster-info-text p {
-            font-size: 14px;
-            opacity: 0.8;
+            font-size: 0.75rem;
+            opacity: 0.7;
         }
 
         .chart-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
             padding: 24px;
             height: 400px;
@@ -254,7 +253,7 @@
         .time-range-select {
             padding: 6px 12px;
             border: 1px solid #d1d5db;
-            border-radius: 6px;
+            border-radius: 2px;
             background: white;
             font-size: 13px;
             color: #374151;
@@ -272,12 +271,12 @@
             box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
-        /* 美化后的时间选择器样式 */
+        /* Time range selector */
         /* 筛选器样式 */
         .filter-select {
             padding: 8px 12px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             background: white;
             min-width: 120px;
@@ -292,8 +291,8 @@
 
         .filter-select:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         .filter-select:hover {
@@ -306,7 +305,7 @@
             border: 1px solid #d1d5db;
             background: white;
             color: #6b7280;
-            border-radius: 6px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -322,10 +321,10 @@
 
         .filter-btn {
             padding: 8px 16px;
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
@@ -334,7 +333,7 @@
         }
 
         .filter-btn:hover {
-            background: #2563eb;
+            background: #0E4AE6;
         }
 
         .filter-btn.secondary {
@@ -347,7 +346,7 @@
 
         .status-badge {
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
@@ -360,13 +359,13 @@
         }
 
         .status-badge.monitoring {
-            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            background: #165DFF;
             color: white;
         }
 
         .table-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -385,11 +384,11 @@
         }
 
         .refresh-btn {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            background: #165DFF;
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
@@ -473,7 +472,7 @@
             border: 1px solid #d1d5db;
             background: white;
             color: #6b7280;
-            border-radius: 8px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -503,7 +502,7 @@
             border: 1px solid #d1d5db;
             background: white;
             color: #374151;
-            border-radius: 8px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -519,13 +518,13 @@
         }
 
         .page-btn.active {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            background: #165DFF;
             border-color: #165DFF;
             color: white;
         }
 
         .page-btn.active:hover {
-            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%);
+            background: #0E4AE6;
         }
 
         .node-status {
@@ -533,7 +532,7 @@
             align-items: center;
             gap: 8px;
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-size: 12px;
             font-weight: 600;
         }
@@ -559,7 +558,7 @@
             align-items: center;
             gap: 8px;
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-size: 12px;
             font-weight: 600;
         }
@@ -590,7 +589,7 @@
             align-items: center;
             gap: 6px;
             padding: 4px 8px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 11px;
             font-weight: 600;
         }
@@ -627,7 +626,7 @@
             background: linear-gradient(135deg, #8b5cf6, #a78bfa);
             color: white;
             padding: 2px 6px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 10px;
             font-weight: 600;
             min-width: 20px;
@@ -645,7 +644,7 @@
             background: rgba(139, 92, 246, 0.1);
             color: #7c3aed;
             padding: 2px 6px;
-            border-radius: 6px;
+            border-radius: 2px;
             font-size: 10px;
             font-weight: 500;
             white-space: nowrap;
@@ -677,14 +676,14 @@
             width: 80px;
             height: 8px;
             background: #f3f4f6;
-            border-radius: 4px;
+            border-radius: 2px;
             overflow: hidden;
             position: relative;
         }
 
         .usage-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 2px;
             transition: width 0.3s ease;
         }
 
@@ -705,7 +704,7 @@
             border: 1px solid #d1d5db;
             color: #6b7280;
             padding: 8px 12px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -754,7 +753,7 @@
             background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
             color: white;
             padding: 8px 12px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 12px;
             font-weight: 500;
             white-space: nowrap;
@@ -816,17 +815,17 @@
 
         /* Kafka配置区域特殊样式 */
         #kafka-config-section .section-header h4 {
-            color: #1e40af;
+            color: #0E4AE6;
         }
 
         #kafka-config-section .form-hint {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border: 1px solid #93c5fd;
-            color: #1e40af;
+            border: 1px solid rgba(22, 93, 255, 0.35);
+            color: #0E4AE6;
         }
 
         #kafka-config-section .form-hint i {
-            color: #3b82f6;
+            color: #165DFF;
         }
 
         /* 移动端Tooltip优化 */
@@ -862,13 +861,13 @@
         }
 
         .action-btn.primary {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            background: #165DFF;
             border-color: #165DFF;
             color: white;
         }
 
         .action-btn.primary:hover {
-            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%);
+            background: #0E4AE6;
             box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
         }
 
@@ -917,7 +916,7 @@
 
         .modal-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             width: 90%;
             max-width: 800px;
             max-height: 90vh;
@@ -934,7 +933,7 @@
         }
 
         .modal-header {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            background: linear-gradient(135deg, #165DFF 0%, #8b5cf6 100%);
             color: white;
             padding: 20px 24px;
             display: flex;
@@ -954,7 +953,7 @@
             color: white;
             width: 32px;
             height: 32px;
-            border-radius: 8px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -980,7 +979,7 @@
 
         .detail-group {
             background: #f8fafc;
-            border-radius: 12px;
+            border-radius: 2px;
             padding: 20px;
         }
 
@@ -1031,13 +1030,13 @@
             flex: 1;
             height: 8px;
             background: #e5e7eb;
-            border-radius: 4px;
+            border-radius: 2px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 2px;
             transition: width 0.3s ease;
         }
 
@@ -1064,7 +1063,7 @@
             height: 40px;
             padding: 0 40px 0 40px;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 14px;
             color: #374151;
             background: white;
@@ -1098,7 +1097,7 @@
             color: #6b7280;
             cursor: pointer;
             padding: 4px;
-            border-radius: 4px;
+            border-radius: 2px;
             transition: all 0.2s ease;
         }
 
@@ -1136,7 +1135,7 @@
             padding: 8px 12px;
             background: rgba(16, 185, 129, 0.1);
             color: #059669;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 12px;
             font-weight: 600;
             min-width: 68px;
@@ -1155,7 +1154,7 @@
         /* 确认对话框样式 */
         .confirm-modal-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             width: 90%;
             max-width: 400px;
             overflow: hidden;
@@ -1213,7 +1212,7 @@
             border: 2px solid #d1d5db;
             color: #6b7280;
             padding: 12px 24px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
@@ -1233,7 +1232,7 @@
             border: 2px solid #ef4444;
             color: white;
             padding: 12px 24px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
@@ -1251,7 +1250,7 @@
         /* 节点管理对话框样式 */
         .node-modal-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             width: 90%;
             max-width: 700px;
             max-height: 90vh;
@@ -1277,7 +1276,7 @@
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e5e7eb;
-            border-radius: 10px;
+            border-radius: 2px;
             font-size: 14px;
             color: #374151;
             background: white;
@@ -1304,7 +1303,7 @@
 
         .form-section {
             background: #f8fafc;
-            border-radius: 12px;
+            border-radius: 2px;
             padding: 20px;
             margin-bottom: 20px;
         }
@@ -1340,7 +1339,7 @@
             color: #6b7280;
             cursor: pointer;
             padding: 4px 8px;
-            border-radius: 6px;
+            border-radius: 2px;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
@@ -1357,12 +1356,12 @@
         }
 
         .toggle-all-btn {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: linear-gradient(135deg, #165DFF, #8b5cf6);
             border: none;
             color: white;
             cursor: pointer;
             padding: 6px 10px;
-            border-radius: 8px;
+            border-radius: 2px;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
@@ -1403,7 +1402,7 @@
             font-size: 10px;
             font-weight: 600;
             padding: 2px 6px;
-            border-radius: 10px;
+            border-radius: 2px;
             margin-left: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -1412,18 +1411,18 @@
         /* 表单提示信息样式 */
         .form-hint {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border: 1px solid #93c5fd;
-            border-radius: 8px;
+            border: 1px solid rgba(22, 93, 255, 0.35);
+            border-radius: 2px;
             padding: 12px 16px;
             margin-bottom: 16px;
             font-size: 13px;
-            color: #1e40af;
+            color: #0E4AE6;
             display: flex;
             align-items: center;
         }
 
         .form-hint i {
-            color: #3b82f6;
+            color: #165DFF;
             margin-right: 8px;
         }
 
@@ -1456,7 +1455,7 @@
         }
 
         .tab-btn:hover {
-            color: #374151;
+            color: #165DFF;
         }
 
         .tab-content {
@@ -1469,7 +1468,7 @@
 
         .file-upload-area {
             border: 2px dashed #d1d5db;
-            border-radius: 12px;
+            border-radius: 2px;
             padding: 40px 20px;
             text-align: center;
             background: #f9fafb;
@@ -1512,7 +1511,7 @@
         .preview-table {
             margin-top: 20px;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border-radius: 2px;
             overflow: hidden;
         }
 
@@ -1622,7 +1621,7 @@
 
             .tab-btn {
                 padding: 10px 16px;
-                border-radius: 8px;
+                border-radius: 2px;
                 border: 1px solid #e5e7eb;
                 margin-bottom: 0;
             }
@@ -1634,11 +1633,11 @@
             }
         }
 
-        /* Select2 美化样式 - 参考scheduler.html */
+        /* Select2 (aligned with scheduler) */
         .select2-container--default .select2-selection--single {
             background: white;
             border: 2px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: 2px;
             height: 40px;
             padding: 0;
             transition: all 0.3s ease;
@@ -1694,7 +1693,7 @@
         .select2-dropdown {
             background: white;
             border: 2px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: 2px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             margin-top: 4px;
         }
@@ -1717,7 +1716,7 @@
 
         .select2-container--default .select2-results__option[aria-selected=true] {
             background: #f0f9ff;
-            color: #1e40af;
+            color: #0E4AE6;
             font-weight: 600;
         }
 
@@ -1746,7 +1745,7 @@
         .chart-time-selector .select2-container--default .select2-selection--single {
             height: 36px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
         }
 
         .chart-time-selector .select2-container--default .select2-selection--single .select2-selection__rendered {
@@ -1773,41 +1772,18 @@
             <th:block th:replace="~{public/header :: header}"></th:block>
 
             <main class="flex-1 overflow-y-auto p-6 pt-20">
-                <!-- 集群概览卡片 -->
-                <div class="cluster-overview">
-                    <h1><i class="fa fa-server mr-3"></i>Kafka 集群监控</h1>
-                    <p>实时监控集群状态，确保系统稳定运行</p>
-
-                    <div class="cluster-info">
-                        <div class="cluster-info-item">
-                            <div class="cluster-info-icon">
-                                <i class="fa fa-heartbeat"></i>
-                            </div>
-                            <div class="cluster-info-text">
-                                <h3>集群状态</h3>
-                                <p id="cluster-status">加载中...</p>
-                            </div>
-                        </div>
-
-                        <div class="cluster-info-item">
-                            <div class="cluster-info-icon">
-                                <i class="fa fa-clock"></i>
-                            </div>
-                            <div class="cluster-info-text">
-                                <h3>运行时长</h3>
-                                <p id="cluster-runtime">加载中...</p>
-                            </div>
-                        </div>
-
-                        <div class="cluster-info-item">
-                            <div class="cluster-info-icon">
-                                <i class="fa fa-tachometer"></i>
-                            </div>
-                            <div class="cluster-info-text">
-                                <h3>平均负载</h3>
-                                <p id="cluster-load">加载中...</p>
-                            </div>
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                    <div class="kpi-card">
+                        <div class="kpi-label">状态</div>
+                        <div class="kpi-value" id="cluster-status">—</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">运行时长</div>
+                        <div class="kpi-value" id="cluster-runtime">—</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">负载</div>
+                        <div class="kpi-value" id="cluster-load">—</div>
                     </div>
                 </div>
 
@@ -1845,7 +1821,7 @@
                             <i class="fa fa-microchip"></i>
                         </div>
                         <div class="metric-value" id="avg-cpu-usage">-</div>
-                        <div class="metric-label">CPU使用率</div>
+                        <div class="metric-label">CPU</div>
                         <div class="metric-change" id="cpu-usage-change">
                             <i class="fa fa-circle"></i>
                             加载中...
@@ -1858,7 +1834,7 @@
                             <i class="fa fa-hdd"></i>
                         </div>
                         <div class="metric-value" id="avg-memory-usage">-</div>
-                        <div class="metric-label">内存使用率</div>
+                        <div class="metric-label">内存</div>
                         <div class="metric-change" id="memory-usage-change">
                             <i class="fa fa-circle"></i>
                             加载中...
@@ -1982,7 +1958,7 @@
                                 </tr>
                             </thead>
                             <tbody id="brokers-tbody">
-                                <!-- 动态加载数据 -->
+                                <!-- Table body -->
                             </tbody>
                         </table>
 
@@ -2000,7 +1976,7 @@
                                     <i class="fa fa-angle-left"></i>
                                 </button>
                                 <div class="pagination-pages" id="pagination-pages">
-                                    <!-- 动态生成页码 -->
+                                    <!-- Pagination -->
                                 </div>
                                 <button id="next-page" class="pagination-btn" title="下一页">
                                     <i class="fa fa-angle-right"></i>
@@ -2039,7 +2015,7 @@
                                 <div class="toolbar-controls">
                                     <!-- 自动刷新指示器 -->
                                     <div class="auto-refresh-indicator">
-                                        <i class="fa fa-clock-o mr-1"></i>
+                                        <i class="fa fa-clock mr-1"></i>
                                         <span id="distributed-refresh-countdown" class="refresh-countdown">60</span>s
                                     </div>
                                     <button id="refresh-distributed" class="filter-btn" title="刷新表格">
@@ -2054,15 +2030,16 @@
                         <table class="data-table" id="distributed-table" style="width: 100%;">
                             <thead>
                                 <tr>
-                                    <th style="width: 25%;">节点ID</th>
-                                    <th style="width: 25%;">IP地址</th>
-                                    <th style="width: 20%;">PID</th>
-                                    <th style="width: 15%;">服务状态</th>
-                                    <th style="width: 15%;">最后心跳</th>
+                                    <th style="width: 22%;">节点ID</th>
+                                    <th style="width: 18%;">IP地址</th>
+                                    <th style="width: 12%;">角色</th>
+                                    <th style="width: 12%;">PID</th>
+                                    <th style="width: 18%;">服务状态</th>
+                                    <th style="width: 18%;">最后心跳</th>
                                 </tr>
                             </thead>
                             <tbody id="distributed-tbody">
-                                <!-- 动态加载数据 -->
+                                <!-- Table body -->
                             </tbody>
                         </table>
 
@@ -2081,7 +2058,7 @@
                                     <i class="fa fa-angle-left"></i>
                                 </button>
                                 <div class="pagination-pages" id="distributed-pagination-pages">
-                                    <!-- 动态生成页码 -->
+                                    <!-- Pagination -->
                                 </div>
                                 <button id="distributed-next-page" class="pagination-btn" title="下一页">
                                     <i class="fa fa-angle-right"></i>
@@ -2421,7 +2398,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="preview-tbody">
-                                    <!-- 动态生成 -->
+                                    <!-- Rendered at runtime -->
                                 </tbody>
                             </table>
                         </div>

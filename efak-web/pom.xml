@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kafka.eagle</groupId>
         <artifactId>efak</artifactId>
-        <version>5.0.0</version>
+        <version>${kafka.eagle.version}</version>
     </parent>
 
     <artifactId>efak-web</artifactId>
@@ -21,22 +21,22 @@
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-core</artifactId>
-            <version>${project.version}</version>
+            <version>${kafka.eagle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-ai</artifactId>
-            <version>${project.version}</version>
+            <version>${kafka.eagle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-tool</artifactId>
-            <version>${project.version}</version>
+            <version>${kafka.eagle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kafka.eagle</groupId>
             <artifactId>efak-dto</artifactId>
-            <version>${project.version}</version>
+            <version>${kafka.eagle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -90,6 +90,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
         </dependency>
         <!-- 分布式锁依赖 -->
         <dependency>

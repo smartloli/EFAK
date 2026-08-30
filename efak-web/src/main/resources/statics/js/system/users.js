@@ -176,7 +176,7 @@ function renderUsers(userList) {
             row.innerHTML = `
                 <td>
                     <div class="user-info">
-                        <img src="${user.avatar || '/images/user_profile.jpg'}" alt="${user.username}" class="user-avatar">
+                        <img src="${user.avatar || '/images/user_admin_logo.png'}" alt="${user.username}" class="user-avatar">
                         <div>
                             <h4 class="font-semibold text-gray-900">${user.username}</h4>
                             <p class="text-sm text-gray-500">用户ID: ${user.id}</p>
@@ -545,46 +545,10 @@ window.confirmDelete = async function (userId, button) {
     }
 };
 
-// 显示提示信息
 function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    const icons = {
-        'success': 'check-circle',
-        'error': 'times-circle',
-        'warning': 'exclamation-circle',
-        'info': 'info-circle'
-    };
-    const colors = {
-        'success': 'bg-green-50 text-green-800 border-green-200',
-        'error': 'bg-red-50 text-red-800 border-red-200',
-        'warning': 'bg-yellow-50 text-yellow-800 border-yellow-200',
-        'info': 'bg-blue-50 text-blue-800 border-blue-200'
-    };
-
-    toast.className = `fixed top-4 right-4 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg border ${colors[type]} transform transition-all duration-300 z-50`;
-    toast.innerHTML = `
-        <i class="fa fa-${icons[type]} text-lg"></i>
-        <span class="font-medium">${message}</span>
-    `;
-
-    // 添加进场动画
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(-20px)';
-
-    document.body.appendChild(toast);
-
-    // 触发进场动画
-    setTimeout(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateY(0)';
-    }, 10);
-
-    // 3秒后开始退场动画
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(-20px)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    if (window.efakShowToast) {
+        window.efakShowToast(message, type);
+    }
 }
 
 // 关闭用户详情弹窗

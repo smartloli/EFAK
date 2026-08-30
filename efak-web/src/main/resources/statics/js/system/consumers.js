@@ -780,7 +780,7 @@ function formatResetTypeOption(state) {
 
     const colorMap = {
         'earliest': '#059669',
-        'latest': '#3b82f6',
+        'latest': '#165DFF',
         'specific': '#f59e0b',
         'timestamp': '#8b5cf6'
     };
@@ -1059,33 +1059,9 @@ function formatTimestamp(timestamp) {
 }
 
 function showToast(message, type = 'info') {
-    const toast = $(`
-        <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg text-white transform transition-all duration-300 ${type === 'success' ? 'bg-green-500' :
-            type === 'error' ? 'bg-red-500' :
-                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-        } translate-x-full">
-            <div class="flex items-center gap-2">
-                <i class="fa ${type === 'success' ? 'fa-check-circle' :
-            type === 'error' ? 'fa-exclamation-circle' :
-                type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'
-        }"></i>
-                <span>${message}</span>
-            </div>
-        </div>
-    `);
-
-    $('body').append(toast);
-
-    // 动画显示
-    setTimeout(() => {
-        toast.removeClass('translate-x-full');
-    }, 100);
-
-    // 自动隐藏
-    setTimeout(() => {
-        toast.addClass('translate-x-full');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    if (window.efakShowToast) {
+        window.efakShowToast(message, type);
+    }
 }
 
 /**

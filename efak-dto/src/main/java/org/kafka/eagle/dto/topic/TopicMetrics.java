@@ -68,4 +68,9 @@ public class TopicMetrics {
      * 创建时间
      */
     private LocalDateTime createTime;
+
+    /**
+     * Collector round id.
+     */
+    private String collectRound;
 }

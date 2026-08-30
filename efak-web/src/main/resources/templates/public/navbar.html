@@ -5,20 +5,20 @@
 <aside id="sidebar"
     class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm flex-shrink-0 transition-all duration-300 ease-in-out z-30 fixed-sidebar lg:translate-x-0"
     th:fragment="navbar">
-    <div class="flex items-center justify-between p-3 border-b border-gray-200">
-        <a href="/">
-            <div class="flex items-center space-x-3 sidebar-logo-container">
-                <img th:src="@{/images/efak_ai_logo.png}" alt="EFAK AI Logo"
-                    class="w-10 h-10 rounded-full object-cover flex-shrink-0 transition-transform hover:scale-110" />
-                <h1 class="text-xl font-bold sidebar-title">EFAK · <span class="text-primary">AI</span></h1>
-            </div>
+    <div class="sidebar-brand">
+        <a href="/" class="brand-link min-w-0" aria-label="EFAK AI">
+            <span class="sidebar-logo-container">
+                <img th:src="@{/images/efak_ai_title.png}" alt=""
+                    class="brand-lockup" width="215" height="50" />
+                <img th:src="@{/images/efak_ai_login.png}" alt=""
+                    class="brand-mark" width="40" height="40" />
+            </span>
         </a>
         <!-- 折叠按钮（展开状态时显示） -->
-        <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-colors sidebar-toggle">
+        <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="折叠侧边栏">
             <i class="fa fa-angle-left"></i>
         </button>
-        <!-- 展开按钮（折叠状态时显示） -->
-        <button id="sidebar-expand" class="p-2 rounded-full hover:bg-gray-100 transition-colors sidebar-expand hidden">
+        <button id="sidebar-expand" class="sidebar-expand hidden flex-shrink-0" type="button" aria-label="展开侧边栏">
             <i class="fa fa-angle-right"></i>
         </button>
     </div>
@@ -29,42 +29,42 @@
         </div>
         <a th:href="@{/dashboard(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
-            th:classappend="${#strings.equals(activePage, 'dashboard')} ? 'bg-primary text-white' : ''"
+            th:classappend="${#strings.equals(activePage, 'dashboard')} ? 'sidebar-item-active' : ''"
             data-page="dashboard" data-tooltip="仪表盘">
             <i class="fa fa-dashboard w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">仪表盘</span>
         </a>
         <a th:href="@{/cluster(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
-            th:classappend="${#strings.equals(activePage, 'cluster')} ? 'bg-primary text-white' : ''"
+            th:classappend="${#strings.equals(activePage, 'cluster')} ? 'sidebar-item-active' : ''"
             data-page="cluster" data-tooltip="集群管理">
             <i class="fa fa-server w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">集群管理</span>
         </a>
         <a th:href="@{/topics(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
-            th:classappend="${#strings.equals(activePage, 'topics')} ? 'bg-primary text-white' : ''" data-page="topics"
+            th:classappend="${#strings.equals(activePage, 'topics')} ? 'sidebar-item-active' : ''" data-page="topics"
             data-tooltip="主题管理">
             <i class="fa fa-list-ul w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">主题管理</span>
         </a>
         <a th:href="@{/consumers(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
-            th:classappend="${#strings.equals(activePage, 'consumers')} ? 'bg-primary text-white' : ''"
+            th:classappend="${#strings.equals(activePage, 'consumers')} ? 'sidebar-item-active' : ''"
             data-page="consumers" data-tooltip="消费者组">
             <i class="fa fa-users w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">消费者组</span>
         </a>
         <a th:href="@{/monitoring(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
-            th:classappend="${#strings.equals(activePage, 'monitoring')} ? 'bg-primary text-white' : ''"
+            th:classappend="${#strings.equals(activePage, 'monitoring')} ? 'sidebar-item-active' : ''"
             data-page="monitoring" data-tooltip="性能监控">
             <i class="fa fa-tachometer w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">性能监控</span>
         </a>
         <a th:href="@{/alerts(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
-            th:classappend="${#strings.equals(activePage, 'alerts')} ? 'bg-primary text-white' : ''" data-page="alerts"
+            th:classappend="${#strings.equals(activePage, 'alerts')} ? 'sidebar-item-active' : ''" data-page="alerts"
             data-tooltip="系统告警">
             <i class="fa fa-bell w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">系统告警</span>
@@ -76,7 +76,7 @@
         </div>
         <a th:href="@{/ai-assistant(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative group"
-            th:classappend="${#strings.equals(activePage, 'ai-assistant')} ? 'bg-primary text-white' : ''"
+            th:classappend="${#strings.equals(activePage, 'ai-assistant')} ? 'sidebar-item-active' : ''"
             data-page="ai-assistant" data-tooltip="AI智能助手">
             <i
                 class="fa fa-comments w-5 h-5 mr-3 text-center sidebar-icon transition-all duration-300 group-hover:animate-pulse"></i>
@@ -90,21 +90,21 @@
         </div>
         <a th:href="@{/config(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
-            th:classappend="${#strings.equals(activePage, 'config')} ? 'bg-primary text-white' : ''" data-page="config"
+            th:classappend="${#strings.equals(activePage, 'config')} ? 'sidebar-item-active' : ''" data-page="config"
             data-tooltip="配置管理" th:if="${#strings.contains(userRole, '管理员')}">
             <i class="fa fa-cog w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">配置管理</span>
         </a>
         <a th:href="@{/users(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
-            th:classappend="${#strings.equals(activePage, 'users')} ? 'bg-primary text-white' : ''" data-page="users"
+            th:classappend="${#strings.equals(activePage, 'users')} ? 'sidebar-item-active' : ''" data-page="users"
             data-tooltip="用户管理" th:if="${#strings.contains(userRole, '管理员')}">
             <i class="fa fa-user-circle w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">用户管理</span>
         </a>
         <a th:href="@{/scheduler(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
-            th:classappend="${#strings.equals(activePage, 'scheduler')} ? 'bg-primary text-white' : ''"
+            th:classappend="${#strings.equals(activePage, 'scheduler')} ? 'sidebar-item-active' : ''"
             data-page="scheduler" data-tooltip="任务调度" th:if="${#strings.contains(userRole, '管理员')}">
             <i class="fa fa-clock w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">任务调度</span>

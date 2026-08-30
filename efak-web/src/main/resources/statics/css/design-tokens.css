@@ -1,0 +1,506 @@
+/**
+ * EFAK-AI visual tokens and shared layout utilities.
+ *
+ * Default control radius is 2px. Preserve `rounded-full` for avatars,
+ * status indicators, and toggle knobs.
+ */
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.main-content,
+.fixed-sidebar,
+.overflow-y-auto,
+.chat-messages,
+.history-list {
+  overscroll-behavior: contain;
+}
+
+:root {
+  --efak-radius-xs: 1px;
+  --efak-radius: 2px;
+  --efak-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --efak-shadow-md: 0 2px 8px rgba(15, 23, 42, 0.07);
+  --efak-primary: #165DFF;
+  --efak-primary-rgb: 22, 93, 255;
+  --efak-primary-hover: #0E4AE6;
+  --efak-primary-soft: rgba(22, 93, 255, 0.08);
+  --efak-primary-soft-border: rgba(22, 93, 255, 0.22);
+  --efak-success: #059669;
+  --efak-warning: #d97706;
+  --efak-danger: #dc2626;
+  --efak-text: #111827;
+  --efak-muted: #6b7280;
+  --efak-border: #e5e7eb;
+  --efak-surface: #ffffff;
+  --efak-topbar-height: 64px;
+  --efak-sidebar-offset: 256px;
+}
+
+.fixed-header,
+.sidebar-brand {
+  height: var(--efak-topbar-height);
+  box-sizing: border-box;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 0 8px 0 10px;
+  border-bottom: 1px solid var(--efak-border);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sidebar-collapsed .sidebar-brand {
+  padding: 0 6px;
+  justify-content: center;
+  gap: 2px;
+}
+
+.sidebar-collapsed .brand-lockup {
+  display: none;
+}
+
+.sidebar-collapsed .brand-link {
+  flex: 0 0 auto;
+}
+
+.sidebar-collapsed .brand-mark {
+  display: block;
+}
+
+.sidebar-collapsed .sidebar-expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+  color: #9ca3af;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.sidebar-collapsed .sidebar-expand:hover,
+.sidebar-collapsed .sidebar-expand:focus {
+  color: var(--efak-primary);
+  background: transparent;
+}
+
+.sidebar-collapsed .brand-link:hover .brand-mark {
+  filter: brightness(1.08);
+}
+
+/* Brand blue: #165DFF = rgb(22, 93, 255). Remap Tailwind blue-* to this hue. */
+.text-primary,
+.text-blue-500,
+.text-blue-600,
+.text-blue-700,
+.hover\:text-blue-500:hover,
+.hover\:text-blue-600:hover,
+.hover\:text-primary:hover {
+  color: rgb(22 93 255 / var(--tw-text-opacity, 1)) !important;
+}
+
+.hover\:text-blue-800:hover,
+.hover\:text-blue-900:hover,
+.hover\:text-primary\/80:hover {
+  color: var(--efak-primary-hover) !important;
+}
+
+.text-blue-800,
+.text-blue-900 {
+  color: var(--efak-primary-hover) !important;
+}
+
+.bg-primary,
+.bg-blue-500,
+.bg-blue-600 {
+  background-color: rgb(22 93 255 / var(--tw-bg-opacity, 1)) !important;
+}
+
+.hover\:bg-blue-600:hover,
+.hover\:bg-blue-700:hover,
+.hover\:bg-primary:hover,
+.hover\:bg-primary\/90:hover {
+  background-color: var(--efak-primary-hover) !important;
+}
+
+.bg-blue-50,
+.bg-primary\/10 {
+  background-color: var(--efak-primary-soft) !important;
+}
+
+.bg-blue-100 {
+  background-color: rgba(22, 93, 255, 0.12) !important;
+}
+
+.border-blue-500,
+.border-primary,
+.focus\:border-blue-500:focus,
+.focus\:border-primary:focus {
+  border-color: rgb(22 93 255 / var(--tw-border-opacity, 1)) !important;
+}
+
+.border-blue-200,
+.border-blue-100 {
+  border-color: var(--efak-primary-soft-border) !important;
+}
+
+.border-blue-400 {
+  border-color: rgba(22, 93, 255, 0.45) !important;
+}
+
+.focus\:ring-blue-500:focus,
+.focus\:ring-primary:focus,
+.focus\:ring-2:focus.focus\:ring-blue-500 {
+  --tw-ring-color: rgba(22, 93, 255, 0.28);
+}
+
+.sidebar-item-active,
+a.sidebar-nav-item.sidebar-item-active {
+  background-color: rgba(22, 93, 255, 0.10) !important;
+  color: #165DFF !important;
+  border-left: 4px solid #165DFF !important;
+  border-radius: 0 2px 2px 0;
+}
+
+.sidebar-item-active .sidebar-icon,
+.sidebar-item-active .sidebar-text {
+  color: #165DFF !important;
+}
+
+.sidebar-item-active:hover {
+  background-color: rgba(22, 93, 255, 0.10) !important;
+}
+
+.table-tab:hover:not(.active),
+.filter-btn:hover:not(.active):not(.primary):not(.secondary) {
+  border-color: #165DFF;
+  color: #165DFF;
+  background: rgba(22, 93, 255, 0.08);
+}
+
+.table-tab.active:hover,
+.filter-btn.active:hover,
+.tab-btn.active:hover {
+  background: #0E4AE6 !important;
+  border-color: #0E4AE6 !important;
+  color: #ffffff !important;
+}
+
+.tab-btn:hover:not(.active) {
+  color: #165DFF;
+}
+
+/* Map Tailwind radius utilities to the product token. `rounded-full` is unchanged. */
+.rounded,
+.rounded-sm,
+.rounded-md,
+.rounded-lg,
+.rounded-xl,
+.rounded-2xl,
+.rounded-3xl {
+  border-radius: var(--efak-radius) !important;
+}
+
+.rounded-t,
+.rounded-t-md,
+.rounded-t-lg,
+.rounded-t-xl,
+.rounded-t-2xl {
+  border-top-left-radius: var(--efak-radius) !important;
+  border-top-right-radius: var(--efak-radius) !important;
+}
+
+.rounded-b,
+.rounded-b-md,
+.rounded-b-lg,
+.rounded-b-xl,
+.rounded-b-2xl {
+  border-bottom-left-radius: var(--efak-radius) !important;
+  border-bottom-right-radius: var(--efak-radius) !important;
+}
+
+.rounded-l-md,
+.rounded-l-lg {
+  border-top-left-radius: var(--efak-radius) !important;
+  border-bottom-left-radius: var(--efak-radius) !important;
+}
+
+.rounded-r-md,
+.rounded-r-lg {
+  border-top-right-radius: var(--efak-radius) !important;
+  border-bottom-right-radius: var(--efak-radius) !important;
+}
+
+.card-shadow {
+  box-shadow: var(--efak-shadow-sm);
+}
+
+.hover-lift {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hover-lift:hover {
+  transform: none;
+  box-shadow: var(--efak-shadow-sm);
+}
+
+.chart-container {
+  border-radius: var(--efak-radius) !important;
+}
+
+/* Page title row */
+.page-header,
+.page-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 0 0 12px;
+  margin-bottom: 16px;
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: var(--efak-text);
+  box-shadow: none !important;
+}
+
+.page-header-title,
+.page-hero-title {
+  color: var(--efak-text) !important;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.page-header-meta,
+.page-hero-subtitle {
+  color: var(--efak-muted) !important;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.page-hero input,
+.page-hero select,
+.page-hero textarea {
+  color: #111827;
+}
+
+/* KPI metric tiles */
+.kpi-card,
+.hero-stat,
+.performance-stat,
+.hero-chip,
+.cluster-info-item {
+  background: var(--efak-surface) !important;
+  border: 1px solid var(--efak-border) !important;
+  border-radius: var(--efak-radius);
+  color: var(--efak-text);
+  padding: 14px 16px;
+}
+
+.kpi-label,
+.hero-stat-label,
+.performance-stat-label,
+.hero-chip-label {
+  color: var(--efak-muted) !important;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.kpi-value,
+.hero-stat-number,
+.performance-stat-number,
+.hero-chip-number {
+  color: var(--efak-text);
+  font-size: 1.375rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.metric-card,
+.stat-card {
+  border-radius: var(--efak-radius) !important;
+}
+
+.ai-workspace-bar {
+  background: var(--efak-surface) !important;
+  border: 1px solid var(--efak-border) !important;
+  border-radius: var(--efak-radius);
+  color: var(--efak-text);
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  line-height: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.sidebar-brand .brand-link {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.brand-lockup {
+  height: 50px;
+  width: auto;
+  max-width: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: left center;
+  flex-shrink: 1;
+}
+
+.brand-link:hover .brand-lockup {
+  filter: brightness(1.08);
+}
+
+.sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: #6b7280;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.sidebar-toggle:hover {
+  color: var(--efak-primary);
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.brand-mark {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: contain;
+  flex-shrink: 0;
+  background: #000;
+}
+
+.sidebar-logo-container {
+  display: flex;
+  align-items: center;
+  line-height: 0;
+}
+
+header.fixed-header {
+  overflow: visible;
+}
+
+#toast-container,
+.toast-container {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+  z-index: 60 !important;
+  flex-direction: column;
+  gap: 4px;
+  background: transparent !important;
+}
+
+body > #toast-container,
+body > .toast-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: var(--efak-sidebar-offset, 0px) !important;
+  right: 0 !important;
+  bottom: auto !important;
+  height: var(--efak-topbar-height, 64px) !important;
+}
+
+#toast-container > *,
+.toast-container > *,
+.header-toast,
+.cluster-toast,
+.toast,
+.notification {
+  pointer-events: auto;
+  border-radius: 2px !important;
+  font-size: 13px;
+  line-height: 1.3;
+  padding: 6px 12px !important;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
+}
+
+#toast-container > *,
+.toast-container > * {
+  transform: none !important;
+  animation: efak-toast-in 0.16s ease-out;
+  white-space: nowrap;
+  max-width: min(560px, 70%);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes efak-toast-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+body > .header-toast,
+body > .cluster-toast,
+body > .toast,
+body > .notification,
+body > .fixed.top-4.right-4 {
+  position: fixed !important;
+  top: calc(var(--efak-topbar-height, 64px) / 2) !important;
+  right: auto !important;
+  left: calc((100vw + var(--efak-sidebar-offset, 256px)) / 2) !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 80 !important;
+  border-radius: 2px !important;
+  opacity: 1 !important;
+}
+
+.status-badge,
+.status-pill,
+.consumer-status,
+.user-status,
+.user-role,
+.rank-badge,
+table td span.inline-flex,
+table td span.rounded,
+table td span.rounded-full,
+table td span.rounded-md,
+table td span.rounded-lg,
+td span.rounded-full,
+td .status-badge,
+td .status-pill {
+  border-radius: 2px !important;
+}

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.kafka.eagle.web.service.AIGatewayService;
 import org.kafka.eagle.web.service.ModelConfigService;
+import org.kafka.eagle.web.util.ModelApiProtocol;
 import org.kafka.eagle.dto.config.ModelConfig;
 import com.alibaba.fastjson2.JSON;
 
@@ -53,18 +54,15 @@ public class AIGatewayServiceImpl implements AIGatewayService {
             setupSSEResponse(response);
 
             // 根据API类型选择不同的处理方式
-            switch (modelConfig.getApiType()) {
-                case "Ollama":
+            switch (ModelApiProtocol.of(modelConfig.getApiType())) {
+                case ModelApiProtocol.OLLAMA:
                     handleOllamaChatRequest(modelConfig, requestData, response);
                     break;
-                case "OpenAI":
-                    handleOpenAIChatRequest(modelConfig, requestData, response);
-                    break;
-                case "DeepSeek":
-                    handleDeepSeekChatRequest(modelConfig, requestData, response);
+                case ModelApiProtocol.ANTHROPIC:
+                    handleAnthropicChatRequest(modelConfig, requestData, response);
                     break;
                 default:
-                    sendErrorResponse(response, "不支持的模型类型: " + modelConfig.getApiType());
+                    handleOpenAIChatRequest(modelConfig, requestData, response);
                     break;
             }
 
@@ -94,18 +92,15 @@ public class AIGatewayServiceImpl implements AIGatewayService {
             setupSSEResponse(response);
 
             // 根据API类型选择不同的处理方式
-            switch (modelConfig.getApiType()) {
-                case "Ollama":
+            switch (ModelApiProtocol.of(modelConfig.getApiType())) {
+                case ModelApiProtocol.OLLAMA:
                     handleOllamaCompletionRequest(modelConfig, requestData, response);
                     break;
-                case "OpenAI":
-                    handleOpenAICompletionRequest(modelConfig, requestData, response);
-                    break;
-                case "DeepSeek":
-                    handleDeepSeekCompletionRequest(modelConfig, requestData, response);
+                case ModelApiProtocol.ANTHROPIC:
+                    handleAnthropicChatRequest(modelConfig, requestData, response);
                     break;
                 default:
-                    sendErrorResponse(response, "不支持的模型类型: " + modelConfig.getApiType());
+                    handleOpenAICompletionRequest(modelConfig, requestData, response);
                     break;
             }
 
@@ -123,15 +118,13 @@ public class AIGatewayServiceImpl implements AIGatewayService {
                 return false;
             }
 
-            switch (modelConfig.getApiType()) {
-                case "Ollama":
+            switch (ModelApiProtocol.of(modelConfig.getApiType())) {
+                case ModelApiProtocol.OLLAMA:
                     return testOllamaConnection(modelConfig);
-                case "OpenAI":
-                    return testOpenAIConnection(modelConfig);
-                case "DeepSeek":
-                    return testDeepSeekConnection(modelConfig);
+                case ModelApiProtocol.ANTHROPIC:
+                    return testAnthropicConnection(modelConfig);
                 default:
-                    return false;
+                    return testOpenAIConnection(modelConfig);
             }
         } catch (Exception e) {
             log.error("测试模型连接异常: {}", e.getMessage(), e);
@@ -240,7 +233,9 @@ public class AIGatewayServiceImpl implements AIGatewayService {
             // 设置OpenAI API密钥
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(modelConfig.getApiKey());
+            if (modelConfig.getApiKey() != null && !modelConfig.getApiKey().isBlank()) {
+                headers.setBearerAuth(modelConfig.getApiKey());
+            }
 
             // 发送请求并处理响应
             sendRequestWithAuthAndHandleResponse(endpoint, openaiRequest, headers, response, "OpenAI");
@@ -248,6 +243,31 @@ public class AIGatewayServiceImpl implements AIGatewayService {
         } catch (Exception e) {
             log.error("处理OpenAI聊天请求失败: {}", e.getMessage(), e);
             sendErrorResponse(response, "OpenAI请求失败: " + e.getMessage());
+        }
+    }
+
+    private void handleAnthropicChatRequest(ModelConfig modelConfig, Map<String, Object> requestData,
+            HttpServletResponse response) {
+        try {
+            String endpoint = modelConfig.getEndpoint();
+            Map<String, Object> anthropicRequest = new HashMap<>();
+            anthropicRequest.put("model", modelConfig.getModelName());
+            anthropicRequest.put("max_tokens", requestData.getOrDefault("max_tokens", 4096));
+            anthropicRequest.put("stream", true);
+            if (requestData.containsKey("messages")) {
+                anthropicRequest.put("messages", requestData.get("messages"));
+            } else if (requestData.containsKey("prompt")) {
+                anthropicRequest.put("messages", List.of(Map.of("role", "user", "content", requestData.get("prompt"))));
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("x-api-key", modelConfig.getApiKey());
+            headers.set("anthropic-version", "2023-06-01");
+            sendRequestWithAuthAndHandleResponse(endpoint, anthropicRequest, headers, response, "Anthropic");
+        } catch (Exception e) {
+            log.error("处理Anthropic聊天请求失败: {}", e.getMessage(), e);
+            sendErrorResponse(response, "Anthropic请求失败: " + e.getMessage());
         }
     }
 
@@ -275,7 +295,9 @@ public class AIGatewayServiceImpl implements AIGatewayService {
             // 设置DeepSeek API密钥
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(modelConfig.getApiKey());
+            if (modelConfig.getApiKey() != null && !modelConfig.getApiKey().isBlank()) {
+                headers.setBearerAuth(modelConfig.getApiKey());
+            }
 
             // 发送请求并处理响应
             sendRequestWithAuthAndHandleResponse(endpoint, deepseekRequest, headers, response, "DeepSeek");
@@ -337,7 +359,9 @@ public class AIGatewayServiceImpl implements AIGatewayService {
             // 设置OpenAI API密钥
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(modelConfig.getApiKey());
+            if (modelConfig.getApiKey() != null && !modelConfig.getApiKey().isBlank()) {
+                headers.setBearerAuth(modelConfig.getApiKey());
+            }
 
             // 发送请求并处理响应
             sendRequestWithAuthAndHandleResponse(endpoint, openaiRequest, headers, response, "OpenAI");
@@ -372,7 +396,9 @@ public class AIGatewayServiceImpl implements AIGatewayService {
             // 设置DeepSeek API密钥
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(modelConfig.getApiKey());
+            if (modelConfig.getApiKey() != null && !modelConfig.getApiKey().isBlank()) {
+                headers.setBearerAuth(modelConfig.getApiKey());
+            }
 
             // 发送请求并处理响应
             sendRequestWithAuthAndHandleResponse(endpoint, deepseekRequest, headers, response, "DeepSeek");
@@ -491,7 +517,8 @@ public class AIGatewayServiceImpl implements AIGatewayService {
      */
     private boolean testOpenAIConnection(ModelConfig modelConfig) {
         try {
-            if (modelConfig.getApiKey() == null || modelConfig.getApiKey().trim().isEmpty()) {
+            if (!ModelApiProtocol.isCustom(modelConfig.getApiType())
+                    && (modelConfig.getApiKey() == null || modelConfig.getApiKey().trim().isEmpty())) {
                 return false;
             }
 
@@ -499,7 +526,9 @@ public class AIGatewayServiceImpl implements AIGatewayService {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(modelConfig.getApiKey());
+            if (modelConfig.getApiKey() != null && !modelConfig.getApiKey().isBlank()) {
+                headers.setBearerAuth(modelConfig.getApiKey());
+            }
 
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
@@ -513,12 +542,35 @@ public class AIGatewayServiceImpl implements AIGatewayService {
         }
     }
 
+    private boolean testAnthropicConnection(ModelConfig modelConfig) {
+        try {
+            if (modelConfig.getApiKey() == null || modelConfig.getApiKey().trim().isEmpty()) {
+                return false;
+            }
+            String endpoint = modelConfig.getEndpoint();
+            if (endpoint != null && endpoint.contains("/v1/messages")) {
+                endpoint = endpoint.replace("/v1/messages", "/v1/models");
+            }
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("x-api-key", modelConfig.getApiKey());
+            headers.set("anthropic-version", "2023-06-01");
+            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    endpoint, HttpMethod.GET, requestEntity, String.class);
+            return response.getStatusCode() == HttpStatus.OK;
+        } catch (Exception e) {
+            log.error("测试Anthropic连接失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
     /**
      * 测试DeepSeek连接
      */
     private boolean testDeepSeekConnection(ModelConfig modelConfig) {
         try {
-            if (modelConfig.getApiKey() == null || modelConfig.getApiKey().trim().isEmpty()) {
+            if (!ModelApiProtocol.isCustom(modelConfig.getApiType())
+                    && (modelConfig.getApiKey() == null || modelConfig.getApiKey().trim().isEmpty())) {
                 return false;
             }
 
@@ -526,7 +578,9 @@ public class AIGatewayServiceImpl implements AIGatewayService {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(modelConfig.getApiKey());
+            if (modelConfig.getApiKey() != null && !modelConfig.getApiKey().isBlank()) {
+                headers.setBearerAuth(modelConfig.getApiKey());
+            }
 
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 

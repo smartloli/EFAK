@@ -110,11 +110,15 @@ const CommonModule = {
     // 侧边栏折叠/展开功能
     initSidebar() {
         const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebarExpand = document.getElementById('sidebar-expand');
         const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
 
         function toggleSidebar() {
+            clearSidebarTooltips();
+
             const mainContent = document.querySelector('.main-content');
             const header = document.querySelector('header');
 
@@ -127,6 +131,7 @@ const CommonModule = {
                 // 调整主内容区域和头部的左边距为80px (w-20)
                 if (mainContent) mainContent.style.marginLeft = '80px';
                 if (header) header.style.left = '80px';
+                document.documentElement.style.setProperty('--efak-sidebar-offset', '80px');
 
                 // 隐藏文本和分组标题
                 const sidebarTexts = sidebar.querySelectorAll('.sidebar-text');
@@ -141,7 +146,7 @@ const CommonModule = {
                 const logoContainer = sidebar.querySelector('.sidebar-logo-container');
                 if (logoContainer) {
                     logoContainer.classList.add('justify-center');
-                    logoContainer.classList.remove('space-x-3');
+                    logoContainer.classList.remove('space-x-2', 'space-x-3');
                 }
 
                 // 隐藏折叠按钮，显示展开按钮
@@ -161,8 +166,6 @@ const CommonModule = {
                     }
                 });
 
-                // 初始化提示功能
-                initTooltips();
             } else {
                 // 展开到完整尺寸
                 sidebar.classList.remove('w-20', 'sidebar-collapsed');
@@ -171,6 +174,7 @@ const CommonModule = {
                 // 恢复主内容区域和头部的左边距为256px (w-64)
                 if (mainContent) mainContent.style.marginLeft = '256px';
                 if (header) header.style.left = '256px';
+                document.documentElement.style.setProperty('--efak-sidebar-offset', '256px');
 
                 // 显示文本和分组标题
                 const sidebarTexts = sidebar.querySelectorAll('.sidebar-text');
@@ -185,7 +189,7 @@ const CommonModule = {
                 const logoContainer = sidebar.querySelector('.sidebar-logo-container');
                 if (logoContainer) {
                     logoContainer.classList.remove('justify-center');
-                    logoContainer.classList.add('space-x-3');
+                    logoContainer.classList.add('space-x-2');
                 }
 
                 // 显示折叠按钮，隐藏展开按钮
@@ -205,82 +209,54 @@ const CommonModule = {
                     }
                 });
 
-                // 在展开状态下也保持工具提示功能
-                // removeTooltips(); // 注释掉这行，让工具提示在展开状态下也能工作
-                // 确保在展开状态下也初始化工具提示
-                initTooltips();
             }
         }
 
-        // 初始化提示功能
+        function clearSidebarTooltips() {
+            document.querySelectorAll('.sidebar-tooltip').forEach((tooltip) => tooltip.remove());
+        }
+
         function initTooltips() {
             const navItems = sidebar.querySelectorAll('.sidebar-nav-item[data-tooltip]');
-            navItems.forEach(item => {
+            navItems.forEach((item) => {
+                if (item.dataset.tooltipBound === '1') return;
+                item.dataset.tooltipBound = '1';
                 item.addEventListener('mouseenter', showSidebarTooltip);
                 item.addEventListener('mouseleave', hideSidebarTooltip);
             });
         }
 
-        // 移除提示功能
-        function removeTooltips() {
-            const navItems = sidebar.querySelectorAll('.sidebar-nav-item[data-tooltip]');
-            navItems.forEach(item => {
-                item.removeEventListener('mouseenter', showSidebarTooltip);
-                item.removeEventListener('mouseleave', hideSidebarTooltip);
-            });
-            // 移除所有现有的提示框
-            const existingTooltips = document.querySelectorAll('.sidebar-tooltip');
-            existingTooltips.forEach(tooltip => tooltip.remove());
-        }
-
-        // 显示侧边栏提示
         function showSidebarTooltip(event) {
+            if (!sidebar.classList.contains('sidebar-collapsed')) {
+                clearSidebarTooltips();
+                return;
+            }
+
             const item = event.currentTarget;
             const tooltipText = item.getAttribute('data-tooltip');
             if (!tooltipText) return;
 
-            // 检查侧边栏是否处于折叠状态
-            const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
+            clearSidebarTooltips();
 
-            // 创建提示框
             const tooltip = document.createElement('div');
             tooltip.className = 'sidebar-tooltip fixed bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg z-50 pointer-events-none';
             tooltip.textContent = tooltipText;
             document.body.appendChild(tooltip);
 
-            // 定位提示框
             const rect = item.getBoundingClientRect();
-
-            if (isCollapsed) {
-                // 折叠状态下，提示框显示在右侧
-                tooltip.style.left = (rect.right + 10) + 'px';
-                tooltip.style.top = (rect.top + rect.height / 2 - tooltip.offsetHeight / 2) + 'px';
-            } else {
-                // 展开状态下，提示框显示在菜单项上方
-                tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
-                tooltip.style.top = (rect.top - tooltip.offsetHeight - 8) + 'px';
-            }
-
-            // 添加动画
+            tooltip.style.left = (rect.right + 10) + 'px';
+            tooltip.style.top = (rect.top + rect.height / 2 - tooltip.offsetHeight / 2) + 'px';
             tooltip.style.opacity = '0';
-            tooltip.style.transform = isCollapsed ? 'translateX(-10px)' : 'translateY(-10px)';
-            setTimeout(() => {
-                tooltip.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+            tooltip.style.transform = 'translateX(-8px)';
+            requestAnimationFrame(() => {
+                tooltip.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
                 tooltip.style.opacity = '1';
-                tooltip.style.transform = 'translateX(0) translateY(0)';
-            }, 10);
+                tooltip.style.transform = 'translateX(0)';
+            });
         }
 
-        // 隐藏侧边栏提示
-        function hideSidebarTooltip(event) {
-            const tooltips = document.querySelectorAll('.sidebar-tooltip');
-            const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
-
-            tooltips.forEach(tooltip => {
-                tooltip.style.opacity = '0';
-                tooltip.style.transform = isCollapsed ? 'translateX(-10px)' : 'translateY(-10px)';
-                setTimeout(() => tooltip.remove(), 200);
-            });
+        function hideSidebarTooltip() {
+            clearSidebarTooltips();
         }
 
         if (sidebarToggle) {
@@ -398,6 +374,8 @@ const CommonModule = {
                 }
             }
         });
+
+        initTooltips();
     },
 
     // 用户菜单功能
@@ -805,68 +783,65 @@ const CommonModule = {
         }
     },
 
-    // 显示通知
-    showNotification(message, type = 'info') {
-        // 检查是否已存在toast-container
+    getToastContainer() {
         let container = document.getElementById('toast-container');
+        const header = document.querySelector('header.fixed-header, header');
         if (!container) {
             container = document.createElement('div');
             container.id = 'toast-container';
-            container.className = 'fixed top-4 right-4 z-50 space-y-2';
-            document.body.appendChild(container);
+            if (header) {
+                header.appendChild(container);
+            } else {
+                document.body.appendChild(container);
+            }
+        } else if (header && container.parentElement !== header) {
+            header.appendChild(container);
         }
+        return container;
+    },
+
+    showNotification(message, type = 'info') {
+        const container = this.getToastContainer();
+        container.replaceChildren();
 
         const toast = document.createElement('div');
-
-        // 根据类型设置样式
-        let bgColor, textColor, icon;
+        let bgColor, icon;
         switch (type) {
             case 'success':
                 bgColor = 'bg-green-500';
-                textColor = 'text-white';
                 icon = 'fa-check-circle';
                 break;
             case 'error':
                 bgColor = 'bg-red-500';
-                textColor = 'text-white';
                 icon = 'fa-exclamation-circle';
                 break;
             case 'warning':
                 bgColor = 'bg-yellow-500';
-                textColor = 'text-white';
                 icon = 'fa-exclamation-triangle';
+                break;
+            case 'loading':
+                bgColor = 'bg-blue-500';
+                icon = 'fa-spinner fa-spin';
                 break;
             default:
                 bgColor = 'bg-blue-500';
-                textColor = 'text-white';
                 icon = 'fa-info-circle';
         }
 
-        toast.className = `${bgColor} ${textColor} px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 transform translate-x-full transition-all duration-300 ease-in-out`;
+        toast.className = `header-toast ${bgColor} text-white flex items-center space-x-2`;
         toast.innerHTML = `
             <i class="fa ${icon}"></i>
             <span>${message}</span>
-            <button onclick="this.parentElement.remove()" class="ml-auto text-white hover:text-gray-200">
-                <i class="fa fa-times"></i>
-            </button>
         `;
-
         container.appendChild(toast);
 
-        // 动画效果
-        setTimeout(() => {
-            toast.classList.remove('translate-x-full');
-        }, 100);
-
-        // 自动移除
-        setTimeout(() => {
-            toast.classList.add('translate-x-full');
+        if (type !== 'loading') {
             setTimeout(() => {
                 if (toast.parentElement) {
                     toast.remove();
                 }
-            }, 300);
-        }, 5000);
+            }, 3000);
+        }
     },
 
     // 切换密码可见性
@@ -889,7 +864,7 @@ const CommonModule = {
         }
     },
 
-    // 通知面板功能 - 完整版本，包含API调用和数据处理
+    // 通知面板：红点与列表都只反映当前集群未处理告警
     initNotificationPanel() {
         const notificationButton = document.getElementById('notification-button');
         const notificationPanel = document.getElementById('notification-panel');
@@ -903,16 +878,22 @@ const CommonModule = {
 
         let isNotificationPanelOpen = false;
 
-        // 获取当前集群ID
         function getCurrentClusterId() {
             const params = new URLSearchParams(window.location.search);
-            return params.get('cid') || sessionStorage.getItem('currentClusterId') || '5uTuNNn5dKvh0ZvF';
+            const fromUrl = params.get('cid');
+            if (fromUrl) {
+                sessionStorage.setItem('currentClusterId', fromUrl);
+                return fromUrl;
+            }
+            return sessionStorage.getItem('currentClusterId') || '';
         }
 
         // 格式化时间差
         function formatTimeAgo(dateString) {
+            if (!dateString) return '';
             const now = new Date();
             const date = new Date(dateString);
+            if (isNaN(date.getTime())) return '';
             const diffMs = now.getTime() - date.getTime();
 
             const diffMinutes = Math.floor(diffMs / (1000 * 60));
@@ -971,11 +952,49 @@ const CommonModule = {
             }
         }
 
-        // 加载告警通知
-        async function loadAlertNotifications() {
-            console.log('=== loadAlertNotifications 函数开始执行 ===');
+        function escapeHtml(value) {
+            if (value == null) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
 
-            // 显示加载状态
+        function parseNotificationPayload(payload) {
+            if (Array.isArray(payload)) {
+                return { alerts: payload, unreadCount: payload.length };
+            }
+            const alerts = payload && Array.isArray(payload.alerts) ? payload.alerts : [];
+            const unreadCount = payload && payload.total != null ? Number(payload.total) : alerts.length;
+            return { alerts, unreadCount };
+        }
+
+        async function fetchUnreadNotifications(limit) {
+            const cid = getCurrentClusterId();
+            if (!cid) {
+                return { alerts: [], unreadCount: 0 };
+            }
+            const response = await fetch(`/api/alerts/notifications?cid=${encodeURIComponent(cid)}&limit=${limit}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                throw new Error('notifications ' + response.status);
+            }
+            return parseNotificationPayload(await response.json());
+        }
+
+        async function refreshNotificationBadge() {
+            try {
+                const data = await fetchUnreadNotifications(1);
+                updateNotificationCount(data.unreadCount);
+            } catch (error) {
+                updateNotificationCount(0);
+            }
+        }
+
+        async function loadAlertNotifications() {
             const notificationList = document.getElementById('notification-list');
             const emptyState = document.getElementById('empty-notifications');
 
@@ -987,55 +1006,33 @@ const CommonModule = {
             }
 
             try {
-                const cid = getCurrentClusterId();
-                const apiUrl = `/api/alerts/notifications?cid=${cid}&limit=5`;
-
-                console.log('请求URL:', apiUrl);
-                console.log('集群ID:', cid);
-
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                console.log('响应状态:', response.status);
-
-                if (response.ok) {
-                    const alerts = await response.json();
-                    console.log('告警数据数量:', alerts.length);
-
-                    renderNotifications(alerts);
-                    updateNotificationCount(alerts.length);
-
-                    console.log('=== 数据渲染完成 ===');
-                } else {
-                    console.error('API请求失败，状态码:', response.status);
-                    showEmptyState();
-                }
+                const data = await fetchUnreadNotifications(5);
+                renderNotifications(data.alerts);
+                updateNotificationCount(data.unreadCount);
             } catch (error) {
-                console.error('=== API请求异常 ===', error);
                 showEmptyState();
             }
         }
 
-        // 渲染通知列表
         function renderNotifications(alerts) {
             const notificationList = document.getElementById('notification-list');
             const emptyState = document.getElementById('empty-notifications');
+            const cid = getCurrentClusterId();
 
-            if (alerts.length === 0) {
+            if (!alerts || alerts.length === 0) {
                 showEmptyState();
                 return;
             }
 
-            emptyState.classList.add('hidden');
+            if (emptyState) {
+                emptyState.classList.add('hidden');
+            }
             notificationList.innerHTML = alerts.map(alert => {
                 const statusInfo = getAlertStatusInfo(alert.status);
+                const timeValue = alert.updatedAt || alert.createdAt;
                 return `
                     <div class="notification-item border-b border-gray-100 p-4 hover:bg-gray-50 cursor-pointer relative"
-                         onclick="window.location.href='/alerts?cid=${getCurrentClusterId()}'">
+                         onclick="window.location.href='/alerts?cid=${encodeURIComponent(cid)}'">
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 rounded-full ${statusInfo.bgColor} flex items-center justify-center flex-shrink-0">
                                 <i class="fa ${statusInfo.icon} ${statusInfo.textColor} text-sm"></i>
@@ -1043,37 +1040,34 @@ const CommonModule = {
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
                                     <p class="text-sm font-medium text-gray-900">${statusInfo.text}</p>
-                                    <span class="text-xs text-gray-500">${formatTimeAgo(alert.updatedAt)}</span>
+                                    <span class="text-xs text-gray-500">${formatTimeAgo(timeValue)}</span>
                                 </div>
-                                <p class="text-sm text-gray-600 mt-1" title="${alert.description}">${alert.title}</p>
-                                ${alert.object ? `<p class="text-xs text-gray-500 mt-1">来源: ${alert.object}</p>` : ''}
+                                <p class="text-sm text-gray-600 mt-1" title="${escapeHtml(alert.description || '')}">${escapeHtml(alert.title || '未命名告警')}</p>
+                                ${alert.object ? `<p class="text-xs text-gray-500 mt-1">来源: ${escapeHtml(alert.object)}</p>` : ''}
                             </div>
-                            <div class="w-2 h-2 ${statusInfo.dotColor} rounded-full absolute top-4 right-4"></div>
+                            <div class="w-2 h-2 ${statusInfo.dotColor} rounded-full absolute top-4 right-4 unread-dot"></div>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // 显示空状态
         function showEmptyState() {
             const notificationList = document.getElementById('notification-list');
             const emptyState = document.getElementById('empty-notifications');
 
-            notificationList.innerHTML = '';
-            emptyState.classList.remove('hidden');
+            if (notificationList) {
+                notificationList.innerHTML = '';
+            }
+            if (emptyState) {
+                emptyState.classList.remove('hidden');
+            }
             updateNotificationCount(0);
         }
 
-        // 点击通知按钮打开面板并加载数据
         notificationButton.addEventListener('click', function (e) {
-            console.log('=== 通知按钮点击事件触发 ===');
             e.stopPropagation();
-
-            // 显示面板
             showNotificationPanel();
-
-            // 加载数据
             loadAlertNotifications();
         });
 
@@ -1099,14 +1093,12 @@ const CommonModule = {
             });
         }
 
-        // 全部已读功能
         if (markAllReadButton) {
             markAllReadButton.addEventListener('click', function () {
                 markAllNotificationsAsRead();
             });
         }
 
-        // 清空全部功能
         if (clearAllButton) {
             clearAllButton.addEventListener('click', function () {
                 clearAllNotifications();
@@ -1155,102 +1147,55 @@ const CommonModule = {
             document.body.style.overflow = '';
         }
 
-        function markAllNotificationsAsRead() {
-            const unreadNotifications = document.querySelectorAll('.notification-item .bg-red-500, .notification-item .bg-yellow-500, .notification-item .bg-green-500');
-            unreadNotifications.forEach(badge => {
-                badge.remove();
-            });
-
-            // 更新所有未读通知的样式
-            const unreadItems = document.querySelectorAll('.notification-item .font-medium:not(.text-gray-500)');
-            unreadItems.forEach(item => {
-                item.classList.remove('text-gray-900');
-                item.classList.add('text-gray-500');
-            });
-
-            const unreadContents = document.querySelectorAll('.notification-item .text-gray-600');
-            unreadContents.forEach(content => {
-                content.classList.remove('text-gray-600');
-                content.classList.add('text-gray-500');
-            });
-
-            // 更新计数
-            updateNotificationCount();
-
-            // 隐藏通知徽章
-            const notificationBadge = document.querySelector('.notification-badge');
-            if (notificationBadge) {
-                notificationBadge.style.display = 'none';
+        async function markAllNotificationsAsRead() {
+            const cid = getCurrentClusterId();
+            if (!cid) {
+                showEmptyState();
+                return;
             }
+            try {
+                await fetch(`/api/alerts/notifications/read-all?cid=${encodeURIComponent(cid)}`, { method: 'PUT' });
+            } catch (error) {
+                console.error('标记全部已读失败', error);
+            }
+            showEmptyState();
         }
 
-        function clearAllNotifications() {
-            const notificationList = document.querySelector('.notification-list');
-            const emptyState = document.getElementById('empty-notifications');
-
-            if (notificationList) {
-                notificationList.innerHTML = '';
+        async function clearAllNotifications() {
+            const cid = getCurrentClusterId();
+            if (!cid) {
+                showEmptyState();
+                return;
             }
-
-            if (emptyState) {
-                emptyState.classList.remove('hidden');
+            try {
+                await fetch(`/api/alerts/notifications/clear-all?cid=${encodeURIComponent(cid)}`, { method: 'PUT' });
+            } catch (error) {
+                console.error('清空通知失败', error);
             }
-
-            updateNotificationCount();
-
-            // 隐藏通知徽章
-            const notificationBadge = document.querySelector('.notification-badge');
-            if (notificationBadge) {
-                notificationBadge.style.display = 'none';
-            }
+            showEmptyState();
         }
 
-        function markNotificationAsRead(notificationItem) {
-            // 移除未读标识
-            const badge = notificationItem.querySelector('.bg-red-500, .bg-yellow-500, .bg-green-500');
-            if (badge) {
-                badge.remove();
-
-                // 更新样式为已读状态
-                const title = notificationItem.querySelector('.font-medium');
-                const content = notificationItem.querySelector('.text-gray-600');
-
-                if (title) {
-                    title.classList.remove('text-gray-900');
-                    title.classList.add('text-gray-500');
-                }
-
-                if (content) {
-                    content.classList.remove('text-gray-600');
-                    content.classList.add('text-gray-500');
-                }
-
-                updateNotificationCount();
-            }
-        }
-
-        function updateNotificationCount() {
-            const unreadCount = document.querySelectorAll('.notification-item .bg-red-500, .notification-item .bg-yellow-500, .notification-item .bg-green-500').length;
+        function updateNotificationCount(unreadCount) {
+            const count = Number(unreadCount) || 0;
             const countElement = document.getElementById('notification-count');
-
             if (countElement) {
-                if (unreadCount === 0) {
-                    countElement.textContent = '暂无未读';
-                } else {
-                    countElement.textContent = `${unreadCount}条未读`;
-                }
+                countElement.textContent = count === 0 ? '暂无未读' : `${count}条未读`;
             }
 
-            // 更新按钮上的通知徽章
-            const notificationBadge = document.querySelector('.notification-badge');
+            const notificationBadge = document.getElementById('notification-badge')
+                || document.querySelector('.notification-badge');
             if (notificationBadge) {
-                if (unreadCount === 0) {
+                if (count === 0) {
+                    notificationBadge.classList.add('hidden');
                     notificationBadge.style.display = 'none';
                 } else {
+                    notificationBadge.classList.remove('hidden');
                     notificationBadge.style.display = 'block';
                 }
             }
         }
+
+        refreshNotificationBadge();
     },
 
     // 加载当前用户信息
@@ -1423,6 +1368,10 @@ const CommonModule = {
                 });
         };
     }
+};
+
+window.efakShowToast = function (message, type) {
+    CommonModule.showNotification(message, type);
 };
 
 // 全局函数：加载公共模块

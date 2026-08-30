@@ -96,11 +96,11 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
 
         if (savedRequest != null) {
             String redirectUrl = savedRequest.getRedirectUrl();
+            cache.removeRequest(request, response);
             if (redirectUrl != null && !redirectUrl.trim().isEmpty() && isValidTargetUrl(redirectUrl)) {
-                // 清除已使用的SavedRequest
-                cache.removeRequest(request, response);
                 return redirectUrl;
             }
+            log.info("忽略无效的登录回跳地址: {}", redirectUrl);
         }
 
         // 如果没有SavedRequest，尝试从URL参数中获取
@@ -155,9 +155,41 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
         }
 
         // 排除登录相关页面，避免循环重定向
-        if (targetPath.equals("/login") || targetPath.startsWith("/login?") || 
+        if (targetPath.equals("/login") || targetPath.startsWith("/login?") ||
             targetPath.equals("/logout") || targetPath.startsWith("/logout?")) {
             return false;
+        }
+
+        String pathOnly = targetPath;
+        int queryIndex = targetPath.indexOf('?');
+        if (queryIndex >= 0) {
+            pathOnly = targetPath.substring(0, queryIndex);
+        }
+        String lowerPath = pathOnly.toLowerCase();
+
+        // 静态资源和浏览器探测请求不能作为登录后落地页
+        if (lowerPath.equals("/sm") || lowerPath.startsWith("/sm/")
+                || lowerPath.equals("/error") || lowerPath.startsWith("/error/")
+                || lowerPath.startsWith("/error-")
+                || lowerPath.equals("/favicon.ico")
+                || lowerPath.startsWith("/css/")
+                || lowerPath.startsWith("/js/")
+                || lowerPath.startsWith("/images/")
+                || lowerPath.startsWith("/fonts/")
+                || lowerPath.startsWith("/webfonts/")
+                || lowerPath.startsWith("/plugins/")
+                || lowerPath.startsWith("/statics/")) {
+            return false;
+        }
+
+        String[] blockedSuffixes = {
+                ".map", ".css", ".js", ".mjs", ".png", ".jpg", ".jpeg", ".gif", ".svg",
+                ".ico", ".webp", ".woff", ".woff2", ".ttf", ".eot"
+        };
+        for (String suffix : blockedSuffixes) {
+            if (lowerPath.endsWith(suffix)) {
+                return false;
+            }
         }
 
         // 检查是否包含危险字符

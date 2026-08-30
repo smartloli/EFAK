@@ -343,7 +343,7 @@ function initializeMessageFlowChart(messageFlow) {
                     borderColor: ctx => {
                         const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height);
                         gradient.addColorStop(0, '#165DFF');
-                        gradient.addColorStop(1, '#4F8AFF');
+                        gradient.addColorStop(1, '#165DFF');
                         return gradient;
                     }
                 }
@@ -1055,13 +1055,15 @@ function showErrorMessage(message) {
     showNotification(message, 'error');
 }
 
-// 显示美化的通知提示
+// Toast
 function showNotification(message, type = 'info') {
-    // 创建通知元素
+    if (window.efakShowToast) {
+        window.efakShowToast(message, type);
+        return;
+    }
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = `notification header-toast ${type}`;
 
-    // 根据类型设置不同的样式和图标
     let icon, bgColor, textColor, borderColor;
     switch (type) {
         case 'error':
@@ -1082,29 +1084,22 @@ function showNotification(message, type = 'info') {
             textColor = '#D97706';
             borderColor = '#FDE68A';
             break;
-        default: // info
+        default:
             icon = 'fa-info-circle';
             bgColor = '#EFF6FF';
-            textColor = '#2563EB';
+            textColor = '#0E4AE6';
             borderColor = '#DBEAFE';
     }
 
     notification.innerHTML = `
         <div style="
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10001;
-            max-width: 400px;
             background: ${bgColor};
             border: 1px solid ${borderColor};
-            border-radius: 0.75rem;
-            padding: 1rem 1.25rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 2px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            animation: slideIn 0.3s ease-out;
         ">
             <i class="fa ${icon}" style="color: ${textColor}; font-size: 1.125rem;"></i>
             <span style="color: ${textColor}; font-weight: 500; flex: 1;">${message}</span>

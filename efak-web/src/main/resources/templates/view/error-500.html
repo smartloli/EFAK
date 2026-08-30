@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>服务器错误 - EFAK·AI</title>
-    <link rel="shortcut icon" th:href="@{/images/efak_ai_logo.png}" />
+    <link rel="shortcut icon" th:href="@{/images/efak_ai_login.png?v1}" />
     <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}" />
     <link th:href="@{/plugins/tailwindcss/tailwind.min.css}" rel="stylesheet">
     <link th:href="@{/css/inter-font.css}" rel="stylesheet">
@@ -16,8 +16,8 @@
             --secondary-color: #4F46E5;
             --error-color: #EF4444;
             --error-dark: #DC2626;
-            --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6366f1 100%);
-            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --gradient-bg: #0f172a;
+            --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
             --text-primary: #1f2937;
             --text-secondary: #6b7280;
         }
@@ -55,15 +55,13 @@
         }
 
         .error-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
+            background: #ffffff;
+            border-radius: 2px;
             box-shadow: var(--card-shadow);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid #e5e7eb;
             width: 100%;
-            max-width: 500px;
-            padding: 3rem 2.5rem;
+            max-width: 480px;
+            padding: 2rem;
             text-align: center;
             position: relative;
             z-index: 1;
@@ -87,16 +85,17 @@
         }
 
         .logo {
-            width: 100px;
-            height: 100px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
             margin: 0 auto 1rem;
-            box-shadow: 0 10px 25px rgba(22, 93, 255, 0.3);
-            transition: transform 0.3s ease;
+            object-fit: contain;
+            background: #000;
+            display: block;
         }
 
         .logo:hover {
-            transform: scale(1.05);
+            transform: none;
         }
 
         .brand-title {
@@ -169,7 +168,7 @@
         .error-details {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 1rem;
             margin-bottom: 2rem;
             font-size: 0.875rem;
@@ -185,7 +184,7 @@
 
         .btn {
             padding: 0.875rem 1.5rem;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 1rem;
             font-weight: 600;
             text-decoration: none;
@@ -300,7 +299,7 @@
         @media (max-width: 480px) {
             .error-card {
                 padding: 2rem 1.5rem;
-                border-radius: 16px;
+                border-radius: 2px;
             }
 
             .error-number {
@@ -344,9 +343,8 @@
 
         <div class="error-card">
             <div class="logo-container">
-                <img th:src="@{/images/efak_ai_logo.png}" alt="EFAK AI Logo" class="logo">
-                <h1 class="brand-title">EFAK · AI</h1>
-                <p class="brand-subtitle">Eagle For Apache Kafka · 智能监控平台</p>
+                <img th:src="@{/images/efak_ai_logo_v2.png}" alt="EFAK AI" class="logo">
+                <p class="brand-subtitle">Eagle For Apache Kafka</p>
             </div>
 
             <div class="error-icon">

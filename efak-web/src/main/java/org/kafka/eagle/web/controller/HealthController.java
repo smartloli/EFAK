@@ -19,6 +19,8 @@ package org.kafka.eagle.web.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.tool.constant.KeConst;
+import org.kafka.eagle.web.config.EfakRuntimeProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +48,9 @@ public class HealthController {
     @Value("${server.port:8080}")
     private String serverPort;
 
+    @Autowired
+    private EfakRuntimeProperties runtimeProperties;
+
     /**
      * 基础健康检查接口
      *
@@ -61,6 +66,7 @@ public class HealthController {
             response.put("application", "EFAK-AI");
             response.put("version", KeConst.APP_VERSION.getValue());
             response.put("port", serverPort);
+            response.put("role", runtimeProperties.normalizedRole());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {

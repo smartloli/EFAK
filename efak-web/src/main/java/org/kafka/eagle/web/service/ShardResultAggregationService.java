@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -85,9 +84,10 @@ public class ShardResultAggregationService {
      */
     private Map<String, Object> aggregateShardResults(String taskType, int waitTimeSeconds) {
         try {
-
-            // 关键逻辑：按“最多等待 waitTimeSeconds”，并支持结果齐备时提前结束，避免固定睡眠带来的延迟
-            Map<String, Object> allShardResults = waitAndFetchShardResults(taskType, waitTimeSeconds);
+            
+            // MySQL is the source of truth. Do not block waiting for other nodes.
+            // 获取所有节点的分片结果
+            Map<String, Object> allShardResults = taskCoordinator.getAllShardResults(taskType);
             
             if (allShardResults.isEmpty()) {
                 log.warn("没有找到{}任务的分片结果", taskType);
@@ -117,36 +117,6 @@ public class ShardResultAggregationService {
             log.error("汇总{}任务分片结果失败", taskType, e);
             return createErrorAggregationResult(taskType, e.getMessage());
         }
-    }
-
-    private Map<String, Object> waitAndFetchShardResults(String taskType, int waitTimeSeconds) {
-        // 关键逻辑：期望参与节点数量使用在线服务数；若只有一个节点则无需等待
-        int expectedNodes = Math.max(1, taskCoordinator.getOnlineServices().size());
-        if (waitTimeSeconds <= 0 || expectedNodes <= 1) {
-            return taskCoordinator.getAllShardResults(taskType);
-        }
-
-        long deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(waitTimeSeconds);
-        long pollMillis = Math.min(1000L, Math.max(200L, waitTimeSeconds * 1000L / 10L)); // 最多约轮询10次
-
-        Map<String, Object> results = taskCoordinator.getAllShardResults(taskType);
-        while (System.nanoTime() < deadlineNanos) {
-            if (!results.isEmpty() && results.size() >= expectedNodes) {
-                return results;
-            }
-
-            try {
-                TimeUnit.MILLISECONDS.sleep(pollMillis);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                log.warn("等待分片结果被中断: taskType={}", taskType, e);
-                break;
-            }
-
-            results = taskCoordinator.getAllShardResults(taskType);
-        }
-
-        return results;
     }
 
     /**

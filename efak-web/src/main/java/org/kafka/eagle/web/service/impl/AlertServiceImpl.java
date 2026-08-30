@@ -92,6 +92,13 @@ public class AlertServiceImpl implements AlertService {
     @Override
     public AlertPageResponse queryAlertsForNotifications(AlertQueryRequest request) {
         AlertPageResponse response = new AlertPageResponse();
+        if (request == null || request.getClusterId() == null || request.getClusterId().isBlank()) {
+            response.setAlerts(java.util.Collections.emptyList());
+            response.setTotal(0L);
+            response.setPage(request != null ? request.getPage() : 1);
+            response.setPageSize(request != null ? request.getPageSize() : 5);
+            return response;
+        }
 
         // 计算偏移量
         int offset = (request.getPage() - 1) * request.getPageSize();
@@ -107,8 +114,8 @@ public class AlertServiceImpl implements AlertService {
         // 查询总数
         Long total = alertMapper.countAlertsForNotifications(request.getClusterId());
 
-        response.setAlerts(alerts);
-        response.setTotal(total);
+        response.setAlerts(alerts != null ? alerts : java.util.Collections.emptyList());
+        response.setTotal(total != null ? total : 0L);
         response.setPage(request.getPage());
         response.setPageSize(request.getPageSize());
 
@@ -128,6 +135,14 @@ public class AlertServiceImpl implements AlertService {
     @Override
     public boolean updateAlertStatusById(Long id, String clusterId, Integer status) {
         return alertMapper.updateAlertStatusById(id, clusterId, status) > 0;
+    }
+
+    @Override
+    public int markUnprocessedAlerts(String clusterId, Integer status) {
+        if (clusterId == null || clusterId.isBlank() || status == null) {
+            return 0;
+        }
+        return alertMapper.updateUnprocessedAlertsStatus(clusterId, status);
     }
 
     @Override

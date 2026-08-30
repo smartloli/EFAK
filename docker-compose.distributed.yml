@@ -1,0 +1,131 @@
+# EFAK-AI distributed stack: MySQL + Redis + Nginx + Web + Worker
+#
+# One-click:
+#   ./deploy-distributed.sh
+#
+# Manual:
+#   docker compose -p efak-dist -f docker-compose.distributed.yml up -d --build \
+#     --scale efak-web=1 --scale efak-worker=2
+
+name: efak-dist
+
+x-efak-common: &efak-common
+  image: efak-ai:5.0.0
+  build:
+    context: .
+    dockerfile: Dockerfile
+  restart: unless-stopped
+  depends_on:
+    mysql:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  environment: &efak-env
+    SPRING_PROFILES_ACTIVE: prod
+    SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/efak_ai?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    SPRING_DATASOURCE_USERNAME: root
+    SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-admin123}
+    SPRING_DATA_REDIS_HOST: redis
+    SPRING_DATA_REDIS_PORT: "6379"
+    SPRING_DATA_REDIS_DATABASE: "0"
+    SERVER_PORT: "8080"
+  networks:
+    - efak-net
+  logging:
+    driver: json-file
+    options:
+      max-size: 100m
+      max-file: "3"
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-admin123}
+      MYSQL_DATABASE: efak_ai
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --default-authentication-plugin=mysql_native_password
+    volumes:
+      - efak-mysql-data:/var/lib/mysql
+      - ./efak-web/src/main/resources/sql/ke.sql:/docker-entrypoint-initdb.d/01-ke.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - efak-net
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - efak-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - efak-net
+
+  efak-web:
+    <<: *efak-common
+    environment:
+      <<: *efak-env
+      EFAK_ROLE: web
+      JAVA_OPTS: ${WEB_JAVA_OPTS:--Xms256m -Xmx1g -XX:+UseG1GC -XX:+UseStringDeduplication}
+    expose:
+      - "8080"
+    volumes:
+      - ./logs/web:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/health/check"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 90s
+
+  efak-worker:
+    <<: *efak-common
+    environment:
+      <<: *efak-env
+      EFAK_ROLE: worker
+      JAVA_OPTS: ${WORKER_JAVA_OPTS:--Xms512m -Xmx1536m -XX:+UseG1GC -XX:+UseStringDeduplication}
+    expose:
+      - "8080"
+    volumes:
+      - ./logs/worker:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/health/check"]
+      interval: 20s
+      timeout: 5s
+      retries: 8
+      start_period: 90s
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      efak-web:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      - ./deploy/nginx-distributed.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - efak-net
+
+volumes:
+  efak-mysql-data:
+  efak-redis-data:
+
+networks:
+  efak-net:
+    driver: bridge

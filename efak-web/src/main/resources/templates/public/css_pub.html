@@ -15,12 +15,12 @@
         }
 
         .hover-lift:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
         }
 
         .status-pill {
-            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+            @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
         }
 
         /* 表格样式 */
@@ -69,7 +69,7 @@
 
     .cluster-modal-container {
         background: white;
-        border-radius: 16px;
+        border-radius: 2px;
         width: 95%;
         max-width: 1000px;
         max-height: 90vh;
@@ -110,7 +110,7 @@
         color: #6b7280;
         cursor: pointer;
         padding: 8px;
-        border-radius: 6px;
+        border-radius: 2px;
         transition: all 0.2s;
     }
 
@@ -137,7 +137,7 @@
 
     .form-section {
         background: #f8fafc;
-        border-radius: 12px;
+        border-radius: 2px;
         padding: 20px;
         margin-bottom: 20px;
     }
@@ -167,7 +167,7 @@
         width: 100%;
         padding: 10px 12px;
         border: 1px solid #d1d5db;
-        border-radius: 6px;
+        border-radius: 2px;
         font-size: 14px;
         transition: all 0.2s;
         box-sizing: border-box;
@@ -187,8 +187,8 @@
 
     .form-input:focus {
         outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: #165DFF;
+        box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
     }
 
     /* 主题类型图标选择器样式（参考topics.html） */
@@ -201,12 +201,24 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        color: #111827 !important;
+        background-color: #ffffff !important;
+    }
+
+    .topic-icon-dropdown .select2-results__option > * {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        min-width: 0;
+        background: transparent !important;
+        color: inherit !important;
     }
 
     .topic-icon-dropdown .select2-results__option .icon-preview {
         width: 32px;
         height: 32px;
-        border-radius: 6px;
+        border-radius: 2px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -214,28 +226,38 @@
     }
 
     .topic-icon-dropdown .select2-results__option .icon-info {
-        flex-grow: 1;
+        flex: 1;
+        min-width: 0;
+        background: transparent !important;
     }
 
     .topic-icon-dropdown .select2-results__option .icon-title {
         font-weight: 500;
-        margin-bottom: 2px;
-        padding: 4px;
+        color: #111827 !important;
+        background: transparent !important;
     }
 
     .topic-icon-dropdown .select2-results__option .icon-description {
         font-size: 0.75rem;
-        color: #6b7280;
+        color: #6b7280 !important;
+        background: transparent !important;
     }
 
-    .topic-icon-dropdown .select2-results__option[aria-selected="true"] {
-        background-color: #f3f4f6;
-        color: #111827; /* 确保选中项文字可读 */
+    .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted,
+    .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted.select2-results__option--selectable,
+    .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted[aria-selected],
+    .topic-icon-dropdown .select2-results__option--highlighted,
+    .topic-icon-dropdown .select2-results__option--highlighted:hover,
+    .topic-icon-dropdown .select2-results__option:hover {
+        background: rgba(22, 93, 255, 0.08) !important;
+        background-image: none !important;
+        color: #111827 !important;
     }
 
-    .topic-icon-dropdown .select2-results__option--highlighted[aria-selected] {
-        background-color: #f9fafb;
-        color: #111827; /* 修复高亮状态下白底白字问题 */
+    .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted .icon-title,
+    .topic-icon-dropdown .select2-results__option--highlighted .icon-title,
+    .topic-icon-dropdown .select2-results__option:hover .icon-title {
+        color: #111827 !important;
     }
 
     /* 选中项的样式 */
@@ -255,7 +277,7 @@
     .topic-icon-select+.select2 .icon-preview {
         width: 24px;
         height: 24px;
-        border-radius: 4px;
+        border-radius: 2px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -263,8 +285,8 @@
 
     /* 图标颜色定义 */
     .icon-color-blue {
-        background-color: #EBF5FF;
-        color: #2563EB;
+        background-color: rgba(22, 93, 255, 0.08);
+        color: #165DFF;
     }
 
     .icon-color-green {
@@ -321,21 +343,21 @@
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        background: var(--efak-primary, #165DFF);
         color: white;
         border: none;
         padding: 10px 20px;
-        border-radius: 6px;
+        border-radius: 2px;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: background 0.15s ease;
     }
 
     .btn-primary:hover {
-        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        background: var(--efak-primary-hover, #0E4AE6);
+        transform: none;
+        box-shadow: none;
     }
 
     .btn-secondary {
@@ -343,7 +365,7 @@
         color: #374151;
         border: 1px solid #d1d5db;
         padding: 10px 20px;
-        border-radius: 6px;
+        border-radius: 2px;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
@@ -384,7 +406,7 @@
     }
 
     .tab-btn:hover {
-        color: #374151;
+        color: #165DFF;
     }
 
     .tab-content {
@@ -446,7 +468,7 @@
         bottom: 0;
         background-color: #ccc;
         transition: .4s;
-        border-radius: 24px;
+        border-radius: 9999px;
     }
 
     .slider:before {
@@ -462,7 +484,7 @@
     }
 
     input:checked + .slider {
-        background-color: #3b82f6;
+        background-color: #165DFF;
     }
 
     input:checked + .slider:before {
@@ -479,7 +501,7 @@
         color: white;
         border: none;
         padding: 12px 24px;
-        border-radius: 8px;
+        border-radius: 2px;
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
@@ -511,7 +533,7 @@
 
     .delete-confirm-container {
         background: white;
-        border-radius: 12px;
+        border-radius: 2px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         max-width: 420px;
         width: 90%;
@@ -577,7 +599,7 @@
         line-height: 1.4;
         background: #F9FAFB;
         padding: 12px;
-        border-radius: 6px;
+        border-radius: 2px;
         border-left: 3px solid #FBD38D;
     }
 
@@ -593,7 +615,7 @@
         color: #374151;
         border: 1px solid #D1D5DB;
         padding: 10px 20px;
-        border-radius: 8px;
+        border-radius: 2px;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
@@ -613,7 +635,7 @@
         color: white;
         border: 1px solid #DC2626;
         padding: 10px 20px;
-        border-radius: 8px;
+        border-radius: 2px;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
@@ -636,18 +658,19 @@
 
     /* Toast 通知样式 */
     .toast-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1050;
+        position: absolute;
+        inset: 0;
+        z-index: 50;
         display: flex;
-        flex-direction: column;
-        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        gap: 4px;
     }
 
     .toast {
         background: white;
-        border-radius: 8px;
+        border-radius: 2px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         padding: 16px;
         display: flex;
@@ -655,7 +678,7 @@
         gap: 12px;
         min-width: 300px;
         max-width: 400px;
-        animation: toastSlideIn 0.3s ease-out;
+        animation: none;
         border-left: 4px solid #10B981;
     }
 
@@ -668,7 +691,7 @@
     }
 
     .toast.info {
-        border-left-color: #3B82F6;
+        border-left-color: #165DFF;
     }
 
     .toast.slide-out {
@@ -676,27 +699,13 @@
     }
 
     @keyframes toastSlideIn {
-        from {
-            opacity: 0;
-            transform: translateX(100%);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 
     @keyframes toastSlideOut {
-        from {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        to {
-            opacity: 0;
-            transform: translateX(100%);
-        }
+        from { opacity: 1; }
+        to { opacity: 0; }
     }
 
     .toast-icon {
@@ -725,7 +734,7 @@
     }
 
     .toast.info .toast-icon i {
-        color: #3B82F6;
+        color: #165DFF;
     }
 
     .toast-content {
@@ -751,7 +760,7 @@
         color: #9CA3AF;
         cursor: pointer;
         padding: 4px;
-        border-radius: 4px;
+        border-radius: 2px;
         display: flex;
         align-items: center;
         justify-content: center;

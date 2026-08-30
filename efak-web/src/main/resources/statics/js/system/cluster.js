@@ -157,6 +157,7 @@ window.ClusterModule = {
         row.innerHTML = `
             <td>${node.nodeId || '-'}</td>
             <td>${node.ipAddress || '-'}</td>
+            <td>${node.role || '-'}</td>
             <td>${node.pid || '-'}</td>
             <td>
                 <span class="distributed-status ${statusClass}">
@@ -1077,7 +1078,7 @@ window.ClusterModule = {
         if (memoryUsageChangeElement) {
             const memoryUsage = stats.avgMemoryUsage || 0;
             memoryUsageChangeElement.innerHTML = `
-                <i class="fa fa-hdd-o"></i>
+                <i class="fa fa-hdd"></i>
                 ${memoryUsage < 70 ? '正常' : memoryUsage < 85 ? '偏高' : '过高'}
             `;
             memoryUsageChangeElement.className = memoryUsage < 70 ? 'metric-change positive' : memoryUsage < 85 ? 'metric-change warning' : 'metric-change negative';
@@ -1468,52 +1469,9 @@ window.ClusterModule = {
         }
     },
     showToast(message, type = 'info') {
-        // 移除已存在的toast
-        const existingToast = document.querySelector('.cluster-toast');
-        if (existingToast) {
-            existingToast.remove();
+        if (window.efakShowToast) {
+            window.efakShowToast(message, type);
         }
-
-        const toast = document.createElement('div');
-        const icons = {
-            'success': 'fa-check-circle',
-            'error': 'fa-exclamation-circle',
-            'warning': 'fa-exclamation-triangle',
-            'info': 'fa-info-circle'
-        };
-
-        toast.className = `cluster-toast fixed top-4 right-4 z-[9999] px-6 py-3 rounded-lg text-white transform transition-all duration-300 shadow-lg flex items-center gap-2 ${type === 'success' ? 'bg-green-500' :
-            type === 'error' ? 'bg-red-500' :
-                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-            }`;
-
-        toast.innerHTML = `
-            <i class="fa ${icons[type] || 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        `;
-
-        // 初始状态：从右侧滑入
-        toast.style.transform = 'translateX(100%)';
-        toast.style.opacity = '0';
-
-        document.body.appendChild(toast);
-
-        // 显示动画
-        setTimeout(() => {
-            toast.style.transform = 'translateX(0)';
-            toast.style.opacity = '1';
-        }, 10);
-
-        // 自动隐藏
-        setTimeout(() => {
-            toast.style.transform = 'translateX(100%)';
-            toast.style.opacity = '0';
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 300);
-        }, 3000);
     },
 
     // 初始化配置区域状态
@@ -1931,8 +1889,8 @@ window.ClusterModule = {
 
         // 使用蓝色主题的渐变色系
         const blueColors = [
-            '#1e40af', '#2563eb', '#3b82f6', '#60a5fa',
-            '#93c5fd', '#1e3a8a', '#1d4ed8', '#2563eb'
+            '#0E4AE6', '#0E4AE6', '#165DFF', '#165DFF',
+            'rgba(22, 93, 255, 0.35)', '#1e3a8a', '#0E4AE6', '#0E4AE6'
         ];
 
         datasets.forEach((dataset, index) => {
@@ -1962,8 +1920,8 @@ window.ClusterModule = {
 
         // 使用蓝色主题的渐变色系
         const blueColors = [
-            '#1e40af', '#2563eb', '#3b82f6', '#60a5fa',
-            '#93c5fd', '#1e3a8a', '#1d4ed8', '#2563eb'
+            '#0E4AE6', '#0E4AE6', '#165DFF', '#165DFF',
+            'rgba(22, 93, 255, 0.35)', '#1e3a8a', '#0E4AE6', '#0E4AE6'
         ];
 
         datasets.forEach((dataset, index) => {

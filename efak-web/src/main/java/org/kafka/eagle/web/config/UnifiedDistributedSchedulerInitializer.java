@@ -22,10 +22,17 @@ public class UnifiedDistributedSchedulerInitializer implements CommandLineRunner
     @Autowired
     private UnifiedDistributedScheduler unifiedScheduler;
 
+    @Autowired
+    private EfakRuntimeProperties runtimeProperties;
+
     @Override
     public void run(String... args) throws Exception {
         try {
-            // 启动统一分布式任务调度器
+            if (!runtimeProperties.isWorker()) {
+                log.info("Process role={} skips collector scheduler startup",
+                        runtimeProperties.normalizedRole());
+                return;
+            }
             startUnifiedDistributedScheduler();
         } catch (Exception e) {
             log.error("统一分布式任务调度系统初始化失败", e);

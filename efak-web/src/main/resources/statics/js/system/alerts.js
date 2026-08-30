@@ -699,7 +699,7 @@ class AlertManager {
                     <p class="text-gray-600 text-sm">管理不同的告警渠道，配置后可在告警时及时通知相关人员。</p>
                 </div>
                 
-                <div style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+                <div style="background: white; border-radius: 2px; border: 1px solid #e2e8f0; overflow: hidden;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
@@ -726,7 +726,7 @@ class AlertManager {
                                     <td style="padding: 12px 16px; color: #1f2937; font-weight: 500;">${channel.name}</td>
                                     <td style="padding: 12px 16px;">
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <img src="${channelInfo?.icon}" alt="${channelInfo?.name}" style="width: 20px; height: 20px; border-radius: 4px;">
+                                            <img src="${channelInfo?.icon}" alt="${channelInfo?.name}" style="width: 20px; height: 20px; border-radius: 2px;">
                                             <span style="color: #374151;">${channelInfo?.name}</span>
                                         </div>
                                     </td>
@@ -757,7 +757,7 @@ class AlertManager {
                 </table>
             </div>
             
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 2px;">
                 <div style="color: #6b7280; font-size: 0.875rem;">
                     共 ${channels.length} 条渠道
                 </div>
@@ -798,7 +798,7 @@ class AlertManager {
                     </label>
                     <input type="text" id="channel-name" 
                            placeholder="请输入渠道名称，如：生产环境钉钉群"
-                           style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem;">
+                           style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; font-size: 0.875rem;">
                 </div>
                 
                 <div>
@@ -821,7 +821,7 @@ class AlertManager {
                     </label>
                     <input type="text" id="channel-api" 
                            placeholder="请先选择渠道类型"
-                           style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem;">
+                           style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; font-size: 0.875rem;">
                 </div>
                 
                 <div>
@@ -868,7 +868,7 @@ class AlertManager {
         if (typeInfo) {
             return $(`
                 <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0;">
-                    <div style="width: 24px; height: 24px; border-radius: 4px; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+                    <div style="width: 24px; height: 24px; border-radius: 2px; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-bell" style="color: #6b7280; font-size: 12px;"></i>
                     </div>
                     <span>${typeInfo.name}</span>
@@ -892,7 +892,7 @@ class AlertManager {
             if (channelInfo) {
                 return $(`
                     <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0;">
-                        <img src="${channelInfo.icon}" alt="${channelInfo.name}" style="width: 24px; height: 24px; border-radius: 4px;">
+                        <img src="${channelInfo.icon}" alt="${channelInfo.name}" style="width: 24px; height: 24px; border-radius: 2px;">
                         <span>${option.text}</span>
                     </div>
                 `);
@@ -904,7 +904,7 @@ class AlertManager {
         if (channelInfo) {
             return $(`
                 <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0;">
-                    <img src="${channelInfo.icon}" alt="${channelInfo.name}" style="width: 24px; height: 24px; border-radius: 4px;">
+                    <img src="${channelInfo.icon}" alt="${channelInfo.name}" style="width: 24px; height: 24px; border-radius: 2px;">
                     <span>${channelInfo.name}</span>
                 </div>
             `);
@@ -1000,7 +1000,7 @@ class AlertManager {
                         </div>
                         <div class="alert-meta-value">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <img src="${channelInfo?.icon}" alt="${channelInfo?.name}" style="width: 24px; height: 24px; border-radius: 4px;">
+                                <img src="${channelInfo?.icon}" alt="${channelInfo?.name}" style="width: 24px; height: 24px; border-radius: 2px;">
                                 <span>${channelInfo?.name}</span>
                             </div>
                         </div>
@@ -1088,7 +1088,7 @@ class AlertManager {
                             渠道名称
                         </label>
                         <input type="text" value="${channel.name}" disabled
-                               style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem; background: #f3f4f6; color: #6b7280;">
+                               style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; font-size: 0.875rem; background: #f3f4f6; color: #6b7280;">
                         <small style="color: #6b7280; font-size: 0.75rem;">渠道名称不可修改</small>
                     </div>
                     
@@ -1096,8 +1096,8 @@ class AlertManager {
                         <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">
                             渠道类型
                         </label>
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; background: #f3f4f6;">
-                            <img src="${this.channelList.find(c => c.key === channel.type)?.icon}" alt="${this.channelList.find(c => c.key === channel.type)?.name}" style="width: 20px; height: 20px; border-radius: 4px;">
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; background: #f3f4f6;">
+                            <img src="${this.channelList.find(c => c.key === channel.type)?.icon}" alt="${this.channelList.find(c => c.key === channel.type)?.name}" style="width: 20px; height: 20px; border-radius: 2px;">
                             <span style="color: #6b7280;">${this.channelList.find(c => c.key === channel.type)?.name}</span>
                         </div>
                         <small style="color: #6b7280; font-size: 0.75rem;">渠道类型不可修改</small>
@@ -1110,7 +1110,7 @@ class AlertManager {
                         <input type="text" id="edit-channel-api" 
                                value="${channel.apiUrl}"
                                placeholder="请输入API地址"
-                               style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem;">
+                               style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; font-size: 0.875rem;">
                     </div>
                     
                     <div>
@@ -1157,9 +1157,9 @@ class AlertManager {
                     <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 16px;">
                         您即将删除渠道 <strong style="color: #1f2937;">"${channel.name}"</strong>
                     </p>
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 2px; padding: 16px; margin-bottom: 16px;">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                            <img src="${this.channelList.find(c => c.key === channel.type)?.icon}" alt="${this.channelList.find(c => c.key === channel.type)?.name}" style="width: 20px; height: 20px; border-radius: 4px;">
+                            <img src="${this.channelList.find(c => c.key === channel.type)?.icon}" alt="${this.channelList.find(c => c.key === channel.type)?.name}" style="width: 20px; height: 20px; border-radius: 2px;">
                             <span style="font-weight: 500; color: #374151;">${this.channelList.find(c => c.key === channel.type)?.name}</span>
                         </div>
                         <div style="font-size: 0.875rem; color: #6b7280; text-align: left;">
@@ -1366,7 +1366,7 @@ class AlertManager {
                     <p class="text-gray-600 text-sm">配置不同类型的告警监控规则和阈值，当监控指标超过设定阈值时将触发告警。</p>
                 </div>
                 
-                <div style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+                <div style="background: white; border-radius: 2px; border: 1px solid #e2e8f0; overflow: hidden;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
@@ -1435,7 +1435,7 @@ class AlertManager {
                 </table>
             </div>
             
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 2px;">
                 <div style="color: #6b7280; font-size: 0.875rem;">
                     共 ${this.alertTypeConfigTotal} 条配置
                 </div>
@@ -1552,7 +1552,7 @@ class AlertManager {
                         监控目标 <span style="color: #ef4444;">*</span>
                     </label>
                     <div id="target-select-container">
-                        <!-- 动态生成目标选择器 -->
+                        <!-- Target selector -->
                     </div>
                 </div>
                 
@@ -1563,7 +1563,7 @@ class AlertManager {
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <input type="number" id="alert-threshold" 
                                placeholder="请输入阈值"
-                               style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem;">
+                               style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; font-size: 0.875rem;">
                         <select id="alert-unit" class="filter-input select2-filter" style="width: 120px;">
                             <option value="%">内存可用率(%)</option>
                             <option value="条">条数</option>
@@ -1582,7 +1582,7 @@ class AlertManager {
                     </div>
                     <select id="alert-channels" class="filter-input select2-filter" style="width: 100%;">
                         <option value="">请选择告警渠道</option>
-                        <!-- 动态加载渠道列表 -->
+                        <!-- Channel list -->
                     </select>
                 </div>
                 
@@ -2146,7 +2146,7 @@ class AlertManager {
                         <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">
                             告警类型
                         </label>
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; background: #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; background: #f3f4f6;">
                             <i class="fa fa-bell" style="color: #6b7280;"></i>
                             <span style="color: #6b7280;">${typeInfo?.name || config.type}</span>
                         </div>
@@ -2161,7 +2161,7 @@ class AlertManager {
                             <input type="number" id="edit-alert-threshold" 
                                    value="${config.threshold}"
                                    placeholder="请输入阈值"
-                                   style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem;">
+                                   style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; font-size: 0.875rem;">
                             <select id="edit-alert-unit" class="filter-input select2-filter" style="width: 120px;">
                                 <option value="%" ${config.unit === '%' ? 'selected' : ''}>内存可用率(%)</option>
                                 <option value="条" ${config.unit === '条' ? 'selected' : ''}>条数</option>
@@ -2180,7 +2180,7 @@ class AlertManager {
                             <small style="color: #6b7280; font-size: 0.75rem;">选择告警触发时通知的渠道</small>
                         </div>
                         <select id="edit-alert-channels" class="filter-input select2-filter" style="width: 100%;">
-                            <!-- 动态加载渠道列表 -->
+                            <!-- Channel list -->
                         </select>
                     </div>
                     
@@ -2301,7 +2301,7 @@ class AlertManager {
                     <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 16px;">
                         您即将删除告警类型配置 <strong style="color: #1f2937;">"${typeInfo?.name || config.type}"</strong>
                     </p>
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 2px; padding: 16px; margin-bottom: 16px;">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                             <i class="fa fa-chart-line" style="color: #6b7280;"></i>
                             <span style="font-weight: 500; color: #374151;">告警阈值: ${config.threshold} ${config.unit}</span>
@@ -2472,29 +2472,9 @@ class AlertManager {
      * 显示提示消息
      */
     showToast(message, type = 'info') {
-        // 移除现有的toast
-        const existingToast = document.querySelector('.toast');
-        if (existingToast) {
-            existingToast.remove();
+        if (window.efakShowToast) {
+            window.efakShowToast(message, type);
         }
-
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-            <i class="fa fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}"></i>
-            ${message}
-        `;
-
-        document.body.appendChild(toast);
-
-        // 显示动画
-        setTimeout(() => toast.classList.add('show'), 100);
-
-        // 自动隐藏
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
     }
 }
 
@@ -2691,27 +2671,14 @@ document.addEventListener('DOMContentLoaded', () => {
 const style = document.createElement('style');
 style.textContent = `
     .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1100;
-        padding: 12px 20px;
-        border-radius: 8px;
+        border-radius: 2px;
         color: white;
         font-weight: 500;
         display: flex;
         align-items: center;
         gap: 8px;
-        transform: translateX(100%);
-        opacity: 0;
-        transition: all 0.3s ease;
         min-width: 200px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .toast.show {
-        transform: translateX(0);
-        opacity: 1;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
     }
 
     .toast.success {
@@ -2723,7 +2690,7 @@ style.textContent = `
     }
 
     .toast.info {
-        background: #3b82f6;
+        background: #165DFF;
     }
 `;
 document.head.appendChild(style); 

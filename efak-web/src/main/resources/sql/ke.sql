@@ -40,7 +40,7 @@ CREATE TABLE `ke_alert_type_configs` (
   KEY `idx_enabled` (`enabled`),
   KEY `idx_cluster_id` (`cluster_id`),
   KEY `idx_cluster_type` (`cluster_id`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='告警类型配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='告警类型配置表'
 
 -- 创建告警任务表
 CREATE TABLE `ke_alerts` (
@@ -58,7 +58,7 @@ CREATE TABLE `ke_alerts` (
   KEY `idx_alert_task_cluster` (`alert_task_id`,`cluster_id`),
   KEY `idx_status` (`status`),
   KEY `idx_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='告警信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='告警信息表'
 
 -- 创建Broker信息表
 CREATE TABLE `ke_broker_info` (
@@ -77,13 +77,11 @@ CREATE TABLE `ke_broker_info` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_cluster_broker_host_port` (`cluster_id`,`broker_id`,`host_ip`,`port`),
+  UNIQUE KEY `uk_broker_host_port` (`broker_id`,`host_ip`,`port`),
   KEY `idx_status` (`status`),
   KEY `idx_host_ip` (`host_ip`),
-  KEY `idx_created_at` (`created_at`),
-  KEY `idx_cluster_id` (`cluster_id`),
-  KEY `idx_cluster_broker_id` (`cluster_id`,`broker_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Kafka Broker信息表';
+  KEY `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Kafka Broker信息表'
 
 -- 创建Broker性能指标历史数据表
 CREATE TABLE `ke_broker_metrics` (
@@ -96,13 +94,14 @@ CREATE TABLE `ke_broker_metrics` (
   `collect_time` datetime NOT NULL COMMENT '采集时间',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `cluster_id` varchar(255) DEFAULT NULL,
+  `collect_round` varchar(128) DEFAULT NULL COMMENT '采集轮次',
   PRIMARY KEY (`id`),
   KEY `idx_broker_id` (`broker_id`),
   KEY `idx_collect_time` (`collect_time`),
   KEY `idx_broker_collect_time` (`broker_id`,`collect_time`),
   KEY `idx_host_port` (`host_ip`,`port`),
   KEY `idx_cluster_id` (`cluster_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Broker性能指标历史数据表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Broker性能指标历史数据表'
 
 -- AI对话消息表
 CREATE TABLE `ke_chat_message` (
@@ -124,7 +123,7 @@ CREATE TABLE `ke_chat_message` (
   KEY `idx_sender` (`sender`),
   KEY `idx_create_time` (`create_time`),
   KEY `idx_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI对话消息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI对话消息表'
 
 --  AI对话会话表
 CREATE TABLE `ke_chat_session` (
@@ -142,7 +141,7 @@ CREATE TABLE `ke_chat_session` (
   KEY `idx_username` (`username`),
   KEY `idx_create_time` (`create_time`),
   KEY `idx_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI对话会话表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI对话会话表'
 
 -- 集群信息表
 CREATE TABLE `ke_cluster` (
@@ -160,7 +159,7 @@ CREATE TABLE `ke_cluster` (
   `updated_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `cluster_id` (`cluster_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='集群信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='集群信息表'
 
 -- 消费者组主题信息表
 CREATE TABLE `ke_consumer_group_topic` (
@@ -187,7 +186,7 @@ CREATE TABLE `ke_consumer_group_topic` (
   KEY `idx_date_time_covering` (`collect_date`,`collect_time`,`cluster_id`,`group_id`),
   KEY `idx_lags_analysis` (`cluster_id`,`lags`,`collect_date`),
   KEY `idx_state_analysis` (`state`,`cluster_id`,`collect_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='消费者组主题延迟数据采集表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='消费者组主题延迟数据采集表'
 
 -- 大模型配置表
 CREATE TABLE `ke_model_config` (
@@ -196,7 +195,7 @@ CREATE TABLE `ke_model_config` (
   `api_type` varchar(50) NOT NULL COMMENT 'API类型',
   `endpoint` varchar(500) NOT NULL COMMENT '接口地址',
   `api_key` varchar(500) DEFAULT NULL COMMENT 'API密钥',
-  `system_prompt` text COMMENT '系统提示词',
+  `system_prompt` text DEFAULT NULL COMMENT '系统提示词',
   `timeout` int DEFAULT '30' COMMENT '超时时间(秒)',
   `description` text COMMENT '描述信息',
   `enabled` tinyint(1) DEFAULT '1' COMMENT '是否启用(0:禁用,1:启用)',
@@ -211,7 +210,7 @@ CREATE TABLE `ke_model_config` (
   KEY `idx_enabled` (`enabled`),
   KEY `idx_status` (`status`),
   KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='大模型配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='大模型配置表'
 
 -- 性能监控表
 CREATE TABLE `ke_performance_monitor` (
@@ -232,7 +231,7 @@ CREATE TABLE `ke_performance_monitor` (
   KEY `idx_cluster_time` (`cluster_id`,`collect_time`),
   KEY `idx_cluster_collect_time_desc` (`cluster_id`,`collect_time` DESC),
   KEY `idx_cluster_host_time` (`cluster_id`,`collect_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='性能监控表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='性能监控表'
 
 -- 任务执行历史表
 CREATE TABLE `ke_task_execution_history` (
@@ -258,7 +257,7 @@ CREATE TABLE `ke_task_execution_history` (
   KEY `idx_execution_status` (`execution_status`),
   KEY `idx_start_time` (`start_time`),
   KEY `idx_task_type` (`task_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='任务执行历史表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='任务执行历史表'
 
 -- 任务调度表
 CREATE TABLE `ke_task_scheduler` (
@@ -289,7 +288,7 @@ CREATE TABLE `ke_task_scheduler` (
   KEY `idx_status` (`status`),
   KEY `idx_cluster_name` (`cluster_name`),
   KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='任务调度表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='任务调度表'
 
 -- Topic信息表
 CREATE TABLE `ke_topic_info` (
@@ -311,7 +310,7 @@ CREATE TABLE `ke_topic_info` (
   UNIQUE KEY `uk_cid_topic` (`cluster_id`,`topic_name`),
   KEY `idx_create_time` (`create_time`),
   KEY `idx_update_time` (`update_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Topic信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Topic信息表'
 
 -- Topic实例指标表
 CREATE TABLE `ke_topic_instant_metrics` (
@@ -322,6 +321,7 @@ CREATE TABLE `ke_topic_instant_metrics` (
   `metric_value` varchar(32) NOT NULL DEFAULT '0' COMMENT '指标数值',
   `last_updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后更新时间',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `collect_round` varchar(128) DEFAULT NULL COMMENT '采集轮次',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique_cluster_topic_metric` (`cluster_id`,`topic_name`,`metric_type`) USING BTREE,
   KEY `idx_cluster_id` (`cluster_id`),
@@ -330,7 +330,7 @@ CREATE TABLE `ke_topic_instant_metrics` (
   KEY `idx_last_updated` (`last_updated`),
   KEY `idx_cluster_metric_type` (`cluster_id`,`metric_type`),
   KEY `idx_cluster_topic_updated` (`cluster_id`,`topic_name`,`last_updated` DESC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Topic当前实时指标表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Topic当前实时指标表'
 
 -- Topic历史指标表
 CREATE TABLE `ke_topics_metrics` (
@@ -345,11 +345,12 @@ CREATE TABLE `ke_topics_metrics` (
   `collect_time` datetime NOT NULL COMMENT '采集时间',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `cluster_id` varchar(255) DEFAULT NULL,
+  `collect_round` varchar(128) DEFAULT NULL COMMENT '采集轮次',
   PRIMARY KEY (`id`),
   KEY `idx_create_time` (`create_time`),
   KEY `idx_collect_time_desc` (`collect_time` DESC),
   KEY `idx_cid_topic_time_desc` (`cluster_id`,`topic_name`,`collect_time` DESC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Topic指标采集明细表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Topic指标采集明细表'
 
 -- 用户信息表
 CREATE TABLE `ke_users_info` (
@@ -362,7 +363,7 @@ CREATE TABLE `ke_users_info` (
   `modify_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户信息表'
 
 -- 登录信息表
 CREATE TABLE `persistent_logins` (
@@ -409,4 +410,21 @@ INSERT INTO `ke_task_scheduler` (
  'disabled', NULL, NULL, 0, 0, 0, '执行成功',
  NULL, 'admin', NOW(), NULL, NOW(), NULL, 300, NULL, 'cluster-1')
 ON DUPLICATE KEY UPDATE status = VALUES(status);
+
+CREATE TABLE IF NOT EXISTS `ke_collect_round` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `round_id` varchar(128) NOT NULL,
+  `task_type` varchar(64) NOT NULL,
+  `node_id` varchar(128) NOT NULL,
+  `cluster_id` varchar(64) DEFAULT NULL,
+  `assigned_count` int NOT NULL DEFAULT 0,
+  `success_count` int NOT NULL DEFAULT 0,
+  `skipped_count` int NOT NULL DEFAULT 0,
+  `error_message` varchar(1024) DEFAULT NULL,
+  `started_at` datetime NOT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_round_id` (`round_id`),
+  KEY `idx_task_started` (`task_type`, `started_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Collector round ledger';
 

@@ -25,7 +25,7 @@ public class ModelConfig {
     private String modelName;
 
     /**
-     * API类型 (OpenAI, Ollama, DeepSeek等)
+     * 厂商类型 (OpenAI, Anthropic, DeepSeek, Kimi, Qwen, Doubao, GLM, Ollama 等)
      */
     private String apiType;
 

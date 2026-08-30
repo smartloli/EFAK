@@ -49,21 +49,21 @@ public class KafkaEagleVersion {
 
                 System.out.println("Welcome to");
                 System.out.println(asciiArt + "( Eagle For Apache Kafka® )\n");
-                System.out.println("Version " + appVersion + " -- Copyright 2016-2025");
+                System.out.println("Version " + appVersion + " -- Copyright 2026");
 
                 fontStream.close();
             } else {
                 // 如果无法加载字体，使用简单文本输出
                 System.out.println("Welcome to");
                 System.out.println("EFAK · AI ( Eagle For Apache Kafka® )\n");
-                System.out.println("Version " + appVersion + " -- Copyright 2016-2025");
+                System.out.println("Version " + appVersion + " -- Copyright 2025");
             }
         } catch (Exception e) {
             log.error("获取 Kafka Eagle 版本信息失败", e);
             // 失败时也显示基本信息
             try {
                 System.out.println("Welcome to EFAK · AI ( Eagle For Apache Kafka® )");
-                System.out.println("Version " + KeConst.APP_VERSION.getValue() + " -- Copyright 2016-2025");
+                System.out.println("Version " + KeConst.APP_VERSION.getValue() + " -- Copyright 2025");
             } catch (Exception ex) {
                 log.error("无法显示版本信息", ex);
             }

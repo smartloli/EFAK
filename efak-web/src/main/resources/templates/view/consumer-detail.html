@@ -44,7 +44,7 @@
 
         .stat-card {
             background: white;
-            border-radius: 1.25rem;
+            border-radius: 2px;
             padding: 1.5rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(229, 231, 235, 0.6);
@@ -64,7 +64,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #165DFF, #36CFC9);
+            background: #165DFF;
         }
 
         .stat-card:hover {
@@ -96,7 +96,7 @@
         .stat-icon {
             width: 2.5rem;
             height: 2.5rem;
-            border-radius: 0.75rem;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -127,7 +127,7 @@
 
         .content-section {
             background: white;
-            border-radius: 1.25rem;
+            border-radius: 2px;
             padding: 2rem;
             margin-bottom: 2rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -155,8 +155,8 @@
         .section-icon {
             width: 2rem;
             height: 2rem;
-            border-radius: 0.5rem;
-            background: linear-gradient(135deg, #165DFF, #4F8AFF);
+            border-radius: 2px;
+            background: #165DFF;
             color: white;
             display: flex;
             align-items: center;
@@ -183,10 +183,10 @@
         }
 
         .refresh-btn {
-            background: linear-gradient(135deg, #165DFF, #4F8AFF);
+            background: #165DFF;
             color: white;
             border: none;
-            border-radius: 0.75rem;
+            border-radius: 2px;
             padding: 0.75rem 1.5rem;
             font-weight: 500;
             cursor: pointer;
@@ -210,7 +210,7 @@
         .select2-container--default .select2-selection--single {
             height: 38px;
             border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
+            border-radius: 2px;
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
 
@@ -250,7 +250,7 @@
 
         .select2-dropdown {
             border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
+            border-radius: 2px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             z-index: 9999;
         }
@@ -360,12 +360,13 @@
             <!-- 页面内容 -->
             <main class="flex-1 overflow-y-auto p-6 scrollbar-hide pt-20">
                 <!-- 页面标题 -->
-                <div class="flex items-center justify-between mb-6">
+                <div class="page-header flex items-center justify-between">
                     <div>
-                        <div class="flex items-center gap-6 mt-2 text-sm text-gray-600">
-                            <span>集群: <span id="clusterName" class="font-medium">-</span></span>
-                            <span>消费者组: <span id="consumerGroupName" class="font-medium">-</span></span>
-                            <span>主题名称: <span id="topicName" class="font-medium">-</span></span>
+                        <h1 class="page-header-title">消费组</h1>
+                        <div class="flex items-center gap-6 mt-2 text-sm page-header-meta">
+                            <span>集群 <span id="clusterName" class="font-medium">-</span></span>
+                            <span>组 <span id="consumerGroupName" class="font-medium">-</span></span>
+                            <span>Topic <span id="topicName" class="font-medium">-</span></span>
                         </div>
                     </div>
                     <button class="refresh-btn" onclick="refreshConsumerData()">

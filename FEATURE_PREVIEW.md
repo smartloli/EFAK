@@ -19,7 +19,7 @@
   - [告警管理](#9-告警管理-alert)
   - [任务调度](#10-任务调度-task)
   - [用户管理](#11-用户管理-users)
-  - [多集群管理](#12-多集群管理-manager)
+  - [系统管理](#12-系统管理-manager)
 
 ---
 
@@ -29,7 +29,7 @@
 
 EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式：
 
-![快速启动菜单](../imgs/quick-start-bash-1.jpg)
+![快速启动菜单](efak-web/src/main/resources/imgs/quick-start-bash-1.jpg)
 
 **功能选项：**
 - **选项 1**: Docker Compose 部署（推荐）
@@ -42,7 +42,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 2. 部署成功示例
 
-![部署成功](../imgs/quick-start-bash-2.jpg)
+![部署成功](efak-web/src/main/resources/imgs/quick-start-bash-2.jpg)
 
 部署成功后，您可以：
 - 访问应用: `http://localhost:8080`
@@ -56,7 +56,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 1. 仪表盘 (Dashboard)
 
-![仪表盘](../imgs/dashboard.jpg)
+![仪表盘](efak-web/src/main/resources/imgs/dashboard.jpg)
 
 **功能特性：**
 - 实时监控: Kafka 集群整体运行状态
@@ -76,7 +76,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 2. 集群管理 (Cluster)
 
-![集群管理](../imgs/cluster.jpg)
+![集群管理](efak-web/src/main/resources/imgs/cluster.jpg)
 
 **功能特性：**
 - 多集群管理: 支持管理多个 Kafka 集群
@@ -96,7 +96,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 3. 主题管理 (Topics)
 
-![主题管理](../imgs/topics.jpg)
+![主题管理](efak-web/src/main/resources/imgs/topics.jpg)
 
 **功能特性：**
 - Topic 列表: 展示所有 Topic 及其关键信息
@@ -120,7 +120,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 4. 主题详情 (Topic Detail)
 
-![主题详情](../imgs/topic_detail.jpg)
+![主题详情](efak-web/src/main/resources/imgs/topic_detail.jpg)
 
 **功能特性：**
 - 分区详情: 每个分区的 Offset、Leader、Replicas
@@ -142,7 +142,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 5. 消费者监控 (Consumer)
 
-![消费者监控](../imgs/consumer.jpg)
+![消费者监控](efak-web/src/main/resources/imgs/consumer.jpg)
 
 **功能特性：**
 - 消费者组列表: 所有活跃的消费者组
@@ -165,7 +165,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 6. AI 智能对话 (AI Chat)
 
-![AI 智能对话](../imgs/ai-chat.jpg)
+![AI 智能对话](efak-web/src/main/resources/imgs/ai-chat.jpg)
 
 **功能特性：**
 - 智能助手: 基于大语言模型的 Kafka 运维助手
@@ -194,7 +194,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 7. 模型配置 (Model)
 
-![模型配置](../imgs/model.jpg)
+![模型配置](efak-web/src/main/resources/imgs/model.jpg)
 
 **功能特性：**
 - 模型管理: 配置和切换 AI 大语言模型
@@ -223,7 +223,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 8. 性能监控 (Performance)
 
-![性能监控](../imgs/performance.jpg)
+![性能监控](efak-web/src/main/resources/imgs/performance.jpg)
 
 **功能特性：**
 - 实时监控: Broker、Topic、Consumer 性能指标
@@ -256,7 +256,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 9. 告警管理 (Alert)
 
-![告警管理](../imgs/alert.jpg)
+![告警管理](efak-web/src/main/resources/imgs/alert.jpg)
 
 **功能特性：**
 - 告警规则: 自定义告警规则和阈值
@@ -292,7 +292,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 10. 任务调度 (Task)
 
-![任务调度](../imgs/task.jpg)
+![任务调度](efak-web/src/main/resources/imgs/task.jpg)
 
 **功能特性：**
 - 定时任务: 创建和管理定时任务
@@ -334,7 +334,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 11. 用户管理 (Users)
 
-![用户管理](../imgs/users.jpg)
+![用户管理](efak-web/src/main/resources/imgs/users.jpg)
 
 **功能特性：**
 - 用户管理: 创建、编辑、删除用户
@@ -373,7 +373,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ### 12. 多集群管理 (Manager)
 
-![多集群管理](../imgs/manager.jpg)
+![多集群管理](efak-web/src/main/resources/imgs/manager.jpg)
 
 **功能特性：**
 - 多集群统一管理: 在一个平台管理多个 Kafka 集群
@@ -443,16 +443,17 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ## 相关文档
 
-- [快速开始](../../../../../README.md)
+- [快速开始](README.md)
 - [部署指南](DEPLOY.md)
 
 ---
 
 ## 链接
 
-- **GitHub**: [https://github.com/smartloli/EFAK](https://github.com/smartloli/EFAK)
+- **GitHub**: [https://github.com/smartloli/EFAK-AI](https://github.com/smartloli/EFAK-AI)
 - **官方网站**: [https://www.kafka-eagle.org](https://www.kafka-eagle.org)
-- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK/issues)
+- **文档**: [https://docs.kafka-eagle.org](https://docs.kafka-eagle.org)
+- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK-AI/issues)
 
 ---
 
@@ -465,4 +466,4 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 ---
 
-**© 2025 EFAK-AI. All Rights Reserved.**
+**© 2026 EFAK-AI. All Rights Reserved.**

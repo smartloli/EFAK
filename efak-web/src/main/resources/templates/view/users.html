@@ -19,7 +19,7 @@
         .user-card {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 2px;
             padding: 24px;
             transition: all 0.3s ease;
             height: 100%;
@@ -32,7 +32,7 @@
 
         .user-table-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
@@ -80,7 +80,7 @@
             align-items: center;
             gap: 6px;
             padding: 4px 12px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
         }
@@ -100,7 +100,7 @@
             align-items: center;
             gap: 6px;
             padding: 6px 12px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
         }
@@ -112,7 +112,7 @@
 
         .user-role.user {
             background: #dbeafe;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         .user-actions {
@@ -122,7 +122,7 @@
 
         .user-btn {
             padding: 6px 12px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
             border: none;
@@ -131,7 +131,7 @@
         }
 
         .user-btn.edit {
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
         }
 
@@ -155,7 +155,7 @@
         .stat-card {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
+            border-radius: 2px;
             padding: 24px;
             text-align: center;
             transition: all 0.3s ease;
@@ -243,7 +243,7 @@
             border: 1px solid #d1d5db;
             background: white;
             color: #374151;
-            border-radius: 6px;
+            border-radius: 2px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -259,20 +259,20 @@
         }
 
         #pagination button.bg-blue-500 {
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
-            border-color: #3b82f6;
+            border-color: #165DFF;
         }
 
         /* 确保page-btn的active状态不被覆盖 */
         #pagination .page-btn.active {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%) !important;
+            background: #165DFF !important;
             border-color: #165DFF !important;
             color: white !important;
         }
 
         #pagination .page-btn.active:hover {
-            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%) !important;
+            background: #0E4AE6 !important;
         }
 
         /* 弹窗中select2下拉框宽度适配 */
@@ -286,11 +286,11 @@
             max-width: none !important;
         }
 
-        /* 美化select2组件样式 */
+        /* Select2 */
         .select2-container--default .select2-selection--single {
             background-color: #ffffff;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             height: 48px !important;
             line-height: 48px !important;
             padding: 0 12px;
@@ -302,8 +302,8 @@
         }
 
         .select2-container--default.select2-container--focus .select2-selection--single {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
             outline: none;
         }
 
@@ -348,7 +348,7 @@
         /* 下拉选项样式 */
         .select2-dropdown {
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             background-color: #ffffff;
             margin-top: 4px;
@@ -367,13 +367,13 @@
         }
 
         .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #3b82f6;
+            background-color: #165DFF;
             color: #ffffff;
         }
 
         .select2-container--default .select2-results__option[aria-selected=true] {
             background-color: #dbeafe;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         /* 自定义角色选项样式 */
@@ -407,11 +407,11 @@
 
         /* 选中状态的图标颜色 */
         .select2-results__option[aria-selected=true] span i {
-            color: #1d4ed8 !important;
+            color: #0E4AE6 !important;
         }
 
         .select2-results__option[aria-selected=true] span div div:last-child {
-            color: #1d4ed8 !important;
+            color: #0E4AE6 !important;
         }
 
         /* 悬停状态的图标颜色 */
@@ -439,15 +439,15 @@
         /* 搜索框样式 */
         .select2-container--default .select2-search--dropdown .select2-search__field {
             border: 1px solid #d1d5db;
-            border-radius: 6px;
+            border-radius: 2px;
             padding: 8px 12px;
             font-size: 14px;
             outline: none;
         }
 
         .select2-container--default .select2-search--dropdown .select2-search__field:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         /* 角色选择框特殊样式 */
@@ -456,7 +456,7 @@
             line-height: 48px !important;
             padding: 0 12px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             background-color: #ffffff;
             transition: all 0.2s ease;
         }
@@ -466,8 +466,8 @@
         }
 
         .select2-user-role.select2-container--focus .select2-selection--single {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
             outline: none;
         }
 
@@ -506,7 +506,7 @@
             line-height: 48px !important;
             padding: 0 12px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             background-color: #ffffff;
             transition: all 0.2s ease;
             width: 100% !important;
@@ -517,8 +517,8 @@
         }
 
         .select2-user-status.select2-container--focus .select2-selection--single {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
             outline: none;
         }
 
@@ -579,7 +579,7 @@
             border: 1px solid #d1d5db;
             background: white;
             color: #6b7280;
-            border-radius: 8px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -612,7 +612,7 @@
             border: 1px solid #d1d5db;
             background: white;
             color: #374151;
-            border-radius: 8px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -629,13 +629,13 @@
         }
 
         .page-btn.active {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%) !important;
+            background: #165DFF !important;
             border-color: #165DFF !important;
             color: white !important;
         }
 
         .page-btn.active:hover {
-            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%) !important;
+            background: #0E4AE6 !important;
         }
 
         /* 确保分页容器在小屏幕上也能正常显示 */
@@ -676,20 +676,19 @@
     <!-- 页面内容 -->
     <div class="p-6">
         <!-- 页面标题 -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">用户管理</h1>
-            <p class="text-gray-600">管理系统用户、角色和权限</p>
+        <div class="page-header">
+            <h1 class="page-header-title">用户</h1>
         </div>
 
         <!-- 统计卡片 -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalUsers">5</div>
-                <div class="stat-label">总用户数</div>
+                <div class="stat-label">用户</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="activeUsers">3</div>
-                <div class="stat-label">活跃用户</div>
+                <div class="stat-label">活跃</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="adminUsers">1</div>
@@ -697,7 +696,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="newUsers">2</div>
-                <div class="stat-label">本月新增</div>
+                <div class="stat-label">新增</div>
             </div>
         </div>
 

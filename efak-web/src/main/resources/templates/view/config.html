@@ -27,7 +27,7 @@
         .config-card {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 2px;
             padding: 24px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -43,7 +43,7 @@
             right: 0;
             height: 4px;
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border-radius: 20px 20px 0 0;
+            border-radius: 2px 4px 0 0;
         }
 
         .config-card:hover {
@@ -69,7 +69,7 @@
         .config-icon {
             width: 48px;
             height: 48px;
-            border-radius: 12px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -152,7 +152,7 @@
             color: #374151;
             background: #f9fafb;
             padding: 8px 12px;
-            border-radius: 8px;
+            border-radius: 2px;
             min-width: 120px;
             justify-content: center;
         }
@@ -165,7 +165,7 @@
 
         .config-btn {
             padding: 6px 12px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
             border: none;
@@ -174,12 +174,12 @@
         }
 
         .config-btn.edit {
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
         }
 
         .config-btn.edit:hover {
-            background: #2563eb;
+            background: #0E4AE6;
         }
 
         .config-btn.reset {
@@ -211,7 +211,7 @@
 
         .config-form-content {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             padding: 32px;
             max-width: 500px;
             width: 90%;
@@ -248,17 +248,29 @@
 
         .form-input {
             width: 100%;
+            height: 44px;
+            box-sizing: border-box;
             padding: 12px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
+            line-height: 1.25;
             transition: border-color 0.2s ease;
+        }
+
+        textarea.form-input {
+            height: auto;
+        }
+
+        .api-key-input {
+            -webkit-text-security: disc;
+            text-security: disc;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         .form-actions {
@@ -270,7 +282,7 @@
 
         .form-btn {
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-weight: 500;
             border: none;
             cursor: pointer;
@@ -278,12 +290,12 @@
         }
 
         .form-btn.primary {
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
         }
 
         .form-btn.primary:hover {
-            background: #2563eb;
+            background: #0E4AE6;
         }
 
         .form-btn.secondary {
@@ -304,27 +316,13 @@
             background: #dc2626;
         }
 
-        /* Toast 消息样式 */
         .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1100;
-            padding: 12px 20px;
-            border-radius: 8px;
+            border-radius: 2px;
             color: white;
             font-weight: 500;
             display: flex;
             align-items: center;
             gap: 8px;
-            transform: translateX(100%);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
         }
 
         .toast.success {
@@ -336,7 +334,7 @@
         }
 
         .toast.loading {
-            background: #3b82f6;
+            background: #165DFF;
         }
 
         /* 响应式设计 */
@@ -368,7 +366,7 @@
         .select2-container--default .select2-selection--single {
             height: 48px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 14px;
         }
 
@@ -385,7 +383,7 @@
 
         .select2-dropdown {
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             z-index: 9999;
         }
@@ -407,13 +405,13 @@
         }
 
         .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #3b82f6;
+            background-color: #165DFF;
             color: white;
         }
 
         .select2-container--default .select2-search--dropdown .select2-search__field {
             border: 1px solid #d1d5db;
-            border-radius: 6px;
+            border-radius: 2px;
             padding: 8px 12px;
             margin: 8px;
             width: calc(100% - 16px);
@@ -422,12 +420,12 @@
 
         .select2-container--default .select2-results__option[aria-selected=true] {
             background-color: #eff6ff;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         .select2-container--default .select2-results__option[data-selected=true] {
             background-color: #eff6ff;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         .select2-container {
@@ -436,7 +434,17 @@
 
         /* 确保在模态框中的select2有正确的z-index */
         .select2-container--open .select2-dropdown {
-            z-index: 9999;
+            z-index: 10050;
+        }
+
+        .select2-results__options {
+            max-height: 280px;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .select2-results__options.is-scrolling .select2-results__option {
+            pointer-events: none;
         }
 
         /* 优化select2中图标的显示 */
@@ -462,7 +470,7 @@
             padding: 12px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            border-radius: 2px;
         }
 
         .config-name-text {
@@ -473,7 +481,7 @@
 
         .config-category-badge {
             padding: 4px 8px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
             text-transform: uppercase;
@@ -484,7 +492,7 @@
             padding: 12px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            border-radius: 2px;
             color: #6b7280;
             font-size: 0.875rem;
             line-height: 1.5;
@@ -523,7 +531,7 @@
             bottom: 0;
             background-color: #ccc;
             transition: .4s;
-            border-radius: 34px;
+            border-radius: 2px;
         }
 
         .config-toggle-slider:before {
@@ -578,7 +586,7 @@
             font-weight: 600;
             background: #f3f4f6;
             padding: 2px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
         }
 
         .config-default-value {
@@ -586,7 +594,7 @@
             font-weight: 600;
             background: #d1fae5;
             padding: 2px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
         }
 
 
@@ -635,7 +643,7 @@
             color: #374151;
             background: #f9fafb;
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
             min-width: 80px;
             justify-content: center;
         }
@@ -648,7 +656,7 @@
 
         .dynamic-config-btn {
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
             font-size: 0.625rem;
             font-weight: 500;
             border: none;
@@ -657,12 +665,12 @@
         }
 
         .dynamic-config-btn.edit {
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
         }
 
         .dynamic-config-btn.edit:hover {
-            background: #2563eb;
+            background: #0E4AE6;
         }
 
         .dynamic-config-btn.reset {
@@ -682,7 +690,7 @@
         .select2-sasl-mechanism .select2-selection--single {
             height: 32px;
             border: 1px solid #d1d5db;
-            border-radius: 6px;
+            border-radius: 2px;
             font-size: 0.75rem;
         }
 
@@ -699,7 +707,7 @@
 
         .select2-sasl-mechanism .select2-dropdown {
             border: 1px solid #d1d5db;
-            border-radius: 6px;
+            border-radius: 2px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             z-index: 9999;
         }
@@ -711,13 +719,103 @@
         }
 
         .select2-sasl-mechanism .select2-results__option--highlighted[aria-selected] {
-            background-color: #3b82f6;
+            background-color: #165DFF;
             color: white;
         }
 
         .select2-sasl-mechanism .select2-results__option[aria-selected=true] {
             background-color: #eff6ff;
-            color: #1d4ed8;
+            color: #0E4AE6;
+        }
+
+        .select2-model-type + .select2-container .select2-selection--single,
+        .select2-edit-model-type + .select2-container .select2-selection--single,
+        .select2-model-protocol + .select2-container .select2-selection--single,
+        .select2-edit-model-protocol + .select2-container .select2-selection--single {
+            height: 44px;
+            box-sizing: border-box;
+            border: 1px solid #d1d5db;
+            border-radius: 2px;
+        }
+
+        .select2-model-type + .select2-container .select2-selection__rendered,
+        .select2-edit-model-type + .select2-container .select2-selection__rendered,
+        .select2-model-protocol + .select2-container .select2-selection__rendered,
+        .select2-edit-model-protocol + .select2-container .select2-selection__rendered {
+            height: 42px;
+            line-height: 42px;
+            padding-left: 12px;
+            padding-right: 20px;
+            color: #1f2937;
+        }
+
+        .select2-model-type + .select2-container .select2-selection__arrow,
+        .select2-edit-model-type + .select2-container .select2-selection__arrow,
+        .select2-model-protocol + .select2-container .select2-selection__arrow,
+        .select2-edit-model-protocol + .select2-container .select2-selection__arrow {
+            height: 42px;
+        }
+
+        .select2-container--open .select2-dropdown {
+            border: 1px solid #d1d5db;
+            border-radius: 2px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+            z-index: 10050;
+        }
+
+        .model-provider-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 0;
+        }
+
+        .model-provider-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: none;
+            border: none;
+        }
+
+        .model-provider-icon img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .model-provider-meta {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            line-height: 1;
+        }
+
+        .model-provider-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            white-space: nowrap;
+        }
+
+        .model-provider-protocol {
+            font-size: 12px;
+            font-weight: 400;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        .select2-results__option--highlighted[aria-selected] .model-provider-name,
+        .select2-results__option--highlighted[aria-selected] .model-provider-protocol {
+            color: #0f172a;
+        }
+
+        .select2-results__option--highlighted[aria-selected] {
+            background-color: #e8f1ff !important;
         }
 
         /* 统计卡片样式 */
@@ -731,7 +829,7 @@
         .stat-card {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
+            border-radius: 2px;
             padding: 24px;
             text-align: center;
             transition: all 0.3s ease;
@@ -768,28 +866,27 @@
     <!-- 页面内容 -->
     <div class="p-6">
         <!-- 页面标题 -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">配置管理</h1>
-            <p class="text-gray-600">管理不同的模型接口配置与状态</p>
+        <div class="page-header">
+            <h1 class="page-header-title">模型配置</h1>
         </div>
 
         <!-- 统计卡片 -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalModels">5</div>
-                <div class="stat-label">总模型数</div>
+                <div class="stat-label">模型</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="onlineModels">3</div>
-                <div class="stat-label">在线模型</div>
+                <div class="stat-label">在线</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="offlineModels">1</div>
-                <div class="stat-label">离线模型</div>
+                <div class="stat-label">离线</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="disabledModels">1</div>
-                <div class="stat-label">禁用模型</div>
+                <div class="stat-label">禁用</div>
             </div>
         </div>
 
@@ -838,7 +935,7 @@
                     </tr>
                     </thead>
                     <tbody id="model-table-body" class="bg-white divide-y divide-gray-200">
-                    <!-- 表格内容将通过JavaScript动态填充 -->
+                    <!-- Table body -->
                     </tbody>
                 </table>
             </div>
@@ -855,7 +952,7 @@
                         上一页
                     </button>
                     <div id="page-numbers" class="flex space-x-1">
-                        <!-- 页码按钮将通过JavaScript动态生成 -->
+                        <!-- Pagination -->
                     </div>
                     <button id="next-page"
                             class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
@@ -877,34 +974,57 @@
             <p class="config-form-subtitle">配置新的AI大模型接口信息</p>
         </div>
 
-        <form id="add-model-form">
+        <form id="add-model-form" autocomplete="off">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
                     <label class="form-label" for="model-name">模型名称 *</label>
-                    <input type="text" id="model-name" class="form-input" placeholder="例如：GPT-4, Claude-3" required>
+                    <input type="text" id="model-name" class="form-input" placeholder="例如：gpt-4o, claude-sonnet-4, deepseek-chat" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="model-type">API类型 *</label>
+                    <label class="form-label" for="model-type">大模型厂商 *</label>
                     <select id="model-type" class="form-input select2-model-type" required>
-                        <option value="">请选择API类型</option>
-                        <option value="OpenAI" data-icon="/images/icons/openai.svg">OpenAI</option>
-                        <option value="Ollama" data-icon="/images/icons/ollama.png">Ollama</option>
-                        <option value="DeepSeek" data-icon="/images/icons/deepseek.svg">DeepSeek</option>
+                        <option value="">请选择大模型厂商</option>
+                        <option value="OpenAI" data-icon="/images/icons/openai.svg" data-protocol="OpenAI 协议">OpenAI</option>
+                        <option value="Anthropic" data-icon="/images/icons/anthropic.svg" data-protocol="Anthropic 协议">Anthropic</option>
+                        <option value="DeepSeek" data-icon="/images/icons/deepseek.svg" data-protocol="OpenAI 协议">DeepSeek</option>
+                        <option value="Kimi" data-icon="/images/icons/kimi.svg" data-protocol="OpenAI 协议">Kimi</option>
+                        <option value="Qwen" data-icon="/images/icons/qwen.svg" data-protocol="OpenAI 协议">Qwen</option>
+                        <option value="Doubao" data-icon="/images/icons/doubao.svg" data-protocol="OpenAI 协议">豆包</option>
+                        <option value="GLM" data-icon="/images/icons/glm.png" data-protocol="OpenAI 协议">GLM</option>
+                        <option value="Custom" data-icon="/images/icons/custom.svg" data-protocol="内部部署">自定义</option>
                     </select>
                 </div>
             </div>
 
+            <div class="form-group hidden" id="model-protocol-group">
+                <label class="form-label" for="model-protocol">接口协议 *</label>
+                <select id="model-protocol" class="form-input select2-model-protocol">
+                    <option value="openai" data-icon="/images/icons/openai.svg">OpenAI 协议</option>
+                    <option value="anthropic" data-icon="/images/icons/anthropic.svg">Anthropic 协议</option>
+                    <option value="ollama" data-icon="/images/icons/ollama.svg">Ollama 协议</option>
+                </select>
+                <p class="text-xs text-gray-500 mt-1">内部部署请填写实际可达地址，密钥可留空。</p>
+            </div>
+
             <div class="form-group">
                 <label class="form-label" for="model-endpoint">接口地址 *</label>
-                <input type="url" id="model-endpoint" class="form-input"
-                       placeholder="https://api.openai.com/v1/chat/completions" required>
+                <input type="text" id="model-endpoint" class="form-input"
+                       placeholder="https://api.openai.com/v1/chat/completions" required
+                       autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                       data-lpignore="true" data-1p-ignore="true" data-form-type="other">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
                     <label class="form-label" for="model-api-key">API密钥</label>
-                    <input type="password" id="model-api-key" class="form-input" placeholder="sk-...">
+                    <input type="text" tabindex="-1" aria-hidden="true" autocomplete="username"
+                           style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+                    <input type="text" id="model-api-key" class="form-input api-key-input"
+                           name="efak_llm_api_key_add" placeholder="云厂商必填，内部部署可留空"
+                           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                           readonly onfocus="this.removeAttribute('readonly')"
+                           data-lpignore="true" data-1p-ignore="true" data-form-type="other">
                 </div>
 
                 <div class="form-group">
@@ -947,7 +1067,7 @@
             <p class="config-form-subtitle">修改模型配置信息</p>
         </div>
 
-        <form id="edit-model-form">
+        <form id="edit-model-form" autocomplete="off">
             <input type="hidden" id="edit-model-id">
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -957,24 +1077,47 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="edit-model-type">API类型 *</label>
+                    <label class="form-label" for="edit-model-type">大模型厂商 *</label>
                     <select id="edit-model-type" class="form-input select2-edit-model-type" required>
-                        <option value="OpenAI" data-icon="/images/icons/openai.svg">OpenAI</option>
-                        <option value="Ollama" data-icon="/images/icons/ollama.png">Ollama</option>
-                        <option value="DeepSeek" data-icon="/images/icons/deepseek.svg">DeepSeek</option>
+                        <option value="OpenAI" data-icon="/images/icons/openai.svg" data-protocol="OpenAI 协议">OpenAI</option>
+                        <option value="Anthropic" data-icon="/images/icons/anthropic.svg" data-protocol="Anthropic 协议">Anthropic</option>
+                        <option value="DeepSeek" data-icon="/images/icons/deepseek.svg" data-protocol="OpenAI 协议">DeepSeek</option>
+                        <option value="Kimi" data-icon="/images/icons/kimi.svg" data-protocol="OpenAI 协议">Kimi</option>
+                        <option value="Qwen" data-icon="/images/icons/qwen.svg" data-protocol="OpenAI 协议">Qwen</option>
+                        <option value="Doubao" data-icon="/images/icons/doubao.svg" data-protocol="OpenAI 协议">豆包</option>
+                        <option value="GLM" data-icon="/images/icons/glm.png" data-protocol="OpenAI 协议">GLM</option>
+                        <option value="Custom" data-icon="/images/icons/custom.svg" data-protocol="内部部署">自定义</option>
                     </select>
                 </div>
             </div>
 
+            <div class="form-group hidden" id="edit-model-protocol-group">
+                <label class="form-label" for="edit-model-protocol">接口协议 *</label>
+                <select id="edit-model-protocol" class="form-input select2-edit-model-protocol">
+                    <option value="openai" data-icon="/images/icons/openai.svg">OpenAI 协议</option>
+                    <option value="anthropic" data-icon="/images/icons/anthropic.svg">Anthropic 协议</option>
+                    <option value="ollama" data-icon="/images/icons/ollama.svg">Ollama 协议</option>
+                </select>
+                <p class="text-xs text-gray-500 mt-1">内部部署请填写实际可达地址，密钥可留空。</p>
+            </div>
+
             <div class="form-group">
                 <label class="form-label" for="edit-model-endpoint">接口地址 *</label>
-                <input type="url" id="edit-model-endpoint" class="form-input" required>
+                <input type="text" id="edit-model-endpoint" class="form-input" required
+                       autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                       data-lpignore="true" data-1p-ignore="true" data-form-type="other">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
                     <label class="form-label" for="edit-model-api-key">API密钥</label>
-                    <input type="password" id="edit-model-api-key" class="form-input">
+                    <input type="text" tabindex="-1" aria-hidden="true" autocomplete="username"
+                           style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+                    <input type="text" id="edit-model-api-key" class="form-input api-key-input"
+                           name="efak_llm_api_key_edit" placeholder="云厂商必填，内部部署可留空"
+                           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                           readonly onfocus="this.removeAttribute('readonly')"
+                           data-lpignore="true" data-1p-ignore="true" data-form-type="other">
                 </div>
 
                 <div class="form-group">

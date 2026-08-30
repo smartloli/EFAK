@@ -1,29 +1,31 @@
 package org.kafka.eagle.web.scheduler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.core.util.NetUtils;
 import org.kafka.eagle.web.config.DistributedTaskConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * <p>
- * DistributedTaskCoordinator类
- * </p>
- * @author Mr.SmartLoli
- * @since 2025/09/30 01:07:14
- * @version 5.0.0
+ * Coordinates EFAK nodes for sharded monitor tasks.
+ *
+ * Node identity is stable {@code ip:port} (or {@code efak.node-id}). Every online
+ * node executes the same scheduled task but only processes its own shard.
  */
 @Slf4j
 @Component
@@ -33,625 +35,470 @@ public class DistributedTaskCoordinator {
     private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private DistributedTaskConfig taskConfig;
 
     @Autowired
-    private DistributedTaskConfig taskConfig;
+    private org.kafka.eagle.web.config.EfakRuntimeProperties runtimeProperties;
 
     @Value("${server.port:8080}")
     private int serverPort;
 
-    // Redis键前缀
+    @Value("${efak.node-id:}")
+    private String configuredNodeId;
+
     private static final String SERVICE_REGISTRY_KEY = "efak:services:registry";
     private static final String SERVICE_HEARTBEAT_KEY = "efak:services:heartbeat:";
-    private static final String TASK_SHARD_LOCK_KEY = "efak:task:shard:lock:";
-    private static final String TASK_SHARD_RESULT_KEY = "efak:task:shard:result:";
-    
-    // 服务心跳超时时间（秒）
-    private static final long HEARTBEAT_TIMEOUT = 180;
-    
-    // 当前节点ID
-    private String currentNodeId;
-    
-    /**
-     * 初始化当前节点
-     */
+    private static final String TASK_LOCK_PREFIX = "efak:task:lock:";
+    private static final String SHARD_RESULT_PREFIX = "efak:task:shard:result:";
+    private static final String TASK_DONE_PREFIX = "efak:task:done:";
+    private static final String TASK_STATS_PREFIX = "efak:task:stats:";
+    private static final String TASK_ROUND_WINDOW_PREFIX = "efak:task:window:";
+
+    private volatile String currentNodeId;
+
     public void initializeNode() {
         this.currentNodeId = generateNodeId();
         registerService();
+        log.info("Distributed node initialized: {}", currentNodeId);
     }
-    
+
     /**
-     * 生成节点ID
-     * 使用 IP+端口+进程信息，确保同一台机器上不同实例也能正确参与分片与统计
+     * Stable identity: configured id, otherwise {@code ip:port}.
      */
     private String generateNodeId() {
-        String hostName = NetUtils.getLocalAddress();
-        String pid = String.valueOf(ProcessHandle.current().pid());
-        // 关键逻辑：加入端口避免“同IP不同实例”被误判为同一个服务
-        return hostName + "-" + serverPort + "-" + pid + "-" + System.currentTimeMillis();
+        if (configuredNodeId != null && !configuredNodeId.isBlank()) {
+            return configuredNodeId.trim();
+        }
+        String host = NetUtils.getLocalAddress();
+        if (host == null || host.isBlank()) {
+            host = "unknown";
+        }
+        return host + ":" + serverPort;
     }
-    
-    /**
-     * 获取服务的唯一标识（基于IP地址+端口）
-     */
-    private String getServiceUniqueId(String nodeId) {
-        if (nodeId == null) {
-            return null;
-        }
-        // 关键逻辑：兼容老格式 nodeId=ip-pid-ts，以及新格式 nodeId=ip-port-pid-ts
-        String[] parts = nodeId.split("-");
-        if (parts.length >= 4) {
-            String ipAddress = parts[0];
-            String port = parts[1];
-            return ipAddress + ":" + port;
-        }
-        if (parts.length >= 2) {
-            String ipAddress = parts[0];
-            // 老节点ID不含端口时，只能退化为“当前端口”
-            return ipAddress + ":" + serverPort;
-        }
-        return nodeId;
-    }
-    
-    /**
-     * 注册服务到Redis
-     */
+
     public void registerService() {
         try {
+            ensureNodeId();
             Map<String, Object> serviceInfo = new HashMap<>();
             serviceInfo.put("nodeId", currentNodeId);
             serviceInfo.put("hostname", NetUtils.getLocalAddress());
             serviceInfo.put("port", serverPort);
             serviceInfo.put("pid", ProcessHandle.current().pid());
+            serviceInfo.put("role", runtimeProperties.normalizedRole());
             serviceInfo.put("startTime", LocalDateTime.now().toString());
             serviceInfo.put("lastHeartbeat", LocalDateTime.now().toString());
-            
-            // 注册到服务列表
             redisTemplate.opsForHash().put(SERVICE_REGISTRY_KEY, currentNodeId, serviceInfo);
-            
-            // 设置心跳
             updateHeartbeat();
-            
         } catch (Exception e) {
-            log.error("服务注册失败", e);
+            log.error("Service registration failed", e);
         }
     }
-    
-    /**
-     * 更新心跳
-     */
+
     public void updateHeartbeat() {
         try {
+            ensureNodeId();
             String heartbeatKey = SERVICE_HEARTBEAT_KEY + currentNodeId;
-            long timeoutSeconds = taskConfig.getOfflineTimeout() + 30; // 增加缓冲时间
-            redisTemplate.opsForValue().set(heartbeatKey, LocalDateTime.now().toString(), 
+            long timeoutSeconds = Math.max(taskConfig.getOfflineTimeout(), 30) + 30;
+            redisTemplate.opsForValue().set(heartbeatKey, LocalDateTime.now().toString(),
                     timeoutSeconds, TimeUnit.SECONDS);
-            
-            // 同时更新注册表中的心跳时间
-            redisTemplate.opsForHash().put(SERVICE_REGISTRY_KEY, currentNodeId + ":lastHeartbeat", 
-                    LocalDateTime.now().toString());
+
+            Object raw = redisTemplate.opsForHash().get(SERVICE_REGISTRY_KEY, currentNodeId);
+            if (raw instanceof Map<?, ?> map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> serviceInfo = (Map<String, Object>) map;
+                serviceInfo.put("lastHeartbeat", LocalDateTime.now().toString());
+                redisTemplate.opsForHash().put(SERVICE_REGISTRY_KEY, currentNodeId, serviceInfo);
+            } else {
+                registerService();
+            }
         } catch (Exception e) {
-            log.error("更新心跳失败", e);
+            log.error("Heartbeat update failed", e);
         }
     }
-    
+
     /**
-     * 获取在线服务列表
-     * 按IP地址去重，确保同一台服务器只被识别为一个在线服务
+     * Online nodes, sorted so every process computes the same shard layout.
      */
     public List<String> getOnlineServices() {
+        return listOnlineServices(false);
+    }
+
+    /**
+     * Nodes that actually collect shards. Web-only processes stay in the
+     * registry for visibility but must not own topic/broker assignments.
+     */
+    public List<String> getOnlineWorkerServices() {
+        List<String> workers = listOnlineServices(true);
+        if (!workers.isEmpty()) {
+            return workers;
+        }
+        ensureNodeId();
+        return runtimeProperties.isWorker() ? List.of(currentNodeId) : Collections.emptyList();
+    }
+
+    private List<String> listOnlineServices(boolean workersOnly) {
         try {
             Set<Object> allServices = redisTemplate.opsForHash().keys(SERVICE_REGISTRY_KEY);
-            Set<String> uniqueServices = new HashSet<>(); // 用于IP地址去重
             List<String> onlineServices = new ArrayList<>();
-            
+            if (allServices == null || allServices.isEmpty()) {
+                ensureNodeId();
+                if (currentNodeId == null) {
+                    return Collections.emptyList();
+                }
+                return !workersOnly || runtimeProperties.isWorker() ? List.of(currentNodeId) : Collections.emptyList();
+            }
             for (Object serviceKey : allServices) {
                 String nodeId = serviceKey.toString();
-                if (nodeId.contains(":")) {
-                    continue; // 跳过心跳时间等附加信息
-                }
-                
                 String heartbeatKey = SERVICE_HEARTBEAT_KEY + nodeId;
-                if (redisTemplate.hasKey(heartbeatKey)) {
-                    // 获取服务的唯一标识（基于IP地址）
-                    String serviceUniqueId = getServiceUniqueId(nodeId);
-                    if (serviceUniqueId != null && !uniqueServices.contains(serviceUniqueId)) {
-                        uniqueServices.add(serviceUniqueId);
-                        onlineServices.add(nodeId); // 保留完整的nodeId用于后续处理
-                    }
+                if (!Boolean.TRUE.equals(redisTemplate.hasKey(heartbeatKey))) {
+                    continue;
                 }
+                if (workersOnly && !isWorkerRole(nodeId)) {
+                    continue;
+                }
+                onlineServices.add(nodeId);
             }
-
+            Collections.sort(onlineServices);
             return onlineServices;
         } catch (Exception e) {
-            log.error("获取在线服务列表失败", e);
-            return Collections.singletonList(currentNodeId); // 降级处理，返回当前节点
-        }
-    }
-    
-    /**
-     * 获取唯一在线服务数量（按IP+端口去重）
-     * 用于分片逻辑判断
-     */
-    public int getUniqueOnlineServiceCount() {
-        try {
-            Set<Object> allServices = redisTemplate.opsForHash().keys(SERVICE_REGISTRY_KEY);
-            Set<String> uniqueServiceInstances = new HashSet<>();
-            
-            for (Object serviceKey : allServices) {
-                String nodeId = serviceKey.toString();
-                if (nodeId.contains(":")) {
-                    continue; // 跳过心跳时间等附加信息
-                }
-                
-                String heartbeatKey = SERVICE_HEARTBEAT_KEY + nodeId;
-                if (redisTemplate.hasKey(heartbeatKey)) {
-                    String serviceUniqueId = getServiceUniqueId(nodeId);
-                    if (serviceUniqueId != null) {
-                        uniqueServiceInstances.add(serviceUniqueId);
-                    }
-                }
+            log.error("Failed to list online services", e);
+            ensureNodeId();
+            if (currentNodeId == null) {
+                return Collections.emptyList();
             }
-            
-            int uniqueCount = uniqueServiceInstances.size();
-            return uniqueCount;
-        } catch (Exception e) {
-            log.error("获取唯一在线服务数量失败", e);
-            return 1; // 降级处理，返回1
+            return !workersOnly || runtimeProperties.isWorker() ? List.of(currentNodeId) : Collections.emptyList();
         }
     }
-    
-    /**
-     * 获取分布式服务节点详细信息
-     */
+
+    private boolean isWorkerRole(String nodeId) {
+        Object raw = redisTemplate.opsForHash().get(SERVICE_REGISTRY_KEY, nodeId);
+        if (!(raw instanceof Map<?, ?> stored)) {
+            return true;
+        }
+        Object role = stored.get("role");
+        if (role == null) {
+            return true;
+        }
+        String value = role.toString().trim();
+        return value.isEmpty() || "worker".equalsIgnoreCase(value) || "all".equalsIgnoreCase(value);
+    }
+
+    public int getUniqueOnlineServiceCount() {
+        return getOnlineServices().size();
+    }
+
     public List<Map<String, Object>> getServiceDetails() {
         List<Map<String, Object>> serviceDetails = new ArrayList<>();
         try {
             Set<Object> allServices = redisTemplate.opsForHash().keys(SERVICE_REGISTRY_KEY);
-            
+            if (allServices == null) {
+                return serviceDetails;
+            }
             for (Object serviceKey : allServices) {
                 String nodeId = serviceKey.toString();
-                if (nodeId.contains(":")) {
-                    continue; // 跳过心跳时间等附加信息
-                }
-                
                 String heartbeatKey = SERVICE_HEARTBEAT_KEY + nodeId;
-                if (redisTemplate.hasKey(heartbeatKey)) {
-                    Map<String, Object> serviceInfo = new HashMap<>();
-                    
-                    // 解析节点ID获取IP和端口
-                    String[] parts = nodeId.split("-");
-                    if (parts.length >= 4) {
-                        String ipAddress = parts[0];
-                        String port = parts[1];
-                        String pid = parts[2];
-                        
-                        serviceInfo.put("nodeId", nodeId);
-                        serviceInfo.put("ipAddress", ipAddress);
-                        serviceInfo.put("port", port);
-                        serviceInfo.put("pid", pid);
-                        serviceInfo.put("status", "ONLINE");
-                        
-                        // 获取最后心跳时间
-                        Object heartbeatTime = redisTemplate.opsForValue().get(heartbeatKey);
-                        if (heartbeatTime != null) {
-                            serviceInfo.put("lastHeartbeat", heartbeatTime.toString());
-                        } else {
-                            serviceInfo.put("lastHeartbeat", "未知");
-                        }
-                        
-                        serviceDetails.add(serviceInfo);
-                    } else if (parts.length >= 2) {
-                        // 兼容老格式 nodeId=ip-pid-ts
-                        String ipAddress = parts[0];
-                        String pid = parts[1];
-                        serviceInfo.put("nodeId", nodeId);
-                        serviceInfo.put("ipAddress", ipAddress);
-                        serviceInfo.put("port", String.valueOf(serverPort));
-                        serviceInfo.put("pid", pid);
-                        serviceInfo.put("status", "ONLINE");
-                        Object heartbeatTime = redisTemplate.opsForValue().get(heartbeatKey);
-                        serviceInfo.put("lastHeartbeat", heartbeatTime != null ? heartbeatTime.toString() : "未知");
-                        serviceDetails.add(serviceInfo);
-                    }
+                if (!Boolean.TRUE.equals(redisTemplate.hasKey(heartbeatKey))) {
+                    continue;
                 }
+                Map<String, Object> serviceInfo = new HashMap<>();
+                Object raw = redisTemplate.opsForHash().get(SERVICE_REGISTRY_KEY, nodeId);
+                if (raw instanceof Map<?, ?> stored) {
+                    Object hostname = stored.get("hostname");
+                    Object port = stored.get("port");
+                    Object pid = stored.get("pid");
+                    serviceInfo.put("hostname", hostname);
+                    serviceInfo.put("port", port);
+                    serviceInfo.put("pid", pid != null ? String.valueOf(pid) : "-");
+                    serviceInfo.put("role", stored.get("role") != null ? stored.get("role").toString() : "worker");
+                    serviceInfo.put("ipAddress", hostname != null ? hostname.toString() : parseHost(nodeId));
+                } else {
+                    serviceInfo.put("ipAddress", parseHost(nodeId));
+                    serviceInfo.put("port", parsePort(nodeId));
+                    serviceInfo.put("pid", "-");
+                    serviceInfo.put("role", "worker");
+                }
+                serviceInfo.put("nodeId", nodeId);
+                serviceInfo.put("status", "ONLINE");
+                Object heartbeatTime = redisTemplate.opsForValue().get(heartbeatKey);
+                serviceInfo.put("lastHeartbeat", heartbeatTime != null ? heartbeatTime.toString() : "unknown");
+                serviceDetails.add(serviceInfo);
             }
-            
         } catch (Exception e) {
-            log.error("获取分布式服务节点详细信息失败", e);
+            log.error("Failed to load service details", e);
         }
-        
         return serviceDetails;
     }
-    
-    /**
-     * 清理离线服务
-     * 清理没有心跳的服务节点
-     */
+
     public void cleanupOfflineServices() {
         try {
             Set<Object> allServices = redisTemplate.opsForHash().keys(SERVICE_REGISTRY_KEY);
-            
+            if (allServices == null) {
+                return;
+            }
             for (Object serviceKey : allServices) {
                 String nodeId = serviceKey.toString();
-                if (nodeId.contains(":")) {
-                    continue; // 跳过心跳时间等附加信息
-                }
-                
                 String heartbeatKey = SERVICE_HEARTBEAT_KEY + nodeId;
-                if (!redisTemplate.hasKey(heartbeatKey)) {
-                    // 服务已离线，从注册表中移除
+                if (!Boolean.TRUE.equals(redisTemplate.hasKey(heartbeatKey))) {
                     redisTemplate.opsForHash().delete(SERVICE_REGISTRY_KEY, nodeId);
-                    String serviceUniqueId = getServiceUniqueId(nodeId);
-                    log.info("清理离线服务: {} (IP: {})", nodeId, serviceUniqueId);
+                    log.info("Removed offline node from registry: {}", nodeId);
                 }
             }
         } catch (Exception e) {
-            log.error("清理离线服务失败", e);
+            log.error("Offline service cleanup failed", e);
         }
     }
-    
-    /**
-     * 对broker列表进行分片
-     * @param brokerIds 所有broker ID列表
-     * @return 分配给当前节点的broker ID列表
-     */
+
     public List<Integer> shardBrokers(List<Integer> brokerIds) {
-        if (brokerIds == null || brokerIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        
-        List<String> onlineServices = getOnlineServices();
-        if (onlineServices.isEmpty()) {
-            log.warn("没有在线服务，当前节点处理所有broker");
-            return brokerIds;
-        }
-        
-        // 使用唯一在线服务数量判断是否需要分片
-        int uniqueServiceCount = getUniqueOnlineServiceCount();
-        if (uniqueServiceCount == 1) {
-            return brokerIds;
-        }
-        
-        // 对服务列表排序，确保所有节点的分片结果一致
-        Collections.sort(onlineServices);
-        
-        int currentNodeIndex = onlineServices.indexOf(currentNodeId);
-        if (currentNodeIndex == -1) {
-            log.warn("当前节点不在在线服务列表中，处理所有broker");
-            return brokerIds;
-        }
-        
-        // 计算分片
-        List<Integer> assignedBrokers = new ArrayList<>();
-        int serviceCount = onlineServices.size();
-        
-        for (int i = 0; i < brokerIds.size(); i++) {
-            if (i % serviceCount == currentNodeIndex) {
-                assignedBrokers.add(brokerIds.get(i));
-            }
-        }
-        
-        return assignedBrokers;
+        return shardItems(brokerIds);
     }
-    
-    /**
-     * 对主题列表进行分片
-     * @param topicNames 所有主题名称列表
-     * @return 分配给当前节点的主题名称列表
-     */
+
     public List<String> shardTopics(List<String> topicNames) {
-        if (topicNames == null || topicNames.isEmpty()) {
-            return Collections.emptyList();
-        }
-        
-        List<String> onlineServices = getOnlineServices();
-        if (onlineServices.isEmpty()) {
-            log.warn("没有在线服务，当前节点处理所有主题");
-            return topicNames;
-        }
-        
-        // 使用唯一在线服务数量判断是否需要分片
-        int uniqueServiceCount = getUniqueOnlineServiceCount();
-        if (uniqueServiceCount == 1) {
-            return topicNames;
-        }
-        
-        // 对服务列表排序，确保所有节点的分片结果一致
-        Collections.sort(onlineServices);
-        
-        int currentNodeIndex = onlineServices.indexOf(currentNodeId);
-        if (currentNodeIndex == -1) {
-            log.warn("当前节点不在在线服务列表中，处理所有主题");
-            return topicNames;
-        }
-        
-        // 计算分片
-        List<String> assignedTopics = new ArrayList<>();
-        int serviceCount = onlineServices.size();
-        
-        for (int i = 0; i < topicNames.size(); i++) {
-            if (i % serviceCount == currentNodeIndex) {
-                assignedTopics.add(topicNames.get(i));
-            }
-        }
-        
-        return assignedTopics;
+        return shardItems(topicNames);
     }
-    
-    /**
-     * 对消费者组列表进行分片
-     * @param consumerGroups 所有消费者组列表
-     * @return 分配给当前节点的消费者组列表
-     */
+
     public List<String> shardConsumerGroups(List<String> consumerGroups) {
-        if (consumerGroups == null || consumerGroups.isEmpty()) {
-            return Collections.emptyList();
-        }
-        
-        List<String> onlineServices = getOnlineServices();
-        if (onlineServices.isEmpty()) {
-            log.warn("没有在线服务，当前节点处理所有消费者组");
-            return consumerGroups;
-        }
-        
-        // 使用唯一在线服务数量判断是否需要分片
-        int uniqueServiceCount = getUniqueOnlineServiceCount();
-        if (uniqueServiceCount == 1) {
-            return consumerGroups;
-        }
-        
-        // 对服务列表排序，确保所有节点的分片结果一致
-        Collections.sort(onlineServices);
-        
-        int currentNodeIndex = onlineServices.indexOf(currentNodeId);
-        if (currentNodeIndex == -1) {
-            log.warn("当前节点不在在线服务列表中，处理所有消费者组");
-            return consumerGroups;
-        }
-        
-        // 计算分片
-        List<String> assignedGroups = new ArrayList<>();
-        int serviceCount = onlineServices.size();
-        
-        for (int i = 0; i < consumerGroups.size(); i++) {
-            if (i % serviceCount == currentNodeIndex) {
-                assignedGroups.add(consumerGroups.get(i));
-            }
-        }
-        
-        return assignedGroups;
+        return shardItems(consumerGroups);
     }
 
-    /**
-     * 对告警配置列表进行分片
-     * @param alertConfigIds 所有告警配置ID列表
-     * @return 分配给当前节点的告警配置ID列表
-     */
     public List<Long> shardAlertConfigs(List<Long> alertConfigIds) {
-        if (alertConfigIds == null || alertConfigIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<String> onlineServices = getOnlineServices();
-        if (onlineServices.isEmpty()) {
-            log.warn("没有在线服务，当前节点处理所有告警配置");
-            return alertConfigIds;
-        }
-
-        // 使用唯一在线服务数量判断是否需要分片
-        int uniqueServiceCount = getUniqueOnlineServiceCount();
-        if (uniqueServiceCount == 1) {
-            return alertConfigIds;
-        }
-
-        // 对服务列表排序，确保所有节点的分片结果一致
-        Collections.sort(onlineServices);
-
-        int currentNodeIndex = onlineServices.indexOf(currentNodeId);
-        if (currentNodeIndex == -1) {
-            log.warn("当前节点不在在线服务列表中，处理所有告警配置");
-            return alertConfigIds;
-        }
-
-        // 计算分片
-        List<Long> assignedConfigs = new ArrayList<>();
-        int serviceCount = onlineServices.size();
-
-        for (int i = 0; i < alertConfigIds.size(); i++) {
-            if (i % serviceCount == currentNodeIndex) {
-                assignedConfigs.add(alertConfigIds.get(i));
-            }
-        }
-
-        return assignedConfigs;
+        return shardItems(alertConfigIds);
     }
 
-    /**
-     * 对数据表列表进行分片
-     * @param tableNames 所有需要清理的表名列表
-     * @return 分配给当前节点的表名列表
-     */
     public List<String> shardTables(List<String> tableNames) {
-        if (tableNames == null || tableNames.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<String> onlineServices = getOnlineServices();
-        if (onlineServices.isEmpty()) {
-            log.warn("没有在线服务，当前节点处理所有数据表");
-            return tableNames;
-        }
-
-        // 使用唯一在线服务数量判断是否需要分片
-        int uniqueServiceCount = getUniqueOnlineServiceCount();
-        if (uniqueServiceCount == 1) {
-            return tableNames;
-        }
-
-        // 对服务列表排序，确保所有节点的分片结果一致
-        Collections.sort(onlineServices);
-
-        int currentNodeIndex = onlineServices.indexOf(currentNodeId);
-        if (currentNodeIndex == -1) {
-            log.warn("当前节点不在在线服务列表中，处理所有数据表");
-            return tableNames;
-        }
-
-        // 计算分片
-        List<String> assignedTables = new ArrayList<>();
-        int serviceCount = onlineServices.size();
-
-        for (int i = 0; i < tableNames.size(); i++) {
-            if (i % serviceCount == currentNodeIndex) {
-                assignedTables.add(tableNames.get(i));
-            }
-        }
-
-        return assignedTables;
+        return shardItems(tableNames);
     }
 
     /**
-     * 获取当前节点ID
+     * Assign items with a consistent hash ring so membership changes only
+     * move about 1/N of the keys.
      */
+    <T> List<T> shardItems(List<T> items) {
+        if (items == null || items.isEmpty()) {
+            return Collections.emptyList();
+        }
+        ensureNodeId();
+        List<String> onlineServices = getOnlineWorkerServices();
+        if (onlineServices.isEmpty()) {
+            log.warn("No online nodes; skipping shard assignment on {}", currentNodeId);
+            return Collections.emptyList();
+        }
+        if (onlineServices.size() == 1) {
+            return items;
+        }
+        if (!onlineServices.contains(currentNodeId)) {
+            log.warn("Current node {} is not in online list {}; skipping this round",
+                    currentNodeId, onlineServices);
+            return Collections.emptyList();
+        }
+        List<T> assigned = new ArrayList<>();
+        for (T item : items) {
+            String owner = ConsistentHashRing.owner(item, onlineServices);
+            if (currentNodeId.equals(owner)) {
+                assigned.add(item);
+            }
+        }
+        return assigned;
+    }
+
     public String getCurrentNodeId() {
+        ensureNodeId();
         return currentNodeId;
     }
-    
+
     /**
-     * 获取分布式任务执行锁
-     * @param taskType 任务类型
-     * @param lockTimeout 锁超时时间（秒）
-     * @return 是否获取到锁
+     * Node-scoped lock so the same process cannot overlap a task, while other
+     * nodes can run their shards in parallel.
      */
     public boolean acquireTaskLock(String taskType, long lockTimeout) {
+        ensureNodeId();
+        return tryLock(TASK_LOCK_PREFIX + taskType + ":" + currentNodeId, currentNodeId, lockTimeout);
+    }
+
+    public void releaseTaskLock(String taskType) {
+        ensureNodeId();
+        unlock(TASK_LOCK_PREFIX + taskType + ":" + currentNodeId, currentNodeId);
+    }
+
+    public void renewTaskLock(String taskType, long lockTimeout) {
+        ensureNodeId();
+        renewLock(TASK_LOCK_PREFIX + taskType + ":" + currentNodeId, currentNodeId, lockTimeout);
+    }
+
+    public boolean tryLock(String lockKey, String owner, long timeoutSeconds) {
         try {
-            String lockKey = TASK_SHARD_LOCK_KEY + taskType;
-            Boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(
-                    lockKey, currentNodeId, lockTimeout, TimeUnit.SECONDS);
-            
-            if (lockAcquired != null && lockAcquired) {
-                return true;
-            } else {
-                return false;
-            }
+            byte[] key = lockKey.getBytes(StandardCharsets.UTF_8);
+            byte[] val = owner.getBytes(StandardCharsets.UTF_8);
+            Boolean acquired = redisTemplate.execute((RedisCallback<Boolean>) connection ->
+                    connection.stringCommands().set(key, val,
+                            Expiration.seconds(Math.max(timeoutSeconds, 1)),
+                            RedisStringCommands.SetOption.SET_IF_ABSENT));
+            return Boolean.TRUE.equals(acquired);
         } catch (Exception e) {
-            log.error("获取任务锁异常: taskType={}", taskType, e);
+            log.error("Failed to acquire lock {}", lockKey, e);
             return false;
         }
     }
-    
-    /**
-     * 释放分布式任务执行锁
-     * @param taskType 任务类型
-     */
-    public void releaseTaskLock(String taskType) {
+
+    public void renewLock(String lockKey, String owner, long timeoutSeconds) {
         try {
-            String lockKey = TASK_SHARD_LOCK_KEY + taskType;
-            redisTemplate.delete(lockKey);
+            byte[] key = lockKey.getBytes(StandardCharsets.UTF_8);
+            byte[] val = owner.getBytes(StandardCharsets.UTF_8);
+            redisTemplate.execute((RedisCallback<Boolean>) connection -> {
+                byte[] current = connection.stringCommands().get(key);
+                if (current != null && java.util.Arrays.equals(current, val)) {
+                    connection.keyCommands().expire(key, Math.max(timeoutSeconds, 1));
+                    return Boolean.TRUE;
+                }
+                return Boolean.FALSE;
+            });
         } catch (Exception e) {
-            log.error("释放任务锁异常: taskType={}", taskType, e);
+            log.error("Failed to renew lock {}", lockKey, e);
         }
     }
-    
-    /**
-     * 保存分片任务结果
-     * @param taskType 任务类型
-     * @param shardResult 分片结果
-     */
+
+    public void unlock(String lockKey, String owner) {
+        try {
+            byte[] key = lockKey.getBytes(StandardCharsets.UTF_8);
+            byte[] val = owner.getBytes(StandardCharsets.UTF_8);
+            redisTemplate.execute((RedisCallback<Long>) connection -> {
+                byte[] current = connection.stringCommands().get(key);
+                if (current != null && java.util.Arrays.equals(current, val)) {
+                    connection.keyCommands().del(key);
+                    return 1L;
+                }
+                return 0L;
+            });
+        } catch (Exception e) {
+            log.error("Failed to release lock {}", lockKey, e);
+        }
+    }
+
     public void saveShardResult(String taskType, Map<String, Object> shardResult) {
         try {
-            String resultKey = TASK_SHARD_RESULT_KEY + taskType + ":" + currentNodeId;
-            long expireSeconds = taskConfig.getShardResultExpireMinutes() * 60;
-            redisTemplate.opsForValue().set(resultKey, shardResult, expireSeconds, TimeUnit.SECONDS);
+            ensureNodeId();
+            String resultKey = SHARD_RESULT_PREFIX + taskType;
+            redisTemplate.opsForHash().put(resultKey, currentNodeId, shardResult);
+            long expireSeconds = Math.max(taskConfig.getShardResultExpireMinutes(), 1) * 60L;
+            redisTemplate.expire(resultKey, expireSeconds, TimeUnit.SECONDS);
         } catch (Exception e) {
-            log.error("保存分片任务结果异常: taskType={}", taskType, e);
+            log.error("Failed to save shard result: taskType={}", taskType, e);
         }
     }
-    
-    /**
-     * 获取所有分片任务结果
-     * @param taskType 任务类型
-     * @return 所有节点的分片结果
-     */
+
     public Map<String, Object> getAllShardResults(String taskType) {
         try {
-            String pattern = TASK_SHARD_RESULT_KEY + taskType + ":*";
-            Set<String> keys = scanKeys(pattern);
-            String keyPrefix = TASK_SHARD_RESULT_KEY + taskType + ":";
-
+            String resultKey = SHARD_RESULT_PREFIX + taskType;
+            Map<Object, Object> entries = redisTemplate.opsForHash().entries(resultKey);
             Map<String, Object> allResults = new HashMap<>();
-            if (keys != null && !keys.isEmpty()) {
-                // 关键逻辑：批量拉取结果，减少 Redis 往返次数
-                List<String> keyList = new ArrayList<>(keys);
-                final int batchSize = 200;
-                for (int i = 0; i < keyList.size(); i += batchSize) {
-                    List<String> batchKeys = keyList.subList(i, Math.min(i + batchSize, keyList.size()));
-                    List<Object> batchValues = redisTemplate.opsForValue().multiGet(batchKeys);
-                    if (batchValues == null) {
-                        continue;
-                    }
-                    for (int j = 0; j < batchKeys.size(); j++) {
-                        Object value = batchValues.get(j);
-                        if (value == null) {
-                            continue;
-                        }
-                        String key = batchKeys.get(j);
-                        String nodeId = key.startsWith(keyPrefix) ? key.substring(keyPrefix.length())
-                                : key.substring(key.lastIndexOf(":") + 1);
-                        allResults.put(nodeId, value);
+            if (entries != null) {
+                for (Map.Entry<Object, Object> entry : entries.entrySet()) {
+                    if (entry.getKey() != null && entry.getValue() != null) {
+                        allResults.put(entry.getKey().toString(), entry.getValue());
                     }
                 }
             }
-            
             return allResults;
         } catch (Exception e) {
-            log.error("获取所有分片任务结果异常: taskType={}", taskType, e);
+            log.error("Failed to read shard results: taskType={}", taskType, e);
             return Collections.emptyMap();
         }
     }
-    
-    /**
-     * 清理指定任务类型的所有分片结果
-     * @param taskType 任务类型
-     */
+
     public void clearShardResults(String taskType) {
         try {
-            String pattern = TASK_SHARD_RESULT_KEY + taskType + ":*";
-            Set<String> keys = scanKeys(pattern);
-            if (keys == null || keys.isEmpty()) {
-                return;
-            }
-
-            // 关键逻辑：分批删除，避免一次性删除过多 key
-            List<String> keyList = new ArrayList<>(keys);
-            final int batchSize = 500;
-            for (int i = 0; i < keyList.size(); i += batchSize) {
-                List<String> batchKeys = keyList.subList(i, Math.min(i + batchSize, keyList.size()));
-                redisTemplate.delete(batchKeys);
-            }
+            redisTemplate.delete(SHARD_RESULT_PREFIX + taskType);
         } catch (Exception e) {
-            log.error("清理分片任务结果失败", e);
+            log.error("Failed to clear shard results: taskType={}", taskType, e);
         }
     }
 
-    private Set<String> scanKeys(String pattern) {
-        // 关键逻辑：用 SCAN 替代 KEYS，避免 Redis 阻塞
-        return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = new LinkedHashSet<>();
-            RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
-            ScanOptions options = ScanOptions.scanOptions().match(pattern).count(1000).build();
+    /**
+     * Marks that this node already processed the given schedule round.
+     */
+    public boolean markRoundDone(Long taskId, String roundId) {
+        try {
+            ensureNodeId();
+            String key = TASK_DONE_PREFIX + taskId + ":" + currentNodeId + ":" + roundId;
+            return tryLock(key, currentNodeId, TimeUnit.HOURS.toSeconds(25));
+        } catch (Exception e) {
+            log.error("Failed to mark round done: taskId={}", taskId, e);
+            return false;
+        }
+    }
 
-            try (Cursor<byte[]> cursor = connection.scan(options)) {
-                while (cursor.hasNext()) {
-                    String key = serializer.deserialize(cursor.next());
-                    if (key != null) {
-                        keys.add(key);
-                    }
-                }
-            }
-            return keys;
-        });
+    public boolean hasCompletedRound(Long taskId, String roundId) {
+        try {
+            ensureNodeId();
+            String key = TASK_DONE_PREFIX + taskId + ":" + currentNodeId + ":" + roundId;
+            return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+        } catch (Exception e) {
+            log.error("Failed to check round completion: taskId={}", taskId, e);
+            return false;
+        }
+    }
+
+    /**
+     * Only one node per round updates shared scheduler statistics.
+     */
+    /**
+     * Opens a short join window so later workers can still process their
+     * shards after the first node updates {@code last_execute_time}.
+     */
+    public void openRoundWindow(Long taskId, String roundId, long ttlSeconds) {
+        try {
+            String key = TASK_ROUND_WINDOW_PREFIX + taskId;
+            redisTemplate.opsForValue().set(key, roundId, Math.max(ttlSeconds, 30), TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error("Failed to open round window: taskId={}", taskId, e);
+        }
+    }
+
+    public String getOpenRoundId(Long taskId) {
+        try {
+            Object value = redisTemplate.opsForValue().get(TASK_ROUND_WINDOW_PREFIX + taskId);
+            return value != null ? value.toString() : null;
+        } catch (Exception e) {
+            log.error("Failed to read round window: taskId={}", taskId, e);
+            return null;
+        }
+    }
+
+    public boolean tryClaimStatsUpdate(Long taskId, String roundId) {
+        try {
+            ensureNodeId();
+            String key = TASK_STATS_PREFIX + taskId + ":" + roundId;
+            return tryLock(key, currentNodeId, TimeUnit.HOURS.toSeconds(25));
+        } catch (Exception e) {
+            log.error("Failed to claim stats update: taskId={}", taskId, e);
+            return false;
+        }
+    }
+
+    private void ensureNodeId() {
+        if (currentNodeId == null || currentNodeId.isBlank()) {
+            currentNodeId = generateNodeId();
+        }
+    }
+
+    private String parseHost(String nodeId) {
+        if (nodeId == null) {
+            return "-";
+        }
+        int idx = nodeId.lastIndexOf(':');
+        if (idx > 0) {
+            return nodeId.substring(0, idx);
+        }
+        return nodeId;
+    }
+
+    private String parsePort(String nodeId) {
+        if (nodeId == null) {
+            return "-";
+        }
+        int idx = nodeId.lastIndexOf(':');
+        if (idx > 0 && idx < nodeId.length() - 1) {
+            return nodeId.substring(idx + 1);
+        }
+        return String.valueOf(serverPort);
     }
 }

@@ -26,6 +26,7 @@ import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.kafka.eagle.core.constant.ClusterMetricsConst;
 import org.kafka.eagle.dto.cluster.KafkaClientInfo;
 
 import java.util.Properties;
@@ -41,8 +42,10 @@ import java.util.Properties;
 @Slf4j
 public class KafkaStoragePlugin {
     private final KafkaAsyncCloser closer;
+    private final Properties props;
 
     public KafkaStoragePlugin() {
+        this.props = new Properties();
         this.closer = new KafkaAsyncCloser();
     }
 
@@ -50,19 +53,23 @@ public class KafkaStoragePlugin {
 
     /** 获取 Kafka AdminClient 配置 */
     public Properties buildAdminClientProps(KafkaClientInfo clientInfo) {
-        Properties props = new Properties();
-        props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, clientInfo.getBrokerServer());
-
-        // 关键逻辑：每次构建都用新的 Properties，避免并发请求/多集群互相污染配置
-        applySecurityConfig(props, clientInfo);
-        return props;
+        Properties local = new Properties();
+        local.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, clientInfo.getBrokerServer());
+        local.put(CommonClientConfigs.REQUEST_TIMEOUT_MS_CONFIG, 10_000);
+        local.put(CommonClientConfigs.DEFAULT_API_TIMEOUT_MS_CONFIG, 15_000);
+        local.put(CommonClientConfigs.CONNECTIONS_MAX_IDLE_MS_CONFIG, 300_000);
+        if (clientInfo.isSasl()) {
+            applySaslConfig(local, clientInfo);
+        }
+        if (clientInfo.isSsl()) {
+            applySslConfig(local, clientInfo);
+        }
+        return local;
     }
 
     /** 获取 Kafka Consumer 配置 */
     public Properties buildConsumerProps(KafkaClientInfo clientInfo) {
-        Properties props = new Properties();
-        // 关键逻辑：不设置 group.id，避免在开启 ACL 时触发 ConsumerGroup 权限校验导致“无结果”
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, ClusterMetricsConst.Cluster.EFAK_SYSTEM_GROUP.key());
         props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, clientInfo.getBrokerServer());
 
         String keyDeserializer = clientInfo.getKeyDeserializer();
@@ -72,13 +79,18 @@ public class KafkaStoragePlugin {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 valueDeserializer == null ? StringDeserializer.class.getCanonicalName() : valueDeserializer);
 
-        applySecurityConfig(props, clientInfo);
+        if (clientInfo.isSasl()) {
+            applySaslConfig(props, clientInfo);
+        }
+        if (clientInfo.isSsl()) {
+            applySslConfig(props, clientInfo);
+        }
+
         return props;
     }
 
     /** 获取 Kafka Producer 配置 */
     public Properties buildProducerProps(KafkaClientInfo clientInfo) {
-        Properties props = new Properties();
         props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, clientInfo.getBrokerServer());
 
         String keySerializer = clientInfo.getKeySerializer();
@@ -90,62 +102,21 @@ public class KafkaStoragePlugin {
 
         props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, KafkaPartitioner.class.getName());
 
-        applySecurityConfig(props, clientInfo);
-        return props;
-    }
-
-    /* ======================= SASL & SSL CONFIG ======================= */
-
-    private void applySecurityConfig(Properties props, KafkaClientInfo clientInfo) {
-        if (clientInfo == null) {
-            throw new IllegalArgumentException("KafkaClientInfo不能为空");
-        }
-
-        // 关键逻辑：先确定 security.protocol，避免 SASL/SSL 重复覆盖或写入 null 导致 NPE
-        String saslProtocol = clientInfo.getSaslProtocol();
-        String sslProtocol = clientInfo.getSslProtocol();
-
-        String securityProtocol = null;
-        if (clientInfo.isSasl()) {
-            if (StrUtil.isBlank(saslProtocol)) {
-                throw new IllegalArgumentException("已启用SASL认证但缺少 security.protocol");
-            }
-            securityProtocol = saslProtocol;
-        }
-        if (clientInfo.isSsl()) {
-            if (StrUtil.isBlank(sslProtocol)) {
-                throw new IllegalArgumentException("已启用SSL但缺少 security.protocol");
-            }
-            if (securityProtocol == null) {
-                securityProtocol = sslProtocol;
-            } else if (!securityProtocol.equals(sslProtocol)) {
-                // SASL_SSL 场景下建议两者一致；若不一致，优先使用 SASL 的 security.protocol
-                log.warn("检测到SASL/SSL的security.protocol不一致，优先使用SASL协议: sasl={}, ssl={}",
-                        saslProtocol, sslProtocol);
-            }
-        }
-
-        if (StrUtil.isNotBlank(securityProtocol)) {
-            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
-        }
-
         if (clientInfo.isSasl()) {
             applySaslConfig(props, clientInfo);
         }
         if (clientInfo.isSsl()) {
             applySslConfig(props, clientInfo);
         }
+
+        return props;
     }
+
+    /* ======================= SASL & SSL CONFIG ======================= */
 
     /** 应用 SASL 身份验证设置 */
     private void applySaslConfig(Properties props, KafkaClientInfo clientInfo) {
-        // 关键逻辑：Properties 不允许 null value，这里做必填校验避免 NPE
-        if (StrUtil.isBlank(clientInfo.getSaslMechanism())) {
-            throw new IllegalArgumentException("已启用SASL认证但缺少 sasl.mechanism");
-        }
-        if (StrUtil.isBlank(clientInfo.getSaslJaasConfig())) {
-            throw new IllegalArgumentException("已启用SASL认证但缺少 sasl.jaas.config");
-        }
+        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, clientInfo.getSaslProtocol());
 
         if (StrUtil.isNotBlank(clientInfo.getSaslClientId())) {
             props.put(CommonClientConfigs.CLIENT_ID_CONFIG, clientInfo.getSaslClientId());
@@ -157,28 +128,16 @@ public class KafkaStoragePlugin {
 
     /** 应用 SSL 加密设置 */
     private void applySslConfig(Properties props, KafkaClientInfo clientInfo) {
-        // 关键逻辑：SSL 配置中很多字段是可选的（例如单向TLS不需要 keystore），只在有值时写入
-        if (StrUtil.isNotBlank(clientInfo.getSslTruststoreLocation())) {
-            props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, clientInfo.getSslTruststoreLocation());
-            if (clientInfo.getSslTruststorePassword() != null) {
-                props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, clientInfo.getSslTruststorePassword());
-            }
-        }
+        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, clientInfo.getSslProtocol());
 
-        if (StrUtil.isNotBlank(clientInfo.getSslKeystoreLocation())) {
-            props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, clientInfo.getSslKeystoreLocation());
-            if (clientInfo.getSslKeystorePassword() != null) {
-                props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, clientInfo.getSslKeystorePassword());
-            }
-        }
-        if (clientInfo.getSslKeyPassword() != null) {
-            props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, clientInfo.getSslKeyPassword());
-        }
+        props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, clientInfo.getSslTruststoreLocation());
+        props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, clientInfo.getSslTruststorePassword());
 
-        // 允许配置为空字符串以关闭主机名校验
-        if (clientInfo.getSslAlgorithm() != null) {
-            props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, clientInfo.getSslAlgorithm());
-        }
+        props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, clientInfo.getSslKeystoreLocation());
+        props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, clientInfo.getSslKeystorePassword());
+        props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, clientInfo.getSslKeyPassword());
+
+        props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, clientInfo.getSslAlgorithm());
     }
 
     /* ======================= RESOURCE MANAGEMENT ======================= */

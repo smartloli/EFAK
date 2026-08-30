@@ -50,8 +50,8 @@ docker-compose --version  # 需要 2.0+
 #### 2. 获取源代码
 
 ```bash
-git clone https://github.com/smartloli/EFAK.git
-cd EFAK
+git clone https://github.com/smartloli/EFAK-AI.git
+cd EFAK-AI
 ```
 
 #### 3. 启动所有服务
@@ -113,6 +113,34 @@ docker-compose restart efak-ai
 # 更新镜像
 docker-compose pull
 docker-compose up -d
+```
+
+### 方式三：分布式一键部署（Web + Worker）
+
+同一套镜像拆成 UI 节点和采集节点，自带 MySQL、Redis、Nginx。
+
+```bash
+chmod +x ./deploy-distributed.sh
+./deploy-distributed.sh                 # 默认 1 个 Web + 2 个 Worker
+./deploy-distributed.sh --web 2 --workers 3
+```
+
+访问 `http://localhost:8080`，账号 `admin` / `admin123`。
+
+```bash
+./deploy-distributed.sh status
+./deploy-distributed.sh logs
+./deploy-distributed.sh --web 2 --workers 4 scale
+./deploy-distributed.sh down
+```
+
+Worker 通过容器 IP 自动形成稳定节点 ID，扩容后一致性哈希只迁移约 `1/N` 的采集分片。Web 使用 Redis Session，多副本无需粘滞会话。
+
+也可用 Compose 直接启动：
+
+```bash
+docker compose -p efak-dist -f docker-compose.distributed.yml up -d --build \
+  --scale efak-web=1 --scale efak-worker=2
 ```
 
 ### 方式二：使用 Dockerfile 构建
@@ -331,6 +359,20 @@ grep ERROR logs/efak-ai.log
 | `SPRING_DATA_REDIS_PORT` | Redis 端口 | 6379 |
 | `SERVER_PORT` | 应用端口 | 8080 |
 | `JAVA_OPTS` | JVM 参数 | -Xms512m -Xmx2g |
+| `EFAK_ROLE` | 进程角色：`all` / `web` / `worker` | all |
+| `EFAK_NODE_ID` | 稳定节点 ID，空则使用 `ip:port` | |
+
+同一套 JAR 可以拆成 Web 与采集进程。Web 只服务 UI（Session 存在 Redis，可多副本），Worker 只跑监控任务并用一致性哈希分片：
+
+```bash
+# UI 节点（可水平扩展，需负载均衡粘滞或 Redis Session）
+EFAK_ROLE=web SERVER_PORT=8080 java -jar KafkaEagle.jar
+
+# 采集节点（按 Kafka 规模扩容，node-id 或端口必须唯一）
+EFAK_ROLE=worker SERVER_PORT=8081 java -jar KafkaEagle.jar
+```
+
+单机默认 `efak.role=all`，行为与原来一致。
 
 ### JVM 参数调优
 
@@ -577,9 +619,9 @@ curl http://localhost:8080/actuator/metrics/jvm.memory.used
 
 ## 支持与反馈
 
-- **文档**: [https://github.com/smartloli/EFAK](https://github.com/smartloli/EFAK)
-- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK/issues)
-- **社区讨论**: [GitHub Discussions](https://github.com/smartloli/EFAK/discussions)
+- **文档**: [https://github.com/smartloli/EFAK-AI](https://github.com/smartloli/EFAK-AI)
+- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK-AI/issues)
+- **社区讨论**: [GitHub Discussions](https://github.com/smartloli/EFAK-AI/discussions)
 
 ---
 

@@ -32,15 +32,15 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scroll-behavior: smooth;
+            overscroll-behavior: contain;
+            scroll-behavior: auto;
             padding: 16px 16px 8px 16px;
             /* 确保内容可以正常滚动 */
             position: relative;
             /* 防止内容溢出 */
             box-sizing: border-box;
             /* 确保占据剩余空间 */
-            display: flex;
-            flex-direction: column;
+            display: block;
             /* 限制最大宽度，防止内容过宽 */
             max-width: 100%;
             /* 确保内容不会超出容器边界 */
@@ -59,13 +59,13 @@
 
         .chat-messages::-webkit-scrollbar-track {
             background: #f8fafc;
-            border-radius: 4px;
+            border-radius: 2px;
             margin: 2px 0;
         }
 
         .chat-messages::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-            border-radius: 4px;
+            border-radius: 2px;
             border: 1px solid #f8fafc;
             min-height: 30px;
         }
@@ -84,66 +84,50 @@
             scrollbar-color: #cbd5e1 #f8fafc;
         }
 
-        /* 确保聊天容器有固定高度 */
         .chat-container {
-            height: calc(100vh - 200px);
-            min-height: 700px;
-            max-height: calc(100vh - 200px);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            /* 确保底部操作区域紧贴底部 */
-            justify-content: space-between;
-            /* 确保聊天区域有固定高度 */
             position: relative;
-            /* 确保消息区域有足够空间 */
             gap: 0;
-            /* 确保聊天消息区域能够正确滚动 */
-            flex: 1;
-            /* 确保聊天容器高度固定，不会随内容增加 */
-            flex-shrink: 0;
         }
 
         .message-bubble {
-            max-width: 85%;
-            min-width: 200px;
+            max-width: 100%;
+            min-width: 0;
             word-wrap: break-word;
             word-break: break-word;
             overflow-wrap: break-word;
-            animation: slideIn 0.3s ease-out;
-            /* 防止内容溢出 */
+            animation: slideIn 0.2s ease-out;
             box-sizing: border-box;
+            border-radius: 2px;
         }
 
         .message-bubble.assistant {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            color: #334155;
-            border: 1px solid #e2e8f0;
-            /* 固定AI回答内容宽度，防止挤压右侧布局 */
-            max-width: 60%;
-            min-width: 250px;
-            /* 确保AI回答内容不会超出容器边界 */
+            background: #ffffff;
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+            max-width: 100%;
+            min-width: 0;
             overflow-wrap: break-word;
             word-wrap: break-word;
             word-break: break-word;
         }
 
         .message-bubble.user {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            background: #165DFF;
             color: white;
             margin-left: auto;
-            /* 确保用户消息不会遮挡AI回答 */
-            max-width: 60%;
-            min-width: 200px;
-            /* 确保用户消息内容不会超出容器边界 */
+            max-width: 76%;
+            min-width: 0;
             overflow-wrap: break-word;
             word-wrap: break-word;
             word-break: break-word;
+            border: 1px solid #165DFF;
         }
 
         .message-avatar {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -152,12 +136,12 @@
         }
 
         .message-avatar.user {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
+            background: #165DFF;
             color: white;
         }
 
         .message-avatar.assistant {
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            background: #165DFF;
             color: white;
         }
 
@@ -219,10 +203,10 @@
         }
 
         .model-selector {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            padding: 8px;
             max-height: 300px;
             overflow-y: auto;
         }
@@ -247,7 +231,7 @@
 
         .model-option {
             padding: 8px 12px;
-            border-radius: 8px;
+            border-radius: 2px;
             cursor: pointer;
             transition: all 0.2s ease;
             border: 1px solid transparent;
@@ -260,9 +244,10 @@
         }
 
         .model-option.active {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%);
-            color: white;
+            background: rgba(22, 93, 255, 0.08);
+            color: #165DFF;
             border-color: #165DFF;
+            box-shadow: inset 2px 0 0 #165DFF;
         }
 
         .model-option .text-xs {
@@ -271,7 +256,7 @@
 
         .model-option.active .font-medium,
         .model-option.active .text-xs {
-            color: white;
+            color: #165DFF;
         }
 
         .markdown-content h1,
@@ -283,7 +268,7 @@
 
         .markdown-content pre {
             background: #f3f4f6;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 16px;
             overflow-x: auto;
             margin: 12px 0;
@@ -300,14 +285,14 @@
         /* 代码块包装器样式 */
         .code-block-wrapper {
             margin: 12px 0;
-            border-radius: 8px;
+            border-radius: 2px;
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .code-block-wrapper pre {
             margin: 0;
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 4px 4px;
             background: #282c34;
             color: #abb2bf;
         }
@@ -326,7 +311,7 @@
 
         .copy-code-btn {
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
             transition: all 0.2s ease;
         }
 
@@ -337,7 +322,7 @@
         .markdown-content code {
             background: #f3f4f6;
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: 2px;
             font-family: 'Courier New', monospace;
         }
 
@@ -351,7 +336,7 @@
         /* 表格包装器样式 */
         .table-wrapper {
             margin: 16px 0;
-            border-radius: 8px;
+            border-radius: 2px;
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             background: white;
@@ -364,7 +349,7 @@
 
         .copy-table-btn {
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
             transition: all 0.2s ease;
         }
 
@@ -375,7 +360,7 @@
         .table-container {
             overflow-x: auto;
             max-width: 100%;
-            border-radius: 8px;
+            border-radius: 2px;
         }
 
         .markdown-table {
@@ -508,7 +493,7 @@
         .action-btn {
             background: rgba(0, 0, 0, 0.05);
             border: none;
-            border-radius: 4px;
+            border-radius: 2px;
             padding: 4px 8px;
             font-size: 12px;
             cursor: pointer;
@@ -522,7 +507,7 @@
         .chart-container {
             margin: 16px 0;
             background: white;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 16px;
             border: 1px solid #e5e7eb;
             /* 限制图表宽度，防止图表挤压布局 */
@@ -543,28 +528,28 @@
         }
 
         .quick-action {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 6px 12px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            padding: 4px 10px;
             font-size: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
             color: #475569;
             font-weight: 500;
         }
 
         .quick-action:hover {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            transform: translateY(-1px);
-            border-color: #cbd5e1;
-            color: #1e293b;
+            background: rgba(22, 93, 255, 0.06);
+            transform: none;
+            border-color: #165DFF;
+            color: #165DFF;
         }
 
         /* 思考区域样式 */
         .thinking-section {
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             background: #f9fafb;
             margin-bottom: 12px;
             /* 限制最大宽度 */
@@ -580,23 +565,23 @@
             display: flex;
             align-items: center;
             padding: 8px 12px;
-            background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
-            border-radius: 8px 8px 0 0;
+            background: #f3f4f6;
+            border-radius: 2px 4px 0 0;
             cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 14px;
+            transition: background 0.15s ease;
+            font-size: 13px;
             font-weight: 500;
-            color: #ffffff;
+            color: #374151;
         }
 
         .thinking-header:hover {
-            background: linear-gradient(135deg, #9ca3af 0%, #d1d5db 100%);
+            background: #e5e7eb;
         }
 
         .thinking-content {
             padding: 12px;
             background: #f9fafb;
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 4px 4px;
             font-size: 13px;
             line-height: 1.5;
             color: #6b7280;
@@ -608,7 +593,7 @@
             font-family: 'Courier New', monospace;
             background: #f3f4f6;
             padding: 8px;
-            border-radius: 4px;
+            border-radius: 2px;
             border-left: 3px solid #6b7280;
             /* 防止长文本溢出 */
             word-wrap: break-word;
@@ -646,7 +631,7 @@
         .markdown-content code {
             background: #f3f4f6;
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: 2px;
             font-family: 'Courier New', monospace;
             word-wrap: break-word;
             word-break: break-word;
@@ -741,7 +726,7 @@
             /* 确保聊天消息区域在固定高度内滚动 */
             height: auto;
             /* 确保新消息添加时历史内容向上滚动 */
-            scroll-behavior: smooth;
+            scroll-behavior: auto;
             /* 确保聊天消息区域不会增加容器高度 */
             flex-shrink: 1;
         }
@@ -847,17 +832,854 @@
             flex-shrink: 0;
         }
 
-        /* 确保聊天容器高度完全固定 */
-        .chat-container {
-            height: calc(100vh - 0px) !important;
-            max-height: calc(100vh - 0px) !important;
+        .ai-workspace-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 14px;
+            background: transparent;
+            border: 0;
+            border-bottom: 1px solid #e5e7eb;
+            border-radius: 0;
+            margin-bottom: 0;
+            flex-shrink: 0;
+            color: #111827;
         }
 
-        /* 确保聊天消息区域在固定高度内滚动 */
+        .composer-box {
+            position: relative;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            background: #ffffff;
+            padding: 8px 8px 6px 8px;
+        }
+
+        .slash-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: calc(100% + 6px);
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+            z-index: 26;
+            overflow: hidden;
+            padding: 4px;
+        }
+
+        .slash-menu.open {
+            display: block;
+        }
+
+        .slash-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            text-align: left;
+            border: 0;
+            background: transparent;
+            border-radius: 2px;
+            padding: 8px 10px;
+            cursor: pointer;
+            color: #111827;
+        }
+
+        .slash-item.active,
+        .slash-item:hover {
+            background: rgba(22, 93, 255, 0.06);
+            color: #165DFF;
+        }
+
+        .slash-item-cmd {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        .slash-item-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .slash-item.active .slash-item-desc,
+        .slash-item:hover .slash-item-desc {
+            color: #165DFF;
+        }
+
+        .composer-box:focus-within {
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.12);
+        }
+
+        .composer-box textarea {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            padding: 4px 4px 6px 4px !important;
+            min-height: 40px;
+            max-height: 160px;
+        }
+
+        .composer-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 0 4px 2px 4px;
+        }
+
+        .composer-hint {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .composer-send {
+            width: 32px;
+            height: 32px;
+            border-radius: 2px;
+            background: #165DFF;
+            color: #ffffff;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s ease, opacity 0.15s ease;
+        }
+
+        .composer-send:hover:not(:disabled) {
+            background: #0E4AE6;
+        }
+
+        .composer-send:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .composer-icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 2px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #6b7280;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .composer-icon-btn:hover {
+            color: #165DFF;
+            border-color: #165DFF;
+        }
+
+        .icon-btn-ghost {
+            width: 32px;
+            height: 32px;
+            border: 0;
+            background: transparent;
+            color: #6b7280;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .icon-btn-ghost:hover {
+            color: #165DFF;
+            background: rgba(22, 93, 255, 0.08);
+        }
+
+        .ai-page {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            flex: 1 1 auto !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
         .chat-messages {
-            height: calc(100vh - 100px) !important;
-            max-height: calc(100vh - 100px) !important;
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            height: auto !important;
+            max-height: none !important;
             overflow-y: auto !important;
+            overflow-x: hidden !important;
+            padding: 12px 16px !important;
+        }
+
+        .chat-composer {
+            flex-shrink: 0;
+            position: static;
+        }
+
+        .workspace-actions {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: auto;
+        }
+
+        .model-picker {
+            position: relative;
+        }
+
+        .model-picker-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            max-width: 220px;
+            height: 28px;
+            padding: 0 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            background: #f8fafc;
+            color: #374151;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .model-picker-btn:hover,
+        .model-picker.open .model-picker-btn {
+            border-color: #165DFF;
+            color: #165DFF;
+            background: #fff;
+        }
+
+        .model-picker-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 168px;
+        }
+
+        .model-picker-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            bottom: calc(100% + 6px);
+            width: 260px;
+            max-height: 240px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+            z-index: 30;
+            padding: 4px;
+        }
+
+        .model-picker.open .model-picker-menu {
+            display: block;
+        }
+
+        .model-option {
+            padding: 8px 10px;
+            border-radius: 2px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            margin-bottom: 2px;
+        }
+
+        .model-option:hover {
+            background: rgba(22, 93, 255, 0.06);
+        }
+
+        .model-option.active {
+            background: rgba(22, 93, 255, 0.08);
+            color: #165DFF;
+            border-color: #165DFF;
+        }
+
+        .history-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        .history-modal.open {
+            display: flex;
+        }
+
+        .history-dialog {
+            width: min(520px, calc(100vw - 32px));
+            max-height: min(640px, calc(100vh - 48px));
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            box-shadow: 0 16px 48px rgba(15, 23, 42, 0.18);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .history-dialog-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .history-search {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .history-search input {
+            width: 100%;
+            height: 32px;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            padding: 0 10px 0 30px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .history-search input:focus {
+            border-color: #165DFF;
+        }
+
+        .history-search-wrap {
+            position: relative;
+        }
+
+        .history-search-wrap i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .history-list {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 6px;
+        }
+
+        .history-item {
+            padding: 10px 10px;
+            border-radius: 2px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .history-item:hover,
+        .history-item.active {
+            background: #f8fafc;
+            border-color: #e5e7eb;
+        }
+
+        .history-item-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item-meta {
+            margin-top: 3px;
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .history-empty {
+            padding: 32px 16px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .history-pager {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 14px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .history-pager button {
+            height: 26px;
+            padding: 0 10px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            border-radius: 2px;
+            color: #374151;
+            cursor: pointer;
+        }
+
+        .history-pager button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .thinking-section {
+            border: 1px solid #e5e7eb;
+            background: #f8fafc;
+            border-radius: 2px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .thinking-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 10px;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4b5563;
+            text-align: left;
+        }
+
+        .thinking-pulse {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #165DFF;
+            box-shadow: 0 0 0 0 rgba(22, 93, 255, 0.5);
+        }
+
+        .thinking-section.is-streaming .thinking-pulse {
+            animation: thinkPulse 1.2s ease-out infinite;
+        }
+
+        .thinking-section.is-done .thinking-pulse {
+            background: #059669;
+            box-shadow: none;
+        }
+
+        @keyframes thinkPulse {
+            0% { box-shadow: 0 0 0 0 rgba(22, 93, 255, 0.45); }
+            100% { box-shadow: 0 0 0 8px rgba(22, 93, 255, 0); }
+        }
+
+        .thinking-content {
+            display: none;
+            padding: 0 10px 10px;
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.6;
+            border-top: 1px solid #edf0f3;
+        }
+
+        .thinking-section.open .thinking-content {
+            display: block;
+            padding-top: 8px;
+        }
+
+        .thinking-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 180px;
+            overflow-y: auto;
+            font-family: ui-sans-serif, system-ui, sans-serif;
+            background: #fff;
+            border: 1px solid #eef2f6;
+            border-radius: 2px;
+            padding: 8px;
+        }
+
+        .message-container.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-bubble.user {
+            max-width: 72%;
+            margin-left: 0;
+            padding: 8px 12px;
+            font-size: 13px;
+            line-height: 1.45;
+            white-space: pre-wrap;
+        }
+
+        .message-bubble.assistant {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-messages .markdown-content p {
+            margin: 0 0 8px;
+        }
+
+        .chat-messages .markdown-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .chat-messages .markdown-content ul {
+            margin: 4px 0 8px;
+        }
+
+        .chat-messages {
+            padding: 20px 24px 12px !important;
+        }
+
+        .chat-messages > * {
+            max-width: 768px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .message-container.assistant {
+            display: block;
+        }
+
+        .message-bubble.assistant {
+            background: transparent;
+            border: 0;
+            padding: 0;
+            box-shadow: none;
+            color: #1f2937;
+            font-size: 14.5px;
+            line-height: 1.75;
+        }
+
+        .message-bubble.user {
+            background: #f3f4f6;
+            color: #111827;
+            border: 0;
+            max-width: min(72%, 560px);
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .message-actions {
+            opacity: 1;
+            margin-top: 10px;
+            gap: 2px;
+        }
+
+        .action-btn {
+            background: transparent;
+            color: #9ca3af;
+            padding: 4px 6px;
+            font-size: 13px;
+        }
+
+        .action-btn:hover {
+            background: rgba(22, 93, 255, 0.08);
+            color: #165DFF;
+        }
+
+        .composer-inner {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 4px 24px 16px;
+        }
+
+        .chat-composer {
+            border-top: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 28%);
+        }
+
+        .composer-box {
+            padding: 10px 12px 8px;
+        }
+
+        .composer-box textarea {
+            min-height: 28px;
+            max-height: 160px;
+        }
+
+        .welcome-block .markdown-content {
+            color: #374151;
+        }
+
+        .ai-page.is-empty .chat-messages {
+            display: none !important;
+        }
+
+        .ai-page:not(.is-empty) .agent-empty {
+            display: none;
+        }
+
+        .agent-stage {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .agent-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 24px 8px;
+            text-align: center;
+        }
+
+        .agent-empty-kicker {
+            font-size: 12px;
+            letter-spacing: 0.04em;
+            color: #165DFF;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .agent-empty h1 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            font-weight: 650;
+            color: #111827;
+            letter-spacing: -0.02em;
+        }
+
+        .agent-empty p {
+            margin: 0 0 22px;
+            font-size: 13px;
+            color: #6b7280;
+            max-width: 420px;
+            line-height: 1.55;
+        }
+
+        .intent-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 220px));
+            gap: 8px;
+            max-width: 456px;
+            width: 100%;
+        }
+
+        .intent-card {
+            text-align: left;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            border-radius: 2px;
+            padding: 12px 12px 11px;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+        .intent-card:hover {
+            border-color: #165DFF;
+            background: rgba(22, 93, 255, 0.04);
+        }
+
+        .intent-card-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .intent-card-label i {
+            color: #165DFF;
+            width: 14px;
+            text-align: center;
+        }
+
+        .intent-card-desc {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.45;
+            padding-left: 22px;
+        }
+
+        .agent-step {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #6b7280;
+            margin: 6px 0;
+            line-height: 1.4;
+        }
+
+        .agent-step i {
+            color: #165DFF;
+            font-size: 11px;
+        }
+
+        .agent-step.is-pending {
+            color: #9ca3af;
+        }
+
+        .agent-trace {
+            margin: 2px 0 8px;
+        }
+
+        .follow-ups {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 0 0 10px;
+        }
+
+        .follow-up {
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #374151;
+            border-radius: 2px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .follow-up:hover {
+            border-color: #165DFF;
+            color: #165DFF;
+            background: rgba(22, 93, 255, 0.04);
+        }
+
+        .chat-container {
+            border: 1px solid #e5e7eb;
+            box-shadow: none;
+        }
+
+        .ai-workspace-bar {
+            padding: 6px 12px;
+        }
+
+        @media (max-width: 720px) {
+            .intent-grid {
+                grid-template-columns: 1fr;
+                max-width: 360px;
+            }
+        }
+
+        /* Fixed agent canvas: dock never leaves the viewport. */
+        .ai-page {
+            height: 100% !important;
+            max-height: 100% !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        .agent-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            max-height: 100%;
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+        }
+
+        .agent-topbar {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            height: 44px;
+            padding: 0 12px;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .agent-stage {
+            flex: 1 1 0;
+            min-height: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-scroll {
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scroll-behavior: auto;
+            padding: 20px 0 28px;
+        }
+
+        .agent-thread {
+            width: min(768px, calc(100% - 48px));
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .agent-empty {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: auto;
+            background: #fff;
+        }
+
+        .ai-page.is-empty .agent-empty {
+            display: flex;
+        }
+
+        .ai-page.is-empty .agent-scroll {
+            visibility: hidden;
+        }
+
+        .agent-dock {
+            flex: 0 0 auto;
+            background: #fff;
+            border-top: 1px solid #eef2f6;
+            padding: 10px 0 14px;
+        }
+
+        .agent-dock .composer-inner {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .agent-shell .composer-box textarea {
+            min-height: 24px !important;
+            max-height: 120px !important;
+        }
+
+        .agent-shell .message-bubble {
+            animation: none;
+        }
+
+        .agent-shell .message-container.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .chat-container>div:last-child {
+            margin-top: 0;
         }
     </style>
 </head>
@@ -870,167 +1692,101 @@
         <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
             <th:block th:replace="~{public/header :: header}"></th:block>
 
-            <main class="flex-1 overflow-hidden p-4 pt-20 pb-2">
-                <div class="flex h-full gap-4" style="min-width: 0; overflow: hidden;">
-                    <!-- 主聊天区域 -->
-                    <div class="flex-1 flex flex-col" style="min-width: 0; overflow: hidden; height: 100%;">
-                        <!-- 欢迎卡片 -->
-                        <div
-                            class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white mb-2 shadow-lg">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h1 class="text-2xl font-bold mb-2">
-                                        <i class="fa fa-robot mr-2"></i>EFAK AI 智能助手
-                                    </h1>
-                                    <p class="text-blue-100">支持多种大模型，提供智能分析和可视化图表</p>
-                                </div>
-                                <div class="text-6xl opacity-20">
-                                    <i class="fa fa-magic"></i>
-                                </div>
+            <main class="flex-1 overflow-hidden px-4 pt-20 pb-0" style="min-height: 0;">
+                <div class="ai-page is-empty">
+                    <div class="agent-shell">
+                    <header class="agent-topbar">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="text-sm font-semibold leading-tight text-gray-900">Kafka Copilot</div>
+                            <div id="agent-cluster-hint" class="text-xs text-gray-400 truncate"></div>
+                        </div>
+                        <div class="workspace-actions">
+                            <button type="button" id="history-chat-btn" class="icon-btn-ghost" title="历史对话">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </button>
+                            <button type="button" id="new-chat-btn" class="icon-btn-ghost" title="新建对话">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                        </div>
+                    </header>
+                        <div class="agent-stage">
+                            <div id="agent-empty" class="agent-empty">
+                                <div class="agent-empty-kicker">AGENT</div>
+                                <h1>有什么可以帮你排查的？</h1>
+                                <p id="agent-empty-sub">选一个任务开始，或直接描述 Topic、消费者、集群问题。我会查实时数据再回答。</p>
+                                <div id="intent-grid" class="intent-grid"></div>
+                            </div>
+                            <div id="agent-scroll" class="agent-scroll">
+                                <div id="chat-messages" class="agent-thread"></div>
                             </div>
                         </div>
 
-                        <!-- 聊天容器 -->
-                        <div class="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 chat-container">
-                            <!-- 聊天消息区域 -->
-                            <div id="chat-messages" class="chat-messages space-y-4 overflow-y-auto">
-                                <!-- 欢迎消息 -->
-                                <div class="flex items-start space-x-3">
-                                    <div class="message-avatar assistant">
-                                        <img src="/images/ai_robot.jpg" alt="AI助手"
-                                            class="w-full h-full object-cover rounded-full">
-                                    </div>
-                                    <div class="message-bubble assistant p-4 rounded-lg">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <div class="text-sm text-gray-600">AI助手</div>
-                                            <div class="text-xs text-gray-400" id="welcome-model-name">正在加载...</div>
-                                        </div>
-                                        <div class="markdown-content">
-                                            <p>您好！我是 EFAK AI 智能助手。我支持：</p>
-                                            <ul>
-                                                <li>🤖 <strong>多种大模型</strong> - GPT-4, Claude, DeepSeek等</li>
-                                                <li>📊 <strong>数据可视化</strong> - 自动生成图表和统计分析</li>
-                                                <li>📝 <strong>Markdown渲染</strong> - 支持代码高亮、表格、数学公式</li>
-                                                <li>🔍 <strong>Kafka专家</strong> - 集群分析、性能优化、故障诊断</li>
-                                            </ul>
-                                            <p>请选择您偏好的大模型，然后告诉我您需要什么帮助！</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 底部操作区域 -->
-                            <div class="border-t border-gray-200 bg-gray-50 rounded-b-xl flex-shrink-0"
-                                style="flex-shrink: 0;">
-                                <!-- 快捷操作区域 -->
-                                <div class="p-1 border-b border-gray-200">
-                                    <div class="quick-actions">
-                                        <div class="quick-action" data-action="alert-analysis">🔔 告警分析</div>
-                                        <div class="quick-action" data-action="analyze-performance">🚀 Broker资源分析</div>
-                                        <div class="quick-action" data-action="cluster-health">❤️ 集群健康检查</div>
-                                        <div class="quick-action" data-action="explain-kafka">📚 Kafka知识</div>
-                                    </div>
-                                </div>
-
-                                <!-- 输入区域 -->
-                                <div class="p-1">
-                                    <div class="flex space-x-3">
-                                        <div class="flex-1 relative">
-                                            <textarea id="chat-input" placeholder="请输入您的问题或需求... (支持Shift+Enter换行)"
-                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white"
-                                                rows="2"></textarea>
-                                            <div class="absolute right-3 bottom-3 flex items-center space-x-3">
-                                                <button id="new-chat-btn"
-                                                    class="text-gray-400 hover:text-blue-500 transition-colors text-xl">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                                <button id="send-btn"
-                                                    class="text-gray-400 hover:text-blue-500 transition-colors text-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    disabled data-action="send">
-                                                    <i class="fa fa-arrow-up"></i>
-                                                </button>
+                        <footer class="agent-dock">
+                            <div class="composer-inner">
+                                <div id="follow-ups" class="follow-ups" hidden></div>
+                                <div class="composer-box">
+                                    <div id="slash-menu" class="slash-menu" hidden></div>
+                                    <textarea id="chat-input" placeholder="随心输入，/new 新建对话"
+                                        class="w-full resize-none bg-white text-sm"
+                                        rows="1"></textarea>
+                                    <div class="composer-toolbar">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                        <div class="model-picker" id="model-picker">
+                                            <button type="button" class="model-picker-btn" id="model-picker-btn" title="选择模型">
+                                                <i class="fa-solid fa-microchip"></i>
+                                                <span class="model-picker-label" id="model-picker-label">加载模型…</span>
+                                                <i class="fa-solid fa-chevron-up" style="font-size: 10px;"></i>
+                                            </button>
+                                            <div class="model-picker-menu" id="model-options">
+                                                <div class="text-center text-gray-500 py-4 text-xs">
+                                                    <i class="fa fa-spinner fa-spin mr-1"></i>正在加载模型...
+                                                </div>
                                             </div>
                                         </div>
+                                        </div>
+                                        <button id="send-btn" class="composer-send" disabled data-action="send" title="发送">
+                                            <i class="fa fa-arrow-up"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </footer>
                     </div>
+                </div>
 
-                    <!-- 右侧控制面板 -->
-                    <div class="w-80 space-y-4" style="flex-shrink: 0; min-width: 320px;">
-                        <!-- 模型选择 -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                            <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-                                <i class="fa fa-cogs mr-2 text-purple-500"></i>AI模型选择
-                            </h3>
-                            <div class="model-selector">
-                                <div class="space-y-2" id="model-options">
-                                    <!-- 模型选项将通过JavaScript动态加载 -->
-                                    <div class="text-center text-gray-500 py-4">
-                                        <i class="fa fa-spinner fa-spin mr-2"></i>正在加载模型...
-                                    </div>
-                                </div>
+                <input type="checkbox" id="enable-charts" checked hidden>
+                <input type="checkbox" id="enable-highlight" checked hidden>
+
+                <div id="history-modal" class="history-modal" aria-hidden="true">
+                    <div class="history-dialog" role="dialog" aria-labelledby="history-dialog-title">
+                        <div class="history-dialog-header">
+                            <div>
+                                <div id="history-dialog-title" class="text-sm font-semibold text-gray-900">历史对话</div>
+                                <div class="text-xs text-gray-500">搜索并打开之前的会话</div>
+                            </div>
+                            <button type="button" id="history-close-btn" class="composer-icon-btn" title="关闭">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <div class="history-search">
+                            <div class="history-search-wrap">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="search" id="history-search-input" placeholder="搜索对话标题">
                             </div>
                         </div>
-
-                        <!-- 对话设置 -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                            <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-                                <i class="fa fa-sliders mr-2 text-blue-500"></i>对话设置
-                            </h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">启用图表生成</span>
-                                    <label class="switch">
-                                        <input type="checkbox" id="enable-charts" checked>
-                                        <span class="slider round"></span>
-                                    </label>
-                                </div>
-
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">代码高亮</span>
-                                    <label class="switch">
-                                        <input type="checkbox" id="enable-highlight" checked>
-                                        <span class="slider round"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 对话历史 -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                            <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-                                <i class="fa fa-history mr-2 text-green-500"></i>对话历史
-                            </h3>
-                            <div class="space-y-2" id="chat-history">
-                                <div class="p-2 hover:bg-gray-50 rounded cursor-pointer text-sm">
-                                    <div class="font-medium text-gray-700">Kafka性能优化分析</div>
-                                    <div class="text-gray-500 text-xs">2小时前 · GPT-4</div>
-                                </div>
-                                <div class="p-2 hover:bg-gray-50 rounded cursor-pointer text-sm">
-                                    <div class="font-medium text-gray-700">消费者延迟问题诊断</div>
-                                    <div class="text-gray-500 text-xs">昨天 · Claude-3</div>
-                                </div>
-                                <div class="p-2 hover:bg-gray-50 rounded cursor-pointer text-sm">
-                                    <div class="font-medium text-gray-700">集群容量规划</div>
-                                    <div class="text-gray-500 text-xs">3天前 · Gemini Pro</div>
-                                </div>
-                                <div class="p-2 hover:bg-gray-50 rounded cursor-pointer text-sm">
-                                    <div class="font-medium text-gray-700">Topic分区策略优化</div>
-                                    <div class="text-gray-500 text-xs">5天前 · DeepSeek</div>
-                                </div>
-                            </div>
+                        <div class="history-list" id="chat-history"></div>
+                        <div class="history-pager">
+                            <button type="button" id="history-prev-btn">上一页</button>
+                            <span id="history-page-info">第 1 / 1 页</span>
+                            <button type="button" id="history-next-btn">下一页</button>
                         </div>
                     </div>
                 </div>
             </main>
-            <!-- Footer -->
-            <th:block th:replace="~{public/common :: footer_sub}"></th:block>
         </div>
     </div>
 
-    <!-- 开关样式 -->
+    <!-- Toggle -->
     <style>
         .switch {
             position: relative;
@@ -1080,7 +1836,7 @@
         }
 
         .slider.round {
-            border-radius: 20px;
+            border-radius: 9999px;
         }
 
         .slider.round:before {
@@ -1088,8 +1844,8 @@
         }
     </style>
 
-    <!-- AI助手专用JavaScript -->
-    <script th:src="@{/js/system/ai-assistant.js}"></script>
+    <!-- AI assistant -->
+    <script th:src="@{/js/system/ai-assistant.js(v='agent4')}"></script>
 </body>
 
 </html>

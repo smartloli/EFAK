@@ -128,6 +128,11 @@ public interface TopicService {
     List<Map<String, Object>> getTopicPartitionMessages(String topicName, String clusterId, Integer partition, Integer limit);
 
     /**
+     * 获取主题分区消息（支持关键字过滤，最多 10000 条）
+     */
+    List<Map<String, Object>> getTopicPartitionMessages(String topicName, String clusterId, Integer partition, Integer limit, String keyword);
+
+    /**
      * 获取主题配置信息
      *
      * @param topicName 主题名称

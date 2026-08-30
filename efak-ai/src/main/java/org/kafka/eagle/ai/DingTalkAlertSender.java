@@ -170,4 +170,33 @@ public class DingTalkAlertSender {
         }
     }
 
+    public static void main(String[] args) {
+        // 使用示例
+        String webhook = "https://oapi.dingtalk.com/robot/send?access_token=your_access_token";
+        // 如果机器人开启了签名验证，需要提供密钥
+        String secret = "your_secret";
+
+        CompletableFuture.runAsync(() -> {
+            DingTalkAlertSender sender = new DingTalkAlertSender(webhook);
+
+            try {
+                // 发送文本告警
+                String textResult = sender.sendTextAlert("EFAK系统告警: 服务器CPU使用率超过90%!", true);
+                System.out.println("文本消息发送结果: " + textResult);
+
+                // 发送Markdown告警
+                String markdownContent = "# EFAK系统严重告警\n" +
+                        "服务器CPU使用率超过90%!\n" +
+                        "**时间**: " + new java.util.Date() + "\n" +
+                        "**服务器**: 192.168.1.1\n" +
+                        "![趋势图](https://example.com/cpu_trend.jpg)\n" +
+                        "@13800138000";
+                String markdownResult = sender.sendMarkdownAlert("系统告警", markdownContent, false, "13800138000");
+                System.out.println(markdownResult);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
 }

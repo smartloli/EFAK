@@ -27,12 +27,12 @@ package org.kafka.eagle.tool.constant;
  * </p>
  * @author Mr.SmartLoli
  * @since 2025/6/22 23:13:40
- * @version 5.0.0
+ * @version 5.1.0
  */
 public enum KeConst {
 
     /** 应用版本常量 */
-    APP_VERSION("5.0.0", "当前应用版本"),
+    APP_VERSION("5.1.0", "当前应用版本"),
     
     /** 最大重试次数的配置键 */
     MAX_RETRY_ATTEMPTS("max.retry.attempts", "3", "操作的最大重试次数"),

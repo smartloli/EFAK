@@ -5,15 +5,12 @@ import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.kafka.eagle.dto.scheduler.TaskExecutionResult;
 import org.kafka.eagle.dto.scheduler.TaskScheduler;
-import org.kafka.eagle.web.config.DistributedTaskConfig;
+import org.kafka.eagle.web.config.EfakRuntimeProperties;
 import org.kafka.eagle.web.mapper.TaskExecutionHistoryMapper;
 import org.kafka.eagle.web.mapper.TaskSchedulerMapper;
 import org.kafka.eagle.web.service.CronExpressionUpdateService;
-import org.kafka.eagle.web.service.ShardResultAggregationService;
 import org.kafka.eagle.web.service.TaskExecutorManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,8 +21,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <p>
@@ -58,27 +64,24 @@ public class UnifiedDistributedScheduler {
     private CronExpressionUpdateService cronExpressionUpdateService;
 
     @Autowired
-    private ShardResultAggregationService shardResultAggregationService;
+    private EfakRuntimeProperties runtimeProperties;
 
-    @Autowired
-    private DistributedTaskConfig taskConfig;
-
-    @Autowired
-    private Environment environment;
-
-    @Value("${server.port:8080}")
-    private int serverPort;
-
-    // 调度器状态
     private final AtomicBoolean schedulerEnabled = new AtomicBoolean(true);
-    private final ScheduledExecutorService schedulerExecutor = Executors.newScheduledThreadPool(10);
-    private final Map<Long, Future<?>> runningTasks = new ConcurrentHashMap<>();
-    private final Map<Long, TaskScheduler> registeredTasks = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService schedulerExecutor = newScheduler();
 
-    // Redis键前缀
-    private static final String TASK_LOCK_KEY = "efak:unified:scheduler:lock";
-    private static final String TASK_STATS_KEY = "efak:unified:scheduler:stats";
-    private static final String NODE_REGISTRY_KEY = "efak:unified:nodes";
+    private static ScheduledExecutorService newScheduler() {
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, namedThreadFactory("efak-sched"));
+        executor.setRemoveOnCancelPolicy(true);
+        return executor;
+    }
+    private final ExecutorService taskExecutor = new ThreadPoolExecutor(
+            2, 8, 60, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(32),
+            namedThreadFactory("efak-task"),
+            new ThreadPoolExecutor.CallerRunsPolicy());
+    private final Map<Long, Future<?>> runningTasks = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<Long, TaskScheduler> registeredTasks = new java.util.concurrent.ConcurrentHashMap<>();
+
     private static final String CRON_UPDATE_NOTIFICATION_KEY = "efak:unified:cron:update:";
 
     // 支持的任务类型
@@ -92,20 +95,16 @@ public class UnifiedDistributedScheduler {
 
     @PostConstruct
     public void init() {
-
         try {
-            // 初始化分布式任务协调器
             taskCoordinator.initializeNode();
-
-            // 启动任务扫描
-            startTaskScanner();
-
-            // 启动Cron表达式变化监听器
-            startCronExpressionChangeListener();
-
-            // 启动节点心跳
             startNodeHeartbeat();
-
+            if (!runtimeProperties.isWorker()) {
+                schedulerEnabled.set(false);
+                log.info("Process role={} registers for cluster view but skips collector scheduling",
+                        runtimeProperties.normalizedRole());
+                return;
+            }
+            startCronExpressionChangeListener();
         } catch (Exception e) {
             log.error("统一分布式任务调度器初始化失败", e);
         }
@@ -116,17 +115,16 @@ public class UnifiedDistributedScheduler {
         log.info("销毁统一分布式任务调度器");
         stopScheduler();
         schedulerExecutor.shutdown();
+        taskExecutor.shutdown();
     }
 
-    /**
-     * 启动任务扫描器
-     */
-    private void startTaskScanner() {
-        schedulerExecutor.scheduleAtFixedRate(() -> {
-            if (schedulerEnabled.get()) {
-                scanAndExecuteTasks();
-            }
-        }, 0, 60, TimeUnit.SECONDS);
+    private static ThreadFactory namedThreadFactory(String prefix) {
+        AtomicInteger sequence = new AtomicInteger(1);
+        return runnable -> {
+            Thread thread = new Thread(runnable, prefix + "-" + sequence.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
+        };
     }
 
     /**
@@ -148,17 +146,10 @@ public class UnifiedDistributedScheduler {
     private void startNodeHeartbeat() {
         schedulerExecutor.scheduleAtFixedRate(() -> {
             try {
-                // 使用分布式任务协调器更新心跳
                 taskCoordinator.updateHeartbeat();
-
-                // 清理离线服务
                 taskCoordinator.cleanupOfflineServices();
-
-                // 保持原有的心跳逻辑作为备份
-                updateNodeHeartbeat();
-                cleanupOfflineNodes();
             } catch (Exception e) {
-                log.error("节点心跳更新失败", e);
+                log.error("Node heartbeat update failed", e);
             }
         }, 0, 10, TimeUnit.SECONDS);
     }
@@ -166,37 +157,22 @@ public class UnifiedDistributedScheduler {
     /**
      * 扫描并执行任务
      */
-    @Scheduled(fixedRate = 60000) // 每分钟扫描一次
+    @Scheduled(fixedRate = 60000)
     public void scanAndExecuteTasks() {
         if (!schedulerEnabled.get()) {
             return;
         }
 
-        // 尝试获取分布式锁
-        Boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(TASK_LOCK_KEY,
-                getCurrentNodeId(), 60, TimeUnit.SECONDS);
-
-        if (lockAcquired == null || !lockAcquired) {
-            return;
-        }
-
         try {
-
-            // 获取启用的任务
             List<TaskScheduler> enabledTasks = getEnabledTasksFromDatabase();
-
             for (TaskScheduler task : enabledTasks) {
-                if (shouldExecuteTask(task)) {
-                    executeTask(task);
-                } else {
+                if (!shouldExecuteTask(task)) {
+                    continue;
                 }
+                executeTask(task);
             }
-
         } catch (Exception e) {
-            log.error("扫描任务时发生错误", e);
-        } finally {
-            // 释放分布式锁
-            redisTemplate.delete(TASK_LOCK_KEY);
+            log.error("Failed to scan scheduled tasks", e);
         }
     }
 
@@ -242,14 +218,20 @@ public class UnifiedDistributedScheduler {
      * 判断任务是否应该执行
      */
     private boolean shouldExecuteTask(TaskScheduler task) {
-        if (task.getLastExecuteTime() == null) {
-            return true; // 首次执行
+        String openRound = taskCoordinator.getOpenRoundId(task.getId());
+        if (openRound != null && !taskCoordinator.hasCompletedRound(task.getId(), openRound)) {
+            return true;
         }
+        return isTaskDue(task);
+    }
 
+    private boolean isTaskDue(TaskScheduler task) {
+        if (task.getLastExecuteTime() == null) {
+            return true;
+        }
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime nextExecuteTime = calculateNextExecuteTime(task.getLastExecuteTime(), task.getCronExpression());
-
-        return now.isAfter(nextExecuteTime) || now.isEqual(nextExecuteTime);
+        return !now.isBefore(nextExecuteTime);
     }
 
     /**
@@ -284,43 +266,107 @@ public class UnifiedDistributedScheduler {
      * 执行任务（通用方法）
      */
     private void executeTaskWithTriggerType(TaskScheduler task, String triggerType) {
+        if (!runtimeProperties.isWorker()) {
+            log.warn("Process role={} cannot execute collector task {}",
+                    runtimeProperties.normalizedRole(), task.getTaskName());
+            return;
+        }
         if (runningTasks.containsKey(task.getId())) {
-            log.warn("任务 {} 正在执行中，跳过本次执行", task.getTaskName());
+            log.warn("Task {} is already running on this node, skip", task.getTaskName());
             return;
         }
 
-        Future<?> future = schedulerExecutor.submit(() -> {
+        String roundId = resolveRoundId(task, triggerType);
+        if (!"MANUAL".equals(triggerType) && taskCoordinator.hasCompletedRound(task.getId(), roundId)) {
+            return;
+        }
+
+        if (!taskCoordinator.acquireTaskLock(task.getTaskType(), 600)) {
+            log.warn("Task {} is locked on this node, skip", task.getTaskName());
+            return;
+        }
+
+        boolean submitted = false;
+        try {
+        Future<?> future = taskExecutor.submit(() -> {
             Long executionId = null;
+            ScheduledFuture<?> renewFuture = schedulerExecutor.scheduleAtFixedRate(
+                    () -> taskCoordinator.renewTaskLock(task.getTaskType(), 600),
+                    60, 60, TimeUnit.SECONDS);
             try {
-                // 记录任务执行开始
                 executionId = recordTaskExecutionStart(task, triggerType);
-
-                // 执行任务
                 TaskExecutionResult result = taskExecutorManager.executeTask(task);
-
-                // 记录任务执行结束
                 recordTaskExecutionEnd(executionId, result);
+                recordShardProgress(task, result);
 
-                // 汇总分片结果
-                aggregateShardResults(task, result);
-
-                // 更新任务状态
-                updateTaskStatus(task, result.isSuccess() ? "SUCCESS" : "FAILED");
-
+                if (!"MANUAL".equals(triggerType)) {
+                    taskCoordinator.markRoundDone(task.getId(), roundId);
+                    if (taskCoordinator.tryClaimStatsUpdate(task.getId(), roundId)) {
+                        updateTaskStatus(task, result.isSuccess() ? "SUCCESS" : "FAILED");
+                    }
+                } else if (taskCoordinator.tryClaimStatsUpdate(task.getId(), "manual-" + System.currentTimeMillis())) {
+                    updateTaskStatus(task, result.isSuccess() ? "SUCCESS" : "FAILED");
+                }
             } catch (Exception e) {
-                log.error("任务 {} 执行异常", task.getTaskName(), e);
-
+                log.error("Task {} failed", task.getTaskName(), e);
                 if (executionId != null) {
                     recordTaskExecutionEnd(executionId, createErrorResult(e.getMessage()));
                 }
-
-                updateTaskStatus(task, "FAILED");
+                if (!"MANUAL".equals(triggerType)) {
+                    taskCoordinator.markRoundDone(task.getId(), roundId);
+                    if (taskCoordinator.tryClaimStatsUpdate(task.getId(), roundId)) {
+                        updateTaskStatus(task, "FAILED");
+                    }
+                }
             } finally {
+                renewFuture.cancel(false);
                 runningTasks.remove(task.getId());
+                taskCoordinator.releaseTaskLock(task.getTaskType());
             }
         });
 
         runningTasks.put(task.getId(), future);
+        submitted = true;
+        } finally {
+            if (!submitted) {
+                taskCoordinator.releaseTaskLock(task.getTaskType());
+            }
+        }
+    }
+
+    private String resolveRoundId(TaskScheduler task, String triggerType) {
+        if ("MANUAL".equals(triggerType)) {
+            return "manual-" + System.currentTimeMillis();
+        }
+        if (isTaskDue(task)) {
+            String roundId = buildRoundId(task);
+            taskCoordinator.openRoundWindow(task.getId(), roundId, 120);
+            return roundId;
+        }
+        String openRound = taskCoordinator.getOpenRoundId(task.getId());
+        return openRound != null ? openRound : buildRoundId(task);
+    }
+
+    private String buildRoundId(TaskScheduler task) {
+        return LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES)
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
+    }
+
+    /**
+     * Snapshot shard results already written to Redis. Does not sleep or
+     * delete other nodes' keys; MySQL is the source of truth.
+     */
+    private void recordShardProgress(TaskScheduler task, TaskExecutionResult result) {
+        try {
+            Map<String, Object> shardResults = taskCoordinator.getAllShardResults(task.getTaskType());
+            log.info("Task {} finished on node {}, shard reports so far: {}",
+                    task.getTaskName(), taskCoordinator.getCurrentNodeId(), shardResults.size());
+            if (result != null && result.getData() != null) {
+                result.getData().put("shardReportCount", shardResults.size());
+            }
+        } catch (Exception e) {
+            log.warn("Failed to read shard progress for {}", task.getTaskName(), e);
+        }
     }
 
     /**
@@ -411,52 +457,7 @@ public class UnifiedDistributedScheduler {
         return null;
     }
 
-    /**
-     * 汇总分片结果
-     */
-    private void aggregateShardResults(TaskScheduler task, TaskExecutionResult result) {
-        try {
 
-            Map<String, Object> aggregatedResult = null;
-            String taskType = task.getTaskType();
-
-            // 等待其他节点完成任务，然后汇总结果
-            int waitTimeSeconds = taskConfig.getShardResultWaitTime();
-
-            switch (taskType) {
-                case "cluster_monitor":
-                    aggregatedResult = shardResultAggregationService.aggregateClusterMonitorResults(waitTimeSeconds);
-                    break;
-                case "topic_monitor":
-                    aggregatedResult = shardResultAggregationService.aggregateTopicMonitorResults(waitTimeSeconds);
-                    break;
-                case "consumer_monitor":
-                    aggregatedResult = shardResultAggregationService.aggregateConsumerMonitorResults(waitTimeSeconds);
-                    break;
-                case "alert_monitor":
-                    aggregatedResult = shardResultAggregationService.aggregateAlertMonitorResults(waitTimeSeconds);
-                    break;
-                case "data_cleanup":
-                    aggregatedResult = shardResultAggregationService.aggregateDataCleanupResults(waitTimeSeconds);
-                    break;
-                case "performance_stats":
-                    aggregatedResult = shardResultAggregationService.aggregatePerformanceStatsResults(waitTimeSeconds);
-                    break;
-                default:
-                    log.warn("不支持的任务类型: {}", taskType);
-                    return;
-            }
-
-            if (aggregatedResult != null) {
-
-                // 清理分片结果
-                taskCoordinator.clearShardResults(taskType);
-            }
-
-        } catch (Exception e) {
-            log.error("汇总任务 {} 分片结果失败", task.getTaskName(), e);
-        }
-    }
 
     /**
      * 创建错误结果
@@ -555,138 +556,20 @@ public class UnifiedDistributedScheduler {
         }
     }
 
-    /**
-     * 更新节点心跳
-     */
-    private void updateNodeHeartbeat() {
-        try {
-            String nodeId = getCurrentNodeId();
-            Map<String, Object> nodeInfo = new HashMap<>();
-            nodeInfo.put("nodeId", nodeId);
-            nodeInfo.put("lastHeartbeat", LocalDateTime.now());
-            nodeInfo.put("status", "ONLINE");
-
-            redisTemplate.opsForHash().put(NODE_REGISTRY_KEY, nodeId, nodeInfo);
-            redisTemplate.expire(NODE_REGISTRY_KEY, 30, TimeUnit.MINUTES);
-
-        } catch (Exception e) {
-            log.error("更新节点心跳失败", e);
-        }
-    }
-
-    /**
-     * 清理离线节点
-     */
-    private void cleanupOfflineNodes() {
-        try {
-            Map<Object, Object> nodes = redisTemplate.opsForHash().entries(NODE_REGISTRY_KEY);
-            LocalDateTime threshold = LocalDateTime.now().minusMinutes(2);
-
-            for (Map.Entry<Object, Object> entry : nodes.entrySet()) {
-                try {
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> nodeInfo = (Map<String, Object>) entry.getValue();
-
-                    // 安全地获取lastHeartbeat，处理不同的数据类型
-                    LocalDateTime lastHeartbeat = null;
-                    Object heartbeatObj = nodeInfo.get("lastHeartbeat");
-
-                    if (heartbeatObj instanceof LocalDateTime) {
-                        lastHeartbeat = (LocalDateTime) heartbeatObj;
-                    } else if (heartbeatObj instanceof String) {
-                        try {
-                            lastHeartbeat = LocalDateTime.parse((String) heartbeatObj);
-                        } catch (Exception e) {
-                            log.warn("无法解析心跳时间字符串: {} - {}", heartbeatObj, e.getMessage());
-                        }
-                    } else if (heartbeatObj instanceof java.util.Date) {
-                        lastHeartbeat = ((java.util.Date) heartbeatObj).toInstant()
-                                .atZone(java.time.ZoneId.systemDefault())
-                                .toLocalDateTime();
-                    } else if (heartbeatObj instanceof java.sql.Timestamp) {
-                        lastHeartbeat = ((java.sql.Timestamp) heartbeatObj).toLocalDateTime();
-                    } else if (heartbeatObj instanceof java.time.Instant) {
-                        lastHeartbeat = ((java.time.Instant) heartbeatObj)
-                                .atZone(java.time.ZoneId.systemDefault())
-                                .toLocalDateTime();
-                    } else if (heartbeatObj instanceof java.util.ArrayList) {
-                        // 处理ArrayList格式的时间数据
-                        try {
-                            @SuppressWarnings("unchecked")
-                            java.util.ArrayList<Integer> timeList = (java.util.ArrayList<Integer>) heartbeatObj;
-                            if (timeList.size() >= 6) {
-                                // 格式: [year, month, day, hour, minute, second, nano]
-                                lastHeartbeat = LocalDateTime.of(
-                                        timeList.get(0), timeList.get(1), timeList.get(2),
-                                        timeList.get(3), timeList.get(4), timeList.get(5));
-                            } else {
-                                log.warn("节点 {} ArrayList格式不正确，元素数量: {}", entry.getKey(), timeList.size());
-                            }
-                        } catch (Exception e) {
-                            log.warn("节点 {} 无法解析ArrayList格式的心跳时间: {} - {}",
-                                    entry.getKey(), heartbeatObj, e.getMessage());
-                        }
-                    } else if (heartbeatObj instanceof java.util.List) {
-                        // 处理List格式的时间数据（非ArrayList的其他List实现）
-                        try {
-                            @SuppressWarnings("unchecked")
-                            java.util.List<Integer> timeList = (java.util.List<Integer>) heartbeatObj;
-                            if (timeList.size() >= 6) {
-                                // 格式: [year, month, day, hour, minute, second, nano]
-                                lastHeartbeat = LocalDateTime.of(
-                                        timeList.get(0), timeList.get(1), timeList.get(2),
-                                        timeList.get(3), timeList.get(4), timeList.get(5));
-                            } else {
-                                log.warn("节点 {} List格式不正确，元素数量: {}", entry.getKey(), timeList.size());
-                            }
-                        } catch (Exception e) {
-                            log.warn("节点 {} 无法解析List格式的心跳时间: {} - {}",
-                                    entry.getKey(), heartbeatObj, e.getMessage());
-                        }
-                    } else if (heartbeatObj != null) {
-                        log.warn("节点 {} 未知的心跳时间数据类型: {} - {}",
-                                entry.getKey(), heartbeatObj.getClass().getName(), heartbeatObj);
-                    } else {
-                    }
-
-                    if (lastHeartbeat != null && lastHeartbeat.isBefore(threshold)) {
-                        redisTemplate.opsForHash().delete(NODE_REGISTRY_KEY, entry.getKey());
-                    }
-                } catch (Exception e) {
-                    log.error("处理节点 {} 时发生错误: {}", entry.getKey(), e.getMessage(), e);
-                }
-            }
-        } catch (Exception e) {
-            log.error("清理离线节点失败", e);
-        }
-    }
-
-    /**
-     * 获取当前节点ID
-     */
     private String getCurrentNodeId() {
-        try {
-            // 获取应用名称
-            String applicationName = environment.getProperty("spring.application.name", "efak-ai");
-
-            // 获取IP地址
-            String ipAddress = java.net.InetAddress.getLocalHost().getHostAddress();
-
-            // 获取当前时间戳，格式为yyyyMMddHHmmss
-            String timestamp = LocalDateTime.now()
-                    .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-
-            return applicationName + "-" + ipAddress + "-" + serverPort + "-" + timestamp;
-        } catch (Exception e) {
-            log.warn("获取节点ID失败，使用默认格式: {}", e.getMessage());
-            return "efak-ai-unknown-" + System.currentTimeMillis();
-        }
+        return taskCoordinator.getCurrentNodeId();
     }
 
     /**
      * 启动调度器
      */
     public void startScheduler() {
+        if (!runtimeProperties.isWorker()) {
+            schedulerEnabled.set(false);
+            log.info("Process role={} does not start the collector scheduler",
+                    runtimeProperties.normalizedRole());
+            return;
+        }
         schedulerEnabled.set(true);
     }
 
@@ -733,7 +616,8 @@ public class UnifiedDistributedScheduler {
         status.put("enabled", schedulerEnabled.get());
         status.put("runningTasks", runningTasks.size());
         status.put("registeredTasks", registeredTasks.size());
-        status.put("nodeId", getCurrentNodeId());
+        status.put("nodeId", runtimeProperties.isWorker() ? getCurrentNodeId() : "-");
+        status.put("role", runtimeProperties.normalizedRole());
         status.put("timestamp", LocalDateTime.now());
         return status;
     }

@@ -67,6 +67,24 @@ public interface TopicInfoMapper {
             "leader_skewed = VALUES(leader_skewed), retention_time = VALUES(retention_time), " +
             "update_by = VALUES(update_by), update_time = CURRENT_TIMESTAMP")
     int insertOrUpdateByTopicAndCluster(TopicInfo topicInfo);
+
+    /**
+     * Batch insert or update topic information by topic name and cluster id.
+     */
+    @Insert("<script>" +
+            "INSERT INTO ke_topic_info (topic_name, cluster_id, partitions, replicas, broker_spread, broker_skewed, " +
+            "leader_skewed, retention_time, create_by, update_by) VALUES " +
+            "<foreach collection='list' item='item' separator=','>" +
+            "(#{item.topicName}, #{item.clusterId}, #{item.partitions}, #{item.replicas}, #{item.brokerSpread}, #{item.brokerSkewed}, " +
+            "#{item.leaderSkewed}, #{item.retentionTime}, #{item.createBy}, #{item.updateBy})" +
+            "</foreach> " +
+            "ON DUPLICATE KEY UPDATE " +
+            "partitions = VALUES(partitions), replicas = VALUES(replicas), " +
+            "broker_spread = VALUES(broker_spread), broker_skewed = VALUES(broker_skewed), " +
+            "leader_skewed = VALUES(leader_skewed), retention_time = VALUES(retention_time), " +
+            "update_by = VALUES(update_by), update_time = CURRENT_TIMESTAMP" +
+            "</script>")
+    int batchInsertOrUpdateByTopicAndCluster(@Param("list") List<TopicInfo> list);
     
     /**
      * Select topic information by topic name

@@ -24,20 +24,20 @@
         .scheduler-card {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 2px;
             padding: 24px;
             transition: all 0.3s ease;
             height: 100%;
         }
 
         .scheduler-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
         }
 
         .scheduler-table-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             overflow-x: auto;
             overflow-y: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -90,13 +90,13 @@
         .scheduler-table-container::-webkit-scrollbar-track,
         .history-table-container::-webkit-scrollbar-track {
             background: #f1f5f9;
-            border-radius: 4px;
+            border-radius: 2px;
         }
 
         .scheduler-table-container::-webkit-scrollbar-thumb,
         .history-table-container::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-            border-radius: 4px;
+            border-radius: 2px;
         }
 
         .scheduler-table-container::-webkit-scrollbar-thumb:hover,
@@ -109,7 +109,7 @@
             align-items: center;
             gap: 6px;
             padding: 4px 12px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
         }
@@ -126,7 +126,7 @@
 
         .task-status.running {
             background: #dbeafe;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         .task-status.error {
@@ -139,7 +139,7 @@
             align-items: center;
             gap: 6px;
             padding: 4px 12px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
         }
@@ -156,7 +156,7 @@
 
         .execution-status.RUNNING {
             background: #dbeafe;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         .execution-status.CANCELLED {
@@ -169,7 +169,7 @@
             align-items: center;
             gap: 6px;
             padding: 6px 12px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
         }
@@ -214,7 +214,7 @@
         .stat-card {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
+            border-radius: 2px;
             padding: 24px;
             text-align: center;
             transition: all 0.3s ease;
@@ -241,7 +241,7 @@
         .filter-bar {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
+            border-radius: 2px;
             padding: 20px;
             margin-bottom: 24px;
             display: flex;
@@ -266,7 +266,7 @@
         .filter-input {
             padding: 8px 12px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             transition: border-color 0.2s ease;
             min-width: 180px;
@@ -274,14 +274,14 @@
 
         .filter-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         .filter-select {
             padding: 8px 12px;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             background: white;
             min-width: 180px;
@@ -296,22 +296,22 @@
 
         .filter-select:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         .filter-select:hover {
             border-color: #9ca3af;
         }
 
-        /* 美化表单样式 */
+        /* Form */
         .form-input {
             transition: all 0.2s ease;
         }
 
         .form-input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         .form-select {
@@ -339,23 +339,23 @@
             color: #6b7280;
         }
 
-        /* 美化按钮样式 */
+        /* Buttons */
         .btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            background: #165DFF;
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 2px 4px rgba(22, 93, 255, 0.2);
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: #0E4AE6;
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 8px rgba(22, 93, 255, 0.3);
         }
 
         .btn-secondary {
@@ -363,7 +363,7 @@
             color: #374151;
             border: 1px solid #d1d5db;
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -374,10 +374,10 @@
             border-color: #9ca3af;
         }
 
-        /* 美化模态框样式 */
+        /* Modal */
         .modal-content {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             max-width: 800px;
             width: 90%;
@@ -388,10 +388,10 @@
         .modal-header {
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             border-bottom: 1px solid #e2e8f0;
-            border-radius: 16px 16px 0 0;
+            border-radius: 2px 4px 0 0;
         }
 
-        /* 美化表格样式 */
+        /* Table */
         .scheduler-table th {
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             font-weight: 600;
@@ -409,11 +409,11 @@
             transition: all 0.2s ease;
         }
 
-        /* 美化卡片样式 */
+        /* Card */
         .stat-card {
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
+            border-radius: 2px;
             padding: 24px;
             text-align: center;
             transition: all 0.3s ease;
@@ -428,7 +428,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            background: #165DFF;
         }
 
         .stat-card:hover {
@@ -480,7 +480,7 @@
         /* 加载动画 */
         .loading-spinner {
             border: 2px solid #f3f4f6;
-            border-top: 2px solid #3b82f6;
+            border-top: 2px solid #165DFF;
             border-radius: 50%;
             width: 20px;
             height: 20px;
@@ -499,10 +499,10 @@
 
         .filter-btn {
             padding: 8px 16px;
-            background: #3b82f6;
+            background: #165DFF;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
@@ -510,7 +510,7 @@
         }
 
         .filter-btn:hover {
-            background: #2563eb;
+            background: #0E4AE6;
         }
 
         .filter-btn.secondary {
@@ -561,7 +561,7 @@
             border: 1px solid #d1d5db;
             background: white;
             color: #6b7280;
-            border-radius: 8px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -594,7 +594,7 @@
             border: 1px solid #d1d5db;
             background: white;
             color: #374151;
-            border-radius: 8px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -611,13 +611,13 @@
         }
 
         .page-btn.active {
-            background: linear-gradient(135deg, #165DFF 0%, #4F8AFF 100%) !important;
+            background: #165DFF !important;
             border-color: #165DFF !important;
             color: white !important;
         }
 
         .page-btn.active:hover {
-            background: linear-gradient(135deg, #1c5fff 0%, #5a93ff 100%) !important;
+            background: #0E4AE6 !important;
         }
 
         /* 确保分页容器在小屏幕上也能正常显示 */
@@ -645,7 +645,7 @@
         .action-btn {
             padding: 4px 8px;
             border: none;
-            border-radius: 4px;
+            border-radius: 2px;
             font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -671,7 +671,7 @@
 
         .action-btn.execute {
             background: #dbeafe;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         .action-btn.execute:hover {
@@ -701,7 +701,7 @@
             width: 32px;
             height: 32px;
             border: none;
-            border-radius: 6px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -713,7 +713,7 @@
 
         .action-btn-icon.view {
             background: #dbeafe;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         .action-btn-icon.view:hover {
@@ -771,13 +771,13 @@
             transform: scale(1.05);
         }
 
-        /* 美化提示框样式 */
+        /* Toast */
         .custom-tooltip {
             position: absolute;
             background: #1f2937;
             color: white;
             padding: 8px 12px;
-            border-radius: 6px;
+            border-radius: 2px;
             font-size: 12px;
             font-weight: 500;
             z-index: 1000;
@@ -816,7 +816,7 @@
 
         .confirm-content {
             background: white;
-            border-radius: 12px;
+            border-radius: 2px;
             padding: 24px;
             max-width: 400px;
             width: 90%;
@@ -871,7 +871,7 @@
 
         .confirm-btn {
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 2px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -901,7 +901,7 @@
             background: #10b981;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
@@ -919,7 +919,7 @@
             font-family: 'Courier New', monospace;
             background: #f3f4f6;
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
             font-size: 0.75rem;
         }
 
@@ -938,7 +938,7 @@
             text-align: center;
             padding: 4px 8px;
             background: #f3f4f6;
-            border-radius: 6px;
+            border-radius: 2px;
             display: inline-block;
             min-width: 40px;
         }
@@ -963,11 +963,11 @@
             animation: fadeIn 0.3s ease-out;
         }
 
-        /* Select2 美化样式 - 参考用户管理页面 */
+        /* Select2 (aligned with users) */
         .select2-container--default .select2-selection--single {
             background-color: #ffffff;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             height: 48px !important;
             line-height: 48px !important;
             padding: 0 12px;
@@ -979,8 +979,8 @@
         }
 
         .select2-container--default.select2-container--focus .select2-selection--single {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
             outline: none;
         }
 
@@ -1025,7 +1025,7 @@
         /* 下拉选项样式 */
         .select2-dropdown {
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 2px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             background-color: #ffffff;
             margin-top: 4px;
@@ -1046,13 +1046,13 @@
         }
 
         .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #3b82f6;
+            background-color: #165DFF;
             color: #ffffff;
         }
 
         .select2-container--default .select2-results__option[aria-selected=true] {
             background-color: #dbeafe;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         /* 自定义任务类型选项样式 */
@@ -1086,11 +1086,11 @@
 
         /* 选中状态的图标颜色 */
         .select2-results__option[aria-selected=true] span i {
-            color: #1d4ed8 !important;
+            color: #0E4AE6 !important;
         }
 
         .select2-results__option[aria-selected=true] span div div:last-child {
-            color: #1d4ed8 !important;
+            color: #0E4AE6 !important;
         }
 
         /* 悬停状态的图标颜色 */
@@ -1130,15 +1130,15 @@
         /* 搜索框样式 */
         .select2-container--default .select2-search--dropdown .select2-search__field {
             border: 1px solid #d1d5db;
-            border-radius: 6px;
+            border-radius: 2px;
             padding: 8px 12px;
             font-size: 14px;
             outline: none;
         }
 
         .select2-container--default .select2-search--dropdown .select2-search__field:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
         }
 
         /* 筛选栏中的select2样式 */
@@ -1186,7 +1186,7 @@
         /* 历史任务执行表格样式 - 防止换行 */
         .history-table-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 2px;
             overflow-x: auto;
             overflow-y: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -1262,7 +1262,7 @@
             align-items: center;
             gap: 6px;
             padding: 4px 12px;
-            border-radius: 20px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
         }
@@ -1279,7 +1279,7 @@
 
         .history-table .execution-status.RUNNING {
             background: #dbeafe;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         .history-table .execution-status.CANCELLED {
@@ -1292,7 +1292,7 @@
             align-items: center;
             gap: 6px;
             padding: 6px 12px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-size: 0.75rem;
             font-weight: 500;
         }
@@ -1352,7 +1352,7 @@
             width: 28px;
             height: 28px;
             border: none;
-            border-radius: 4px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1364,7 +1364,7 @@
 
         .history-table .action-btn-icon.view {
             background: #dbeafe;
-            color: #1d4ed8;
+            color: #0E4AE6;
         }
 
         .history-table .action-btn-icon.view:hover {
@@ -1376,7 +1376,7 @@
         @media (max-width: 1200px) {
             .history-table-container {
                 overflow-x: auto;
-                border-radius: 12px;
+                border-radius: 2px;
             }
 
             .history-table {
@@ -1454,7 +1454,7 @@
         .detail-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 2px;
             margin-bottom: 16px;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -1525,7 +1525,7 @@
         .cron-code {
             background: #f3f4f6;
             padding: 8px 12px;
-            border-radius: 6px;
+            border-radius: 2px;
             font-family: 'Courier New', monospace;
             font-size: 13px;
             color: #1f2937;
@@ -1542,7 +1542,7 @@
             text-align: center;
             padding: 16px;
             background: #f8fafc;
-            border-radius: 8px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
         }
@@ -1586,7 +1586,7 @@
         .detail-description {
             background: #f8fafc;
             padding: 16px;
-            border-radius: 8px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
             font-size: 14px;
             line-height: 1.6;
@@ -1606,7 +1606,7 @@
         .error-message {
             background: #ffffff;
             padding: 16px;
-            border-radius: 8px;
+            border-radius: 2px;
             border: 1px solid #fca5a5;
             font-size: 14px;
             line-height: 1.6;
@@ -1618,7 +1618,7 @@
 
         .config-content {
             background: #f8fafc;
-            border-radius: 8px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
             overflow: hidden;
         }
@@ -1669,28 +1669,27 @@
     <main class="main-content" style="margin-left: 256px;">
         <div class="p-6">
             <!-- 页面标题 -->
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold text-gray-900 mb-2">任务调度</h1>
-                <p class="text-gray-600">管理系统中的定时任务，包括监控、清理、备份等自动化任务</p>
+            <div class="page-header">
+                <h1 class="page-header-title">任务调度</h1>
             </div>
 
             <!-- 统计卡片 -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number" id="totalTasks">8</div>
-                    <div class="stat-label">总任务数</div>
+                    <div class="stat-label">任务</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="enabledTasks">7</div>
-                    <div class="stat-label">启用任务</div>
+                    <div class="stat-label">启用</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="runningTasks">0</div>
-                    <div class="stat-label">运行中任务</div>
+                    <div class="stat-label">运行中</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="errorTasks">0</div>
-                    <div class="stat-label">错误任务</div>
+                    <div class="stat-label">错误</div>
                 </div>
             </div>
 
@@ -1751,7 +1750,7 @@
                         </tr>
                     </thead>
                     <tbody id="schedulerTableBody">
-                        <!-- 任务数据将通过JavaScript动态加载 -->
+                        <!-- Task list -->
                     </tbody>
                 </table>
             </div>
@@ -1827,7 +1826,7 @@
                             </tr>
                         </thead>
                         <tbody id="historyTableBody">
-                            <!-- 历史执行数据将通过JavaScript动态加载 -->
+                            <!-- Execution history -->
                         </tbody>
                     </table>
                 </div>
@@ -1861,7 +1860,7 @@
             </div>
             <div class="p-6">
                 <div id="taskDetailContent">
-                    <!-- 任务详情内容将通过JavaScript动态加载 -->
+                    <!-- Task detail -->
                 </div>
             </div>
         </div>

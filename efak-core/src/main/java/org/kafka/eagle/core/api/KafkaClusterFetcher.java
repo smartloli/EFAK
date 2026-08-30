@@ -134,27 +134,7 @@ public class KafkaClusterFetcher {
      * 安全地执行 JMX 操作并自动管理连接与资源关闭。
      */
     private static void executeJmxOperation(JMXInitializeInfo initializeInfo, JMXOperation operation) {
-        if (!NetUtils.telnet(initializeInfo.getHost(), initializeInfo.getPort())) {
-            return;
-        }
-
-        JMXConnector connector = null;
-        try {
-            JMXServiceURL jmxUrl = new JMXServiceURL(String.format(initializeInfo.getUri(), initializeInfo.getHost() + ":" + initializeInfo.getPort()));
-            initializeInfo.setUrl(jmxUrl);
-            connector = JmxConnectionManager.connectWithTimeout(initializeInfo);
-            operation.execute(connector.getMBeanServerConnection());
-        } catch (Exception e) {
-            log.error("执行 JMX 操作出错：{}", initializeInfo, e);
-        } finally {
-            if (connector != null) {
-                try {
-                    connector.close();
-                } catch (IOException e) {
-                    log.error("关闭 JMX 连接器失败：{}", e.getMessage());
-                }
-            }
-        }
+        JmxConnectionManager.execute(initializeInfo, operation::execute);
     }
 
     /**
