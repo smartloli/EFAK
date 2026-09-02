@@ -69,6 +69,7 @@ public class McpToolRegistry {
             item.put("description", meta.getDescription());
             item.put("access", meta.getAccess().name());
             item.put("available", executors.containsKey(meta.getName()));
+            item.put("parameters", meta.getParameters());
             catalog.add(item);
         }
         return catalog;

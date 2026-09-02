@@ -1764,14 +1764,14 @@
 </head>
 
 <body class="bg-light-bg text-dark font-inter">
-    <div class="flex min-h-screen overflow-hidden">
+    <div class="flex h-screen min-h-0 overflow-hidden">
         <th:block th:replace="~{public/navbar :: navbar}"></th:block>
         <th:block th:replace="~{public/navbar :: overlay}"></th:block>
 
-        <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
+        <div class="flex-1 flex flex-col min-h-0 overflow-hidden main-content" style="margin-left: 256px;">
             <th:block th:replace="~{public/header :: header}"></th:block>
 
-            <main class="flex-1 overflow-y-auto p-6 pt-20">
+            <main class="flex-1 min-h-0 overflow-y-auto p-6 pt-20">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                     <div class="kpi-card">
                         <div class="kpi-label">状态</div>

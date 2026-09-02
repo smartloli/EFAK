@@ -24,7 +24,8 @@
     const INPUT_HISTORY_KEY = 'efak.ai.inputHistory';
     const INPUT_HISTORY_MAX = 80;
     const SLASH_COMMANDS = [
-        { cmd: '/new', label: '新建对话', desc: '清空当前会话并开始新对话' }
+        { cmd: '/new', label: '新建对话', desc: '清空当前会话并开始新对话' },
+        { cmd: '/mcp_tools', label: 'MCP 接口', desc: '查看当前可用的全部 MCP 接口' }
     ];
     let inputHistory = [];
     let inputHistoryIndex = -1;
@@ -32,6 +33,9 @@
     let slashActiveIndex = 0;
     let stickToBottom = true;
     let scrollFrame = 0;
+    let streamPaintRaf = 0;
+    let streamPaintState = null;
+    let lastStreamHtml = '';
 
     const INTENT_CARDS = [
         { id: 'topic_inspect', label: 'Topic 体检', desc: '存在性、分区、ISR 与副本', icon: 'fa-layer-group', adminOnly: false,
@@ -593,6 +597,86 @@
             }
             await createNewChat();
             if (chatInput) chatInput.focus();
+        } else if (cmd === '/mcp_tools') {
+            await showMcpToolsCatalog();
+        }
+    }
+
+    function formatMcpParams(parameters) {
+        if (!parameters || typeof parameters !== 'object') return '';
+        const properties = parameters.properties || {};
+        const required = Array.isArray(parameters.required) ? parameters.required : [];
+        const names = Object.keys(properties);
+        if (!names.length) return '<div class="mcp-tool-params">无参数</div>';
+        const rows = names.map(function (name) {
+            const meta = properties[name] || {};
+            const star = required.indexOf(name) >= 0 ? '<span class="mcp-req">*</span>' : '';
+            const type = escapeHtml(meta.type || 'string');
+            const desc = escapeHtml(meta.description || '');
+            return `<div class="mcp-param"><code>${escapeHtml(name)}</code>${star} <span class="mcp-param-type">${type}</span><span class="mcp-param-desc">${desc}</span></div>`;
+        }).join('');
+        return `<div class="mcp-tool-params">${rows}</div>`;
+    }
+
+    function appendMcpCatalog(data) {
+        const chatMessages = document.getElementById('chat-messages');
+        if (!chatMessages) return;
+        const tools = Array.isArray(data.tools) ? data.tools : [];
+        const role = data.admin ? '管理员' : '普通用户';
+        const items = tools.map(function (tool) {
+            const access = (tool.access || 'USER') === 'ADMIN' ? 'ADMIN' : 'USER';
+            const offline = tool.available === false ? '<span class="mcp-offline">未注册</span>' : '';
+            return `
+                <div class="mcp-tool">
+                    <div class="mcp-tool-head">
+                        <code class="mcp-tool-name">${escapeHtml(tool.name || '')}</code>
+                        <span class="mcp-access mcp-access-${access.toLowerCase()}">${access}</span>
+                        ${offline}
+                    </div>
+                    <div class="mcp-tool-desc">${escapeHtml(tool.description || '')}</div>
+                    ${formatMcpParams(tool.parameters)}
+                </div>`;
+        }).join('');
+        const wrap = document.createElement('div');
+        wrap.className = 'message-container assistant';
+        wrap.innerHTML = `
+            <div class="message-bubble assistant">
+                <div class="mcp-catalog">
+                    <div class="mcp-catalog-head">当前可用 MCP 接口 · ${tools.length} 个 · ${role}</div>
+                    ${items || '<div class="mcp-tool-desc">暂无可用接口</div>'}
+                </div>
+            </div>`;
+        chatMessages.appendChild(wrap);
+        stickToBottom = true;
+        scrollToBottom();
+    }
+
+    async function showMcpToolsCatalog() {
+        if (isStreaming) {
+            showToast('请等待当前AI回答完成', 'warning');
+            return;
+        }
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.value = '';
+            autoResize(chatInput);
+            const sendBtn = document.getElementById('send-btn');
+            if (sendBtn) sendBtn.disabled = true;
+            chatInput.focus();
+        }
+        setStage('thread');
+        addMessage('/mcp_tools', 'user');
+        try {
+            const response = await fetch('/api/mcp/tools');
+            const data = response.ok ? await response.json() : null;
+            if (!data || data.success === false) {
+                addMessage('无法读取 MCP 接口列表', 'assistant');
+                return;
+            }
+            isAdminUser = !!data.admin;
+            appendMcpCatalog(data);
+        } catch (e) {
+            addMessage('读取 MCP 接口失败，请稍后重试', 'assistant');
         }
     }
 
@@ -813,50 +897,62 @@
         }
     }
 
-    // 更新正在输入的消息
-    function updateTypingMessage(content, thinkingContent, isThinking) {
-        const typingIndicator = document.getElementById('typing-indicator');
-        if (typingIndicator) {
-            const typingContent = typingIndicator.querySelector('.typing-indicator');
-            const markdownContent = typingIndicator.querySelector('.markdown-content');
-
-            if (markdownContent) {
-                markdownContent.style.display = 'block';
-
-                let displayContent = '';
-
-                if (isThinking && thinkingContent) {
-                    displayContent = buildThinkingHtml(thinkingContent, true, true);
-                } else if (thinkingContent && content) {
-                    displayContent = buildThinkingHtml(thinkingContent, false, false) +
-                        `<div class="answer-content">${renderMarkdown(content)}</div>`;
-                } else if (content) {
-                    displayContent = renderMarkdown(content);
-                } else if (thinkingContent) {
-                    displayContent = buildThinkingHtml(thinkingContent, false, true);
-                }
-
-                markdownContent.innerHTML = displayContent;
-
-                if (isHighlightEnabled()) {
-                    setTimeout(() => {
-                        applyCodeHighlighting(markdownContent);
-                    }, 50);
-                }
-
-                // 处理图表和表格
-                setTimeout(() => {
-                    processCharts(markdownContent);
-                    processTables(markdownContent);
-                }, 50);
-
-                // 隐藏打字指示器
-                if (typingContent) {
-                    typingContent.style.display = 'none';
-                }
-                scrollToBottom();
-            }
+    function stabilizeMarkdown(text) {
+        if (!text) return '';
+        let value = String(text);
+        const fences = (value.match(/```/g) || []).length;
+        if (fences % 2 === 1) {
+            value += '\n```';
         }
+        return value;
+    }
+
+    function updateTypingMessage(content, thinkingContent, isThinking) {
+        streamPaintState = { content, thinkingContent, isThinking };
+        if (streamPaintRaf) return;
+        streamPaintRaf = requestAnimationFrame(function () {
+            streamPaintRaf = 0;
+            paintStreamingMessage(false);
+        });
+    }
+
+    function paintStreamingMessage(finalPass) {
+        const state = streamPaintState;
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (!state || !typingIndicator) return;
+
+        const typingContent = typingIndicator.querySelector('.typing-indicator');
+        const markdownContent = typingIndicator.querySelector('.markdown-content');
+        if (!markdownContent) return;
+
+        markdownContent.style.display = 'block';
+        if (typingContent) typingContent.style.display = 'none';
+
+        let displayContent = '';
+        const thinking = state.thinkingContent || '';
+        const content = state.content || '';
+        if (thinking && (state.isThinking || !content)) {
+            displayContent = buildThinkingHtml(thinking, !!state.isThinking, !!state.isThinking);
+        } else if (thinking && content) {
+            displayContent = buildThinkingHtml(thinking, false, false) +
+                `<div class="answer-content">${renderMarkdown(content, !finalPass)}</div>`;
+        } else if (content) {
+            displayContent = renderMarkdown(content, !finalPass);
+        }
+
+        if (!finalPass && displayContent === lastStreamHtml) {
+            scrollToBottom();
+            return;
+        }
+        lastStreamHtml = displayContent;
+        markdownContent.innerHTML = displayContent;
+
+        if (finalPass) {
+            processCharts(markdownContent);
+            processTables(markdownContent);
+            applyCodeHighlighting(markdownContent);
+        }
+        scrollToBottom();
     }
 
     // 保存消息到数据库
@@ -964,13 +1060,15 @@
         }
     }
 
-    // 渲染Markdown
-    function renderMarkdown(text) {
+    function renderMarkdown(text, lite) {
         if (typeof marked === 'undefined') {
-            return text.replace(/\n/g, '<br>');
+            return String(text || '').replace(/\n/g, '<br>');
         }
 
-        let html = marked.parse(text);
+        let html = marked.parse(stabilizeMarkdown(text || ''));
+        if (lite) {
+            return html;
+        }
 
         // 为代码块添加复制按钮
         html = html.replace(/<pre><code class="([^"]*)">([\s\S]*?)<\/code><\/pre>/g, function (match, className, codeContent) {
@@ -978,9 +1076,9 @@
             const languageDisplay = language || 'text';
             return `
                 <div class="code-block-wrapper relative">
-                    <div class="code-header flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t-lg">
+                    <div class="code-header flex items-center justify-between px-4 py-2">
                         <span class="text-sm font-medium">${languageDisplay}</span>
-                        <button class="copy-code-btn text-gray-300 hover:text-white transition-colors" onclick="copyCodeBlock(this)" title="复制代码">
+                        <button class="copy-code-btn transition-colors" onclick="copyCodeBlock(this)" title="复制代码">
                             <i class="fa fa-copy"></i>
                         </button>
                     </div>
@@ -1045,16 +1143,9 @@
                 }
             });
 
-            // 也处理内联代码
             const inlineCodes = container.querySelectorAll('code:not(pre code)');
             inlineCodes.forEach(code => {
-                if (typeof hljs !== 'undefined') {
-                    try {
-                        hljs.highlightElement(code);
-                    } catch (e) {
-                        console.warn('内联代码高亮失败:', e);
-                    }
-                }
+                code.classList.remove('hljs');
             });
         } catch (e) {
             console.warn('应用代码高亮时出错:', e);
@@ -1176,6 +1267,8 @@
         typingDiv.appendChild(bubble);
 
         chatMessages.appendChild(typingDiv);
+        lastStreamHtml = '';
+        streamPaintState = null;
         stickToBottom = true;
         scrollToBottom();
     }
@@ -1203,25 +1296,17 @@
             addMessage(text, 'assistant', true, thinkingContent);
             return;
         }
+        streamPaintState = { content: text, thinkingContent, isThinking: false };
+        paintStreamingMessage(true);
         typing.removeAttribute('id');
         const dots = typing.querySelector('.typing-indicator');
         if (dots) dots.remove();
         const markdown = typing.querySelector('.markdown-content');
-        if (markdown) {
-            markdown.style.display = 'block';
-            let html = '';
-            if (thinkingContent) {
-                html += buildThinkingHtml(thinkingContent, false, false);
-            }
-            html += `<div class="answer-content">${renderMarkdown(text || '')}</div>`;
-            markdown.innerHTML = html;
+        if (markdown && !markdown.querySelector('.message-actions')) {
             const actions = document.createElement('div');
             actions.className = 'message-actions';
             actions.innerHTML = assistantActionsHtml();
             markdown.appendChild(actions);
-            processCharts(markdown);
-            processTables(markdown);
-            applyCodeHighlighting(markdown);
         }
         isTyping = false;
         stickToBottom = true;

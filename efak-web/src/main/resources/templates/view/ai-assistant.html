@@ -12,7 +12,7 @@
     <script th:src="@{/plugins/marked/marked.min.js}"></script>
 
     <!-- 代码高亮库 -->
-    <link rel="stylesheet" th:href="@{/plugins/highlight/atom-one-dark.min.css}">
+    <link rel="stylesheet" th:href="@{/plugins/highlight/github.min.css}">
     <script th:src="@{/plugins/highlight/highlight.min.js}"></script>
 
     <!-- 图表库 -->
@@ -1145,31 +1145,47 @@
             border-bottom: 1px solid #f3f4f6;
         }
 
-        .history-search input {
-            width: 100%;
+        .history-search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             height: 32px;
+            padding: 0 12px 0 10px;
             border: 1px solid #e5e7eb;
             border-radius: 2px;
-            padding: 0 10px 0 30px;
-            font-size: 13px;
-            outline: none;
+            background: #fff;
         }
 
-        .history-search input:focus {
+        .history-search-wrap:focus-within {
             border-color: #165DFF;
         }
 
-        .history-search-wrap {
-            position: relative;
-        }
-
         .history-search-wrap i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
+            position: static;
+            flex-shrink: 0;
             color: #9ca3af;
             font-size: 12px;
+            pointer-events: none;
+            line-height: 1;
+        }
+
+        .history-search input {
+            flex: 1;
+            min-width: 0;
+            height: 100%;
+            border: 0;
+            border-radius: 2px;
+            padding: 0;
+            font-size: 13px;
+            outline: none;
+            background: transparent;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .history-search input::-webkit-search-decoration,
+        .history-search input::-webkit-search-cancel-button {
+            -webkit-appearance: none;
         }
 
         .history-list {
@@ -1361,9 +1377,63 @@
             border: 0;
             padding: 0;
             box-shadow: none;
-            color: #1f2937;
+            color: #0f172a;
             font-size: 14.5px;
             line-height: 1.75;
+        }
+
+        .markdown-content {
+            color: #0f172a;
+        }
+
+        .markdown-content strong {
+            color: #0f172a;
+            font-weight: 650;
+        }
+
+        .markdown-content mark {
+            background: #dbeafe;
+            color: #1e3a8a;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .markdown-content code {
+            color: #1e3a8a !important;
+            background: #eff6ff !important;
+            padding: 1px 5px;
+            border-radius: 2px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        .markdown-content pre,
+        .code-block-wrapper pre {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+            border: 1px solid #e5e7eb;
+        }
+
+        .markdown-content pre code,
+        .code-block-wrapper pre code,
+        .markdown-content pre code.hljs {
+            color: #0f172a !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        .hljs {
+            color: #0f172a;
+            background: transparent;
+        }
+
+        .code-header {
+            background: #f1f5f9 !important;
+            color: #334155 !important;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .copy-code-btn {
+            color: #64748b !important;
         }
 
         .message-bubble.user {
@@ -1535,6 +1605,114 @@
 
         .agent-trace {
             margin: 2px 0 8px;
+        }
+
+        .mcp-catalog {
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .mcp-catalog-head {
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            background: #f8fafc;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .mcp-tool {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .mcp-tool:last-child {
+            border-bottom: 0;
+        }
+
+        .mcp-tool-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mcp-tool-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #111827;
+            background: #f3f4f6;
+            padding: 1px 6px;
+            border-radius: 2px;
+        }
+
+        .mcp-access {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            padding: 1px 6px;
+            border-radius: 2px;
+        }
+
+        .mcp-access-user {
+            color: #165DFF;
+            background: rgba(22, 93, 255, 0.08);
+        }
+
+        .mcp-access-admin {
+            color: #b45309;
+            background: #fff7ed;
+        }
+
+        .mcp-offline {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .mcp-tool-desc {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .mcp-tool-params {
+            margin-top: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .mcp-param {
+            font-size: 12px;
+            color: #4b5563;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: baseline;
+        }
+
+        .mcp-param code {
+            font-size: 11px;
+            background: #f8fafc;
+            padding: 0 4px;
+            border-radius: 2px;
+        }
+
+        .mcp-req {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .mcp-param-type {
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        .mcp-param-desc {
+            color: #6b7280;
         }
 
         .follow-ups {
@@ -1845,7 +2023,7 @@
     </style>
 
     <!-- AI assistant -->
-    <script th:src="@{/js/system/ai-assistant.js(v='agent4')}"></script>
+    <script th:src="@{/js/system/ai-assistant.js(v='agent6')}"></script>
 </body>
 
 </html>

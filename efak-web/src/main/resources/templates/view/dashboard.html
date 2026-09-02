@@ -575,18 +575,18 @@
 </head>
 
 <body class="bg-gray-50">
-    <div class="flex min-h-screen overflow-hidden">
+    <div class="flex h-screen min-h-0 overflow-hidden">
         <!-- 侧边栏和遮罩层 -->
         <th:block th:replace="~{public/navbar :: navbar}"></th:block>
         <th:block th:replace="~{public/navbar :: overlay}"></th:block>
 
         <!-- 主内容区域 -->
-        <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
+        <div class="flex-1 flex flex-col min-h-0 overflow-hidden main-content" style="margin-left: 256px;">
             <!-- 头部 -->
             <th:block th:replace="~{public/header :: header}"></th:block>
 
             <!-- 页面内容 -->
-            <main class="flex-1 overflow-y-auto p-6 pt-20">
+            <main class="flex-1 min-h-0 overflow-y-auto p-6 pt-20">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                     <div class="kpi-card">
                         <div class="kpi-label">Broker</div>

@@ -8,15 +8,29 @@
 html,
 body {
   height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
 }
 
-.main-content,
+body > .flex.min-h-screen {
+  height: 100%;
+  max-height: 100%;
+}
+
+.main-content.overflow-hidden {
+  min-height: 0;
+}
+
+.main-content > main {
+  min-height: 0;
+}
+
+.main-content > main.overflow-y-auto {
+  overscroll-behavior: contain;
+}
+
 .fixed-sidebar,
-.overflow-y-auto,
 .chat-messages,
-.history-list {
+.history-list,
+.agent-scroll {
   overscroll-behavior: contain;
 }
 

@@ -567,7 +567,7 @@
 </head>
 
 <body class="bg-light-bg text-dark font-inter">
-    <div class="flex min-h-screen overflow-hidden">
+    <div class="flex h-screen min-h-0 overflow-hidden">
         <!-- 侧边栏 -->
         <th:block th:replace="~{public/navbar :: navbar}"></th:block>
 
@@ -580,12 +580,12 @@
         </div>
 
         <!-- 主内容区域 -->
-        <div class="flex-1 flex flex-col overflow-hidden main-content" style="margin-left: 256px;">
+        <div class="flex-1 flex flex-col min-h-0 overflow-hidden main-content" style="margin-left: 256px;">
             <!-- 顶部导航栏 -->
             <th:block th:replace="~{public/header :: header}"></th:block>
 
             <!-- 页面内容 -->
-            <main class="flex-1 overflow-y-auto p-6 scrollbar-hide pt-20">
+            <main class="flex-1 min-h-0 overflow-y-auto p-6 scrollbar-hide pt-20">
                 <!-- 页面标题 -->
                 <div class="page-header flex items-center justify-between">
                     <div>
