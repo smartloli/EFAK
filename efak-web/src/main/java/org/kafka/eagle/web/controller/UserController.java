@@ -374,35 +374,35 @@ public class UserController {
                 return ResponseEntity.notFound().build();
             }
 
-            // 获取当前登录用户信息
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String currentUsername = authentication != null ? authentication.getName() : null;
-
-            // 验证当前用户是否有权限修改密码
-            if (currentUsername == null || !currentUsername.equals(userInfo.getUsername())) {
-                Map<String, Object> error = new HashMap<>();
-                error.put("error", "无权限修改其他用户的密码");
-                return ResponseEntity.status(403).body(error);
-            }
+            boolean isSelf = currentUsername != null && currentUsername.equals(userInfo.getUsername());
+            boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
 
             String newPassword;
             String message;
+            boolean suppliedNewPassword = requestBody != null && requestBody.containsKey("newPassword");
+            boolean changeOwn = requestBody != null && requestBody.containsKey("currentPassword")
+                    && suppliedNewPassword;
 
-            if (requestBody != null && requestBody.containsKey("currentPassword")
-                    && requestBody.containsKey("newPassword")) {
-                // 修改密码模式
+            if (changeOwn) {
+                if (!isSelf) {
+                    Map<String, Object> error = new HashMap<>();
+                    error.put("error", "无权限修改其他用户的密码");
+                    return ResponseEntity.status(403).body(error);
+                }
+
                 String currentPassword = (String) requestBody.get("currentPassword");
                 newPassword = (String) requestBody.get("newPassword");
 
-                // 验证当前密码
                 if (!userService.verifyPassword(userInfo, currentPassword)) {
                     Map<String, Object> error = new HashMap<>();
                     error.put("error", "当前密码不正确");
                     return ResponseEntity.badRequest().body(error);
                 }
 
-                // 验证新密码复杂度
-                if (newPassword.length() < 8) {
+                if (newPassword == null || newPassword.length() < 8) {
                     Map<String, Object> error = new HashMap<>();
                     error.put("error", "新密码长度至少8位");
                     return ResponseEntity.badRequest().body(error);
@@ -410,9 +410,28 @@ public class UserController {
 
                 message = "密码修改成功";
             } else {
-                // 重置密码模式（管理员操作）
-                newPassword = generateRandomPassword();
+                if (!isAdmin) {
+                    Map<String, Object> error = new HashMap<>();
+                    error.put("error", "仅管理员可重置他人密码");
+                    return ResponseEntity.status(403).body(error);
+                }
+                if (suppliedNewPassword) {
+                    newPassword = (String) requestBody.get("newPassword");
+                    if (newPassword == null || newPassword.isBlank()) {
+                        Map<String, Object> error = new HashMap<>();
+                        error.put("error", "新密码不能为空");
+                        return ResponseEntity.badRequest().body(error);
+                    }
+                    if (newPassword.length() < 8) {
+                        Map<String, Object> error = new HashMap<>();
+                        error.put("error", "新密码长度至少8位");
+                        return ResponseEntity.badRequest().body(error);
+                    }
+                } else {
+                    newPassword = generateRandomPassword();
+                }
                 message = "密码重置成功";
+                log.info("管理员重置用户密码: {}", userInfo.getUsername());
             }
 
             // 对密码进行BCrypt加密

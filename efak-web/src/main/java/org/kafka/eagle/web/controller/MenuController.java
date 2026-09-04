@@ -156,6 +156,23 @@ public class MenuController {
         return "view/users";
     }
 
+    @GetMapping("/password-tool")
+    public String passwordTool(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/login";
+        }
+        String username = authentication.getName();
+        UserInfo userInfo = userService.getUserByUsername(username);
+        if (userInfo == null || userInfo.getRoles() == null || !userInfo.getRoles().contains("ROLE_ADMIN")) {
+            return "redirect:/error-403";
+        }
+        addCommonAttributes(model);
+        model.addAttribute("activePage", "password-tool");
+        model.addAttribute("pageTitle", "密码工具");
+        return "view/password-tool";
+    }
+
     @GetMapping("/scheduler")
     public String scheduler(Model model) {
         // 检查用户权限

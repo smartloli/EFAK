@@ -67,11 +67,6 @@ public class LoginController {
         return "view/dashboard";
     }
 
-    @GetMapping("/password-tool")
-    public String passwordToolPage() {
-        return "view/password-tool";
-    }
-
     @GetMapping("/test-login-redirect")
     public String testLoginRedirectPage() {
         return "view/test-login-redirect";

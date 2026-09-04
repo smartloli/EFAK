@@ -85,9 +85,11 @@ public class WebSecurityConfig {
                 http.authorizeHttpRequests(authz -> authz
                                 .requestMatchers("/login", "/error/**", "/statics/**", "/css/**", "/js/**",
                                                 "/images/**", "/fonts/**", "/webfonts/**", "/sm/**",
-                                                "/plugins/**", "/api/password/**", "/password-tool", "/health/**")
+                                                "/plugins/**", "/health/**")
                                 .permitAll()
-                                .requestMatchers("/users", "/config", "/scheduler").hasRole("ADMIN")
+                                .requestMatchers("/users", "/config", "/scheduler", "/password-tool",
+                                                "/api/password/**")
+                                .hasRole("ADMIN")
                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/login")

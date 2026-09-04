@@ -102,6 +102,13 @@
             <i class="fa fa-user-circle w-5 h-5 mr-3 text-center sidebar-icon"></i>
             <span class="sidebar-text">用户管理</span>
         </a>
+        <a th:href="@{/password-tool(cid=${param.cid})}"
+            class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
+            th:classappend="${#strings.equals(activePage, 'password-tool')} ? 'sidebar-item-active' : ''"
+            data-page="password-tool" data-tooltip="密码工具" th:if="${#strings.contains(userRole, '管理员')}">
+            <i class="fa fa-key w-5 h-5 mr-3 text-center sidebar-icon"></i>
+            <span class="sidebar-text">密码工具</span>
+        </a>
         <a th:href="@{/scheduler(cid=${param.cid})}"
             class="sidebar-nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-100 mb-1 transition-colors relative"
             th:classappend="${#strings.equals(activePage, 'scheduler')} ? 'sidebar-item-active' : ''"
