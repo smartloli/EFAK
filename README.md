@@ -1,6 +1,6 @@
 # EFAK-AI (Eagle For Apache Kafka - AI Enhanced)
 
-[![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)](https://github.com/smartloli/EFAK-AI)
+[![Version](https://img.shields.io/badge/version-5.1.0-blue.svg)](https://github.com/smartloli/EFAK-AI)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.java.net/projects/jdk/17/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-green.svg)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
@@ -149,18 +149,18 @@ cd EFAK-AI
 # 执行构建脚本
 ./build-package.sh
 
-# 生成安装包: efak-ai-5.0.0.tar.gz
+# 生成安装包: efak-ai-5.1.0.tar.gz
 ```
 
 #### 2. 部署安装包
 ```bash
 # 传输到服务器（如果需要）
-scp efak-ai-5.0.0.tar.gz user@server:/opt/
+scp efak-ai-5.1.0.tar.gz user@server:/opt/
 
 # 解压
 cd /opt
-tar -zxvf efak-ai-5.0.0.tar.gz
-cd efak-ai-5.0.0
+tar -zxvf efak-ai-5.1.0.tar.gz
+cd efak-ai-5.1.0
 
 # 目录结构
 # bin/      - 启动脚本
@@ -175,7 +175,7 @@ cd efak-ai-5.0.0
 mysql -u root -p
 CREATE DATABASE efak_ai CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE efak_ai;
-SOURCE /opt/efak-ai-5.0.0/sql/ke.sql;
+SOURCE /opt/efak-ai-5.1.0/sql/ke.sql;
 ```
 
 #### 4. 修改配置
@@ -406,6 +406,14 @@ efak-web/src/main/java/org/kafka/eagle/
 - 作者: Mr.SmartLoli
 
 ## 更新日志
+
+### v5.1.0 (2026-09-12)
+- ✨ 全站暗色主题：跟随系统偏好，支持手动切换，覆盖页面、对话框、表格、图表与下拉组件
+- ✨ 集群上下文：自动记忆并回写 `cid`，避免页面跳转后丢失当前集群
+- ✨ AI 助手体验：模型选择、历史对话、MCP 工具与暗色下拉图标优化
+- ✨ 密码工具：BCrypt 生成/校验，支持管理员重置用户密码
+- ✨ 图表主题：折线、饼图、环形图图例与刻度适配暗色模式
+- ✨ 交互打磨：创建/编辑集群、主题管理、消费者组、告警配置等对话框与分页下拉美化
 
 ### v5.0.0 (2025-01-27)
 - ✨ 集成 AI 智能助手功能
