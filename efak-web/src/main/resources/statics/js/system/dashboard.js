@@ -52,14 +52,31 @@ $(document).ready(function () {
     setupEventListeners();
     loadInitialData();
     startAutoRefresh();
+    window.addEventListener('efak:themechange', syncResourceChartTheme);
 });
+
+function syncResourceChartTheme() {
+    Object.values(charts.resource || {}).forEach(function (chart) {
+        if (!chart || !chart.data || !chart.data.datasets || !chart.data.datasets[0]) return;
+        const ds = chart.data.datasets[0];
+        if (Array.isArray(ds.backgroundColor) && ds.backgroundColor.length > 1) {
+            ds.backgroundColor[1] = 'rgba(0,0,0,0)';
+            ds.borderColor = 'transparent';
+            if (typeof chart.update === 'function') chart.update('none');
+        }
+    });
+}
 
 /**
  * 初始化集群ID
  */
 function initializeClusterId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    currentClusterId = urlParams.get('cid') || 'default';
+    if (window.efakCluster && typeof window.efakCluster.get === 'function') {
+        currentClusterId = window.efakCluster.get() || '';
+    } else {
+        const urlParams = new URLSearchParams(window.location.search);
+        currentClusterId = urlParams.get('cid') || '';
+    }
 }
 
 /**
@@ -251,7 +268,8 @@ function initializeThroughputChart() {
                     position: 'bottom',
                     labels: {
                         usePointStyle: true,
-                        padding: 20
+                        padding: 20,
+                        color: chartLegendTextColor()
                     }
                 },
                 tooltip: {
@@ -317,25 +335,39 @@ function initializeResourceChart() {
 /**
  * 创建单个环形图
  */
+function chartTrackColor() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? '#3a4658' : '#e5e7eb';
+}
+
 function createDoughnutChart(canvasId, value, label, color) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return null;
 
-    const remaining = 100 - value;
+    const remaining = Math.max(0, 100 - value);
 
     return new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
         data: {
             datasets: [{
                 data: [value, remaining],
-                backgroundColor: [color, '#f1f5f9'],
+                backgroundColor: [color, 'rgba(0,0,0,0)'],
                 borderWidth: 0,
-                cutout: '75%'
+                hoverBorderWidth: 0,
+                borderColor: 'transparent',
+                spacing: 0
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
+            clip: false,
+            layout: {
+                padding: 6
+            },
+            cutout: '72%',
+            radius: '90%',
+            rotation: -90,
+            circumference: 360,
             plugins: {
                 legend: {
                     display: false
@@ -343,6 +375,10 @@ function createDoughnutChart(canvasId, value, label, color) {
                 tooltip: {
                     enabled: false
                 }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: false
             }
         }
     });
@@ -361,6 +397,37 @@ function getUsageColor(value, type) {
         if (value >= 70) return '#f59e0b'; // 黄色 - 中等使用率
         return '#165DFF'; // 蓝色 - 低使用率
     }
+}
+
+function chartLegendTextColor(chart) {
+    const fromChart = chart && chart.options && chart.options.plugins
+        && chart.options.plugins.legend && chart.options.plugins.legend.labels
+        && chart.options.plugins.legend.labels.color;
+    if (typeof fromChart === 'string' && fromChart) return fromChart;
+    if (window.efakTheme && typeof window.efakTheme.colors === 'function') {
+        return window.efakTheme.colors().text;
+    }
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? '#f3f6fa' : '#374151';
+}
+
+function doughnutLegendLabels(chart) {
+    const data = chart.data;
+    const textColor = chartLegendTextColor(chart);
+    if (!data.labels.length || !data.datasets.length) return [];
+    return data.labels.map(function (label, i) {
+        const value = data.datasets[0].data[i];
+        const total = data.datasets[0].data.reduce(function (a, b) { return a + b; }, 0);
+        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+        return {
+            text: label + ': ' + value + '个 (' + percentage + '%)',
+            fillStyle: data.datasets[0].backgroundColor[i],
+            strokeStyle: data.datasets[0].backgroundColor[i],
+            fontColor: textColor,
+            pointStyle: 'circle',
+            hidden: false,
+            index: i
+        };
+    });
 }
 
 /**
@@ -394,28 +461,12 @@ function initializeTopicsChart() {
                     labels: {
                         usePointStyle: true,
                         padding: 20,
+                        color: chartLegendTextColor(),
                         font: {
                             size: 14,
                             weight: 'bold'
                         },
-                        generateLabels: function (chart) {
-                            const data = chart.data;
-                            if (data.labels.length && data.datasets.length) {
-                                return data.labels.map((label, i) => {
-                                    const value = data.datasets[0].data[i];
-                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
-                                    return {
-                                        text: `${label}: ${value}个 (${percentage}%)`,
-                                        fillStyle: data.datasets[0].backgroundColor[i],
-                                        pointStyle: 'circle',
-                                        hidden: false,
-                                        index: i
-                                    };
-                                });
-                            }
-                            return [];
-                        }
+                        generateLabels: doughnutLegendLabels
                     }
                 },
                 tooltip: {
@@ -467,28 +518,12 @@ function initializeCapacityChart() {
                     labels: {
                         usePointStyle: true,
                         padding: 20,
+                        color: chartLegendTextColor(),
                         font: {
                             size: 14,
                             weight: 'bold'
                         },
-                        generateLabels: function (chart) {
-                            const data = chart.data;
-                            if (data.labels.length && data.datasets.length) {
-                                return data.labels.map((label, i) => {
-                                    const value = data.datasets[0].data[i];
-                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
-                                    return {
-                                        text: `${label}: ${value}个 (${percentage}%)`,
-                                        fillStyle: data.datasets[0].backgroundColor[i],
-                                        pointStyle: 'circle',
-                                        hidden: false,
-                                        index: i
-                                    };
-                                });
-                            }
-                            return [];
-                        }
+                        generateLabels: doughnutLegendLabels
                     }
                 },
                 tooltip: {
@@ -574,13 +609,14 @@ function updateResourceChart(data) {
     const memoryValue = parseFloat(data.averageMemoryUsage.toFixed(2));
 
     // 创建集群整体资源使用率卡片（优化大小和布局）
+    const healthy = data.clusterStatus === '健康';
     const clusterCardHtml = `
         <div class="resource-node-card" style="max-width: 600px; width: 100%;">
             <div class="resource-node-title" style="font-size: 1.25rem; margin-bottom: 24px;">集群整体资源使用率</div>
             <div class="resource-charts-row" style="gap: 40px;">
                 <div class="resource-chart-item">
-                    <div class="resource-chart-wrapper" style="width: 160px; height: 160px;">
-                        <canvas id="cluster-cpu-chart" width="160" height="160"></canvas>
+                    <div class="resource-chart-wrapper">
+                        <canvas id="cluster-cpu-chart"></canvas>
                         <div class="resource-chart-center-text">
                             <div class="resource-chart-value" style="font-size: 1.75rem;">${cpuValue}%</div>
                             <div class="resource-chart-label" style="font-size: 0.875rem;">平均CPU</div>
@@ -588,8 +624,8 @@ function updateResourceChart(data) {
                     </div>
                 </div>
                 <div class="resource-chart-item">
-                    <div class="resource-chart-wrapper" style="width: 160px; height: 160px;">
-                        <canvas id="cluster-memory-chart" width="160" height="160"></canvas>
+                    <div class="resource-chart-wrapper">
+                        <canvas id="cluster-memory-chart"></canvas>
                         <div class="resource-chart-center-text">
                             <div class="resource-chart-value" style="font-size: 1.75rem;">${memoryValue}%</div>
                             <div class="resource-chart-label" style="font-size: 0.875rem;">平均内存</div>
@@ -597,25 +633,25 @@ function updateResourceChart(data) {
                     </div>
                 </div>
             </div>
-            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 12px;">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-server" style="color: #165DFF;"></i>
-                        在线节点: <strong style="color: #1f2937;">${data.onlineNodes}/${data.totalNodes}</strong>
+            <div class="resource-node-meta">
+                <div class="resource-meta-row">
+                    <span class="resource-meta-item">
+                        <i class="fas fa-server"></i>
+                        在线节点: <strong>${data.onlineNodes}/${data.totalNodes}</strong>
                     </span>
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-clock" style="color: #165DFF;"></i>
-                        运行时间: <strong style="color: #1f2937;">${data.runtime}</strong>
+                    <span class="resource-meta-item">
+                        <i class="fas fa-clock"></i>
+                        运行时间: <strong>${data.runtime}</strong>
                     </span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #6b7280;">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-chart-line" style="color: #165DFF;"></i>
-                        在线率: <strong style="color: #1f2937;">${data.onlineRate}%</strong>
+                <div class="resource-meta-row">
+                    <span class="resource-meta-item">
+                        <i class="fas fa-chart-line"></i>
+                        在线率: <strong>${data.onlineRate}%</strong>
                     </span>
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-heartbeat" style="color: ${data.clusterStatus === '健康' ? '#10b981' : '#ef4444'};"></i>
-                        集群状态: <strong style="color: ${data.clusterStatus === '健康' ? '#10b981' : '#ef4444'};">${data.clusterStatus}</strong>
+                    <span class="resource-meta-item ${healthy ? 'is-ok' : 'is-bad'}">
+                        <i class="fas fa-heartbeat"></i>
+                        集群状态: <strong>${data.clusterStatus}</strong>
                     </span>
                 </div>
             </div>

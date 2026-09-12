@@ -212,29 +212,24 @@
         }
 
         .stat-card {
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: var(--efak-surface);
+            border: 1px solid var(--efak-border);
             border-radius: 2px;
             padding: 24px;
             text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
-            color: #1f2937;
+            color: var(--efak-text);
             margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
         }
 
         .stat-label {
             font-size: 0.875rem;
-            color: #6b7280;
+            color: var(--efak-text-secondary);
             font-weight: 500;
         }
 
@@ -404,19 +399,17 @@
         }
 
         .scheduler-table tr:hover {
-            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-            transform: scale(1.01);
-            transition: all 0.2s ease;
+            background: var(--efak-surface-2);
         }
 
         /* Card */
         .stat-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border: 1px solid #e2e8f0;
+            background: var(--efak-surface);
+            border: 1px solid var(--efak-border);
             border-radius: 2px;
             padding: 24px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: border-color 0.15s ease;
             position: relative;
             overflow: hidden;
         }
@@ -431,19 +424,12 @@
             background: #165DFF;
         }
 
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--efak-text);
             margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
         }
 
         /* 动画效果 */

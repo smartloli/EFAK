@@ -26,7 +26,7 @@ $(document).ready(function () {
 function initializePage() {
     // 获取URL参数
     currentGroupId = getUrlParameter('group');
-    currentClusterId = getUrlParameter('cid');
+    currentClusterId = (window.efakCluster && window.efakCluster.get()) || getUrlParameter('cid');
     currentTopic = getUrlParameter('topic');
 
     if (!currentGroupId || !currentClusterId || !currentTopic) {

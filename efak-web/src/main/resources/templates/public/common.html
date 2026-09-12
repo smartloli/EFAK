@@ -81,7 +81,7 @@
     <script th:src="@{/plugins/select2/select2.min.js}"></script>
     <script th:src="@{/plugins/fontawesome/all.min.js}"></script>
     <!--  common  -->
-    <script th:src="@{/js/common/common.js}"></script>
+    <script th:src="@{/js/common/common.js(v='cid1')}"></script>
 
     <script>
         window.tailwind = window.tailwind || {};
@@ -165,12 +165,348 @@
 
 <!-- css fragment -->
 <th:block th:fragment="css">
+    <script>
+        (function () {
+            var KEY = 'efak.theme';
+            function read() {
+                try {
+                    var saved = localStorage.getItem(KEY);
+                    if (saved === 'light' || saved === 'dark') return saved;
+                } catch (e) {}
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            function palette(theme) {
+                if (theme === 'dark') {
+                    return {
+                        text: '#f3f6fa',
+                        muted: '#d5dce8',
+                        grid: 'rgba(255,255,255,0.10)',
+                        surface: '#141b24',
+                        track: '#1b2430',
+                        tooltipBg: '#1b2430',
+                        tooltipText: '#f3f6fa'
+                    };
+                }
+                return {
+                    text: '#374151',
+                    muted: '#6b7280',
+                    grid: 'rgba(0,0,0,0.06)',
+                    surface: '#ffffff',
+                    track: '#f1f5f9',
+                    tooltipBg: '#111827',
+                    tooltipText: '#ffffff'
+                };
+            }
+            function isTrackFill(value) {
+                var n = String(value || '').toLowerCase().replace(/\s/g, '');
+                return n === '#fff' || n === '#ffffff' || n === 'white' || n === '#f1f5f9' ||
+                    n === '#f8fafc' || n === '#e5e7eb' || n === '#f3f4f6' || n === '#1b2430';
+            }
+            function isSurfaceBorder(value) {
+                var n = String(value || '').toLowerCase().replace(/\s/g, '');
+                return !n || n === '#fff' || n === '#ffffff' || n === 'white' || n === '#141b24' || n === '#f1f5f9';
+            }
+            function applyChartDefaults(theme) {
+                if (!window.Chart || !Chart.defaults) return;
+                var c = palette(theme);
+                Chart.defaults.color = c.text;
+                Chart.defaults.borderColor = c.grid;
+                try {
+                    var d = Chart.defaults;
+                    if (d.plugins && d.plugins.legend && d.plugins.legend.labels) {
+                        d.plugins.legend.labels.color = c.text;
+                    }
+                    if (d.plugins && d.plugins.title) {
+                        d.plugins.title.color = c.text;
+                    }
+                    if (d.plugins && d.plugins.tooltip) {
+                        d.plugins.tooltip.backgroundColor = c.tooltipBg;
+                        d.plugins.tooltip.titleColor = c.tooltipText;
+                        d.plugins.tooltip.bodyColor = c.tooltipText;
+                    }
+                    if (d.scale) {
+                        if (d.scale.ticks) d.scale.ticks.color = c.muted;
+                        if (d.scale.title) d.scale.title.color = c.text;
+                        if (d.scale.grid) d.scale.grid.color = c.grid;
+                    }
+                } catch (e) {}
+            }
+            function paintChartOptions(opt, c) {
+                if (!opt || typeof opt !== 'object') return;
+                var plugins = opt.plugins;
+                if (plugins) {
+                    if (plugins.legend && plugins.legend.labels) {
+                        plugins.legend.labels.color = c.text;
+                    }
+                    if (plugins.title) plugins.title.color = c.text;
+                    if (plugins.subtitle) plugins.subtitle.color = c.muted;
+                    if (plugins.tooltip) {
+                        plugins.tooltip.titleColor = c.tooltipText;
+                        plugins.tooltip.bodyColor = c.tooltipText;
+                        plugins.tooltip.backgroundColor = c.tooltipBg;
+                    }
+                }
+                var scales = opt.scales;
+                if (scales && typeof scales === 'object') {
+                    Object.keys(scales).forEach(function (key) {
+                        var scale = scales[key];
+                        if (!scale || typeof scale !== 'object') return;
+                        if (scale.ticks) scale.ticks.color = c.muted;
+                        if (scale.title) scale.title.color = c.text;
+                        if (scale.grid && scale.grid.display !== false) scale.grid.color = c.grid;
+                    });
+                }
+            }
+            function styleChart(chart, doUpdate) {
+                if (!chart || chart.__efakStyling) return;
+                chart.__efakStyling = true;
+                try {
+                    var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+                    var c = palette(theme);
+                    var raw = chart.config && (chart.config._config || chart.config);
+                    paintChartOptions(raw && raw.options, c);
+                    try { paintChartOptions(chart.options, c); } catch (e) {}
+                    var type = (raw && raw.type) || (chart.config && chart.config.type);
+                    if (type === 'doughnut' || type === 'pie') {
+                        var datasets = (chart.data && chart.data.datasets) || [];
+                        datasets.forEach(function (ds) {
+                            if (!ds) return;
+                            if (Array.isArray(ds.borderColor)) {
+                                ds.borderColor = ds.borderColor.map(function (bc) {
+                                    return isSurfaceBorder(bc) ? c.surface : bc;
+                                });
+                            } else if (isSurfaceBorder(ds.borderColor)) {
+                                ds.borderColor = c.surface;
+                            }
+                            if (Array.isArray(ds.backgroundColor)) {
+                                ds.backgroundColor = ds.backgroundColor.map(function (bg) {
+                                    return isTrackFill(bg) ? c.track : bg;
+                                });
+                            }
+                        });
+                    }
+                    if (chart.canvas) chart.canvas.style.background = 'transparent';
+                    if (doUpdate && typeof chart.update === 'function') {
+                        chart.update('none');
+                    }
+                } catch (e) {
+                } finally {
+                    chart.__efakStyling = false;
+                }
+            }
+            function syncCharts() {
+                if (!window.Chart || typeof Chart.getChart !== 'function') return;
+                document.querySelectorAll('canvas').forEach(function (el) {
+                    var chart = Chart.getChart(el);
+                    if (chart) styleChart(chart, true);
+                });
+            }
+            function apply(theme, persist) {
+                var root = document.documentElement;
+                root.setAttribute('data-theme', theme);
+                root.style.colorScheme = theme;
+                applyChartDefaults(theme);
+                if (persist) {
+                    try { localStorage.setItem(KEY, theme); } catch (e) {}
+                }
+                var light = document.getElementById('hljs-light');
+                var dark = document.getElementById('hljs-dark');
+                if (light) light.disabled = theme === 'dark';
+                if (dark) dark.disabled = theme !== 'dark';
+                var btn = document.getElementById('theme-toggle');
+                if (btn) {
+                    var next = theme === 'dark' ? '浅色' : '暗色';
+                    btn.setAttribute('aria-label', '切换到' + next + '主题');
+                    btn.setAttribute('title', '切换到' + next + '主题');
+                    btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+                }
+                syncCharts();
+                try {
+                    window.dispatchEvent(new CustomEvent('efak:themechange', { detail: { theme: theme } }));
+                } catch (e) {}
+            }
+            window.efakTheme = {
+                get: function () {
+                    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+                },
+                colors: function () {
+                    return palette(this.get());
+                },
+                apply: apply,
+                styleChart: styleChart,
+                syncCharts: syncCharts,
+                toggle: function () {
+                    apply(this.get() === 'dark' ? 'light' : 'dark', true);
+                }
+            };
+            apply(read(), false);
+            document.addEventListener('DOMContentLoaded', function () {
+                var btn = document.getElementById('theme-toggle');
+                if (btn && !btn.dataset.bound) {
+                    btn.dataset.bound = '1';
+                    btn.addEventListener('click', function () { window.efakTheme.toggle(); });
+                }
+                apply(window.efakTheme.get(), false);
+                if (!localStorage.getItem(KEY) && window.matchMedia) {
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+                        if (!localStorage.getItem(KEY)) apply(e.matches ? 'dark' : 'light', false);
+                    });
+                }
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            var KEY = 'efak.clusterId';
+            var SESSION_KEY = 'currentClusterId';
+            function isAppPage() {
+                var path = location.pathname || '';
+                return path !== '/login' && path.indexOf('/login.') !== 0 && path !== '/logout';
+            }
+            function isValidCid(cid) {
+                if (!cid) return false;
+                cid = String(cid).trim();
+                return cid !== '' && cid !== 'default' && cid !== 'undefined' && cid !== 'null';
+            }
+            function readStored() {
+                try {
+                    return localStorage.getItem(KEY) || sessionStorage.getItem(SESSION_KEY) || '';
+                } catch (e) { return ''; }
+            }
+            function writeStored(cid) {
+                if (!isValidCid(cid)) return;
+                try {
+                    localStorage.setItem(KEY, cid);
+                    sessionStorage.setItem(SESSION_KEY, cid);
+                } catch (e) {}
+            }
+            function readUrlCid() {
+                try {
+                    var params = new URLSearchParams(location.search);
+                    return params.get('cid') || params.get('clusterId') || '';
+                } catch (e) { return ''; }
+            }
+            function buildUrlWithCid(href, cid) {
+                if (!isValidCid(cid) || !href) return href;
+                try {
+                    var url = new URL(href, location.origin);
+                    if (url.origin !== location.origin) return href;
+                    var path = url.pathname || '';
+                    if (path === '/login' || path.indexOf('/login.') === 0 || path === '/logout') return href;
+                    if (/\.(css|js|png|jpe?g|gif|svg|ico|woff2?|map)$/i.test(path)) return href;
+                    if (path.indexOf('/api/') === 0 || path.indexOf('/plugins/') === 0) return href;
+                    if (url.searchParams.get('cid') === cid) {
+                        return url.pathname + url.search + url.hash;
+                    }
+                    url.searchParams.set('cid', cid);
+                    url.searchParams.delete('clusterId');
+                    return url.pathname + url.search + url.hash;
+                } catch (e) {
+                    return href;
+                }
+            }
+            function ensureUrl(cid) {
+                if (!isAppPage() || !isValidCid(cid)) return false;
+                var next = buildUrlWithCid(location.pathname + location.search + location.hash, cid);
+                var cur = location.pathname + location.search + location.hash;
+                if (next === cur) return false;
+                history.replaceState(null, '', next);
+                return true;
+            }
+            function patchLinks(cid) {
+                if (!isValidCid(cid) || !document.querySelectorAll) return;
+                document.querySelectorAll('a[href]').forEach(function (a) {
+                    var href = a.getAttribute('href');
+                    if (!href || href.charAt(0) === '#' || href.indexOf('javascript:') === 0) return;
+                    var next = buildUrlWithCid(href, cid);
+                    if (next && next !== href) a.setAttribute('href', next);
+                });
+            }
+            function getCid() {
+                var urlCid = readUrlCid();
+                if (isValidCid(urlCid)) {
+                    writeStored(urlCid);
+                    return urlCid;
+                }
+                var stored = readStored();
+                return isValidCid(stored) ? stored : '';
+            }
+            function setCid(cid, opts) {
+                if (!isValidCid(cid)) return;
+                writeStored(cid);
+                if (!opts || opts.updateUrl !== false) ensureUrl(cid);
+                if (!opts || opts.patchLinks !== false) patchLinks(cid);
+                try {
+                    window.dispatchEvent(new CustomEvent('efak:clusterchange', { detail: { cid: cid } }));
+                } catch (e) {}
+            }
+            function clusterPagesNeedReload(path) {
+                return /^\/(dashboard|cluster|topics|consumers|monitoring|alerts|ai-assistant|topic\/view|consumer\/view)(\/|$)/.test(path || '');
+            }
+            function resolveFromApi() {
+                if (!isAppPage() || getCid()) return;
+                if (window.__efakCidResolving) return;
+                window.__efakCidResolving = true;
+                fetch('/api/manager/cluster/list', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ page: 1, pageSize: 1, sortField: 'updatedAt', sortOrder: 'DESC' })
+                }).then(function (res) {
+                    if (!res.ok) return null;
+                    return res.json();
+                }).then(function (data) {
+                    var list = data && (data.clusters || data.records || data.list) || [];
+                    var first = list[0];
+                    var cid = first && (first.clusterId || first.cid || first.id);
+                    if (!isValidCid(cid)) return;
+                    cid = String(cid);
+                    writeStored(cid);
+                    var next = buildUrlWithCid(location.pathname + location.search + location.hash, cid);
+                    if (clusterPagesNeedReload(location.pathname)) {
+                        location.replace(next);
+                    } else {
+                        history.replaceState(null, '', next);
+                        patchLinks(cid);
+                    }
+                }).catch(function () {}).finally(function () {
+                    window.__efakCidResolving = false;
+                });
+            }
+
+            var bootCid = getCid();
+            if (isValidCid(bootCid)) {
+                ensureUrl(bootCid);
+            }
+            window.efakCluster = {
+                get: getCid,
+                set: setCid,
+                withCid: function (href) { return buildUrlWithCid(href, getCid()); },
+                patchLinks: patchLinks,
+                resolveFromApi: resolveFromApi
+            };
+            document.addEventListener('DOMContentLoaded', function () {
+                var cid = getCid();
+                if (cid) patchLinks(cid);
+                else resolveFromApi();
+            });
+            document.addEventListener('click', function (e) {
+                var a = e.target && e.target.closest && e.target.closest('a[href]');
+                if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                var cid = getCid();
+                if (!cid) return;
+                var href = a.getAttribute('href');
+                var next = buildUrlWithCid(href, cid);
+                if (next && next !== href) a.setAttribute('href', next);
+            }, true);
+        })();
+    </script>
     <!-- logo icon -->
     <link rel="shortcut icon" th:href="@{/images/efak_ai_login.png?v1}" />
     <!-- plugins -->
     <link th:href="@{/plugins/tailwindcss/tailwind.min.css}" rel="stylesheet">
     <link th:href="@{/plugins/tailwindcss/tailwind-config.css}" rel="stylesheet">
-    <link th:href="@{/css/design-tokens.css(v='scroll2')}" rel="stylesheet">
+    <link th:href="@{/css/design-tokens.css(v='theme19')}" rel="stylesheet">
     <link th:href="@{/plugins/fontawesome/all.min.css}" rel="stylesheet">
     <link th:href="@{/plugins/select2/select2.min.css}" rel="stylesheet">
 

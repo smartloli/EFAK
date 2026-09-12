@@ -40,10 +40,14 @@ window.ClusterModule = {
         // 先检查用户权限
         await this.checkUserPermissions();
 
-        // 从URL解析cid（兼容旧的clusterId参数）
         try {
-            const params = new URLSearchParams(window.location.search);
-            this.clusterId = params.get('cid') || params.get('clusterId');
+            if (window.efakCluster && typeof window.efakCluster.get === 'function') {
+                this.clusterId = window.efakCluster.get() || '';
+            }
+            if (!this.clusterId) {
+                const params = new URLSearchParams(window.location.search);
+                this.clusterId = params.get('cid') || params.get('clusterId');
+            }
         } catch (e) {
             console.warn('解析URL参数失败:', e);
         }

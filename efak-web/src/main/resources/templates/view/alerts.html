@@ -1215,6 +1215,288 @@
 
             /* 操作列在小屏幕上缩短 */
         }
+
+        .alert-config-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .alert-config-hint {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--efak-text-secondary);
+            max-width: 560px;
+        }
+
+        .alert-config-table-wrap {
+            background: var(--efak-surface);
+            border: 1px solid var(--efak-border);
+            border-radius: 2px;
+            overflow: auto;
+        }
+
+        .alert-config-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .alert-config-empty {
+            text-align: center;
+            padding: 48px 16px !important;
+            color: var(--efak-text-secondary) !important;
+        }
+
+        .alert-config-empty i {
+            display: block;
+            font-size: 28px;
+            margin: 0 auto 12px;
+            color: var(--efak-muted);
+        }
+
+        .alert-config-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .alert-config-channel {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-config-channel img {
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .alert-config-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 12px 14px;
+            background: var(--efak-surface-2);
+            border: 1px solid var(--efak-border);
+            border-radius: 2px;
+            color: var(--efak-text-secondary);
+            font-size: 13px;
+        }
+
+        .alert-config-pager {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cell-strong {
+            font-weight: 600;
+            color: var(--efak-text);
+        }
+
+        .cell-muted {
+            color: var(--efak-text-secondary);
+        }
+
+        #alert-type-config-modal .alert-modal-content,
+        #channel-config-modal .alert-modal-content,
+        #create-channel-modal .alert-modal-content {
+            background: var(--efak-surface);
+            color: var(--efak-text);
+            border: 1px solid var(--efak-border);
+        }
+
+        #alert-type-config-modal .alert-modal-title,
+        #channel-config-modal .alert-modal-title,
+        #create-channel-modal .alert-modal-title {
+            color: var(--efak-text);
+        }
+
+        #alert-type-config-modal .close-btn,
+        #channel-config-modal .close-btn,
+        #create-channel-modal .close-btn {
+            color: var(--efak-text-secondary);
+        }
+
+        #alert-type-config-modal .close-btn:hover,
+        #channel-config-modal .close-btn:hover,
+        #create-channel-modal .close-btn:hover {
+            color: var(--efak-text);
+            background: var(--efak-surface-2);
+        }
+
+        .alert-form-hint {
+            margin: 0 0 20px;
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--efak-text-secondary);
+        }
+
+        .alert-form-grid {
+            display: grid;
+            gap: 18px;
+        }
+
+        .alert-form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--efak-text);
+        }
+
+        .alert-form-req {
+            color: #ef4444;
+        }
+
+        .alert-form-input {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid var(--efak-border);
+            border-radius: 2px;
+            font-size: 13px;
+            background: var(--efak-surface);
+            color: var(--efak-text);
+            box-sizing: border-box;
+        }
+
+        .alert-form-input:focus {
+            outline: none;
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.12);
+        }
+
+        .alert-form-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--efak-text);
+            cursor: pointer;
+        }
+
+        .alert-form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--efak-border);
+        }
+
+        .alert-form-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-form-option img {
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        html[data-theme="dark"] .alert-form-input {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .alert-form-input::placeholder {
+            color: var(--efak-muted);
+        }
+
+        html[data-theme="dark"] .filter-btn.secondary {
+            background: var(--efak-surface-2) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .filter-btn.secondary:hover {
+            background: #243044 !important;
+        }
+
+        html[data-theme="dark"] #create-channel-modal .select2-container--default .select2-selection--single {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] #create-channel-modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] #create-channel-modal .select2-dropdown {
+            background: var(--efak-surface) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .alert-modal-content,
+        html[data-theme="dark"] .config-item,
+        html[data-theme="dark"] .alert-type-display,
+        html[data-theme="dark"] .alert-detail-value,
+        html[data-theme="dark"] .alert-meta-item {
+            background: var(--efak-surface) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .alert-modal-title,
+        html[data-theme="dark"] .config-item-title,
+        html[data-theme="dark"] .alert-detail-value,
+        html[data-theme="dark"] .alert-meta-value {
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .config-item-description,
+        html[data-theme="dark"] .config-threshold-unit,
+        html[data-theme="dark"] .close-btn,
+        html[data-theme="dark"] .alert-detail-label,
+        html[data-theme="dark"] .alert-meta-label {
+            color: var(--efak-text-secondary) !important;
+        }
+
+        html[data-theme="dark"] .close-btn:hover {
+            color: var(--efak-text) !important;
+            background: var(--efak-surface-2) !important;
+        }
+
+        html[data-theme="dark"] .alert-modal table,
+        html[data-theme="dark"] .alert-modal table th,
+        html[data-theme="dark"] .alert-modal table td,
+        html[data-theme="dark"] .alert-modal table span,
+        html[data-theme="dark"] .alert-modal table div {
+            color: var(--efak-text) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .alert-modal table th {
+            background: var(--efak-surface-2) !important;
+            color: var(--efak-text-secondary) !important;
+        }
+
+        html[data-theme="dark"] .alert-modal .cell-muted,
+        html[data-theme="dark"] .alert-modal .alert-config-empty,
+        html[data-theme="dark"] .alert-modal .alert-config-footer {
+            color: var(--efak-text-secondary) !important;
+        }
+
+        html[data-theme="dark"] .config-item {
+            background: var(--efak-surface-2) !important;
+        }
+
+        html[data-theme="dark"] .config-threshold-input {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
     </style>
 </head>
 
@@ -1495,7 +1777,7 @@
                 <!-- 动态内容 -->
             </div>
 
-            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+            <div class="alert-form-actions">
                 <button class="filter-btn secondary" onclick="closeCreateChannel()">取消</button>
                 <button class="filter-btn primary" onclick="saveCreateChannel()">创建渠道</button>
             </div>

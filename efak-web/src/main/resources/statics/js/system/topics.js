@@ -1318,7 +1318,8 @@ const TopicsModule = {
                 $('#retention-time-unit').select2({
                     minimumResultsForSearch: Infinity,
                     dropdownParent: $('#create-topic-modal'),
-                    width: 'resolve'
+                    width: 'resolve',
+                    dropdownCssClass: 'cleanup-policy-dropdown'
                 });
             }
 
@@ -1679,7 +1680,9 @@ const TopicsModule = {
 
     // 获取集群ID
     getClusterId() {
-        // 从URL参数中获取cid
+        if (window.efakCluster && typeof window.efakCluster.get === 'function') {
+            return window.efakCluster.get() || '';
+        }
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get('cid');
     },

@@ -210,7 +210,7 @@
 
 
 <!-- JavaScript -->
-<script src="/statics/js/system/manager.js" th:src="@{/statics/js/system/manager.js}"></script>
+<script src="/statics/js/system/manager.js" th:src="@{/statics/js/system/manager.js(v='theme16')}"></script>
 <script>
     // 导航栏滚动效果
     window.addEventListener('scroll', function () {
@@ -291,8 +291,8 @@
                                 生产环境
                             </option>
                         </select>
-                        <p class="text-xs text-gray-500 mt-1">
-                            <i class="fa fa-info-circle text-blue-500 mr-1"></i>
+                        <p class="form-hint">
+                            <i class="fa fa-info-circle"></i>
                             选择合适的环境类型来标识集群用途
                         </p>
                     </div>
@@ -379,22 +379,16 @@
                                     下载Excel模板
                                 </button>
                             </div>
-                            <div class="file-upload-area" onclick="document.getElementById('excelFile').click()"
-                                 style="border: 2px dashed #d1d5db; border-radius: 2px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s;">
-                                <div class="upload-icon"
-                                     style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;">
+                            <div class="file-upload-area" onclick="document.getElementById('excelFile').click()">
+                                <div class="upload-icon">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                 </div>
-                                <div class="upload-text"
-                                     style="font-size: 16px; color: #374151; margin-bottom: 8px;">点击上传或拖拽文件到此区域
-                                </div>
-                                <div class="upload-hint" style="font-size: 14px; color: #9ca3af;">支持 .xlsx, .xls
-                                    格式文件
-                                </div>
+                                <div class="upload-text">点击上传或拖拽文件到此区域</div>
+                                <div class="upload-hint">支持 .xlsx, .xls 格式文件</div>
                                 <input type="file" id="excelFile" class="file-input" accept=".xlsx,.xls"
                                        onchange="handleFileSelect(event)" style="display: none;">
                             </div>
-                            <div id="fileInfo" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
+                            <div id="fileInfo" class="form-hint"></div>
                         </div>
 
                         <button type="button" class="submit-btn" onclick="submitBatchImport()">

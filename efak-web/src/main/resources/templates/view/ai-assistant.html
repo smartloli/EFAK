@@ -12,7 +12,8 @@
     <script th:src="@{/plugins/marked/marked.min.js}"></script>
 
     <!-- 代码高亮库 -->
-    <link rel="stylesheet" th:href="@{/plugins/highlight/github.min.css}">
+    <link id="hljs-light" rel="stylesheet" th:href="@{/plugins/highlight/github.min.css}">
+    <link id="hljs-dark" rel="stylesheet" th:href="@{/plugins/highlight/atom-one-dark.min.css}" disabled>
     <script th:src="@{/plugins/highlight/highlight.min.js}"></script>
 
     <!-- 图表库 -->
@@ -1106,6 +1107,25 @@
             border-color: #165DFF;
         }
 
+        .model-provider-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 2px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .model-provider-icon img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            display: block;
+        }
+
         .history-modal {
             position: fixed;
             inset: 0;
@@ -1859,6 +1879,202 @@
         .chat-container>div:last-child {
             margin-top: 0;
         }
+
+        html[data-theme="dark"] .agent-shell,
+        html[data-theme="dark"] .agent-empty,
+        html[data-theme="dark"] .agent-dock,
+        html[data-theme="dark"] .composer-box,
+        html[data-theme="dark"] .slash-menu,
+        html[data-theme="dark"] .model-picker-menu,
+        html[data-theme="dark"] .intent-card,
+        html[data-theme="dark"] .mcp-catalog,
+        html[data-theme="dark"] .follow-up,
+        html[data-theme="dark"] .history-dialog,
+        html[data-theme="dark"] .history-pager button,
+        html[data-theme="dark"] .table-wrapper,
+        html[data-theme="dark"] .markdown-table {
+            background: var(--efak-surface) !important;
+            background-color: var(--efak-surface) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .agent-topbar,
+        html[data-theme="dark"] .agent-dock,
+        html[data-theme="dark"] .ai-workspace-bar {
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .chat-composer {
+            background: var(--efak-surface) !important;
+        }
+
+        html[data-theme="dark"] .message-bubble.assistant,
+        html[data-theme="dark"] .markdown-content,
+        html[data-theme="dark"] .markdown-content h1,
+        html[data-theme="dark"] .markdown-content h2,
+        html[data-theme="dark"] .markdown-content h3,
+        html[data-theme="dark"] .markdown-content strong,
+        html[data-theme="dark"] .agent-empty h1,
+        html[data-theme="dark"] .intent-card-label,
+        html[data-theme="dark"] .mcp-tool-name,
+        html[data-theme="dark"] .history-item-title,
+        html[data-theme="dark"] .slash-item,
+        html[data-theme="dark"] .model-picker-btn {
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .message-bubble.user {
+            background: var(--efak-surface-2) !important;
+            color: var(--efak-text) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .agent-empty p,
+        html[data-theme="dark"] .intent-card-desc,
+        html[data-theme="dark"] .agent-step,
+        html[data-theme="dark"] .mcp-tool-desc,
+        html[data-theme="dark"] .mcp-param,
+        html[data-theme="dark"] .mcp-param-desc,
+        html[data-theme="dark"] .mcp-catalog-head,
+        html[data-theme="dark"] .history-item-meta,
+        html[data-theme="dark"] .history-pager,
+        html[data-theme="dark"] .slash-item-desc,
+        html[data-theme="dark"] .composer-hint,
+        html[data-theme="dark"] .icon-btn-ghost,
+        html[data-theme="dark"] .composer-icon-btn,
+        html[data-theme="dark"] .welcome-block .markdown-content,
+        html[data-theme="dark"] .markdown-content blockquote,
+        html[data-theme="dark"] .model-option .text-xs {
+            color: var(--efak-text-secondary) !important;
+        }
+
+        html[data-theme="dark"] .model-provider-icon {
+            background: #edf1f7 !important;
+            border-color: #d5dce8 !important;
+        }
+
+        html[data-theme="dark"] .model-option:hover .model-provider-icon,
+        html[data-theme="dark"] .model-option.active .model-provider-icon {
+            background: #ffffff !important;
+            border-color: #ffffff !important;
+        }
+
+        html[data-theme="dark"] .model-picker-btn,
+        html[data-theme="dark"] .mcp-catalog-head,
+        html[data-theme="dark"] .mcp-tool-name,
+        html[data-theme="dark"] .thinking-section,
+        html[data-theme="dark"] .history-item:hover,
+        html[data-theme="dark"] .history-item.active,
+        html[data-theme="dark"] .markdown-table th,
+        html[data-theme="dark"] .table-header,
+        html[data-theme="dark"] .code-header {
+            background: var(--efak-surface-2) !important;
+            color: var(--efak-text) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .markdown-table td {
+            color: var(--efak-text) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .markdown-table tr:hover,
+        html[data-theme="dark"] .table-row-alternate,
+        html[data-theme="dark"] .table-row-alternate:hover {
+            background-color: var(--efak-surface-2) !important;
+        }
+
+        html[data-theme="dark"] .markdown-content code {
+            color: #93c5fd !important;
+            background: rgba(91, 147, 255, 0.16) !important;
+        }
+
+        html[data-theme="dark"] .markdown-content pre,
+        html[data-theme="dark"] .code-block-wrapper pre,
+        html[data-theme="dark"] .markdown-content pre code,
+        html[data-theme="dark"] .code-block-wrapper pre code,
+        html[data-theme="dark"] .markdown-content pre code.hljs,
+        html[data-theme="dark"] .hljs {
+            background: var(--efak-code-bg) !important;
+            color: var(--efak-code-text) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .markdown-content mark {
+            background: rgba(91, 147, 255, 0.28) !important;
+            color: #dbeafe !important;
+        }
+
+        html[data-theme="dark"] .composer-box textarea,
+        html[data-theme="dark"] .history-search input {
+            color: var(--efak-text) !important;
+            background: transparent !important;
+        }
+
+        html[data-theme="dark"] .chat-messages::-webkit-scrollbar-track {
+            background: var(--efak-surface);
+        }
+
+        html[data-theme="dark"] .chat-messages::-webkit-scrollbar-thumb {
+            background: #3a4658;
+            border-color: var(--efak-surface);
+        }
+
+        html[data-theme="dark"] .chat-messages {
+            scrollbar-color: #3a4658 var(--efak-surface);
+        }
+
+        html[data-theme="dark"] .copy-code-btn,
+        html[data-theme="dark"] .action-btn {
+            color: var(--efak-muted) !important;
+        }
+
+        html[data-theme="dark"] .mcp-access-admin {
+            color: #fdba74 !important;
+            background: rgba(180, 83, 9, 0.2) !important;
+        }
+
+        html[data-theme="dark"] .mcp-param code {
+            background: var(--efak-surface-2) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .history-search-wrap,
+        html[data-theme="dark"] .composer-icon-btn,
+        html[data-theme="dark"] .model-picker-btn {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] #history-close-btn,
+        html[data-theme="dark"] .history-dialog-header .composer-icon-btn,
+        html[data-theme="dark"] .history-dialog-header .icon-btn-ghost {
+            background: transparent !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text-secondary) !important;
+        }
+
+        html[data-theme="dark"] #history-close-btn:hover,
+        html[data-theme="dark"] .history-dialog-header .composer-icon-btn:hover {
+            color: var(--efak-text) !important;
+            background: var(--efak-surface-2) !important;
+        }
+
+        html[data-theme="dark"] #chat-input,
+        html[data-theme="dark"] .composer-box textarea,
+        html[data-theme="dark"] .history-search input {
+            background: transparent !important;
+            background-color: transparent !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .composer-box {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+        }
     </style>
 </head>
 
@@ -1905,7 +2121,7 @@
                                 <div class="composer-box">
                                     <div id="slash-menu" class="slash-menu" hidden></div>
                                     <textarea id="chat-input" placeholder="随心输入，/new 新建对话"
-                                        class="w-full resize-none bg-white text-sm"
+                                        class="w-full resize-none text-sm"
                                         rows="1"></textarea>
                                     <div class="composer-toolbar">
                                         <div class="flex items-center gap-2 min-w-0">
@@ -1942,7 +2158,7 @@
                                 <div id="history-dialog-title" class="text-sm font-semibold text-gray-900">历史对话</div>
                                 <div class="text-xs text-gray-500">搜索并打开之前的会话</div>
                             </div>
-                            <button type="button" id="history-close-btn" class="composer-icon-btn" title="关闭">
+                            <button type="button" id="history-close-btn" class="icon-btn-ghost" title="关闭">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
@@ -2023,7 +2239,7 @@
     </style>
 
     <!-- AI assistant -->
-    <script th:src="@{/js/system/ai-assistant.js(v='agent6')}"></script>
+    <script th:src="@{/js/system/ai-assistant.js(v='agent7')}"></script>
 </body>
 
 </html>

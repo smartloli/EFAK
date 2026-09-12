@@ -688,57 +688,53 @@ class AlertManager {
             const content = document.getElementById('channel-config-content');
 
             content.innerHTML = `
-                <div style="margin-bottom: 24px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1f2937;">告警渠道列表</h3>
-                        <button class="filter-btn primary" onclick="createChannel()" style="display: flex; align-items: center; gap: 8px;">
-                            <i class="fa fa-plus"></i>
-                            创建渠道
-                        </button>
-                    </div>
-                    <p class="text-gray-600 text-sm">管理不同的告警渠道，配置后可在告警时及时通知相关人员。</p>
+                <div class="alert-config-toolbar">
+                    <p class="alert-config-hint">管理告警通知渠道，配置后可在告警触发时及时通知相关人员。</p>
+                    <button class="filter-btn primary" onclick="createChannel()">
+                        <i class="fa fa-plus"></i>
+                        创建渠道
+                    </button>
                 </div>
-                
-                <div style="background: white; border-radius: 2px; border: 1px solid #e2e8f0; overflow: hidden;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <div class="alert-config-table-wrap">
+                    <table class="alert-config-table">
                         <thead>
-                            <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">渠道名称</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">渠道类型</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">创建时间</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">更新时间</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">状态</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">操作</th>
-                        </tr>
-                    </thead>
+                            <tr>
+                                <th>渠道名称</th>
+                                <th>渠道类型</th>
+                                <th>创建时间</th>
+                                <th>更新时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
                     <tbody>
                         ${channels.length === 0 ? `
                             <tr>
-                                <td colspan="6" style="text-align: center; padding: 40px; color: #6b7280;">
-                                    <i class="fa fa-bell" style="font-size: 48px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;"></i>
+                                <td colspan="6" class="alert-config-empty">
+                                    <i class="fa fa-bell"></i>
                                     暂无告警渠道，请创建第一个渠道
                                 </td>
                             </tr>
                         ` : channels.map(channel => {
                 const channelInfo = this.channelList.find(c => c.key === channel.type);
                 return `
-                                <tr style="border-bottom: 1px solid #f1f5f9;">
-                                    <td style="padding: 12px 16px; color: #1f2937; font-weight: 500;">${channel.name}</td>
-                                    <td style="padding: 12px 16px;">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <img src="${channelInfo?.icon}" alt="${channelInfo?.name}" style="width: 20px; height: 20px; border-radius: 2px;">
-                                            <span style="color: #374151;">${channelInfo?.name}</span>
+                                <tr>
+                                    <td><span class="cell-strong">${channel.name}</span></td>
+                                    <td>
+                                        <div class="alert-config-channel">
+                                            <img src="${channelInfo?.icon}" alt="${channelInfo?.name || ''}">
+                                            <span class="cell-strong">${channelInfo?.name || channel.type}</span>
                                         </div>
                                     </td>
-                                    <td style="padding: 12px 16px; color: #6b7280; font-size: 0.875rem;">${this.formatDate(new Date(channel.createdAt))}</td>
-                                    <td style="padding: 12px 16px; color: #6b7280; font-size: 0.875rem;">${this.formatDate(new Date(channel.updatedAt))}</td>
-                                    <td style="padding: 12px 16px;">
+                                    <td class="cell-muted">${this.formatDate(new Date(channel.createdAt))}</td>
+                                    <td class="cell-muted">${this.formatDate(new Date(channel.updatedAt))}</td>
+                                    <td>
                                         <span class="alert-status ${channel.enabled ? 'resolved' : 'active'}">
                                             ${channel.enabled ? '启用' : '禁用'}
                                         </span>
                                     </td>
-                                    <td style="padding: 12px 16px;">
-                                        <div style="display: flex; gap: 8px;">
+                                    <td>
+                                        <div class="alert-config-actions">
                                             <button class="action-btn view" onclick="viewChannel(${channel.id})" title="查看">
                                                 <i class="fa fa-eye"></i>
                                             </button>
@@ -756,13 +752,11 @@ class AlertManager {
                     </tbody>
                 </table>
             </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 2px;">
-                <div style="color: #6b7280; font-size: 0.875rem;">
-                    共 ${channels.length} 条渠道
-                </div>
+            <div class="alert-config-footer">
+                <div>共 ${channels.length} 条渠道</div>
             </div>
         `;
+
 
             modal.classList.add('show');
         } catch (error) {
@@ -787,24 +781,15 @@ class AlertManager {
         const content = document.getElementById('create-channel-content');
 
         content.innerHTML = `
-            <div style="margin-bottom: 20px;">
-                <p class="text-gray-600 text-sm">创建新的告警渠道，配置后可在告警时及时通知相关人员。</p>
-            </div>
-            
-            <div style="display: grid; gap: 20px;">
-                <div>
-                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">
-                        渠道名称 <span style="color: #ef4444;">*</span>
-                    </label>
-                    <input type="text" id="channel-name" 
-                           placeholder="请输入渠道名称，如：生产环境钉钉群"
-                           style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; font-size: 0.875rem;">
+            <p class="alert-form-hint">填写渠道信息，配置后可在告警触发时及时通知相关人员。</p>
+            <div class="alert-form-grid">
+                <div class="alert-form-field">
+                    <label class="alert-form-label">渠道名称 <span class="alert-form-req">*</span></label>
+                    <input type="text" id="channel-name" class="alert-form-input"
+                           placeholder="例如：生产环境钉钉群" autocomplete="off">
                 </div>
-                
-                <div>
-                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">
-                        渠道类型 <span style="color: #ef4444;">*</span>
-                    </label>
+                <div class="alert-form-field">
+                    <label class="alert-form-label">渠道类型 <span class="alert-form-req">*</span></label>
                     <select id="channel-type" class="filter-input select2-filter" style="width: 100%;">
                         <option value="">请选择渠道类型</option>
                         ${this.channelList.map(channel => `
@@ -814,22 +799,15 @@ class AlertManager {
                         `).join('')}
                     </select>
                 </div>
-                
-                <div>
-                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">
-                        API地址 <span style="color: #ef4444;">*</span>
-                    </label>
-                    <input type="text" id="channel-api" 
-                           placeholder="请先选择渠道类型"
-                           style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 2px; font-size: 0.875rem;">
+                <div class="alert-form-field">
+                    <label class="alert-form-label">API 地址 <span class="alert-form-req">*</span></label>
+                    <input type="text" id="channel-api" class="alert-form-input"
+                           placeholder="请先选择渠道类型" autocomplete="off">
                 </div>
-                
-                <div>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: #374151;">
-                        <input type="checkbox" id="channel-enabled" checked style="width: 16px; height: 16px;">
-                        立即启用此渠道
-                    </label>
-                </div>
+                <label class="alert-form-check">
+                    <input type="checkbox" id="channel-enabled" checked>
+                    立即启用此渠道
+                </label>
             </div>
         `;
 
@@ -838,6 +816,7 @@ class AlertManager {
         $('#channel-type').select2({
             theme: 'default',
             width: '100%',
+            dropdownParent: $('#create-channel-modal .alert-modal-content'),
             minimumResultsForSearch: Infinity,
             placeholder: '请选择渠道类型',
             templateResult: function (option) {
@@ -891,8 +870,8 @@ class AlertManager {
             const channelInfo = this.channelList.find(c => c.key === channelType);
             if (channelInfo) {
                 return $(`
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0;">
-                        <img src="${channelInfo.icon}" alt="${channelInfo.name}" style="width: 24px; height: 24px; border-radius: 2px;">
+                    <div class="alert-form-option">
+                        <img src="${channelInfo.icon}" alt="${channelInfo.name}">
                         <span>${option.text}</span>
                     </div>
                 `);
@@ -903,8 +882,8 @@ class AlertManager {
         const channelInfo = this.channelList.find(c => c.key === option.id);
         if (channelInfo) {
             return $(`
-                <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0;">
-                    <img src="${channelInfo.icon}" alt="${channelInfo.name}" style="width: 24px; height: 24px; border-radius: 2px;">
+                <div class="alert-form-option">
+                    <img src="${channelInfo.icon}" alt="${channelInfo.name}">
                     <span>${channelInfo.name}</span>
                 </div>
             `);
@@ -1355,68 +1334,53 @@ class AlertManager {
             const content = document.getElementById('alert-type-config-content');
 
             content.innerHTML = `
-                <div style="margin-bottom: 24px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1f2937;">告警类型配置</h3>
-                        <button class="filter-btn primary" onclick="createAlertType()" style="display: flex; align-items: center; gap: 8px;">
-                            <i class="fa fa-plus"></i>
-                            创建告警类型
-                        </button>
-                    </div>
-                    <p class="text-gray-600 text-sm">配置不同类型的告警监控规则和阈值，当监控指标超过设定阈值时将触发告警。</p>
+                <div class="alert-config-toolbar">
+                    <p class="alert-config-hint">配置告警监控规则和阈值，指标超过阈值时触发通知。</p>
+                    <button class="filter-btn primary" onclick="createAlertType()">
+                        <i class="fa fa-plus"></i>
+                        创建告警类型
+                    </button>
                 </div>
-                
-                <div style="background: white; border-radius: 2px; border: 1px solid #e2e8f0; overflow: hidden;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <div class="alert-config-table-wrap">
+                    <table class="alert-config-table">
                         <thead>
-                            <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">告警类型</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">告警渠道</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">告警阈值</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">创建时间</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">修改时间</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">管理员</th>
-                                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 0.875rem;">操作</th>
-                        </tr>
-                    </thead>
+                            <tr>
+                                <th>告警类型</th>
+                                <th>告警渠道</th>
+                                <th>告警阈值</th>
+                                <th>创建时间</th>
+                                <th>修改时间</th>
+                                <th>管理员</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
                     <tbody>
                         ${configs.length === 0 ? `
                             <tr>
-                                <td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">
-                                    <i class="fa fa-bell" style="font-size: 48px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;"></i>
+                                <td colspan="7" class="alert-config-empty">
+                                    <i class="fa fa-bell"></i>
                                     暂无告警类型配置，请创建第一个配置
                                 </td>
                             </tr>
                         ` : configs.map(config => {
                 const typeInfo = this.typeList.find(t => t.key === config.type);
+                const channelsLabel = config.channels && config.channels.length > 0
+                    ? config.channels.map(channel => {
+                        if (channel.channelName) return channel.channelName;
+                        const channelInfo = this.channelList.find(c => c.key === channel.channelType);
+                        return channelInfo?.name || channel.channelType;
+                    }).join(', ')
+                    : '未配置';
                 return `
-                                <tr style="border-bottom: 1px solid #f1f5f9;">
-                                    <td style="padding: 12px 16px;">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span style="font-weight: 500; color: #1f2937;">${typeInfo?.name || config.type}</span>
-                                        </div>
-                                    </td>
-                                    <td style="padding: 12px 16px; color: #6b7280; font-size: 0.875rem;">
-                                        ${config.channels && config.channels.length > 0 ?
-                        config.channels.map(channel => {
-                            // 优先显示渠道名称，如果没有则显示渠道类型对应的名称
-                            if (channel.channelName) {
-                                return channel.channelName;
-                            } else {
-                                const channelInfo = this.channelList.find(c => c.key === channel.channelType);
-                                return channelInfo?.name || channel.channelType;
-                            }
-                        }).join(', ')
-                        : '未配置'}
-                                    </td>
-                                    <td style="padding: 12px 16px;">
-                                        <span style="font-weight: 500; color: #1f2937;">${config.threshold} ${config.unit}</span>
-                                    </td>
-                                    <td style="padding: 12px 16px; color: #6b7280; font-size: 0.875rem;">${this.formatDate(new Date(config.createdAt))}</td>
-                                    <td style="padding: 12px 16px; color: #6b7280; font-size: 0.875rem;">${this.formatDate(new Date(config.updatedAt))}</td>
-                                    <td style="padding: 12px 16px; color: #6b7280; font-size: 0.875rem;">${config.createdBy || 'admin'}</td>
-                                    <td style="padding: 12px 16px;">
-                                        <div style="display: flex; gap: 8px;">
+                                <tr>
+                                    <td><span class="cell-strong">${typeInfo?.name || config.type}</span></td>
+                                    <td class="cell-muted">${channelsLabel}</td>
+                                    <td><span class="cell-strong">${config.threshold} ${config.unit}</span></td>
+                                    <td class="cell-muted">${this.formatDate(new Date(config.createdAt))}</td>
+                                    <td class="cell-muted">${this.formatDate(new Date(config.updatedAt))}</td>
+                                    <td class="cell-muted">${config.createdBy || 'admin'}</td>
+                                    <td>
+                                        <div class="alert-config-actions">
                                             <button class="action-btn view" onclick="viewAlertType(${config.id})" title="查看">
                                                 <i class="fa fa-eye"></i>
                                             </button>
@@ -1434,16 +1398,12 @@ class AlertManager {
                     </tbody>
                 </table>
             </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 2px;">
-                <div style="color: #6b7280; font-size: 0.875rem;">
-                    共 ${this.alertTypeConfigTotal} 条配置
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    ${this.renderAlertTypeConfigPagination()}
-                </div>
+            <div class="alert-config-footer">
+                <div>共 ${this.alertTypeConfigTotal} 条配置</div>
+                <div class="alert-config-pager">${this.renderAlertTypeConfigPagination()}</div>
             </div>
         `;
+
 
             modal.classList.add('show');
         } catch (error) {
@@ -1816,10 +1776,12 @@ class AlertManager {
      * 获取当前集群ID
      */
     getCurrentClusterId() {
-        // 从URL参数或session storage获取当前集群ID
+        if (window.efakCluster && typeof window.efakCluster.get === 'function') {
+            const cid = window.efakCluster.get();
+            if (cid) return cid;
+        }
         const params = new URLSearchParams(window.location.search);
-        const cid = params.get('cid') || sessionStorage.getItem('currentClusterId') || '1';
-        return cid;
+        return params.get('cid') || sessionStorage.getItem('currentClusterId') || '';
     }
 
     /**

@@ -7,7 +7,7 @@ class KafkaMonitoring {
     constructor() {
         this.charts = {};
         this.currentTimeRange = '24h';
-        this.clusterId = this.getUrlParameter('cid');
+        this.clusterId = (window.efakCluster && window.efakCluster.get()) || this.getUrlParameter('cid');
         this.apiEndpoint = '/api/performance/monitors';
 
         if (!this.clusterId) {

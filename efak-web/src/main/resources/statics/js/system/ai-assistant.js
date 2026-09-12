@@ -80,6 +80,9 @@
     };
 
     function getClusterIdFromUrl() {
+        if (window.efakCluster && typeof window.efakCluster.get === 'function') {
+            return window.efakCluster.get() || '';
+        }
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get('cid') || '';
     }
@@ -1223,7 +1226,7 @@
         if (typeof mermaid !== 'undefined') {
             mermaid.initialize({
                 startOnLoad: false,
-                theme: 'default',
+                theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
                 securityLevel: 'loose'
             });
         }
@@ -1542,7 +1545,9 @@
             modelOption.innerHTML = `
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2 min-w-0">
-                            <img src="${providerIcon}" alt="" class="w-5 h-5 flex-shrink-0 object-contain">
+                            <span class="model-provider-icon">
+                                <img src="${providerIcon}" alt="">
+                            </span>
                             <div class="min-w-0">
                                 <div class="font-medium text-sm truncate">${model.modelName}</div>
                                 <div class="text-xs text-gray-500 truncate">${model.apiType || ''}${model.description ? ' · ' + model.description : ''}</div>

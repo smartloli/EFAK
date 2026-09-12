@@ -653,8 +653,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            color: #111827 !important;
-            background-color: #ffffff !important;
+            color: var(--efak-text, #111827) !important;
+            background-color: var(--efak-surface, #ffffff) !important;
         }
 
         .topic-icon-dropdown .select2-results__option > * {
@@ -684,14 +684,14 @@
         }
 
         .topic-icon-dropdown .select2-results__option .icon-title {
-            font-weight: 500;
-            color: #111827 !important;
+            font-weight: 600;
+            color: var(--efak-text, #111827) !important;
             background: transparent !important;
         }
 
         .topic-icon-dropdown .select2-results__option .icon-description {
             font-size: 0.75rem;
-            color: #6b7280 !important;
+            color: var(--efak-muted, #6b7280) !important;
             background: transparent !important;
         }
 
@@ -701,9 +701,9 @@
         .topic-icon-dropdown .select2-results__option--highlighted,
         .topic-icon-dropdown .select2-results__option--highlighted:hover,
         .topic-icon-dropdown .select2-results__option:hover {
-            background: rgba(22, 93, 255, 0.08) !important;
+            background: rgba(22, 93, 255, 0.10) !important;
             background-image: none !important;
-            color: #111827 !important;
+            color: var(--efak-text, #111827) !important;
         }
 
         .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted .icon-title,
@@ -711,7 +711,7 @@
         .topic-icon-dropdown .select2-results__option:hover .icon-title,
         .topic-icon-dropdown .select2-results__option--highlighted .icon-description,
         .topic-icon-dropdown .select2-results__option:hover .icon-description {
-            color: #111827 !important;
+            color: var(--efak-text, #111827) !important;
         }
 
         .select2-container--default .topic-icon-dropdown .select2-results__option--selected,
@@ -880,31 +880,34 @@
             width: 100%;
             height: 40px;
             padding: 0 40px 0 36px;
-            border: 2px solid #e5e7eb;
+            border: 1px solid var(--efak-border, #e5e7eb);
             border-radius: 2px;
-            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            background: var(--efak-surface, #ffffff);
+            color: var(--efak-text, #111827);
             font-size: 0.875rem;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
             outline: none;
+        }
+
+        .topic-search-input::placeholder {
+            color: var(--efak-muted, #6b7280);
         }
 
         .topic-search-input:hover {
             border-color: #165DFF;
-            box-shadow: 0 4px 8px rgba(22, 93, 255, 0.1);
         }
 
         .topic-search-input:focus {
-            border-color: #0E4AE6;
-            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
-            background: #ffffff;
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.12);
+            background: var(--efak-surface, #ffffff);
         }
 
         /* 选中状态时的输入框样式 */
         .topic-search-input.has-selection {
-            color: #0E4AE6;
+            color: #165DFF;
             font-weight: 500;
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: var(--efak-primary-soft, rgba(22, 93, 255, 0.08));
             border-color: #165DFF;
         }
 
@@ -934,8 +937,8 @@
             top: 100%;
             left: 0;
             right: 0;
-            background: white;
-            border: 2px solid #e5e7eb;
+            background: var(--efak-surface, #ffffff);
+            border: 1px solid var(--efak-border, #e5e7eb);
             border-radius: 2px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             z-index: 50;
@@ -988,13 +991,13 @@
 
         .suggestion-item .topic-name {
             font-weight: 500;
-            color: #1f2937;
+            color: var(--efak-text, #1f2937);
             font-size: 0.875rem;
         }
 
         .suggestion-item .topic-desc {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: var(--efak-muted, #6b7280);
             margin-top: 2px;
         }
 
@@ -1082,6 +1085,247 @@
                 padding: 14px 16px;
             }
         }
+
+        .topics-table-search {
+            background: var(--efak-surface, #ffffff);
+            color: var(--efak-text, #111827);
+            border: 1px solid var(--efak-border, #d1d5db);
+            border-radius: 2px;
+        }
+
+        .topics-table-search::placeholder {
+            color: var(--efak-muted, #6b7280);
+        }
+
+        .date-input-wrapper input[type="date"] {
+            background: var(--efak-surface, #ffffff);
+            color: var(--efak-text, #111827);
+            border: 1px solid var(--efak-border, #d1d5db);
+            border-radius: 2px;
+            height: 32px;
+            padding: 0 8px;
+            font-size: 12px;
+            color-scheme: light;
+        }
+
+        .date-input-wrapper input[type="date"]:focus {
+            outline: none;
+            border-color: #165DFF;
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.12);
+        }
+
+        /* Dark: topics page */
+        html[data-theme="dark"] .topic-search-input {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+            box-shadow: none !important;
+        }
+
+        html[data-theme="dark"] .topic-search-input::placeholder {
+            color: var(--efak-muted) !important;
+        }
+
+        html[data-theme="dark"] .topic-search-input:focus {
+            background: var(--efak-surface-2) !important;
+            border-color: #165DFF !important;
+        }
+
+        html[data-theme="dark"] .topic-search-input.has-selection {
+            background: rgba(22, 93, 255, 0.16) !important;
+            color: #93c5fd !important;
+            border-color: #165DFF !important;
+        }
+
+        html[data-theme="dark"] .topic-clear-btn {
+            background: var(--efak-surface) !important;
+            color: var(--efak-muted) !important;
+        }
+
+        html[data-theme="dark"] .topic-suggestions {
+            background: var(--efak-surface) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .suggestion-item {
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .suggestion-item .topic-name {
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .suggestion-item .topic-desc {
+            color: var(--efak-muted) !important;
+        }
+
+        html[data-theme="dark"] .suggestion-item:hover,
+        html[data-theme="dark"] .suggestion-item.highlighted {
+            background: #165DFF !important;
+        }
+
+        html[data-theme="dark"] .suggestion-item:hover .topic-name,
+        html[data-theme="dark"] .suggestion-item.highlighted .topic-name,
+        html[data-theme="dark"] .suggestion-item:hover .topic-desc,
+        html[data-theme="dark"] .suggestion-item.highlighted .topic-desc {
+            color: #ffffff !important;
+        }
+
+        html[data-theme="dark"] #topic-search,
+        html[data-theme="dark"] .topics-table-search {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] #topic-search::placeholder,
+        html[data-theme="dark"] .topics-table-search::placeholder {
+            color: var(--efak-muted) !important;
+        }
+
+        html[data-theme="dark"] .date-input-wrapper input[type="date"],
+        html[data-theme="dark"] #start-date,
+        html[data-theme="dark"] #end-date {
+            background: var(--efak-surface-2) !important;
+            color: var(--efak-text) !important;
+            border-color: var(--efak-border) !important;
+            color-scheme: dark;
+        }
+
+        html[data-theme="dark"] .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator,
+        html[data-theme="dark"] #start-date::-webkit-calendar-picker-indicator,
+        html[data-theme="dark"] #end-date::-webkit-calendar-picker-indicator {
+            filter: invert(0.88);
+            opacity: 0.85;
+            cursor: pointer;
+        }
+
+        html[data-theme="dark"] #create-topic-modal .modal-content,
+        html[data-theme="dark"] .create-topic-modal .modal-content {
+            background: var(--efak-surface) !important;
+            color: var(--efak-text) !important;
+            border: 1px solid var(--efak-border);
+        }
+
+        html[data-theme="dark"] #create-topic-modal h3,
+        html[data-theme="dark"] #create-topic-modal label,
+        html[data-theme="dark"] #create-topic-modal .text-gray-800,
+        html[data-theme="dark"] #create-topic-modal .text-gray-700 {
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal .text-gray-500,
+        html[data-theme="dark"] #create-topic-modal .text-gray-600,
+        html[data-theme="dark"] #create-topic-modal .text-xs {
+            color: var(--efak-text-secondary) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal input[type="text"],
+        html[data-theme="dark"] #create-topic-modal input[type="number"] {
+            background: var(--efak-bg) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal input::placeholder {
+            color: var(--efak-muted) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal .border-b,
+        html[data-theme="dark"] #create-topic-modal .border-t,
+        html[data-theme="dark"] #create-topic-modal .border-gray-200 {
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal .select2-container--default .select2-selection--single,
+        html[data-theme="dark"] .create-topic-modal .select2-selection--single,
+        html[data-theme="dark"] #create-topic-modal .topic-icon-select + .select2 .select2-selection--single {
+            background: var(--efak-bg) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal .select2-selection__rendered,
+        html[data-theme="dark"] .create-topic-modal .select2-selection__rendered {
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal .select2-dropdown,
+        html[data-theme="dark"] .topic-icon-dropdown.select2-dropdown,
+        html[data-theme="dark"] .cleanup-policy-dropdown.select2-dropdown {
+            background: var(--efak-surface) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal .select2-results__option,
+        html[data-theme="dark"] .cleanup-policy-dropdown .select2-results__option {
+            color: var(--efak-text) !important;
+            background: transparent !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .create-topic-modal .topic-icon-dropdown .select2-results__option,
+        html[data-theme="dark"] .topic-icon-dropdown .select2-results__option {
+            background: transparent !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .create-topic-modal .topic-icon-dropdown .icon-title,
+        html[data-theme="dark"] .create-topic-modal .topic-icon-dropdown .icon-info,
+        html[data-theme="dark"] .topic-icon-dropdown .icon-title,
+        html[data-theme="dark"] .topic-icon-dropdown .icon-info {
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .create-topic-modal .topic-icon-dropdown .icon-description,
+        html[data-theme="dark"] .topic-icon-dropdown .icon-description {
+            color: var(--efak-muted) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal .select2-results__option--highlighted,
+        html[data-theme="dark"] #create-topic-modal .select2-results__option:hover,
+        html[data-theme="dark"] .cleanup-policy-dropdown .select2-results__option--highlighted,
+        html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted,
+        html[data-theme="dark"] .topic-icon-dropdown .select2-results__option:hover {
+            background: #165DFF !important;
+            color: #ffffff !important;
+        }
+
+        html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted .icon-title,
+        html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted .icon-description,
+        html[data-theme="dark"] .topic-icon-dropdown .select2-results__option:hover .icon-title,
+        html[data-theme="dark"] .topic-icon-dropdown .select2-results__option:hover .icon-description {
+            color: #ffffff !important;
+        }
+
+        html[data-theme="dark"] .select2-search--dropdown {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .select2-search--dropdown .select2-search__field {
+            background: var(--efak-bg) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal .close-modal,
+        html[data-theme="dark"] #create-topic-modal .text-gray-400 {
+            color: var(--efak-muted) !important;
+        }
+
+        html[data-theme="dark"] #create-topic-modal #advanced-config-toggle:hover {
+            background: var(--efak-surface-2) !important;
+        }
+
+        html[data-theme="dark"] .icon-color-blue { background-color: rgba(22, 93, 255, 0.22) !important; color: #93c5fd !important; }
+        html[data-theme="dark"] .icon-color-green { background-color: rgba(16, 185, 129, 0.20) !important; color: #6ee7b7 !important; }
+        html[data-theme="dark"] .icon-color-purple { background-color: rgba(124, 58, 237, 0.22) !important; color: #c4b5fd !important; }
+        html[data-theme="dark"] .icon-color-orange { background-color: rgba(245, 158, 11, 0.20) !important; color: #fdba74 !important; }
+        html[data-theme="dark"] .icon-color-gray { background-color: rgba(148, 163, 184, 0.18) !important; color: #cbd5e1 !important; }
+        html[data-theme="dark"] .icon-color-red { background-color: rgba(239, 68, 68, 0.20) !important; color: #fca5a5 !important; }
+        html[data-theme="dark"] .icon-color-brown { background-color: rgba(180, 83, 9, 0.22) !important; color: #fdba74 !important; }
+        html[data-theme="dark"] .icon-color-teal { background-color: rgba(13, 148, 136, 0.22) !important; color: #5eead4 !important; }
     </style>
 </head>
 
@@ -1227,7 +1471,7 @@
                                 <div class="custom-date-picker">
                                     <div class="date-input-wrapper">
                                         <input type="date" id="start-date"
-                                               class="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                                               class="date-field px-2 py-1 text-xs border rounded focus:outline-none"
                                                title="点击选择开始日期">
                                     </div>
                                 </div>
@@ -1235,7 +1479,7 @@
                                 <div class="custom-date-picker">
                                     <div class="date-input-wrapper">
                                         <input type="date" id="end-date"
-                                               class="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                                               class="date-field px-2 py-1 text-xs border rounded focus:outline-none"
                                                title="点击选择结束日期">
                                     </div>
                                 </div>
@@ -1263,7 +1507,7 @@
                         <!-- 搜索框 -->
                         <div class="relative">
                             <input type="text" id="topic-search" placeholder="搜索主题名称..."
-                                   class="pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary w-64">
+                                   class="topics-table-search pl-8 pr-3 py-1.5 text-sm focus:outline-none w-64">
                             <i class="fa fa-search absolute left-2.5 top-2 text-gray-400 text-sm"></i>
                         </div>
 
@@ -1854,7 +2098,7 @@
 </div>
 
 <!-- 页面特定JavaScript -->
-<script th:src="@{/js/system/topics.js}"></script>
+<script th:src="@{/js/system/topics.js(v='theme17')}"></script>
 
 <!-- 扩容主题对话框 -->
 <div id="scale-topic-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">

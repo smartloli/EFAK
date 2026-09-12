@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const topicName = urlParams.get('name') || document.getElementById('topicName').textContent;
 
     if (!topicName || topicName === '主题加载中...') {
-        window.location.href = '/topics';
+        window.location.href = (window.efakCluster && window.efakCluster.withCid)
+            ? window.efakCluster.withCid('/topics')
+            : '/topics';
         return;
     }
 
@@ -35,7 +37,7 @@ async function initializeTopicDetail(topicName, timeRange = '1d') {
     try {
         // 获取URL参数中的集群ID
         const urlParams = new URLSearchParams(window.location.search);
-        const clusterId = urlParams.get('cid');
+        const clusterId = (window.efakCluster && window.efakCluster.get()) || urlParams.get('cid');
 
         // 并行获取主题详情数据
         const [topicInfo, partitionResult, messageFlow, consumerGroups, configInfo] = await Promise.all([
@@ -299,7 +301,7 @@ async function goToPartitionPage(page) {
 async function refreshPartitionData() {
     const topicName = document.getElementById('topicName').textContent;
     const urlParams = new URLSearchParams(window.location.search);
-    const clusterId = urlParams.get('cid');
+    const clusterId = (window.efakCluster && window.efakCluster.get()) || urlParams.get('cid');
 
     try {
         const partitionResult = await fetchPartitionInfo(topicName, clusterId);
@@ -625,7 +627,7 @@ async function goToConsumerGroupPage(page) {
 async function refreshConsumerGroupData() {
     const topicName = document.getElementById('topicName').textContent;
     const urlParams = new URLSearchParams(window.location.search);
-    const clusterId = urlParams.get('cid');
+    const clusterId = (window.efakCluster && window.efakCluster.get()) || urlParams.get('cid');
 
     try {
         const consumerGroupsResult = await fetchConsumerGroups(topicName, clusterId);
@@ -667,7 +669,7 @@ function getConsumerGroupStatusIcon(stateCode) {
 // 跳转到消费者组调整页面
 function goToConsumerGroupAdjust(groupId, topicName) {
     const urlParams = new URLSearchParams(window.location.search);
-    const clusterId = urlParams.get('cid');
+    const clusterId = (window.efakCluster && window.efakCluster.get()) || urlParams.get('cid');
     const adjustUrl = `/consumer/view?group=${encodeURIComponent(groupId)}&topic=${encodeURIComponent(topicName)}&cid=${encodeURIComponent(clusterId)}`;
     window.open(adjustUrl, '_blank');
 }
@@ -720,7 +722,7 @@ async function updateTimeRange() {
     showLoading(true);
     try {
         const urlParams = new URLSearchParams(window.location.search);
-        const clusterId = urlParams.get('cid');
+        const clusterId = (window.efakCluster && window.efakCluster.get()) || urlParams.get('cid');
 
         const messageFlow = await fetchMessageFlow(topicName, clusterId, timeRange);
         initializeMessageFlowChart(messageFlow);
@@ -760,7 +762,7 @@ async function previewMessages(partitionId) {
     try {
         // 获取集群ID
         const urlParams = new URLSearchParams(window.location.search);
-        const clusterId = urlParams.get('cid');
+        const clusterId = (window.efakCluster && window.efakCluster.get()) || urlParams.get('cid');
 
         // 调用API获取消息数据
         const messages = await fetchPartitionMessages(topicName, partitionId, clusterId);

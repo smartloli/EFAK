@@ -226,25 +226,25 @@
 
         .chart-filters {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
         }
 
         .filter-btn {
-            padding: 8px 16px;
-            border: 1px solid #d1d5db;
+            padding: 6px 14px;
+            border: 1px solid var(--efak-border, #d1d5db);
             border-radius: 2px;
-            background: white;
-            color: #6b7280;
-            font-size: 0.875rem;
+            background: var(--efak-surface-2, #f3f4f6);
+            color: var(--efak-text-secondary, #6b7280);
+            font-size: 0.8125rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
 
         .filter-btn.active {
             background: #165DFF;
             border-color: #165DFF;
-            color: white;
+            color: #ffffff;
         }
 
         .filter-btn:hover:not(.active) {
@@ -256,7 +256,7 @@
         .filter-btn.active:hover {
             background: #0E4AE6;
             border-color: #0E4AE6;
-            color: white;
+            color: #ffffff;
         }
 
         .chart-content {
@@ -445,24 +445,17 @@
 
         /* 环形图样式 */
         .resource-node-card {
-            background: white;
+            background: var(--efak-surface-2, #f8fafc);
             border-radius: 2px;
             padding: 20px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
+            border: 1px solid var(--efak-border, #e2e8f0);
             text-align: center;
-        }
-
-        .resource-node-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
         }
 
         .resource-node-title {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #1f2937;
+            color: var(--efak-text, #1f2937);
             margin-bottom: 16px;
         }
 
@@ -479,10 +472,25 @@
         }
 
         .resource-chart-wrapper {
+            --resource-track: #e5e7eb;
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: 160px;
+            height: 160px;
             margin: 0 auto;
+            overflow: visible;
+            background: radial-gradient(closest-side,
+                transparent 59%,
+                var(--resource-track) 60.5%,
+                var(--resource-track) 83%,
+                transparent 84.5%);
+        }
+
+        .resource-chart-wrapper canvas {
+            position: relative;
+            z-index: 1;
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
         }
 
         .resource-chart-center-text {
@@ -497,14 +505,56 @@
         .resource-chart-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #1f2937;
+            color: var(--efak-text, #1f2937);
             line-height: 1;
         }
 
         .resource-chart-label {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: var(--efak-muted, #6b7280);
             margin-top: 4px;
+        }
+
+        .resource-node-meta {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--efak-border, #e5e7eb);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .resource-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--efak-text-secondary, #6b7280);
+        }
+
+        .resource-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .resource-meta-item i {
+            color: #165DFF;
+        }
+
+        .resource-meta-item strong {
+            color: var(--efak-text, #1f2937);
+            font-weight: 600;
+        }
+
+        .resource-meta-item.is-ok i,
+        .resource-meta-item.is-ok strong {
+            color: #10b981;
+        }
+
+        .resource-meta-item.is-bad i,
+        .resource-meta-item.is-bad strong {
+            color: #ef4444;
         }
 
         /* 响应式设计 */
@@ -515,8 +565,8 @@
             }
 
             .resource-chart-wrapper {
-                width: 100px;
-                height: 100px;
+                width: 132px;
+                height: 132px;
             }
 
             .resource-chart-value {
@@ -570,6 +620,75 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+        }
+
+        html[data-theme="dark"] .filter-btn {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+            color: var(--efak-text-secondary) !important;
+        }
+
+        html[data-theme="dark"] .filter-btn.active,
+        html[data-theme="dark"] .filter-btn.active:hover {
+            background: #165DFF !important;
+            border-color: #165DFF !important;
+            color: #ffffff !important;
+        }
+
+        html[data-theme="dark"] .filter-btn:hover:not(.active) {
+            background: rgba(22, 93, 255, 0.12) !important;
+            border-color: #165DFF !important;
+            color: #93c5fd !important;
+        }
+
+        html[data-theme="dark"] .resource-node-card {
+            background: var(--efak-surface-2) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .resource-node-title,
+        html[data-theme="dark"] .resource-chart-value,
+        html[data-theme="dark"] .resource-meta-item strong {
+            color: var(--efak-text) !important;
+        }
+
+        html[data-theme="dark"] .resource-chart-label,
+        html[data-theme="dark"] .resource-meta-row {
+            color: var(--efak-text-secondary) !important;
+        }
+
+        html[data-theme="dark"] .resource-node-meta {
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .chart-container canvas {
+            background: transparent !important;
+        }
+
+        html[data-theme="dark"] .resource-chart-wrapper {
+            --resource-track: #3a4658;
+        }
+
+        .chart-panel {
+            background: var(--efak-surface, #ffffff);
+            border-color: var(--efak-border, #e5e7eb);
+        }
+
+        .chart-panel-title {
+            color: var(--efak-text, #1f2937);
+        }
+
+        html[data-theme="dark"] .chart-panel {
+            background: var(--efak-surface) !important;
+            border-color: var(--efak-border) !important;
+        }
+
+        html[data-theme="dark"] .chart-panel-title {
+            color: var(--efak-text) !important;
+        }
+
+        .chart-container .chart-content {
+            overflow: visible;
         }
     </style>
 </head>
@@ -710,8 +829,8 @@
                     <!-- 图表区域 -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- 主题状态饼图 -->
-                        <div class="bg-white p-6 rounded-lg border border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <div class="chart-panel bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 class="chart-panel-title text-lg font-semibold mb-4 flex items-center gap-2">
                                 <i class="fa fa-pie-chart text-blue-500"></i>
                                 主题活跃状态分布
                             </h3>
@@ -721,8 +840,8 @@
                         </div>
 
                         <!-- 容量分布饼图 -->
-                        <div class="bg-white p-6 rounded-lg border border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <div class="chart-panel bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 class="chart-panel-title text-lg font-semibold mb-4 flex items-center gap-2">
                                 <i class="fa fa-chart-pie text-orange-500"></i>
                                 主题容量分布
                             </h3>
@@ -774,7 +893,7 @@
     </div>
 
     <!-- JavaScript -->
-    <script th:src="@{/js/system/dashboard.js}"></script>
+    <script th:src="@{/js/system/dashboard.js(v='theme19')}"></script>
 
 </body>
 

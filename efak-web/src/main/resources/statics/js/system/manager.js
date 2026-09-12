@@ -1491,6 +1491,8 @@ window.ManagerModule.openEditClusterModal = function (clusterData) {
         if (editTypeEl.length && !editTypeEl.hasClass('select2-hidden-accessible')) {
             editTypeEl.select2({
                 dropdownParent: $('#editClusterModal'),
+                placeholder: '请选择环境类型',
+                allowClear: false,
                 minimumResultsForSearch: Infinity,
                 width: '100%',
                 dropdownCssClass: 'topic-icon-dropdown',
@@ -1517,17 +1519,24 @@ window.ManagerModule.openEditClusterModal = function (clusterData) {
         $('#editSecurityConfig').hide();
     }
 
-    // 填充broker节点信息（渲染为带表头的表格，单元格可编辑）
     this.loadBrokerNodes(clusterData.brokers || []);
 
-    // 显示对话框
-    $('#editClusterModal').show();
+    const modal = document.getElementById('editClusterModal');
+    if (modal) modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 };
 
 // 关闭编辑集群对话框
 window.ManagerModule.closeEditClusterModal = function () {
-    $('#editClusterModal').hide();
-    $('#editClusterForm')[0].reset();
+    const editTypeEl = $('#editClusterType');
+    if (editTypeEl.length && editTypeEl.hasClass('select2-hidden-accessible')) {
+        editTypeEl.select2('destroy');
+    }
+    const modal = document.getElementById('editClusterModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    const form = document.getElementById('editClusterForm');
+    if (form) form.reset();
     $('#brokerNodesList').empty();
     $('#edit-cluster-modal-message').hide();
 };
@@ -1549,23 +1558,23 @@ window.ManagerModule.loadBrokerNodes = function (brokers) {
     container.empty();
 
     const tableHtml = `
-    <table class="min-w-full divide-y divide-gray-200 broker-nodes-table">
-      <thead class="bg-gray-50">
+    <table class="broker-nodes-table">
+      <thead>
         <tr>
-          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">节点ID</th>
-          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
-          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">端口</th>
-          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">JMX端口</th>
+          <th>节点 ID</th>
+          <th>IP</th>
+          <th>端口</th>
+          <th>JMX 端口</th>
         </tr>
       </thead>
-      <tbody id="brokerNodesTbody" class="bg-white divide-y divide-gray-200"></tbody>
+      <tbody id="brokerNodesTbody"></tbody>
     </table>`;
 
     container.append(tableHtml);
     const tbody = $('#brokerNodesTbody');
 
     if (!brokers || brokers.length === 0) {
-        tbody.html(`<tr class="empty-brokers"><td colspan="4" class="px-4 py-6 text-center text-gray-500">暂无Broker节点，点击上方\"添加节点\"按钮添加</td></tr>`);
+        tbody.html('<tr class="empty-brokers"><td colspan="4">暂无 Broker 节点，点击上方「添加节点」添加</td></tr>');
         return;
     }
 
@@ -1583,21 +1592,21 @@ window.ManagerModule.addBrokerNodeItem = function (broker, index) {
 
     const rowHtml = `
     <tr class="broker-node-row" data-index="${index}">
-      <td class="px-4 py-2">
-        <div class="flex items-center gap-2">
-          <input type="number" class="form-input" name="brokerId_${index}" value="${broker.brokerId || ''}" placeholder="如: 0" style="max-width: 140px;">
-          <button type="button" class="text-red-500 hover:text-red-600" title="删除" onclick="ManagerModule.removeBrokerNode(${index})">
+      <td>
+        <div class="broker-id-cell">
+          <input type="number" class="form-input" name="brokerId_${index}" value="${broker.brokerId != null ? broker.brokerId : ''}" placeholder="如: 0">
+          <button type="button" class="broker-del-btn" title="删除" onclick="ManagerModule.removeBrokerNode(${index})">
             <i class="fas fa-trash"></i>
           </button>
         </div>
       </td>
-      <td class="px-4 py-2">
+      <td>
         <input type="text" class="form-input" name="hostIp_${index}" value="${broker.hostIp || ''}" placeholder="如: 192.168.1.100">
       </td>
-      <td class="px-4 py-2">
+      <td>
         <input type="number" class="form-input" name="kafkaPort_${index}" value="${broker.kafkaPort || 9092}" placeholder="9092">
       </td>
-      <td class="px-4 py-2">
+      <td>
         <input type="number" class="form-input" name="jmxPort_${index}" value="${broker.jmxPort || 9999}" placeholder="9999">
       </td>
     </tr>`;
@@ -1626,7 +1635,7 @@ window.ManagerModule.removeBrokerNode = function (index) {
 
     const rows = tbody.find('.broker-node-row');
     if (!rows.length) {
-        tbody.html(`<tr class="empty-brokers"><td colspan="4" class="px-4 py-6 text-center text-gray-500">暂无Broker节点，点击上方\"添加节点\"按钮添加</td></tr>`);
+        tbody.html('<tr class="empty-brokers"><td colspan="4">暂无 Broker 节点，点击上方「添加节点」添加</td></tr>');
         return;
     }
 
@@ -1769,10 +1778,14 @@ window.submitEditCluster = function () {
 // 格式化环境类型选项（参考topics.js）
 // 格式化环境类型选项（参考topics.js的formatIconOption）
 window.ManagerModule.formatEnvironmentOption = function (env) {
-    if (!env.id) return env.text;
+    if (!env.id) return null;
     const $env = $(env.element);
-    const iconClass = $env.data('icon');
-    const iconColor = $env.data('color');
+    const iconClass = $env.data('icon') || 'fa-server';
+    const iconColor = $env.data('color') || 'gray';
+    const description = $env.data('description') || '';
+    const descHtml = description
+        ? `<div class="icon-description">${description}</div>`
+        : '';
 
     return $(`
     <div class="flex items-center">
@@ -1781,6 +1794,7 @@ window.ManagerModule.formatEnvironmentOption = function (env) {
       </div>
       <div class="icon-info">
         <div class="icon-title">${env.text}</div>
+        ${descHtml}
       </div>
     </div>
   `);

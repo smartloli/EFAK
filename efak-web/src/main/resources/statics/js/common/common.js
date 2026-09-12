@@ -2,6 +2,7 @@
 const CommonModule = {
     // 初始化公共功能
     init() {
+        this.initClusterContext();
         this.initSidebar();
         this.loadCurrentUserInfo();
         this.initUserMenu();
@@ -9,6 +10,30 @@ const CommonModule = {
         this.setActiveNavigation();
         this.initGlobalTooltips();
         this.setupGlobalAjaxHandler();
+        this.initChartTheme();
+    },
+
+    initClusterContext() {
+        if (!window.efakCluster) return;
+        const cid = window.efakCluster.get();
+        if (cid) {
+            window.efakCluster.patchLinks(cid);
+        } else if (typeof window.efakCluster.resolveFromApi === 'function') {
+            window.efakCluster.resolveFromApi();
+        }
+    },
+
+    initChartTheme() {
+        if (!window.Chart || !window.efakTheme || window.__efakChartTheme) return;
+        window.__efakChartTheme = true;
+        Chart.register({
+            id: 'efakTheme',
+            beforeUpdate(chart) {
+                if (window.efakTheme && typeof window.efakTheme.styleChart === 'function') {
+                    window.efakTheme.styleChart(chart, false);
+                }
+            }
+        });
     },
 
     // 全局工具提示功能
@@ -879,6 +904,9 @@ const CommonModule = {
         let isNotificationPanelOpen = false;
 
         function getCurrentClusterId() {
+            if (window.efakCluster && typeof window.efakCluster.get === 'function') {
+                return window.efakCluster.get() || '';
+            }
             const params = new URLSearchParams(window.location.search);
             const fromUrl = params.get('cid');
             if (fromUrl) {

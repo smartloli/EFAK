@@ -104,8 +104,8 @@
 
         /* 监控卡片样式 */
         .monitor-card {
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: var(--efak-surface);
+            border: 1px solid var(--efak-border);
             border-radius: 2px;
             padding: 24px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -176,7 +176,7 @@
         .monitor-title h3 {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #1f2937;
+            color: var(--efak-text);
             margin: 0;
         }
 
@@ -186,9 +186,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f8fafc;
+            background: var(--efak-surface-2);
+            border: 1px solid var(--efak-border);
             border-radius: 2px;
-            color: #6b7280;
+            color: var(--efak-text-secondary);
         }
 
         .monitor-metrics {
@@ -201,9 +202,9 @@
         .metric-item {
             text-align: center;
             padding: 16px;
-            background: #f8fafc;
+            background: var(--efak-surface-2);
             border-radius: 2px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--efak-border);
         }
 
         .metric-value {
@@ -215,7 +216,7 @@
 
         .metric-label {
             font-size: 0.875rem;
-            color: #6b7280;
+            color: var(--efak-text-secondary);
         }
 
         .metric-change {
@@ -245,12 +246,12 @@
 
         .time-btn {
             padding: 8px 16px;
-            border: 1px solid #d1d5db;
-            background: white;
+            border: 1px solid var(--efak-border);
+            background: var(--efak-surface);
             border-radius: 2px;
             font-size: 0.875rem;
             font-weight: 500;
-            color: #374151;
+            color: var(--efak-text);
             cursor: pointer;
             transition: all 0.2s ease;
         }

@@ -27,35 +27,46 @@ $(document).ready(function () {
  * 初始化页面
  */
 function initializePage() {
-    // 初始化图表
-    initializeIdleGroupsTrendChart();
-
-    // 初始化Select2组件
     initializeSelect2();
-
-    // 初始化搜索框
     setupSearchInput();
+    try {
+        initializeIdleGroupsTrendChart();
+    } catch (error) {
+        console.warn('Idle groups trend chart init failed', error);
+    }
 }
 
 /**
  * 初始化Select2组件
  */
 function initializeSelect2() {
-    $('#status-filter').select2({
-        placeholder: '选择状态',
-        allowClear: false,
-        width: '100%',
-        minimumResultsForSearch: Infinity, // 禁用搜索框
-        templateResult: formatStatusOption,
-        templateSelection: formatStatusSelection,
-        escapeMarkup: function(markup) { return markup; } // 允许HTML标记
-    });
+    if (typeof $.fn.select2 !== 'function') {
+        console.warn('Select2 is not loaded');
+        return;
+    }
 
-    // 设置默认选中"所有状态"
-    $('#status-filter').val('').trigger('change');
+    if ($('#status-filter').length && !$('#status-filter').hasClass('select2-hidden-accessible')) {
+        $('#status-filter').select2({
+            placeholder: '选择状态',
+            allowClear: false,
+            width: '100%',
+            minimumResultsForSearch: Infinity,
+            templateResult: formatStatusOption,
+            templateSelection: formatStatusSelection,
+            escapeMarkup: function(markup) { return markup; }
+        });
+        $('#status-filter').val('').trigger('change');
+        updateStatusIndicator('');
+    }
 
-    // 初始化状态指示器
-    updateStatusIndicator('');
+    if ($('#page-size').length && !$('#page-size').hasClass('select2-hidden-accessible')) {
+        $('#page-size').select2({
+            width: '72px',
+            minimumResultsForSearch: Infinity,
+            dropdownCssClass: 'page-size-dropdown',
+            selectionCssClass: 'page-size-selection'
+        });
+    }
 }
 
 /**
@@ -1068,6 +1079,9 @@ function showToast(message, type = 'info') {
  * 从URL中获取集群ID
  */
 function getClusterIdFromUrl() {
+    if (window.efakCluster && typeof window.efakCluster.get === 'function') {
+        return window.efakCluster.get() || '';
+    }
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('cid');
 }

@@ -15,13 +15,18 @@
         </div>
 
         <div class="flex items-center space-x-4">
-            <!-- 通知按钮 -->
-            <div class="relative">
-                <button id="notification-button" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                    <i class="fa fa-bell"></i>
-                    <span id="notification-badge"
-                        class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full notification-badge hidden"></span>
+            <div class="flex items-center">
+                <button type="button" id="theme-toggle" class="theme-toggle" aria-label="切换到暗色主题" title="切换到暗色主题" aria-pressed="false">
+                    <i class="fa-regular fa-moon theme-icon-moon" aria-hidden="true"></i>
+                    <i class="fa-regular fa-sun theme-icon-sun" aria-hidden="true"></i>
                 </button>
+                <div class="relative">
+                    <button id="notification-button" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fa fa-bell"></i>
+                        <span id="notification-badge"
+                            class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full notification-badge hidden"></span>
+                    </button>
+                </div>
             </div>
 
             <!-- 用户菜单 -->

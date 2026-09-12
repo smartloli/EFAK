@@ -68,7 +68,9 @@
     }
 
     .cluster-modal-container {
-        background: white;
+        background: var(--efak-surface, #ffffff);
+        color: var(--efak-text, #111827);
+        border: 1px solid var(--efak-border, #e5e7eb);
         border-radius: 2px;
         width: 95%;
         max-width: 1000px;
@@ -88,67 +90,77 @@
     }
 
     .modal-header {
-        padding: 24px 24px 0 24px;
+        padding: 20px 24px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid #e5e7eb;
-        margin-bottom: 24px;
+        border-bottom: 1px solid var(--efak-border, #e5e7eb);
+        margin-bottom: 0;
+        background: var(--efak-surface, #ffffff);
     }
 
     .modal-header h3 {
         margin: 0;
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 600;
-        color: #1f2937;
+        color: var(--efak-text, #111827);
+        letter-spacing: 0;
     }
 
     .modal-close {
         background: none;
         border: none;
-        font-size: 20px;
-        color: #6b7280;
+        font-size: 18px;
+        color: var(--efak-muted, #6b7280);
         cursor: pointer;
         padding: 8px;
         border-radius: 2px;
         transition: all 0.2s;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .modal-close:hover {
-        background-color: #f3f4f6;
-        color: #374151;
+        background-color: var(--efak-surface-2, #f3f4f6);
+        color: var(--efak-text, #111827);
     }
 
     .modal-body {
-        padding: 0 24px;
+        padding: 20px 24px;
         overflow-y: auto;
         flex: 1;
+        background: var(--efak-surface, #ffffff);
     }
 
     .modal-footer {
-        padding: 24px;
+        padding: 16px 24px;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         gap: 12px;
-        border-top: 1px solid #e5e7eb;
-        margin-top: 24px;
+        border-top: 1px solid var(--efak-border, #e5e7eb);
+        margin-top: 0;
+        background: var(--efak-surface, #ffffff);
     }
 
     .form-section {
-        background: #f8fafc;
+        background: var(--efak-surface-2, #f8fafc);
+        border: 1px solid var(--efak-border, #e5e7eb);
         border-radius: 2px;
         padding: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
     }
 
     .form-section-title {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
-        color: #1f2937;
+        color: var(--efak-text, #111827);
         margin: 0 0 16px 0;
         padding-bottom: 8px;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 1px solid var(--efak-border, #e5e7eb);
     }
 
     .form-group {
@@ -157,20 +169,26 @@
 
     .form-label {
         display: block;
-        font-size: 14px;
-        font-weight: 500;
-        color: #374151;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--efak-text, #111827);
         margin-bottom: 6px;
     }
 
     .form-input {
         width: 100%;
         padding: 10px 12px;
-        border: 1px solid #d1d5db;
+        border: 1px solid var(--efak-border, #d1d5db);
         border-radius: 2px;
         font-size: 14px;
-        transition: all 0.2s;
+        color: var(--efak-text, #111827);
+        background: var(--efak-surface, #ffffff);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
         box-sizing: border-box;
+    }
+
+    .form-input::placeholder {
+        color: var(--efak-muted, #6b7280);
     }
 
     .form-input select,
@@ -201,8 +219,8 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        color: #111827 !important;
-        background-color: #ffffff !important;
+        color: var(--efak-text, #111827) !important;
+        background-color: var(--efak-surface, #ffffff) !important;
     }
 
     .topic-icon-dropdown .select2-results__option > * {
@@ -232,14 +250,18 @@
     }
 
     .topic-icon-dropdown .select2-results__option .icon-title {
-        font-weight: 500;
-        color: #111827 !important;
+        font-weight: 600;
+        font-size: 13px;
+        line-height: 1.3;
+        color: var(--efak-text, #111827) !important;
         background: transparent !important;
     }
 
     .topic-icon-dropdown .select2-results__option .icon-description {
-        font-size: 0.75rem;
-        color: #6b7280 !important;
+        font-size: 12px;
+        line-height: 1.4;
+        margin-top: 2px;
+        color: var(--efak-muted, #6b7280) !important;
         background: transparent !important;
     }
 
@@ -249,15 +271,21 @@
     .topic-icon-dropdown .select2-results__option--highlighted,
     .topic-icon-dropdown .select2-results__option--highlighted:hover,
     .topic-icon-dropdown .select2-results__option:hover {
-        background: rgba(22, 93, 255, 0.08) !important;
+        background: rgba(22, 93, 255, 0.10) !important;
         background-image: none !important;
-        color: #111827 !important;
+        color: var(--efak-text, #111827) !important;
     }
 
     .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted .icon-title,
     .topic-icon-dropdown .select2-results__option--highlighted .icon-title,
     .topic-icon-dropdown .select2-results__option:hover .icon-title {
-        color: #111827 !important;
+        color: var(--efak-text, #111827) !important;
+    }
+
+    .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted .icon-description,
+    .topic-icon-dropdown .select2-results__option--highlighted .icon-description,
+    .topic-icon-dropdown .select2-results__option:hover .icon-description {
+        color: var(--efak-text-secondary, #4b5563) !important;
     }
 
     /* 选中项的样式 */
@@ -266,12 +294,29 @@
         display: flex;
         align-items: center;
         padding: 0 8px;
+        background: var(--efak-surface, #ffffff) !important;
+        border: 1px solid var(--efak-border, #e5e7eb) !important;
+        border-radius: 2px !important;
     }
 
     .topic-icon-select+.select2 .select2-selection__rendered {
         display: flex;
         align-items: center;
         gap: 8px;
+        color: var(--efak-text, #111827) !important;
+        line-height: 40px !important;
+    }
+
+    .topic-icon-select+.select2 .select2-selection__placeholder {
+        color: var(--efak-muted, #6b7280) !important;
+    }
+
+    .topic-icon-dropdown.select2-dropdown {
+        background: var(--efak-surface, #ffffff) !important;
+        border: 1px solid var(--efak-border, #e5e7eb) !important;
+        border-radius: 2px !important;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+        margin-top: 4px !important;
     }
 
     .topic-icon-select+.select2 .icon-preview {
@@ -361,9 +406,9 @@
     }
 
     .btn-secondary {
-        background: #f9fafb;
-        color: #374151;
-        border: 1px solid #d1d5db;
+        background: var(--efak-surface-2, #f9fafb);
+        color: var(--efak-text, #374151);
+        border: 1px solid var(--efak-border, #d1d5db);
         padding: 10px 20px;
         border-radius: 2px;
         font-size: 14px;
@@ -373,8 +418,9 @@
     }
 
     .btn-secondary:hover {
-        background: #f3f4f6;
-        border-color: #9ca3af;
+        background: var(--efak-surface, #f3f4f6);
+        border-color: var(--efak-muted, #9ca3af);
+        color: var(--efak-text, #111827);
     }
 
     .tab-container {
@@ -383,30 +429,34 @@
 
     .tab-buttons {
         display: flex;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 1px solid var(--efak-border, #e5e7eb);
         margin-bottom: 20px;
     }
 
     .tab-btn {
         padding: 12px 24px;
-        background: none;
+        background: none !important;
         border: none;
         font-size: 14px;
         font-weight: 600;
-        color: #6b7280;
+        color: var(--efak-muted, #6b7280);
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: color 0.15s ease, border-color 0.15s ease;
         border-bottom: 2px solid transparent;
-        margin-bottom: -2px;
+        margin-bottom: -1px;
+        border-radius: 0;
     }
 
-    .tab-btn.active {
-        color: #165DFF;
-        border-bottom-color: #165DFF;
+    .cluster-modal-container .tab-btn.active,
+    .cluster-modal-container .tab-btn.active:hover {
+        color: #165DFF !important;
+        border-bottom-color: #165DFF !important;
+        background: transparent !important;
     }
 
-    .tab-btn:hover {
-        color: #165DFF;
+    .cluster-modal-container .tab-btn:hover:not(.active) {
+        color: #165DFF !important;
+        background: transparent !important;
     }
 
     .tab-content {
@@ -428,15 +478,15 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 16px;
-        border-bottom: 2px solid #e2e8f0;
+        border-bottom: 1px solid var(--efak-border, #e2e8f0);
         padding-bottom: 8px;
     }
 
     .section-header h4 {
         margin: 0;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
-        color: #1f2937;
+        color: var(--efak-text, #111827);
     }
 
     .security-switch {
@@ -774,6 +824,342 @@
 
     .toast-close i {
         font-size: 12px;
+    }
+
+    .file-upload-area {
+        border: 1px dashed var(--efak-border, #d1d5db);
+        border-radius: 2px;
+        padding: 36px 24px;
+        text-align: center;
+        cursor: pointer;
+        background: var(--efak-surface, #ffffff);
+        transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .file-upload-area:hover {
+        border-color: #165DFF;
+        background: var(--efak-primary-soft, rgba(22, 93, 255, 0.06));
+    }
+
+    .upload-icon {
+        font-size: 36px;
+        color: var(--efak-muted, #9ca3af);
+        margin-bottom: 12px;
+    }
+
+    .upload-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--efak-text, #111827);
+        margin-bottom: 6px;
+    }
+
+    .upload-hint {
+        font-size: 12px;
+        color: var(--efak-muted, #9ca3af);
+    }
+
+    .form-hint {
+        margin-top: 8px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--efak-text-secondary, #4b5563);
+    }
+
+    .form-hint i {
+        color: #165DFF;
+        margin-right: 4px;
+    }
+
+    /* Dark: create / edit cluster dialog */
+    html[data-theme="dark"] .cluster-modal-container {
+        background: var(--efak-surface) !important;
+        color: var(--efak-text) !important;
+        border-color: var(--efak-border) !important;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .modal-header,
+    html[data-theme="dark"] .cluster-modal-container .modal-body,
+    html[data-theme="dark"] .cluster-modal-container .modal-footer {
+        background: var(--efak-surface) !important;
+        border-color: var(--efak-border) !important;
+        color: var(--efak-text) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .modal-header h3,
+    html[data-theme="dark"] .cluster-modal-container .form-section-title,
+    html[data-theme="dark"] .cluster-modal-container .section-header h4,
+    html[data-theme="dark"] .cluster-modal-container .form-label,
+    html[data-theme="dark"] .cluster-modal-container .upload-text {
+        color: var(--efak-text) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .form-section {
+        background: var(--efak-surface-2) !important;
+        border-color: var(--efak-border) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .form-input,
+    html[data-theme="dark"] .cluster-modal-container textarea.form-input {
+        background: var(--efak-bg) !important;
+        border-color: var(--efak-border) !important;
+        color: var(--efak-text) !important;
+        caret-color: #165DFF;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .form-input::placeholder,
+    html[data-theme="dark"] .cluster-modal-container textarea.form-input::placeholder {
+        color: var(--efak-muted) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .form-hint,
+    html[data-theme="dark"] .cluster-modal-container .upload-hint,
+    html[data-theme="dark"] .cluster-modal-container .text-gray-500,
+    html[data-theme="dark"] .cluster-modal-container .tab-btn {
+        color: var(--efak-text-secondary) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .tab-buttons,
+    html[data-theme="dark"] .cluster-modal-container .section-header,
+    html[data-theme="dark"] .cluster-modal-container .form-section-title {
+        border-color: var(--efak-border) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .tab-btn.active,
+    html[data-theme="dark"] .cluster-modal-container .tab-btn.active:hover,
+    html[data-theme="dark"] .cluster-modal-container .tab-btn:hover:not(.active) {
+        color: #7eb0ff !important;
+        background: transparent !important;
+        border-bottom-color: #165DFF !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .btn-secondary {
+        background: var(--efak-surface-2) !important;
+        border-color: var(--efak-border) !important;
+        color: var(--efak-text) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .btn-secondary:hover {
+        background: #243044 !important;
+        color: var(--efak-text) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .file-upload-area {
+        background: var(--efak-bg) !important;
+        border-color: var(--efak-border) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .file-upload-area:hover {
+        border-color: #165DFF !important;
+        background: rgba(22, 93, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .upload-icon {
+        color: var(--efak-muted) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .topic-icon-select + .select2 .select2-selection--single,
+    html[data-theme="dark"] #create-cluster-modal .select2-container--default .select2-selection--single,
+    html[data-theme="dark"] #editClusterModal .select2-container--default .select2-selection--single {
+        background: var(--efak-bg) !important;
+        border-color: var(--efak-border) !important;
+        color: var(--efak-text) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .topic-icon-select + .select2 .select2-selection__rendered,
+    html[data-theme="dark"] #create-cluster-modal .select2-selection__rendered,
+    html[data-theme="dark"] #editClusterModal .select2-selection__rendered {
+        color: var(--efak-text) !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .select2-selection__placeholder,
+    html[data-theme="dark"] #create-cluster-modal .select2-selection__placeholder {
+        color: var(--efak-muted) !important;
+    }
+
+    html[data-theme="dark"] .topic-icon-dropdown.select2-dropdown,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__options {
+        background: var(--efak-surface) !important;
+        border-color: var(--efak-border) !important;
+        color: var(--efak-text) !important;
+    }
+
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option {
+        background: transparent !important;
+        color: var(--efak-text) !important;
+    }
+
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option .icon-title,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option .icon-info {
+        color: var(--efak-text) !important;
+        background: transparent !important;
+    }
+
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option .icon-description {
+        color: var(--efak-muted) !important;
+    }
+
+    html[data-theme="dark"] .select2-container--default .topic-icon-dropdown .select2-results__option--highlighted,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted[aria-selected],
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option:hover {
+        background: #165DFF !important;
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted .icon-title,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted .icon-description,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted .icon-info,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted span,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option--highlighted div,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option:hover .icon-title,
+    html[data-theme="dark"] .topic-icon-dropdown .select2-results__option:hover .icon-description {
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .icon-color-blue {
+        background-color: rgba(22, 93, 255, 0.22) !important;
+        color: #93c5fd !important;
+    }
+
+    html[data-theme="dark"] .icon-color-green {
+        background-color: rgba(16, 185, 129, 0.20) !important;
+        color: #6ee7b7 !important;
+    }
+
+    html[data-theme="dark"] .icon-color-orange {
+        background-color: rgba(245, 158, 11, 0.20) !important;
+        color: #fdba74 !important;
+    }
+
+    html[data-theme="dark"] .icon-color-red {
+        background-color: rgba(239, 68, 68, 0.20) !important;
+        color: #fca5a5 !important;
+    }
+
+    html[data-theme="dark"] .cluster-modal-container .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: var(--efak-muted) transparent transparent transparent !important;
+    }
+
+    .broker-nodes-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--efak-surface, #ffffff);
+        border: 1px solid var(--efak-border, #e5e7eb);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .broker-nodes-table th {
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0;
+        text-transform: none;
+        color: var(--efak-text-secondary, #4b5563);
+        background: var(--efak-surface, #ffffff);
+        border-bottom: 1px solid var(--efak-border, #e5e7eb);
+        padding: 10px 12px;
+    }
+
+    .broker-nodes-table td {
+        padding: 8px 12px;
+        vertical-align: middle;
+        background: var(--efak-surface, #ffffff);
+        border-bottom: 1px solid var(--efak-border, #e5e7eb);
+        color: var(--efak-text, #111827);
+    }
+
+    .broker-nodes-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .broker-nodes-table .empty-brokers td {
+        text-align: center;
+        color: var(--efak-muted, #6b7280);
+        padding: 28px 12px;
+        font-size: 13px;
+    }
+
+    .broker-id-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .broker-id-cell .form-input {
+        max-width: 140px;
+    }
+
+    .broker-del-btn {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 2px;
+        color: #ef4444;
+        cursor: pointer;
+        transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .broker-del-btn:hover {
+        background: rgba(239, 68, 68, 0.12);
+        border-color: rgba(239, 68, 68, 0.28);
+        color: #dc2626;
+    }
+
+    html[data-theme="dark"] #editClusterModal .cluster-modal-container {
+        background: var(--efak-surface) !important;
+        color: var(--efak-text) !important;
+        border-color: var(--efak-border) !important;
+    }
+
+    html[data-theme="dark"] .broker-nodes-table,
+    html[data-theme="dark"] .broker-nodes-table th,
+    html[data-theme="dark"] .broker-nodes-table td {
+        background: var(--efak-bg) !important;
+        border-color: var(--efak-border) !important;
+    }
+
+    html[data-theme="dark"] .broker-nodes-table th {
+        color: var(--efak-text-secondary) !important;
+        text-transform: none !important;
+    }
+
+    html[data-theme="dark"] .broker-nodes-table td {
+        color: var(--efak-text) !important;
+    }
+
+    html[data-theme="dark"] .broker-nodes-table .empty-brokers td {
+        color: var(--efak-muted) !important;
+        background: var(--efak-bg) !important;
+    }
+
+    html[data-theme="dark"] .broker-del-btn {
+        color: #fca5a5 !important;
+    }
+
+    html[data-theme="dark"] .broker-del-btn:hover {
+        background: rgba(239, 68, 68, 0.16) !important;
+        color: #fecaca !important;
+    }
+
+    html[data-theme="dark"] #editClusterModal .select2-selection__placeholder {
+        color: var(--efak-muted) !important;
+    }
+
+    html[data-theme="dark"] #editClusterModal .form-section,
+    html[data-theme="dark"] #editClusterModal .section-header h4,
+    html[data-theme="dark"] #editClusterModal .form-label,
+    html[data-theme="dark"] #editClusterModal .form-section-title {
+        color: var(--efak-text) !important;
+        border-color: var(--efak-border) !important;
     }
 </style>
 </html>
