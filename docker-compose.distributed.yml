@@ -10,7 +10,7 @@
 name: efak-dist
 
 x-efak-common: &efak-common
-  image: efak-ai:5.0.0
+  image: efak-ai:5.1.0
   build:
     context: .
     dockerfile: Dockerfile

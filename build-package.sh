@@ -4,7 +4,7 @@
 # EFAK-AI 安装包构建脚本
 # 用于构建 tar.gz 格式的发行版安装包
 # Author: Mr.SmartLoli
-# Version: 5.0.0
+# Version: 5.1.0
 ################################################################################
 
 set -e
@@ -20,7 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
 
 # 版本信息
-VERSION="5.0.0"
+VERSION="5.1.0"
 PACKAGE_NAME="efak-ai-${VERSION}"
 
 # 目录定义
@@ -296,7 +296,7 @@ chmod +x "${PACKAGE_DIR}/bin/"*.sh
 # 创建 README
 cat > "${PACKAGE_DIR}/README.txt" << 'README'
 ================================
-EFAK-AI v5.0.0
+EFAK-AI v5.1.0
 ================================
 
 企业级 Kafka AI 助手与监控平台
@@ -313,8 +313,8 @@ EFAK-AI v5.0.0
 ## 安装步骤
 
 1. 解压安装包
-   tar -zxvf efak-ai-5.0.0.tar.gz
-   cd efak-ai-5.0.0
+   tar -zxvf efak-ai-5.1.0.tar.gz
+   cd efak-ai-5.1.0
 
 2. 修改配置文件
    vi config/application.yml

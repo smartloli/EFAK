@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 版本信息
-VERSION="5.0.0"
+VERSION="5.1.0"
 IMAGE_NAME="efak-ai:${VERSION}"
 
 # 显示 Logo
@@ -28,7 +28,7 @@ cat << 'LOGO'
 |_____|_|/_/   \_\_|\_\   /_/   \_\___|
 
 Enterprise Kafka AI Assistant & Monitoring Platform
-Version 5.0.0
+Version 5.1.0
 LOGO
 echo -e "${NC}"
 

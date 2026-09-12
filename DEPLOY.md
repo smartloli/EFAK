@@ -50,8 +50,8 @@ docker-compose --version  # 需要 2.0+
 #### 2. 获取源代码
 
 ```bash
-git clone https://github.com/smartloli/EFAK-AI.git
-cd EFAK-AI
+git clone https://github.com/smartloli/EFAK.git
+cd EFAK
 ```
 
 #### 3. 启动所有服务
@@ -148,8 +148,8 @@ docker compose -p efak-dist -f docker-compose.distributed.yml up -d --build \
 #### 1. 构建镜像
 
 ```bash
-cd EFAK-AI
-docker build -t efak-ai:5.0.0 .
+cd EFAK
+docker build -t efak-ai:5.1.0 .
 ```
 
 #### 2. 运行容器
@@ -164,7 +164,7 @@ docker run -d \
   -e SPRING_DATA_REDIS_HOST="your-redis-host" \
   -e SPRING_DATA_REDIS_PORT="6379" \
   -v /path/to/logs:/opt/efak-ai/logs \
-  efak-ai:5.0.0
+  efak-ai:5.1.0
 ```
 
 ### Docker 部署优势
@@ -189,28 +189,28 @@ docker run -d \
 ./build-package.sh
 ```
 
-构建成功后会在项目根目录生成 `efak-ai-5.0.0.tar.gz`
+构建成功后会在项目根目录生成 `efak-ai-5.1.0.tar.gz`
 
 ### 2. 传输安装包
 
 将安装包上传到目标服务器：
 
 ```bash
-scp efak-ai-5.0.0.tar.gz user@server:/opt/
+scp efak-ai-5.1.0.tar.gz user@server:/opt/
 ```
 
 ### 3. 解压安装包
 
 ```bash
 cd /opt
-tar -zxvf efak-ai-5.0.0.tar.gz
-cd efak-ai-5.0.0
+tar -zxvf efak-ai-5.1.0.tar.gz
+cd efak-ai-5.1.0
 ```
 
 解压后的目录结构：
 
 ```
-efak-ai-5.0.0/
+efak-ai-5.1.0/
 ├── bin/              # 启动脚本
 │   ├── start.sh      # 启动脚本
 │   ├── stop.sh       # 停止脚本
@@ -219,7 +219,7 @@ efak-ai-5.0.0/
 ├── config/           # 配置文件
 │   └── application.yml
 ├── libs/             # JAR 包
-│   └── efak-web-5.0.0.jar
+│   └── efak-web-5.1.0.jar
 ├── logs/             # 日志目录
 ├── sql/              # SQL 初始化脚本
 ├── README.txt        # 说明文件
@@ -268,7 +268,7 @@ CREATE DATABASE efak_ai DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 
 # 导入表结构和初始数据
 USE efak_ai;
-SOURCE /opt/efak-ai-5.0.0/sql/init.sql;
+SOURCE /opt/efak-ai-5.1.0/sql/init.sql;
 ```
 
 ### 6. 启动应用
@@ -303,9 +303,9 @@ After=network.target mysql.service redis.service
 Type=forking
 User=efak
 Group=efak
-WorkingDirectory=/opt/efak-ai-5.0.0
-ExecStart=/opt/efak-ai-5.0.0/bin/start.sh
-ExecStop=/opt/efak-ai-5.0.0/bin/stop.sh
+WorkingDirectory=/opt/efak-ai-5.1.0
+ExecStart=/opt/efak-ai-5.1.0/bin/start.sh
+ExecStop=/opt/efak-ai-5.1.0/bin/stop.sh
 Restart=on-failure
 RestartSec=10
 
@@ -600,7 +600,7 @@ curl http://localhost:8080/health/check
 {
     "application": "EFAK-AI",
     "port": "8080",
-    "version": "5.0.0",
+    "version": "5.1.0",
     "status": "UP",
     "timestamp": "2025-10-06T23:32:47.392037"
 }
@@ -619,9 +619,9 @@ curl http://localhost:8080/actuator/metrics/jvm.memory.used
 
 ## 支持与反馈
 
-- **文档**: [https://github.com/smartloli/EFAK-AI](https://github.com/smartloli/EFAK-AI)
-- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK-AI/issues)
-- **社区讨论**: [GitHub Discussions](https://github.com/smartloli/EFAK-AI/discussions)
+- **文档**: [https://github.com/smartloli/EFAK](https://github.com/smartloli/EFAK)
+- **问题反馈**: [GitHub Issues](https://github.com/smartloli/EFAK/issues)
+- **社区讨论**: [GitHub Discussions](https://github.com/smartloli/EFAK/discussions)
 
 ---
 

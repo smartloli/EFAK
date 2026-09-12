@@ -16,9 +16,9 @@ services:
       # 可选：使用构建参数
       # args:
       #   - BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-      #   - VERSION=5.0.0
+      #   - VERSION=5.1.0
 
-    image: efak-ai:5.0.0
+    image: efak-ai:5.1.0
     container_name: efak-ai
 
     # 使用 host 网络模式，容器与宿主机共享网络

@@ -20,7 +20,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-VERSION="5.0.0"
+VERSION="5.1.0"
 PROJECT_NAME="efak-dist"
 COMPOSE_FILE="docker-compose.distributed.yml"
 WEB_REPLICAS=1

@@ -461,7 +461,7 @@ EFAK-AI 提供了一键启动脚本 `quick-start.sh`，支持多种部署方式�
 
 - **作者**: Mr.SmartLoli
 - **邮箱**: smartloli.org@gmail.com
-- **版本**: 5.0.0
+- **版本**: 5.1.0
 - **更新日期**: 2025-10-06
 
 ---

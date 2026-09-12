@@ -35,7 +35,7 @@ FROM openjdk:17-jdk-slim
 # 设置维护者信息
 LABEL maintainer="Mr.SmartLoli <smartloli.org@gmail.com>"
 LABEL description="EFAK-AI - (Eagle For Apache Kafka - AI Enhanced)"
-LABEL version="5.0.0"
+LABEL version="5.1.0"
 
 # 设置工作目录
 WORKDIR /app
